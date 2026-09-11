@@ -37,7 +37,7 @@ export function ContributionDashboard() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [proposal, setProposal] = useState({ title: "", description: "" });
+  const [proposal, setProposal] = useState<{ title: string; description: string; category: Category }>({ title: "", description: "", category: "histoire" });
 
   async function load() {
     const { data: auth } = await supabase.auth.getUser();
