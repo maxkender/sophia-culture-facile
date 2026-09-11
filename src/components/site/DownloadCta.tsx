@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import { downloadHref, IS_EXTERNAL_DOWNLOAD } from "@/config/links";
+import { useLocalePath } from "@/i18n";
 
 type Props = {
   children: React.ReactNode;
@@ -9,9 +10,10 @@ type Props = {
   className?: string;
 };
 
-/** Unique point d'entrée des CTA de téléchargement (lien intelligent ou /telecharger). */
+/** Unique point d'entrée des CTA de téléchargement (lien intelligent ou page de téléchargement). */
 export function DownloadCta({ children, variant = "pill", size = "pill", className }: Props) {
   const href = downloadHref();
+  const downloadPath = useLocalePath("download");
   return (
     <Button asChild variant={variant} size={size} className={className}>
       {IS_EXTERNAL_DOWNLOAD ? (
@@ -19,7 +21,7 @@ export function DownloadCta({ children, variant = "pill", size = "pill", classNa
           {children}
         </a>
       ) : (
-        <Link to="/telecharger">{children}</Link>
+        <Link to={downloadPath}>{children}</Link>
       )}
     </Button>
   );

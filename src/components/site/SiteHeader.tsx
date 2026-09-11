@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 import { DownloadCta } from "./DownloadCta";
-import { LanguageToggle, useI18n } from "@/i18n";
+import { LanguageToggle, useI18n, useLocalePath } from "@/i18n";
 
 /**
  * En-tête sticky : fond clair, translucide + flou au scroll.
@@ -11,6 +11,7 @@ import { LanguageToggle, useI18n } from "@/i18n";
 export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const { t } = useI18n();
+  const homePath = useLocalePath("home");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -34,7 +35,7 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
         {bare ? (
           <Logo />
         ) : (
-          <Link to="/" aria-label={t.nav.home} className="rounded-full">
+          <Link to={homePath} aria-label={t.nav.home} className="rounded-full">
             <Logo />
           </Link>
         )}

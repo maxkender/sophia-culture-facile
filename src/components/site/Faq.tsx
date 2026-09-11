@@ -1,12 +1,8 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { fr } from "@/i18n/dict";
 import { useI18n } from "@/i18n";
 
 export type FaqItem = { question: string; answer: string };
-
-/** Version française : sert de source au FAQPage JSON-LD. */
-export const FAQ_ITEMS: FaqItem[] = fr.faq;
 
 export function Faq({ items }: { items?: FaqItem[] }) {
   const { t } = useI18n();
