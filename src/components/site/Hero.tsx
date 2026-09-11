@@ -8,7 +8,11 @@ import { StoreBadges } from "./StoreBadges";
  */
 export function Hero({ compact = false }: { compact?: boolean }) {
   return (
-    <section className="relative isolate overflow-hidden bg-brand-navy pb-0 pt-10 md:pt-16">
+    <section
+      className={`relative isolate overflow-hidden bg-brand-navy pb-0 md:pt-16 ${
+        compact ? "pt-24" : "pt-10"
+      }`}
+    >
       <span aria-hidden="true" className="grid-texture absolute inset-0 -z-10" />
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 md:grid-cols-2 md:items-center md:gap-6">
         <div className={compact ? "pb-10 text-center md:text-left" : "pb-6"}>
