@@ -14,16 +14,186 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      course_submissions: {
+        Row: {
+          admin_feedback: string | null
+          author_id: string
+          content: Json
+          created_at: string
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["submission_status"]
+          submitted_at: string | null
+          title: string | null
+          topic_id: string
+          updated_at: string
+        }
+        Insert: {
+          admin_feedback?: string | null
+          author_id: string
+          content?: Json
+          created_at?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitted_at?: string | null
+          title?: string | null
+          topic_id: string
+          updated_at?: string
+        }
+        Update: {
+          admin_feedback?: string | null
+          author_id?: string
+          content?: Json
+          created_at?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitted_at?: string | null
+          title?: string | null
+          topic_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_submissions_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_path: string
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          language: string
+          last_name: string
+          study_country: string
+          subject_taught: string
+          teaching_level: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_path: string
+          created_at?: string
+          email: string
+          first_name: string
+          id: string
+          language: string
+          last_name: string
+          study_country: string
+          subject_taught: string
+          teaching_level: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_path?: string
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          language?: string
+          last_name?: string
+          study_country?: string
+          subject_taught?: string
+          teaching_level?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      topics: {
+        Row: {
+          admin_feedback: string | null
+          created_at: string
+          description: string | null
+          id: string
+          language: string
+          proposed_by: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["topic_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          admin_feedback?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          language: string
+          proposed_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["topic_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          admin_feedback?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          language?: string
+          proposed_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["topic_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "teacher"
+      submission_status:
+        | "draft"
+        | "submitted"
+        | "approved"
+        | "changes_requested"
+        | "rejected"
+      topic_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +320,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "teacher"],
+      submission_status: [
+        "draft",
+        "submitted",
+        "approved",
+        "changes_requested",
+        "rejected",
+      ],
+      topic_status: ["pending", "approved", "rejected"],
+    },
   },
 } as const
