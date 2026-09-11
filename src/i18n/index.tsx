@@ -43,20 +43,44 @@ export function fill(template: string, values: Record<string, string>) {
   );
 }
 
-/** Sélecteur de langue : conserve la page courante. */
-export function LanguageToggle({ className = "" }: { className?: string }) {
+const TOGGLE_CLASS =
+  "rounded-full border border-brand-line px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-navy transition-colors hover:bg-brand-navy/5";
+
+/**
+ * Sélecteur de langue : conserve la page courante.
+ * Sur une page de cours, `alternateSlug` donne l'équivalent dans l'autre langue.
+ */
+export function LanguageToggle({
+  className = "",
+  alternateSlug,
+}: {
+  className?: string;
+  alternateSlug?: string;
+}) {
   const lang = useLang();
   const key = useRouteKey();
   const other: Lang = lang === "fr" ? "en" : "fr";
   const t = DICTS[lang];
+  const common = {
+    hrefLang: other,
+    "aria-label": t.langSwitchAria,
+    className: `${TOGGLE_CLASS} ${className}`,
+  };
+
+  if (alternateSlug) {
+    return other === "en" ? (
+      <Link to="/en/lessons/$slug" params={{ slug: alternateSlug }} {...common}>
+        {t.langLabel}
+      </Link>
+    ) : (
+      <Link to="/cours/$slug" params={{ slug: alternateSlug }} {...common}>
+        {t.langLabel}
+      </Link>
+    );
+  }
 
   return (
-    <Link
-      to={pathFor(key, other)}
-      hrefLang={other}
-      aria-label={t.langSwitchAria}
-      className={`rounded-full border border-brand-line px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-navy transition-colors hover:bg-brand-navy/5 ${className}`}
-    >
+    <Link to={pathFor(key, other)} {...common}>
       {t.langLabel}
     </Link>
   );
