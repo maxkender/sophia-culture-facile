@@ -1,31 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://sophia-culture.com/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://sophia-culture.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sophia-culture.com/en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sophia-culture.com/"/>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://sophia-culture.com/en</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://sophia-culture.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sophia-culture.com/en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sophia-culture.com/"/>
     <lastmod>2026-09-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://sophia-culture.com/telecharger</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://sophia-culture.com/telecharger"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sophia-culture.com/en/download"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sophia-culture.com/telecharger"/>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://sophia-culture.com/en/download</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://sophia-culture.com/telecharger"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sophia-culture.com/en/download"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sophia-culture.com/telecharger"/>
     <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://sophia-culture.com/sophia-culture-generale</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://sophia-culture.com/sophia-culture-generale"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sophia-culture.com/en/sophia-general-knowledge"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sophia-culture.com/sophia-culture-generale"/>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://sophia-culture.com/en/sophia-general-knowledge</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://sophia-culture.com/sophia-culture-generale"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sophia-culture.com/en/sophia-general-knowledge"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sophia-culture.com/sophia-culture-generale"/>
     <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://sophia-culture.com/mentions-legales</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://sophia-culture.com/mentions-legales"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sophia-culture.com/en/legal-notice"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sophia-culture.com/mentions-legales"/>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://sophia-culture.com/en/legal-notice</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://sophia-culture.com/mentions-legales"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sophia-culture.com/en/legal-notice"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sophia-culture.com/mentions-legales"/>
     <lastmod>2026-09-11</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://sophia-culture.com/confidentialite</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://sophia-culture.com/confidentialite"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sophia-culture.com/en/privacy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sophia-culture.com/confidentialite"/>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://sophia-culture.com/en/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://sophia-culture.com/confidentialite"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sophia-culture.com/en/privacy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sophia-culture.com/confidentialite"/>
     <lastmod>2026-09-11</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
