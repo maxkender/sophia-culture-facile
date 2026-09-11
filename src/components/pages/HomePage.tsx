@@ -1,7 +1,5 @@
 import {
   Check,
-  Flame,
-  Trophy,
   Globe2,
   Landmark,
   FlaskConical,
@@ -29,6 +27,7 @@ import {
 import { fill, useI18n } from "@/i18n";
 import shotCours from "@/assets/shot-cours.png.asset.json";
 import shotQuiz from "@/assets/shot-quiz.png.asset.json";
+import shotProgression from "@/assets/shot-progression.png.asset.json";
 
 const CATEGORY_STYLE = [
   { icon: Landmark, tint: "bg-brand-blue/12 text-brand-navy" },
@@ -192,27 +191,13 @@ export function HomePage() {
                 </DownloadCta>
               </div>
             </Reveal>
-            <Reveal delay={80} className="flex flex-col gap-4">
-              <div className="flex items-center gap-4 rounded-3xl bg-brand-onNavy/10 p-5 ring-1 ring-white/10">
-                <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl bg-brand-pink/30 text-brand-pink">
-                  <Flame aria-hidden="true" className="size-6" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-lg font-extrabold text-brand-onNavy">
-                    {t.progress.streakTitle}
-                  </p>
-                  <p className="text-sm text-brand-onNavy/70">{t.progress.streakText}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 rounded-3xl bg-card p-5 shadow-card">
-                <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl bg-brand-pink/30 text-brand-navy">
-                  <Trophy aria-hidden="true" className="size-6" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-lg font-extrabold text-brand-navy">{t.progress.rankTitle}</p>
-                  <p className="text-sm text-brand-navySoft">{t.progress.rankText}</p>
-                </div>
-              </div>
+            <Reveal delay={80} className="flex justify-center">
+              <PhoneMock
+                src={shotProgression.url}
+                label={t.progress.shot}
+                alt={t.progress.shotAlt}
+                width={260}
+              />
             </Reveal>
           </div>
         </section>

@@ -85,12 +85,14 @@ export const en: Dict = {
     ],
   },
   progress: {
-    title: "Your progress, day after day",
-    text: "Keep the streak alive, climb the ranks, and watch your library grow.",
+    title: "Your collection, day after day.",
+    text: "Course collections to complete, ranks to unlock, and a reason to come back every day.",
     streakTitle: "Streak running",
     streakText: "Come back every day to keep it alive.",
     rankTitle: "New rank! Scholar",
     rankText: "Unlocked by training every day.",
+    shot: "Collection progress",
+    shotAlt: "Sophia app screen showing progress inside a course collection",
   },
   testimonials: {
     title: "They learn with Sophia",
