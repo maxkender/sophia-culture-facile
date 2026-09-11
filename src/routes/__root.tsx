@@ -10,6 +10,8 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { COMPANY, SITE_NAME } from "@/config/links";
+import { APPLE_ITUNES_APP_ID } from "@/config/site";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -77,9 +79,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { property: "og:site_name", content: "Sophia — Culture générale" },
+      { property: "og:site_name", content: SITE_NAME },
       { property: "og:locale", content: "fr_FR" },
-      { name: "author", content: "Vik Studios SAS" },
+      { name: "author", content: COMPANY },
+      // Smart App Banner iOS — APPLE_ITUNES_APP_ID est un placeholder à remplacer.
+      { name: "apple-itunes-app", content: `app-id=${APPLE_ITUNES_APP_ID}` },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
