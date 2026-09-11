@@ -3,8 +3,18 @@ import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 import { DownloadCta } from "./DownloadCta";
 
-/** En-tête sticky. `bare` = sans lien de navigation (landing publicitaire). */
-export function SiteHeader({ bare = false }: { bare?: boolean }) {
+/**
+ * En-tête sticky : transparent en haut, translucide + flou au scroll.
+ * `bare` = sans lien de navigation (landing publicitaire).
+ * `overDark` = le haut de page est navy, le logo passe en version claire.
+ */
+export function SiteHeader({
+  bare = false,
+  overDark = false,
+}: {
+  bare?: boolean;
+  overDark?: boolean;
+}) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -14,12 +24,14 @@ export function SiteHeader({ bare = false }: { bare?: boolean }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const light = overDark && !scrolled;
+
   return (
     <header
       className={`sticky top-0 z-40 transition-colors duration-300 motion-reduce:transition-none ${
         scrolled
           ? "border-b border-brand-line/70 bg-brand-surface/80 backdrop-blur-xl"
-          : "border-b border-transparent bg-transparent"
+          : `border-b border-transparent ${overDark ? "bg-transparent" : "bg-brand-surface"}`
       }`}
     >
       <nav
@@ -27,10 +39,10 @@ export function SiteHeader({ bare = false }: { bare?: boolean }) {
         className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-3"
       >
         {bare ? (
-          <Logo />
+          <Logo light={light} />
         ) : (
           <Link to="/" aria-label="Sophia — Culture générale, accueil" className="rounded-full">
-            <Logo />
+            <Logo light={light} />
           </Link>
         )}
         <DownloadCta variant="pillPink" size="pillSm">
