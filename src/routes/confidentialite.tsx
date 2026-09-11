@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { COMPANY, CONTACT_EMAIL } from "@/config/links";
-import { meta } from "@/lib/seo";
+import { canonical, meta } from "@/lib/seo";
 
 export const Route = createFileRoute("/confidentialite")({
   head: () => ({
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/confidentialite")({
         "Politique de confidentialité de Sophia — Culture générale, application mobile d'apprentissage éditée par Vik Studios SAS.",
       url: "/confidentialite",
     }),
-    links: [{ rel: "canonical", href: "/confidentialite" }],
+    links: [canonical("/confidentialite")],
   }),
   component: Confidentialite,
 });

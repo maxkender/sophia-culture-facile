@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { COMPANY, CONTACT_EMAIL } from "@/config/links";
-import { meta } from "@/lib/seo";
+import { canonical, meta } from "@/lib/seo";
 
 export const Route = createFileRoute("/mentions-legales")({
   head: () => ({
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/mentions-legales")({
         "Mentions légales du site de Sophia — Culture générale, application mobile éditée par Vik Studios SAS, France.",
       url: "/mentions-legales",
     }),
-    links: [{ rel: "canonical", href: "/mentions-legales" }],
+    links: [canonical("/mentions-legales")],
   }),
   component: MentionsLegales,
 });

@@ -14,7 +14,7 @@ export const Route = createFileRoute("/sophia-culture-generale")({
         "Sophia — Culture générale : cours courts, quiz et entraînement quotidien. Application française gratuite sur iOS et Android. Télécharge-la en une minute.",
       url: "/sophia-culture-generale",
     }),
-    links: [{ rel: "canonical", href: "/sophia-culture-generale" }],
+    links: [canonical("/sophia-culture-generale")],
     scripts: [ldScript(mobileApplicationSchema)],
   }),
   component: LandingPage,
