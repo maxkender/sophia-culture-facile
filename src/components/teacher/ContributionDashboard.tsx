@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { BookOpen, CheckCircle2, Clock3, Plus, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,12 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ensureAdminRole } from "@/lib/admin.functions";
 
 type Topic = Tables<"topics">;
 type Submission = Tables<"course_submissions">;
 type Profile = Tables<"profiles">;
 
 export function ContributionDashboard() {
+  const ensureAdmin = useServerFn(ensureAdminRole);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [profile, setProfile] = useState<Profile>();
@@ -27,6 +30,7 @@ export function ContributionDashboard() {
     const { data: auth } = await supabase.auth.getUser();
     const user = auth.user;
     if (!user) return;
+    await ensureAdmin();
     const [{ data: roles }, { data: ownProfile }] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", user.id),
       supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
