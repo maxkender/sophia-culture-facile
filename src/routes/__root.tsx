@@ -4,15 +4,16 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { COMPANY, SITE_NAME } from "@/config/links";
+import { COMPANY } from "@/config/links";
 import { APPLE_ITUNES_APP_ID } from "@/config/site";
-import { I18nProvider } from "@/i18n";
+import { langFromPath } from "@/i18n/routes";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -80,8 +81,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { property: "og:site_name", content: SITE_NAME },
-      { property: "og:locale", content: "fr_FR" },
       { name: "author", content: COMPANY },
       // Smart App Banner iOS — APPLE_ITUNES_APP_ID est un placeholder à remplacer.
       { name: "apple-itunes-app", content: `app-id=${APPLE_ITUNES_APP_ID}` },
@@ -107,8 +106,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
   return (
-    <html lang="fr">
+    <html lang={langFromPath(pathname)}>
       <head>
         <HeadContent />
       </head>
@@ -125,10 +126,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <I18nProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-      </I18nProvider>
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <Outlet />
     </QueryClientProvider>
   );
 }
