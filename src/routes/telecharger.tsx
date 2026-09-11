@@ -17,7 +17,7 @@ export const Route = createFileRoute("/telecharger")({
     }),
     links: [{ rel: "canonical", href: "/telecharger" }],
   }),
-  component: Telecharger;
+  component: Telecharger,
 });
 
 type Platform = "ios" | "android" | "other";
