@@ -36,16 +36,14 @@ export function Hero({ compact = false }: { compact?: boolean }) {
             <PhoneMock
               label="Accueil"
               alt="Écran d'accueil de l'application Sophia — Culture générale"
-              width={200}
-              className="md:w-[248px]"
+              width={216}
             />
           </div>
           <div className="absolute left-1/2 top-10 -translate-x-[8%] rotate-[12deg] md:-translate-x-[10%]">
             <PhoneMock
               label="Quiz"
               alt="Un quiz de culture générale dans l'application Sophia"
-              width={200}
-              className="md:w-[248px]"
+              width={216}
             />
           </div>
         </div>
