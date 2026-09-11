@@ -4,7 +4,7 @@ import { Logo } from "@/components/site/Logo";
 import { PhoneGallery } from "@/components/site/PhoneGallery";
 import { Button } from "@/components/ui/button";
 import { COMPANY } from "@/config/links";
-import { ldScript, meta, mobileApplicationSchema } from "@/lib/seo";
+import { canonical, ldScript, meta, mobileApplicationSchema } from "@/lib/seo";
 
 export const Route = createFileRoute("/sophia-culture-generale")({
   head: () => ({
