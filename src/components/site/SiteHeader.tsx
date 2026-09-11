@@ -2,20 +2,15 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 import { DownloadCta } from "./DownloadCta";
+import { LanguageToggle, useI18n } from "@/i18n";
 
 /**
- * En-tête sticky : transparent en haut, translucide + flou au scroll.
+ * En-tête sticky : fond clair, translucide + flou au scroll.
  * `bare` = sans lien de navigation (landing publicitaire).
- * `overDark` = le haut de page est navy, le logo passe en version claire.
  */
-export function SiteHeader({
-  bare = false,
-  overDark = false,
-}: {
-  bare?: boolean;
-  overDark?: boolean;
-}) {
+export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
+  const { t } = useI18n();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -24,30 +19,31 @@ export function SiteHeader({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const light = overDark && !scrolled;
-
   return (
     <header
       className={`sticky top-0 z-40 transition-colors duration-300 motion-reduce:transition-none ${
         scrolled
           ? "border-b border-brand-line/70 bg-brand-surface/80 backdrop-blur-xl"
-          : `border-b border-transparent ${overDark ? "bg-transparent" : "bg-brand-surface"}`
+          : "border-b border-transparent bg-brand-surface"
       }`}
     >
       <nav
-        aria-label="Navigation principale"
-        className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-3"
+        aria-label={t.nav.main}
+        className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-5 py-3"
       >
         {bare ? (
-          <Logo light={light} />
+          <Logo />
         ) : (
-          <Link to="/" aria-label="Sophia — Culture générale, accueil" className="rounded-full">
-            <Logo light={light} />
+          <Link to="/" aria-label={t.nav.home} className="rounded-full">
+            <Logo />
           </Link>
         )}
-        <DownloadCta variant="pillPink" size="pillSm">
-          Télécharger
-        </DownloadCta>
+        <div className="flex items-center gap-2">
+          <LanguageToggle />
+          <DownloadCta variant="pillPink" size="pillSm">
+            {t.nav.download}
+          </DownloadCta>
+        </div>
       </nav>
     </header>
   );
