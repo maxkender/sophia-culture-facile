@@ -6,6 +6,8 @@ export const fr = {
   brand: "Sophia — Culture générale",
   nav: {
     download: "Télécharger",
+    teacherLogin: "Connexion professeur",
+    becomeTeacher: "Devenir professeur certifié",
     home: "Sophia — Culture générale, accueil",
     main: "Navigation principale",
   },

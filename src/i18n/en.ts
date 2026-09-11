@@ -8,6 +8,8 @@ export const en: Dict = {
   brand: "Sophia: General Knowledge",
   nav: {
     download: "Download",
+    teacherLogin: "Teacher sign in",
+    becomeTeacher: "Become a certified teacher",
     home: "Sophia: General Knowledge, home",
     main: "Main navigation",
   },

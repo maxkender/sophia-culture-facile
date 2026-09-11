@@ -29,6 +29,16 @@ export function SiteFooter() {
             </Link>
           </li>
           <li>
+            <Link to="/auth" className="underline-offset-4 hover:underline">
+              {t.nav.teacherLogin}
+            </Link>
+          </li>
+          <li>
+            <Link to="/devenir-professeur" className="underline-offset-4 hover:underline">
+              {t.nav.becomeTeacher}
+            </Link>
+          </li>
+          <li>
             <Link to={legalPath} className="underline-offset-4 hover:underline">
               {t.footer.legal}
             </Link>
