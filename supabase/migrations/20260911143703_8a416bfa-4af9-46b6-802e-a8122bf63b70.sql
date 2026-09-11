@@ -1,0 +1,2 @@
+CREATE TYPE public.topic_category AS ENUM ('histoire','science','litterature','art','mythologie','geopolitique');
+ALTER TABLE public.topics ADD COLUMN category public.topic_category NOT NULL DEFAULT 'histoire';
