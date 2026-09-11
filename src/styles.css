@@ -59,6 +59,23 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Sophia brand */
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-navySoft: var(--brand-navy-soft);
+  --color-brand-onNavy: var(--brand-on-navy);
+  --color-brand-pink: var(--brand-pink);
+  --color-brand-purple: var(--brand-purple);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-surfaceStrong: var(--brand-surface-strong);
+  --color-brand-line: var(--brand-line);
+
+  --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-soft: 0 18px 50px -24px rgb(27 48 84 / 0.22);
+  --shadow-card: 0 10px 40px -18px rgb(27 48 84 / 0.18);
 }
 
 :root {
