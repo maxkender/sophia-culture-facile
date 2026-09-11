@@ -10,7 +10,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ensureAdminRole } from "@/lib/admin.functions";
+
+const CATEGORIES = [
+  { value: "histoire", label: "Histoire" },
+  { value: "science", label: "Science" },
+  { value: "litterature", label: "Littérature" },
+  { value: "art", label: "Art" },
+  { value: "mythologie", label: "Mythologie" },
+  { value: "geopolitique", label: "Géopolitique" },
+] as const;
+
+type Category = (typeof CATEGORIES)[number]["value"];
+const categoryLabel = (value: string) => CATEGORIES.find((c) => c.value === value)?.label ?? value;
 
 type Topic = Tables<"topics">;
 type Submission = Tables<"course_submissions">;
