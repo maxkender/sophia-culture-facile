@@ -4,7 +4,7 @@
  * TO REPLACE : déposer les captures d'écran iPhone (ratio 9:19.5, ex. 1179x2556)
  * dans `public/screenshots/` puis renseigner `src` ci-dessous.
  */
-type Shot = { label: string; src?: string; alt: string };
+type Shot = { label: string; src?: string | undefined; alt: string };
 
 const SHOTS: Shot[] = [
   { label: "Accueil", src: undefined, alt: "Écran d'accueil de l'application Sophia — Culture générale" },
