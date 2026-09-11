@@ -2,10 +2,12 @@ import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 import { StoreButtons } from "./StoreButtons";
 import { COMPANY, CONTACT_EMAIL } from "@/config/links";
-import { LanguageToggle, fill, useI18n } from "@/i18n";
+import { LanguageToggle, fill, useI18n, useLocalePath } from "@/i18n";
 
 export function SiteFooter() {
   const { t } = useI18n();
+  const legalPath = useLocalePath("legal");
+  const privacyPath = useLocalePath("privacy");
 
   return (
     <footer className="border-t border-brand-line bg-brand-surface">
@@ -21,12 +23,12 @@ export function SiteFooter() {
 
         <ul className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-semibold text-brand-navy">
           <li>
-            <Link to="/mentions-legales" className="underline-offset-4 hover:underline">
+            <Link to={legalPath} className="underline-offset-4 hover:underline">
               {t.footer.legal}
             </Link>
           </li>
           <li>
-            <Link to="/confidentialite" className="underline-offset-4 hover:underline">
+            <Link to={privacyPath} className="underline-offset-4 hover:underline">
               {t.footer.privacy}
             </Link>
           </li>
