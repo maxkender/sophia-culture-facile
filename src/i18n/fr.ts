@@ -83,12 +83,14 @@ export const fr = {
     ],
   },
   progress: {
-    title: "Ta progression, jour après jour.",
-    text: "Une série de jours à entretenir, des rangs à débloquer, de Curieux à Érudit.",
+    title: "Une série qui te fait revenir.",
+    text: "Des collections de cours à compléter, des rangs à débloquer, et une raison de revenir chaque jour.",
     streakTitle: "Série en cours",
     streakText: "Reviens chaque jour pour ne pas la briser.",
     rankTitle: "Nouveau rang ! Érudit",
     rankText: "Débloqué en révisant tes chapitres chaque jour.",
+    shot: "Progression dans une collection",
+    shotAlt: "Écran de l'app Sophia montrant l'avancée dans une collection de cours",
   },
   testimonials: {
     title: "Ils apprennent avec Sophia",
