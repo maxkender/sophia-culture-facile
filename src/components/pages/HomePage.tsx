@@ -28,6 +28,7 @@ import { fill, useI18n } from "@/i18n";
 import shotCours from "@/assets/shot-cours.png.asset.json";
 import shotQuiz from "@/assets/shot-quiz.png.asset.json";
 import shotProgression from "@/assets/shot-progression.png.asset.json";
+import shotProfil from "@/assets/shot-profil.png.asset.json";
 
 const CATEGORY_STYLE = [
   { icon: Landmark, tint: "bg-brand-blue/12 text-brand-navy" },
@@ -41,7 +42,7 @@ const CATEGORY_STYLE = [
 ];
 
 /* Captures réelles de l'application pour les deux premières fonctionnalités. */
-const FEATURE_SHOTS = [shotCours.url, shotQuiz.url, undefined];
+const FEATURE_SHOTS = [shotCours.url, shotQuiz.url, shotProfil.url];
 
 export function HomePage() {
   const { t, lang } = useI18n();
