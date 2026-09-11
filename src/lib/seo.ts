@@ -128,3 +128,105 @@ export function faqSchema(lang: Lang) {
 export function ldScript(schema: unknown) {
   return { type: "application/ld+json", children: JSON.stringify(schema) };
 }
+
+/* ------------------------------------------------------------------ Cours */
+
+import type { Course } from "@/content/courses";
+import { coursePath } from "@/i18n/routes";
+
+/** Métadonnées d'une page de cours (title/description propres au cours). */
+export function courseMeta(course: Course) {
+  const lang = course.locale;
+  const url = absUrl(coursePath(lang, course.slug));
+  const image = absUrl(course.heroImage.src);
+  return [
+    { title: `${course.title} | ${BRAND[lang]}` },
+    { name: "description", content: course.excerpt },
+    { property: "og:title", content: course.title },
+    { property: "og:description", content: course.excerpt },
+    { property: "og:type", content: "article" },
+    { property: "og:site_name", content: BRAND[lang] },
+    { property: "og:locale", content: lang === "fr" ? "fr_FR" : "en_US" },
+    { property: "og:locale:alternate", content: lang === "fr" ? "en_US" : "fr_FR" },
+    { property: "og:url", content: url },
+    { property: "og:image", content: image },
+    { property: "og:image:width", content: String(course.heroImage.width) },
+    { property: "og:image:height", content: String(course.heroImage.height) },
+    { property: "og:image:alt", content: course.heroImage.alt },
+    { property: "article:published_time", content: course.publishedAt },
+    { property: "article:modified_time", content: course.updatedAt },
+    { property: "article:section", content: course.category },
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: course.title },
+    { name: "twitter:description", content: course.excerpt },
+    { name: "twitter:image", content: image },
+  ];
+}
+
+/** Canonique + hreflang croisés d'une page de cours, via `alternateSlug`. */
+export function courseLinks(course: Course) {
+  const frUrl = absUrl(
+    coursePath("fr", course.locale === "fr" ? course.slug : course.alternateSlug),
+  );
+  const enUrl = absUrl(
+    coursePath("en", course.locale === "en" ? course.slug : course.alternateSlug),
+  );
+  return [
+    { rel: "canonical", href: course.locale === "fr" ? frUrl : enUrl },
+    { rel: "alternate", hrefLang: "fr", href: frUrl },
+    { rel: "alternate", hrefLang: "en", href: enUrl },
+    { rel: "alternate", hrefLang: "x-default", href: frUrl },
+  ];
+}
+
+/** Article + LearningResource pour une page de cours. */
+export function courseSchema(course: Course) {
+  const lang = course.locale;
+  const url = absUrl(coursePath(lang, course.slug));
+  return {
+    "@context": "https://schema.org",
+    "@type": ["Article", "LearningResource"],
+    "@id": `${url}#article`,
+    headline: course.title,
+    name: course.title,
+    description: course.excerpt,
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    datePublished: course.publishedAt,
+    dateModified: course.updatedAt,
+    inLanguage: lang,
+    image: absUrl(course.heroImage.src),
+    articleSection: course.category,
+    learningResourceType: lang === "fr" ? "Cours" : "Lesson",
+    educationalLevel: lang === "fr" ? "Grand public" : "General audience",
+    timeRequired: `PT${course.readingTimeMinutes}M`,
+    author: { "@id": `${SITE_URL}/#organization` },
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    isPartOf: { "@id": `${absUrl(pathFor("courses", lang))}#collection` },
+  };
+}
+
+/** Fil d'Ariane : Accueil > Cours > Catégorie > Titre. */
+export function courseBreadcrumbSchema(course: Course) {
+  const lang = course.locale;
+  const homeName = lang === "fr" ? "Accueil" : "Home";
+  const hubName = lang === "fr" ? "Les cours" : "Lessons";
+  const hubUrl = absUrl(pathFor("courses", lang));
+  const courseUrl = absUrl(coursePath(lang, course.slug));
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "@id": `${courseUrl}#breadcrumb`,
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: homeName, item: absUrl(pathFor("home", lang)) },
+      { "@type": "ListItem", position: 2, name: hubName, item: hubUrl },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: course.category,
+        item: `${hubUrl}#${course.categoryId}`,
+      },
+      { "@type": "ListItem", position: 4, name: course.title, item: courseUrl },
+    ],
+  };
+}

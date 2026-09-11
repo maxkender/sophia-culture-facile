@@ -181,6 +181,33 @@ export const en: Dict = {
     rightsText:
       "Under the GDPR you can access, correct, delete, object to and port your data. To exercise those rights, write to",
   },
+  courses: {
+    hubTitle: "Sophia lessons",
+    hubSubtitle:
+      "The guides from the app, free to read on the web. Each lesson takes five minutes, and the quiz that follows lives in the app.",
+    hubLink: "Lessons",
+    all: "All",
+    filterAria: "Filter by category",
+    listAria: "Lesson list",
+    readingTime: "{minutes} min read",
+    updated: "Updated {date}",
+    read: "Read the lesson",
+    chaptersTitle: "In this lesson",
+    sourcesTitle: "Sources",
+    relatedTitle: "Read next",
+    progressAria: "Reading progress",
+    breadcrumbHome: "Home",
+    breadcrumbAria: "Breadcrumb",
+    inlineCtaTitle: "Finish this lesson in the app, with the quiz",
+    inlineCtaText:
+      "The quiz after this chapter, spaced repetition and your streak all live in the app.",
+    inlineCtaButton: "Open in the app",
+    finalCtaTitle: "Learn a little more every day.",
+    finalCtaText: "Over 300 lessons, a quiz after each one, free on iOS and Android.",
+    finalCtaButton: "Download free",
+    notFound: "This lesson does not exist or has moved.",
+    backToHub: "Browse all lessons",
+  },
   faq: [
     {
       question: "What is Sophia?",

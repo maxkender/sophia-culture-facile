@@ -1,3 +1,5 @@
+import { useI18n } from "@/i18n";
+
 type LogoProps = {
   className?: string;
   /** Variante claire pour les fonds navy. */
@@ -5,12 +7,12 @@ type LogoProps = {
 };
 
 /** Monogramme officiel de Sophia (phi rose). */
-export function LogoMark({ className }: { className?: string }) {
+export function LogoMark({ className, label }: { className?: string; label?: string }) {
   return (
     <svg
       viewBox="550 450 142 170"
       role="img"
-      aria-label="Logo Sophia — Culture générale"
+      aria-label={label ?? "Sophia"}
       className={className ?? "h-9 w-auto"}
     >
     <path fill="currentColor" d="M622.85,618.19c-4.44,0-8.53-1.82-11.51-5.14-2.69-2.99-4.08-7.01-3.92-11.32l.06-1.51c.08-2.05.15-3.96.21-5.51,0-.16-.1-.29-.26-.32-27.67-6.01-46.41-23.94-50.29-48.24-3.92-24.57,9.03-49.41,32.24-61.81,1.77-.94,3.67-1.42,5.64-1.42.21,0,.43,0,.64.02,6.13.32,11.17,5.56,11.47,11.91.21,4.56-2.07,8.77-5.93,11.11-12.32,7.44-18.38,21.22-15.81,35.97,1.8,10.32,8.79,22.66,23,27.55.21.07.44-.09.44-.32v-3.11c.28-27.32.69-66.11-1.05-95.59-.27-4.59,1.3-9.01,4.31-12.12,2.93-3.03,6.87-4.69,11.09-4.69,1.02,0,2.06.1,3.08.29,2.27.43,4.37,1.4,6.21,2.8,4.1,3.13,6.34,7.84,6.15,12.93l-.05,1.44c-.08,2.24-.16,4.33-.23,6,0,.16.1.29.26.32,15.55,3.37,28.56,10.76,37.71,21.42,8.91,10.38,13.81,23.54,13.81,37.06,0,19.93-12.73,39.51-33.23,51.11-1.81,1.03-3.85,1.57-5.9,1.57-6.48,0-11.78-5.07-12.08-11.55v-.17c-.21-4.44,2.07-8.66,5.95-11.01,12.31-7.45,18.36-21.23,15.78-35.97-1.8-10.32-8.79-22.65-22.99-27.53-.21-.07-.44.09-.44.32v3.07c-.28,27.4-.7,66.19,1.05,95.66.25,4.29-1.13,8.49-3.8,11.52-2.98,3.39-7.1,5.25-11.61,5.25Z"/>
@@ -22,13 +24,14 @@ export function LogoMark({ className }: { className?: string }) {
 
 /** Logo Sophia : monogramme rose + wordmark officiel. */
 export function Logo({ className, light = false }: LogoProps) {
+  const { t } = useI18n();
   return (
     <span
       className={`inline-flex items-center gap-2 ${
         light ? "text-brand-onNavy" : "text-brand-navy"
       } ${className ?? ""}`}
     >
-      <LogoMark className="h-8 w-auto shrink-0" />
+      <LogoMark className="h-8 w-auto shrink-0" label={`Logo ${t.brand}`} />
       <svg
         viewBox="708 468 440 137"
         role="img"

@@ -179,6 +179,33 @@ export const fr = {
     rightsText:
       "Conformément au RGPD, vous disposez de droits d'accès, de rectification, d'effacement, d'opposition et de portabilité. Pour les exercer, écrivez à",
   },
+  courses: {
+    hubTitle: "Les cours Sophia",
+    hubSubtitle:
+      "Les dossiers de culture générale de l'application, à lire librement sur le web. Chaque cours se lit en cinq minutes et se prolonge par un quiz dans l'application.",
+    hubLink: "Les cours",
+    all: "Tous",
+    filterAria: "Filtrer par catégorie",
+    listAria: "Liste des cours",
+    readingTime: "{minutes} min de lecture",
+    updated: "Mis à jour le {date}",
+    read: "Lire le cours",
+    chaptersTitle: "Au sommaire",
+    sourcesTitle: "Sources",
+    relatedTitle: "À lire ensuite",
+    progressAria: "Progression de lecture",
+    breadcrumbHome: "Accueil",
+    breadcrumbAria: "Fil d'Ariane",
+    inlineCtaTitle: "Continue ce cours dans l'app, avec le quiz",
+    inlineCtaText:
+      "Le quiz qui suit ce chapitre, la révision espacée et ta série de jours sont dans l'application.",
+    inlineCtaButton: "Ouvrir dans l'app",
+    finalCtaTitle: "Apprends un peu plus chaque jour.",
+    finalCtaText: "Plus de 300 cours, un quiz après chacun, gratuitement sur iOS et Android.",
+    finalCtaButton: "Télécharger gratuitement",
+    notFound: "Ce cours n'existe pas ou a été déplacé.",
+    backToHub: "Voir tous les cours",
+  },
   faq: [
     {
       question: "Sophia, c'est quoi ?",
