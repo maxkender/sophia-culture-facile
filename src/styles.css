@@ -59,19 +59,46 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Sophia brand */
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-navySoft: var(--brand-navy-soft);
+  --color-brand-onNavy: var(--brand-on-navy);
+  --color-brand-pink: var(--brand-pink);
+  --color-brand-purple: var(--brand-purple);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-surfaceStrong: var(--brand-surface-strong);
+  --color-brand-line: var(--brand-line);
+
+  --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-soft: 0 18px 50px -24px rgb(27 48 84 / 0.22);
+  --shadow-card: 0 10px 40px -18px rgb(27 48 84 / 0.18);
 }
 
 :root {
+  --brand-navy: oklch(0.325 0.058 259.5);
+  --brand-navy-soft: oklch(0.48 0.045 259);
+  --brand-on-navy: oklch(1 0 0);
+  --brand-pink: oklch(0.792 0.093 348.5);
+  --brand-purple: oklch(0.714 0.146 292.6);
+  --brand-blue: oklch(0.546 0.215 262.9);
+  --brand-surface: oklch(0.968 0.006 254);
+  --brand-surface-strong: oklch(0.938 0.011 254);
+  --brand-line: oklch(0.905 0.012 254);
+
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --background: oklch(0.968 0.006 254);
+  --foreground: oklch(0.325 0.058 259.5);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
+  --primary: oklch(0.325 0.058 259.5);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.938 0.011 254);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
   --muted-foreground: oklch(0.554 0.046 257.417);
@@ -140,5 +167,19 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--brand-blue);
+    outline-offset: 2px;
   }
 }

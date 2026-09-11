@@ -10,33 +10,89 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
+import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
+import { Route as SophiaCultureGeneraleRouteImport } from './routes/sophia-culture-generale'
+import { Route as TelechargerRouteImport } from './routes/telecharger'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfidentialiteRoute = ConfidentialiteRouteImport.update({
+  id: '/confidentialite',
+  path: '/confidentialite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
+  id: '/mentions-legales',
+  path: '/mentions-legales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SophiaCultureGeneraleRoute = SophiaCultureGeneraleRouteImport.update({
+  id: '/sophia-culture-generale',
+  path: '/sophia-culture-generale',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TelechargerRoute = TelechargerRouteImport.update({
+  id: '/telecharger',
+  path: '/telecharger',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/confidentialite': typeof ConfidentialiteRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
+  '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
+  '/telecharger': typeof TelechargerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/confidentialite': typeof ConfidentialiteRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
+  '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
+  '/telecharger': typeof TelechargerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/confidentialite': typeof ConfidentialiteRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
+  '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
+  '/telecharger': typeof TelechargerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/confidentialite'
+    | '/mentions-legales'
+    | '/sophia-culture-generale'
+    | '/telecharger'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/confidentialite'
+    | '/mentions-legales'
+    | '/sophia-culture-generale'
+    | '/telecharger'
+  id:
+    | '__root__'
+    | '/'
+    | '/confidentialite'
+    | '/mentions-legales'
+    | '/sophia-culture-generale'
+    | '/telecharger'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ConfidentialiteRoute: typeof ConfidentialiteRoute
+  MentionsLegalesRoute: typeof MentionsLegalesRoute
+  SophiaCultureGeneraleRoute: typeof SophiaCultureGeneraleRoute
+  TelechargerRoute: typeof TelechargerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +104,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/confidentialite': {
+      id: '/confidentialite'
+      path: '/confidentialite'
+      fullPath: '/confidentialite'
+      preLoaderRoute: typeof ConfidentialiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mentions-legales': {
+      id: '/mentions-legales'
+      path: '/mentions-legales'
+      fullPath: '/mentions-legales'
+      preLoaderRoute: typeof MentionsLegalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sophia-culture-generale': {
+      id: '/sophia-culture-generale'
+      path: '/sophia-culture-generale'
+      fullPath: '/sophia-culture-generale'
+      preLoaderRoute: typeof SophiaCultureGeneraleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/telecharger': {
+      id: '/telecharger'
+      path: '/telecharger'
+      fullPath: '/telecharger'
+      preLoaderRoute: typeof TelechargerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ConfidentialiteRoute: ConfidentialiteRoute,
+  MentionsLegalesRoute: MentionsLegalesRoute,
+  SophiaCultureGeneraleRoute: SophiaCultureGeneraleRoute,
+  TelechargerRoute: TelechargerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
