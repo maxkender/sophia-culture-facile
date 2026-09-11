@@ -21,7 +21,10 @@ import { Reveal } from "@/components/site/Reveal";
 import { DownloadCta } from "@/components/site/DownloadCta";
 import { MobileCtaBar } from "@/components/site/MobileCtaBar";
 import { Faq } from "@/components/site/Faq";
-import { SOCIAL_PROOF } from "@/config/stats";
+import { STAT_COURSES, STAT_DOWNLOADS, STAT_RATING } from "@/config/stats";
+import { useI18n } from "@/i18n";
+import shotCours from "@/assets/shot-cours.png.asset.json";
+import shotQuiz from "@/assets/shot-quiz.png.asset.json";
 import {
   faqSchema,
   ldScript,
@@ -49,62 +52,45 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const CATEGORIES = [
-  { icon: Landmark, label: "Histoire", tint: "bg-brand-blue/12 text-brand-navy" },
-  { icon: FlaskConical, label: "Sciences", tint: "bg-brand-purple/15 text-brand-navy" },
-  { icon: Users, label: "Société", tint: "bg-brand-pink/25 text-brand-navy" },
-  { icon: Globe2, label: "Géopolitique", tint: "bg-brand-navy/10 text-brand-navy" },
-  { icon: Palette, label: "Culture", tint: "bg-brand-pink/20 text-brand-navy" },
-  { icon: Coins, label: "Économie", tint: "bg-brand-blue/10 text-brand-navy" },
-  { icon: BrainCog, label: "Philosophie", tint: "bg-brand-purple/12 text-brand-navy" },
-  { icon: Star, label: "Arts", tint: "bg-brand-navy/8 text-brand-navy" },
+const CATEGORY_STYLE = [
+  { icon: Landmark, tint: "bg-brand-blue/12 text-brand-navy" },
+  { icon: FlaskConical, tint: "bg-brand-purple/15 text-brand-navy" },
+  { icon: Users, tint: "bg-brand-pink/25 text-brand-navy" },
+  { icon: Globe2, tint: "bg-brand-navy/10 text-brand-navy" },
+  { icon: Palette, tint: "bg-brand-pink/20 text-brand-navy" },
+  { icon: Coins, tint: "bg-brand-blue/10 text-brand-navy" },
+  { icon: BrainCog, tint: "bg-brand-purple/12 text-brand-navy" },
+  { icon: Star, tint: "bg-brand-navy/8 text-brand-navy" },
 ];
 
-const FEATURES = [
-  {
-    label: "Les cours",
-    title: "Des cours qui se lisent en 5 minutes",
-    text: "Chaque dossier se découpe en cinq chapitres courts. Tu avances par petites touches, sans jamais y passer ta soirée.",
-    bullets: ["Dossiers de 5 chapitres", "Sources citées", "Images d'illustration"],
-    shot: "Cours",
-    alt: "Un chapitre de cours dans Sophia — Culture générale",
-  },
-  {
-    label: "Les quiz",
-    title: "Un quiz après chaque cours",
-    text: "Tu réponds juste après avoir lu. C'est là que ce que tu viens de lire devient quelque chose que tu retiens vraiment.",
-    bullets: ["Questions immédiates", "Correction expliquée", "Score par chapitre"],
-    shot: "Quiz",
-    alt: "Un quiz de culture générale dans l'application Sophia",
-  },
-  {
-    label: "L'habitude",
-    title: "Une série qui te fait revenir",
-    text: "Un entraînement quotidien de quelques minutes suffit. La révision espacée ramène les bonnes notions au bon moment.",
-    bullets: ["Entraînement quotidien", "Révision espacée", "Rangs à débloquer"],
-    shot: "Progression",
-    alt: "Suivi de progression et série de jours dans Sophia",
-  },
-];
-
-/* À REMPLACER PAR DE VRAIS AVIS — aucun faux témoignage ne doit être publié. */
-const TESTIMONIALS = [
-  { name: "Prénom À REMPLACER", text: "Témoignage à remplacer" },
-  { name: "Prénom À REMPLACER", text: "Témoignage à remplacer" },
-  { name: "Prénom À REMPLACER", text: "Témoignage à remplacer" },
-];
+/* Captures réelles de l'application pour les deux premières fonctionnalités. */
+const FEATURE_SHOTS = [shotCours.url, shotQuiz.url, undefined];
 
 function Home() {
+  const { t } = useI18n();
+
+  const socialProof = [
+    { value: STAT_DOWNLOADS, label: t.stats.downloads },
+    { value: STAT_RATING, label: t.stats.rating },
+    { value: STAT_COURSES, label: t.stats.courses },
+  ];
+
+  /* À REMPLACER PAR DE VRAIS AVIS — aucun faux témoignage ne doit être publié. */
+  const testimonials = [0, 1, 2].map(() => ({
+    name: t.testimonials.name,
+    text: t.testimonials.text,
+  }));
+
   return (
     <>
-      <SiteHeader overDark />
+      <SiteHeader />
       <main>
         <Hero />
 
         {/* Preuve sociale */}
-        <section aria-label="Chiffres clés" className="bg-brand-surface pt-24 md:pt-32">
+        <section aria-label={t.stats.aria} className="bg-brand-surface pt-24 md:pt-32">
           <div className="mx-auto flex w-full max-w-4xl flex-wrap items-center justify-center gap-x-6 gap-y-6 px-5">
-            {SOCIAL_PROOF.map((item) => (
+            {socialProof.map((item) => (
               <div key={item.label} className="flex items-center gap-1">
                 <Laurel />
                 <div className="text-center">
@@ -126,31 +112,37 @@ function Home() {
               id="apprends"
               className="text-3xl font-extrabold leading-tight text-brand-navy md:text-5xl"
             >
-              Ce que tu apprends
+              {t.categories.title}
             </h2>
             <p className="mt-4 max-w-lg text-[17px] leading-relaxed text-brand-navySoft">
-              Huit domaines de culture générale, découpés en dossiers courts.
+              {t.categories.subtitle}
             </p>
           </Reveal>
           <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {CATEGORIES.map(({ icon: Icon, label, tint }, i) => (
-              <li key={label}>
-                <Reveal delay={i * 40}>
-                  <div
-                    className={`flex items-center gap-3 rounded-2xl px-4 py-4 font-bold transition-transform duration-200 hover:-translate-y-1 hover:shadow-card ${tint}`}
-                  >
-                    <Icon aria-hidden="true" className="size-5 shrink-0" />
-                    <span className="text-[13px] uppercase leading-tight tracking-wide">{label}</span>
-                  </div>
-                </Reveal>
-              </li>
-            ))}
+            {t.categories.items.map((label, i) => {
+              const style = CATEGORY_STYLE[i] ?? CATEGORY_STYLE[0]!;
+              const Icon = style.icon;
+              return (
+                <li key={label}>
+                  <Reveal delay={i * 40}>
+                    <div
+                      className={`flex items-center gap-3 rounded-2xl px-4 py-4 font-bold transition-transform duration-200 hover:-translate-y-1 hover:shadow-card ${style.tint}`}
+                    >
+                      <Icon aria-hidden="true" className="size-5 shrink-0" />
+                      <span className="text-[13px] uppercase leading-tight tracking-wide">
+                        {label}
+                      </span>
+                    </div>
+                  </Reveal>
+                </li>
+              );
+            })}
           </ul>
         </section>
 
         {/* Fonctionnalités en alternance */}
-        <section aria-label="Fonctionnalités" className="mx-auto w-full max-w-6xl px-5 pb-8">
-          {FEATURES.map((f, i) => (
+        <section aria-label={t.features.aria} className="mx-auto w-full max-w-6xl px-5 pb-8">
+          {t.features.items.map((f, i) => (
             <div
               key={f.title}
               className={`grid items-center gap-10 py-14 md:grid-cols-2 md:gap-16 ${
@@ -179,7 +171,7 @@ function Home() {
                 </ul>
               </Reveal>
               <Reveal delay={80} className="flex justify-center">
-                <PhoneMock label={f.shot} alt={f.alt} width={250} />
+                <PhoneMock src={FEATURE_SHOTS[i]} label={f.shot} alt={f.alt} width={250} />
               </Reveal>
             </div>
           ))}
@@ -197,14 +189,14 @@ function Home() {
                 id="progression"
                 className="text-3xl font-extrabold leading-tight text-brand-onNavy md:text-5xl"
               >
-                Ta progression, jour après jour.
+                {t.progress.title}
               </h2>
               <p className="mt-5 max-w-md text-[17px] leading-relaxed text-brand-onNavy/75">
-                Une série de jours à entretenir, des rangs à débloquer, de Curieux à Érudit.
+                {t.progress.text}
               </p>
               <div className="mt-8 max-w-sm">
                 <DownloadCta variant="pillLight" className="w-full">
-                  Télécharger gratuitement
+                  {t.hero.cta}
                 </DownloadCta>
               </div>
             </Reveal>
@@ -214,10 +206,10 @@ function Home() {
                   <Flame aria-hidden="true" className="size-6" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-lg font-extrabold text-brand-onNavy">Série en cours</p>
-                  <p className="text-sm text-brand-onNavy/70">
-                    Reviens chaque jour pour ne pas la briser.
+                  <p className="text-lg font-extrabold text-brand-onNavy">
+                    {t.progress.streakTitle}
                   </p>
+                  <p className="text-sm text-brand-onNavy/70">{t.progress.streakText}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4 rounded-3xl bg-card p-5 shadow-card">
@@ -225,10 +217,8 @@ function Home() {
                   <Trophy aria-hidden="true" className="size-6" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-lg font-extrabold text-brand-navy">Nouveau rang ! Érudit</p>
-                  <p className="text-sm text-brand-navySoft">
-                    Débloqué en révisant tes chapitres chaque jour.
-                  </p>
+                  <p className="text-lg font-extrabold text-brand-navy">{t.progress.rankTitle}</p>
+                  <p className="text-sm text-brand-navySoft">{t.progress.rankText}</p>
                 </div>
               </div>
             </Reveal>
@@ -242,22 +232,21 @@ function Home() {
               id="avis"
               className="text-3xl font-extrabold leading-tight text-brand-navy md:text-5xl"
             >
-              Ils apprennent avec Sophia
+              {t.testimonials.title}
             </h2>
-            {/* À REMPLACER PAR DE VRAIS AVIS D'UTILISATEURS */}
-            <p className="mt-4 text-sm font-bold uppercase tracking-wider text-brand-navySoft">
-              Contenu provisoire — à remplacer par de vrais avis
+            <p className="mt-4 max-w-lg text-[17px] leading-relaxed text-brand-navySoft">
+              {t.testimonials.subtitle}
             </p>
           </Reveal>
           <ul className="mt-10 grid gap-4 md:grid-cols-3">
-            {TESTIMONIALS.map((t, i) => (
+            {testimonials.map((item, i) => (
               <li key={i}>
                 <Reveal delay={i * 60}>
                   <div className="h-full rounded-3xl bg-card p-7 shadow-card">
                     <p className="text-[17px] font-semibold leading-relaxed text-brand-navy">
-                      « {t.text} »
+                      « {item.text} »
                     </p>
-                    <p className="mt-5 text-sm text-brand-navySoft">{t.name}</p>
+                    <p className="mt-5 text-sm text-brand-navySoft">{item.name}</p>
                   </div>
                 </Reveal>
               </li>
@@ -271,7 +260,7 @@ function Home() {
             id="faq"
             className="mb-6 text-sm font-bold uppercase tracking-[0.2em] text-brand-navySoft"
           >
-            Questions fréquentes
+            {t.faqTitle}
           </h2>
           <Faq />
         </section>
@@ -282,44 +271,14 @@ function Home() {
             id="a-propos"
             className="text-sm font-bold uppercase tracking-[0.2em] text-brand-navySoft"
           >
-            À propos de Sophia
+            {t.about.title}
           </h2>
           <div className="mt-6 columns-1 gap-10 text-[14px] leading-relaxed text-brand-navySoft md:columns-2">
-            <p className="mb-4">
-              Sophia — Culture générale est une application mobile d'apprentissage de la culture
-              générale, entièrement en français. L'application propose des cours courts, des quiz et
-              un entraînement quotidien. Elle s'adresse à toute personne qui veut apprendre un peu
-              chaque jour, sans y consacrer plus de dix minutes.
-            </p>
-            <p className="mb-4">
-              Sophia — Culture générale est éditée par Vik Studios SAS, une société française. Vik
-              Studios SAS conçoit et rédige l'ensemble des contenus de l'application. L'éditeur est
-              établi en France et publie l'application sous son propre nom.
-            </p>
-            <p className="mb-4">
-              Le téléchargement de Sophia — Culture générale est gratuit. L'application est
-              disponible sur iPhone et iPad via l'App Store d'Apple, et sur les smartphones et
-              tablettes Android via le Google Play Store. Aucun matériel particulier n'est
-              nécessaire : un téléphone récent suffit.
-            </p>
-            <p className="mb-4">
-              Les contenus de Sophia — Culture générale couvrent cinq grands domaines : l'histoire,
-              les sciences, la société, la géopolitique et la culture. Chaque domaine est découpé en
-              dossiers thématiques de cinq chapitres. Un chapitre se lit en quelques minutes et se
-              termine par un quiz.
-            </p>
-            <p className="mb-4">
-              Le fonctionnement de Sophia — Culture générale repose sur trois étapes : lire un
-              chapitre court, répondre à un quiz, puis réviser plus tard grâce à la répétition
-              espacée. La progression est mesurée par une série de jours consécutifs et par des
-              rangs, de Curieux à Érudit. L'objectif est de transformer l'apprentissage en habitude
-              quotidienne plutôt qu'en effort ponctuel.
-            </p>
-            <p className="mb-4">
-              Sophia — Culture générale est une application mobile d'apprentissage. Elle n'a aucun
-              lien avec le robot humanoïde Sophia, avec l'université Sophia de Tokyo, ni avec le
-              programme sophia de l'Assurance Maladie.
-            </p>
+            {t.about.paragraphs.map((p) => (
+              <p key={p} className="mb-4">
+                {p}
+              </p>
+            ))}
           </div>
         </section>
 
@@ -327,14 +286,14 @@ function Home() {
         <section className="bg-brand-pink">
           <div className="mx-auto w-full max-w-4xl px-5 py-20 text-center">
             <h2 className="text-4xl font-extrabold leading-[1.05] text-brand-navy md:text-6xl">
-              Commence aujourd'hui.
+              {t.finalCta.title}
             </h2>
             <p className="mx-auto mt-5 max-w-md text-[16px] leading-relaxed text-brand-navy/80">
-              Gratuit, sur iOS et Android. Cinq minutes par jour suffisent.
+              {t.finalCta.text}
             </p>
             <div className="mx-auto mt-9 max-w-sm">
               <DownloadCta size="pillLg" className="w-full">
-                Télécharger gratuitement
+                {t.finalCta.cta}
               </DownloadCta>
             </div>
           </div>
