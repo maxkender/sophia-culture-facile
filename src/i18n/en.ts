@@ -33,6 +33,14 @@ export const en: Dict = {
     rankLabel: "in Education on the App Store",
     qualifier: "{country} · {year}",
   },
+  stores: {
+    appStore: "Download on the App Store",
+    play: "Get it on Google Play",
+    badgeAppStoreTop: "Download on the",
+    badgePlayTop: "GET IT ON",
+    badgeAppStoreAria: "Download Sophia: General Knowledge on the App Store",
+    badgePlayAria: "Get Sophia: General Knowledge on Google Play",
+  },
   categories: {
     title: "What you learn",
     subtitle: "Eight fields of general knowledge, cut into short guides.",

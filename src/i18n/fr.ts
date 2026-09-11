@@ -31,6 +31,14 @@ export const fr = {
     rankLabel: "en Éducation sur l'App Store",
     qualifier: "{country} · {year}",
   },
+  stores: {
+    appStore: "Télécharger sur l'App Store",
+    play: "Télécharger sur Google Play",
+    badgeAppStoreTop: "Télécharger dans l'",
+    badgePlayTop: "DISPONIBLE SUR",
+    badgeAppStoreAria: "Télécharger Sophia — Culture générale sur l'App Store",
+    badgePlayAria: "Télécharger Sophia — Culture générale sur Google Play",
+  },
   categories: {
     title: "Ce que tu apprends",
     subtitle: "Huit domaines de culture générale, découpés en dossiers courts.",
