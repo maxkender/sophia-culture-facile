@@ -47,7 +47,7 @@ export const FAQ_ITEMS: FaqItem[] = [
 ];
 
 export function Faq({ items = FAQ_ITEMS }: { items?: FaqItem[] }) {
-  const [open, setOpen] = useState<number | null>(0);
+  const [open, setOpen] = useState<number | null>(null);
 
   return (
     <div className="flex flex-col gap-3">
