@@ -21,7 +21,7 @@ export function MobileCtaBar() {
       }`}
       aria-hidden={!visible}
     >
-      <DownloadCta className="w-full">Télécharger gratuitement</DownloadCta>
+      <DownloadCta className="w-full">{t.hero.cta}</DownloadCta>
     </div>
   );
 }
