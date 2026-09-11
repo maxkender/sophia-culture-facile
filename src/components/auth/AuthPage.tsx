@@ -20,18 +20,27 @@ export function AuthPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
-    if (error) return toast.error("Adresse e-mail ou mot de passe incorrect.");
-    navigate({ to: "/espace-professeur", replace: true });
+    if (error) {
+      toast.error("Adresse e-mail ou mot de passe incorrect.");
+      return;
+    }
+    await navigate({ to: "/espace-professeur", replace: true });
   }
 
   async function sendReset() {
-    if (!email.trim()) return toast.error("Saisissez d’abord votre adresse e-mail.");
+    if (!email.trim()) {
+      toast.error("Saisissez d’abord votre adresse e-mail.");
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
-    if (error) return toast.error("Impossible d’envoyer le lien pour le moment.");
+    if (error) {
+      toast.error("Impossible d’envoyer le lien pour le moment.");
+      return;
+    }
     setResetSent(true);
   }
 

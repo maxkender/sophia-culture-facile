@@ -18,9 +18,12 @@ export function ResetPasswordPage() {
   async function submit(event: FormEvent) {
     event.preventDefault();
     const { error } = await supabase.auth.updateUser({ password });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Mot de passe mis à jour.");
-    navigate({ to: "/espace-professeur", replace: true });
+    await navigate({ to: "/espace-professeur", replace: true });
   }
   return <AuthShell title="Nouveau mot de passe" intro="Choisissez un nouveau mot de passe pour votre compte Sophia.">{valid ? <form onSubmit={submit} className="space-y-5"><div className="space-y-2"><Label htmlFor="new-password">Nouveau mot de passe</Label><Input id="new-password" type="password" autoComplete="new-password" minLength={8} required value={password} onChange={(e) => setPassword(e.target.value)} className="h-11" /></div><Button type="submit" variant="pillPink" size="pillSm" className="w-full">Enregistrer</Button></form> : <p className="text-sm text-brand-navySoft">Ouvrez cette page depuis le lien reçu par e-mail.</p>}</AuthShell>;
 }

@@ -43,18 +43,18 @@ export function ContributionDashboard() {
 
   async function propose(event: FormEvent) {
     event.preventDefault();
-    if (proposal.title.trim().length < 3) return toast.error("Le titre doit contenir au moins 3 caractères.");
+    if (proposal.title.trim().length < 3) { toast.error("Le titre doit contenir au moins 3 caractères."); return; }
     const { data: auth } = await supabase.auth.getUser();
     const user = auth.user;
     if (!user) return;
     const { error } = await supabase.from("topics").insert({ title: proposal.title.trim(), description: proposal.description.trim() || null, language: profile?.language ?? "fr", proposed_by: user.id, status: "pending" });
-    if (error) return toast.error("La proposition n’a pas pu être envoyée.");
+    if (error) { toast.error("La proposition n’a pas pu être envoyée."); return; }
     setProposal({ title: "", description: "" }); toast.success("Sujet envoyé pour validation."); await load();
   }
 
   async function reviewTopic(id: string, status: "approved" | "rejected") {
     const { error } = await supabase.from("topics").update({ status }).eq("id", id);
-    if (error) return toast.error("La décision n’a pas pu être enregistrée.");
+    if (error) { toast.error("La décision n’a pas pu être enregistrée."); return; }
     await load();
   }
 
