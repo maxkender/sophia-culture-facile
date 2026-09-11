@@ -12,6 +12,19 @@ export const PLAY_STORE_URL =
  */
 export const APP_STORE_URL = "https://apps.apple.com/app/id0000000000";
 
+// Lien intelligent qui redirige déjà vers le bon store.
+export const SMART_LINK = "https://taap.it/sophia.culture";
+// Mettre à false pour router via la page /telecharger du site.
+export const USE_SMART_LINK = true;
+
+/** Destination unique de tous les CTA de téléchargement du site. */
+export function downloadHref(): string {
+  return USE_SMART_LINK ? SMART_LINK : "/telecharger";
+}
+
+/** Vrai si la destination est un lien externe (donc un <a>, pas un <Link>). */
+export const IS_EXTERNAL_DOWNLOAD = USE_SMART_LINK;
+
 export const CONTACT_EMAIL = "contact@vikstudios.fr"; // TO REPLACE
 
 export const COMPANY = "Vik Studios SAS";

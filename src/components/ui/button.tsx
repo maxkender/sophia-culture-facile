@@ -20,7 +20,9 @@ const buttonVariants = cva(
         pillSecondary:
           "rounded-full bg-brand-surface text-brand-navy font-bold border border-brand-line hover:bg-brand-surfaceStrong",
         pillLight:
-          "rounded-full bg-brand-onNavy text-brand-navy font-bold shadow-soft hover:bg-brand-onNavy/90",
+          "rounded-full bg-brand-onNavy text-brand-navy font-bold shadow-[0_18px_40px_-12px_rgba(10,18,35,0.55)] hover:bg-brand-onNavy/90",
+        pillPink:
+          "rounded-full bg-brand-pink text-brand-navy font-bold shadow-soft hover:brightness-105",
       },
       size: {
         default: "h-9 px-4 py-2",
@@ -28,6 +30,7 @@ const buttonVariants = cva(
         lg: "h-10 rounded-md px-8",
         icon: "h-9 w-9",
         pill: "h-14 px-8 text-base",
+        pillLg: "h-16 px-10 text-lg [&_svg]:size-5",
         pillSm: "h-11 px-5 text-sm",
       },
     },
