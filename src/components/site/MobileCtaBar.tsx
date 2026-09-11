@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { DownloadCta } from "./DownloadCta";
+import { useI18n } from "@/i18n";
 
 /** Barre de téléchargement fixe, mobile uniquement, visible après le hero. */
 export function MobileCtaBar() {
   const [visible, setVisible] = useState(false);
+  const { t } = useI18n();
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.75);
