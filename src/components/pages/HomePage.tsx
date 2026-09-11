@@ -1,7 +1,5 @@
 import {
   Check,
-  Flame,
-  Trophy,
   Globe2,
   Landmark,
   FlaskConical,
