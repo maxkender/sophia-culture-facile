@@ -24,13 +24,14 @@ export function LogoMark({ className, label }: { className?: string; label?: str
 
 /** Logo Sophia : monogramme rose + wordmark officiel. */
 export function Logo({ className, light = false }: LogoProps) {
+  const { t } = useI18n();
   return (
     <span
       className={`inline-flex items-center gap-2 ${
         light ? "text-brand-onNavy" : "text-brand-navy"
       } ${className ?? ""}`}
     >
-      <LogoMark className="h-8 w-auto shrink-0" />
+      <LogoMark className="h-8 w-auto shrink-0" label={`Logo ${t.brand}`} />
       <svg
         viewBox="708 468 440 137"
         role="img"
