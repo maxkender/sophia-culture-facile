@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { StoreButtons } from "@/components/site/StoreButtons";
 import { canonical, meta } from "@/lib/seo";
+import { useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/telecharger")({
   head: () => ({
@@ -32,6 +33,7 @@ function detectPlatform(): Platform {
 }
 
 function Telecharger() {
+  const { t } = useI18n();
   const [platform, setPlatform] = useState<Platform | null>(null);
   const [pageUrl, setPageUrl] = useState("");
 
@@ -62,13 +64,10 @@ function Telecharger() {
               className="size-10 animate-spin rounded-full border-4 border-brand-line border-t-brand-navy"
             />
             <h1 className="mt-6 text-2xl font-extrabold text-brand-navy">
-              {platform === "android"
-                ? "Redirection vers Google Play…"
-                : "Redirection vers l'App Store…"}
+              {platform === "android" ? t.download.redirectAndroid : t.download.redirectIos}
             </h1>
             <p className="mt-3 text-[15px] text-brand-navySoft" role="status">
-              Ouverture de la fiche de Sophia — Culture générale. Si rien ne se passe, utilise les
-              boutons ci-dessous.
+{t.download.redirectText}
             </p>
             <div className="mt-8 w-full max-w-sm">
               <StoreButtons />
@@ -77,11 +76,10 @@ function Telecharger() {
         ) : (
           <>
             <h1 className="text-3xl font-extrabold text-brand-navy md:text-4xl">
-              Télécharger Sophia — Culture générale
+              {t.download.title}
             </h1>
             <p className="mt-4 max-w-md text-[15px] leading-relaxed text-brand-navySoft">
-              L'application est gratuite sur iOS et Android. Scanne le QR code avec ton téléphone ou
-              choisis ton store.
+{t.download.text}
             </p>
             <div className="mt-8 rounded-3xl bg-card p-6 shadow-card">
               {pageUrl ? (
@@ -90,7 +88,7 @@ function Telecharger() {
                   size={168}
                   bgColor="#ffffff"
                   fgColor="#1B3054"
-                  aria-label="QR code vers la page de téléchargement de Sophia — Culture générale"
+                  aria-label={t.download.qrAlt}
                 />
               ) : (
                 <div className="size-[168px]" />
