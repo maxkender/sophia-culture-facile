@@ -18,6 +18,7 @@ import { Reveal } from "@/components/site/Reveal";
 import { DownloadCta } from "@/components/site/DownloadCta";
 import { MobileCtaBar } from "@/components/site/MobileCtaBar";
 import { Faq } from "@/components/site/Faq";
+import { TeacherAccessBand } from "@/components/site/TeacherAccessBand";
 import {
   STAT_RANK_COUNTRY,
   STAT_RANK_YEAR,
@@ -276,6 +277,7 @@ export function HomePage() {
             </div>
           </div>
         </section>
+        <TeacherAccessBand />
       </main>
       <SiteFooter />
       <div className="h-20 md:hidden" aria-hidden="true" />

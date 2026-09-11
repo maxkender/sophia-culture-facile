@@ -4,6 +4,7 @@ import { Hero } from "@/components/site/Hero";
 import { Reveal } from "@/components/site/Reveal";
 import { DownloadCta } from "@/components/site/DownloadCta";
 import { MobileCtaBar } from "@/components/site/MobileCtaBar";
+import { TeacherAccessBand } from "@/components/site/TeacherAccessBand";
 import { COMPANY } from "@/config/links";
 import { fill, useI18n } from "@/i18n";
 
@@ -65,6 +66,7 @@ export function LandingPage() {
             </p>
           </div>
         </section>
+        <TeacherAccessBand />
       </main>
       <div className="h-20 md:hidden" aria-hidden="true" />
       <MobileCtaBar />

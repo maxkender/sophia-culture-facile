@@ -119,6 +119,12 @@ export const en: Dict = {
     text: "Free, on iOS and Android. Five minutes a day is all it takes.",
     cta: "Download free",
   },
+  teacherAccess: {
+    title: "Teach with Sophia",
+    text: "Suggest topics and contribute lessons that our team reviews before publication.",
+    login: "Teacher sign in",
+    join: "Become a certified teacher",
+  },
   footer: {
     tagline:
       "Sophia: General Knowledge is a mobile learning app published by {company}, a French company.",

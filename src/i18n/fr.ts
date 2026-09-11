@@ -117,6 +117,12 @@ export const fr = {
     text: "Gratuit, sur iOS et Android. Cinq minutes par jour suffisent.",
     cta: "Télécharger gratuitement",
   },
+  teacherAccess: {
+    title: "Enseignez avec Sophia",
+    text: "Proposez des sujets et contribuez à des cours qui seront vérifiés par notre équipe avant publication.",
+    login: "Connexion professeur",
+    join: "Devenir professeur certifié",
+  },
   footer: {
     tagline:
       "Sophia — Culture générale est une application mobile d'apprentissage éditée par {company}, société française.",
