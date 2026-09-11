@@ -12,6 +12,7 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
   const [scrolled, setScrolled] = useState(false);
   const { t } = useI18n();
   const homePath = useLocalePath("home");
+  const coursesPath = useLocalePath("courses");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -40,6 +41,15 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
           </Link>
         )}
         <div className="flex items-center gap-2">
+          {!bare && (
+            <Link
+              to={coursesPath}
+              className="hidden rounded-full px-3 py-1.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy/5 sm:inline-flex"
+              activeProps={{ className: "underline underline-offset-4" }}
+            >
+              {t.courses.hubLink}
+            </Link>
+          )}
           <LanguageToggle />
           <DownloadCta variant="pillPink" size="pillSm">
             {t.nav.download}
