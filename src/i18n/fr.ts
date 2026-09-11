@@ -6,6 +6,8 @@ export const fr = {
   brand: "Sophia — Culture générale",
   nav: {
     download: "Télécharger",
+    teacherLogin: "Connexion professeur",
+    becomeTeacher: "Devenir professeur certifié",
     home: "Sophia — Culture générale, accueil",
     main: "Navigation principale",
   },
@@ -114,6 +116,12 @@ export const fr = {
     title: "Commence aujourd'hui.",
     text: "Gratuit, sur iOS et Android. Cinq minutes par jour suffisent.",
     cta: "Télécharger gratuitement",
+  },
+  teacherAccess: {
+    title: "Enseignez avec Sophia",
+    text: "Proposez des sujets et contribuez à des cours qui seront vérifiés par notre équipe avant publication.",
+    login: "Connexion professeur",
+    join: "Devenir professeur certifié",
   },
   footer: {
     tagline:

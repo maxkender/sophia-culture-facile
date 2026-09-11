@@ -43,6 +43,22 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
         <div className="flex items-center gap-2">
           {!bare && (
             <Link
+              to="/auth"
+              className="hidden rounded-full px-3 py-1.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy/5 md:inline-flex"
+            >
+              {t.nav.teacherLogin}
+            </Link>
+          )}
+          {!bare && (
+            <Link
+              to="/devenir-professeur"
+              className="hidden rounded-full border border-brand-line px-3 py-1.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy/5 lg:inline-flex"
+            >
+              {t.nav.becomeTeacher}
+            </Link>
+          )}
+          {!bare && (
+            <Link
               to={coursesPath}
               className="hidden rounded-full px-3 py-1.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy/5 sm:inline-flex"
               activeProps={{ className: "underline underline-offset-4" }}

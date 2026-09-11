@@ -8,6 +8,8 @@ export const en: Dict = {
   brand: "Sophia: General Knowledge",
   nav: {
     download: "Download",
+    teacherLogin: "Teacher sign in",
+    becomeTeacher: "Become a certified teacher",
     home: "Sophia: General Knowledge, home",
     main: "Main navigation",
   },
@@ -116,6 +118,12 @@ export const en: Dict = {
     title: "Start today.",
     text: "Free, on iOS and Android. Five minutes a day is all it takes.",
     cta: "Download free",
+  },
+  teacherAccess: {
+    title: "Teach with Sophia",
+    text: "Suggest topics and contribute lessons that our team reviews before publication.",
+    login: "Teacher sign in",
+    join: "Become a certified teacher",
   },
   footer: {
     tagline:
