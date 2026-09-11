@@ -64,9 +64,9 @@ export function ContributionDashboard() {
     const { data: auth } = await supabase.auth.getUser();
     const user = auth.user;
     if (!user) return;
-    const { error } = await supabase.from("topics").insert({ title: proposal.title.trim(), description: proposal.description.trim() || null, language: profile?.language ?? "fr", proposed_by: user.id, status: "pending" });
-    if (error) { toast.error("La proposition n’a pas pu être envoyée."); return; }
-    setProposal({ title: "", description: "" }); toast.success("Sujet envoyé pour validation."); await load();
+    const { error } = await supabase.from("topics").insert({ title: proposal.title.trim(), description: proposal.description.trim() || null, category: proposal.category, language: profile?.language ?? "fr", proposed_by: user.id, status: isAdmin ? "approved" : "pending" });
+    if (error) { toast.error(isAdmin ? "Le sujet n’a pas pu être créé." : "La proposition n’a pas pu être envoyée."); return; }
+    setProposal({ title: "", description: "", category: "histoire" }); toast.success(isAdmin ? "Sujet créé et publié." : "Sujet envoyé pour validation."); await load();
   }
 
   async function reviewTopic(id: string, status: "approved" | "rejected") {
