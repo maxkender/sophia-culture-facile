@@ -83,7 +83,7 @@ export const fr = {
     ],
   },
   progress: {
-    title: "Une série qui te fait revenir.",
+    title: "Ta collection, jour après jour.",
     text: "Des collections de cours à compléter, des rangs à débloquer, et une raison de revenir chaque jour.",
     streakTitle: "Série en cours",
     streakText: "Reviens chaque jour pour ne pas la briser.",

@@ -85,7 +85,7 @@ export const en: Dict = {
     ],
   },
   progress: {
-    title: "A series that brings you back.",
+    title: "Your collection, day after day.",
     text: "Course collections to complete, ranks to unlock, and a reason to come back every day.",
     streakTitle: "Streak running",
     streakText: "Come back every day to keep it alive.",
