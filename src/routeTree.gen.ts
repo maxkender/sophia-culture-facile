@@ -16,12 +16,14 @@ import { Route as SophiaCultureGeneraleRouteImport } from './routes/sophia-cultu
 import { Route as TelechargerRouteImport } from './routes/telecharger'
 import { Route as DotwellKnownAppleAppSiteAssociationRouteImport } from './routes/[.]well-known.apple-app-site-association'
 import { Route as CoursIndexRouteImport } from './routes/cours/index'
+import { Route as CoursSlugRouteImport } from './routes/cours/$slug'
 import { Route as EnIndexRouteImport } from './routes/en/index'
 import { Route as EnDownloadRouteImport } from './routes/en/download'
 import { Route as EnLegalNoticeRouteImport } from './routes/en/legal-notice'
 import { Route as EnPrivacyRouteImport } from './routes/en/privacy'
 import { Route as EnSophiaGeneralKnowledgeRouteImport } from './routes/en/sophia-general-knowledge'
 import { Route as EnLessonsIndexRouteImport } from './routes/en/lessons/index'
+import { Route as EnLessonsSlugRouteImport } from './routes/en/lessons/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -59,6 +61,11 @@ const CoursIndexRoute = CoursIndexRouteImport.update({
   path: '/cours/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoursSlugRoute = CoursSlugRouteImport.update({
+  id: '/cours/$slug',
+  path: '/cours/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnIndexRoute = EnIndexRouteImport.update({
   id: '/en/',
   path: '/en/',
@@ -90,6 +97,11 @@ const EnLessonsIndexRoute = EnLessonsIndexRouteImport.update({
   path: '/en/lessons/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnLessonsSlugRoute = EnLessonsSlugRouteImport.update({
+  id: '/en/lessons/$slug',
+  path: '/en/lessons/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -98,12 +110,14 @@ export interface FileRoutesByFullPath {
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
+  '/cours/$slug': typeof CoursSlugRoute
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
   '/cours/': typeof CoursIndexRoute
   '/en/': typeof EnIndexRoute
+  '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/en/lessons/': typeof EnLessonsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -113,12 +127,14 @@ export interface FileRoutesByTo {
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
+  '/cours/$slug': typeof CoursSlugRoute
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
   '/cours': typeof CoursIndexRoute
   '/en': typeof EnIndexRoute
+  '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/en/lessons': typeof EnLessonsIndexRoute
 }
 export interface FileRoutesById {
@@ -129,12 +145,14 @@ export interface FileRoutesById {
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
+  '/cours/$slug': typeof CoursSlugRoute
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
   '/cours/': typeof CoursIndexRoute
   '/en/': typeof EnIndexRoute
+  '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/en/lessons/': typeof EnLessonsIndexRoute
 }
 export interface FileRouteTypes {
@@ -146,12 +164,14 @@ export interface FileRouteTypes {
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
+    | '/cours/$slug'
     | '/en/download'
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/sophia-general-knowledge'
     | '/cours/'
     | '/en/'
+    | '/en/lessons/$slug'
     | '/en/lessons/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -161,12 +181,14 @@ export interface FileRouteTypes {
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
+    | '/cours/$slug'
     | '/en/download'
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/sophia-general-knowledge'
     | '/cours'
     | '/en'
+    | '/en/lessons/$slug'
     | '/en/lessons'
   id:
     | '__root__'
@@ -176,12 +198,14 @@ export interface FileRouteTypes {
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
+    | '/cours/$slug'
     | '/en/download'
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/sophia-general-knowledge'
     | '/cours/'
     | '/en/'
+    | '/en/lessons/$slug'
     | '/en/lessons/'
   fileRoutesById: FileRoutesById
 }
@@ -192,12 +216,14 @@ export interface RootRouteChildren {
   SophiaCultureGeneraleRoute: typeof SophiaCultureGeneraleRoute
   TelechargerRoute: typeof TelechargerRoute
   DotwellKnownAppleAppSiteAssociationRoute: typeof DotwellKnownAppleAppSiteAssociationRoute
+  CoursSlugRoute: typeof CoursSlugRoute
   EnDownloadRoute: typeof EnDownloadRoute
   EnLegalNoticeRoute: typeof EnLegalNoticeRoute
   EnPrivacyRoute: typeof EnPrivacyRoute
   EnSophiaGeneralKnowledgeRoute: typeof EnSophiaGeneralKnowledgeRoute
   CoursIndexRoute: typeof CoursIndexRoute
   EnIndexRoute: typeof EnIndexRoute
+  EnLessonsSlugRoute: typeof EnLessonsSlugRoute
   EnLessonsIndexRoute: typeof EnLessonsIndexRoute
 }
 
@@ -252,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cours/$slug': {
+      id: '/cours/$slug'
+      path: '/cours/$slug'
+      fullPath: '/cours/$slug'
+      preLoaderRoute: typeof CoursSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/en/': {
       id: '/en/'
       path: '/en'
@@ -294,6 +327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnLessonsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/en/lessons/$slug': {
+      id: '/en/lessons/$slug'
+      path: '/en/lessons/$slug'
+      fullPath: '/en/lessons/$slug'
+      preLoaderRoute: typeof EnLessonsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -305,12 +345,14 @@ const rootRouteChildren: RootRouteChildren = {
   TelechargerRoute: TelechargerRoute,
   DotwellKnownAppleAppSiteAssociationRoute:
     DotwellKnownAppleAppSiteAssociationRoute,
+  CoursSlugRoute: CoursSlugRoute,
   EnDownloadRoute: EnDownloadRoute,
   EnLegalNoticeRoute: EnLegalNoticeRoute,
   EnPrivacyRoute: EnPrivacyRoute,
   EnSophiaGeneralKnowledgeRoute: EnSophiaGeneralKnowledgeRoute,
   CoursIndexRoute: CoursIndexRoute,
   EnIndexRoute: EnIndexRoute,
+  EnLessonsSlugRoute: EnLessonsSlugRoute,
   EnLessonsIndexRoute: EnLessonsIndexRoute,
 }
 export const routeTree = rootRouteImport
