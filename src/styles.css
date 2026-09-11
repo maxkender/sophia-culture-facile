@@ -183,3 +183,17 @@
     outline-offset: 2px;
   }
 }
+
+/* Texture de grille fine (papier millimétré) pour les fonds navy. */
+@utility grid-texture {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+@utility h1-hero {
+  font-size: clamp(2.8rem, 8vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
