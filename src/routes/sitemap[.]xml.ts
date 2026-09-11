@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getCourseSitemapEntries } from "@/content/api";
 import { absUrl } from "@/config/site";
-import { ROUTES, coursePath, type Lang, type RouteKey } from "@/i18n/routes";
+import { ROUTES, coursePath, type RouteKey } from "@/i18n/routes";
 
 /** Une entrée = une URL + ses alternates hreflang (fr, en, x-default). */
 function urlEntry(opts: {
@@ -32,17 +32,9 @@ const STATIC_PAGES: { key: RouteKey; changefreq: string; priority: string }[] = 
   { key: "privacy", changefreq: "yearly", priority: "0.3" },
 ];
 
+/** Sitemap généré à la volée : les cours viennent de `src/content/api.ts`. */
 function buildSitemap(): string {
   const today = new Date().toISOString().slice(0, 10);
-  const entries: string[] = [];
-
-  for (const page of STATIC_PAGES) {
-    const frUrl = absUrl(ROUTES[page.key].fr);
-    const enUrl = absUrl(ROUTES[page.key].en);
-    for (const loc of [frUrl, enUrl]) {
-      entries.push({ ...page, loc, frUrl, enUrl, lastmod: today } as never as string);
-    }
-  }
 
   const staticXml = STATIC_PAGES.flatMap((page) => {
     const frUrl = absUrl(ROUTES[page.key].fr);
@@ -60,22 +52,17 @@ function buildSitemap(): string {
   });
 
   const courseXml = getCourseSitemapEntries().map((entry) => {
-    const lang: Lang = entry.locale;
-    const frSlug = lang === "fr" ? entry.slug : entry.alternateSlug;
-    const enSlug = lang === "en" ? entry.slug : entry.alternateSlug;
-    const frUrl = absUrl(coursePath("fr", frSlug));
-    const enUrl = absUrl(coursePath("en", enSlug));
+    const frSlug = entry.locale === "fr" ? entry.slug : entry.alternateSlug;
+    const enSlug = entry.locale === "en" ? entry.slug : entry.alternateSlug;
     return urlEntry({
-      loc: absUrl(coursePath(lang, entry.slug)),
-      frUrl,
-      enUrl,
+      loc: absUrl(coursePath(entry.locale, entry.slug)),
+      frUrl: absUrl(coursePath("fr", frSlug)),
+      enUrl: absUrl(coursePath("en", enSlug)),
       lastmod: entry.updatedAt,
       changefreq: "monthly",
       priority: "0.8",
     });
   });
-
-  entries.length = 0;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -84,7 +71,7 @@ ${[...staticXml, ...courseXml].join("\n")}
 `;
 }
 
-export const Route = createFileRoute("/sitemap/xml")({
+export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: () =>

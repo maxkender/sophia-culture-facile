@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SophiaCultureGeneraleRouteImport } from './routes/sophia-culture-generale'
 import { Route as TelechargerRouteImport } from './routes/telecharger'
 import { Route as DotwellKnownAppleAppSiteAssociationRouteImport } from './routes/[.]well-known.apple-app-site-association'
@@ -38,6 +39,11 @@ const ConfidentialiteRoute = ConfidentialiteRouteImport.update({
 const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
   id: '/mentions-legales',
   path: '/mentions-legales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SophiaCultureGeneraleRoute = SophiaCultureGeneraleRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/confidentialite': typeof ConfidentialiteRoute
   '/mentions-legales': typeof MentionsLegalesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/confidentialite': typeof ConfidentialiteRoute
   '/mentions-legales': typeof MentionsLegalesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/confidentialite': typeof ConfidentialiteRoute
   '/mentions-legales': typeof MentionsLegalesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/'
     | '/confidentialite'
     | '/mentions-legales'
+    | '/sitemap.xml'
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/'
     | '/confidentialite'
     | '/mentions-legales'
+    | '/sitemap.xml'
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/'
     | '/confidentialite'
     | '/mentions-legales'
+    | '/sitemap.xml'
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
@@ -213,6 +225,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConfidentialiteRoute: typeof ConfidentialiteRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SophiaCultureGeneraleRoute: typeof SophiaCultureGeneraleRoute
   TelechargerRoute: typeof TelechargerRoute
   DotwellKnownAppleAppSiteAssociationRoute: typeof DotwellKnownAppleAppSiteAssociationRoute
@@ -248,6 +261,13 @@ declare module '@tanstack/react-router' {
       path: '/mentions-legales'
       fullPath: '/mentions-legales'
       preLoaderRoute: typeof MentionsLegalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sophia-culture-generale': {
@@ -341,6 +361,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfidentialiteRoute: ConfidentialiteRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SophiaCultureGeneraleRoute: SophiaCultureGeneraleRoute,
   TelechargerRoute: TelechargerRoute,
   DotwellKnownAppleAppSiteAssociationRoute:
