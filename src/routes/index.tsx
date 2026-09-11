@@ -50,13 +50,13 @@ export const Route = createFileRoute("/")({
 });
 
 const CATEGORIES = [
-  { icon: Landmark, label: "Histoire", tint: "bg-brand-blue/12 text-brand-blue" },
-  { icon: FlaskConical, label: "Sciences", tint: "bg-brand-purple/15 text-brand-purple" },
+  { icon: Landmark, label: "Histoire", tint: "bg-brand-blue/12 text-brand-navy" },
+  { icon: FlaskConical, label: "Sciences", tint: "bg-brand-purple/15 text-brand-navy" },
   { icon: Users, label: "Société", tint: "bg-brand-pink/25 text-brand-navy" },
   { icon: Globe2, label: "Géopolitique", tint: "bg-brand-navy/10 text-brand-navy" },
   { icon: Palette, label: "Culture", tint: "bg-brand-pink/20 text-brand-navy" },
-  { icon: Coins, label: "Économie", tint: "bg-brand-blue/10 text-brand-blue" },
-  { icon: BrainCog, label: "Philosophie", tint: "bg-brand-purple/12 text-brand-purple" },
+  { icon: Coins, label: "Économie", tint: "bg-brand-blue/10 text-brand-navy" },
+  { icon: BrainCog, label: "Philosophie", tint: "bg-brand-purple/12 text-brand-navy" },
   { icon: Star, label: "Arts", tint: "bg-brand-navy/8 text-brand-navy" },
 ];
 
@@ -140,7 +140,7 @@ function Home() {
                     className={`flex items-center gap-3 rounded-2xl px-4 py-4 font-bold transition-transform duration-200 hover:-translate-y-1 hover:shadow-card ${tint}`}
                   >
                     <Icon aria-hidden="true" className="size-5 shrink-0" />
-                    <span className="truncate text-sm uppercase tracking-wide">{label}</span>
+                    <span className="text-[13px] uppercase leading-tight tracking-wide">{label}</span>
                   </div>
                 </Reveal>
               </li>
