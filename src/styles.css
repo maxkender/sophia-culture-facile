@@ -79,8 +79,18 @@
 }
 
 :root {
+  --brand-navy: oklch(0.325 0.058 259.5);
+  --brand-navy-soft: oklch(0.48 0.045 259);
+  --brand-on-navy: oklch(1 0 0);
+  --brand-pink: oklch(0.792 0.093 348.5);
+  --brand-purple: oklch(0.714 0.146 292.6);
+  --brand-blue: oklch(0.546 0.215 262.9);
+  --brand-surface: oklch(0.968 0.006 254);
+  --brand-surface-strong: oklch(0.938 0.011 254);
+  --brand-line: oklch(0.905 0.012 254);
+
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background: oklch(0.968 0.006 254);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
