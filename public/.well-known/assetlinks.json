@@ -1,0 +1,13 @@
+[
+  {
+    "_comment": "Android App Links — À REMPLIR : remplacer la valeur de sha256_cert_fingerprints par l'empreinte SHA-256 du certificat de signature, disponible dans la Play Console (Configuration > Intégrité de l'app > Certificat de signature d'application). Supprimer les clés _comment une fois le fichier complété.",
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.rork.sophia",
+      "sha256_cert_fingerprints": [
+        "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99"
+      ]
+    }
+  }
+]

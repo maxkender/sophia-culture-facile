@@ -20,6 +20,7 @@ import {
   faqSchema,
   ldScript,
   meta,
+  canonical,
   mobileApplicationSchema,
   organizationSchema,
 } from "@/lib/seo";
@@ -32,7 +33,7 @@ export const Route = createFileRoute("/")({
         "Sophia — Culture générale est l'application mobile française gratuite pour apprendre la culture générale chaque jour : cours courts, quiz et révision quotidienne. iOS et Android.",
       url: "/",
     }),
-    links: [{ rel: "canonical", href: "/" }],
+    links: [canonical("/")],
     scripts: [
       ldScript(mobileApplicationSchema),
       ldScript(organizationSchema),

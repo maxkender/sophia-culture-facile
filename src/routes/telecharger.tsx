@@ -5,7 +5,7 @@ import { APP_STORE_URL, PLAY_STORE_URL } from "@/config/links";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { StoreButtons } from "@/components/site/StoreButtons";
-import { meta } from "@/lib/seo";
+import { canonical, meta } from "@/lib/seo";
 
 export const Route = createFileRoute("/telecharger")({
   head: () => ({
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/telecharger")({
         "Télécharge Sophia — Culture générale gratuitement sur l'App Store ou Google Play. L'application française de culture générale : cours courts, quiz et entraînement quotidien.",
       url: "/telecharger",
     }),
-    links: [{ rel: "canonical", href: "/telecharger" }],
+    links: [canonical("/telecharger")],
   }),
   component: Telecharger,
 });
