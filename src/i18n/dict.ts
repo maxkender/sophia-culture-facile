@@ -211,7 +211,7 @@ export const fr = {
         "Vous pouvez commencer à lire les cours de Sophia — Culture générale dès l'ouverture de l'application. Créer un compte permet de sauvegarder votre progression, votre série de jours et votre rang. Le compte est gratuit.",
     },
   ],
-} as const;
+};
 
 export type Dict = typeof fr;
 
