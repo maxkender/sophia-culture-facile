@@ -1,12 +1,12 @@
-import { APP_STORE_URL, PLAY_STORE_URL } from "@/config/links";
+import { appStoreHref, PLAY_STORE_URL } from "@/config/links";
 
 /** Badges officiels App Store et Google Play, dessinés en SVG inline. */
 export function StoreBadges({ className = "" }: { className?: string }) {
   return (
     <div className={`flex flex-wrap items-center gap-3 ${className}`}>
       <a
-        href={APP_STORE_URL}
-        rel="noopener"
+        href={appStoreHref()}
+        target="_blank" rel="noopener noreferrer"
         aria-label="Télécharger Sophia — Culture générale sur l'App Store"
         className="rounded-xl"
       >
@@ -14,7 +14,7 @@ export function StoreBadges({ className = "" }: { className?: string }) {
       </a>
       <a
         href={PLAY_STORE_URL}
-        rel="noopener"
+        target="_blank" rel="noopener noreferrer"
         aria-label="Télécharger Sophia — Culture générale sur Google Play"
         className="rounded-xl"
       >

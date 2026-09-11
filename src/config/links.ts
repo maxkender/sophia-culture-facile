@@ -17,6 +17,14 @@ export const SMART_LINK = "https://taap.it/sophia.culture";
 // Mettre à false pour router via la page /telecharger du site.
 export const USE_SMART_LINK = true;
 
+/** Vrai tant que l'URL App Store est le placeholder à remplacer. */
+export const APP_STORE_PENDING = APP_STORE_URL.includes("id0000000000");
+
+/** Lien App Store réel, ou lien intelligent tant que la fiche iOS n'existe pas. */
+export function appStoreHref(): string {
+  return APP_STORE_PENDING ? SMART_LINK : APP_STORE_URL;
+}
+
 /** Destination unique de tous les CTA de téléchargement du site. */
 export function downloadHref(): string {
   return USE_SMART_LINK ? SMART_LINK : "/telecharger";

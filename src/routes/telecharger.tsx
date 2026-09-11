@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { APP_STORE_URL, PLAY_STORE_URL } from "@/config/links";
+import { appStoreHref, PLAY_STORE_URL } from "@/config/links";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { StoreButtons } from "@/components/site/StoreButtons";
@@ -40,7 +40,7 @@ function Telecharger() {
     setPlatform(p);
     setPageUrl(window.location.href);
     if (p === "ios" || p === "android") {
-      const target = p === "ios" ? APP_STORE_URL : PLAY_STORE_URL;
+      const target = p === "ios" ? appStoreHref() : PLAY_STORE_URL;
       const timer = window.setTimeout(() => {
         window.location.replace(target);
       }, 900);

@@ -15,7 +15,7 @@ export function DownloadCta({ children, variant = "pill", size = "pill", classNa
   return (
     <Button asChild variant={variant} size={size} className={className}>
       {IS_EXTERNAL_DOWNLOAD ? (
-        <a href={href} rel="noopener">
+        <a href={href} target="_blank" rel="noopener noreferrer">
           {children}
         </a>
       ) : (
