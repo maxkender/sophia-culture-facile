@@ -112,6 +112,7 @@ export type Database = {
       topics: {
         Row: {
           admin_feedback: string | null
+          category: Database["public"]["Enums"]["topic_category"]
           created_at: string
           description: string | null
           id: string
@@ -125,6 +126,7 @@ export type Database = {
         }
         Insert: {
           admin_feedback?: string | null
+          category?: Database["public"]["Enums"]["topic_category"]
           created_at?: string
           description?: string | null
           id?: string
@@ -138,6 +140,7 @@ export type Database = {
         }
         Update: {
           admin_feedback?: string | null
+          category?: Database["public"]["Enums"]["topic_category"]
           created_at?: string
           description?: string | null
           id?: string
@@ -187,6 +190,13 @@ export type Database = {
         | "approved"
         | "changes_requested"
         | "rejected"
+      topic_category:
+        | "histoire"
+        | "science"
+        | "litterature"
+        | "art"
+        | "mythologie"
+        | "geopolitique"
       topic_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -322,6 +332,14 @@ export const Constants = {
         "approved",
         "changes_requested",
         "rejected",
+      ],
+      topic_category: [
+        "histoire",
+        "science",
+        "litterature",
+        "art",
+        "mythologie",
+        "geopolitique",
       ],
       topic_status: ["pending", "approved", "rejected"],
     },
