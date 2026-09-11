@@ -58,7 +58,8 @@ export function CoursesHubPage() {
             {visible.map((course) => (
               <li key={course.slug}>
                 <Link
-                  to={coursePath(lang, course.slug) as "/cours"}
+                  to={lang === "fr" ? "/cours/$slug" : "/en/lessons/$slug"}
+                  params={{ slug: course.slug }}
                   className="group flex h-full flex-col overflow-hidden rounded-3xl bg-card shadow-card transition-transform duration-200 hover:-translate-y-1"
                 >
                   <img
