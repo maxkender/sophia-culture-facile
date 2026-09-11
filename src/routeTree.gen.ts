@@ -14,6 +14,7 @@ import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as SophiaCultureGeneraleRouteImport } from './routes/sophia-culture-generale'
 import { Route as TelechargerRouteImport } from './routes/telecharger'
+import { Route as DotwellKnownAppleAppSiteAssociationRouteImport } from './routes/[.]well-known.apple-app-site-association'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +41,12 @@ const TelechargerRoute = TelechargerRouteImport.update({
   path: '/telecharger',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DotwellKnownAppleAppSiteAssociationRoute =
+  DotwellKnownAppleAppSiteAssociationRouteImport.update({
+    id: '/.well-known/apple-app-site-association',
+    path: '/.well-known/apple-app-site-association',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +54,7 @@ export interface FileRoutesByFullPath {
   '/mentions-legales': typeof MentionsLegalesRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
+  '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +62,7 @@ export interface FileRoutesByTo {
   '/mentions-legales': typeof MentionsLegalesRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
+  '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,6 +71,7 @@ export interface FileRoutesById {
   '/mentions-legales': typeof MentionsLegalesRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
+  '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,6 +81,7 @@ export interface FileRouteTypes {
     | '/mentions-legales'
     | '/sophia-culture-generale'
     | '/telecharger'
+    | '/.well-known/apple-app-site-association'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -78,6 +89,7 @@ export interface FileRouteTypes {
     | '/mentions-legales'
     | '/sophia-culture-generale'
     | '/telecharger'
+    | '/.well-known/apple-app-site-association'
   id:
     | '__root__'
     | '/'
@@ -85,6 +97,7 @@ export interface FileRouteTypes {
     | '/mentions-legales'
     | '/sophia-culture-generale'
     | '/telecharger'
+    | '/.well-known/apple-app-site-association'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -93,6 +106,7 @@ export interface RootRouteChildren {
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   SophiaCultureGeneraleRoute: typeof SophiaCultureGeneraleRoute
   TelechargerRoute: typeof TelechargerRoute
+  DotwellKnownAppleAppSiteAssociationRoute: typeof DotwellKnownAppleAppSiteAssociationRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -132,6 +146,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TelechargerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.well-known/apple-app-site-association': {
+      id: '/.well-known/apple-app-site-association'
+      path: '/.well-known/apple-app-site-association'
+      fullPath: '/.well-known/apple-app-site-association'
+      preLoaderRoute: typeof DotwellKnownAppleAppSiteAssociationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -141,6 +162,8 @@ const rootRouteChildren: RootRouteChildren = {
   MentionsLegalesRoute: MentionsLegalesRoute,
   SophiaCultureGeneraleRoute: SophiaCultureGeneraleRoute,
   TelechargerRoute: TelechargerRoute,
+  DotwellKnownAppleAppSiteAssociationRoute:
+    DotwellKnownAppleAppSiteAssociationRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
