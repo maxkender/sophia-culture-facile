@@ -1,0 +1,15 @@
+{
+  "_comment": "Universal Links iOS — À REMPLIR : remplacer TEAMID par l'identifiant d'équipe Apple Developer et vérifier le bundle id (appID au format TEAMID.bundleid). Supprimer les clés _comment une fois le fichier complété.",
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAMID.app.rork.sophia",
+        "paths": ["*"]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["TEAMID.app.rork.sophia"]
+  }
+}
