@@ -14,6 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
+      assignments: {
+        Row: {
+          brief: string | null
+          created_at: string
+          created_by: string | null
+          deadline: string | null
+          id: string
+          status: Database["public"]["Enums"]["assignment_state"]
+          teacher_id: string
+          topic_id: string
+          updated_at: string
+        }
+        Insert: {
+          brief?: string | null
+          created_at?: string
+          created_by?: string | null
+          deadline?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["assignment_state"]
+          teacher_id: string
+          topic_id: string
+          updated_at?: string
+        }
+        Update: {
+          brief?: string | null
+          created_at?: string
+          created_by?: string | null
+          deadline?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["assignment_state"]
+          teacher_id?: string
+          topic_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignments_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      author_payment_details: {
+        Row: {
+          address: string
+          bic: string | null
+          created_at: string
+          iban: string
+          legal_name: string
+          legal_status: Database["public"]["Enums"]["author_legal_status"]
+          siret: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          bic?: string | null
+          created_at?: string
+          iban: string
+          legal_name: string
+          legal_status?: Database["public"]["Enums"]["author_legal_status"]
+          siret?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          bic?: string | null
+          created_at?: string
+          iban?: string
+          legal_name?: string
+          legal_status?: Database["public"]["Enums"]["author_legal_status"]
+          siret?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      contract_signatures: {
+        Row: {
+          accepted: boolean
+          contract_version: string
+          created_at: string
+          id: string
+          signed_at: string
+          signed_name: string
+          user_id: string
+        }
+        Insert: {
+          accepted?: boolean
+          contract_version?: string
+          created_at?: string
+          id?: string
+          signed_at?: string
+          signed_name: string
+          user_id: string
+        }
+        Update: {
+          accepted?: boolean
+          contract_version?: string
+          created_at?: string
+          id?: string
+          signed_at?: string
+          signed_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       course_submissions: {
         Row: {
           admin_feedback: string | null
@@ -67,6 +177,62 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount_cents: number
+          assignment_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          due_date: string | null
+          id: string
+          kind: Database["public"]["Enums"]["payment_kind"]
+          label: string
+          paid_at: string | null
+          status: Database["public"]["Enums"]["payment_state"]
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number
+          assignment_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          due_date?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["payment_kind"]
+          label: string
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["payment_state"]
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          assignment_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          due_date?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["payment_kind"]
+          label?: string
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["payment_state"]
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_path: string
@@ -108,6 +274,44 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      topic_applications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          status: Database["public"]["Enums"]["application_state"]
+          teacher_id: string
+          topic_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          status?: Database["public"]["Enums"]["application_state"]
+          teacher_id: string
+          topic_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          status?: Database["public"]["Enums"]["application_state"]
+          teacher_id?: string
+          topic_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topic_applications_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       topics: {
         Row: {
@@ -184,6 +388,16 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "teacher"
+      application_state: "pending" | "accepted" | "rejected"
+      assignment_state:
+        | "attribue"
+        | "en_cours"
+        | "soumis"
+        | "termine"
+        | "annule"
+      author_legal_status: "droits_auteur" | "independant"
+      payment_kind: "acompte" | "solde" | "complement"
+      payment_state: "a_venir" | "paye"
       submission_status:
         | "draft"
         | "submitted"
@@ -326,6 +540,11 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "teacher"],
+      application_state: ["pending", "accepted", "rejected"],
+      assignment_state: ["attribue", "en_cours", "soumis", "termine", "annule"],
+      author_legal_status: ["droits_auteur", "independant"],
+      payment_kind: ["acompte", "solde", "complement"],
+      payment_state: ["a_venir", "paye"],
       submission_status: [
         "draft",
         "submitted",
