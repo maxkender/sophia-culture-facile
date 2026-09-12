@@ -20,7 +20,11 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SophiaCultureGeneraleRouteImport } from './routes/sophia-culture-generale'
 import { Route as TelechargerRouteImport } from './routes/telecharger'
 import { Route as DotwellKnownAppleAppSiteAssociationRouteImport } from './routes/[.]well-known.apple-app-site-association'
+import { Route as AuthenticatedAdministrationRouteImport } from './routes/_authenticated/administration'
+import { Route as AuthenticatedContratRouteImport } from './routes/_authenticated/contrat'
 import { Route as AuthenticatedEspaceProfesseurRouteImport } from './routes/_authenticated/espace-professeur'
+import { Route as AuthenticatedMesCoursRouteImport } from './routes/_authenticated/mes-cours'
+import { Route as AuthenticatedPaiementsRouteImport } from './routes/_authenticated/paiements'
 import { Route as AuthenticatedProfilEnseignantRouteImport } from './routes/_authenticated/profil-enseignant'
 import { Route as CoursIndexRouteImport } from './routes/cours/index'
 import { Route as CoursSlugRouteImport } from './routes/cours/$slug'
@@ -87,12 +91,33 @@ const DotwellKnownAppleAppSiteAssociationRoute =
     path: '/.well-known/apple-app-site-association',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdministrationRoute =
+  AuthenticatedAdministrationRouteImport.update({
+    id: '/administration',
+    path: '/administration',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedContratRoute = AuthenticatedContratRouteImport.update({
+  id: '/contrat',
+  path: '/contrat',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedEspaceProfesseurRoute =
   AuthenticatedEspaceProfesseurRouteImport.update({
     id: '/espace-professeur',
     path: '/espace-professeur',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMesCoursRoute = AuthenticatedMesCoursRouteImport.update({
+  id: '/mes-cours',
+  path: '/mes-cours',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPaiementsRoute = AuthenticatedPaiementsRouteImport.update({
+  id: '/paiements',
+  path: '/paiements',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedProfilEnseignantRoute =
   AuthenticatedProfilEnseignantRouteImport.update({
     id: '/profil-enseignant',
@@ -157,7 +182,11 @@ export interface FileRoutesByFullPath {
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
+  '/administration': typeof AuthenticatedAdministrationRoute
+  '/contrat': typeof AuthenticatedContratRoute
   '/espace-professeur': typeof AuthenticatedEspaceProfesseurRoute
+  '/mes-cours': typeof AuthenticatedMesCoursRoute
+  '/paiements': typeof AuthenticatedPaiementsRoute
   '/profil-enseignant': typeof AuthenticatedProfilEnseignantRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/en/download': typeof EnDownloadRoute
@@ -180,7 +209,11 @@ export interface FileRoutesByTo {
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
+  '/administration': typeof AuthenticatedAdministrationRoute
+  '/contrat': typeof AuthenticatedContratRoute
   '/espace-professeur': typeof AuthenticatedEspaceProfesseurRoute
+  '/mes-cours': typeof AuthenticatedMesCoursRoute
+  '/paiements': typeof AuthenticatedPaiementsRoute
   '/profil-enseignant': typeof AuthenticatedProfilEnseignantRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/en/download': typeof EnDownloadRoute
@@ -205,7 +238,11 @@ export interface FileRoutesById {
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
+  '/_authenticated/administration': typeof AuthenticatedAdministrationRoute
+  '/_authenticated/contrat': typeof AuthenticatedContratRoute
   '/_authenticated/espace-professeur': typeof AuthenticatedEspaceProfesseurRoute
+  '/_authenticated/mes-cours': typeof AuthenticatedMesCoursRoute
+  '/_authenticated/paiements': typeof AuthenticatedPaiementsRoute
   '/_authenticated/profil-enseignant': typeof AuthenticatedProfilEnseignantRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/en/download': typeof EnDownloadRoute
@@ -230,7 +267,11 @@ export interface FileRouteTypes {
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
+    | '/administration'
+    | '/contrat'
     | '/espace-professeur'
+    | '/mes-cours'
+    | '/paiements'
     | '/profil-enseignant'
     | '/cours/$slug'
     | '/en/download'
@@ -253,7 +294,11 @@ export interface FileRouteTypes {
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
+    | '/administration'
+    | '/contrat'
     | '/espace-professeur'
+    | '/mes-cours'
+    | '/paiements'
     | '/profil-enseignant'
     | '/cours/$slug'
     | '/en/download'
@@ -277,7 +322,11 @@ export interface FileRouteTypes {
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
+    | '/_authenticated/administration'
+    | '/_authenticated/contrat'
     | '/_authenticated/espace-professeur'
+    | '/_authenticated/mes-cours'
+    | '/_authenticated/paiements'
     | '/_authenticated/profil-enseignant'
     | '/cours/$slug'
     | '/en/download'
@@ -392,11 +441,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotwellKnownAppleAppSiteAssociationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/administration': {
+      id: '/_authenticated/administration'
+      path: '/administration'
+      fullPath: '/administration'
+      preLoaderRoute: typeof AuthenticatedAdministrationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/contrat': {
+      id: '/_authenticated/contrat'
+      path: '/contrat'
+      fullPath: '/contrat'
+      preLoaderRoute: typeof AuthenticatedContratRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/espace-professeur': {
       id: '/_authenticated/espace-professeur'
       path: '/espace-professeur'
       fullPath: '/espace-professeur'
       preLoaderRoute: typeof AuthenticatedEspaceProfesseurRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mes-cours': {
+      id: '/_authenticated/mes-cours'
+      path: '/mes-cours'
+      fullPath: '/mes-cours'
+      preLoaderRoute: typeof AuthenticatedMesCoursRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/paiements': {
+      id: '/_authenticated/paiements'
+      path: '/paiements'
+      fullPath: '/paiements'
+      preLoaderRoute: typeof AuthenticatedPaiementsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/profil-enseignant': {
@@ -473,12 +550,20 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdministrationRoute: typeof AuthenticatedAdministrationRoute
+  AuthenticatedContratRoute: typeof AuthenticatedContratRoute
   AuthenticatedEspaceProfesseurRoute: typeof AuthenticatedEspaceProfesseurRoute
+  AuthenticatedMesCoursRoute: typeof AuthenticatedMesCoursRoute
+  AuthenticatedPaiementsRoute: typeof AuthenticatedPaiementsRoute
   AuthenticatedProfilEnseignantRoute: typeof AuthenticatedProfilEnseignantRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdministrationRoute: AuthenticatedAdministrationRoute,
+  AuthenticatedContratRoute: AuthenticatedContratRoute,
   AuthenticatedEspaceProfesseurRoute: AuthenticatedEspaceProfesseurRoute,
+  AuthenticatedMesCoursRoute: AuthenticatedMesCoursRoute,
+  AuthenticatedPaiementsRoute: AuthenticatedPaiementsRoute,
   AuthenticatedProfilEnseignantRoute: AuthenticatedProfilEnseignantRoute,
 }
 
