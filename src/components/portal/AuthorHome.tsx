@@ -66,7 +66,16 @@ export function AuthorHome() {
               </div>
             </>
           ) : (
-            <p className="mt-4 text-sm text-brand-navySoft">No code has been issued to you yet.</p>
+            <>
+              <p className="mt-4 font-mono text-lg font-bold tracking-wide text-brand-navySoft">
+                {profile?.is_test ? "Code de test, non fonctionnel" : "—"}
+              </p>
+              <p className="mt-1 text-xs text-brand-navySoft">
+                {profile?.is_test
+                  ? "This is the internal test profile: no App Store code is attached to it."
+                  : "No code has been issued to you yet."}
+              </p>
+            </>
           )}
         </PortalCard>
 
