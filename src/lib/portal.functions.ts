@@ -188,7 +188,10 @@ export const acceptInvite = createServerFn({ method: "POST" })
     }
 
     const claimEmail = String((context.claims as Record<string, unknown>)["email"] ?? "").toLowerCase();
-    if (profile.email.toLowerCase() !== claimEmail) {
+    if (!profile.email && claimEmail) {
+      const adopted = await resolveClaimEmail(profile, claimEmail);
+      if ("error" in adopted) return { ok: false as const, reason: "taken" as const };
+    } else if ((profile.email ?? "").toLowerCase() !== claimEmail) {
       return { ok: false as const, reason: "email" as const, expected: profile.email };
     }
     if (profile.user_id && profile.user_id !== context.userId) {
