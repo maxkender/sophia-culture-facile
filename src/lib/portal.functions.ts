@@ -10,7 +10,7 @@ export type InvitePreview = {
   profile: {
     id: string;
     full_name: string;
-    email: string;
+    email: string | null;
     title: string | null;
     institution: string | null;
     country: string | null;
@@ -85,9 +85,28 @@ export const getInvite = createServerFn({ method: "POST" })
         photo_url: photo,
       },
       courses: courses ?? [],
-      hasAccount: await accountExists(profile.email),
+      hasAccount: profile.email ? await accountExists(profile.email) : false,
     };
   });
+
+/** The author may have been created without an email; they supply their own when claiming. */
+async function resolveClaimEmail(
+  profile: { id: string; email: string | null },
+  provided: string | undefined,
+): Promise<{ email: string } | { error: "missing" | "taken" }> {
+  if (profile.email) return { email: profile.email.toLowerCase() };
+  const email = (provided ?? "").trim().toLowerCase();
+  if (!email) return { error: "missing" };
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: clash } = await supabaseAdmin
+    .from("profiles")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+  if (clash && clash.id !== profile.id) return { error: "taken" };
+  await supabaseAdmin.from("profiles").update({ email }).eq("id", profile.id);
+  return { email };
+}
 
 /** Public: creates the auth account for an invited author and links it to their existing profile. */
 export const claimInvite = createServerFn({ method: "POST" })
