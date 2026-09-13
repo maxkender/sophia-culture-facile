@@ -34,17 +34,25 @@ async function loadInvite(token: string) {
   return { supabaseAdmin, profile };
 }
 
-function inviteState(profile: { activated_at: string | null; invite_expires_at: string | null } | null): InviteState {
+function inviteState(
+  profile: { activated_at: string | null; invite_expires_at: string | null; is_test?: boolean } | null,
+): InviteState {
   if (!profile) return "invalid";
+  // The internal test account keeps a reusable invite so the flow can be replayed.
+  if (profile.is_test) return "ok";
   if (profile.activated_at) return "used";
   if (profile.invite_expires_at && new Date(profile.invite_expires_at).getTime() < Date.now()) return "expired";
   return "ok";
 }
 
-async function accountExists(email: string) {
+async function findUserByEmail(email: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-  return (data?.users ?? []).some((user) => (user.email ?? "").toLowerCase() === email.toLowerCase());
+  return (data?.users ?? []).find((user) => (user.email ?? "").toLowerCase() === email.toLowerCase()) ?? null;
+}
+
+async function accountExists(email: string) {
+  return Boolean(await findUserByEmail(email));
 }
 
 /** Public: shows the invited author the profile the desk already built for them. */
