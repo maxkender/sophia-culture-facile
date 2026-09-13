@@ -111,15 +111,24 @@ async function resolveClaimEmail(
 /** Public: creates the auth account for an invited author and links it to their existing profile. */
 export const claimInvite = createServerFn({ method: "POST" })
   .inputValidator((data) =>
-    z.object({ token: z.string().min(4).max(200), password: z.string().min(8).max(200) }).parse(data),
+    z
+      .object({
+        token: z.string().min(4).max(200),
+        password: z.string().min(8).max(200),
+        email: z.string().email().max(200).optional(),
+      })
+      .parse(data),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin, profile } = await loadInvite(data.token);
     const state = inviteState(profile);
     if (!profile || state !== "ok") return { ok: false as const, state };
 
+    const resolved = await resolveClaimEmail(profile, data.email);
+    if ("error" in resolved) return { ok: false as const, state: resolved.error };
+
     const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email: profile.email,
+      email: resolved.email,
       password: data.password,
       email_confirm: true,
     });
