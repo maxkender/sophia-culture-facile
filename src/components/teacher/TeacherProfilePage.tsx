@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-type ProfileForm = { firstName: string; lastName: string; language: "fr" | "en"; country: string; subject: string; level: string };
-const EMPTY: ProfileForm = { firstName: "", lastName: "", language: "fr", country: "", subject: "", level: "" };
+type ProfileForm = { firstName: string; lastName: string; language: "fr" | "en"; country: string; subject: string; level: string; institution: string; specialty: string };
+const EMPTY: ProfileForm = { firstName: "", lastName: "", language: "fr", country: "", subject: "", level: "", institution: "", specialty: "" };
 
 export function TeacherProfilePage() {
   const navigate = useNavigate();
