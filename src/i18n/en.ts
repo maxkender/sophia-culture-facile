@@ -14,13 +14,13 @@ export const en: Dict = {
     main: "Main navigation",
   },
   hero: {
-    titleA: "Get ",
-    titleHighlight: "smarter",
-    titleB: " in 5 minutes a day.",
+    titleA: "Sophia, the ",
+    titleHighlight: "general knowledge",
+    titleB: " that fits in your pocket",
     subtitle:
-      "Short lessons, quick quizzes, and a streak you won't want to break. Sophia turns curiosity into a daily habit.",
+      "Short lessons, written to be understood, on the subjects you would actually like to know about.",
     cta: "Download free",
-    note: "Free · iOS and Android · No commitment",
+    note: "Free, iOS and Android.",
     shotHome: "Lesson",
     shotHomeAlt: "A lesson screen in the Sophia: General Knowledge app",
     shotQuiz: "Quiz",
@@ -45,78 +45,76 @@ export const en: Dict = {
   },
   categories: {
     title: "What you learn",
-    subtitle: "Eight fields of general knowledge, cut into short guides.",
+    subtitle: "Six subjects, over 240 lessons, and one topic at a time so you are never lost.",
     items: [
       "History",
+      "Mythology",
+      "Art",
+      "Literature",
       "Science",
-      "Society",
-      "Geopolitics",
-      "Culture",
-      "Economics",
-      "Philosophy",
-      "Arts",
+      "Understanding today's world",
     ],
   },
   features: {
-    aria: "Features",
+    aria: "How it works",
     items: [
       {
         label: "Lessons",
-        title: "Lessons you can read in five minutes",
-        text: "Five-chapter guides with cited sources and illustrations. Written to be finished, not bookmarked.",
-        bullets: ["Five short chapters", "Sources you can check", "New topics every week"],
+        title: "Short lessons",
+        text: "Five screens, a few minutes, one topic at a time. Short enough to read on the bus, dense enough to leave you with something.",
+        bullets: ["Five screens per lesson", "Sources cited", "No jargon"],
         shot: "Lesson",
-        alt: "A lesson chapter in the Sophia: General Knowledge app",
+        alt: "A lesson screen in the Sophia: General Knowledge app",
       },
       {
         label: "Quizzes",
-        title: "A quiz after every lesson",
-        text: "Reading is not remembering. A short quiz right after each lesson turns what you just read into something that sticks.",
-        bullets: ["Instant feedback", "Explanations on every answer", "Track what you've mastered"],
+        title: "Quizzes",
+        text: "After each lesson, a few questions to check what stayed with you. Not to catch you out, but to make it stick.",
+        bullets: ["Instant questions", "Explained answers", "Score per lesson"],
         shot: "Quiz",
         alt: "A quiz question in the Sophia: General Knowledge app",
       },
       {
-        label: "Streaks",
-        title: "A streak that brings you back",
-        text: "Daily practice with spaced repetition, and ranks to unlock as you go. Curious, then Scholar, then further.",
-        bullets: ["Daily training session", "Spaced repetition", "Ranks and levels"],
+        label: "Review",
+        title: "A daily review",
+        text: "Ideas you have already seen come back at spaced intervals, right when you were about to forget them. That is the difference between reading and remembering.",
+        bullets: ["Daily practice", "Spaced repetition", "A few minutes a day"],
         shot: "Progress",
-        alt: "Streak and rank tracking in the Sophia: General Knowledge app",
+        alt: "Streak and progress tracking in the Sophia: General Knowledge app",
       },
     ],
   },
   progress: {
-    title: "Your collection, day after day.",
-    text: "Course collections to complete, ranks to unlock, and a reason to come back every day.",
+    title: "Progress you can see",
+    text: "Day streaks, levels, and a general knowledge score per subject. You can see what you know and what you do not know yet.",
     streakTitle: "Streak running",
     streakText: "Come back every day to keep it alive.",
-    rankTitle: "New rank! Scholar",
-    rankText: "Unlocked by training every day.",
+    rankTitle: "New level: Scholar",
+    rankText: "Unlocked by reviewing every day.",
     shot: "Collection progress",
     shotAlt: "Sophia app screen showing progress inside a course collection",
   },
   testimonials: {
     title: "They learn with Sophia",
-    subtitle: "Placeholder reviews — replace with real user feedback before publishing.",
+    subtitle: "Placeholder reviews, to be replaced with real user feedback before publishing.",
     name: "NAME TO REPLACE",
     text: "Testimonial to replace",
   },
   faqTitle: "Frequently asked questions",
   about: {
-    title: "About Sophia",
+    title: "What is Sophia?",
     paragraphs: [
-      "Sophia: General Knowledge is a mobile learning app. It gives you short lessons, a quiz after each one, and a few minutes of daily practice. It is built for anyone who wants to learn a little every day without setting aside an evening.",
-      "The app is published by Vik Studios SAS, a French company. Vik Studios writes and designs every lesson in the app.",
-      "Sophia is free to download. It runs on iPhone and iPad through the App Store, and on Android phones and tablets through Google Play. Any recent phone will do.",
-      "Lessons cover history, science, society, geopolitics and culture. Each field is split into themed guides of five chapters. A chapter takes a few minutes and ends with a quiz.",
-      "The method is simple: read a short chapter, answer a quiz, then review later through spaced repetition. Progress shows up as a daily streak and as ranks, from Curious to Scholar. The point is a habit, not a cram session.",
-      "Sophia: General Knowledge is a mobile learning app published by Vik Studios SAS, a French company. It is not related to the Sophia humanoid robot, to Sophia University in Tokyo, or to the sophia health programme run by France's Assurance Maladie.",
+      "Sophia is a French mobile app about general knowledge. It offers short lessons you can read in a few minutes, followed by quizzes that check what you kept.",
+      "The app is published by Vik Studios SAS, a French company. It is available free of charge on iOS and on Android.",
+      "The catalogue holds over 240 lessons across six subjects: history, mythology, art, literature, science, and understanding today's world.",
+      "Each lesson is read in five screens. A quiz follows, and daily practice brings back what you have already seen so that it does not fade.",
+      "Sophia is for everyone, with no required level and no jargon. It is built to be opened for a few minutes a day, on the way to work or between two things.",
+      "Sophia: General Knowledge is a mobile learning app. It has no connection with the Sophia humanoid robot, with Sophia University in Tokyo, or with the sophia health programme run by France's Assurance Maladie.",
     ],
   },
   finalCta: {
-    title: "Start today.",
-    text: "Free, on iOS and Android. Five minutes a day is all it takes.",
+    title: "Start today",
+    text: "One lesson a day, five minutes, and general knowledge that settles in for good.",
     cta: "Download free",
   },
   teacherAccess: {
@@ -133,22 +131,26 @@ export const en: Dict = {
     rights: "All rights reserved.",
   },
   landing: {
-    benefitsTitle: "What Sophia: General Knowledge gives you",
+    benefitsTitle: "How it works",
     benefits: [
       {
         title: "Short lessons",
-        text: "Five-chapter guides on history, science, society, geopolitics and culture.",
+        text: "Five screens, a few minutes, one topic at a time. Short enough to read on the bus, dense enough to leave you with something.",
       },
       {
-        title: "A quiz every time",
-        text: "Every chapter ends with a quiz, so what you read actually sticks.",
+        title: "Quizzes",
+        text: "After each lesson, a few questions to check what stayed with you. Not to catch you out, but to make it stick.",
       },
       {
-        title: "Five minutes a day",
-        text: "Spaced repetition, streaks and ranks turn learning into a habit.",
+        title: "A daily review",
+        text: "Ideas you have already seen come back at spaced intervals, right when you were about to forget them. That is the difference between reading and remembering.",
+      },
+      {
+        title: "Progress you can see",
+        text: "Day streaks, levels, and a general knowledge score per subject. You can see what you know and what you do not know yet.",
       },
     ],
-    ctaTitle: "Start today.",
+    ctaTitle: "Start today",
     cta: "Download free",
     publisher: "Sophia: General Knowledge, published by {company}, France.",
   },
@@ -194,7 +196,7 @@ export const en: Dict = {
   courses: {
     hubTitle: "Sophia lessons",
     hubSubtitle:
-      "The guides from the app, free to read on the web. Each lesson takes five minutes, and the quiz that follows lives in the app.",
+      "The lessons from the app, free to read on the web. Each one is read in five screens, and the quiz that follows lives in the app.",
     hubLink: "Lessons",
     all: "All",
     filterAria: "Filter by category",
@@ -210,10 +212,10 @@ export const en: Dict = {
     breadcrumbAria: "Breadcrumb",
     inlineCtaTitle: "Finish this lesson in the app, with the quiz",
     inlineCtaText:
-      "The quiz after this chapter, spaced repetition and your streak all live in the app.",
+      "The quiz after this screen, the daily review and your streak all live in the app.",
     inlineCtaButton: "Open in the app",
     finalCtaTitle: "Learn a little more every day.",
-    finalCtaText: "Over 300 lessons, a quiz after each one, free on iOS and Android.",
+    finalCtaText: "Over 240 lessons, a quiz after each one, free on iOS and Android.",
     finalCtaButton: "Download free",
     notFound: "This lesson does not exist or has moved.",
     backToHub: "Browse all lessons",
@@ -222,42 +224,47 @@ export const en: Dict = {
     {
       question: "What is Sophia?",
       answer:
-        "Sophia: General Knowledge is a mobile learning app. It gives you short lessons, quizzes and daily practice across history, science, society, geopolitics and culture. It is published by Vik Studios SAS, a French company.",
+        "Sophia is a mobile app about general knowledge, published in France. It offers short lessons of five screens, followed by quizzes, on over 240 topics. It is free and available on iOS and Android.",
     },
     {
-      question: "Is Sophia free?",
+      question: "Who created Sophia?",
       answer:
-        "Yes. Sophia: General Knowledge is free to download, and the core lessons and quizzes cost nothing. You can start learning without paying.",
-    },
-    {
-      question: "Which phones does it run on?",
-      answer:
-        "Sophia runs on iPhone and Android phones, and works on iPad and Android tablets too. Get it from the App Store or Google Play.",
+        "Sophia was created by two students around a single idea: general knowledge is almost always taught as a list of things to memorise, while what makes people want to learn are the subjects that intrigue them. They wanted an app that starts from the questions everyone asks rather than from a syllabus. Sophia now works with academics and PhD holders who write its lessons, so that answers come from people who genuinely know the subject. The app is published by Vik Studios SAS.",
     },
     {
       question: "What topics does it cover?",
       answer:
-        "History, science, society, geopolitics and culture. Each topic is split into guides of five short chapters, and new guides are added regularly.",
+        "Sophia covers six subjects: history, mythology, art, literature, science, and understanding today's world. Over 240 lessons are available, from the fall of Constantinople to how artificial intelligence works. New lessons are added regularly.",
     },
     {
-      question: "Who makes Sophia?",
+      question: "Is Sophia free?",
       answer:
-        "Vik Studios SAS, a French company, writes and publishes the app. Every lesson in Sophia is written in-house.",
-    },
-    {
-      question: "Is this the Sophia robot?",
-      answer:
-        "No. Sophia: General Knowledge is a mobile learning app. It has nothing to do with the Sophia humanoid robot from Hanson Robotics, with Sophia University in Tokyo, or with the sophia health programme run by France's Assurance Maladie.",
-    },
-    {
-      question: "How much time does it take?",
-      answer:
-        "Five to ten minutes a day. A chapter takes a few minutes to read and ends with a quick quiz. Showing up regularly matters more than long sessions.",
+        "The download and the first lessons are free. A subscription opens the whole catalogue, the quizzes and the daily review. Terms and prices are shown in the app before any commitment.",
     },
     {
       question: "Do I need an account?",
       answer:
-        "You can start reading as soon as you open the app. An account saves your progress, your streak and your rank, and it is free.",
+        "Yes, an account is required. It keeps your progress, your streak and your reviews, and brings them back if you change phone. Creating one takes less than a minute.",
+    },
+    {
+      question: "Which phones does Sophia run on?",
+      answer:
+        "Sophia runs on iPhone and iPad through the App Store, and on Android through the Google Play Store. The app is designed for the phone and can be read one-handed.",
+    },
+    {
+      question: "How much time does it take each day?",
+      answer:
+        "A lesson takes five to ten minutes, quiz included. The daily review adds a minute or two. The app is made for short, regular use, not for long sessions.",
+    },
+    {
+      question: "Is Sophia connected to the Sophia robot?",
+      answer:
+        "No, not at all. Sophia: General Knowledge is a mobile learning app published by Vik Studios SAS in France. It has nothing to do with the Sophia humanoid robot from Hanson Robotics, with Sophia University in Tokyo, or with the sophia health programme run by France's Assurance Maladie.",
+    },
+    {
+      question: "Are the lessons written by specialists?",
+      answer:
+        "Sophia works with academics and PhD holders who write its lessons, each in their own field. Signed lessons carry the name and title of their author. The aim is simple: an answer written by someone who truly knows the subject, but written to be understood with no prior knowledge.",
     },
   ],
 };

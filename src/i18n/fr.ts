@@ -1,26 +1,26 @@
-/** Contenu français — langue par défaut du site. */
+/** Contenu français, langue par défaut du site. */
 
 export const fr = {
   langLabel: "EN",
   langSwitchAria: "Switch to English",
-  brand: "Sophia — Culture générale",
+  brand: "Sophia, culture générale",
   nav: {
     download: "Télécharger",
     teacherLogin: "Connexion professeur",
     becomeTeacher: "Devenir professeur certifié",
-    home: "Sophia — Culture générale, accueil",
+    home: "Sophia, culture générale, accueil",
     main: "Navigation principale",
   },
   hero: {
-    titleA: "Ta ",
+    titleA: "Sophia, la ",
     titleHighlight: "culture générale",
-    titleB: ", 5 minutes par jour.",
+    titleB: " qui tient dans ta poche",
     subtitle:
-      "Des cours courts, des quiz, et une série à ne pas briser. Sophia transforme ta curiosité en habitude quotidienne.",
+      "Des cours courts, écrits pour être compris, sur les sujets qu'on aimerait vraiment connaître.",
     cta: "Télécharger gratuitement",
-    note: "Gratuit · iOS et Android · Sans engagement",
+    note: "Gratuit, iOS et Android.",
     shotHome: "Accueil",
-    shotHomeAlt: "Écran de cours de l'application Sophia — Culture générale",
+    shotHomeAlt: "Écran de cours de l'application Sophia, culture générale",
     shotQuiz: "Quiz",
     shotQuizAlt: "Un quiz de culture générale dans l'application Sophia",
   },
@@ -38,59 +38,58 @@ export const fr = {
     play: "Télécharger sur Google Play",
     badgeAppStoreTop: "Télécharger dans l'",
     badgePlayTop: "DISPONIBLE SUR",
-    badgeAppStoreAria: "Télécharger Sophia — Culture générale sur l'App Store",
-    badgePlayAria: "Télécharger Sophia — Culture générale sur Google Play",
+    badgeAppStoreAria: "Télécharger Sophia, culture générale sur l'App Store",
+    badgePlayAria: "Télécharger Sophia, culture générale sur Google Play",
   },
   categories: {
     title: "Ce que tu apprends",
-    subtitle: "Huit domaines de culture générale, découpés en dossiers courts.",
+    subtitle:
+      "Six matières, plus de 240 cours, et un sujet à la fois pour ne jamais être perdu.",
     items: [
       "Histoire",
+      "Mythologie",
+      "Art",
+      "Littérature",
       "Sciences",
-      "Société",
-      "Géopolitique",
-      "Culture",
-      "Économie",
-      "Philosophie",
-      "Arts",
+      "Comprendre le monde actuel",
     ],
   },
   features: {
-    aria: "Fonctionnalités",
+    aria: "Comment ça marche",
     items: [
       {
         label: "Les cours",
-        title: "Des cours qui se lisent en 5 minutes",
-        text: "Chaque dossier se découpe en cinq chapitres courts. Tu avances par petites touches, sans jamais y passer ta soirée.",
-        bullets: ["Dossiers de 5 chapitres", "Sources citées", "Images d'illustration"],
+        title: "Des cours courts",
+        text: "Cinq écrans, quelques minutes, un sujet à la fois. Assez court pour le lire dans le métro, assez dense pour en ressortir avec quelque chose.",
+        bullets: ["Cinq écrans par cours", "Sources citées", "Sans jargon"],
         shot: "Cours",
-        alt: "Un chapitre de cours dans Sophia — Culture générale",
+        alt: "Un écran de cours dans Sophia, culture générale",
       },
       {
         label: "Les quiz",
-        title: "Un quiz après chaque cours",
-        text: "Tu réponds juste après avoir lu. C'est là que ce que tu viens de lire devient quelque chose que tu retiens vraiment.",
-        bullets: ["Questions immédiates", "Correction expliquée", "Score par chapitre"],
+        title: "Des quiz",
+        text: "Après chaque cours, quelques questions pour vérifier ce qui est resté. Pas pour te piéger, pour que ça tienne.",
+        bullets: ["Questions immédiates", "Correction expliquée", "Score par cours"],
         shot: "Quiz",
         alt: "Un quiz de culture générale dans l'application Sophia",
       },
       {
-        label: "L'habitude",
-        title: "Une série qui te fait revenir",
-        text: "Un entraînement quotidien de quelques minutes suffit. La révision espacée ramène les bonnes notions au bon moment.",
-        bullets: ["Entraînement quotidien", "Révision espacée", "Rangs à débloquer"],
+        label: "La révision",
+        title: "Une révision quotidienne",
+        text: "Les notions déjà vues reviennent à intervalles espacés, au moment où on allait les oublier. C'est ce qui fait la différence entre lire et retenir.",
+        bullets: ["Entraînement quotidien", "Révision espacée", "Quelques minutes par jour"],
         shot: "Progression",
         alt: "Suivi de progression et série de jours dans Sophia",
       },
     ],
   },
   progress: {
-    title: "Ta collection, jour après jour.",
-    text: "Des collections de cours à compléter, des rangs à débloquer, et une raison de revenir chaque jour.",
+    title: "Une progression",
+    text: "Des séries de jours, des niveaux, un indice de culture générale par matière. On voit ce qu'on sait et ce qu'on ne sait pas encore.",
     streakTitle: "Série en cours",
     streakText: "Reviens chaque jour pour ne pas la briser.",
-    rankTitle: "Nouveau rang ! Érudit",
-    rankText: "Débloqué en révisant tes chapitres chaque jour.",
+    rankTitle: "Nouveau niveau : Érudit",
+    rankText: "Débloqué en révisant chaque jour.",
     shot: "Progression dans une collection",
     shotAlt: "Écran de l'app Sophia montrant l'avancée dans une collection de cours",
   },
@@ -102,68 +101,72 @@ export const fr = {
   },
   faqTitle: "Questions fréquentes",
   about: {
-    title: "À propos de Sophia",
+    title: "Sophia, c'est quoi ?",
     paragraphs: [
-      "Sophia — Culture générale est une application mobile d'apprentissage de la culture générale, entièrement en français. L'application propose des cours courts, des quiz et un entraînement quotidien. Elle s'adresse à toute personne qui veut apprendre un peu chaque jour, sans y consacrer plus de dix minutes.",
-      "Sophia — Culture générale est éditée par Vik Studios SAS, une société française. Vik Studios SAS conçoit et rédige l'ensemble des contenus de l'application. L'éditeur est établi en France et publie l'application sous son propre nom.",
-      "Le téléchargement de Sophia — Culture générale est gratuit. L'application est disponible sur iPhone et iPad via l'App Store d'Apple, et sur les smartphones et tablettes Android via le Google Play Store. Aucun matériel particulier n'est nécessaire : un téléphone récent suffit.",
-      "Les contenus de Sophia — Culture générale couvrent cinq grands domaines : l'histoire, les sciences, la société, la géopolitique et la culture. Chaque domaine est découpé en dossiers thématiques de cinq chapitres. Un chapitre se lit en quelques minutes et se termine par un quiz.",
-      "Le fonctionnement de Sophia — Culture générale repose sur trois étapes : lire un chapitre court, répondre à un quiz, puis réviser plus tard grâce à la répétition espacée. La progression est mesurée par une série de jours consécutifs et par des rangs, de Curieux à Érudit. L'objectif est de transformer l'apprentissage en habitude quotidienne plutôt qu'en effort ponctuel.",
-      "Sophia — Culture générale est une application mobile d'apprentissage. Elle n'a aucun lien avec le robot humanoïde Sophia, avec l'université Sophia de Tokyo, ni avec le programme sophia de l'Assurance Maladie.",
+      "Sophia est une application mobile française de culture générale. Elle propose des cours courts, lisibles en quelques minutes, suivis de quiz pour vérifier ce qu'on a retenu.",
+      "L'application est éditée par Vik Studios SAS, une société française. Elle est disponible gratuitement sur iOS et sur Android.",
+      "Le catalogue compte plus de 240 cours répartis en six matières : histoire, mythologie, art, littérature, sciences, et comprendre le monde actuel.",
+      "Chaque cours se lit en cinq écrans. Un quiz suit, et un entraînement quotidien fait revenir les notions déjà vues pour qu'elles ne s'effacent pas.",
+      "Sophia s'adresse à tout le monde, sans niveau requis et sans jargon. L'application est pensée pour être ouverte quelques minutes par jour, dans les transports ou entre deux choses.",
+      "Sophia, culture générale est une application mobile d'apprentissage. Elle n'a aucun lien avec le robot humanoïde Sophia, avec l'université Sophia de Tokyo, ni avec le programme sophia de l'Assurance Maladie.",
     ],
   },
   finalCta: {
-    title: "Commence aujourd'hui.",
-    text: "Gratuit, sur iOS et Android. Cinq minutes par jour suffisent.",
+    title: "Commence aujourd'hui",
+    text: "Un cours par jour, cinq minutes, et une culture générale qui s'installe pour de bon.",
     cta: "Télécharger gratuitement",
   },
   teacherAccess: {
     title: "Enseignez avec Sophia",
-    text: "Proposez des sujets et contribuez à des cours qui seront vérifiés par notre équipe avant publication.",
+    text: "Proposez des sujets et contribuez à des cours vérifiés par notre équipe avant publication.",
     login: "Connexion professeur",
     join: "Devenir professeur certifié",
   },
   footer: {
     tagline:
-      "Sophia — Culture générale est une application mobile d'apprentissage éditée par {company}, société française.",
+      "Sophia, culture générale est une application mobile d'apprentissage éditée par {company}, société française.",
     legal: "Mentions légales",
     privacy: "Confidentialité",
     rights: "Tous droits réservés.",
   },
   landing: {
-    benefitsTitle: "Ce que propose Sophia — Culture générale",
+    benefitsTitle: "Comment ça marche",
     benefits: [
       {
         title: "Des cours courts",
-        text: "Des dossiers de 5 chapitres en histoire, sciences, société, géopolitique et culture.",
+        text: "Cinq écrans, quelques minutes, un sujet à la fois. Assez court pour le lire dans le métro, assez dense pour en ressortir avec quelque chose.",
       },
       {
-        title: "Des quiz immédiats",
-        text: "Chaque chapitre se termine par un quiz pour ancrer ce que tu viens de lire.",
+        title: "Des quiz",
+        text: "Après chaque cours, quelques questions pour vérifier ce qui est resté. Pas pour te piéger, pour que ça tienne.",
       },
       {
-        title: "10 minutes par jour",
-        text: "Révision espacée, série de jours et rangs : la culture générale devient une habitude.",
+        title: "Une révision quotidienne",
+        text: "Les notions déjà vues reviennent à intervalles espacés, au moment où on allait les oublier. C'est ce qui fait la différence entre lire et retenir.",
+      },
+      {
+        title: "Une progression",
+        text: "Des séries de jours, des niveaux, un indice de culture générale par matière. On voit ce qu'on sait et ce qu'on ne sait pas encore.",
       },
     ],
-    ctaTitle: "Commence aujourd'hui.",
+    ctaTitle: "Commence aujourd'hui",
     cta: "Télécharger gratuitement",
-    publisher: "Sophia — Culture générale, éditée par {company}, France.",
+    publisher: "Sophia, culture générale, éditée par {company}, France.",
   },
   download: {
     redirectAndroid: "Redirection vers Google Play…",
     redirectIos: "Redirection vers l'App Store…",
     redirectText:
-      "Ouverture de la fiche de Sophia — Culture générale. Si rien ne se passe, utilise les boutons ci-dessous.",
-    title: "Télécharger Sophia — Culture générale",
+      "Ouverture de la fiche de Sophia, culture générale. Si rien ne se passe, utilise les boutons ci-dessous.",
+    title: "Télécharger Sophia, culture générale",
     text: "L'application est gratuite sur iOS et Android. Scanne le QR code avec ton téléphone ou choisis ton store.",
-    qrAlt: "QR code vers la page de téléchargement de Sophia — Culture générale",
+    qrAlt: "QR code vers la page de téléchargement de Sophia, culture générale",
   },
   legal: {
     title: "Mentions légales",
     editorTitle: "Éditeur du site",
     editorText:
-      "{company}, société par actions simplifiée de droit français, éditrice de l'application mobile Sophia — Culture générale.",
+      "{company}, société par actions simplifiée de droit français, éditrice de l'application mobile Sophia, culture générale.",
     editorDetails:
       "Adresse du siège social : À COMPLÉTER. Numéro SIREN / SIRET : À COMPLÉTER. Numéro de TVA intracommunautaire : À COMPLÉTER. Capital social : À COMPLÉTER.",
     director: "Directeur de la publication : À COMPLÉTER. Contact :",
@@ -171,12 +174,12 @@ export const fr = {
     hostText: "Hébergeur du site : À COMPLÉTER (raison sociale, adresse et téléphone).",
     ipTitle: "Propriété intellectuelle",
     ipText:
-      "L'ensemble des contenus du site et de l'application Sophia — Culture générale (textes, quiz, marques, logo, interfaces) est protégé et reste la propriété de {company}, sauf mention contraire. Section à compléter.",
+      "L'ensemble des contenus du site et de l'application Sophia, culture générale (textes, quiz, marques, logo, interfaces) est protégé et reste la propriété de {company}, sauf mention contraire. Section à compléter.",
   },
   privacy: {
     title: "Politique de confidentialité",
     intro:
-      "Cette page décrit la manière dont {company} traite les données personnelles des utilisateurs de l'application Sophia — Culture générale et de ce site. Document à compléter avant publication.",
+      "Cette page décrit la manière dont {company} traite les données personnelles des utilisateurs de l'application Sophia, culture générale et de ce site. Document à compléter avant publication.",
     dataTitle: "Données collectées",
     dataText:
       "À COMPLÉTER : nature des données collectées (compte, progression, données techniques), finalités et bases légales.",
@@ -192,7 +195,7 @@ export const fr = {
   courses: {
     hubTitle: "Les cours Sophia",
     hubSubtitle:
-      "Les dossiers de culture générale de l'application, à lire librement sur le web. Chaque cours se lit en cinq minutes et se prolonge par un quiz dans l'application.",
+      "Les cours de l'application, à lire librement sur le web. Chaque cours se lit en cinq écrans et se prolonge par un quiz dans l'application.",
     hubLink: "Les cours",
     all: "Tous",
     filterAria: "Filtrer par catégorie",
@@ -208,10 +211,10 @@ export const fr = {
     breadcrumbAria: "Fil d'Ariane",
     inlineCtaTitle: "Continue ce cours dans l'app, avec le quiz",
     inlineCtaText:
-      "Le quiz qui suit ce chapitre, la révision espacée et ta série de jours sont dans l'application.",
+      "Le quiz qui suit cet écran, la révision quotidienne et ta série de jours sont dans l'application.",
     inlineCtaButton: "Ouvrir dans l'app",
     finalCtaTitle: "Apprends un peu plus chaque jour.",
-    finalCtaText: "Plus de 300 cours, un quiz après chacun, gratuitement sur iOS et Android.",
+    finalCtaText: "Plus de 240 cours, un quiz après chacun, gratuitement sur iOS et Android.",
     finalCtaButton: "Télécharger gratuitement",
     notFound: "Ce cours n'existe pas ou a été déplacé.",
     backToHub: "Voir tous les cours",
@@ -220,42 +223,47 @@ export const fr = {
     {
       question: "Sophia, c'est quoi ?",
       answer:
-        "Sophia — Culture générale est une application mobile française d'apprentissage de la culture générale. Elle propose des cours courts, des quiz et un entraînement quotidien sur l'histoire, les sciences, la société, la géopolitique et la culture. L'application est éditée par Vik Studios SAS, société établie en France.",
-    },
-    {
-      question: "Sophia est-elle gratuite ?",
-      answer:
-        "Oui, Sophia — Culture générale est gratuite au téléchargement. Les cours et les quiz de base sont accessibles sans payer. Aucun paiement n'est demandé pour commencer à apprendre.",
-    },
-    {
-      question: "Sur quels téléphones fonctionne Sophia ?",
-      answer:
-        "Sophia — Culture générale fonctionne sur les smartphones iOS et Android. L'application se télécharge depuis l'App Store d'Apple et depuis le Google Play Store. Elle s'utilise aussi sur iPad et sur les tablettes Android.",
-    },
-    {
-      question: "Quels sujets sont couverts ?",
-      answer:
-        "Sophia — Culture générale couvre l'histoire, les sciences, la société, la géopolitique et la culture. Chaque thème est découpé en dossiers de cinq chapitres courts. De nouveaux dossiers sont ajoutés régulièrement.",
+        "Sophia est une application mobile de culture générale, éditée en France. Elle propose des cours courts de cinq écrans, suivis de quiz, sur plus de 240 sujets. Elle est gratuite et disponible sur iOS et Android.",
     },
     {
       question: "Qui a créé Sophia ?",
       answer:
-        "Sophia — Culture générale est créée et éditée par Vik Studios SAS, une société française. L'ensemble des contenus de l'application est rédigé en français. Vik Studios SAS est l'unique éditeur de l'application.",
+        "Sophia a été créée par deux étudiants, réunis autour d'une même idée : la culture générale est presque toujours enseignée comme une liste de choses à retenir, alors que ce qui donne envie d'apprendre, ce sont les sujets qui intriguent. Ils ont voulu une application qui parte des questions que tout le monde se pose plutôt que d'un programme. Sophia s'entoure aujourd'hui d'enseignants-chercheurs et de docteurs pour écrire ses cours, afin que les réponses viennent de celles et ceux qui connaissent réellement le sujet. L'application est éditée par Vik Studios SAS.",
     },
     {
-      question: "Sophia a-t-elle un lien avec le robot Sophia ?",
+      question: "Quels sujets sont couverts ?",
       answer:
-        "Non. Sophia — Culture générale est une application mobile d'apprentissage et n'a aucun lien avec le robot humanoïde Sophia de Hanson Robotics. Elle n'a pas non plus de lien avec l'université Sophia de Tokyo, ni avec le programme sophia d'accompagnement des malades chroniques de l'Assurance Maladie.",
+        "Sophia couvre six matières : histoire, mythologie, art, littérature, sciences, et comprendre le monde actuel. Plus de 240 cours sont disponibles, de la chute de Constantinople au fonctionnement de l'intelligence artificielle. De nouveaux cours sont ajoutés régulièrement.",
     },
     {
-      question: "Combien de temps faut-il par jour ?",
+      question: "Sophia est-elle gratuite ?",
       answer:
-        "Cinq à dix minutes par jour suffisent pour progresser avec Sophia — Culture générale. Un chapitre se lit en quelques minutes et se termine par un quiz rapide. La régularité compte plus que la durée de chaque session.",
+        "Le téléchargement et les premiers cours sont gratuits. Un abonnement donne accès à l'ensemble du catalogue, aux quiz et à la révision quotidienne. Les conditions et les tarifs sont affichés dans l'application avant tout engagement.",
     },
     {
       question: "Faut-il créer un compte ?",
       answer:
-        "Vous pouvez commencer à lire les cours de Sophia — Culture générale dès l'ouverture de l'application. Créer un compte permet de sauvegarder votre progression, votre série de jours et votre rang. Le compte est gratuit.",
+        "Oui, un compte est nécessaire. Il sert à conserver ta progression, ta série de jours et tes révisions, et à les retrouver si tu changes de téléphone. La création prend moins d'une minute.",
+    },
+    {
+      question: "Sur quels téléphones fonctionne Sophia ?",
+      answer:
+        "Sophia fonctionne sur iPhone et iPad via l'App Store, et sur Android via le Google Play Store. L'application est conçue pour le téléphone et se lit à une main.",
+    },
+    {
+      question: "Combien de temps faut-il par jour ?",
+      answer:
+        "Un cours se lit en cinq à dix minutes, quiz compris. La révision quotidienne prend une ou deux minutes de plus. L'application est faite pour un usage court et régulier, pas pour de longues sessions.",
+    },
+    {
+      question: "Sophia a-t-elle un lien avec le robot Sophia ?",
+      answer:
+        "Non, aucun. Sophia, culture générale est une application mobile d'apprentissage éditée par Vik Studios SAS en France. Elle n'a aucun rapport avec le robot humanoïde Sophia de Hanson Robotics, avec l'université Sophia de Tokyo, ni avec le programme sophia de l'Assurance Maladie française.",
+    },
+    {
+      question: "Les cours sont-ils écrits par des spécialistes ?",
+      answer:
+        "Sophia fait appel à des enseignants-chercheurs et à des docteurs pour écrire ses cours, chacun dans son domaine. Les cours signés portent le nom et le titre de leur auteur. L'objectif est simple : une réponse écrite par quelqu'un qui connaît vraiment le sujet, mais rédigée pour être comprise sans aucun prérequis.",
     },
   ],
 };
