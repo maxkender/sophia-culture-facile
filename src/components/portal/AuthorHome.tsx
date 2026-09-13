@@ -105,7 +105,7 @@ export function AuthorHome() {
           <p className="mt-4 text-sm leading-relaxed text-brand-navySoft">
             {signed
               ? `Signed on ${formatDate(me?.signedAt)}. The document stays available.`
-              : "Not signed yet. You need to sign before you can write."}
+              : "Not signed yet. You can still start writing your courses now."}
           </p>
           <Button asChild variant={signed ? "pillSecondary" : "pill"} size="pillSm" className="mt-4">
             <Link to="/auteurs/contract">{signed ? "View agreement" : "Read and sign"}</Link>
