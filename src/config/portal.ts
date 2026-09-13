@@ -34,7 +34,8 @@ export const STATUS_LABEL: Record<CourseStatus, string> = {
 };
 
 export const SCREEN_NUMBERS = [1, 2, 3, 4, 5] as const;
-export const WORDS_MIN = 70;
-export const WORDS_MAX = 100;
-export const WORDS_WARN = 120;
-export const COURSE_WORDS_TARGET = 500;
+export const WORDS_MIN = 100;
+export const WORDS_MAX = 140;
+export const WORDS_WARN = 160;
+export const COURSE_WORDS_MIN = 500;
+export const COURSE_WORDS_MAX = 700;
