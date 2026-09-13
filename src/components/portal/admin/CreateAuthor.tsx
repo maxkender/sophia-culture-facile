@@ -48,7 +48,7 @@ export function CreateAuthor() {
       const { data: profile, error } = await supabase
         .from("profiles")
         .insert({
-          email: form.email.trim().toLowerCase(),
+          email: form.email.trim().toLowerCase() || null,
           role: "author",
           full_name: form.full_name.trim(),
           title: form.title.trim() || null,
@@ -110,8 +110,9 @@ export function CreateAuthor() {
             <Input id="full_name" required value={form.full_name} onChange={(e) => update("full_name", e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} className="h-11" />
+            <Label htmlFor="email">Email (optional)</Label>
+            <Input id="email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className="h-11" />
+            <p className="text-xs text-brand-navySoft">Leave empty and the author sets their own when they accept the invite.</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
