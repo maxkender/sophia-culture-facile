@@ -97,6 +97,11 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
       <Link to="/auteurs/admin/authors" className="mb-6 inline-block text-sm font-semibold text-portal-accent">
         ← All authors
       </Link>
+      {author.is_test ? (
+        <p className="mb-3 inline-block rounded-full bg-brand-line px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-brand-navySoft">
+          Test account — excluded from dashboard figures
+        </p>
+      ) : null}
       <PageTitle title={author.full_name} lead={[author.title, author.institution, author.country].filter(Boolean).join(" · ")} />
 
       <div className="grid gap-5 lg:grid-cols-3">

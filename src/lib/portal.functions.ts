@@ -34,17 +34,25 @@ async function loadInvite(token: string) {
   return { supabaseAdmin, profile };
 }
 
-function inviteState(profile: { activated_at: string | null; invite_expires_at: string | null } | null): InviteState {
+function inviteState(
+  profile: { activated_at: string | null; invite_expires_at: string | null; is_test?: boolean } | null,
+): InviteState {
   if (!profile) return "invalid";
+  // The internal test account keeps a reusable invite so the flow can be replayed.
+  if (profile.is_test) return "ok";
   if (profile.activated_at) return "used";
   if (profile.invite_expires_at && new Date(profile.invite_expires_at).getTime() < Date.now()) return "expired";
   return "ok";
 }
 
-async function accountExists(email: string) {
+async function findUserByEmail(email: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-  return (data?.users ?? []).some((user) => (user.email ?? "").toLowerCase() === email.toLowerCase());
+  return (data?.users ?? []).find((user) => (user.email ?? "").toLowerCase() === email.toLowerCase()) ?? null;
+}
+
+async function accountExists(email: string) {
+  return Boolean(await findUserByEmail(email));
 }
 
 /** Public: shows the invited author the profile the desk already built for them. */
@@ -127,25 +135,36 @@ export const claimInvite = createServerFn({ method: "POST" })
     const resolved = await resolveClaimEmail(profile, data.email);
     if ("error" in resolved) return { ok: false as const, state: resolved.error };
 
-    const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email: resolved.email,
-      password: data.password,
-      email_confirm: true,
-    });
-    if (createError || !created?.user) {
-      return { ok: false as const, state: "account" as const };
+    // The test account replays the flow, so reuse its existing login instead of creating a second one.
+    const existingUser = profile.is_test ? await findUserByEmail(resolved.email) : null;
+    let userId: string;
+    if (existingUser) {
+      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
+        password: data.password,
+      });
+      if (updateError) return { ok: false as const, state: "account" as const };
+      userId = existingUser.id;
+    } else {
+      const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email: resolved.email,
+        password: data.password,
+        email_confirm: true,
+      });
+      if (createError || !created?.user) {
+        return { ok: false as const, state: "account" as const };
+      }
+      userId = created.user.id;
     }
 
-    const { error } = await supabaseAdmin
+    const query = supabaseAdmin
       .from("profiles")
       .update({
-        user_id: created.user.id,
+        user_id: userId,
         activated_at: new Date().toISOString(),
-        invite_token: null,
-        invite_expires_at: null,
+        ...(profile.is_test ? {} : { invite_token: null, invite_expires_at: null }),
       })
-      .eq("id", profile.id)
-      .is("activated_at", null);
+      .eq("id", profile.id);
+    const { error } = profile.is_test ? await query : await query.is("activated_at", null);
     if (error) return { ok: false as const, state: "used" as const };
 
     await supabaseAdmin.from("activity_log").insert({
@@ -203,8 +222,7 @@ export const acceptInvite = createServerFn({ method: "POST" })
       .update({
         user_id: context.userId,
         activated_at: profile.activated_at ?? new Date().toISOString(),
-        invite_token: null,
-        invite_expires_at: null,
+        ...(profile.is_test ? {} : { invite_token: null, invite_expires_at: null }),
       })
       .eq("id", profile.id);
     if (error) throw new Error("The invite could not be activated.");
