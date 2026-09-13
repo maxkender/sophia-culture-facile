@@ -46,7 +46,12 @@ export function AuthorHome() {
             <>
               <p className="mt-4 font-mono text-lg font-bold tracking-wide text-brand-navy">{profile.access_code}</p>
               <p className="mt-1 text-xs text-brand-navySoft">
-                {profile.platform === "android" ? "Google Play" : "App Store"} — one-time use
+                {profile.platform === "android" ? "Android — Google Play" : "Apple — App Store"} · one-time use
+              </p>
+              <p className="mt-3 text-xs leading-relaxed text-brand-navySoft">
+                {profile.platform === "android"
+                  ? "To redeem: open Google Play, tap your profile picture, then Payments & subscriptions → Redeem code."
+                  : "To redeem: open the App Store, tap Account, then Redeem Gift Card or Code."}
               </p>
               <p className="mt-3 rounded-2xl bg-portal-bg px-3 py-2 text-xs leading-relaxed text-brand-navy">
                 <span className="font-bold">Important:</span> this code starts a free trial subscription, not a
@@ -72,7 +77,7 @@ export function AuthorHome() {
               </p>
               <p className="mt-1 text-xs text-brand-navySoft">
                 {profile?.is_test
-                  ? "This is the internal test profile: no App Store code is attached to it."
+                  ? "This is the internal test profile: no store code is attached to it."
                   : "No code has been issued to you yet."}
               </p>
             </>
@@ -100,7 +105,7 @@ export function AuthorHome() {
           <p className="mt-4 text-sm leading-relaxed text-brand-navySoft">
             {signed
               ? `Signed on ${formatDate(me?.signedAt)}. The document stays available.`
-              : "Not signed yet. You need to sign before you can write."}
+              : "Not signed yet. You can still start writing your courses now."}
           </p>
           <Button asChild variant={signed ? "pillSecondary" : "pill"} size="pillSm" className="mt-4">
             <Link to="/auteurs/contract">{signed ? "View agreement" : "Read and sign"}</Link>
@@ -110,9 +115,8 @@ export function AuthorHome() {
 
       {!signed ? (
         <div className="mt-6">
-          <Banner tone="warning" title="Your courses are read-only until the agreement is signed">
-            Open the author agreement, read it and sign at the bottom. Your commissioned courses are already listed
-            below.
+          <Banner tone="info" title="Your agreement is ready to review">
+            You can start writing now and read or sign the agreement whenever you are ready.
           </Banner>
         </div>
       ) : null}

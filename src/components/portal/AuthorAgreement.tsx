@@ -75,14 +75,14 @@ export function AuthorAgreement() {
     <div>
       <PageTitle
         title="Author agreement"
-        lead="Read the agreement in full, then sign at the bottom. You can come back to this page at any time."
+        lead="Read the agreement in full and sign at the bottom when you are ready. Signing is not required to start writing."
       />
 
       {signedAt ? (
         <div className="mb-6">
           <Banner tone="success" title={`Signed on ${formatDateTime(signedAt)}`}>
             You signed version {signedVersion ?? "—"} and remain bound to that version. Later edits to the agreement do
-            not change what you signed. Your courses are open for writing.
+            not change what you signed.
           </Banner>
         </div>
       ) : null}

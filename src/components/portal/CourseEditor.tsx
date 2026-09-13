@@ -31,7 +31,6 @@ const EMPTY_SCREEN: ScreenDraft = { id: null, screen_title: "", body: "", image_
 export function CourseEditor({ courseId, admin = false }: { courseId: string; admin?: boolean }) {
   const queryClient = useQueryClient();
   const { data: me } = usePortalProfile();
-  const signed = Boolean(me?.signedAt);
 
   const { data, isLoading } = useQuery({
     queryKey: ["portal", "course", courseId],
@@ -48,7 +47,7 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
 
   const course = data?.course ?? null;
   const liveStatus = (course?.status ?? "assigned") as CourseStatus;
-  const lockedForAuthor = !signed || liveStatus === "submitted" || liveStatus === "accepted" || liveStatus === "published";
+  const lockedForAuthor = liveStatus === "submitted" || liveStatus === "accepted" || liveStatus === "published";
   const readOnly = admin ? false : lockedForAuthor;
 
   const [title, setTitle] = useState("");
@@ -248,16 +247,7 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
         {liveStatus === "changes_requested" && course.review_comment ? (
           <Banner tone="warning" title="Changes requested">{course.review_comment}</Banner>
         ) : null}
-        {!admin && !signed ? (
-          <Banner tone="warning" title="Sign the author agreement to start writing">
-            Your course stays visible and read-only until the agreement is signed.{" "}
-            <Link to="/auteurs/contract" className="font-bold text-portal-accent underline-offset-4 hover:underline">
-              Read and sign
-            </Link>
-            .
-          </Banner>
-        ) : null}
-        {!admin && signed && (liveStatus === "submitted" || liveStatus === "accepted" || liveStatus === "published") ? (
+        {!admin && (liveStatus === "submitted" || liveStatus === "accepted" || liveStatus === "published") ? (
           <Banner tone="info" title="This course is read-only">
             It is with the editorial desk. If changes are requested it reopens automatically.
           </Banner>

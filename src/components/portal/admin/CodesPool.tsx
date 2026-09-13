@@ -40,30 +40,35 @@ export function CodesPool() {
   const { data } = useQuery({
     queryKey: ["portal", "admin", "codes"],
     queryFn: async () => {
-      const countFor = async (state: "available" | "assigned" | "sent") =>
-        (await supabase.from("access_codes").select("id", { count: "exact", head: true }).eq("state", state)).count ?? 0;
-      const [available, assigned, sent, { data: recent }, { data: authors }] = await Promise.all([
+      const countFor = async (state: "available" | "assigned" | "sent", platform?: Platform) => {
+        let query = supabase.from("access_codes").select("id", { count: "exact", head: true }).eq("state", state);
+        if (platform) query = query.eq("platform", platform);
+        return (await query).count ?? 0;
+      };
+      const [available, assigned, sent, appleAvailable, androidAvailable, { data: recent }, { data: authors }] = await Promise.all([
         countFor("available"),
         countFor("assigned"),
         countFor("sent"),
+        countFor("available", "ios"),
+        countFor("available", "android"),
         supabase.from("access_codes").select("*").neq("state", "available").order("assigned_at", { ascending: false }).limit(200),
         supabase.from("profiles").select("id, full_name, platform"),
       ]);
       return {
-        counts: { available, assigned, sent },
+        counts: { available, assigned, sent, appleAvailable, androidAvailable },
         recent: (recent ?? []) as AccessCode[],
         authors: (authors ?? []) as Pick<Profile, "id" | "full_name" | "platform">[],
       };
     },
   });
 
-  const counts = data?.counts ?? { available: 0, assigned: 0, sent: 0 };
+  const counts = data?.counts ?? { available: 0, assigned: 0, sent: 0, appleAvailable: 0, androidAvailable: 0 };
   const recent = data?.recent ?? [];
   const authorById = new Map((data?.authors ?? []).map((author) => [author.id, author]));
 
   const mismatched = recent.filter((code) => {
     const author = code.assigned_to ? authorById.get(code.assigned_to) : null;
-    return Boolean(author) && author!.platform !== code.platform;
+    return Boolean(author && author.platform !== code.platform);
   });
 
   async function insertRows(rows: CodeRow[]) {
@@ -142,6 +147,17 @@ export function CodesPool() {
         ))}
       </div>
 
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <PortalCard>
+          <p className="text-sm font-semibold text-brand-navySoft">Apple App Store available</p>
+          <p className="mt-2 text-3xl font-extrabold text-brand-navy">{counts.appleAvailable.toLocaleString("en-GB")}</p>
+        </PortalCard>
+        <PortalCard>
+          <p className="text-sm font-semibold text-brand-navySoft">Android Google Play available</p>
+          <p className="mt-2 text-3xl font-extrabold text-brand-navy">{counts.androidAvailable.toLocaleString("en-GB")}</p>
+        </PortalCard>
+      </div>
+
       {mismatched.length > 0 ? (
         <div className="mt-6">
           <Banner tone="warning" title="Platform mismatch">
@@ -182,8 +198,8 @@ export function CodesPool() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ios">iOS</SelectItem>
-                <SelectItem value="android">Android</SelectItem>
+                <SelectItem value="ios">Apple App Store</SelectItem>
+                <SelectItem value="android">Android — Google Play</SelectItem>
               </SelectContent>
             </Select>
             <Label htmlFor="code-file" className="pt-2">CSV file</Label>
