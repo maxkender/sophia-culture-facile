@@ -296,7 +296,7 @@ export function InvitePage({ token }: { token: string }) {
                 </Button>
                 {sent ? (
                   <p className="mt-3 text-sm text-brand-navySoft">
-                    Check {profile.email} for the sign-in link, then open it on this device.
+                    Check {profile.email ?? email} for the sign-in link, then open it on this device.
                   </p>
                 ) : null}
               </PortalCard>
