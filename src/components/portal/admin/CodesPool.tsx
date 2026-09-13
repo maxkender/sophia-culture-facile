@@ -40,7 +40,7 @@ export function CodesPool() {
   const { data } = useQuery({
     queryKey: ["portal", "admin", "codes"],
     queryFn: async () => {
-      const countFor = async (state: string) =>
+      const countFor = async (state: "available" | "assigned" | "sent") =>
         (await supabase.from("access_codes").select("id", { count: "exact", head: true }).eq("state", state)).count ?? 0;
       const [available, assigned, sent, { data: recent }, { data: authors }] = await Promise.all([
         countFor("available"),
