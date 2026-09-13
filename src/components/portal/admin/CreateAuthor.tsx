@@ -69,7 +69,8 @@ export function CreateAuthor() {
         await supabase
           .from("access_codes")
           .update({ state: "assigned", assigned_to: profile.id, assigned_at: new Date().toISOString() })
-          .eq("id", code.id);
+          .eq("id", code.id)
+          .eq("state", "available");
       }
 
       if (photo) {

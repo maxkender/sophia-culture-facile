@@ -48,6 +48,12 @@ export function AuthorHome() {
               <p className="mt-1 text-xs text-brand-navySoft">
                 {profile.platform === "android" ? "Google Play" : "App Store"} — one-time use
               </p>
+              <p className="mt-3 rounded-2xl bg-portal-bg px-3 py-2 text-xs leading-relaxed text-brand-navy">
+                <span className="font-bold">Important:</span> this code starts a free trial subscription, not a
+                lifetime one. Cancel the subscription in your{" "}
+                {profile.platform === "android" ? "Google Play" : "App Store"} account settings before the trial ends
+                if you do not want to be charged.
+              </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <CopyButton value={profile.access_code} label="Copy code" />
                 {profile.access_redeem_url ? (
