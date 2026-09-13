@@ -82,7 +82,10 @@ export function CreateAuthor() {
         }
       }
 
-      if (!code) toast.warning("Author created, but the access code pool is empty.");
+      if (!code)
+        toast.warning(
+          `Author created, but there is no available ${platform === "android" ? "Google Play" : "App Store"} code left.`,
+        );
       else toast.success("Author created and access code assigned.");
       await queryClient.invalidateQueries({ queryKey: ["portal", "admin"] });
       await navigate({ to: "/auteurs/admin/authors/$authorId", params: { authorId: profile.id } });
