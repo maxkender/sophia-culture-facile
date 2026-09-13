@@ -139,6 +139,7 @@ export type Database = {
           due_date: string | null
           id: string
           lot_code: string | null
+          lot_name: string | null
           order_index: number
           review_comment: string | null
           status: Database["public"]["Enums"]["course_status"]
@@ -155,6 +156,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           lot_code?: string | null
+          lot_name?: string | null
           order_index?: number
           review_comment?: string | null
           status?: Database["public"]["Enums"]["course_status"]
@@ -171,6 +173,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           lot_code?: string | null
+          lot_name?: string | null
           order_index?: number
           review_comment?: string | null
           status?: Database["public"]["Enums"]["course_status"]
@@ -287,7 +290,7 @@ export type Database = {
           bio: string | null
           country: string | null
           created_at: string
-          email: string
+          email: string | null
           full_name: string
           id: string
           institution: string | null
@@ -308,7 +311,7 @@ export type Database = {
           bio?: string | null
           country?: string | null
           created_at?: string
-          email: string
+          email?: string | null
           full_name: string
           id?: string
           institution?: string | null
@@ -329,7 +332,7 @@ export type Database = {
           bio?: string | null
           country?: string | null
           created_at?: string
-          email?: string
+          email?: string | null
           full_name?: string
           id?: string
           institution?: string | null
