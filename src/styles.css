@@ -71,6 +71,15 @@
   --color-brand-surfaceStrong: var(--brand-surface-strong);
   --color-brand-line: var(--brand-line);
 
+  /* Author portal */
+  --color-portal-bg: var(--portal-bg);
+  --color-portal-accent: var(--portal-accent);
+  --color-portal-amber: var(--portal-amber);
+  --color-portal-green: var(--portal-green);
+  --color-portal-red: var(--portal-red);
+  --radius-portal: 16px;
+  --shadow-portal: 0 12px 34px -20px rgb(27 48 84 / 0.28);
+
   --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
 
@@ -88,6 +97,12 @@
   --brand-surface: oklch(0.968 0.006 254);
   --brand-surface-strong: oklch(0.938 0.011 254);
   --brand-line: oklch(0.905 0.012 254);
+
+  --portal-bg: oklch(0.968 0.005 264.5);
+  --portal-accent: oklch(0.546 0.215 262.9);
+  --portal-amber: oklch(0.769 0.163 70.1);
+  --portal-green: oklch(0.452 0.106 152.5);
+  --portal-red: oklch(0.479 0.176 26.5);
 
   --radius: 0.625rem;
   --background: oklch(0.968 0.006 254);

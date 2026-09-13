@@ -14,7 +14,7 @@ export function TeacherAccessBand() {
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
           <Button asChild variant="outline"><Link to="/auth">{t.teacherAccess.login}</Link></Button>
-          <Button asChild><Link to="/devenir-professeur">{t.teacherAccess.join}</Link></Button>
+          <Button asChild><Link to="/auth">{t.teacherAccess.join}</Link></Button>
         </div>
       </div>
     </section>

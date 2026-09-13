@@ -14,376 +14,314 @@ export type Database = {
   }
   public: {
     Tables: {
-      assignments: {
+      access_codes: {
         Row: {
-          brief: string | null
+          assigned_at: string | null
+          assigned_to: string | null
+          code: string
           created_at: string
-          created_by: string | null
-          deadline: string | null
           id: string
-          status: Database["public"]["Enums"]["assignment_state"]
-          teacher_id: string
-          topic_id: string
-          updated_at: string
+          redeem_url: string | null
+          state: Database["public"]["Enums"]["code_state"]
         }
         Insert: {
-          brief?: string | null
+          assigned_at?: string | null
+          assigned_to?: string | null
+          code: string
           created_at?: string
-          created_by?: string | null
-          deadline?: string | null
           id?: string
-          status?: Database["public"]["Enums"]["assignment_state"]
-          teacher_id: string
-          topic_id: string
-          updated_at?: string
+          redeem_url?: string | null
+          state?: Database["public"]["Enums"]["code_state"]
         }
         Update: {
-          brief?: string | null
+          assigned_at?: string | null
+          assigned_to?: string | null
+          code?: string
           created_at?: string
-          created_by?: string | null
-          deadline?: string | null
           id?: string
-          status?: Database["public"]["Enums"]["assignment_state"]
-          teacher_id?: string
-          topic_id?: string
-          updated_at?: string
+          redeem_url?: string | null
+          state?: Database["public"]["Enums"]["code_state"]
         }
         Relationships: [
           {
-            foreignKeyName: "assignments_topic_id_fkey"
-            columns: ["topic_id"]
+            foreignKeyName: "access_codes_assigned_to_fkey"
+            columns: ["assigned_to"]
             isOneToOne: false
-            referencedRelation: "topics"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
-      author_payment_details: {
+      activity_log: {
         Row: {
-          address: string
-          bic: string | null
+          action: string
+          actor_id: string | null
+          comment: string | null
           created_at: string
-          iban: string
-          legal_name: string
-          legal_status: Database["public"]["Enums"]["author_legal_status"]
-          siret: string | null
-          updated_at: string
-          user_id: string
+          entity: string
+          entity_id: string | null
+          id: string
         }
         Insert: {
-          address: string
-          bic?: string | null
+          action: string
+          actor_id?: string | null
+          comment?: string | null
           created_at?: string
-          iban: string
-          legal_name: string
-          legal_status?: Database["public"]["Enums"]["author_legal_status"]
-          siret?: string | null
-          updated_at?: string
-          user_id: string
+          entity: string
+          entity_id?: string | null
+          id?: string
         }
         Update: {
-          address?: string
-          bic?: string | null
+          action?: string
+          actor_id?: string | null
+          comment?: string | null
           created_at?: string
-          iban?: string
-          legal_name?: string
-          legal_status?: Database["public"]["Enums"]["author_legal_status"]
-          siret?: string | null
-          updated_at?: string
-          user_id?: string
+          entity?: string
+          entity_id?: string | null
+          id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "activity_log_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      contract_signatures: {
+      contracts: {
         Row: {
-          accepted: boolean
-          contract_version: string
-          created_at: string
+          author_id: string
+          document_version: string
           id: string
+          signature_ip: string | null
           signed_at: string
           signed_name: string
-          user_id: string
+          user_agent: string | null
         }
         Insert: {
-          accepted?: boolean
-          contract_version?: string
-          created_at?: string
+          author_id: string
+          document_version: string
           id?: string
+          signature_ip?: string | null
           signed_at?: string
           signed_name: string
-          user_id: string
+          user_agent?: string | null
         }
         Update: {
-          accepted?: boolean
-          contract_version?: string
-          created_at?: string
+          author_id?: string
+          document_version?: string
           id?: string
+          signature_ip?: string | null
           signed_at?: string
           signed_name?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      course_submissions: {
-        Row: {
-          admin_feedback: string | null
-          author_id: string
-          content: Json
-          created_at: string
-          id: string
-          reviewed_at: string | null
-          reviewed_by: string | null
-          status: Database["public"]["Enums"]["submission_status"]
-          submitted_at: string | null
-          title: string | null
-          topic_id: string
-          updated_at: string
-        }
-        Insert: {
-          admin_feedback?: string | null
-          author_id: string
-          content?: Json
-          created_at?: string
-          id?: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: Database["public"]["Enums"]["submission_status"]
-          submitted_at?: string | null
-          title?: string | null
-          topic_id: string
-          updated_at?: string
-        }
-        Update: {
-          admin_feedback?: string | null
-          author_id?: string
-          content?: Json
-          created_at?: string
-          id?: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: Database["public"]["Enums"]["submission_status"]
-          submitted_at?: string | null
-          title?: string | null
-          topic_id?: string
-          updated_at?: string
+          user_agent?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "course_submissions_topic_id_fkey"
-            columns: ["topic_id"]
+            foreignKeyName: "contracts_author_id_fkey"
+            columns: ["author_id"]
             isOneToOne: false
-            referencedRelation: "topics"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
-      payments: {
+      courses: {
         Row: {
-          amount_cents: number
-          assignment_id: string | null
+          author_id: string | null
+          brief_note: string | null
           created_at: string
-          created_by: string | null
-          currency: string
           due_date: string | null
           id: string
-          kind: Database["public"]["Enums"]["payment_kind"]
-          label: string
-          paid_at: string | null
-          status: Database["public"]["Enums"]["payment_state"]
-          teacher_id: string
+          lot_code: string | null
+          order_index: number
+          review_comment: string | null
+          status: Database["public"]["Enums"]["course_status"]
+          subject_area: string | null
+          submitted_at: string | null
+          subtitle: string | null
+          title: string
           updated_at: string
         }
         Insert: {
-          amount_cents?: number
-          assignment_id?: string | null
+          author_id?: string | null
+          brief_note?: string | null
           created_at?: string
-          created_by?: string | null
-          currency?: string
           due_date?: string | null
           id?: string
-          kind?: Database["public"]["Enums"]["payment_kind"]
-          label: string
-          paid_at?: string | null
-          status?: Database["public"]["Enums"]["payment_state"]
-          teacher_id: string
+          lot_code?: string | null
+          order_index?: number
+          review_comment?: string | null
+          status?: Database["public"]["Enums"]["course_status"]
+          subject_area?: string | null
+          submitted_at?: string | null
+          subtitle?: string | null
+          title: string
           updated_at?: string
         }
         Update: {
-          amount_cents?: number
-          assignment_id?: string | null
+          author_id?: string | null
+          brief_note?: string | null
           created_at?: string
-          created_by?: string | null
-          currency?: string
           due_date?: string | null
           id?: string
-          kind?: Database["public"]["Enums"]["payment_kind"]
-          label?: string
-          paid_at?: string | null
-          status?: Database["public"]["Enums"]["payment_state"]
-          teacher_id?: string
+          lot_code?: string | null
+          order_index?: number
+          review_comment?: string | null
+          status?: Database["public"]["Enums"]["course_status"]
+          subject_area?: string | null
+          submitted_at?: string | null
+          subtitle?: string | null
+          title?: string
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "payments_assignment_id_fkey"
-            columns: ["assignment_id"]
+            foreignKeyName: "courses_author_id_fkey"
+            columns: ["author_id"]
             isOneToOne: false
-            referencedRelation: "assignments"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
       profiles: {
         Row: {
-          avatar_path: string
+          access_code: string | null
+          access_redeem_url: string | null
+          activated_at: string | null
+          bio: string | null
+          country: string | null
           created_at: string
           email: string
-          first_name: string
+          full_name: string
           id: string
-          institution: string
-          language: string
-          last_name: string
-          specialty: string
-          study_country: string
-          subject_taught: string
-          teaching_level: string
+          institution: string | null
+          invite_token: string | null
+          invited_at: string | null
+          photo_url: string | null
+          platform: Database["public"]["Enums"]["device_platform"] | null
+          role: Database["public"]["Enums"]["portal_role"]
+          title: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
-          avatar_path: string
+          access_code?: string | null
+          access_redeem_url?: string | null
+          activated_at?: string | null
+          bio?: string | null
+          country?: string | null
           created_at?: string
           email: string
-          first_name: string
-          id: string
-          institution?: string
-          language: string
-          last_name: string
-          specialty?: string
-          study_country: string
-          subject_taught: string
-          teaching_level: string
+          full_name: string
+          id?: string
+          institution?: string | null
+          invite_token?: string | null
+          invited_at?: string | null
+          photo_url?: string | null
+          platform?: Database["public"]["Enums"]["device_platform"] | null
+          role?: Database["public"]["Enums"]["portal_role"]
+          title?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
-          avatar_path?: string
+          access_code?: string | null
+          access_redeem_url?: string | null
+          activated_at?: string | null
+          bio?: string | null
+          country?: string | null
           created_at?: string
           email?: string
-          first_name?: string
+          full_name?: string
           id?: string
-          institution?: string
-          language?: string
-          last_name?: string
-          specialty?: string
-          study_country?: string
-          subject_taught?: string
-          teaching_level?: string
+          institution?: string | null
+          invite_token?: string | null
+          invited_at?: string | null
+          photo_url?: string | null
+          platform?: Database["public"]["Enums"]["device_platform"] | null
+          role?: Database["public"]["Enums"]["portal_role"]
+          title?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
-      topic_applications: {
+      screens: {
         Row: {
-          created_at: string
+          body: string
+          course_id: string
           id: string
-          message: string | null
-          status: Database["public"]["Enums"]["application_state"]
-          teacher_id: string
-          topic_id: string
+          image_idea: string | null
+          screen_number: number
+          screen_title: string
           updated_at: string
         }
         Insert: {
-          created_at?: string
+          body?: string
+          course_id: string
           id?: string
-          message?: string | null
-          status?: Database["public"]["Enums"]["application_state"]
-          teacher_id: string
-          topic_id: string
+          image_idea?: string | null
+          screen_number: number
+          screen_title?: string
           updated_at?: string
         }
         Update: {
-          created_at?: string
+          body?: string
+          course_id?: string
           id?: string
-          message?: string | null
-          status?: Database["public"]["Enums"]["application_state"]
-          teacher_id?: string
-          topic_id?: string
+          image_idea?: string | null
+          screen_number?: number
+          screen_title?: string
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "topic_applications_topic_id_fkey"
-            columns: ["topic_id"]
+            foreignKeyName: "screens_course_id_fkey"
+            columns: ["course_id"]
             isOneToOne: false
-            referencedRelation: "topics"
+            referencedRelation: "courses"
             referencedColumns: ["id"]
           },
         ]
       }
-      topics: {
+      sources: {
         Row: {
-          admin_feedback: string | null
-          category: Database["public"]["Enums"]["topic_category"]
-          created_at: string
-          description: string | null
-          id: string
-          language: string
-          proposed_by: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
-          status: Database["public"]["Enums"]["topic_status"]
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          admin_feedback?: string | null
-          category?: Database["public"]["Enums"]["topic_category"]
-          created_at?: string
-          description?: string | null
-          id?: string
-          language: string
-          proposed_by?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: Database["public"]["Enums"]["topic_status"]
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          admin_feedback?: string | null
-          category?: Database["public"]["Enums"]["topic_category"]
-          created_at?: string
-          description?: string | null
-          id?: string
-          language?: string
-          proposed_by?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: Database["public"]["Enums"]["topic_status"]
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
+          claim: string | null
+          course_id: string
           created_at: string
           id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          page: string | null
+          reference: string | null
         }
         Insert: {
+          claim?: string | null
+          course_id: string
           created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          page?: string | null
+          reference?: string | null
         }
         Update: {
+          claim?: string | null
+          course_id?: string
           created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
+          page?: string | null
+          reference?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sources_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -393,31 +331,16 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "teacher"
-      application_state: "pending" | "accepted" | "rejected"
-      assignment_state:
-        | "attribue"
-        | "en_cours"
-        | "soumis"
-        | "termine"
-        | "annule"
-      author_legal_status: "droits_auteur" | "independant"
-      payment_kind: "acompte" | "solde" | "complement"
-      payment_state: "a_venir" | "paye"
-      submission_status:
-        | "draft"
+      code_state: "available" | "assigned" | "sent"
+      course_status:
+        | "assigned"
+        | "in_progress"
         | "submitted"
-        | "approved"
         | "changes_requested"
-        | "rejected"
-      topic_category:
-        | "histoire"
-        | "science"
-        | "litterature"
-        | "art"
-        | "mythologie"
-        | "geopolitique"
-      topic_status: "pending" | "approved" | "rejected"
+        | "accepted"
+        | "published"
+      device_platform: "ios" | "android"
+      portal_role: "admin" | "author"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -545,28 +468,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "teacher"],
-      application_state: ["pending", "accepted", "rejected"],
-      assignment_state: ["attribue", "en_cours", "soumis", "termine", "annule"],
-      author_legal_status: ["droits_auteur", "independant"],
-      payment_kind: ["acompte", "solde", "complement"],
-      payment_state: ["a_venir", "paye"],
-      submission_status: [
-        "draft",
+      code_state: ["available", "assigned", "sent"],
+      course_status: [
+        "assigned",
+        "in_progress",
         "submitted",
-        "approved",
         "changes_requested",
-        "rejected",
+        "accepted",
+        "published",
       ],
-      topic_category: [
-        "histoire",
-        "science",
-        "litterature",
-        "art",
-        "mythologie",
-        "geopolitique",
-      ],
-      topic_status: ["pending", "approved", "rejected"],
+      device_platform: ["ios", "android"],
+      portal_role: ["admin", "author"],
     },
   },
 } as const
