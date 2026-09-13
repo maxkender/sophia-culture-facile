@@ -156,20 +156,24 @@ export const claimInvite = createServerFn({ method: "POST" })
       comment: "Password account created",
     });
 
-    return { ok: true as const, email: profile.email, state: "ok" as const };
+    return { ok: true as const, email: resolved.email, state: "ok" as const };
   });
 
 /** Public: makes sure an auth account exists so a magic link can be sent to an invited author. */
 export const prepareMagicClaim = createServerFn({ method: "POST" })
-  .inputValidator((data) => tokenSchema.parse(data))
+  .inputValidator((data) =>
+    z.object({ token: z.string().min(4).max(200), email: z.string().email().max(200).optional() }).parse(data),
+  )
   .handler(async ({ data }) => {
     const { supabaseAdmin, profile } = await loadInvite(data.token);
     const state = inviteState(profile);
     if (!profile || state !== "ok") return { ok: false as const, state };
-    if (!(await accountExists(profile.email))) {
-      await supabaseAdmin.auth.admin.createUser({ email: profile.email, email_confirm: true });
+    const resolved = await resolveClaimEmail(profile, data.email);
+    if ("error" in resolved) return { ok: false as const, state: resolved.error };
+    if (!(await accountExists(resolved.email))) {
+      await supabaseAdmin.auth.admin.createUser({ email: resolved.email, email_confirm: true });
     }
-    return { ok: true as const, email: profile.email };
+    return { ok: true as const, email: resolved.email };
   });
 
 /** Links a signed-in account to the invited profile (magic-link return path). */
