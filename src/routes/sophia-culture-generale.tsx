@@ -5,9 +5,9 @@ import { langLinks, ldScript, meta, mobileApplicationSchema } from "@/lib/seo";
 export const Route = createFileRoute("/sophia-culture-generale")({
   head: () => ({
     meta: meta({
-      title: "Sophia — Culture générale : l'app française de culture générale",
+      title: "Sophia, culture générale : l'app française de culture générale",
       description:
-        "Sophia — Culture générale : cours courts, quiz et entraînement quotidien. Application française gratuite sur iOS et Android. Télécharge-la en une minute.",
+        "Sophia, culture générale : cours courts, quiz et entraînement quotidien. Application française gratuite sur iOS et Android. Télécharge-la en une minute.",
       lang: "fr",
       key: "landing",
     }),

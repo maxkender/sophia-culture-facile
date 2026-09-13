@@ -7,8 +7,8 @@
 type Shot = { label: string; src?: string | undefined; alt: string };
 
 const SHOTS: Shot[] = [
-  { label: "Accueil", src: undefined, alt: "Écran d'accueil de l'application Sophia — Culture générale" },
-  { label: "Cours", src: undefined, alt: "Un chapitre de cours dans Sophia — Culture générale" },
+  { label: "Accueil", src: undefined, alt: "Écran d'accueil de l'application Sophia, culture générale" },
+  { label: "Cours", src: undefined, alt: "Un chapitre de cours dans Sophia, culture générale" },
   { label: "Quiz", src: undefined, alt: "Un quiz de culture générale dans l'application Sophia" },
   { label: "Progression", src: undefined, alt: "Suivi de progression et série de jours dans Sophia" },
   { label: "Rangs", src: undefined, alt: "Écran des rangs Curieux et Érudit dans Sophia" },
@@ -18,7 +18,7 @@ export function PhoneGallery() {
   return (
     <ul
       className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4"
-      aria-label="Aperçus de l'application Sophia — Culture générale"
+      aria-label="Aperçus de l'application Sophia, culture générale"
     >
       {SHOTS.map((shot) => (
         <li key={shot.label} className="shrink-0 snap-center">

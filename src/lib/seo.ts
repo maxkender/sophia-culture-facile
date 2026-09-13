@@ -4,7 +4,7 @@ import { fr } from "@/i18n/fr";
 import { en } from "@/i18n/en";
 import { pathFor, type Lang, type RouteKey } from "@/i18n/routes";
 
-export const BRAND = { fr: "Sophia — Culture générale", en: "Sophia: General Knowledge" } as const;
+export const BRAND = { fr: "Sophia, culture générale", en: "Sophia: General Knowledge" } as const;
 
 /** Balises meta d'une page, propres à sa version linguistique. */
 export function meta({
@@ -57,7 +57,7 @@ export function langLinks(key: RouteKey, lang: Lang) {
 }
 
 const DESCRIPTIONS: Record<Lang, string> = {
-  fr: "Sophia — Culture générale est l'application mobile française gratuite pour apprendre la culture générale chaque jour : cours courts, quiz et révision quotidienne.",
+  fr: "Sophia, culture générale est l'application mobile française gratuite pour apprendre la culture générale chaque jour : cours courts, quiz et révision quotidienne.",
   en: "Sophia: General Knowledge is a free mobile app for learning something new every day: five-minute lessons, a quiz after each one, and a streak that keeps you going.",
 };
 

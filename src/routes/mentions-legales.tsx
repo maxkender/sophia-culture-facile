@@ -5,9 +5,9 @@ import { langLinks, meta } from "@/lib/seo";
 export const Route = createFileRoute("/mentions-legales")({
   head: () => ({
     meta: meta({
-      title: "Mentions légales | Sophia — Culture générale",
+      title: "Mentions légales | Sophia, culture générale",
       description:
-        "Mentions légales du site de Sophia — Culture générale, application mobile éditée par Vik Studios SAS, France.",
+        "Mentions légales du site de Sophia, culture générale, application mobile éditée par Vik Studios SAS, France.",
       lang: "fr",
       key: "legal",
     }),
