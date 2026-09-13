@@ -21,6 +21,7 @@ export type Database = {
           code: string
           created_at: string
           id: string
+          platform: Database["public"]["Enums"]["device_platform"]
           redeem_url: string | null
           state: Database["public"]["Enums"]["code_state"]
         }
@@ -30,6 +31,7 @@ export type Database = {
           code: string
           created_at?: string
           id?: string
+          platform?: Database["public"]["Enums"]["device_platform"]
           redeem_url?: string | null
           state?: Database["public"]["Enums"]["code_state"]
         }
@@ -39,6 +41,7 @@ export type Database = {
           code?: string
           created_at?: string
           id?: string
+          platform?: Database["public"]["Enums"]["device_platform"]
           redeem_url?: string | null
           state?: Database["public"]["Enums"]["code_state"]
         }
