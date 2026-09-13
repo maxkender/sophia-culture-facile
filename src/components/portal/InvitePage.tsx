@@ -71,9 +71,15 @@ export function InvitePage({ token }: { token: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
+  const knownEmail = data?.profile?.email ?? null;
+  const needsEmail = Boolean(data?.profile) && !knownEmail;
+
   async function submit(event: FormEvent) {
     event.preventDefault();
-    const next: { password?: string; confirm?: string } = {};
+    const next: { password?: string; confirm?: string; email?: string } = {};
+    if (needsEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      next.email = "Enter the email address you want to sign in with.";
+    }
     if (password.length < 8) next.password = "Use at least 8 characters.";
     if (confirm !== password) next.confirm = "The two passwords do not match.";
     setErrors(next);
@@ -81,12 +87,18 @@ export function InvitePage({ token }: { token: string }) {
 
     setBusy(true);
     try {
-      const result = await claim({ data: { token, password } });
+      const result = await claim({
+        data: { token, password, ...(needsEmail ? { email: email.trim().toLowerCase() } : {}) },
+      });
       if (!result.ok) {
         toast.error(
           result.state === "account"
             ? "An account already exists for this email. Use the sign-in link below instead."
-            : "This invitation is no longer valid.",
+            : result.state === "taken"
+              ? "This email address is already used by another author."
+              : result.state === "missing"
+                ? "Enter your email address first."
+                : "This invitation is no longer valid.",
         );
         return;
       }
