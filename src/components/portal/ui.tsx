@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from "react";
-import { Check, Copy, Download } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { STATUS_LABEL, type CourseStatus } from "@/config/portal";
-import { boldParts, downloadText } from "@/lib/portal";
+import { boldParts } from "@/lib/portal";
 
 export function PortalCard({ className, children }: { className?: string; children: ReactNode }) {
   return (
