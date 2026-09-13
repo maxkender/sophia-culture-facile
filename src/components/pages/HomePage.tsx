@@ -61,7 +61,7 @@ export function HomePage() {
     },
   ];
 
-  /* À REMPLACER PAR DE VRAIS AVIS — aucun faux témoignage ne doit être publié. */
+  /* À REMPLACER PAR DE VRAIS AVIS : aucun faux témoignage ne doit être publié. */
   const testimonials = [0, 1, 2].map(() => ({
     name: t.testimonials.name,
     text: t.testimonials.text,
