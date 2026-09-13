@@ -97,19 +97,22 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
     if (!course || readOnly || saving) return;
     setSaving(true);
     try {
-      const patch: Record<string, unknown> = {
+      const base = {
         title: title.trim() || course.title,
         subtitle: subtitle.trim() || null,
       };
-      if (admin) {
-        patch["lot_code"] = meta.lot_code.trim() || null;
-        patch["subject_area"] = meta.subject_area.trim() || null;
-        patch["brief_note"] = meta.brief_note.trim() || null;
-        patch["due_date"] = meta.due_date || null;
-        patch["status"] = meta.status;
-      } else if (liveStatus === "assigned") {
-        patch["status"] = "in_progress";
-      }
+      const patch = admin
+        ? {
+            ...base,
+            lot_code: meta.lot_code.trim() || null,
+            subject_area: meta.subject_area.trim() || null,
+            brief_note: meta.brief_note.trim() || null,
+            due_date: meta.due_date || null,
+            status: meta.status,
+          }
+        : liveStatus === "assigned"
+          ? { ...base, status: "in_progress" as const }
+          : base;
 
       const { error: courseError } = await supabase.from("courses").update(patch).eq("id", course.id);
       if (courseError) throw courseError;
