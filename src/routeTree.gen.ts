@@ -39,6 +39,7 @@ import { Route as AuthenticatedAuteursCoursesCourseIdRouteImport } from './route
 import { Route as AuthenticatedAuteursAdminAuthorsIndexRouteImport } from './routes/_authenticated/auteurs/admin/authors.index'
 import { Route as AuthenticatedAuteursAdminAuthorsAuthorIdRouteImport } from './routes/_authenticated/auteurs/admin/authors.$authorId'
 import { Route as AuthenticatedAuteursAdminAuthorsNewRouteImport } from './routes/_authenticated/auteurs/admin/authors.new'
+import { Route as AuthenticatedAuteursAdminCoursesCourseIdRouteImport } from './routes/_authenticated/auteurs/admin/courses.$courseId'
 import { Route as AuthenticatedAuteursAdminDocumentsIndexRouteImport } from './routes/_authenticated/auteurs/admin/documents.index'
 import { Route as AuthenticatedAuteursAdminDocumentsSlugRouteImport } from './routes/_authenticated/auteurs/admin/documents.$slug'
 import { Route as AuthenticatedAuteursAdminReviewIndexRouteImport } from './routes/_authenticated/auteurs/admin/review.index'
@@ -205,6 +206,12 @@ const AuthenticatedAuteursAdminAuthorsNewRoute =
     path: '/auteurs/admin/authors/new',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAuteursAdminCoursesCourseIdRoute =
+  AuthenticatedAuteursAdminCoursesCourseIdRouteImport.update({
+    id: '/auteurs/admin/courses/$courseId',
+    path: '/auteurs/admin/courses/$courseId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAuteursAdminDocumentsIndexRoute =
   AuthenticatedAuteursAdminDocumentsIndexRouteImport.update({
     id: '/auteurs/admin/documents/',
@@ -259,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
+  '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/auteurs/admin/authors/': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
@@ -294,6 +302,7 @@ export interface FileRoutesByTo {
   '/auteurs/admin': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
+  '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/auteurs/admin/authors': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
@@ -331,6 +340,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/_authenticated/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/_authenticated/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
+  '/_authenticated/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   '/_authenticated/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/_authenticated/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/_authenticated/auteurs/admin/authors/': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
@@ -368,6 +378,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/'
     | '/auteurs/admin/authors/$authorId'
     | '/auteurs/admin/authors/new'
+    | '/auteurs/admin/courses/$courseId'
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/auteurs/admin/authors/'
@@ -403,6 +414,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin'
     | '/auteurs/admin/authors/$authorId'
     | '/auteurs/admin/authors/new'
+    | '/auteurs/admin/courses/$courseId'
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/auteurs/admin/authors'
@@ -439,6 +451,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/'
     | '/_authenticated/auteurs/admin/authors/$authorId'
     | '/_authenticated/auteurs/admin/authors/new'
+    | '/_authenticated/auteurs/admin/courses/$courseId'
     | '/_authenticated/auteurs/admin/documents/$slug'
     | '/_authenticated/auteurs/admin/review/$courseId'
     | '/_authenticated/auteurs/admin/authors/'
@@ -681,6 +694,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursAdminAuthorsNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auteurs/admin/courses/$courseId': {
+      id: '/_authenticated/auteurs/admin/courses/$courseId'
+      path: '/auteurs/admin/courses/$courseId'
+      fullPath: '/auteurs/admin/courses/$courseId'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCoursesCourseIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/auteurs/admin/documents/': {
       id: '/_authenticated/auteurs/admin/documents/'
       path: '/auteurs/admin/documents'
@@ -722,6 +742,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuteursAdminIndexRoute: typeof AuthenticatedAuteursAdminIndexRoute
   AuthenticatedAuteursAdminAuthorsAuthorIdRoute: typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   AuthenticatedAuteursAdminAuthorsNewRoute: typeof AuthenticatedAuteursAdminAuthorsNewRoute
+  AuthenticatedAuteursAdminCoursesCourseIdRoute: typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   AuthenticatedAuteursAdminDocumentsSlugRoute: typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   AuthenticatedAuteursAdminReviewCourseIdRoute: typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   AuthenticatedAuteursAdminAuthorsIndexRoute: typeof AuthenticatedAuteursAdminAuthorsIndexRoute
@@ -742,6 +763,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAuteursAdminAuthorsAuthorIdRoute,
   AuthenticatedAuteursAdminAuthorsNewRoute:
     AuthenticatedAuteursAdminAuthorsNewRoute,
+  AuthenticatedAuteursAdminCoursesCourseIdRoute:
+    AuthenticatedAuteursAdminCoursesCourseIdRoute,
   AuthenticatedAuteursAdminDocumentsSlugRoute:
     AuthenticatedAuteursAdminDocumentsSlugRoute,
   AuthenticatedAuteursAdminReviewCourseIdRoute:
