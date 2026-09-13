@@ -2,6 +2,17 @@ import { useState, type ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { STATUS_LABEL, type CourseStatus } from "@/config/portal";
 import { boldParts } from "@/lib/portal";
 
@@ -99,5 +110,39 @@ export function EmptyState({ title, text }: { title: string; text?: string }) {
       <p className="text-sm font-bold text-brand-navy">{title}</p>
       {text ? <p className="mt-1 text-sm text-brand-navySoft">{text}</p> : null}
     </PortalCard>
+  );
+}
+
+export function ConfirmButton({
+  trigger,
+  title,
+  description,
+  confirmLabel,
+  onConfirm,
+  label,
+}: {
+  trigger: ReactNode;
+  title: string;
+  description?: string;
+  confirmLabel: string;
+  onConfirm: () => void | Promise<void>;
+  label?: string;
+}) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild aria-label={label}>
+        {trigger}
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          {description ? <AlertDialogDescription>{description}</AlertDialogDescription> : null}
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={() => void onConfirm()}>{confirmLabel}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

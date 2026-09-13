@@ -8,16 +8,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { COURSE_WORDS_MAX, COURSE_WORDS_MIN, SCREEN_NUMBERS, WORDS_MAX, WORDS_MIN, WORDS_WARN, type CourseStatus } from "@/config/portal";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  COURSE_STATUSES,
+  COURSE_WORDS_MAX,
+  COURSE_WORDS_MIN,
+  SCREEN_NUMBERS,
+  STATUS_LABEL,
+  WORDS_MAX,
+  WORDS_MIN,
+  WORDS_WARN,
+  type CourseStatus,
+} from "@/config/portal";
 import { countWords, formatDate, type Course, type Source } from "@/lib/portal";
 import { usePortalProfile } from "./usePortal";
-import { Banner, BoldText, PageTitle, PortalCard, StatusPill } from "./ui";
+import { Banner, BoldText, ConfirmButton, PageTitle, PortalCard, StatusPill } from "./ui";
 
 type ScreenDraft = { id: string | null; screen_title: string; body: string; image_idea: string };
 
 const EMPTY_SCREEN: ScreenDraft = { id: null, screen_title: "", body: "", image_idea: "" };
 
-export function CourseEditor({ courseId }: { courseId: string }) {
+export function CourseEditor({ courseId, admin = false }: { courseId: string; admin?: boolean }) {
   const queryClient = useQueryClient();
   const { data: me } = usePortalProfile();
   const signed = Boolean(me?.signedAt);
@@ -36,11 +47,13 @@ export function CourseEditor({ courseId }: { courseId: string }) {
   });
 
   const course = data?.course ?? null;
-  const status = (course?.status ?? "assigned") as CourseStatus;
-  const readOnly = !signed || status === "submitted" || status === "accepted" || status === "published";
+  const liveStatus = (course?.status ?? "assigned") as CourseStatus;
+  const lockedForAuthor = !signed || liveStatus === "submitted" || liveStatus === "accepted" || liveStatus === "published";
+  const readOnly = admin ? false : lockedForAuthor;
 
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
+  const [meta, setMeta] = useState({ lot_code: "", subject_area: "", brief_note: "", due_date: "", status: "assigned" as CourseStatus });
   const [screens, setScreens] = useState<ScreenDraft[]>(SCREEN_NUMBERS.map(() => ({ ...EMPTY_SCREEN })));
   const [sourceRows, setSourceRows] = useState<Source[]>([]);
   const [preview, setPreview] = useState(false);
@@ -54,6 +67,13 @@ export function CourseEditor({ courseId }: { courseId: string }) {
     hydrated.current = true;
     setTitle(data.course.title ?? "");
     setSubtitle(data.course.subtitle ?? "");
+    setMeta({
+      lot_code: data.course.lot_code ?? "",
+      subject_area: data.course.subject_area ?? "",
+      brief_note: data.course.brief_note ?? "",
+      due_date: data.course.due_date ?? "",
+      status: (data.course.status ?? "assigned") as CourseStatus,
+    });
     setSourceRows(data.sources);
     setScreens(
       SCREEN_NUMBERS.map((number) => {
@@ -73,18 +93,29 @@ export function CourseEditor({ courseId }: { courseId: string }) {
   const totalWords = useMemo(() => screens.reduce((sum, screen) => sum + countWords(screen.body), 0), [screens]);
   const complete = screens.every((screen) => screen.screen_title.trim() && screen.body.trim());
 
-  async function save() {
-    if (!course || readOnly) return;
+  async function save(options: { silent?: boolean } = {}) {
+    if (!course || readOnly || saving) return;
     setSaving(true);
     try {
-      await supabase
-        .from("courses")
-        .update({
-          title: title.trim() || course.title,
-          subtitle: subtitle.trim() || null,
-          status: status === "assigned" ? "in_progress" : status,
-        })
-        .eq("id", course.id);
+      const base = {
+        title: title.trim() || course.title,
+        subtitle: subtitle.trim() || null,
+      };
+      const patch = admin
+        ? {
+            ...base,
+            lot_code: meta.lot_code.trim() || null,
+            subject_area: meta.subject_area.trim() || null,
+            brief_note: meta.brief_note.trim() || null,
+            due_date: meta.due_date || null,
+            status: meta.status,
+          }
+        : liveStatus === "assigned"
+          ? { ...base, status: "in_progress" as const }
+          : base;
+
+      const { error: courseError } = await supabase.from("courses").update(patch).eq("id", course.id);
+      if (courseError) throw courseError;
 
       for (const [index, screen] of screens.entries()) {
         const payload = {
@@ -95,9 +126,11 @@ export function CourseEditor({ courseId }: { courseId: string }) {
           image_idea: screen.image_idea || null,
         };
         if (screen.id) {
-          await supabase.from("screens").update(payload).eq("id", screen.id);
-        } else {
-          const { data: inserted } = await supabase.from("screens").insert(payload).select("id").single();
+          const { error } = await supabase.from("screens").update(payload).eq("id", screen.id);
+          if (error) throw error;
+        } else if (screen.screen_title.trim() || screen.body.trim()) {
+          const { data: inserted, error } = await supabase.from("screens").insert(payload).select("id").single();
+          if (error) throw error;
           if (inserted) {
             setScreens((current) =>
               current.map((item, itemIndex) => (itemIndex === index ? { ...item, id: inserted.id } : item)),
@@ -107,6 +140,11 @@ export function CourseEditor({ courseId }: { courseId: string }) {
       }
       setSavedAt(new Date());
       dirty.current = false;
+      await queryClient.invalidateQueries({ queryKey: ["portal", "admin"] });
+      if (!options.silent) toast.success("Saved.");
+    } catch {
+      if (!options.silent) toast.error("The course could not be saved.");
+      else toast.error("Autosave failed. Use Save now.");
     } finally {
       setSaving(false);
     }
@@ -114,10 +152,10 @@ export function CourseEditor({ courseId }: { courseId: string }) {
 
   useEffect(() => {
     if (!hydrated.current || readOnly || !dirty.current) return;
-    const timer = window.setTimeout(() => void save(), 2000);
+    const timer = window.setTimeout(() => void save({ silent: true }), 2000);
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, subtitle, screens, readOnly]);
+  }, [title, subtitle, screens, meta, readOnly]);
 
   function patchScreen(index: number, patch: Partial<ScreenDraft>) {
     dirty.current = true;
@@ -126,11 +164,15 @@ export function CourseEditor({ courseId }: { courseId: string }) {
 
   async function addSource() {
     if (!course) return;
-    const { data: inserted } = await supabase
+    const { data: inserted, error } = await supabase
       .from("sources")
       .insert({ course_id: course.id, claim: "", reference: "", page: "" })
       .select("*")
       .single();
+    if (error) {
+      toast.error("The source could not be added.");
+      return;
+    }
     if (inserted) setSourceRows((current) => [...current, inserted as Source]);
   }
 
@@ -146,10 +188,10 @@ export function CourseEditor({ courseId }: { courseId: string }) {
 
   async function submit() {
     if (!course || !complete) return;
-    await save();
+    await save({ silent: true });
     const { error } = await supabase
       .from("courses")
-      .update({ status: "submitted", submitted_at: new Date().toISOString() })
+      .update({ status: "submitted", submitted_at: new Date().toISOString(), review_comment: null })
       .eq("id", course.id);
     if (error) {
       toast.error("The course could not be submitted.");
@@ -160,26 +202,36 @@ export function CourseEditor({ courseId }: { courseId: string }) {
       entity: "course",
       entity_id: course.id,
       action: "submitted",
+      comment: course.title,
     });
     await queryClient.invalidateQueries({ queryKey: ["portal"] });
     toast.success("Course submitted for review.");
   }
 
   if (isLoading) return <PortalCard><p className="text-sm text-brand-navySoft">Loading…</p></PortalCard>;
-  if (!course) return <Banner tone="error" title="Course not found" />;
+  if (!course) return <Banner tone="error" title="Course not found">It may have been deleted by the editorial desk.</Banner>;
 
   return (
     <div>
-      <Link to="/auteurs" className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-portal-accent">
-        <ArrowLeft className="size-4" aria-hidden="true" /> Back to your courses
-      </Link>
+      {admin ? (
+        <Link
+          to="/auteurs/admin/authors"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-portal-accent"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" /> Authors
+        </Link>
+      ) : (
+        <Link to="/auteurs" className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-portal-accent">
+          <ArrowLeft className="size-4" aria-hidden="true" /> Back to your courses
+        </Link>
+      )}
 
       <PageTitle
         title={course.title}
         lead={`${course.lot_code ?? "—"} · ${course.subject_area ?? "—"} · due ${formatDate(course.due_date)}`}
         action={
           <div className="flex items-center gap-3">
-            <StatusPill status={status} />
+            <StatusPill status={liveStatus} />
             <Button type="button" variant="pillSecondary" size="pillSm" onClick={() => setPreview((v) => !v)}>
               {preview ? "Edit" : "Preview"}
             </Button>
@@ -188,10 +240,15 @@ export function CourseEditor({ courseId }: { courseId: string }) {
       />
 
       <div className="space-y-6">
-        {status === "changes_requested" && course.review_comment ? (
+        {admin ? (
+          <Banner tone="info" title="Editing as the editorial desk">
+            Your changes overwrite the author's text. The author keeps access according to the status you set here.
+          </Banner>
+        ) : null}
+        {liveStatus === "changes_requested" && course.review_comment ? (
           <Banner tone="warning" title="Changes requested">{course.review_comment}</Banner>
         ) : null}
-        {!signed ? (
+        {!admin && !signed ? (
           <Banner tone="warning" title="Sign the author agreement to start writing">
             Your course stays visible and read-only until the agreement is signed.{" "}
             <Link to="/auteurs/contract" className="font-bold text-portal-accent underline-offset-4 hover:underline">
@@ -200,13 +257,46 @@ export function CourseEditor({ courseId }: { courseId: string }) {
             .
           </Banner>
         ) : null}
-        {signed && (status === "submitted" || status === "accepted" || status === "published") ? (
+        {!admin && signed && (liveStatus === "submitted" || liveStatus === "accepted" || liveStatus === "published") ? (
           <Banner tone="info" title="This course is read-only">
             It is with the editorial desk. If changes are requested it reopens automatically.
           </Banner>
         ) : null}
 
-        {course.brief_note ? (
+        {admin ? (
+          <PortalCard className="space-y-4">
+            <h2 className="text-lg font-extrabold text-brand-navy">Commission</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="c-lot">Lot code</Label>
+                <Input id="c-lot" value={meta.lot_code} className="h-11" onChange={(e) => { dirty.current = true; setMeta({ ...meta, lot_code: e.target.value }); }} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="c-subject">Subject area</Label>
+                <Input id="c-subject" value={meta.subject_area} className="h-11" onChange={(e) => { dirty.current = true; setMeta({ ...meta, subject_area: e.target.value }); }} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="c-due">Due date</Label>
+                <Input id="c-due" type="date" value={meta.due_date} className="h-11" onChange={(e) => { dirty.current = true; setMeta({ ...meta, due_date: e.target.value }); }} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="c-status">Status</Label>
+                <Select value={meta.status} onValueChange={(value) => { dirty.current = true; setMeta({ ...meta, status: value as CourseStatus }); }}>
+                  <SelectTrigger id="c-status" className="h-11"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {COURSE_STATUSES.map((status) => (
+                      <SelectItem key={status} value={status}>{STATUS_LABEL[status as CourseStatus]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="c-brief">Brief note</Label>
+                <Textarea id="c-brief" rows={3} value={meta.brief_note} onChange={(e) => { dirty.current = true; setMeta({ ...meta, brief_note: e.target.value }); }} />
+              </div>
+            </div>
+          </PortalCard>
+        ) : course.brief_note ? (
           <PortalCard className="border-l-4 border-portal-accent">
             <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Brief from the editorial desk</p>
             <p className="mt-2 text-sm leading-relaxed text-brand-navy">{course.brief_note}</p>
@@ -312,7 +402,9 @@ export function CourseEditor({ courseId }: { courseId: string }) {
           </div>
           <div className="mt-5 space-y-3">
             {sourceRows.length === 0 ? (
-              <p className="text-sm text-brand-navySoft">No sources yet.</p>
+              <p className="text-sm text-brand-navySoft">
+                No source yet. Add one for every factual claim a reader could challenge.
+              </p>
             ) : (
               sourceRows.map((row) => (
                 <div key={row.id} className="grid gap-3 md:grid-cols-[2fr_2fr_100px_auto]">
@@ -341,9 +433,18 @@ export function CourseEditor({ courseId }: { courseId: string }) {
                     className="h-11"
                   />
                   {!readOnly ? (
-                    <Button type="button" variant="ghost" size="icon" aria-label="Remove source" onClick={() => removeSource(row.id)}>
-                      <Trash2 className="size-4" />
-                    </Button>
+                    <ConfirmButton
+                      label="Remove source"
+                      title="Remove this source?"
+                      description="The claim, reference and page will be deleted."
+                      confirmLabel="Remove"
+                      onConfirm={() => removeSource(row.id)}
+                      trigger={
+                        <Button type="button" variant="ghost" size="icon" aria-label="Remove source">
+                          <Trash2 className="size-4" />
+                        </Button>
+                      }
+                    />
                   ) : null}
                 </div>
               ))
@@ -357,11 +458,23 @@ export function CourseEditor({ courseId }: { courseId: string }) {
             {readOnly ? "" : saving ? " · Saving…" : savedAt ? ` · Saved at ${savedAt.toLocaleTimeString("en-GB")}` : ""}
           </p>
           {!readOnly ? (
-            <Button type="button" variant="pill" size="pillSm" disabled={!complete} onClick={submit}>
-              Submit for review
-            </Button>
+            <div className="flex flex-wrap gap-3">
+              <Button type="button" variant="pillSecondary" size="pillSm" disabled={saving} onClick={() => save()}>
+                Save now
+              </Button>
+              {!admin ? (
+                <Button type="button" variant="pill" size="pillSm" disabled={!complete} onClick={submit}>
+                  Submit for review
+                </Button>
+              ) : null}
+            </div>
           ) : null}
         </div>
+        {!admin && !complete && !readOnly ? (
+          <p className="text-right text-xs text-brand-navySoft">
+            Every screen needs a title and a body before you can submit.
+          </p>
+        ) : null}
       </div>
     </div>
   );

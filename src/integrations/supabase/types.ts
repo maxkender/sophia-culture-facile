@@ -291,6 +291,7 @@ export type Database = {
           full_name: string
           id: string
           institution: string | null
+          invite_expires_at: string | null
           invite_token: string | null
           invited_at: string | null
           photo_url: string | null
@@ -311,6 +312,7 @@ export type Database = {
           full_name: string
           id?: string
           institution?: string | null
+          invite_expires_at?: string | null
           invite_token?: string | null
           invited_at?: string | null
           photo_url?: string | null
@@ -331,6 +333,7 @@ export type Database = {
           full_name?: string
           id?: string
           institution?: string | null
+          invite_expires_at?: string | null
           invite_token?: string | null
           invited_at?: string | null
           photo_url?: string | null

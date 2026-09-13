@@ -12,6 +12,7 @@ const AUTHOR_LINKS = [
   { to: "/auteurs", label: "Home" },
   { to: "/auteurs/guide", label: "Writing guide" },
   { to: "/auteurs/contract", label: "Agreement" },
+  { to: "/auteurs/profile", label: "Your details" },
 ] as const;
 
 const ADMIN_LINKS = [
