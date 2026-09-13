@@ -22,8 +22,10 @@ export function AdminDashboard() {
     },
   });
 
-  const courses = data?.courses ?? [];
-  const authors = data?.authors ?? [];
+  // The internal test account must never show up in editorial figures.
+  const testIds = new Set((data?.authors ?? []).filter((author) => author.is_test).map((author) => author.id));
+  const courses = (data?.courses ?? []).filter((course) => !testIds.has(course.author_id ?? ""));
+  const authors = (data?.authors ?? []).filter((author) => !author.is_test);
   const unsigned = authors.filter((author) => !data?.signedIds.has(author.id));
   const overdue = courses.filter(isOverdue);
   const byAuthor = new Map(authors.map((author) => [author.id, author.full_name]));
