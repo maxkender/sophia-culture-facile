@@ -122,6 +122,11 @@ export function AuthorsList() {
                       >
                         {author.full_name}
                       </Link>
+                      {author.is_test ? (
+                        <span className="ml-2 rounded-full bg-brand-line px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wide text-brand-navySoft">
+                          Test
+                        </span>
+                      ) : null}
                       <div className="text-xs text-brand-navySoft">{author.email ?? "No email yet"}</div>
                     </td>
                     <td className="py-3 pr-4 text-brand-navySoft">{author.institution ?? "—"}</td>
