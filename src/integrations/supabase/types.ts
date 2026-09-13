@@ -297,6 +297,7 @@ export type Database = {
           invite_expires_at: string | null
           invite_token: string | null
           invited_at: string | null
+          is_test: boolean
           photo_url: string | null
           platform: Database["public"]["Enums"]["device_platform"] | null
           role: Database["public"]["Enums"]["portal_role"]
@@ -318,6 +319,7 @@ export type Database = {
           invite_expires_at?: string | null
           invite_token?: string | null
           invited_at?: string | null
+          is_test?: boolean
           photo_url?: string | null
           platform?: Database["public"]["Enums"]["device_platform"] | null
           role?: Database["public"]["Enums"]["portal_role"]
@@ -339,6 +341,7 @@ export type Database = {
           invite_expires_at?: string | null
           invite_token?: string | null
           invited_at?: string | null
+          is_test?: boolean
           photo_url?: string | null
           platform?: Database["public"]["Enums"]["device_platform"] | null
           role?: Database["public"]["Enums"]["portal_role"]
