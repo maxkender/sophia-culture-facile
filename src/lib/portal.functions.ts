@@ -15,7 +15,7 @@ export type InvitePreview = {
     institution: string | null;
     country: string | null;
     bio: string | null;
-    platform: string;
+    platform: string | null;
     photo_url: string | null;
   } | null;
   courses: { id: string; title: string; subtitle: string | null; lot_code: string | null; subject_area: string | null; due_date: string | null }[];
