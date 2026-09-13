@@ -1,10 +1,9 @@
 import { useState, type ReactNode } from "react";
-import { Check, Copy, Download } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { STATUS_LABEL, type CourseStatus } from "@/config/portal";
-import { boldParts, downloadText } from "@/lib/portal";
-import type { DocSection } from "@/content/author-agreement";
+import { boldParts } from "@/lib/portal";
 
 export function PortalCard({ className, children }: { className?: string; children: ReactNode }) {
   return (
@@ -93,46 +92,6 @@ export function BoldText({ text }: { text: string }) {
   );
 }
 
-export function DocumentView({
-  title,
-  subtitle,
-  sections,
-  filename,
-  plainText,
-}: {
-  title: string;
-  subtitle: string;
-  sections: DocSection[];
-  filename: string;
-  plainText: string;
-}) {
-  return (
-    <PortalCard>
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-extrabold text-brand-navy">{title}</h2>
-          <p className="mt-1 text-sm text-brand-navySoft">{subtitle}</p>
-        </div>
-        <Button type="button" variant="pillSecondary" size="pillSm" onClick={() => downloadText(filename, plainText)}>
-          <Download className="size-4" />
-          Download
-        </Button>
-      </div>
-      <div className="mt-8 max-w-3xl space-y-7">
-        {sections.map((section) => (
-          <section key={section.title}>
-            <h3 className="text-base font-bold text-brand-navy">{section.title}</h3>
-            {section.paragraphs.map((paragraph, index) => (
-              <p key={index} className="mt-2 text-sm leading-7 text-brand-navySoft">
-                {paragraph}
-              </p>
-            ))}
-          </section>
-        ))}
-      </div>
-    </PortalCard>
-  );
-}
 
 export function EmptyState({ title, text }: { title: string; text?: string }) {
   return (

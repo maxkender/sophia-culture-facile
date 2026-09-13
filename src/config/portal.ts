@@ -10,8 +10,6 @@ export const PUBLISHER = {
   director: "Maximilien Kender",
 } as const;
 
-export const CONTRACT_VERSION = "v1-2026";
-export const GUIDE_VERSION = "v1-2026";
 
 export const COURSE_STATUSES = [
   "assigned",

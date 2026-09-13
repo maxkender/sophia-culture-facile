@@ -19,6 +19,7 @@ const ADMIN_LINKS = [
   { to: "/auteurs/admin/authors", label: "Authors" },
   { to: "/auteurs/admin/review", label: "Review queue" },
   { to: "/auteurs/admin/codes", label: "Access codes" },
+  { to: "/auteurs/admin/documents", label: "Documents" },
   { to: "/auteurs/guide", label: "Writing guide" },
 ] as const;
 
