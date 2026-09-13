@@ -13,19 +13,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
-import { Route as DevenirProfesseurRouteImport } from './routes/devenir-professeur'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SophiaCultureGeneraleRouteImport } from './routes/sophia-culture-generale'
 import { Route as TelechargerRouteImport } from './routes/telecharger'
 import { Route as DotwellKnownAppleAppSiteAssociationRouteImport } from './routes/[.]well-known.apple-app-site-association'
-import { Route as AuthenticatedAdministrationRouteImport } from './routes/_authenticated/administration'
-import { Route as AuthenticatedContratRouteImport } from './routes/_authenticated/contrat'
-import { Route as AuthenticatedEspaceProfesseurRouteImport } from './routes/_authenticated/espace-professeur'
-import { Route as AuthenticatedMesCoursRouteImport } from './routes/_authenticated/mes-cours'
-import { Route as AuthenticatedPaiementsRouteImport } from './routes/_authenticated/paiements'
-import { Route as AuthenticatedProfilEnseignantRouteImport } from './routes/_authenticated/profil-enseignant'
+import { Route as AuteursInviteRouteImport } from './routes/auteurs.invite'
 import { Route as CoursIndexRouteImport } from './routes/cours/index'
 import { Route as CoursSlugRouteImport } from './routes/cours/$slug'
 import { Route as EnIndexRouteImport } from './routes/en/index'
@@ -33,8 +27,19 @@ import { Route as EnDownloadRouteImport } from './routes/en/download'
 import { Route as EnLegalNoticeRouteImport } from './routes/en/legal-notice'
 import { Route as EnPrivacyRouteImport } from './routes/en/privacy'
 import { Route as EnSophiaGeneralKnowledgeRouteImport } from './routes/en/sophia-general-knowledge'
+import { Route as AuthenticatedAuteursIndexRouteImport } from './routes/_authenticated/auteurs/index'
+import { Route as AuthenticatedAuteursContractRouteImport } from './routes/_authenticated/auteurs/contract'
+import { Route as AuthenticatedAuteursGuideRouteImport } from './routes/_authenticated/auteurs/guide'
 import { Route as EnLessonsIndexRouteImport } from './routes/en/lessons/index'
 import { Route as EnLessonsSlugRouteImport } from './routes/en/lessons/$slug'
+import { Route as AuthenticatedAuteursAdminIndexRouteImport } from './routes/_authenticated/auteurs/admin/index'
+import { Route as AuthenticatedAuteursAdminCodesRouteImport } from './routes/_authenticated/auteurs/admin/codes'
+import { Route as AuthenticatedAuteursCoursesCourseIdRouteImport } from './routes/_authenticated/auteurs/courses.$courseId'
+import { Route as AuthenticatedAuteursAdminAuthorsIndexRouteImport } from './routes/_authenticated/auteurs/admin/authors.index'
+import { Route as AuthenticatedAuteursAdminAuthorsAuthorIdRouteImport } from './routes/_authenticated/auteurs/admin/authors.$authorId'
+import { Route as AuthenticatedAuteursAdminAuthorsNewRouteImport } from './routes/_authenticated/auteurs/admin/authors.new'
+import { Route as AuthenticatedAuteursAdminReviewIndexRouteImport } from './routes/_authenticated/auteurs/admin/review.index'
+import { Route as AuthenticatedAuteursAdminReviewCourseIdRouteImport } from './routes/_authenticated/auteurs/admin/review.$courseId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -53,11 +58,6 @@ const AuthRoute = AuthRouteImport.update({
 const ConfidentialiteRoute = ConfidentialiteRouteImport.update({
   id: '/confidentialite',
   path: '/confidentialite',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevenirProfesseurRoute = DevenirProfesseurRouteImport.update({
-  id: '/devenir-professeur',
-  path: '/devenir-professeur',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
@@ -91,39 +91,11 @@ const DotwellKnownAppleAppSiteAssociationRoute =
     path: '/.well-known/apple-app-site-association',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AuthenticatedAdministrationRoute =
-  AuthenticatedAdministrationRouteImport.update({
-    id: '/administration',
-    path: '/administration',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedContratRoute = AuthenticatedContratRouteImport.update({
-  id: '/contrat',
-  path: '/contrat',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const AuteursInviteRoute = AuteursInviteRouteImport.update({
+  id: '/auteurs/invite',
+  path: '/auteurs/invite',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedEspaceProfesseurRoute =
-  AuthenticatedEspaceProfesseurRouteImport.update({
-    id: '/espace-professeur',
-    path: '/espace-professeur',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedMesCoursRoute = AuthenticatedMesCoursRouteImport.update({
-  id: '/mes-cours',
-  path: '/mes-cours',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedPaiementsRoute = AuthenticatedPaiementsRouteImport.update({
-  id: '/paiements',
-  path: '/paiements',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedProfilEnseignantRoute =
-  AuthenticatedProfilEnseignantRouteImport.update({
-    id: '/profil-enseignant',
-    path: '/profil-enseignant',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const CoursIndexRoute = CoursIndexRouteImport.update({
   id: '/cours/',
   path: '/cours/',
@@ -160,6 +132,24 @@ const EnSophiaGeneralKnowledgeRoute =
     path: '/en/sophia-general-knowledge',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAuteursIndexRoute =
+  AuthenticatedAuteursIndexRouteImport.update({
+    id: '/auteurs/',
+    path: '/auteurs/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursContractRoute =
+  AuthenticatedAuteursContractRouteImport.update({
+    id: '/auteurs/contract',
+    path: '/auteurs/contract',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursGuideRoute =
+  AuthenticatedAuteursGuideRouteImport.update({
+    id: '/auteurs/guide',
+    path: '/auteurs/guide',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const EnLessonsIndexRoute = EnLessonsIndexRouteImport.update({
   id: '/en/lessons/',
   path: '/en/lessons/',
@@ -170,24 +160,66 @@ const EnLessonsSlugRoute = EnLessonsSlugRouteImport.update({
   path: '/en/lessons/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAuteursAdminIndexRoute =
+  AuthenticatedAuteursAdminIndexRouteImport.update({
+    id: '/auteurs/admin/',
+    path: '/auteurs/admin/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursAdminCodesRoute =
+  AuthenticatedAuteursAdminCodesRouteImport.update({
+    id: '/auteurs/admin/codes',
+    path: '/auteurs/admin/codes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursCoursesCourseIdRoute =
+  AuthenticatedAuteursCoursesCourseIdRouteImport.update({
+    id: '/auteurs/courses/$courseId',
+    path: '/auteurs/courses/$courseId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursAdminAuthorsIndexRoute =
+  AuthenticatedAuteursAdminAuthorsIndexRouteImport.update({
+    id: '/auteurs/admin/authors/',
+    path: '/auteurs/admin/authors/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursAdminAuthorsAuthorIdRoute =
+  AuthenticatedAuteursAdminAuthorsAuthorIdRouteImport.update({
+    id: '/auteurs/admin/authors/$authorId',
+    path: '/auteurs/admin/authors/$authorId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursAdminAuthorsNewRoute =
+  AuthenticatedAuteursAdminAuthorsNewRouteImport.update({
+    id: '/auteurs/admin/authors/new',
+    path: '/auteurs/admin/authors/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursAdminReviewIndexRoute =
+  AuthenticatedAuteursAdminReviewIndexRouteImport.update({
+    id: '/auteurs/admin/review/',
+    path: '/auteurs/admin/review/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursAdminReviewCourseIdRoute =
+  AuthenticatedAuteursAdminReviewCourseIdRouteImport.update({
+    id: '/auteurs/admin/review/$courseId',
+    path: '/auteurs/admin/review/$courseId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/confidentialite': typeof ConfidentialiteRoute
-  '/devenir-professeur': typeof DevenirProfesseurRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
-  '/administration': typeof AuthenticatedAdministrationRoute
-  '/contrat': typeof AuthenticatedContratRoute
-  '/espace-professeur': typeof AuthenticatedEspaceProfesseurRoute
-  '/mes-cours': typeof AuthenticatedMesCoursRoute
-  '/paiements': typeof AuthenticatedPaiementsRoute
-  '/profil-enseignant': typeof AuthenticatedProfilEnseignantRoute
+  '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
@@ -195,26 +227,31 @@ export interface FileRoutesByFullPath {
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
   '/cours/': typeof CoursIndexRoute
   '/en/': typeof EnIndexRoute
+  '/auteurs/contract': typeof AuthenticatedAuteursContractRoute
+  '/auteurs/guide': typeof AuthenticatedAuteursGuideRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
+  '/auteurs/': typeof AuthenticatedAuteursIndexRoute
   '/en/lessons/': typeof EnLessonsIndexRoute
+  '/auteurs/admin/codes': typeof AuthenticatedAuteursAdminCodesRoute
+  '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
+  '/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
+  '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
+  '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
+  '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
+  '/auteurs/admin/authors/': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
+  '/auteurs/admin/review/': typeof AuthenticatedAuteursAdminReviewIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/confidentialite': typeof ConfidentialiteRoute
-  '/devenir-professeur': typeof DevenirProfesseurRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
-  '/administration': typeof AuthenticatedAdministrationRoute
-  '/contrat': typeof AuthenticatedContratRoute
-  '/espace-professeur': typeof AuthenticatedEspaceProfesseurRoute
-  '/mes-cours': typeof AuthenticatedMesCoursRoute
-  '/paiements': typeof AuthenticatedPaiementsRoute
-  '/profil-enseignant': typeof AuthenticatedProfilEnseignantRoute
+  '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
@@ -222,8 +259,19 @@ export interface FileRoutesByTo {
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
   '/cours': typeof CoursIndexRoute
   '/en': typeof EnIndexRoute
+  '/auteurs/contract': typeof AuthenticatedAuteursContractRoute
+  '/auteurs/guide': typeof AuthenticatedAuteursGuideRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
+  '/auteurs': typeof AuthenticatedAuteursIndexRoute
   '/en/lessons': typeof EnLessonsIndexRoute
+  '/auteurs/admin/codes': typeof AuthenticatedAuteursAdminCodesRoute
+  '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
+  '/auteurs/admin': typeof AuthenticatedAuteursAdminIndexRoute
+  '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
+  '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
+  '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
+  '/auteurs/admin/authors': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
+  '/auteurs/admin/review': typeof AuthenticatedAuteursAdminReviewIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -231,19 +279,13 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/confidentialite': typeof ConfidentialiteRoute
-  '/devenir-professeur': typeof DevenirProfesseurRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
-  '/_authenticated/administration': typeof AuthenticatedAdministrationRoute
-  '/_authenticated/contrat': typeof AuthenticatedContratRoute
-  '/_authenticated/espace-professeur': typeof AuthenticatedEspaceProfesseurRoute
-  '/_authenticated/mes-cours': typeof AuthenticatedMesCoursRoute
-  '/_authenticated/paiements': typeof AuthenticatedPaiementsRoute
-  '/_authenticated/profil-enseignant': typeof AuthenticatedProfilEnseignantRoute
+  '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
@@ -251,8 +293,19 @@ export interface FileRoutesById {
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
   '/cours/': typeof CoursIndexRoute
   '/en/': typeof EnIndexRoute
+  '/_authenticated/auteurs/contract': typeof AuthenticatedAuteursContractRoute
+  '/_authenticated/auteurs/guide': typeof AuthenticatedAuteursGuideRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
+  '/_authenticated/auteurs/': typeof AuthenticatedAuteursIndexRoute
   '/en/lessons/': typeof EnLessonsIndexRoute
+  '/_authenticated/auteurs/admin/codes': typeof AuthenticatedAuteursAdminCodesRoute
+  '/_authenticated/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
+  '/_authenticated/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
+  '/_authenticated/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
+  '/_authenticated/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
+  '/_authenticated/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
+  '/_authenticated/auteurs/admin/authors/': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
+  '/_authenticated/auteurs/admin/review/': typeof AuthenticatedAuteursAdminReviewIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -260,19 +313,13 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/confidentialite'
-    | '/devenir-professeur'
     | '/mentions-legales'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
-    | '/administration'
-    | '/contrat'
-    | '/espace-professeur'
-    | '/mes-cours'
-    | '/paiements'
-    | '/profil-enseignant'
+    | '/auteurs/invite'
     | '/cours/$slug'
     | '/en/download'
     | '/en/legal-notice'
@@ -280,26 +327,31 @@ export interface FileRouteTypes {
     | '/en/sophia-general-knowledge'
     | '/cours/'
     | '/en/'
+    | '/auteurs/contract'
+    | '/auteurs/guide'
     | '/en/lessons/$slug'
+    | '/auteurs/'
     | '/en/lessons/'
+    | '/auteurs/admin/codes'
+    | '/auteurs/courses/$courseId'
+    | '/auteurs/admin/'
+    | '/auteurs/admin/authors/$authorId'
+    | '/auteurs/admin/authors/new'
+    | '/auteurs/admin/review/$courseId'
+    | '/auteurs/admin/authors/'
+    | '/auteurs/admin/review/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/confidentialite'
-    | '/devenir-professeur'
     | '/mentions-legales'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
-    | '/administration'
-    | '/contrat'
-    | '/espace-professeur'
-    | '/mes-cours'
-    | '/paiements'
-    | '/profil-enseignant'
+    | '/auteurs/invite'
     | '/cours/$slug'
     | '/en/download'
     | '/en/legal-notice'
@@ -307,27 +359,32 @@ export interface FileRouteTypes {
     | '/en/sophia-general-knowledge'
     | '/cours'
     | '/en'
+    | '/auteurs/contract'
+    | '/auteurs/guide'
     | '/en/lessons/$slug'
+    | '/auteurs'
     | '/en/lessons'
+    | '/auteurs/admin/codes'
+    | '/auteurs/courses/$courseId'
+    | '/auteurs/admin'
+    | '/auteurs/admin/authors/$authorId'
+    | '/auteurs/admin/authors/new'
+    | '/auteurs/admin/review/$courseId'
+    | '/auteurs/admin/authors'
+    | '/auteurs/admin/review'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/confidentialite'
-    | '/devenir-professeur'
     | '/mentions-legales'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
-    | '/_authenticated/administration'
-    | '/_authenticated/contrat'
-    | '/_authenticated/espace-professeur'
-    | '/_authenticated/mes-cours'
-    | '/_authenticated/paiements'
-    | '/_authenticated/profil-enseignant'
+    | '/auteurs/invite'
     | '/cours/$slug'
     | '/en/download'
     | '/en/legal-notice'
@@ -335,8 +392,19 @@ export interface FileRouteTypes {
     | '/en/sophia-general-knowledge'
     | '/cours/'
     | '/en/'
+    | '/_authenticated/auteurs/contract'
+    | '/_authenticated/auteurs/guide'
     | '/en/lessons/$slug'
+    | '/_authenticated/auteurs/'
     | '/en/lessons/'
+    | '/_authenticated/auteurs/admin/codes'
+    | '/_authenticated/auteurs/courses/$courseId'
+    | '/_authenticated/auteurs/admin/'
+    | '/_authenticated/auteurs/admin/authors/$authorId'
+    | '/_authenticated/auteurs/admin/authors/new'
+    | '/_authenticated/auteurs/admin/review/$courseId'
+    | '/_authenticated/auteurs/admin/authors/'
+    | '/_authenticated/auteurs/admin/review/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -344,13 +412,13 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ConfidentialiteRoute: typeof ConfidentialiteRoute
-  DevenirProfesseurRoute: typeof DevenirProfesseurRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SophiaCultureGeneraleRoute: typeof SophiaCultureGeneraleRoute
   TelechargerRoute: typeof TelechargerRoute
   DotwellKnownAppleAppSiteAssociationRoute: typeof DotwellKnownAppleAppSiteAssociationRoute
+  AuteursInviteRoute: typeof AuteursInviteRoute
   CoursSlugRoute: typeof CoursSlugRoute
   EnDownloadRoute: typeof EnDownloadRoute
   EnLegalNoticeRoute: typeof EnLegalNoticeRoute
@@ -390,13 +458,6 @@ declare module '@tanstack/react-router' {
       path: '/confidentialite'
       fullPath: '/confidentialite'
       preLoaderRoute: typeof ConfidentialiteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/devenir-professeur': {
-      id: '/devenir-professeur'
-      path: '/devenir-professeur'
-      fullPath: '/devenir-professeur'
-      preLoaderRoute: typeof DevenirProfesseurRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mentions-legales': {
@@ -441,47 +502,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotwellKnownAppleAppSiteAssociationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/administration': {
-      id: '/_authenticated/administration'
-      path: '/administration'
-      fullPath: '/administration'
-      preLoaderRoute: typeof AuthenticatedAdministrationRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/contrat': {
-      id: '/_authenticated/contrat'
-      path: '/contrat'
-      fullPath: '/contrat'
-      preLoaderRoute: typeof AuthenticatedContratRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/espace-professeur': {
-      id: '/_authenticated/espace-professeur'
-      path: '/espace-professeur'
-      fullPath: '/espace-professeur'
-      preLoaderRoute: typeof AuthenticatedEspaceProfesseurRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/mes-cours': {
-      id: '/_authenticated/mes-cours'
-      path: '/mes-cours'
-      fullPath: '/mes-cours'
-      preLoaderRoute: typeof AuthenticatedMesCoursRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/paiements': {
-      id: '/_authenticated/paiements'
-      path: '/paiements'
-      fullPath: '/paiements'
-      preLoaderRoute: typeof AuthenticatedPaiementsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/profil-enseignant': {
-      id: '/_authenticated/profil-enseignant'
-      path: '/profil-enseignant'
-      fullPath: '/profil-enseignant'
-      preLoaderRoute: typeof AuthenticatedProfilEnseignantRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/auteurs/invite': {
+      id: '/auteurs/invite'
+      path: '/auteurs/invite'
+      fullPath: '/auteurs/invite'
+      preLoaderRoute: typeof AuteursInviteRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/cours/': {
       id: '/cours/'
@@ -532,6 +558,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnSophiaGeneralKnowledgeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/auteurs/': {
+      id: '/_authenticated/auteurs/'
+      path: '/auteurs'
+      fullPath: '/auteurs/'
+      preLoaderRoute: typeof AuthenticatedAuteursIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/contract': {
+      id: '/_authenticated/auteurs/contract'
+      path: '/auteurs/contract'
+      fullPath: '/auteurs/contract'
+      preLoaderRoute: typeof AuthenticatedAuteursContractRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/guide': {
+      id: '/_authenticated/auteurs/guide'
+      path: '/auteurs/guide'
+      fullPath: '/auteurs/guide'
+      preLoaderRoute: typeof AuthenticatedAuteursGuideRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/en/lessons/': {
       id: '/en/lessons/'
       path: '/en/lessons'
@@ -546,25 +593,97 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnLessonsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/auteurs/admin/': {
+      id: '/_authenticated/auteurs/admin/'
+      path: '/auteurs/admin'
+      fullPath: '/auteurs/admin/'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/admin/codes': {
+      id: '/_authenticated/auteurs/admin/codes'
+      path: '/auteurs/admin/codes'
+      fullPath: '/auteurs/admin/codes'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCodesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/courses/$courseId': {
+      id: '/_authenticated/auteurs/courses/$courseId'
+      path: '/auteurs/courses/$courseId'
+      fullPath: '/auteurs/courses/$courseId'
+      preLoaderRoute: typeof AuthenticatedAuteursCoursesCourseIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/admin/authors/': {
+      id: '/_authenticated/auteurs/admin/authors/'
+      path: '/auteurs/admin/authors'
+      fullPath: '/auteurs/admin/authors/'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminAuthorsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/admin/authors/$authorId': {
+      id: '/_authenticated/auteurs/admin/authors/$authorId'
+      path: '/auteurs/admin/authors/$authorId'
+      fullPath: '/auteurs/admin/authors/$authorId'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminAuthorsAuthorIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/admin/authors/new': {
+      id: '/_authenticated/auteurs/admin/authors/new'
+      path: '/auteurs/admin/authors/new'
+      fullPath: '/auteurs/admin/authors/new'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminAuthorsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/admin/review/': {
+      id: '/_authenticated/auteurs/admin/review/'
+      path: '/auteurs/admin/review'
+      fullPath: '/auteurs/admin/review/'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminReviewIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/admin/review/$courseId': {
+      id: '/_authenticated/auteurs/admin/review/$courseId'
+      path: '/auteurs/admin/review/$courseId'
+      fullPath: '/auteurs/admin/review/$courseId'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminReviewCourseIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdministrationRoute: typeof AuthenticatedAdministrationRoute
-  AuthenticatedContratRoute: typeof AuthenticatedContratRoute
-  AuthenticatedEspaceProfesseurRoute: typeof AuthenticatedEspaceProfesseurRoute
-  AuthenticatedMesCoursRoute: typeof AuthenticatedMesCoursRoute
-  AuthenticatedPaiementsRoute: typeof AuthenticatedPaiementsRoute
-  AuthenticatedProfilEnseignantRoute: typeof AuthenticatedProfilEnseignantRoute
+  AuthenticatedAuteursContractRoute: typeof AuthenticatedAuteursContractRoute
+  AuthenticatedAuteursGuideRoute: typeof AuthenticatedAuteursGuideRoute
+  AuthenticatedAuteursIndexRoute: typeof AuthenticatedAuteursIndexRoute
+  AuthenticatedAuteursAdminCodesRoute: typeof AuthenticatedAuteursAdminCodesRoute
+  AuthenticatedAuteursCoursesCourseIdRoute: typeof AuthenticatedAuteursCoursesCourseIdRoute
+  AuthenticatedAuteursAdminIndexRoute: typeof AuthenticatedAuteursAdminIndexRoute
+  AuthenticatedAuteursAdminAuthorsAuthorIdRoute: typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
+  AuthenticatedAuteursAdminAuthorsNewRoute: typeof AuthenticatedAuteursAdminAuthorsNewRoute
+  AuthenticatedAuteursAdminReviewCourseIdRoute: typeof AuthenticatedAuteursAdminReviewCourseIdRoute
+  AuthenticatedAuteursAdminAuthorsIndexRoute: typeof AuthenticatedAuteursAdminAuthorsIndexRoute
+  AuthenticatedAuteursAdminReviewIndexRoute: typeof AuthenticatedAuteursAdminReviewIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdministrationRoute: AuthenticatedAdministrationRoute,
-  AuthenticatedContratRoute: AuthenticatedContratRoute,
-  AuthenticatedEspaceProfesseurRoute: AuthenticatedEspaceProfesseurRoute,
-  AuthenticatedMesCoursRoute: AuthenticatedMesCoursRoute,
-  AuthenticatedPaiementsRoute: AuthenticatedPaiementsRoute,
-  AuthenticatedProfilEnseignantRoute: AuthenticatedProfilEnseignantRoute,
+  AuthenticatedAuteursContractRoute: AuthenticatedAuteursContractRoute,
+  AuthenticatedAuteursGuideRoute: AuthenticatedAuteursGuideRoute,
+  AuthenticatedAuteursIndexRoute: AuthenticatedAuteursIndexRoute,
+  AuthenticatedAuteursAdminCodesRoute: AuthenticatedAuteursAdminCodesRoute,
+  AuthenticatedAuteursCoursesCourseIdRoute:
+    AuthenticatedAuteursCoursesCourseIdRoute,
+  AuthenticatedAuteursAdminIndexRoute: AuthenticatedAuteursAdminIndexRoute,
+  AuthenticatedAuteursAdminAuthorsAuthorIdRoute:
+    AuthenticatedAuteursAdminAuthorsAuthorIdRoute,
+  AuthenticatedAuteursAdminAuthorsNewRoute:
+    AuthenticatedAuteursAdminAuthorsNewRoute,
+  AuthenticatedAuteursAdminReviewCourseIdRoute:
+    AuthenticatedAuteursAdminReviewCourseIdRoute,
+  AuthenticatedAuteursAdminAuthorsIndexRoute:
+    AuthenticatedAuteursAdminAuthorsIndexRoute,
+  AuthenticatedAuteursAdminReviewIndexRoute:
+    AuthenticatedAuteursAdminReviewIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -575,7 +694,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ConfidentialiteRoute: ConfidentialiteRoute,
-  DevenirProfesseurRoute: DevenirProfesseurRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -583,6 +701,7 @@ const rootRouteChildren: RootRouteChildren = {
   TelechargerRoute: TelechargerRoute,
   DotwellKnownAppleAppSiteAssociationRoute:
     DotwellKnownAppleAppSiteAssociationRoute,
+  AuteursInviteRoute: AuteursInviteRoute,
   CoursSlugRoute: CoursSlugRoute,
   EnDownloadRoute: EnDownloadRoute,
   EnLegalNoticeRoute: EnLegalNoticeRoute,

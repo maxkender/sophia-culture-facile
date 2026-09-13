@@ -51,7 +51,7 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
           )}
           {!bare && (
             <Link
-              to="/devenir-professeur"
+              to="/auth"
               className="hidden rounded-full border border-brand-line px-3 py-1.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy/5 lg:inline-flex"
             >
               {t.nav.becomeTeacher}

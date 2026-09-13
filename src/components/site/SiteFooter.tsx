@@ -34,7 +34,7 @@ export function SiteFooter() {
             </Link>
           </li>
           <li>
-            <Link to="/devenir-professeur" className="underline-offset-4 hover:underline">
+            <Link to="/auth" className="underline-offset-4 hover:underline">
               {t.nav.becomeTeacher}
             </Link>
           </li>
