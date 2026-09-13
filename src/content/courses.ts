@@ -1,5 +1,5 @@
 /**
- * CONTENU D'EXEMPLE — À REMPLACER PAR LES VRAIS COURS DE L'APPLICATION.
+ * CONTENU D'EXEMPLE, À REMPLACER PAR LES VRAIS COURS DE L'APPLICATION.
  *
  * Ce fichier est une source de données temporaire. Il a vocation à être
  * remplacé par un export depuis la base de données des cours (plus de 300).
@@ -78,13 +78,13 @@ export const COURSES: Course[] = [
       },
       {
         title: "Ce qu'il en reste aujourd'hui",
-        body: "La décolonisation a bouleversé la carte du monde : l'ONU comptait 51 membres en 1945, elle en compte 193 aujourd'hui. Elle a aussi laissé des héritages durables — frontières contestées, langues officielles européennes, liens économiques asymétriques, mémoires conflictuelles. Le débat historiographique reste vif sur le bilan des empires et sur la place de la colonisation dans les programmes scolaires. Comprendre cette période aide à lire l'actualité de nombreuses régions, du Sahel à l'Asie du Sud-Est.",
+        body: "La décolonisation a bouleversé la carte du monde : l'ONU comptait 51 membres en 1945, elle en compte 193 aujourd'hui. Elle a aussi laissé des héritages durables, frontières contestées, langues officielles européennes, liens économiques asymétriques, mémoires conflictuelles. Le débat historiographique reste vif sur le bilan des empires et sur la place de la colonisation dans les programmes scolaires. Comprendre cette période aide à lire l'actualité de nombreuses régions, du Sahel à l'Asie du Sud-Est.",
       },
     ],
     sources: [
-      { label: "Organisation des Nations unies — Décolonisation", url: "https://www.un.org/dppa/decolonization/fr" },
-      { label: "Encyclopædia Britannica — Decolonization", url: "https://www.britannica.com/topic/decolonization" },
-      { label: "Bibliothèque nationale de France — Ressources sur la conférence de Bandung", url: "https://www.bnf.fr" },
+      { label: "Organisation des Nations unies, Décolonisation", url: "https://www.un.org/dppa/decolonization/fr" },
+      { label: "Encyclopædia Britannica, Decolonization", url: "https://www.britannica.com/topic/decolonization" },
+      { label: "Bibliothèque nationale de France, Ressources sur la conférence de Bandung", url: "https://www.bnf.fr" },
     ],
     relatedSlugs: ["la-sante-mentale-enjeu-de-societe"],
     alternateSlug: "decolonisation-1945-1975",
@@ -123,7 +123,7 @@ export const COURSES: Course[] = [
       },
       {
         title: "Le poids de la stigmatisation",
-        body: "Parler de santé mentale reste difficile. La stigmatisation retarde la demande d'aide, complique le maintien dans l'emploi et alimente des représentations fausses, notamment l'idée que les personnes atteintes de troubles psychiques seraient dangereuses — alors qu'elles sont statistiquement plus souvent victimes qu'auteures de violences. Depuis une quinzaine d'années, des campagnes publiques, des témoignages de personnalités et l'action d'associations ont fait bouger les lignes, sans faire disparaître le tabou.",
+        body: "Parler de santé mentale reste difficile. La stigmatisation retarde la demande d'aide, complique le maintien dans l'emploi et alimente des représentations fausses, notamment l'idée que les personnes atteintes de troubles psychiques seraient dangereuses, alors qu'elles sont statistiquement plus souvent victimes qu'auteures de violences. Depuis une quinzaine d'années, des campagnes publiques, des témoignages de personnalités et l'action d'associations ont fait bouger les lignes, sans faire disparaître le tabou.",
       },
       {
         title: "Quelles réponses ?",
@@ -131,8 +131,8 @@ export const COURSES: Course[] = [
       },
     ],
     sources: [
-      { label: "Organisation mondiale de la santé — Santé mentale", url: "https://www.who.int/fr/health-topics/mental-health" },
-      { label: "Santé publique France — Santé mentale", url: "https://www.santepubliquefrance.fr/maladies-et-traumatismes/sante-mentale" },
+      { label: "Organisation mondiale de la santé, Santé mentale", url: "https://www.who.int/fr/health-topics/mental-health" },
+      { label: "Santé publique France, Santé mentale", url: "https://www.santepubliquefrance.fr/maladies-et-traumatismes/sante-mentale" },
       { label: "Institut national de la santé et de la recherche médicale (Inserm)", url: "https://www.inserm.fr" },
     ],
     relatedSlugs: ["la-decolonisation-panorama-1945-1975"],
@@ -180,9 +180,9 @@ export const COURSES: Course[] = [
       },
     ],
     sources: [
-      { label: "United Nations — Decolonization", url: "https://www.un.org/dppa/decolonization" },
-      { label: "Encyclopædia Britannica — Decolonization", url: "https://www.britannica.com/topic/decolonization" },
-      { label: "British Library — Bandung Conference resources", url: "https://www.bl.uk" },
+      { label: "United Nations, Decolonization", url: "https://www.un.org/dppa/decolonization" },
+      { label: "Encyclopædia Britannica, Decolonization", url: "https://www.britannica.com/topic/decolonization" },
+      { label: "British Library, Bandung Conference resources", url: "https://www.bl.uk" },
     ],
     relatedSlugs: ["mental-health-a-social-issue"],
     alternateSlug: "la-decolonisation-panorama-1945-1975",
@@ -221,7 +221,7 @@ export const COURSES: Course[] = [
       },
       {
         title: "The cost of stigma",
-        body: "Talking about mental health is still hard. Stigma delays help-seeking, complicates staying in work, and keeps false ideas alive — above all the belief that people with mental illness are dangerous, when they are statistically far more likely to be victims of violence than perpetrators. Public campaigns, public figures speaking openly and the work of patient organisations have shifted attitudes over the past fifteen years, without removing the taboo.",
+        body: "Talking about mental health is still hard. Stigma delays help-seeking, complicates staying in work, and keeps false ideas alive, above all the belief that people with mental illness are dangerous, when they are statistically far more likely to be victims of violence than perpetrators. Public campaigns, public figures speaking openly and the work of patient organisations have shifted attitudes over the past fifteen years, without removing the taboo.",
       },
       {
         title: "What is being done",
@@ -229,9 +229,9 @@ export const COURSES: Course[] = [
       },
     ],
     sources: [
-      { label: "World Health Organization — Mental health", url: "https://www.who.int/health-topics/mental-health" },
-      { label: "OECD — Health at a Glance", url: "https://www.oecd.org/health/health-at-a-glance" },
-      { label: "Santé publique France — Mental health data", url: "https://www.santepubliquefrance.fr" },
+      { label: "World Health Organization, Mental health", url: "https://www.who.int/health-topics/mental-health" },
+      { label: "OECD, Health at a Glance", url: "https://www.oecd.org/health/health-at-a-glance" },
+      { label: "Santé publique France, Mental health data", url: "https://www.santepubliquefrance.fr" },
     ],
     relatedSlugs: ["decolonisation-1945-1975"],
     alternateSlug: "la-sante-mentale-enjeu-de-societe",
