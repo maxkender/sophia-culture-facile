@@ -353,7 +353,7 @@ export function CourseEditor({ courseId }: { courseId: string }) {
 
         <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-4 rounded-portal bg-card p-5 shadow-portal">
           <p className="text-sm text-brand-navySoft">
-            {totalWords} words in total · target around {COURSE_WORDS_TARGET}
+            {totalWords} words in total · target {COURSE_WORDS_MIN}–{COURSE_WORDS_MAX}
             {readOnly ? "" : saving ? " · Saving…" : savedAt ? ` · Saved at ${savedAt.toLocaleTimeString("en-GB")}` : ""}
           </p>
           {!readOnly ? (
