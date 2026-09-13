@@ -24,7 +24,8 @@ export function InvitePage({ token }: { token: string }) {
   const [linkError, setLinkError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [errors, setErrors] = useState<{ password?: string; confirm?: string }>({});
+  const [email, setEmail] = useState("");
+  const [errors, setErrors] = useState<{ password?: string; confirm?: string; email?: string }>({});
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -70,9 +71,15 @@ export function InvitePage({ token }: { token: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
+  const knownEmail = data?.profile?.email ?? null;
+  const needsEmail = Boolean(data?.profile) && !knownEmail;
+
   async function submit(event: FormEvent) {
     event.preventDefault();
-    const next: { password?: string; confirm?: string } = {};
+    const next: { password?: string; confirm?: string; email?: string } = {};
+    if (needsEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      next.email = "Enter the email address you want to sign in with.";
+    }
     if (password.length < 8) next.password = "Use at least 8 characters.";
     if (confirm !== password) next.confirm = "The two passwords do not match.";
     setErrors(next);
@@ -80,12 +87,18 @@ export function InvitePage({ token }: { token: string }) {
 
     setBusy(true);
     try {
-      const result = await claim({ data: { token, password } });
+      const result = await claim({
+        data: { token, password, ...(needsEmail ? { email: email.trim().toLowerCase() } : {}) },
+      });
       if (!result.ok) {
         toast.error(
           result.state === "account"
             ? "An account already exists for this email. Use the sign-in link below instead."
-            : "This invitation is no longer valid.",
+            : result.state === "taken"
+              ? "This email address is already used by another author."
+              : result.state === "missing"
+                ? "Enter your email address first."
+                : "This invitation is no longer valid.",
         );
         return;
       }
@@ -104,11 +117,21 @@ export function InvitePage({ token }: { token: string }) {
   }
 
   async function magicLink() {
+    if (needsEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setErrors({ email: "Enter the email address you want to sign in with." });
+      return;
+    }
     setBusy(true);
     try {
-      const prepared = await prepareMagic({ data: { token } });
+      const prepared = await prepareMagic({
+        data: { token, ...(needsEmail ? { email: email.trim().toLowerCase() } : {}) },
+      });
       if (!prepared.ok) {
-        toast.error("This invitation is no longer valid.");
+        toast.error(
+          prepared.state === "taken"
+            ? "This email address is already used by another author."
+            : "This invitation is no longer valid.",
+        );
         return;
       }
       const { error } = await supabase.auth.signInWithOtp({
@@ -174,15 +197,15 @@ export function InvitePage({ token }: { token: string }) {
                     <p className="mt-1 text-sm text-brand-navySoft">
                       {[profile.title, profile.institution, profile.country].filter(Boolean).join(" · ")}
                     </p>
-                    <p className="mt-1 text-sm text-brand-navySoft">{profile.email}</p>
+                    <p className="mt-1 text-sm text-brand-navySoft">{profile.email ?? "Email to be confirmed by you"}</p>
                   </div>
                 </div>
                 {profile.bio ? (
                   <p className="mt-5 text-sm leading-relaxed text-brand-navySoft">{profile.bio}</p>
                 ) : null}
                 <p className="mt-5 text-xs text-brand-navySoft">
-                  You can correct your title, institution, biography and photo once you are in. Your email address and
-                  your commissioned courses are fixed.
+                  You can correct your title, institution, biography and photo once you are in. Your commissioned
+                  courses are fixed.
                 </p>
               </PortalCard>
 
@@ -211,9 +234,26 @@ export function InvitePage({ token }: { token: string }) {
               <PortalCard>
                 <h2 className="text-lg font-extrabold text-brand-navy">Confirm it is you</h2>
                 <p className="mt-2 text-sm text-brand-navySoft">
-                  Set a password for {profile.email}. This link works once and then stops working.
+                  {needsEmail
+                    ? "Give the email address you want to sign in with, then set a password. This link works once and then stops working."
+                    : `Set a password for ${profile.email}. This link works once and then stops working.`}
                 </p>
                 <form onSubmit={submit} className="mt-5 max-w-md space-y-5">
+                  {needsEmail ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="claim-email">Your email address</Label>
+                      <Input
+                        id="claim-email"
+                        type="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        className="h-11"
+                        aria-invalid={Boolean(errors.email)}
+                      />
+                      {errors.email ? <p className="text-sm font-semibold text-portal-red">{errors.email}</p> : null}
+                    </div>
+                  ) : null}
                   <div className="space-y-2">
                     <Label htmlFor="claim-password">Password</Label>
                     <Input
@@ -256,7 +296,7 @@ export function InvitePage({ token }: { token: string }) {
                 </Button>
                 {sent ? (
                   <p className="mt-3 text-sm text-brand-navySoft">
-                    Check {profile.email} for the sign-in link, then open it on this device.
+                    Check {profile.email ?? email} for the sign-in link, then open it on this device.
                   </p>
                 ) : null}
               </PortalCard>

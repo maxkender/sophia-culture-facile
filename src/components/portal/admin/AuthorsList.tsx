@@ -122,7 +122,7 @@ export function AuthorsList() {
                       >
                         {author.full_name}
                       </Link>
-                      <div className="text-xs text-brand-navySoft">{author.email}</div>
+                      <div className="text-xs text-brand-navySoft">{author.email ?? "No email yet"}</div>
                     </td>
                     <td className="py-3 pr-4 text-brand-navySoft">{author.institution ?? "—"}</td>
                     <td className="py-3 pr-4 text-brand-navySoft">{author.country ?? "—"}</td>

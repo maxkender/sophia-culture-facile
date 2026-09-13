@@ -10,7 +10,7 @@ export type InvitePreview = {
   profile: {
     id: string;
     full_name: string;
-    email: string;
+    email: string | null;
     title: string | null;
     institution: string | null;
     country: string | null;
@@ -85,22 +85,50 @@ export const getInvite = createServerFn({ method: "POST" })
         photo_url: photo,
       },
       courses: courses ?? [],
-      hasAccount: await accountExists(profile.email),
+      hasAccount: profile.email ? await accountExists(profile.email) : false,
     };
   });
+
+/** The author may have been created without an email; they supply their own when claiming. */
+async function resolveClaimEmail(
+  profile: { id: string; email: string | null },
+  provided: string | undefined,
+): Promise<{ email: string } | { error: "missing" | "taken" }> {
+  if (profile.email) return { email: profile.email.toLowerCase() };
+  const email = (provided ?? "").trim().toLowerCase();
+  if (!email) return { error: "missing" };
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: clash } = await supabaseAdmin
+    .from("profiles")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+  if (clash && clash.id !== profile.id) return { error: "taken" };
+  await supabaseAdmin.from("profiles").update({ email }).eq("id", profile.id);
+  return { email };
+}
 
 /** Public: creates the auth account for an invited author and links it to their existing profile. */
 export const claimInvite = createServerFn({ method: "POST" })
   .inputValidator((data) =>
-    z.object({ token: z.string().min(4).max(200), password: z.string().min(8).max(200) }).parse(data),
+    z
+      .object({
+        token: z.string().min(4).max(200),
+        password: z.string().min(8).max(200),
+        email: z.string().email().max(200).optional(),
+      })
+      .parse(data),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin, profile } = await loadInvite(data.token);
     const state = inviteState(profile);
     if (!profile || state !== "ok") return { ok: false as const, state };
 
+    const resolved = await resolveClaimEmail(profile, data.email);
+    if ("error" in resolved) return { ok: false as const, state: resolved.error };
+
     const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email: profile.email,
+      email: resolved.email,
       password: data.password,
       email_confirm: true,
     });
@@ -128,20 +156,24 @@ export const claimInvite = createServerFn({ method: "POST" })
       comment: "Password account created",
     });
 
-    return { ok: true as const, email: profile.email, state: "ok" as const };
+    return { ok: true as const, email: resolved.email, state: "ok" as const };
   });
 
 /** Public: makes sure an auth account exists so a magic link can be sent to an invited author. */
 export const prepareMagicClaim = createServerFn({ method: "POST" })
-  .inputValidator((data) => tokenSchema.parse(data))
+  .inputValidator((data) =>
+    z.object({ token: z.string().min(4).max(200), email: z.string().email().max(200).optional() }).parse(data),
+  )
   .handler(async ({ data }) => {
     const { supabaseAdmin, profile } = await loadInvite(data.token);
     const state = inviteState(profile);
     if (!profile || state !== "ok") return { ok: false as const, state };
-    if (!(await accountExists(profile.email))) {
-      await supabaseAdmin.auth.admin.createUser({ email: profile.email, email_confirm: true });
+    const resolved = await resolveClaimEmail(profile, data.email);
+    if ("error" in resolved) return { ok: false as const, state: resolved.error };
+    if (!(await accountExists(resolved.email))) {
+      await supabaseAdmin.auth.admin.createUser({ email: resolved.email, email_confirm: true });
     }
-    return { ok: true as const, email: profile.email };
+    return { ok: true as const, email: resolved.email };
   });
 
 /** Links a signed-in account to the invited profile (magic-link return path). */
@@ -156,7 +188,10 @@ export const acceptInvite = createServerFn({ method: "POST" })
     }
 
     const claimEmail = String((context.claims as Record<string, unknown>)["email"] ?? "").toLowerCase();
-    if (profile.email.toLowerCase() !== claimEmail) {
+    if (!profile.email && claimEmail) {
+      const adopted = await resolveClaimEmail(profile, claimEmail);
+      if ("error" in adopted) return { ok: false as const, reason: "taken" as const };
+    } else if ((profile.email ?? "").toLowerCase() !== claimEmail) {
       return { ok: false as const, reason: "email" as const, expected: profile.email };
     }
     if (profile.user_id && profile.user_id !== context.userId) {
