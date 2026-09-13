@@ -101,3 +101,37 @@ export function EmptyState({ title, text }: { title: string; text?: string }) {
     </PortalCard>
   );
 }
+
+export function ConfirmButton({
+  trigger,
+  title,
+  description,
+  confirmLabel,
+  onConfirm,
+  label,
+}: {
+  trigger: ReactNode;
+  title: string;
+  description?: string;
+  confirmLabel: string;
+  onConfirm: () => void | Promise<void>;
+  label?: string;
+}) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild aria-label={label}>
+        {trigger}
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          {description ? <AlertDialogDescription>{description}</AlertDialogDescription> : null}
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={() => void onConfirm()}>{confirmLabel}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
