@@ -211,7 +211,7 @@ export function AdminWorkspace() {
                 {profiles.map((item) => (
                   <article key={item.id} className="rounded-lg border border-brand-line bg-card p-5">
                     <p className="font-bold text-brand-navy">{item.first_name} {item.last_name}</p>
-                    <p className="mt-1 text-sm text-brand-navySoft">{item.email} · {item.subject_taught} · {item.teaching_level}</p>
+                    <p className="mt-1 text-sm text-brand-navySoft">{item.email} · {item.subject_taught}{item.specialty ? ` (${item.specialty})` : ""} · {item.teaching_level}{item.institution ? ` · ${item.institution}` : ""}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {signatures.some((s) => s.user_id === item.id) ? "Contrat signé" : "Contrat non signé"} · {details.some((d) => d.user_id === item.id) ? "Coordonnées de paiement renseignées" : "Coordonnées manquantes"}
                     </p>

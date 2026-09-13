@@ -240,8 +240,10 @@ export type Database = {
           email: string
           first_name: string
           id: string
+          institution: string
           language: string
           last_name: string
+          specialty: string
           study_country: string
           subject_taught: string
           teaching_level: string
@@ -253,8 +255,10 @@ export type Database = {
           email: string
           first_name: string
           id: string
+          institution?: string
           language: string
           last_name: string
+          specialty?: string
           study_country: string
           subject_taught: string
           teaching_level: string
@@ -266,8 +270,10 @@ export type Database = {
           email?: string
           first_name?: string
           id?: string
+          institution?: string
           language?: string
           last_name?: string
+          specialty?: string
           study_country?: string
           subject_taught?: string
           teaching_level?: string
