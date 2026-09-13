@@ -135,25 +135,36 @@ export const claimInvite = createServerFn({ method: "POST" })
     const resolved = await resolveClaimEmail(profile, data.email);
     if ("error" in resolved) return { ok: false as const, state: resolved.error };
 
-    const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email: resolved.email,
-      password: data.password,
-      email_confirm: true,
-    });
-    if (createError || !created?.user) {
-      return { ok: false as const, state: "account" as const };
+    // The test account replays the flow, so reuse its existing login instead of creating a second one.
+    const existingUser = profile.is_test ? await findUserByEmail(resolved.email) : null;
+    let userId: string;
+    if (existingUser) {
+      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
+        password: data.password,
+      });
+      if (updateError) return { ok: false as const, state: "account" as const };
+      userId = existingUser.id;
+    } else {
+      const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email: resolved.email,
+        password: data.password,
+        email_confirm: true,
+      });
+      if (createError || !created?.user) {
+        return { ok: false as const, state: "account" as const };
+      }
+      userId = created.user.id;
     }
 
-    const { error } = await supabaseAdmin
+    const query = supabaseAdmin
       .from("profiles")
       .update({
-        user_id: created.user.id,
+        user_id: userId,
         activated_at: new Date().toISOString(),
-        invite_token: null,
-        invite_expires_at: null,
+        ...(profile.is_test ? {} : { invite_token: null, invite_expires_at: null }),
       })
-      .eq("id", profile.id)
-      .is("activated_at", null);
+      .eq("id", profile.id);
+    const { error } = profile.is_test ? await query : await query.is("activated_at", null);
     if (error) return { ok: false as const, state: "used" as const };
 
     await supabaseAdmin.from("activity_log").insert({
