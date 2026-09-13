@@ -117,11 +117,21 @@ export function InvitePage({ token }: { token: string }) {
   }
 
   async function magicLink() {
+    if (needsEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setErrors({ email: "Enter the email address you want to sign in with." });
+      return;
+    }
     setBusy(true);
     try {
-      const prepared = await prepareMagic({ data: { token } });
+      const prepared = await prepareMagic({
+        data: { token, ...(needsEmail ? { email: email.trim().toLowerCase() } : {}) },
+      });
       if (!prepared.ok) {
-        toast.error("This invitation is no longer valid.");
+        toast.error(
+          prepared.state === "taken"
+            ? "This email address is already used by another author."
+            : "This invitation is no longer valid.",
+        );
         return;
       }
       const { error } = await supabase.auth.signInWithOtp({
