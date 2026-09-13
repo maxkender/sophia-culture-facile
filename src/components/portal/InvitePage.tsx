@@ -197,15 +197,15 @@ export function InvitePage({ token }: { token: string }) {
                     <p className="mt-1 text-sm text-brand-navySoft">
                       {[profile.title, profile.institution, profile.country].filter(Boolean).join(" · ")}
                     </p>
-                    <p className="mt-1 text-sm text-brand-navySoft">{profile.email}</p>
+                    <p className="mt-1 text-sm text-brand-navySoft">{profile.email ?? "Email to be confirmed by you"}</p>
                   </div>
                 </div>
                 {profile.bio ? (
                   <p className="mt-5 text-sm leading-relaxed text-brand-navySoft">{profile.bio}</p>
                 ) : null}
                 <p className="mt-5 text-xs text-brand-navySoft">
-                  You can correct your title, institution, biography and photo once you are in. Your email address and
-                  your commissioned courses are fixed.
+                  You can correct your title, institution, biography and photo once you are in. Your commissioned
+                  courses are fixed.
                 </p>
               </PortalCard>
 
@@ -234,9 +234,26 @@ export function InvitePage({ token }: { token: string }) {
               <PortalCard>
                 <h2 className="text-lg font-extrabold text-brand-navy">Confirm it is you</h2>
                 <p className="mt-2 text-sm text-brand-navySoft">
-                  Set a password for {profile.email}. This link works once and then stops working.
+                  {needsEmail
+                    ? "Give the email address you want to sign in with, then set a password. This link works once and then stops working."
+                    : `Set a password for ${profile.email}. This link works once and then stops working.`}
                 </p>
                 <form onSubmit={submit} className="mt-5 max-w-md space-y-5">
+                  {needsEmail ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="claim-email">Your email address</Label>
+                      <Input
+                        id="claim-email"
+                        type="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        className="h-11"
+                        aria-invalid={Boolean(errors.email)}
+                      />
+                      {errors.email ? <p className="text-sm font-semibold text-portal-red">{errors.email}</p> : null}
+                    </div>
+                  ) : null}
                   <div className="space-y-2">
                     <Label htmlFor="claim-password">Password</Label>
                     <Input
