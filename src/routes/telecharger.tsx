@@ -5,9 +5,9 @@ import { langLinks, meta } from "@/lib/seo";
 export const Route = createFileRoute("/telecharger")({
   head: () => ({
     meta: meta({
-      title: "Télécharger Sophia — Culture générale (iOS et Android)",
+      title: "Télécharger Sophia, culture générale (iOS et Android)",
       description:
-        "Télécharge Sophia — Culture générale gratuitement sur l'App Store ou Google Play. L'application française de culture générale : cours courts, quiz et entraînement quotidien.",
+        "Télécharge Sophia, culture générale gratuitement sur l'App Store ou Google Play. L'application française de culture générale : cours courts, quiz et entraînement quotidien.",
       lang: "fr",
       key: "download",
     }),

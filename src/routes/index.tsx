@@ -12,9 +12,9 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: meta({
-      title: "Sophia — Culture générale | L'application pour apprendre chaque jour",
+      title: "Sophia, culture générale | L'application pour apprendre chaque jour",
       description:
-        "Sophia — Culture générale est l'application mobile française gratuite pour apprendre la culture générale chaque jour : cours courts, quiz et révision quotidienne. iOS et Android.",
+        "Sophia, culture générale est l'application mobile française gratuite pour apprendre la culture générale chaque jour : cours courts, quiz et révision quotidienne. iOS et Android.",
       lang: "fr",
       key: "home",
     }),

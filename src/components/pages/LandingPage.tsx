@@ -1,4 +1,4 @@
-import { BookOpen, BrainCircuit, CalendarCheck } from "lucide-react";
+import { BookOpen, BrainCircuit, CalendarCheck, TrendingUp } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 import { Hero } from "@/components/site/Hero";
 import { Reveal } from "@/components/site/Reveal";
@@ -8,7 +8,7 @@ import { TeacherAccessBand } from "@/components/site/TeacherAccessBand";
 import { COMPANY } from "@/config/links";
 import { fill, useI18n } from "@/i18n";
 
-const ICONS = [BookOpen, BrainCircuit, CalendarCheck];
+const ICONS = [BookOpen, BrainCircuit, CalendarCheck, TrendingUp];
 
 export function LandingPage() {
   const { t } = useI18n();
@@ -27,7 +27,7 @@ export function LandingPage() {
           <h2 id="atouts" className="sr-only">
             {t.landing.benefitsTitle}
           </h2>
-          <ul className="grid gap-4 md:grid-cols-3">
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {t.landing.benefits.map((benefit, i) => {
               const Icon = ICONS[i] ?? BookOpen;
               return (

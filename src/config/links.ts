@@ -1,5 +1,5 @@
 /**
- * Liens externes de Sophia — Culture générale.
+ * Liens externes de Sophia, culture générale.
  * Point unique de configuration des URLs de stores.
  */
 
@@ -37,4 +37,4 @@ export const CONTACT_EMAIL = "contact@vikstudios.fr"; // TO REPLACE
 
 export const COMPANY = "Vik Studios SAS";
 
-export const SITE_NAME = "Sophia — Culture générale";
+export const SITE_NAME = "Sophia, culture générale";

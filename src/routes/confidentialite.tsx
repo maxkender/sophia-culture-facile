@@ -5,9 +5,9 @@ import { langLinks, meta } from "@/lib/seo";
 export const Route = createFileRoute("/confidentialite")({
   head: () => ({
     meta: meta({
-      title: "Politique de confidentialité | Sophia — Culture générale",
+      title: "Politique de confidentialité | Sophia, culture générale",
       description:
-        "Politique de confidentialité de Sophia — Culture générale, application mobile d'apprentissage éditée par Vik Studios SAS.",
+        "Politique de confidentialité de Sophia, culture générale, application mobile d'apprentissage éditée par Vik Studios SAS.",
       lang: "fr",
       key: "privacy",
     }),
