@@ -26,9 +26,9 @@ export function TeacherProfilePage() {
       const user = auth.user;
       if (!user) return;
       setEmail(user.email ?? "");
-      const { data } = await supabase.from("profiles").select("first_name,last_name,language,study_country,avatar_path,subject_taught,teaching_level").eq("id", user.id).maybeSingle();
+      const { data } = await supabase.from("profiles").select("first_name,last_name,language,study_country,avatar_path,subject_taught,teaching_level,institution,specialty").eq("id", user.id).maybeSingle();
       if (data) {
-        setForm({ firstName: data.first_name, lastName: data.last_name, language: data.language as "fr" | "en", country: data.study_country, subject: data.subject_taught, level: data.teaching_level });
+        setForm({ firstName: data.first_name, lastName: data.last_name, language: data.language as "fr" | "en", country: data.study_country, subject: data.subject_taught, level: data.teaching_level, institution: data.institution, specialty: data.specialty });
         setExistingAvatar(data.avatar_path);
       }
       setLoading(false);
@@ -59,7 +59,7 @@ export function TeacherProfilePage() {
       const { error } = await supabase.storage.from("teacher-avatars").upload(avatarPath, avatar, { upsert: true, contentType: avatar.type });
       if (error) { setSaving(false); toast.error("La photo n’a pas pu être importée."); return; }
     }
-    const { error } = await supabase.from("profiles").upsert({ id: user.id, email: user.email, first_name: form.firstName.trim(), last_name: form.lastName.trim(), language: form.language, study_country: form.country.trim(), avatar_path: avatarPath, subject_taught: form.subject.trim(), teaching_level: form.level.trim() });
+    const { error } = await supabase.from("profiles").upsert({ id: user.id, email: user.email, first_name: form.firstName.trim(), last_name: form.lastName.trim(), language: form.language, study_country: form.country.trim(), avatar_path: avatarPath, subject_taught: form.subject.trim(), teaching_level: form.level.trim(), institution: form.institution.trim(), specialty: form.specialty.trim() });
     setSaving(false);
     if (error) { toast.error("Le profil n’a pas pu être enregistré."); return; }
     toast.success("Profil enregistré.");
