@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { COURSE_WORDS_TARGET, SCREEN_NUMBERS, WORDS_MAX, WORDS_MIN, WORDS_WARN, type CourseStatus } from "@/config/portal";
+import { COURSE_WORDS_MAX, COURSE_WORDS_MIN, SCREEN_NUMBERS, WORDS_MAX, WORDS_MIN, WORDS_WARN, type CourseStatus } from "@/config/portal";
 import { countWords, formatDate, type Course, type Source } from "@/lib/portal";
 import { usePortalProfile } from "./usePortal";
 import { Banner, BoldText, PageTitle, PortalCard, StatusPill } from "./ui";
@@ -353,7 +353,7 @@ export function CourseEditor({ courseId }: { courseId: string }) {
 
         <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-4 rounded-portal bg-card p-5 shadow-portal">
           <p className="text-sm text-brand-navySoft">
-            {totalWords} words in total · target around {COURSE_WORDS_TARGET}
+            {totalWords} words in total · target {COURSE_WORDS_MIN}–{COURSE_WORDS_MAX}
             {readOnly ? "" : saving ? " · Saving…" : savedAt ? ` · Saved at ${savedAt.toLocaleTimeString("en-GB")}` : ""}
           </p>
           {!readOnly ? (

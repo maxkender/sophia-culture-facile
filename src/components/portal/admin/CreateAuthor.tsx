@@ -34,14 +34,15 @@ export function CreateAuthor() {
     event.preventDefault();
     setBusy(true);
     try {
-      const prefix = form.platform === "android" ? "SOPHIA-AND" : "SOPHIA-IOS";
+      const platform = form.platform as "ios" | "android";
       const { data: codes } = await supabase
         .from("access_codes")
         .select("*")
         .eq("state", "available")
-        .order("code");
-      const pool = codes ?? [];
-      const code = pool.find((row) => row.code.startsWith(prefix)) ?? pool[0] ?? null;
+        .eq("platform", platform)
+        .order("code")
+        .limit(1);
+      const code = codes?.[0] ?? null;
 
       const inviteToken = newInviteToken();
       const { data: profile, error } = await supabase
@@ -81,7 +82,10 @@ export function CreateAuthor() {
         }
       }
 
-      if (!code) toast.warning("Author created, but the access code pool is empty.");
+      if (!code)
+        toast.warning(
+          `Author created, but there is no available ${platform === "android" ? "Google Play" : "App Store"} code left.`,
+        );
       else toast.success("Author created and access code assigned.");
       await queryClient.invalidateQueries({ queryKey: ["portal", "admin"] });
       await navigate({ to: "/auteurs/admin/authors/$authorId", params: { authorId: profile.id } });
