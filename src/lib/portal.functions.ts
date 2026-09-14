@@ -314,10 +314,26 @@ export const updateInviteProfile = createServerFn({ method: "POST" })
       .object({
         token: z.string().min(4).max(200),
         title: z.string().max(200).optional(),
+        display_name: z.string().max(200).optional(),
         display_title: z.string().max(300).optional(),
         institution: z.string().max(200).optional(),
         country: z.string().max(120).optional(),
         bio: z.string().max(1200).optional(),
+        short_bio: z.string().max(300).optional(),
+        orcid: z.string().max(200).optional(),
+        personal_site: z.string().max(300).optional(),
+        scholar_url: z.string().max(300).optional(),
+        education: z
+          .array(
+            z.object({
+              degree: z.string().max(120).optional(),
+              field: z.string().max(160).optional(),
+              institution: z.string().max(200).optional(),
+              year: z.string().max(20).optional(),
+            }),
+          )
+          .max(12)
+          .optional(),
         photo: z
           .object({ name: z.string().max(200), dataUrl: z.string().max(7_000_000) })
           .optional(),
@@ -345,6 +361,11 @@ export const updateInviteProfile = createServerFn({ method: "POST" })
 
     const patch = {
       ...(data.title !== undefined ? { title: clean(data.title) ?? null } : {}),
+      ...(data.display_name !== undefined ? { display_name: clean(data.display_name) ?? null } : {}),
+      ...(data.short_bio !== undefined ? { short_bio: clean(data.short_bio) ?? null } : {}),
+      ...(data.orcid !== undefined ? { orcid: clean(data.orcid) ?? null } : {}),
+      ...(data.personal_site !== undefined ? { personal_site: clean(data.personal_site) ?? null } : {}),
+      ...(data.scholar_url !== undefined ? { scholar_url: clean(data.scholar_url) ?? null } : {}),
       ...(data.display_title !== undefined ? { display_title: clean(data.display_title) ?? null } : {}),
       ...(data.institution !== undefined ? { institution: clean(data.institution) ?? null } : {}),
       ...(data.country !== undefined ? { country: clean(data.country) ?? null } : {}),
@@ -354,5 +375,22 @@ export const updateInviteProfile = createServerFn({ method: "POST" })
 
     const { error } = await supabaseAdmin.from("profiles").update(patch).eq("id", profile.id);
     if (error) return { ok: false as const };
+
+    // The education list is replaced wholesale: it is short and always sent complete.
+    if (data.education) {
+      const rows = data.education
+        .filter((row) => (row.degree ?? "").trim() || (row.field ?? "").trim() || (row.institution ?? "").trim())
+        .map((row, index) => ({
+          profile_id: profile.id,
+          degree: clean(row.degree) ?? null,
+          field: clean(row.field) ?? null,
+          institution: clean(row.institution) ?? null,
+          year: clean(row.year) ?? null,
+          order_index: index,
+        }));
+      await supabaseAdmin.from("education_records").delete().eq("profile_id", profile.id);
+      if (rows.length > 0) await supabaseAdmin.from("education_records").insert(rows);
+    }
+
     return { ok: true as const };
   });
