@@ -43,6 +43,10 @@ function initials(name: string): string {
   );
 }
 
+function isNavActive(pathname: string, item: { to: string; exact?: boolean }): boolean {
+  return item.exact ? pathname === item.to : pathname === item.to || pathname.startsWith(`${item.to}/`);
+}
+
 function SidebarNav({
   groups,
   counts,
@@ -54,6 +58,8 @@ function SidebarNav({
   collapsed: boolean;
   onNavigate?: () => void;
 }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
   return (
     <nav aria-label="Portal" className="flex flex-col gap-6">
       {groups.map((group) => (
@@ -69,6 +75,7 @@ function SidebarNav({
             {group.items.map((item) => {
               const Icon = item.icon;
               const count = item.badge ? (counts[item.badge] ?? 0) : 0;
+              const active = isNavActive(pathname, item);
               return (
                 <li key={item.to}>
                   <Link
@@ -77,15 +84,12 @@ function SidebarNav({
                     onClick={onNavigate}
                     title={collapsed ? item.label : undefined}
                     className={cn(
-                      "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-brand-navySoft transition hover:bg-brand-navy/5 hover:text-brand-navy",
+                      "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition",
                       collapsed && "justify-center px-0",
+                      active
+                        ? "bg-brand-navy text-white shadow-sm"
+                        : "text-brand-navy hover:bg-brand-navy/10 hover:text-brand-navy",
                     )}
-                    activeProps={{
-                      className: cn(
-                        "flex items-center gap-3 rounded-xl bg-brand-navy px-3 py-2.5 text-sm font-semibold text-card hover:bg-brand-navy hover:text-card",
-                        collapsed && "justify-center px-0",
-                      ),
-                    }}
                   >
                     <Icon className="size-4 shrink-0" aria-hidden="true" />
                     {collapsed ? (
@@ -94,7 +98,12 @@ function SidebarNav({
                       <>
                         <span className="flex-1 truncate">{item.label}</span>
                         {count > 0 ? (
-                          <span className="rounded-full bg-brand-navy px-2 py-0.5 text-[11px] font-bold text-card">
+                          <span
+                            className={cn(
+                              "rounded-full px-2 py-0.5 text-[11px] font-bold",
+                              active ? "bg-white text-brand-navy" : "bg-brand-navy text-card",
+                            )}
+                          >
                             {count}
                           </span>
                         ) : null}
@@ -174,7 +183,7 @@ export function PortalShell({
         <button
           type="button"
           className={cn(
-            "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-brand-navy/5",
+            "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-brand-navy/10",
             collapsed && "justify-center px-0",
           )}
         >
@@ -240,7 +249,7 @@ export function PortalShell({
             type="button"
             onClick={toggleCollapsed}
             className={cn(
-              "mt-2 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-brand-navySoft transition hover:bg-brand-navy/5",
+              "mt-2 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-brand-navy transition hover:bg-brand-navy/10",
               collapsed && "justify-center px-0",
             )}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
