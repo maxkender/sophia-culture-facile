@@ -379,6 +379,7 @@ export type Database = {
           role: Database["public"]["Enums"]["portal_role"]
           title: string | null
           updated_at: string
+          upwork_status: string
           user_id: string | null
         }
         Insert: {
@@ -402,6 +403,7 @@ export type Database = {
           role?: Database["public"]["Enums"]["portal_role"]
           title?: string | null
           updated_at?: string
+          upwork_status?: string
           user_id?: string | null
         }
         Update: {
@@ -425,6 +427,7 @@ export type Database = {
           role?: Database["public"]["Enums"]["portal_role"]
           title?: string | null
           updated_at?: string
+          upwork_status?: string
           user_id?: string | null
         }
         Relationships: []

@@ -11,6 +11,35 @@ import { formatDate, formatDateTime, inviteUrl, newInviteToken, type Course, typ
 import type { CourseStatus } from "@/config/portal";
 import { Banner, CopyButton, PageTitle, PortalCard, StatusPill } from "../ui";
 
+type Lot = {
+  key: string;
+  lot_code: string | null;
+  lot_name: string | null;
+  subject_area: string | null;
+  courses: Course[];
+};
+
+/** Groups an author's courses by lot, keeping the assigned order. */
+function groupByLot(courses: Course[]): Lot[] {
+  const lots: Lot[] = [];
+  for (const course of courses) {
+    const key = course.lot_code ?? course.lot_name ?? "none";
+    let lot = lots.find((entry) => entry.key === key);
+    if (!lot) {
+      lot = {
+        key,
+        lot_code: course.lot_code,
+        lot_name: course.lot_name,
+        subject_area: course.subject_area,
+        courses: [],
+      };
+      lots.push(lot);
+    }
+    lot.courses.push(course);
+  }
+  return lots;
+}
+
 export function AuthorDetail({ authorId }: { authorId: string }) {
   const queryClient = useQueryClient();
   const [bulk, setBulk] = useState("");
@@ -119,8 +148,27 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
       <div className="grid gap-5 lg:grid-cols-3">
         <PortalCard>
           <h2 className="text-sm font-bold text-brand-navy">Contact</h2>
-          <p className="mt-3 text-sm text-brand-navySoft">{author.email}</p>
-          <p className="mt-1 text-sm text-brand-navySoft">{author.platform === "android" ? "Android" : "iOS"}</p>
+          <p className="mt-3 text-sm text-brand-navySoft">{author.email ?? "No email — contracted through Upwork"}</p>
+          <p className="mt-1 text-sm">
+            {author.platform === "android" ? (
+              <span className="text-brand-navySoft">Android</span>
+            ) : author.platform === "ios" ? (
+              <span className="text-brand-navySoft">iOS</span>
+            ) : (
+              <span className="font-semibold text-portal-amber">Platform unknown</span>
+            )}
+          </p>
+          <p className="mt-2">
+            <span
+              className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${
+                author.upwork_status === "accepted"
+                  ? "bg-portal-green/10 text-portal-green"
+                  : "bg-brand-line text-brand-navySoft"
+              }`}
+            >
+              {author.upwork_status === "accepted" ? "Accepted on Upwork" : "Contacted on Upwork"}
+            </span>
+          </p>
           {author.bio ? <p className="mt-3 text-sm leading-relaxed text-brand-navySoft">{author.bio}</p> : null}
           <div className="mt-4 space-y-1">
             <Label htmlFor="fee">Fee (shown in their contract)</Label>
@@ -175,26 +223,41 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
         )}
       </div>
 
-      <h2 className="mt-10 text-xl font-extrabold text-brand-navy">Commissioned courses</h2>
-      <PortalCard className="mt-4">
-        {courses.length === 0 ? (
+      <h2 className="mt-10 text-xl font-extrabold text-brand-navy">
+        Commissioned courses <span className="text-base font-bold text-brand-navySoft">({courses.length})</span>
+      </h2>
+      {courses.length === 0 ? (
+        <PortalCard className="mt-4">
           <p className="text-sm text-brand-navySoft">No course assigned yet.</p>
-        ) : (
-          <ul className="divide-y divide-brand-line">
-            {courses.map((course) => (
-              <li key={course.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-                <div>
-                  <p className="text-sm font-bold text-brand-navy">{course.title}</p>
-                  <p className="text-xs text-brand-navySoft">
-                    {course.lot_code ?? "—"} · {course.subject_area ?? "—"} · due {formatDate(course.due_date)}
-                  </p>
-                </div>
-                <StatusPill status={course.status as CourseStatus} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </PortalCard>
+        </PortalCard>
+      ) : (
+        <div className="mt-4 space-y-5">
+          {groupByLot(courses).map((lot) => (
+            <PortalCard key={lot.key}>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="text-lg font-extrabold text-brand-navy">
+                  {lot.lot_code ? `${lot.lot_code} — ` : ""}
+                  {lot.lot_name ?? "Unsorted courses"}
+                </h3>
+                <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">
+                  {lot.subject_area ?? "—"} · {lot.courses.length} courses
+                </p>
+              </div>
+              <ul className="mt-2 divide-y divide-brand-line">
+                {lot.courses.map((course) => (
+                  <li key={course.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                    <div>
+                      <p className="text-sm font-bold text-brand-navy">{course.title}</p>
+                      <p className="text-xs text-brand-navySoft">Due {formatDate(course.due_date)}</p>
+                    </div>
+                    <StatusPill status={course.status as CourseStatus} />
+                  </li>
+                ))}
+              </ul>
+            </PortalCard>
+          ))}
+        </div>
+      )}
 
       <div className="mt-6 grid gap-5 lg:grid-cols-2">
         <PortalCard>
