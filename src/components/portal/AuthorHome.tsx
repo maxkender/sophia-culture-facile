@@ -143,9 +143,28 @@ export function AuthorHome() {
         <h3 className="text-lg font-extrabold leading-snug text-brand-navy">Want to read more Sophia courses?</h3>
         <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
           The two examples show you the format. If you would like to see more, here is a free code that unlocks the
-          whole app. Open the App Store, tap your profile picture, choose Redeem Gift Card or Code, then Enter Code
-          Manually.
+          whole app.
         </p>
+        {profile?.platform === "android" ? (
+          <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
+            On Android: open the Play Store, tap your profile picture, choose Payments and subscriptions, then Redeem
+            code.
+          </p>
+        ) : profile?.platform === "ios" ? (
+          <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
+            On iPhone: open the App Store, tap your profile picture, choose Redeem Gift Card or Code, then Enter Code
+            Manually.
+          </p>
+        ) : (
+          <p className="mt-2 text-sm font-semibold leading-relaxed text-portal-amber">
+            Tell us whether you use an iPhone or an Android phone on{" "}
+            <Link to="/auteurs/profile" className="underline">
+              your profile page
+            </Link>{" "}
+            and we will give you a code for the right store.
+          </p>
+        )}
+
         {profile?.access_code ? (
           <>
             <p className="mt-4 rounded-2xl bg-card px-4 py-3 font-mono text-xl font-bold tracking-[0.12em] text-brand-navy">
