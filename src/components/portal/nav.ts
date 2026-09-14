@@ -1,5 +1,6 @@
 import {
   Activity,
+  Code2,
   BookMarked,
   BookOpen,
   FileSignature,
@@ -10,6 +11,7 @@ import {
   Library,
   Settings,
   Sparkles,
+  UserCircle,
   UserCheck,
   Users,
 } from "lucide-react";
@@ -34,6 +36,7 @@ export const AUTHOR_NAV: NavGroup[] = [
       { to: "/auteurs", label: "Home", icon: Home, exact: true },
       { to: "/auteurs/courses", label: "My courses", icon: Library, badge: "myCourses" },
       { to: "/auteurs/examples", label: "Examples", icon: Sparkles },
+      { to: "/auteurs/profile", label: "Profile", icon: UserCircle },
     ],
   },
   {
@@ -72,6 +75,7 @@ export const ADMIN_NAV: NavGroup[] = [
     heading: "Système",
     items: [
       { to: "/auteurs/admin/activity", label: "Activity log", icon: Activity },
+      { to: "/auteurs/admin/api", label: "App export API", icon: Code2 },
       { to: "/auteurs/admin/settings", label: "Settings", icon: Settings },
     ],
   },
