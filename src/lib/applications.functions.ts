@@ -16,29 +16,6 @@ async function assertAdmin(userId: string) {
   return supabaseAdmin;
 }
 
-function inviteEmail(name: string, inviteUrl: string) {
-  const text = [
-    `Hello ${name},`,
-    "",
-    "Good news: your application to write for Sophia has been accepted.",
-    "",
-    "Open the link below to set your password and access the author portal, where you will find your access code, the writing guide, the agreement and the courses assigned to you.",
-    "",
-    inviteUrl,
-    "",
-    "Welcome aboard.",
-    "The Sophia editorial team",
-  ].join("\n");
-  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1B3054;line-height:1.6">
-  <p>Hello ${name},</p>
-  <p>Good news: your application to write for <strong>Sophia</strong> has been accepted.</p>
-  <p>Open the link below to set your password and access the author portal, where you will find your access code, the writing guide, the agreement and the courses assigned to you.</p>
-  <p><a href="${inviteUrl}" style="display:inline-block;background:#1B3054;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:700">Open the author portal</a></p>
-  <p style="font-size:13px;color:#5A6B87">${inviteUrl}</p>
-  <p>Welcome aboard.<br/>The Sophia editorial team</p>
-</div>`;
-  return { text, html };
-}
 
 /** Admin: accepts a candidature, creates the author record and emails the access link. */
 export const approveApplication = createServerFn({ method: "POST" })
