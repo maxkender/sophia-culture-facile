@@ -12,10 +12,12 @@ import {
   BLOCK_LABEL,
   DOCUMENT_LABEL,
   emptyBlock,
+  MERGE_TOKENS,
   parseBlocks,
   type DocBlock,
   type DocumentSlug,
 } from "@/lib/documents";
+import { Switch } from "@/components/ui/switch";
 import { downloadDocumentPdf } from "@/lib/documentPdf";
 import { formatDateTime } from "@/lib/portal";
 import { DocumentBody } from "../DocumentBody";
