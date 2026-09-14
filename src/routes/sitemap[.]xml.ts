@@ -28,6 +28,7 @@ const STATIC_PAGES: { key: RouteKey; changefreq: string; priority: string }[] = 
   { key: "download", changefreq: "monthly", priority: "0.9" },
   { key: "landing", changefreq: "monthly", priority: "0.9" },
   { key: "courses", changefreq: "weekly", priority: "0.9" },
+  { key: "apply", changefreq: "monthly", priority: "0.5" },
   { key: "legal", changefreq: "yearly", priority: "0.3" },
   { key: "privacy", changefreq: "yearly", priority: "0.3" },
 ];
