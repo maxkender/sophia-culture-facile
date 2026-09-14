@@ -133,9 +133,6 @@ export function InvitePage({ token }: { token: string }) {
       scholar_url: p.scholar_url ?? "",
     });
     setPlatform(p.platform === "ios" || p.platform === "android" ? p.platform : null);
-    setDetails((current) => ({
-      ...current,
-    });
     setEducation(
       (data?.education ?? []).map((row) => ({
         degree: row.degree ?? "",
