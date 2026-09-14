@@ -95,58 +95,13 @@ export function AuthorHome() {
 
       <div className="mb-4 flex items-baseline justify-between gap-4">
         <h2 className="text-xl font-extrabold text-brand-navy">Before you write</h2>
-        <p className="text-sm font-bold text-brand-navySoft">Step {Math.min(doneCount, 4)} of 4</p>
+        <p className="text-sm font-bold text-brand-navySoft">
+          Step {Math.min(doneCount, totalSteps)} of {totalSteps}
+        </p>
       </div>
 
       <div className="space-y-4">
-        <StepCard number={1} title="Get Sophia on your phone" muted>
-          <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
-            Your personal code unlocks the app at no cost. Open the App Store, tap your profile picture, choose Redeem
-            Gift Card or Code, then Enter Code Manually.
-          </p>
-          {profile?.access_code ? (
-            <>
-              <p className="mt-4 rounded-2xl bg-card px-4 py-3 font-mono text-xl font-bold tracking-[0.12em] text-brand-navy">
-                {profile.access_code}
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <CopyButton value={profile.access_code} label="Copy code" />
-                {profile.access_redeem_url ? (
-                  <Button asChild variant="pillSecondary" size="pillSm">
-                    <a href={profile.access_redeem_url} target="_blank" rel="noreferrer noopener">
-                      Redeem
-                    </a>
-                  </Button>
-                ) : null}
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="mt-4 text-base font-bold text-brand-navy">
-                {profile?.is_test ? "Code de test, non fonctionnel" : "Your code is on its way"}
-              </p>
-              <p className="mt-1 text-xs leading-relaxed text-brand-navySoft">
-                {profile?.is_test
-                  ? "This is the internal test profile: no store code is attached to it."
-                  : "The editorial desk will add it here as soon as it is issued. Nothing to do on your side."}
-              </p>
-            </>
-          )}
-          <p className="mt-4 flex flex-wrap items-center gap-1 text-sm text-brand-navySoft">
-            <Smartphone className="size-4" aria-hidden="true" />
-            Not on iPhone, or want the other links? Everything is here:{" "}
-            <a
-              href={TAAP_LINK}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="font-semibold text-portal-accent hover:underline"
-            >
-              taap.it/sophia.culture
-            </a>
-          </p>
-        </StepCard>
-
-        <StepCard number={2} title="Read two real Sophia courses" done={examplesDone} highlight={!examplesDone}>
+        <StepCard number={1} title="Read two real Sophia courses" done={examplesDone} highlight={!examplesDone}>
           <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
             Two published courses, screen by screen. This is the single best thing you can do before writing, and it is
             required before your courses open.
