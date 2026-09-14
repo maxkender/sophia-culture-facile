@@ -18,8 +18,15 @@ export async function openConversation(profileId: string, courseId: string | nul
     .insert({ profile_id: profileId, course_id: courseId })
     .select("id")
     .single();
-  if (error) throw error;
-  return created.id;
+  if (!error) return created.id;
+
+  // Another tab or a double render created it first: read it back.
+  const retry = supabase.from("conversations").select("id").eq("profile_id", profileId);
+  const { data: raced } = await (courseId ? retry.eq("course_id", courseId) : retry.is("course_id", null))
+    .limit(1)
+    .maybeSingle();
+  if (raced?.id) return raced.id;
+  throw error;
 }
 
 export async function markConversationRead(conversationId: string, isAdmin: boolean) {
