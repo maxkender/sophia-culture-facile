@@ -1,0 +1,86 @@
+import {
+  Activity,
+  BookMarked,
+  BookOpen,
+  FileSignature,
+  FileText,
+  Home,
+  KeyRound,
+  LayoutDashboard,
+  Library,
+  Settings,
+  Sparkles,
+  UserCheck,
+  Users,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+export type NavBadge = "review" | "myCourses" | "codes" | "applications";
+
+export type NavItem = {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  exact?: boolean;
+  badge?: NavBadge;
+};
+
+export type NavGroup = { heading: string; items: NavItem[] };
+
+export const AUTHOR_NAV: NavGroup[] = [
+  {
+    heading: "Espace",
+    items: [
+      { to: "/auteurs", label: "Home", icon: Home, exact: true },
+      { to: "/auteurs/courses", label: "My courses", icon: Library, badge: "myCourses" },
+      { to: "/auteurs/examples", label: "Examples", icon: Sparkles },
+    ],
+  },
+  {
+    heading: "Ressources",
+    items: [
+      { to: "/auteurs/guide", label: "Writing guide", icon: BookOpen },
+      { to: "/auteurs/contract", label: "Contract", icon: FileSignature },
+    ],
+  },
+];
+
+export const ADMIN_NAV: NavGroup[] = [
+  {
+    heading: "Pilotage",
+    items: [
+      { to: "/auteurs/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+      { to: "/auteurs/admin/review", label: "Review queue", icon: UserCheck, badge: "review" },
+    ],
+  },
+  {
+    heading: "Contenu",
+    items: [
+      { to: "/auteurs/admin/authors", label: "Authors", icon: Users },
+      { to: "/auteurs/admin/courses", label: "Courses", icon: BookMarked },
+      { to: "/auteurs/admin/applications", label: "Applications", icon: FileText, badge: "applications" },
+    ],
+  },
+  {
+    heading: "Ressources",
+    items: [
+      { to: "/auteurs/admin/documents", label: "Documents", icon: Library },
+      { to: "/auteurs/admin/codes", label: "Access codes", icon: KeyRound, badge: "codes" },
+    ],
+  },
+  {
+    heading: "Système",
+    items: [
+      { to: "/auteurs/admin/activity", label: "Activity log", icon: Activity },
+      { to: "/auteurs/admin/settings", label: "Settings", icon: Settings },
+    ],
+  },
+];
+
+export function sectionLabel(pathname: string, groups: NavGroup[]): string {
+  const items = groups.flatMap((group) => group.items);
+  const match = items
+    .filter((item) => (item.exact ? pathname === item.to : pathname.startsWith(item.to)))
+    .sort((a, b) => b.to.length - a.to.length)[0];
+  return match?.label ?? "Portal";
+}
