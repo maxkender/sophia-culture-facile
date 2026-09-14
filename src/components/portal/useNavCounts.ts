@@ -11,7 +11,7 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
     staleTime: 30_000,
     queryFn: async () => {
       const count = async (
-        table: "courses" | "access_codes" | "applications",
+        table: "courses" | "access_codes" | "applications" | "course_requests",
         column: string,
         value: string,
       ) => {
@@ -21,12 +21,13 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
           .eq(column, value);
         return n ?? 0;
       };
-      const [review, codes, applications] = await Promise.all([
+      const [review, codes, applications, requests] = await Promise.all([
         count("courses", "status", "submitted"),
         count("access_codes", "state", "available"),
         count("applications", "status", "pending"),
+        count("course_requests", "status", "pending"),
       ]);
-      return { review, codes, applications } satisfies NavCounts;
+      return { review, codes, applications, requests } satisfies NavCounts;
     },
   });
 

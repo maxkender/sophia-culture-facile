@@ -63,6 +63,7 @@ export const ADMIN_NAV: NavGroup[] = [
     items: [
       { to: "/auteurs/admin/authors", label: "Authors", icon: Users },
       { to: "/auteurs/admin/courses", label: "Courses", icon: BookMarked },
+      { to: "/auteurs/admin/pool", label: "Unassigned courses", icon: Compass, badge: "requests" },
       { to: "/auteurs/admin/applications", label: "Applications", icon: FileText, badge: "applications" },
     ],
   },
