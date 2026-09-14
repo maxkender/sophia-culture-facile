@@ -142,19 +142,36 @@ export function AuthorAgreement() {
             variant="pillSecondary"
             size="pillSm"
             onClick={() =>
-              downloadDocumentPdf({ slug: "author-agreement", title, subtitle, version, blocks })
+              downloadDocumentPdf({
+                slug: "author-agreement",
+                title,
+                subtitle,
+                version,
+                blocks: applyMerge(blocks, merge),
+              })
             }
           >
             <Download className="size-4" />
             Download PDF
           </Button>
         </div>
-        <DocumentBody blocks={blocks} className="mt-8" />
+        <DocumentBody blocks={blocks} merge={merge} className="mt-8" />
       </PortalCard>
 
       {!signedAt ? (
         <PortalCard className="mt-6 max-w-2xl">
           <h2 className="text-lg font-extrabold text-brand-navy">Signature</h2>
+          <p className="mt-3 text-sm leading-7 text-brand-navySoft">
+            <DocumentBody
+              blocks={[
+                {
+                  type: "paragraph",
+                  text: "By signing you confirm you are {{author_name}} and that you accept the terms above. A copy is available to download at any time.",
+                },
+              ]}
+              merge={merge}
+            />
+          </p>
           <form onSubmit={submit} className="mt-5 space-y-5">
             <div className="flex items-start gap-3">
               <Checkbox
