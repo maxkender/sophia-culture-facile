@@ -401,6 +401,8 @@ export type Database = {
           order_index: number
           public_full_text: boolean
           published_at: string | null
+          released_at: string | null
+          released_from: string | null
           review_comment: string | null
           slug: string | null
           status: Database["public"]["Enums"]["course_status"]
@@ -421,6 +423,8 @@ export type Database = {
           order_index?: number
           public_full_text?: boolean
           published_at?: string | null
+          released_at?: string | null
+          released_from?: string | null
           review_comment?: string | null
           slug?: string | null
           status?: Database["public"]["Enums"]["course_status"]
@@ -441,6 +445,8 @@ export type Database = {
           order_index?: number
           public_full_text?: boolean
           published_at?: string | null
+          released_at?: string | null
+          released_from?: string | null
           review_comment?: string | null
           slug?: string | null
           status?: Database["public"]["Enums"]["course_status"]
@@ -454,6 +460,13 @@ export type Database = {
           {
             foreignKeyName: "courses_author_id_fkey"
             columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courses_released_from_fkey"
+            columns: ["released_from"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -640,6 +653,7 @@ export type Database = {
           access_code: string | null
           access_redeem_url: string | null
           activated_at: string | null
+          admin_note: string | null
           bio: string | null
           country: string | null
           created_at: string
@@ -673,6 +687,7 @@ export type Database = {
           access_code?: string | null
           access_redeem_url?: string | null
           activated_at?: string | null
+          admin_note?: string | null
           bio?: string | null
           country?: string | null
           created_at?: string
@@ -706,6 +721,7 @@ export type Database = {
           access_code?: string | null
           access_redeem_url?: string | null
           activated_at?: string | null
+          admin_note?: string | null
           bio?: string | null
           country?: string | null
           created_at?: string

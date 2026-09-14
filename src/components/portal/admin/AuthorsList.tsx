@@ -12,6 +12,8 @@ import { PageTitle, PortalCard } from "../ui";
 export function AuthorsList() {
   const [search, setSearch] = useState("");
   const [platform, setPlatform] = useState("all");
+  // Authors who declined stay reachable, but they are hidden by default.
+  const [status, setStatus] = useState("active");
 
   const { data } = useQuery({
     queryKey: ["portal", "admin", "authors"],
@@ -34,6 +36,13 @@ export function AuthorsList() {
     const term = search.trim().toLowerCase();
     return authors
       .filter((author) =>
+        status === "all"
+          ? true
+          : status === "declined"
+            ? author.upwork_status === "declined"
+            : author.upwork_status !== "declined",
+      )
+      .filter((author) =>
         platform === "all" ? true : platform === "unknown" ? !author.platform : author.platform === platform,
       )
       .filter((author) =>
@@ -54,7 +63,7 @@ export function AuthorsList() {
           signed: data?.signed.has(author.id) ?? false,
         };
       });
-  }, [data, search, platform]);
+  }, [data, search, platform, status]);
 
   return (
     <div>
@@ -79,6 +88,16 @@ export function AuthorsList() {
             className="h-11 max-w-sm"
             aria-label="Search authors"
           />
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger className="h-11 w-44" aria-label="Filter by status">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="active">Active authors</SelectItem>
+              <SelectItem value="declined">Declined</SelectItem>
+              <SelectItem value="all">All authors</SelectItem>
+            </SelectContent>
+          </Select>
           <Select value={platform} onValueChange={setPlatform}>
             <SelectTrigger className="h-11 w-44" aria-label="Filter by platform">
               <SelectValue />
@@ -156,10 +175,16 @@ export function AuthorsList() {
                           className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${
                             author.upwork_status === "accepted"
                               ? "bg-portal-green/10 text-portal-green"
-                              : "bg-brand-line text-brand-navySoft"
+                              : author.upwork_status === "declined"
+                                ? "bg-portal-red/10 text-portal-red"
+                                : "bg-brand-line text-brand-navySoft"
                           }`}
                         >
-                          {author.upwork_status === "accepted" ? "Accepted" : "Contacted"}
+                          {author.upwork_status === "accepted"
+                            ? "Accepted"
+                            : author.upwork_status === "declined"
+                              ? "Declined"
+                              : "Contacted"}
                         </span>
                       )}
                     </td>

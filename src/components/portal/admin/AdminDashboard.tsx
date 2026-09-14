@@ -27,7 +27,10 @@ export function AdminDashboard() {
   // The internal test account must never show up in editorial figures.
   const testIds = new Set((data?.authors ?? []).filter((author) => author.is_test).map((author) => author.id));
   const courses = (data?.courses ?? []).filter((course) => !testIds.has(course.author_id ?? ""));
-  const authors = (data?.authors ?? []).filter((author) => !author.is_test);
+  // Authors who declined stay in the system but leave the active figures.
+  const authors = (data?.authors ?? []).filter((author) => !author.is_test && author.upwork_status !== "declined");
+  const assignedCourses = courses.filter((course) => course.author_id);
+  const pooledCourses = courses.filter((course) => !course.author_id);
   const unsigned = authors.filter((author) => !data?.signedIds.has(author.id));
   const overdue = courses.filter(isOverdue);
   // A byline counts as complete once it has a title line and at least one degree.
@@ -37,7 +40,7 @@ export function AdminDashboard() {
 
   const accepted = authors.filter((author) => author.upwork_status === "accepted").length;
   const awaiting = authors.length - accepted;
-  const commissionedValue = courses.length * COURSE_FEE_USD;
+  const commissionedValue = assignedCourses.length * COURSE_FEE_USD;
 
   return (
     <div>
@@ -46,8 +49,13 @@ export function AdminDashboard() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <PortalCard>
           <p className="text-sm font-semibold text-brand-navySoft">Courses commissioned</p>
-          <p className="mt-2 text-3xl font-extrabold text-brand-navy">{courses.length}</p>
-          <p className="mt-1 text-xs text-brand-navySoft">across {authors.length} authors</p>
+          <p className="mt-2 text-3xl font-extrabold text-brand-navy">{assignedCourses.length}</p>
+          <p className="mt-1 text-xs text-brand-navySoft">across {authors.length} active authors</p>
+        </PortalCard>
+        <PortalCard>
+          <p className="text-sm font-semibold text-brand-navySoft">In the pool</p>
+          <p className="mt-2 text-3xl font-extrabold text-portal-amber">{pooledCourses.length}</p>
+          <p className="mt-1 text-xs text-brand-navySoft">waiting for an author</p>
         </PortalCard>
         <PortalCard>
           <p className="text-sm font-semibold text-brand-navySoft">Accepted on Upwork</p>
