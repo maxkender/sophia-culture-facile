@@ -114,7 +114,7 @@ export function AuthorHome() {
           </Button>
         </StepCard>
 
-        <StepCard number={3} title="Read the writing guide" done={guideDone}>
+        <StepCard number={2} title="Read the writing guide" done={guideDone}>
           <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
             Short. The format, the length, how to write for this reader, and the things that get sent back.
           </p>
@@ -124,7 +124,7 @@ export function AuthorHome() {
           </Button>
         </StepCard>
 
-        <StepCard number={4} title="Read and sign the agreement" done={signed}>
+        <StepCard number={3} title="Read and sign the agreement" done={signed}>
           <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
             {signed
               ? `Signed on ${formatDate(me?.signedAt)}. The document stays available.`
@@ -135,6 +135,55 @@ export function AuthorHome() {
           </Button>
         </StepCard>
       </div>
+
+      <PortalCard className="mt-8 bg-portal-bg shadow-none ring-1 ring-brand-line">
+        <h3 className="text-lg font-extrabold leading-snug text-brand-navy">Want to read more Sophia courses?</h3>
+        <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
+          The two examples show you the format. If you would like to see more, here is a free code that unlocks the
+          whole app. Open the App Store, tap your profile picture, choose Redeem Gift Card or Code, then Enter Code
+          Manually.
+        </p>
+        {profile?.access_code ? (
+          <>
+            <p className="mt-4 rounded-2xl bg-card px-4 py-3 font-mono text-xl font-bold tracking-[0.12em] text-brand-navy">
+              {profile.access_code}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <CopyButton value={profile.access_code} label="Copy code" />
+              {profile.access_redeem_url ? (
+                <Button asChild variant="pillSecondary" size="pillSm">
+                  <a href={profile.access_redeem_url} target="_blank" rel="noreferrer noopener">
+                    Redeem
+                  </a>
+                </Button>
+              ) : null}
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="mt-4 text-base font-bold text-brand-navy">
+              {profile?.is_test ? "Code de test, non fonctionnel" : "Your code is on its way"}
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-brand-navySoft">
+              {profile?.is_test
+                ? "This is the internal test profile: no store code is attached to it."
+                : "The editorial desk will add it here as soon as it is issued. Nothing to do on your side."}
+            </p>
+          </>
+        )}
+        <p className="mt-4 flex flex-wrap items-center gap-1 text-sm text-brand-navySoft">
+          <Smartphone className="size-4" aria-hidden="true" />
+          Not on iPhone, or want the other links? Everything is here:{" "}
+          <a
+            href={TAAP_LINK}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="font-semibold text-portal-accent hover:underline"
+          >
+            taap.it/sophia.culture
+          </a>
+        </p>
+      </PortalCard>
 
       <h2 className="mt-12 text-xl font-extrabold text-brand-navy">Your courses</h2>
       {!examplesDone && courses.length > 0 ? (
