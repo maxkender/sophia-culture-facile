@@ -31,6 +31,31 @@ export function AuthorAgreement() {
   const signedVersion = me?.signedVersion ?? null;
   const { data: signedDoc } = useDocumentVersion(doc?.row.id, signedAt ? signedVersion : null);
 
+  const profile = me?.profile ?? null;
+  const { data: courseCount } = useQuery({
+    queryKey: ["portal", "course-count", profile?.id],
+    enabled: Boolean(profile?.id),
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("courses")
+        .select("id", { count: "exact", head: true })
+        .eq("author_id", profile!.id);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+
+  const merge: MergeValues = {
+    author_name: profile?.full_name ?? null,
+    author_title: profile?.title ?? null,
+    author_institution: profile?.institution ?? null,
+    author_country: profile?.country ?? null,
+    course_count: courseCount ? String(courseCount) : null,
+    fee: profile?.fee ?? null,
+    today: formatDate(new Date().toISOString()),
+  };
+
+
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (!accepted || name.trim().length < 2 || !doc) return;
