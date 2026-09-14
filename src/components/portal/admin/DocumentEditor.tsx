@@ -27,6 +27,21 @@ import { Banner, PageTitle, PortalCard } from "../ui";
 
 const BLOCK_TYPES: DocBlock["type"][] = ["heading", "paragraph", "bullets", "table", "callout"];
 
+/** The state of the document at a glance. */
+function PublishState({ published }: { published: boolean }) {
+  return (
+    <span
+      className={
+        published
+          ? "rounded-full bg-portal-green/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-portal-green"
+          : "rounded-full bg-portal-amber/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-portal-amber"
+      }
+    >
+      {published ? "Published" : "Draft"}
+    </span>
+  );
+}
+
 /** Wraps the current selection of a field in ** or * markers. */
 function wrapSelection(element: HTMLTextAreaElement | HTMLInputElement, marker: string, apply: (value: string) => void) {
   const { selectionStart, selectionEnd, value } = element;
