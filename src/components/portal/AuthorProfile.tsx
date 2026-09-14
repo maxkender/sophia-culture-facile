@@ -8,8 +8,60 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AuthorByline } from "@/components/site/AuthorByline";
+import { useServerFn } from "@tanstack/react-start";
+import { setMyPlatform } from "@/lib/portal.functions";
 import { usePortalProfile } from "./usePortal";
 import { Banner, PageTitle, PortalCard } from "./ui";
+
+/** The store the author uses decides which access code they can redeem. */
+function PlatformCard({ current }: { current: string | null }) {
+  const queryClient = useQueryClient();
+  const save = useServerFn(setMyPlatform);
+  const [busy, setBusy] = useState(false);
+
+  async function choose(platform: "ios" | "android") {
+    if (platform === current || busy) return;
+    setBusy(true);
+    try {
+      const result = await save({ data: { platform } });
+      await queryClient.invalidateQueries({ queryKey: ["portal"] });
+      toast.success(
+        result.code ? "Saved. Your access code now matches your phone." : "Saved.",
+      );
+    } catch {
+      toast.error("Your phone could not be saved.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <PortalCard>
+      <h2 className="text-sm font-bold uppercase tracking-wide text-brand-navySoft">Your phone</h2>
+      <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
+        Sophia exists on both stores. Tell us which one you use and your free access code will be issued for that
+        store.
+      </p>
+      <div className="mt-4 flex flex-wrap gap-3">
+        {(["ios", "android"] as const).map((value) => (
+          <Button
+            key={value}
+            type="button"
+            variant={current === value ? "pill" : "pillSecondary"}
+            size="pillSm"
+            disabled={busy}
+            onClick={() => choose(value)}
+          >
+            {value === "ios" ? "iPhone" : "Android"}
+          </Button>
+        ))}
+      </div>
+      {!current ? (
+        <p className="mt-3 text-sm font-semibold text-portal-red">Required: pick one so we can send you a code.</p>
+      ) : null}
+    </PortalCard>
+  );
+}
 
 type EducationRow = {
   id: string;
@@ -197,6 +249,7 @@ export function AuthorProfile() {
 
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <div className="space-y-6">
+          <PlatformCard current={profile.platform ?? null} />
           <PortalCard>
             <h2 className="text-sm font-bold uppercase tracking-wide text-brand-navySoft">Published identity</h2>
             <form onSubmit={submit} className="mt-5 grid gap-5 md:grid-cols-2">

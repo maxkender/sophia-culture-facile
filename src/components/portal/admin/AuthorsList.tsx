@@ -18,15 +18,17 @@ export function AuthorsList() {
   const { data } = useQuery({
     queryKey: ["portal", "admin", "authors"],
     queryFn: async () => {
-      const [{ data: authors }, { data: courses }, { data: contracts }] = await Promise.all([
+      const [{ data: authors }, { data: courses }, { data: contracts }, { data: codes }] = await Promise.all([
         supabase.from("profiles").select("*").eq("role", "author").order("full_name"),
         supabase.from("courses").select("id, author_id, status"),
         supabase.from("contracts").select("author_id"),
+        supabase.from("access_codes").select("assigned_to, platform").not("assigned_to", "is", null),
       ]);
       return {
         authors: (authors ?? []) as Profile[],
         courses: (courses ?? []) as Pick<Course, "id" | "author_id" | "status">[],
         signed: new Set((contracts ?? []).map((row) => row.author_id)),
+        codePlatform: new Map((codes ?? []).map((row) => [row.assigned_to as string, row.platform as string])),
       };
     },
   });
