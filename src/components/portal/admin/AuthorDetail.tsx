@@ -191,6 +191,13 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
               {author.upwork_status === "accepted" ? "Accepted on Upwork" : "Contacted on Upwork"}
             </span>
           </p>
+          <p
+            className={`mt-2 text-sm font-semibold ${author.examples_reviewed_at ? "text-portal-green" : "text-portal-amber"}`}
+          >
+            {author.examples_reviewed_at
+              ? `Examples read on ${formatDate(author.examples_reviewed_at)}`
+              : "Examples not read yet — their courses are locked"}
+          </p>
           {author.bio ? <p className="mt-3 text-sm leading-relaxed text-brand-navySoft">{author.bio}</p> : null}
           <div className="mt-4 space-y-1">
             <Label htmlFor="fee">Fee (shown in their contract)</Label>

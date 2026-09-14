@@ -1,4 +1,13 @@
-import { PageTitle } from "./ui";
+import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { formatDate } from "@/lib/portal";
+import { usePortalProfile } from "./usePortal";
+import { PageTitle, PortalCard } from "./ui";
 import sky2 from "@/assets/examples/sky-2.png.asset.json";
 import sky3 from "@/assets/examples/sky-3.png.asset.json";
 import sky4 from "@/assets/examples/sky-4.png.asset.json";
@@ -102,9 +111,73 @@ function CourseSection({ title, category, shots }: { title: string; category: st
   );
 }
 
+/** Bottom-of-page confirmation: unlocks the author's courses once both examples have been read. */
+function UnlockBlock() {
+  const { data: me } = usePortalProfile();
+  const profile = me?.profile ?? null;
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [checked, setChecked] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  if (!profile || profile.role !== "author") return null;
+
+  async function unlock() {
+    if (!profile) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ examples_reviewed_at: new Date().toISOString() })
+      .eq("id", profile.id);
+    setSaving(false);
+    if (error) {
+      toast.error("Your confirmation could not be saved. Try again.");
+      return;
+    }
+    await queryClient.invalidateQueries({ queryKey: ["portal"] });
+    toast.success("Your courses are open.");
+    await navigate({ to: "/auteurs/courses" });
+  }
+
+  if (profile.examples_reviewed_at) return null;
+
+  return (
+    <PortalCard className="mt-12 border-l-4 border-portal-accent">
+      <h2 className="text-lg font-extrabold text-brand-navy">One last thing before you write</h2>
+      <label className="mt-4 flex items-start gap-3 text-sm font-semibold text-brand-navy">
+        <Checkbox
+          checked={checked}
+          onCheckedChange={(value) => setChecked(value === true)}
+          aria-label="I have read both example courses and I understand the format"
+          className="mt-0.5"
+        />
+        I have read both example courses and I understand the format
+      </label>
+      <Button
+        type="button"
+        variant="pill"
+        size="pillSm"
+        className="mt-5"
+        disabled={!checked || saving}
+        onClick={() => void unlock()}
+      >
+        Unlock my courses
+      </Button>
+    </PortalCard>
+  );
+}
+
 export function ExamplesPage() {
+  const { data: me } = usePortalProfile();
+  const reviewedAt = me?.profile?.examples_reviewed_at ?? null;
+
   return (
     <div>
+      {reviewedAt ? (
+        <p className="mb-6 rounded-portal border border-portal-green/30 bg-portal-green/8 px-5 py-3 text-sm font-semibold text-portal-green">
+          You confirmed you had read these on {formatDate(reviewedAt)}. Come back any time while you write.
+        </p>
+      ) : null}
       <PageTitle
         title="Two real Sophia courses"
         lead="Read these before you write. This is the format you are writing for."
@@ -134,6 +207,8 @@ export function ExamplesPage() {
           Screen 5 widens out rather than summarising, and the Key takeaway does the summarising instead.
         </Callout>
       </div>
+
+      <UnlockBlock />
     </div>
   );
 }

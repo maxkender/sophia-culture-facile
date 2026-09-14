@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
 } from "@/config/portal";
 import { countWords, formatDate, type Course, type Source } from "@/lib/portal";
 import { usePortalProfile } from "./usePortal";
+import { ExamplesLockNotice } from "./CourseCards";
 import { Banner, BoldText, ConfirmButton, PageTitle, PortalCard, StatusPill } from "./ui";
 
 type ScreenDraft = { id: string | null; screen_title: string; body: string; image_idea: string };
@@ -210,6 +211,19 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
   if (isLoading) return <PortalCard><p className="text-sm text-brand-navySoft">Loading…</p></PortalCard>;
   if (!course) return <Banner tone="error" title="Course not found">It may have been deleted by the editorial desk.</Banner>;
 
+  // The examples are a gate: no author opens an editor before reading them.
+  if (!admin && me?.profile && !me.profile.examples_reviewed_at) {
+    return (
+      <div>
+        <Link to="/auteurs/courses" className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-portal-accent">
+          <ArrowLeft className="size-4" aria-hidden="true" /> Back to your courses
+        </Link>
+        <PageTitle title={course.title} lead={`${course.lot_code ?? "—"} · ${course.subject_area ?? "—"}`} />
+        <ExamplesLockNotice />
+      </div>
+    );
+  }
+
   return (
     <div>
       {admin ? (
@@ -231,6 +245,12 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
         action={
           <div className="flex items-center gap-3">
             <StatusPill status={liveStatus} />
+            <Button asChild variant="pillSecondary" size="pillSm">
+              <a href="/auteurs/examples" target="_blank" rel="noreferrer noopener">
+                <ExternalLink className="size-4" aria-hidden="true" />
+                See the examples
+              </a>
+            </Button>
             <Button type="button" variant="pillSecondary" size="pillSm" onClick={() => setPreview((v) => !v)}>
               {preview ? "Edit" : "Preview"}
             </Button>

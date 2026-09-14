@@ -367,8 +367,10 @@ export type Database = {
           created_at: string
           display_title: string | null
           email: string | null
+          examples_reviewed_at: string | null
           fee: string | null
           full_name: string
+          guide_read_at: string | null
           id: string
           institution: string | null
           invite_expires_at: string | null
@@ -392,8 +394,10 @@ export type Database = {
           created_at?: string
           display_title?: string | null
           email?: string | null
+          examples_reviewed_at?: string | null
           fee?: string | null
           full_name: string
+          guide_read_at?: string | null
           id?: string
           institution?: string | null
           invite_expires_at?: string | null
@@ -417,8 +421,10 @@ export type Database = {
           created_at?: string
           display_title?: string | null
           email?: string | null
+          examples_reviewed_at?: string | null
           fee?: string | null
           full_name?: string
+          guide_read_at?: string | null
           id?: string
           institution?: string | null
           invite_expires_at?: string | null

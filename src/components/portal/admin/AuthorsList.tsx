@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Course, Profile } from "@/lib/portal";
+import { formatDate, type Course, type Profile } from "@/lib/portal";
 import { PageTitle, PortalCard } from "../ui";
 
 export function AuthorsList() {
@@ -104,6 +104,7 @@ export function AuthorsList() {
                 <th className="py-3 pr-4">Platform</th>
                 <th className="py-3 pr-4">Courses</th>
                 <th className="py-3 pr-4">Submitted</th>
+                <th className="py-3 pr-4">Examples</th>
                 <th className="py-3 pr-4">Agreement</th>
                 <th className="py-3 pr-4">Access code</th>
                 <th className="py-3">Invite</th>
@@ -112,7 +113,7 @@ export function AuthorsList() {
             <tbody className="divide-y divide-brand-line">
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="py-6 text-brand-navySoft">
+                  <td colSpan={12} className="py-6 text-brand-navySoft">
                     No author matches this search.
                   </td>
                 </tr>
@@ -175,6 +176,11 @@ export function AuthorsList() {
                     </td>
                     <td className="py-3 pr-4 text-brand-navy">{total}</td>
                     <td className="py-3 pr-4 text-brand-navy">{submitted}</td>
+                    <td
+                      className={`py-3 pr-4 font-semibold ${author.examples_reviewed_at ? "text-portal-green" : "text-portal-amber"}`}
+                    >
+                      {author.examples_reviewed_at ? `Read ${formatDate(author.examples_reviewed_at)}` : "Not read"}
+                    </td>
                     <td className={`py-3 pr-4 font-semibold ${signed ? "text-portal-green" : "text-portal-amber"}`}>
                       {signed ? "Signed" : "Not signed"}
                     </td>

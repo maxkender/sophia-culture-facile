@@ -62,6 +62,14 @@ export function AdminDashboard() {
           </p>
           <p className="mt-1 text-xs text-brand-navySoft">at ${COURSE_FEE_USD} per course</p>
         </PortalCard>
+        <PortalCard>
+          <p className="text-sm font-semibold text-brand-navySoft">Examples reviewed</p>
+          <p className="mt-2 text-3xl font-extrabold text-brand-navy">
+            {authors.filter((author) => author.examples_reviewed_at).length}
+            <span className="text-base font-bold text-brand-navySoft"> / {authors.length}</span>
+          </p>
+          <p className="mt-1 text-xs text-brand-navySoft">authors whose courses are unlocked</p>
+        </PortalCard>
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
