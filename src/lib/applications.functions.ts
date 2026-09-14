@@ -133,11 +133,10 @@ export const approveApplication = createServerFn({ method: "POST" })
         reviewed_at: new Date().toISOString(),
         created_profile_id: profileId,
         admin_note: data.note ?? null,
-        email_sent_at: emailSent ? new Date().toISOString() : null,
       })
       .eq("id", application.id);
 
-    return { ok: true as const, inviteUrl, profileId, emailSent, emailError };
+    return { ok: true as const, inviteUrl, profileId };
   });
 
 /** Admin: declines a candidature. No email is sent. */
