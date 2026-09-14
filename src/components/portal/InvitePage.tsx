@@ -623,7 +623,26 @@ export function InvitePage({ token }: { token: string }) {
                     />
                     {errors.confirm ? <p className="text-sm font-semibold text-portal-red">{errors.confirm}</p> : null}
                   </div>
-                  <Button type="submit" variant="pill" size="pillSm" disabled={busy}>
+                  <div className="rounded-2xl bg-brand-surface p-4">
+                    <label htmlFor="claim-declaration" className="flex cursor-pointer items-start gap-3">
+                      <input
+                        id="claim-declaration"
+                        type="checkbox"
+                        checked={declared}
+                        onChange={(event) => setDeclared(event.target.checked)}
+                        className="mt-1 size-4 shrink-0 accent-brand-navy"
+                      />
+                      <span className="text-sm font-semibold leading-relaxed text-brand-navy">
+                        I confirm that the details above are accurate, and that the qualifications and titles I have
+                        given are genuinely mine.
+                      </span>
+                    </label>
+                    <p className="mt-2 pl-7 text-xs leading-relaxed text-brand-navySoft">
+                      Your courses are published under your name and your credentials, so this is how we stand behind
+                      them.
+                    </p>
+                  </div>
+                  <Button type="submit" variant="pill" size="pillSm" disabled={busy || !declared}>
                     {busy ? "Opening your space…" : "This is me — open my space"}
                   </Button>
                 </form>
