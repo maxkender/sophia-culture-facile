@@ -183,7 +183,7 @@ export function PortalShell({
         <button
           type="button"
           className={cn(
-            "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-brand-navy/5",
+            "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-brand-navy/10",
             collapsed && "justify-center px-0",
           )}
         >
