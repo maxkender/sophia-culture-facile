@@ -24,6 +24,7 @@ import { Route as AuteursInviteRouteImport } from './routes/auteurs.invite'
 import { Route as CoursIndexRouteImport } from './routes/cours/index'
 import { Route as CoursSlugRouteImport } from './routes/cours/$slug'
 import { Route as EnIndexRouteImport } from './routes/en/index'
+import { Route as EnBecomeATeacherRouteImport } from './routes/en/become-a-teacher'
 import { Route as EnDownloadRouteImport } from './routes/en/download'
 import { Route as EnLegalNoticeRouteImport } from './routes/en/legal-notice'
 import { Route as EnPrivacyRouteImport } from './routes/en/privacy'
@@ -119,6 +120,11 @@ const CoursSlugRoute = CoursSlugRouteImport.update({
 const EnIndexRoute = EnIndexRouteImport.update({
   id: '/en/',
   path: '/en/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnBecomeATeacherRoute = EnBecomeATeacherRouteImport.update({
+  id: '/en/become-a-teacher',
+  path: '/en/become-a-teacher',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnDownloadRoute = EnDownloadRouteImport.update({
@@ -256,6 +262,7 @@ export interface FileRoutesByFullPath {
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
+  '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
@@ -293,6 +300,7 @@ export interface FileRoutesByTo {
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
+  '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
@@ -332,6 +340,7 @@ export interface FileRoutesById {
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
+  '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
@@ -371,6 +380,7 @@ export interface FileRouteTypes {
     | '/.well-known/apple-app-site-association'
     | '/auteurs/invite'
     | '/cours/$slug'
+    | '/en/become-a-teacher'
     | '/en/download'
     | '/en/legal-notice'
     | '/en/privacy'
@@ -408,6 +418,7 @@ export interface FileRouteTypes {
     | '/.well-known/apple-app-site-association'
     | '/auteurs/invite'
     | '/cours/$slug'
+    | '/en/become-a-teacher'
     | '/en/download'
     | '/en/legal-notice'
     | '/en/privacy'
@@ -446,6 +457,7 @@ export interface FileRouteTypes {
     | '/.well-known/apple-app-site-association'
     | '/auteurs/invite'
     | '/cours/$slug'
+    | '/en/become-a-teacher'
     | '/en/download'
     | '/en/legal-notice'
     | '/en/privacy'
@@ -485,6 +497,7 @@ export interface RootRouteChildren {
   DotwellKnownAppleAppSiteAssociationRoute: typeof DotwellKnownAppleAppSiteAssociationRoute
   AuteursInviteRoute: typeof AuteursInviteRoute
   CoursSlugRoute: typeof CoursSlugRoute
+  EnBecomeATeacherRoute: typeof EnBecomeATeacherRoute
   EnDownloadRoute: typeof EnDownloadRoute
   EnLegalNoticeRoute: typeof EnLegalNoticeRoute
   EnPrivacyRoute: typeof EnPrivacyRoute
@@ -600,6 +613,13 @@ declare module '@tanstack/react-router' {
       path: '/en'
       fullPath: '/en/'
       preLoaderRoute: typeof EnIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/become-a-teacher': {
+      id: '/en/become-a-teacher'
+      path: '/en/become-a-teacher'
+      fullPath: '/en/become-a-teacher'
+      preLoaderRoute: typeof EnBecomeATeacherRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/download': {
@@ -815,6 +835,7 @@ const rootRouteChildren: RootRouteChildren = {
     DotwellKnownAppleAppSiteAssociationRoute,
   AuteursInviteRoute: AuteursInviteRoute,
   CoursSlugRoute: CoursSlugRoute,
+  EnBecomeATeacherRoute: EnBecomeATeacherRoute,
   EnDownloadRoute: EnDownloadRoute,
   EnLegalNoticeRoute: EnLegalNoticeRoute,
   EnPrivacyRoute: EnPrivacyRoute,
