@@ -9,6 +9,7 @@ import {
   claimInvite,
   getInvite,
   prepareMagicClaim,
+  setInvitePlatform,
   updateInviteProfile,
   type InvitePreview,
 } from "@/lib/portal.functions";
@@ -87,6 +88,8 @@ export function InvitePage({ token }: { token: string }) {
   const [errors, setErrors] = useState<{ password?: string; confirm?: string; email?: string }>({});
   const [busy, setBusy] = useState(false);
   const [declared, setDeclared] = useState(false);
+  const [platform, setPlatform] = useState<"ios" | "android" | null>(null);
+  const savePlatform = useServerFn(setInvitePlatform);
   const [sent, setSent] = useState(false);
   const saveProfile = useServerFn(updateInviteProfile);
   const [details, setDetails] = useState({
