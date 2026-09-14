@@ -51,6 +51,12 @@ function groupByLot(courses: InviteCourse[]): InviteLot[] {
   return lots;
 }
 
+type EducationRow = { degree: string; field: string; institution: string; year: string };
+
+function patchRow(rows: EducationRow[], index: number, patch: Partial<EducationRow>): EducationRow[] {
+  return rows.map((row, i) => (i === index ? { ...row, ...patch } : row));
+}
+
 export function InvitePage({ token }: { token: string }) {
   const navigate = useNavigate();
   const load = useServerFn(getInvite);
@@ -67,7 +73,19 @@ export function InvitePage({ token }: { token: string }) {
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const saveProfile = useServerFn(updateInviteProfile);
-  const [details, setDetails] = useState({ title: "", display_title: "", institution: "", country: "", bio: "" });
+  const [details, setDetails] = useState({
+    title: "",
+    display_name: "",
+    display_title: "",
+    institution: "",
+    country: "",
+    bio: "",
+    short_bio: "",
+    orcid: "",
+    personal_site: "",
+    scholar_url: "",
+  });
+  const [education, setEducation] = useState<EducationRow[]>([]);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<{ name: string; dataUrl: string } | null>(null);
   const [savingDetails, setSavingDetails] = useState(false);
@@ -85,11 +103,24 @@ export function InvitePage({ token }: { token: string }) {
     if (!p) return;
     setDetails({
       title: p.title ?? "",
+      display_name: p.display_name ?? p.full_name ?? "",
       display_title: p.display_title ?? "",
       institution: p.institution ?? "",
       country: p.country ?? "",
       bio: p.bio ?? "",
+      short_bio: p.short_bio ?? "",
+      orcid: p.orcid ?? "",
+      personal_site: p.personal_site ?? "",
+      scholar_url: p.scholar_url ?? "",
     });
+    setEducation(
+      (data?.education ?? []).map((row) => ({
+        degree: row.degree ?? "",
+        field: row.field ?? "",
+        institution: row.institution ?? "",
+        year: row.year ?? "",
+      })),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadedProfileId]);
 
@@ -116,7 +147,7 @@ export function InvitePage({ token }: { token: string }) {
     setSavingDetails(true);
     try {
       const result = await saveProfile({
-        data: { token, ...details, ...(photoFile ? { photo: photoFile } : {}) },
+        data: { token, ...details, education, ...(photoFile ? { photo: photoFile } : {}) },
       });
       if (!result.ok) {
         toast.error("Your details could not be saved.");
@@ -354,6 +385,124 @@ export function InvitePage({ token }: { token: string }) {
                     />
                   </div>
                 </div>
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="inv-name">Name you publish under</Label>
+                    <Input
+                      id="inv-name"
+                      className="h-11"
+                      value={details.display_name}
+                      onChange={(event) => setDetails({ ...details, display_name: event.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="inv-short">Published biography (300 characters)</Label>
+                    <Textarea
+                      id="inv-short"
+                      rows={3}
+                      maxLength={300}
+                      value={details.short_bio}
+                      onChange={(event) => setDetails({ ...details, short_bio: event.target.value })}
+                    />
+                    <p className="text-xs text-brand-navySoft">{details.short_bio.length} / 300</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="inv-orcid">ORCID</Label>
+                    <Input
+                      id="inv-orcid"
+                      className="h-11"
+                      value={details.orcid}
+                      onChange={(event) => setDetails({ ...details, orcid: event.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="inv-site">Personal site</Label>
+                    <Input
+                      id="inv-site"
+                      className="h-11"
+                      value={details.personal_site}
+                      onChange={(event) => setDetails({ ...details, personal_site: event.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="inv-scholar">Google Scholar or publication list</Label>
+                    <Input
+                      id="inv-scholar"
+                      className="h-11"
+                      value={details.scholar_url}
+                      onChange={(event) => setDetails({ ...details, scholar_url: event.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <p className="mt-6 text-sm font-bold text-brand-navy">Education</p>
+                <p className="mt-1 text-xs text-brand-navySoft">Most recent first. This is published on your page.</p>
+                <div className="mt-3 space-y-3">
+                  {education.map((row, index) => (
+                    <div key={index} className="grid gap-3 md:grid-cols-[1fr_1fr_1.4fr_auto_auto]">
+                      <Input
+                        className="h-11"
+                        placeholder="Degree"
+                        value={row.degree}
+                        onChange={(event) => setEducation(patchRow(education, index, { degree: event.target.value }))}
+                      />
+                      <Input
+                        className="h-11"
+                        placeholder="Field"
+                        value={row.field}
+                        onChange={(event) => setEducation(patchRow(education, index, { field: event.target.value }))}
+                      />
+                      <Input
+                        className="h-11"
+                        placeholder="Institution"
+                        value={row.institution}
+                        onChange={(event) =>
+                          setEducation(patchRow(education, index, { institution: event.target.value }))
+                        }
+                      />
+                      <Input
+                        className="h-11 md:w-24"
+                        placeholder="Year"
+                        value={row.year}
+                        onChange={(event) => setEducation(patchRow(education, index, { year: event.target.value }))}
+                      />
+                      <Button
+                        type="button"
+                        variant="pillSecondary"
+                        size="pillSm"
+                        onClick={() => setEducation(education.filter((_, i) => i !== index))}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="pillSecondary"
+                    size="pillSm"
+                    onClick={() =>
+                      setEducation([...education, { degree: "", field: "", institution: "", year: "" }])
+                    }
+                  >
+                    Add a degree
+                  </Button>
+                </div>
+
+                <div className="mt-6 rounded-2xl bg-brand-surface p-5">
+                  <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">
+                    How readers will see you
+                  </p>
+                  <p className="mt-3 text-base font-extrabold text-brand-navy">
+                    {details.display_name.trim() || profile.full_name}
+                  </p>
+                  <p className="text-sm text-brand-navySoft">
+                    {details.display_title.trim() || "Byline to be confirmed"}
+                  </p>
+                  {details.institution.trim() ? (
+                    <p className="text-sm text-brand-navySoft">{details.institution}</p>
+                  ) : null}
+                </div>
+
                 <Button
                   type="button"
                   variant="pillSecondary"
