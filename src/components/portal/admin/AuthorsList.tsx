@@ -63,6 +63,7 @@ export function AuthorsList() {
             ["submitted", "accepted", "published"].includes(course.status ?? ""),
           ).length,
           signed: data?.signed.has(author.id) ?? false,
+          codePlatform: data?.codePlatform.get(author.id) ?? null,
         };
       });
   }, [data, search, platform, status]);
@@ -139,7 +140,7 @@ export function AuthorsList() {
                   </td>
                 </tr>
               ) : (
-                rows.map(({ author, total, submitted, signed }) => (
+                rows.map(({ author, total, submitted, signed, codePlatform }) => (
                   <tr key={author.id}>
                     <td className="py-3 pr-4">
                       <Link
