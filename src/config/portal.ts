@@ -31,6 +31,9 @@ export const STATUS_LABEL: Record<CourseStatus, string> = {
   published: "Published",
 };
 
+/** Flat fee paid per commissioned course, in US dollars. */
+export const COURSE_FEE_USD = 20;
+
 export const SCREEN_NUMBERS = [1, 2, 3, 4, 5] as const;
 export const WORDS_MIN = 100;
 export const WORDS_MAX = 140;

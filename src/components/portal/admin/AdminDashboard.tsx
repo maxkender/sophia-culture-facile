@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { COURSE_STATUSES, STATUS_LABEL, type CourseStatus } from "@/config/portal";
+import { COURSE_FEE_USD, COURSE_STATUSES, STATUS_LABEL, type CourseStatus } from "@/config/portal";
 import { formatDate, isOverdue, type Course, type Profile } from "@/lib/portal";
 import { PageTitle, PortalCard } from "../ui";
 
