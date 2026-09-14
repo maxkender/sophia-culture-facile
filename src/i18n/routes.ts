@@ -7,6 +7,7 @@ export const ROUTES = {
   courses: { fr: "/cours", en: "/en/lessons" },
   legal: { fr: "/mentions-legales", en: "/en/legal-notice" },
   privacy: { fr: "/confidentialite", en: "/en/privacy" },
+  apply: { fr: "/devenir-professeur", en: "/en/become-a-teacher" },
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;

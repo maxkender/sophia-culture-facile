@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { GraduationCap } from "lucide-react";
-import { useI18n } from "@/i18n";
+import { useI18n, useLocalePath } from "@/i18n";
 import { Button } from "@/components/ui/button";
 
 export function TeacherAccessBand() {
   const { t } = useI18n();
+  const applyPath = useLocalePath("apply");
   return (
     <section aria-labelledby="teacher-access" className="border-t border-brand-line bg-brand-surface">
       <div className="mx-auto flex w-full max-w-5xl flex-col items-start justify-between gap-6 px-5 py-12 md:flex-row md:items-center">
@@ -14,7 +15,7 @@ export function TeacherAccessBand() {
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
           <Button asChild variant="outline"><Link to="/auth">{t.teacherAccess.login}</Link></Button>
-          <Button asChild><Link to="/auth">{t.teacherAccess.join}</Link></Button>
+          <Button asChild><Link to={applyPath}>{t.teacherAccess.join}</Link></Button>
         </div>
       </div>
     </section>

@@ -13,6 +13,7 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
   const { t } = useI18n();
   const homePath = useLocalePath("home");
   const coursesPath = useLocalePath("courses");
+  const applyPath = useLocalePath("apply");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -51,7 +52,7 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
           )}
           {!bare && (
             <Link
-              to="/auth"
+              to={applyPath}
               className="hidden rounded-full border border-brand-line px-3 py-1.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy/5 lg:inline-flex"
             >
               {t.nav.becomeTeacher}
