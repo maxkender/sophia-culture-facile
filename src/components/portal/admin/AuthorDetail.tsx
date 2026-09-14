@@ -115,6 +115,20 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
     toast.success(`${rows.length} courses assigned.`);
   }
 
+  /** Returns a course to the open pool. Anything already written is kept. */
+  async function moveToPool(courseId: string) {
+    const { error } = await supabase
+      .from("courses")
+      .update({ author_id: null, status: "unassigned" })
+      .eq("id", courseId);
+    if (error) {
+      toast.error("The course could not be moved back to the pool.");
+      return;
+    }
+    await refresh();
+    toast.success("Course moved back to the pool.");
+  }
+
   async function saveFee() {
     if (fee === null) return;
     const { error } = await supabase.from("profiles").update({ fee: fee.trim() || null }).eq("id", authorId);
@@ -332,7 +346,17 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
                       <p className="text-sm font-bold text-brand-navy">{course.title}</p>
                       <p className="text-xs text-brand-navySoft">Due {formatDate(course.due_date)}</p>
                     </div>
-                    <StatusPill status={course.status as CourseStatus} />
+                    <div className="flex items-center gap-3">
+                      <StatusPill status={course.status as CourseStatus} />
+                      <Button
+                        type="button"
+                        variant="pillSecondary"
+                        size="pillSm"
+                        onClick={() => moveToPool(course.id)}
+                      >
+                        Move back to the pool
+                      </Button>
+                    </div>
                   </li>
                 ))}
               </ul>
