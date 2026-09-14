@@ -90,8 +90,25 @@ export function AuthorAgreement() {
     return <Banner tone="warning" title="The agreement has not been published yet" />;
   }
 
+  // Nobody can read or sign a draft. The author simply waits.
+  if (!doc.row.published && !signedAt) {
+    return (
+      <div>
+        <PageTitle title="Author agreement" />
+        <PortalCard className="max-w-2xl">
+          <h2 className="text-lg font-extrabold text-brand-navy">The agreement is being finalised</h2>
+          <p className="mt-3 text-sm leading-7 text-brand-navySoft">
+            We are putting the final version in place. You will be notified in your author space as soon as it is
+            available to read and sign. There is nothing for you to do in the meantime, and you can start writing your
+            courses straight away.
+          </p>
+        </PortalCard>
+      </div>
+    );
+  }
+
   const showingSigned = Boolean(signedAt && signedDoc);
-  const blocks = showingSigned ? signedDoc!.blocks : doc.blocks;
+  const blocks = applyMerge(showingSigned ? signedDoc!.blocks : doc.blocks, merge);
   const title = showingSigned ? signedDoc!.title || doc.row.title : doc.row.title;
   const version = showingSigned ? signedVersion! : doc.row.current_version;
   const subtitle = showingSigned
