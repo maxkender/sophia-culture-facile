@@ -238,6 +238,13 @@ export function PoolCourses() {
                         {course.lot_code ? (
                           <p className="mt-1 text-xs text-brand-navySoft">{course.lot_code}</p>
                         ) : null}
+                        {course.released_from ? (
+                          <p className="mt-1 text-xs italic text-brand-navySoft">
+                            Previously assigned to{" "}
+                            {authorsById.get(course.released_from)?.full_name ?? "a former author"}
+                            {course.released_at ? `, released ${formatDate(course.released_at)}` : ""}
+                          </p>
+                        ) : null}
                       </td>
                       <td className="px-6 py-4 align-top text-brand-navySoft">
                         {subjectLabel(course.subject_area)}
