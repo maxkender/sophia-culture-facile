@@ -1,17 +1,19 @@
 import { useState, type FormEvent } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Download } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { signAgreement } from "@/lib/portal.functions";
 import { downloadDocumentPdf } from "@/lib/documentPdf";
+import { applyMerge, type MergeValues } from "@/lib/documents";
 import { formatDate, formatDateTime } from "@/lib/portal";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePortalProfile } from "./usePortal";
-import { DocumentBody } from "./DocumentBody";
+import { DocumentBody, RichText } from "./DocumentBody";
 import { useDocument, useDocumentVersion } from "./useDocuments";
 import { Banner, PageTitle, PortalCard } from "./ui";
 
