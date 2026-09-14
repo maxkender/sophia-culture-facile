@@ -231,10 +231,16 @@ export function InvitePage({ token }: { token: string }) {
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
-    if (!declared) return;
+    if (!declared || !platform) return;
 
     setBusy(true);
     try {
+      // The store they use decides which access code they can actually redeem.
+      try {
+        await savePlatform({ data: { token, platform } });
+      } catch {
+        /* the claim itself matters more than the code swap */
+      }
       // Save the details first so the declaration snapshot matches what they just confirmed.
       try {
         await saveProfile({
