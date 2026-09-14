@@ -194,26 +194,41 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
         )}
       </div>
 
-      <h2 className="mt-10 text-xl font-extrabold text-brand-navy">Commissioned courses</h2>
-      <PortalCard className="mt-4">
-        {courses.length === 0 ? (
+      <h2 className="mt-10 text-xl font-extrabold text-brand-navy">
+        Commissioned courses <span className="text-base font-bold text-brand-navySoft">({courses.length})</span>
+      </h2>
+      {courses.length === 0 ? (
+        <PortalCard className="mt-4">
           <p className="text-sm text-brand-navySoft">No course assigned yet.</p>
-        ) : (
-          <ul className="divide-y divide-brand-line">
-            {courses.map((course) => (
-              <li key={course.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-                <div>
-                  <p className="text-sm font-bold text-brand-navy">{course.title}</p>
-                  <p className="text-xs text-brand-navySoft">
-                    {course.lot_code ?? "—"} · {course.subject_area ?? "—"} · due {formatDate(course.due_date)}
-                  </p>
-                </div>
-                <StatusPill status={course.status as CourseStatus} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </PortalCard>
+        </PortalCard>
+      ) : (
+        <div className="mt-4 space-y-5">
+          {groupByLot(courses).map((lot) => (
+            <PortalCard key={lot.key}>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="text-lg font-extrabold text-brand-navy">
+                  {lot.lot_code ? `${lot.lot_code} — ` : ""}
+                  {lot.lot_name ?? "Unsorted courses"}
+                </h3>
+                <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">
+                  {lot.subject_area ?? "—"} · {lot.courses.length} courses
+                </p>
+              </div>
+              <ul className="mt-2 divide-y divide-brand-line">
+                {lot.courses.map((course) => (
+                  <li key={course.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                    <div>
+                      <p className="text-sm font-bold text-brand-navy">{course.title}</p>
+                      <p className="text-xs text-brand-navySoft">Due {formatDate(course.due_date)}</p>
+                    </div>
+                    <StatusPill status={course.status as CourseStatus} />
+                  </li>
+                ))}
+              </ul>
+            </PortalCard>
+          ))}
+        </div>
+      )}
 
       <div className="mt-6 grid gap-5 lg:grid-cols-2">
         <PortalCard>
