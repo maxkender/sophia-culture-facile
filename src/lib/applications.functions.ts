@@ -125,31 +125,6 @@ export const approveApplication = createServerFn({ method: "POST" })
 
     const inviteUrl = `${data.origin.replace(/\/$/, "")}/auteurs/invite?token=${encodeURIComponent(inviteToken)}`;
 
-    let emailSent = false;
-    let emailError: string | null = null;
-    try {
-      const { sendLovableEmail } = await import("@lovable.dev/email-js");
-      const apiKey = process.env["LOVABLE_API_KEY"];
-      const from = process.env["EMAIL_FROM"] ?? "Sophia <hello@sophia-culture.com>";
-      if (!apiKey) throw new Error("no_api_key");
-      const body = inviteEmail(application.full_name, inviteUrl);
-      await sendLovableEmail(
-        {
-          to: email,
-          from,
-          subject: "Your Sophia author access",
-          html: body.html,
-          text: body.text,
-          purpose: "transactional",
-          label: "author-invite",
-          idempotency_key: `application-${application.id}`,
-        },
-        { apiKey },
-      );
-      emailSent = true;
-    } catch (error) {
-      emailError = error instanceof Error ? error.message : "send_failed";
-    }
 
     await supabaseAdmin
       .from("applications")
