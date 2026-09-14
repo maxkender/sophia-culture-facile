@@ -324,7 +324,8 @@ export function DocumentEditor({ slug }: { slug: DocumentSlug }) {
             : "Authors always read the current version of this guide."
         }
         action={
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <PublishState published={doc.row.published} />
             <Button
               type="button"
               variant="pillSecondary"
@@ -343,6 +344,32 @@ export function DocumentEditor({ slug }: { slug: DocumentSlug }) {
         }
       />
 
+      <div className="mb-6">
+        <PortalCard className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="flex items-center gap-3 text-sm font-bold text-brand-navy">
+              Visibility <PublishState published={doc.row.published} />
+            </p>
+            <p className="mt-1 text-sm text-brand-navySoft">
+              {doc.row.published
+                ? "Authors can read and sign this document."
+                : "Draft. Authors see a short message saying it is being finalised, and nobody can sign it."}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Label htmlFor="doc-published" className="text-sm font-semibold text-brand-navy">
+              {doc.row.published ? "Published" : "Draft"}
+            </Label>
+            <Switch
+              id="doc-published"
+              checked={doc.row.published}
+              disabled={publishing}
+              onCheckedChange={(value) => setPublished(value)}
+            />
+          </div>
+        </PortalCard>
+      </div>
+
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="space-y-5">
           <PortalCard className="space-y-3">
@@ -357,6 +384,22 @@ export function DocumentEditor({ slug }: { slug: DocumentSlug }) {
             <p className="text-xs text-brand-navySoft">
               {subtitle}. Saving writes a new version and leaves every earlier one intact.
             </p>
+          </PortalCard>
+
+          <PortalCard className="space-y-2">
+            <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Merge fields</p>
+            <p className="text-sm text-brand-navySoft">
+              Typed anywhere in the text, these are replaced with the author's own details when they read the document.
+              You always see the raw tokens here.
+            </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {MERGE_TOKENS.map((token) => (
+                <code
+                  key={token}
+                  className="rounded bg-portal-accent/10 px-2 py-1 text-xs font-semibold text-portal-accent"
+                >{`{{${token}}}`}</code>
+              ))}
+            </div>
           </PortalCard>
 
           {blocks.map((block, index) => (
