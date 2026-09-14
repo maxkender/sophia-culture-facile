@@ -407,11 +407,9 @@ export function AuthorProfile() {
           </PortalCard>
 
           {signed ? (
-            <Banner
-              tone="warning"
-              title="Your agreement is signed"
-              body="Changing your published name is recorded, because it changes the byline on work already accepted."
-            />
+            <Banner tone="warning" title="Your agreement is signed">
+              Changing your published name is recorded, because it changes the byline on work already accepted.
+            </Banner>
           ) : null}
         </div>
       </div>
