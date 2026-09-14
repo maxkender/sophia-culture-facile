@@ -14,6 +14,7 @@ import { Banner, CopyButton, PageTitle, PortalCard, StatusPill } from "../ui";
 export function AuthorDetail({ authorId }: { authorId: string }) {
   const queryClient = useQueryClient();
   const [bulk, setBulk] = useState("");
+  const [fee, setFee] = useState<string | null>(null);
   const [form, setForm] = useState({ lot_code: "", subject_area: "", title: "", subtitle: "", brief_note: "", due_date: "" });
 
   const { data } = useQuery({
