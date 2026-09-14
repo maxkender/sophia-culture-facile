@@ -195,7 +195,7 @@ export function AuthorHome() {
         )}
         <p className="mt-4 flex flex-wrap items-center gap-1 text-sm text-brand-navySoft">
           <Smartphone className="size-4" aria-hidden="true" />
-          Not on iPhone, or want the other links? Everything is here:{" "}
+          All the download links are here:{" "}
           <a
             href={TAAP_LINK}
             target="_blank"
