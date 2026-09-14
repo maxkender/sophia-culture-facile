@@ -149,6 +149,8 @@ export const claimInvite = createServerFn({ method: "POST" })
         token: z.string().min(4).max(200),
         password: z.string().min(8).max(200),
         email: z.string().email().max(200).optional(),
+        declaration: z.literal(true),
+        userAgent: z.string().max(400).optional(),
       })
       .parse(data),
   )
