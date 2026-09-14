@@ -108,7 +108,7 @@ export function AuthorAgreement() {
   }
 
   const showingSigned = Boolean(signedAt && signedDoc);
-  const blocks = applyMerge(showingSigned ? signedDoc!.blocks : doc.blocks, merge);
+  const blocks = showingSigned ? signedDoc!.blocks : doc.blocks;
   const title = showingSigned ? signedDoc!.title || doc.row.title : doc.row.title;
   const version = showingSigned ? signedVersion! : doc.row.current_version;
   const subtitle = showingSigned
