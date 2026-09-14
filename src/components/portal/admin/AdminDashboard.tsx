@@ -27,7 +27,10 @@ export function AdminDashboard() {
   // The internal test account must never show up in editorial figures.
   const testIds = new Set((data?.authors ?? []).filter((author) => author.is_test).map((author) => author.id));
   const courses = (data?.courses ?? []).filter((course) => !testIds.has(course.author_id ?? ""));
-  const authors = (data?.authors ?? []).filter((author) => !author.is_test);
+  // Authors who declined stay in the system but leave the active figures.
+  const authors = (data?.authors ?? []).filter((author) => !author.is_test && author.upwork_status !== "declined");
+  const assignedCourses = courses.filter((course) => course.author_id);
+  const pooledCourses = courses.filter((course) => !course.author_id);
   const unsigned = authors.filter((author) => !data?.signedIds.has(author.id));
   const overdue = courses.filter(isOverdue);
   // A byline counts as complete once it has a title line and at least one degree.
