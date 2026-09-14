@@ -34,6 +34,7 @@ import { Route as AuthenticatedAuteursIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedAuteursContractRouteImport } from './routes/_authenticated/auteurs/contract'
 import { Route as AuthenticatedAuteursExamplesRouteImport } from './routes/_authenticated/auteurs/examples'
 import { Route as AuthenticatedAuteursGuideRouteImport } from './routes/_authenticated/auteurs/guide'
+import { Route as AuthenticatedAuteursOpenRouteImport } from './routes/_authenticated/auteurs/open'
 import { Route as AuthenticatedAuteursProfileRouteImport } from './routes/_authenticated/auteurs/profile'
 import { Route as EnLessonsIndexRouteImport } from './routes/en/lessons/index'
 import { Route as EnLessonsSlugRouteImport } from './routes/en/lessons/$slug'
@@ -186,6 +187,12 @@ const AuthenticatedAuteursGuideRoute =
   AuthenticatedAuteursGuideRouteImport.update({
     id: '/auteurs/guide',
     path: '/auteurs/guide',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursOpenRoute =
+  AuthenticatedAuteursOpenRouteImport.update({
+    id: '/auteurs/open',
+    path: '/auteurs/open',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAuteursProfileRoute =
@@ -347,6 +354,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/contract': typeof AuthenticatedAuteursContractRoute
   '/auteurs/examples': typeof AuthenticatedAuteursExamplesRoute
   '/auteurs/guide': typeof AuthenticatedAuteursGuideRoute
+  '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/auteurs/': typeof AuthenticatedAuteursIndexRoute
@@ -396,6 +404,7 @@ export interface FileRoutesByTo {
   '/auteurs/contract': typeof AuthenticatedAuteursContractRoute
   '/auteurs/examples': typeof AuthenticatedAuteursExamplesRoute
   '/auteurs/guide': typeof AuthenticatedAuteursGuideRoute
+  '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/auteurs': typeof AuthenticatedAuteursIndexRoute
@@ -447,6 +456,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/contract': typeof AuthenticatedAuteursContractRoute
   '/_authenticated/auteurs/examples': typeof AuthenticatedAuteursExamplesRoute
   '/_authenticated/auteurs/guide': typeof AuthenticatedAuteursGuideRoute
+  '/_authenticated/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/_authenticated/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/_authenticated/auteurs/': typeof AuthenticatedAuteursIndexRoute
@@ -498,6 +508,7 @@ export interface FileRouteTypes {
     | '/auteurs/contract'
     | '/auteurs/examples'
     | '/auteurs/guide'
+    | '/auteurs/open'
     | '/auteurs/profile'
     | '/en/lessons/$slug'
     | '/auteurs/'
@@ -547,6 +558,7 @@ export interface FileRouteTypes {
     | '/auteurs/contract'
     | '/auteurs/examples'
     | '/auteurs/guide'
+    | '/auteurs/open'
     | '/auteurs/profile'
     | '/en/lessons/$slug'
     | '/auteurs'
@@ -597,6 +609,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/contract'
     | '/_authenticated/auteurs/examples'
     | '/_authenticated/auteurs/guide'
+    | '/_authenticated/auteurs/open'
     | '/_authenticated/auteurs/profile'
     | '/en/lessons/$slug'
     | '/_authenticated/auteurs/'
@@ -827,6 +840,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursGuideRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auteurs/open': {
+      id: '/_authenticated/auteurs/open'
+      path: '/auteurs/open'
+      fullPath: '/auteurs/open'
+      preLoaderRoute: typeof AuthenticatedAuteursOpenRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/auteurs/profile': {
       id: '/_authenticated/auteurs/profile'
       path: '/auteurs/profile'
@@ -995,6 +1015,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuteursContractRoute: typeof AuthenticatedAuteursContractRoute
   AuthenticatedAuteursExamplesRoute: typeof AuthenticatedAuteursExamplesRoute
   AuthenticatedAuteursGuideRoute: typeof AuthenticatedAuteursGuideRoute
+  AuthenticatedAuteursOpenRoute: typeof AuthenticatedAuteursOpenRoute
   AuthenticatedAuteursProfileRoute: typeof AuthenticatedAuteursProfileRoute
   AuthenticatedAuteursIndexRoute: typeof AuthenticatedAuteursIndexRoute
   AuthenticatedAuteursAdminActivityRoute: typeof AuthenticatedAuteursAdminActivityRoute
@@ -1021,6 +1042,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAuteursContractRoute: AuthenticatedAuteursContractRoute,
   AuthenticatedAuteursExamplesRoute: AuthenticatedAuteursExamplesRoute,
   AuthenticatedAuteursGuideRoute: AuthenticatedAuteursGuideRoute,
+  AuthenticatedAuteursOpenRoute: AuthenticatedAuteursOpenRoute,
   AuthenticatedAuteursProfileRoute: AuthenticatedAuteursProfileRoute,
   AuthenticatedAuteursIndexRoute: AuthenticatedAuteursIndexRoute,
   AuthenticatedAuteursAdminActivityRoute:

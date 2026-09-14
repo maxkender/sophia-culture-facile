@@ -29,6 +29,7 @@ type MyRequest = {
   status: string;
   created_at: string;
   decline_reason: string | null;
+  course: { title: string } | null;
 };
 
 export function OpenCourses() {
@@ -47,12 +48,16 @@ export function OpenCourses() {
       const [{ data: pool }, { data: mine }, { data: requests }] = await Promise.all([
         supabase.from("courses").select("*").eq("status", "unassigned").order("created_at", { ascending: false }),
         supabase.from("courses").select("subject_area").eq("author_id", profile!.id),
-        supabase.from("course_requests").select("*").eq("profile_id", profile!.id).order("created_at", { ascending: false }),
+        supabase
+          .from("course_requests")
+          .select("*, course:courses(title)")
+          .eq("profile_id", profile!.id)
+          .order("created_at", { ascending: false }),
       ]);
       return {
         pool: (pool ?? []) as Course[],
         mySubjects: [...new Set((mine ?? []).map((row) => row.subject_area).filter(Boolean))] as string[],
-        requests: (requests ?? []) as MyRequest[],
+        requests: (requests ?? []) as unknown as MyRequest[],
       };
     },
   });
@@ -173,7 +178,7 @@ export function OpenCourses() {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-brand-navy">
-                    {pool.find((course) => course.id === request.course_id)?.title ?? "Course"}
+                    {request.course?.title ?? "Course"}
                   </p>
                   <p className="mt-1 text-sm italic text-brand-navySoft">“{request.note}”</p>
                   {request.status === "declined" && request.decline_reason ? (
