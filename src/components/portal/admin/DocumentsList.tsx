@@ -13,7 +13,7 @@ export function DocumentsList() {
   const { data = [] } = useQuery({
     queryKey: ["portal", "documents"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("documents").select("slug, title, current_version, updated_at");
+      const { data, error } = await supabase.from("documents").select("slug, title, current_version, updated_at, published");
       if (error) throw error;
       return data ?? [];
     },
@@ -38,6 +38,17 @@ export function DocumentsList() {
               <p className="mt-1 text-xs text-brand-navySoft">
                 {row ? `Version ${row.current_version} — updated ${formatDateTime(row.updated_at)}` : "—"}
               </p>
+              {row ? (
+                <span
+                  className={
+                    row.published
+                      ? "mt-3 inline-block rounded-full bg-portal-green/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-portal-green"
+                      : "mt-3 inline-block rounded-full bg-portal-amber/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-portal-amber"
+                  }
+                >
+                  {row.published ? "Published" : "Draft"}
+                </span>
+              ) : null}
               <Button asChild variant="pill" size="pillSm" className="mt-4">
                 <Link to="/auteurs/admin/documents/$slug" params={{ slug }}>
                   Edit
