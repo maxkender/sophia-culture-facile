@@ -28,6 +28,7 @@ export function AdminDashboard() {
   const authors = (data?.authors ?? []).filter((author) => !author.is_test);
   const unsigned = authors.filter((author) => !data?.signedIds.has(author.id));
   const overdue = courses.filter(isOverdue);
+  const toConfirm = authors.filter((author) => !author.display_title || !author.institution);
   const byAuthor = new Map(authors.map((author) => [author.id, author.full_name]));
 
   const accepted = authors.filter((author) => author.upwork_status === "accepted").length;
@@ -109,6 +110,38 @@ export function AdminDashboard() {
                   <span className="text-brand-navySoft">
                     {" "}
                     — {byAuthor.get(course.author_id ?? "") ?? "Unassigned"} · due {formatDate(course.due_date)}
+                  </span>
+                </li>
+              ))
+            )}
+          </ul>
+        </PortalCard>
+
+        <PortalCard className="lg:col-span-2">
+          <h2 className="text-lg font-extrabold text-brand-navy">Bylines to confirm</h2>
+          <p className="mt-1 text-sm text-brand-navySoft">
+            These must be right before anything is published. Nothing is invented here.
+          </p>
+          <ul className="mt-4 space-y-2">
+            {toConfirm.length === 0 ? (
+              <li className="text-sm text-brand-navySoft">Every byline and institution is confirmed.</li>
+            ) : (
+              toConfirm.map((author) => (
+                <li key={author.id} className="text-sm">
+                  <Link
+                    to="/auteurs/admin/authors/$authorId"
+                    params={{ authorId: author.id }}
+                    className="font-semibold text-portal-accent hover:underline"
+                  >
+                    {author.full_name}
+                  </Link>
+                  <span className="font-semibold text-portal-amber">
+                    {" "}
+                    — {!author.display_title && !author.institution
+                      ? "byline and institution missing"
+                      : !author.display_title
+                        ? "byline missing"
+                        : "institution missing"}
                   </span>
                 </li>
               ))

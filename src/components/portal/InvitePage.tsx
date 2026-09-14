@@ -4,14 +4,52 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { acceptInvite, claimInvite, getInvite, prepareMagicClaim } from "@/lib/portal.functions";
+import {
+  acceptInvite,
+  claimInvite,
+  getInvite,
+  prepareMagicClaim,
+  updateInviteProfile,
+  type InvitePreview,
+} from "@/lib/portal.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { formatDate } from "@/lib/portal";
 import { Banner, PortalCard } from "./ui";
 
 const CONTACT = "Contact the Sophia editorial desk on Upwork and we will send you a fresh link.";
+
+type InviteCourse = InvitePreview["courses"][number];
+type InviteLot = {
+  key: string;
+  lot_code: string | null;
+  lot_name: string | null;
+  subject_area: string | null;
+  courses: InviteCourse[];
+};
+
+/** Groups the commissioned courses by lot, keeping the assigned order. */
+function groupByLot(courses: InviteCourse[]): InviteLot[] {
+  const lots: InviteLot[] = [];
+  for (const course of courses) {
+    const key = course.lot_code ?? course.lot_name ?? "none";
+    let lot = lots.find((entry) => entry.key === key);
+    if (!lot) {
+      lot = {
+        key,
+        lot_code: course.lot_code,
+        lot_name: course.lot_name,
+        subject_area: course.subject_area,
+        courses: [],
+      };
+      lots.push(lot);
+    }
+    lot.courses.push(course);
+  }
+  return lots;
+}
 
 export function InvitePage({ token }: { token: string }) {
   const navigate = useNavigate();
@@ -28,6 +66,11 @@ export function InvitePage({ token }: { token: string }) {
   const [errors, setErrors] = useState<{ password?: string; confirm?: string; email?: string }>({});
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
+  const saveProfile = useServerFn(updateInviteProfile);
+  const [details, setDetails] = useState({ title: "", display_title: "", institution: "", country: "", bio: "" });
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<{ name: string; dataUrl: string } | null>(null);
+  const [savingDetails, setSavingDetails] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["invite", token],
@@ -35,6 +78,58 @@ export function InvitePage({ token }: { token: string }) {
     retry: false,
     queryFn: () => load({ data: { token } }),
   });
+
+  const loadedProfileId = data?.profile?.id ?? null;
+  useEffect(() => {
+    const p = data?.profile;
+    if (!p) return;
+    setDetails({
+      title: p.title ?? "",
+      display_title: p.display_title ?? "",
+      institution: p.institution ?? "",
+      country: p.country ?? "",
+      bio: p.bio ?? "",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadedProfileId]);
+
+  function onPhoto(file: File | null) {
+    if (!file) {
+      setPhotoFile(null);
+      setPhotoPreview(null);
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error("The photo must be smaller than 4 MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result ?? "");
+      setPhotoFile({ name: file.name, dataUrl });
+      setPhotoPreview(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function saveDetails() {
+    setSavingDetails(true);
+    try {
+      const result = await saveProfile({
+        data: { token, ...details, ...(photoFile ? { photo: photoFile } : {}) },
+      });
+      if (!result.ok) {
+        toast.error("Your details could not be saved.");
+        return;
+      }
+      toast.success("Your details are saved.");
+    } catch {
+      toast.error("Your details could not be saved.");
+    } finally {
+      setSavingDetails(false);
+    }
+  }
+
 
   // Magic-link return: the account is already signed in, so attach it to the invited profile.
   useEffect(() => {
@@ -46,7 +141,7 @@ export function InvitePage({ token }: { token: string }) {
       try {
         const result = await accept({ data: { token } });
         if (result.ok) {
-          await navigate({ to: "/auteurs/profile", replace: true });
+          await navigate({ to: "/auteurs", replace: true });
           return;
         }
         setLinkError(
@@ -108,7 +203,7 @@ export function InvitePage({ token }: { token: string }) {
         await navigate({ to: "/auth" });
         return;
       }
-      await navigate({ to: "/auteurs/profile", replace: true });
+      await navigate({ to: "/auteurs", replace: true });
     } catch {
       toast.error("Your account could not be created.");
     } finally {
@@ -183,9 +278,9 @@ export function InvitePage({ token }: { token: string }) {
             <>
               <PortalCard>
                 <div className="flex flex-wrap items-center gap-5">
-                  {profile.photo_url ? (
+                  {photoPreview ?? profile.photo_url ? (
                     <img
-                      src={profile.photo_url}
+                      src={photoPreview ?? profile.photo_url ?? ""}
                       alt=""
                       className="size-20 rounded-full object-cover"
                       width={80}
@@ -194,18 +289,83 @@ export function InvitePage({ token }: { token: string }) {
                   ) : null}
                   <div>
                     <h2 className="text-2xl font-extrabold text-brand-navy">{profile.full_name}</h2>
-                    <p className="mt-1 text-sm text-brand-navySoft">
-                      {[profile.title, profile.institution, profile.country].filter(Boolean).join(" · ")}
-                    </p>
                     <p className="mt-1 text-sm text-brand-navySoft">{profile.email ?? "Email to be confirmed by you"}</p>
                   </div>
                 </div>
-                {profile.bio ? (
-                  <p className="mt-5 text-sm leading-relaxed text-brand-navySoft">{profile.bio}</p>
-                ) : null}
-                <p className="mt-5 text-xs text-brand-navySoft">
-                  You can correct your title, institution, biography and photo once you are in. Your commissioned
-                  courses are fixed.
+
+                <p className="mt-6 text-sm font-bold text-brand-navy">Your published byline</p>
+                <p className="mt-1 text-xs text-brand-navySoft">
+                  This is the exact line printed under every course you write. Correct it if anything is wrong.
+                </p>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="inv-display">Byline</Label>
+                    <Input
+                      id="inv-display"
+                      className="h-11"
+                      value={details.display_title}
+                      onChange={(event) => setDetails({ ...details, display_title: event.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="inv-title">Title</Label>
+                    <Input
+                      id="inv-title"
+                      className="h-11"
+                      value={details.title}
+                      onChange={(event) => setDetails({ ...details, title: event.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="inv-institution">Institution</Label>
+                    <Input
+                      id="inv-institution"
+                      className="h-11"
+                      value={details.institution}
+                      onChange={(event) => setDetails({ ...details, institution: event.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="inv-country">Country</Label>
+                    <Input
+                      id="inv-country"
+                      className="h-11"
+                      value={details.country}
+                      onChange={(event) => setDetails({ ...details, country: event.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="inv-photo">Photo</Label>
+                    <Input
+                      id="inv-photo"
+                      type="file"
+                      accept="image/*"
+                      className="h-11"
+                      onChange={(event) => onPhoto(event.target.files?.[0] ?? null)}
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="inv-bio">Short biography</Label>
+                    <Textarea
+                      id="inv-bio"
+                      rows={4}
+                      value={details.bio}
+                      onChange={(event) => setDetails({ ...details, bio: event.target.value })}
+                    />
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="pillSecondary"
+                  size="pillSm"
+                  className="mt-4"
+                  disabled={savingDetails}
+                  onClick={saveDetails}
+                >
+                  {savingDetails ? "Saving…" : "Save my details"}
+                </Button>
+                <p className="mt-4 text-xs text-brand-navySoft">
+                  You can change all of this later from your space. Your commissioned courses are fixed.
                 </p>
               </PortalCard>
 
@@ -218,16 +378,27 @@ export function InvitePage({ token }: { token: string }) {
                     The desk will assign your first course shortly; it will be waiting in your space.
                   </p>
                 ) : (
-                  <ul className="mt-4 divide-y divide-brand-line">
-                    {data.courses.map((course) => (
-                      <li key={course.id} className="py-3">
-                        <p className="text-sm font-bold text-brand-navy">{course.title}</p>
-                        <p className="text-xs text-brand-navySoft">
-                          {course.lot_code ?? "—"} · {course.subject_area ?? "—"} · due {formatDate(course.due_date)}
-                        </p>
-                      </li>
+                  <div className="mt-4 space-y-6">
+                    {groupByLot(data.courses).map((lot) => (
+                      <div key={lot.key}>
+                        <h3 className="text-sm font-extrabold text-brand-navy">
+                          {lot.lot_code ? `${lot.lot_code} — ` : ""}
+                          {lot.lot_name ?? "Commissioned courses"}
+                          <span className="ml-2 text-xs font-bold uppercase tracking-wide text-brand-navySoft">
+                            {lot.subject_area ?? ""}
+                          </span>
+                        </h3>
+                        <ul className="mt-1 divide-y divide-brand-line">
+                          {lot.courses.map((course) => (
+                            <li key={course.id} className="py-3">
+                              <p className="text-sm font-bold text-brand-navy">{course.title}</p>
+                              <p className="text-xs text-brand-navySoft">Due {formatDate(course.due_date)}</p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 )}
               </PortalCard>
 

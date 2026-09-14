@@ -98,6 +98,7 @@ export function AuthorsList() {
               <tr>
                 <th className="py-3 pr-4">Name</th>
                 <th className="py-3 pr-4">Institution</th>
+                <th className="py-3 pr-4">Byline</th>
                 <th className="py-3 pr-4">Country</th>
                 <th className="py-3 pr-4">Upwork</th>
                 <th className="py-3 pr-4">Platform</th>
@@ -111,7 +112,7 @@ export function AuthorsList() {
             <tbody className="divide-y divide-brand-line">
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="py-6 text-brand-navySoft">
+                  <td colSpan={11} className="py-6 text-brand-navySoft">
                     No author matches this search.
                   </td>
                 </tr>
@@ -133,7 +134,18 @@ export function AuthorsList() {
                       ) : null}
                       <div className="text-xs text-brand-navySoft">{author.email ?? "No email yet"}</div>
                     </td>
-                    <td className="py-3 pr-4 text-brand-navySoft">{author.institution ?? "—"}</td>
+                    <td className="py-3 pr-4 text-brand-navySoft">
+                      {author.institution ?? <span className="font-semibold text-portal-amber">To confirm</span>}
+                    </td>
+                    <td className="py-3 pr-4 text-brand-navySoft">
+                      {author.display_title ? (
+                        <span className="block max-w-xs truncate" title={author.display_title}>
+                          {author.display_title}
+                        </span>
+                      ) : (
+                        <span className="font-semibold text-portal-amber">To confirm</span>
+                      )}
+                    </td>
                     <td className="py-3 pr-4 text-brand-navySoft">{author.country ?? "—"}</td>
                     <td className="py-3 pr-4">
                       {author.is_test ? (
@@ -166,7 +178,15 @@ export function AuthorsList() {
                     <td className={`py-3 pr-4 font-semibold ${signed ? "text-portal-green" : "text-portal-amber"}`}>
                       {signed ? "Signed" : "Not signed"}
                     </td>
-                    <td className="py-3 pr-4 font-mono text-xs text-brand-navySoft">{author.access_code ?? "—"}</td>
+                    <td className="py-3 pr-4 font-mono text-xs text-brand-navySoft">
+                      {author.access_code ? (
+                        author.access_code
+                      ) : (
+                        <Link to="/auteurs/admin/codes" className="font-sans font-semibold text-brand-navySoft hover:underline">
+                          No code
+                        </Link>
+                      )}
+                    </td>
                     <td className={`py-3 font-semibold ${author.activated_at ? "text-portal-green" : "text-brand-navySoft"}`}>
                       {author.activated_at ? "Activated" : author.invite_token ? "Invite ready" : "—"}
                     </td>
