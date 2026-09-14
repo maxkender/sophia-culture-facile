@@ -119,8 +119,27 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
       <div className="grid gap-5 lg:grid-cols-3">
         <PortalCard>
           <h2 className="text-sm font-bold text-brand-navy">Contact</h2>
-          <p className="mt-3 text-sm text-brand-navySoft">{author.email}</p>
-          <p className="mt-1 text-sm text-brand-navySoft">{author.platform === "android" ? "Android" : "iOS"}</p>
+          <p className="mt-3 text-sm text-brand-navySoft">{author.email ?? "No email — contracted through Upwork"}</p>
+          <p className="mt-1 text-sm">
+            {author.platform === "android" ? (
+              <span className="text-brand-navySoft">Android</span>
+            ) : author.platform === "ios" ? (
+              <span className="text-brand-navySoft">iOS</span>
+            ) : (
+              <span className="font-semibold text-portal-amber">Platform unknown</span>
+            )}
+          </p>
+          <p className="mt-2">
+            <span
+              className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${
+                author.upwork_status === "accepted"
+                  ? "bg-portal-green/10 text-portal-green"
+                  : "bg-brand-line text-brand-navySoft"
+              }`}
+            >
+              {author.upwork_status === "accepted" ? "Accepted on Upwork" : "Contacted on Upwork"}
+            </span>
+          </p>
           {author.bio ? <p className="mt-3 text-sm leading-relaxed text-brand-navySoft">{author.bio}</p> : null}
           <div className="mt-4 space-y-1">
             <Label htmlFor="fee">Fee (shown in their contract)</Label>
