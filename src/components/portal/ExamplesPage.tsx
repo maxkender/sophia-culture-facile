@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { formatDate } from "@/lib/portal";
 import { usePortalProfile } from "./usePortal";
 import { PageTitle, PortalCard } from "./ui";
+import sky1 from "@/assets/examples/sky-1.png.asset.json";
 import sky2 from "@/assets/examples/sky-2.png.asset.json";
 import sky3 from "@/assets/examples/sky-3.png.asset.json";
 import sky4 from "@/assets/examples/sky-4.png.asset.json";
@@ -25,6 +26,7 @@ import berlin7 from "@/assets/examples/berlin-7.png.asset.json";
 import berlin8 from "@/assets/examples/berlin-8.png.asset.json";
 
 const URLS: Record<string, string> = {
+  "sky-1.png": sky1.url,
   "sky-2.png": sky2.url,
   "sky-3.png": sky3.url,
   "sky-4.png": sky4.url,
