@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Course, Profile } from "@/lib/portal";
+import { formatDate, type Course, type Profile } from "@/lib/portal";
 import { PageTitle, PortalCard } from "../ui";
 
 export function AuthorsList() {
