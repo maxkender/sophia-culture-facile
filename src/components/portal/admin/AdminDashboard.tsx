@@ -30,11 +30,40 @@ export function AdminDashboard() {
   const overdue = courses.filter(isOverdue);
   const byAuthor = new Map(authors.map((author) => [author.id, author.full_name]));
 
+  const accepted = authors.filter((author) => author.upwork_status === "accepted").length;
+  const awaiting = authors.length - accepted;
+  const commissionedValue = courses.length * COURSE_FEE_USD;
+
   return (
     <div>
       <PageTitle title="Editorial dashboard" lead="Where every commissioned course stands today." />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <PortalCard>
+          <p className="text-sm font-semibold text-brand-navySoft">Courses commissioned</p>
+          <p className="mt-2 text-3xl font-extrabold text-brand-navy">{courses.length}</p>
+          <p className="mt-1 text-xs text-brand-navySoft">across {authors.length} authors</p>
+        </PortalCard>
+        <PortalCard>
+          <p className="text-sm font-semibold text-brand-navySoft">Accepted on Upwork</p>
+          <p className="mt-2 text-3xl font-extrabold text-portal-green">{accepted}</p>
+          <p className="mt-1 text-xs text-brand-navySoft">signed on in writing</p>
+        </PortalCard>
+        <PortalCard>
+          <p className="text-sm font-semibold text-brand-navySoft">Awaiting a reply</p>
+          <p className="mt-2 text-3xl font-extrabold text-portal-amber">{awaiting}</p>
+          <p className="mt-1 text-xs text-brand-navySoft">contacted, no answer yet</p>
+        </PortalCard>
+        <PortalCard>
+          <p className="text-sm font-semibold text-brand-navySoft">Commissioned value</p>
+          <p className="mt-2 text-3xl font-extrabold text-brand-navy">
+            ${commissionedValue.toLocaleString("en-US")}
+          </p>
+          <p className="mt-1 text-xs text-brand-navySoft">at ${COURSE_FEE_USD} per course</p>
+        </PortalCard>
+      </div>
+
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {COURSE_STATUSES.map((status) => (
           <PortalCard key={status}>
             <p className="text-sm font-semibold text-brand-navySoft">{STATUS_LABEL[status as CourseStatus]}</p>
