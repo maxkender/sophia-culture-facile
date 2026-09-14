@@ -46,6 +46,7 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
   const [bulk, setBulk] = useState("");
   const [fee, setFee] = useState<string | null>(null);
   const [byline, setByline] = useState<string | null>(null);
+  const [showDeclaration, setShowDeclaration] = useState(false);
   const [institution, setInstitution] = useState<string | null>(null);
   const [form, setForm] = useState({ lot_code: "", subject_area: "", title: "", subtitle: "", brief_note: "", due_date: "" });
 
