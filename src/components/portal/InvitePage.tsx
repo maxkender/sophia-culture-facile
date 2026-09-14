@@ -86,6 +86,7 @@ export function InvitePage({ token }: { token: string }) {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<{ password?: string; confirm?: string; email?: string }>({});
   const [busy, setBusy] = useState(false);
+  const [declared, setDeclared] = useState(false);
   const [sent, setSent] = useState(false);
   const saveProfile = useServerFn(updateInviteProfile);
   const [details, setDetails] = useState({
