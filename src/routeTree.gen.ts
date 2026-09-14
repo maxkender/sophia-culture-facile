@@ -42,6 +42,7 @@ import { Route as AuthenticatedAuteursAdminActivityRouteImport } from './routes/
 import { Route as AuthenticatedAuteursAdminApiRouteImport } from './routes/_authenticated/auteurs/admin/api'
 import { Route as AuthenticatedAuteursAdminApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/applications'
 import { Route as AuthenticatedAuteursAdminCodesRouteImport } from './routes/_authenticated/auteurs/admin/codes'
+import { Route as AuthenticatedAuteursAdminPoolRouteImport } from './routes/_authenticated/auteurs/admin/pool'
 import { Route as AuthenticatedAuteursAdminSettingsRouteImport } from './routes/_authenticated/auteurs/admin/settings'
 import { Route as AuthenticatedAuteursCoursesIndexRouteImport } from './routes/_authenticated/auteurs/courses.index'
 import { Route as AuthenticatedAuteursCoursesCourseIdRouteImport } from './routes/_authenticated/auteurs/courses.$courseId'
@@ -233,6 +234,12 @@ const AuthenticatedAuteursAdminCodesRoute =
     path: '/auteurs/admin/codes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAuteursAdminPoolRoute =
+  AuthenticatedAuteursAdminPoolRouteImport.update({
+    id: '/auteurs/admin/pool',
+    path: '/auteurs/admin/pool',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAuteursAdminSettingsRoute =
   AuthenticatedAuteursAdminSettingsRouteImport.update({
     id: '/auteurs/admin/settings',
@@ -348,6 +355,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/api': typeof AuthenticatedAuteursAdminApiRoute
   '/auteurs/admin/applications': typeof AuthenticatedAuteursAdminApplicationsRoute
   '/auteurs/admin/codes': typeof AuthenticatedAuteursAdminCodesRoute
+  '/auteurs/admin/pool': typeof AuthenticatedAuteursAdminPoolRoute
   '/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
@@ -396,6 +404,7 @@ export interface FileRoutesByTo {
   '/auteurs/admin/api': typeof AuthenticatedAuteursAdminApiRoute
   '/auteurs/admin/applications': typeof AuthenticatedAuteursAdminApplicationsRoute
   '/auteurs/admin/codes': typeof AuthenticatedAuteursAdminCodesRoute
+  '/auteurs/admin/pool': typeof AuthenticatedAuteursAdminPoolRoute
   '/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
@@ -446,6 +455,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/api': typeof AuthenticatedAuteursAdminApiRoute
   '/_authenticated/auteurs/admin/applications': typeof AuthenticatedAuteursAdminApplicationsRoute
   '/_authenticated/auteurs/admin/codes': typeof AuthenticatedAuteursAdminCodesRoute
+  '/_authenticated/auteurs/admin/pool': typeof AuthenticatedAuteursAdminPoolRoute
   '/_authenticated/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/_authenticated/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
@@ -496,6 +506,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/api'
     | '/auteurs/admin/applications'
     | '/auteurs/admin/codes'
+    | '/auteurs/admin/pool'
     | '/auteurs/admin/settings'
     | '/auteurs/courses/$courseId'
     | '/api/public/app/courses'
@@ -544,6 +555,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/api'
     | '/auteurs/admin/applications'
     | '/auteurs/admin/codes'
+    | '/auteurs/admin/pool'
     | '/auteurs/admin/settings'
     | '/auteurs/courses/$courseId'
     | '/api/public/app/courses'
@@ -593,6 +605,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/api'
     | '/_authenticated/auteurs/admin/applications'
     | '/_authenticated/auteurs/admin/codes'
+    | '/_authenticated/auteurs/admin/pool'
     | '/_authenticated/auteurs/admin/settings'
     | '/_authenticated/auteurs/courses/$courseId'
     | '/api/public/app/courses'
@@ -870,6 +883,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursAdminCodesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auteurs/admin/pool': {
+      id: '/_authenticated/auteurs/admin/pool'
+      path: '/auteurs/admin/pool'
+      fullPath: '/auteurs/admin/pool'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminPoolRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/auteurs/admin/settings': {
       id: '/_authenticated/auteurs/admin/settings'
       path: '/auteurs/admin/settings'
@@ -981,6 +1001,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuteursAdminApiRoute: typeof AuthenticatedAuteursAdminApiRoute
   AuthenticatedAuteursAdminApplicationsRoute: typeof AuthenticatedAuteursAdminApplicationsRoute
   AuthenticatedAuteursAdminCodesRoute: typeof AuthenticatedAuteursAdminCodesRoute
+  AuthenticatedAuteursAdminPoolRoute: typeof AuthenticatedAuteursAdminPoolRoute
   AuthenticatedAuteursAdminSettingsRoute: typeof AuthenticatedAuteursAdminSettingsRoute
   AuthenticatedAuteursCoursesCourseIdRoute: typeof AuthenticatedAuteursCoursesCourseIdRoute
   AuthenticatedAuteursAdminIndexRoute: typeof AuthenticatedAuteursAdminIndexRoute
@@ -1008,6 +1029,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAuteursAdminApplicationsRoute:
     AuthenticatedAuteursAdminApplicationsRoute,
   AuthenticatedAuteursAdminCodesRoute: AuthenticatedAuteursAdminCodesRoute,
+  AuthenticatedAuteursAdminPoolRoute: AuthenticatedAuteursAdminPoolRoute,
   AuthenticatedAuteursAdminSettingsRoute:
     AuthenticatedAuteursAdminSettingsRoute,
   AuthenticatedAuteursCoursesCourseIdRoute:
