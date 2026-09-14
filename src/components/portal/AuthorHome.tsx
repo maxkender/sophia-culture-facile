@@ -68,6 +68,7 @@ export function AuthorHome() {
   const examplesDone = Boolean(profile?.examples_reviewed_at);
   const guideDone = Boolean(profile?.guide_read_at);
   const doneCount = [examplesDone, guideDone, signed].filter(Boolean).length + 1;
+  const totalSteps = 3;
 
   const { data: courses = [] } = useQuery({
     queryKey: ["portal", "my-courses", profile?.id],
