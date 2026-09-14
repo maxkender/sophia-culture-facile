@@ -59,9 +59,21 @@ function Callout({ block }: { block: Extract<DocBlock, { type: "callout" }> }) {
   );
 }
 
-/** Renders document blocks exactly as an author sees them. Shared by the author pages and the admin preview. */
-export function DocumentBody({ blocks, className }: { blocks: DocBlock[]; className?: string }) {
+/**
+ * Renders document blocks exactly as an author sees them. Shared by the author pages and the admin preview.
+ * Pass `merge` to fill the {{tokens}}; omit it to show them raw, as the admin editor does.
+ */
+export function DocumentBody({
+  blocks,
+  className,
+  merge,
+}: {
+  blocks: DocBlock[];
+  className?: string;
+  merge?: MergeValues;
+}) {
   return (
+    <MergeContext.Provider value={merge}>
     <div className={cn("max-w-3xl space-y-5", className)}>
       {blocks.map((block, index) => {
         switch (block.type) {
