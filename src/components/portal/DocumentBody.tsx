@@ -138,5 +138,6 @@ export function DocumentBody({
         }
       })}
     </div>
+    </MergeContext.Provider>
   );
 }
