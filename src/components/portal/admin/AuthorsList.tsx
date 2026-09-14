@@ -12,6 +12,8 @@ import { PageTitle, PortalCard } from "../ui";
 export function AuthorsList() {
   const [search, setSearch] = useState("");
   const [platform, setPlatform] = useState("all");
+  // Authors who declined stay reachable, but they are hidden by default.
+  const [status, setStatus] = useState("active");
 
   const { data } = useQuery({
     queryKey: ["portal", "admin", "authors"],
