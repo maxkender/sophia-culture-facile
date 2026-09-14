@@ -35,6 +35,7 @@ export function PageTitle({ title, lead, action }: { title: string; lead?: strin
 }
 
 const STATUS_CLASS: Record<CourseStatus, string> = {
+  unassigned: "bg-portal-amber/15 text-portal-amber",
   assigned: "bg-brand-surfaceStrong text-brand-navySoft",
   in_progress: "bg-portal-accent/10 text-portal-accent",
   submitted: "bg-brand-navy/10 text-brand-navy",

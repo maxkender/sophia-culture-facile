@@ -12,6 +12,7 @@ export const PUBLISHER = {
 
 
 export const COURSE_STATUSES = [
+  "unassigned",
   "assigned",
   "in_progress",
   "submitted",
@@ -23,6 +24,7 @@ export const COURSE_STATUSES = [
 export type CourseStatus = (typeof COURSE_STATUSES)[number];
 
 export const STATUS_LABEL: Record<CourseStatus, string> = {
+  unassigned: "In the pool",
   assigned: "Assigned",
   in_progress: "In progress",
   submitted: "Submitted",
