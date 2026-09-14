@@ -93,6 +93,78 @@ export type Database = {
           },
         ]
       }
+      applications: {
+        Row: {
+          admin_note: string | null
+          country: string | null
+          created_at: string
+          created_profile_id: string | null
+          cv_path: string | null
+          date_of_birth: string | null
+          education: string
+          email: string
+          email_sent_at: string | null
+          full_name: string
+          id: string
+          is_certified_teacher: boolean
+          motivation: string
+          platform: Database["public"]["Enums"]["device_platform"]
+          previous_work: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          school: string | null
+          status: Database["public"]["Enums"]["application_state"]
+          tried_sophia: boolean
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string | null
+          country?: string | null
+          created_at?: string
+          created_profile_id?: string | null
+          cv_path?: string | null
+          date_of_birth?: string | null
+          education?: string
+          email: string
+          email_sent_at?: string | null
+          full_name: string
+          id?: string
+          is_certified_teacher?: boolean
+          motivation?: string
+          platform?: Database["public"]["Enums"]["device_platform"]
+          previous_work?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          school?: string | null
+          status?: Database["public"]["Enums"]["application_state"]
+          tried_sophia?: boolean
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string | null
+          country?: string | null
+          created_at?: string
+          created_profile_id?: string | null
+          cv_path?: string | null
+          date_of_birth?: string | null
+          education?: string
+          email?: string
+          email_sent_at?: string | null
+          full_name?: string
+          id?: string
+          is_certified_teacher?: boolean
+          motivation?: string
+          platform?: Database["public"]["Enums"]["device_platform"]
+          previous_work?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          school?: string | null
+          status?: Database["public"]["Enums"]["application_state"]
+          tried_sophia?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contracts: {
         Row: {
           author_id: string
@@ -432,6 +504,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      application_state: "pending" | "approved" | "rejected"
       code_state: "available" | "assigned" | "sent"
       course_status:
         | "assigned"
@@ -569,6 +642,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      application_state: ["pending", "approved", "rejected"],
       code_state: ["available", "assigned", "sent"],
       course_status: [
         "assigned",
