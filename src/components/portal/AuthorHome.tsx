@@ -72,13 +72,13 @@ export function AuthorHome() {
             </>
           ) : (
             <>
-              <p className="mt-4 font-mono text-lg font-bold tracking-wide text-brand-navySoft">
-                {profile?.is_test ? "Code de test, non fonctionnel" : "—"}
+              <p className="mt-4 text-lg font-bold text-brand-navy">
+                {profile?.is_test ? "Code de test, non fonctionnel" : "Your code is on its way"}
               </p>
-              <p className="mt-1 text-xs text-brand-navySoft">
+              <p className="mt-1 text-xs leading-relaxed text-brand-navySoft">
                 {profile?.is_test
                   ? "This is the internal test profile: no store code is attached to it."
-                  : "No code has been issued to you yet."}
+                  : "The editorial desk will add it here as soon as it is issued. Nothing to do on your side."}
               </p>
             </>
           )}

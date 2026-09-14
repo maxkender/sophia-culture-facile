@@ -12,13 +12,14 @@ export type InvitePreview = {
     full_name: string;
     email: string | null;
     title: string | null;
+    display_title: string | null;
     institution: string | null;
     country: string | null;
     bio: string | null;
     platform: string | null;
     photo_url: string | null;
   } | null;
-  courses: { id: string; title: string; subtitle: string | null; lot_code: string | null; subject_area: string | null; due_date: string | null }[];
+  courses: { id: string; title: string; subtitle: string | null; lot_code: string | null; lot_name: string | null; subject_area: string | null; due_date: string | null }[];
   hasAccount: boolean;
 };
 
@@ -67,7 +68,7 @@ export const getInvite = createServerFn({ method: "POST" })
 
     const { data: courses } = await supabaseAdmin
       .from("courses")
-      .select("id, title, subtitle, lot_code, subject_area, due_date")
+      .select("id, title, subtitle, lot_code, lot_name, subject_area, due_date")
       .eq("author_id", profile.id)
       .order("order_index");
 
@@ -86,6 +87,7 @@ export const getInvite = createServerFn({ method: "POST" })
         full_name: profile.full_name,
         email: profile.email,
         title: profile.title,
+        display_title: profile.display_title,
         institution: profile.institution,
         country: profile.country,
         bio: profile.bio,
@@ -135,12 +137,23 @@ export const claimInvite = createServerFn({ method: "POST" })
     const resolved = await resolveClaimEmail(profile, data.email);
     if ("error" in resolved) return { ok: false as const, state: resolved.error };
 
-    // The test account replays the flow, so reuse its existing login instead of creating a second one.
-    const existingUser = profile.is_test ? await findUserByEmail(resolved.email) : null;
+    // An account may already exist for this address (test account, or a retried claim).
+    // Reuse it — but never steal a login that already belongs to another author.
+    const existingUser = await findUserByEmail(resolved.email);
+    if (existingUser) {
+      const { data: owner } = await supabaseAdmin
+        .from("profiles")
+        .select("id")
+        .eq("user_id", existingUser.id)
+        .maybeSingle();
+      if (owner && owner.id !== profile.id) return { ok: false as const, state: "taken" as const };
+    }
+
     let userId: string;
     if (existingUser) {
       const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
         password: data.password,
+        email_confirm: true,
       });
       if (updateError) return { ok: false as const, state: "account" as const };
       userId = existingUser.id;
@@ -292,4 +305,54 @@ export const signAgreement = createServerFn({ method: "POST" })
     });
 
     return { ok: true as const, alreadySigned: false, signedAt: new Date().toISOString() };
+  });
+
+/** Public: lets an invited author correct their own details before they claim the profile. */
+export const updateInviteProfile = createServerFn({ method: "POST" })
+  .inputValidator((data) =>
+    z
+      .object({
+        token: z.string().min(4).max(200),
+        title: z.string().max(200).optional(),
+        display_title: z.string().max(300).optional(),
+        institution: z.string().max(200).optional(),
+        country: z.string().max(120).optional(),
+        bio: z.string().max(1200).optional(),
+        photo: z
+          .object({ name: z.string().max(200), dataUrl: z.string().max(7_000_000) })
+          .optional(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin, profile } = await loadInvite(data.token);
+    if (!profile || inviteState(profile) !== "ok") return { ok: false as const };
+
+    const clean = (value: string | undefined) =>
+      value === undefined ? undefined : value.trim() === "" ? null : value.trim();
+
+    let photoPath: string | undefined;
+    if (data.photo) {
+      const base64 = data.photo.dataUrl.split(",")[1] ?? "";
+      const type = data.photo.dataUrl.match(/^data:([^;]+);/)?.[1] ?? "image/jpeg";
+      const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
+      const path = `${profile.id}/${Date.now()}-${data.photo.name.replace(/[^a-zA-Z0-9.]/g, "-")}`;
+      const { error } = await supabaseAdmin.storage
+        .from("author-photos")
+        .upload(path, bytes, { contentType: type, upsert: true });
+      if (!error) photoPath = path;
+    }
+
+    const patch = {
+      ...(data.title !== undefined ? { title: clean(data.title) ?? null } : {}),
+      ...(data.display_title !== undefined ? { display_title: clean(data.display_title) ?? null } : {}),
+      ...(data.institution !== undefined ? { institution: clean(data.institution) ?? null } : {}),
+      ...(data.country !== undefined ? { country: clean(data.country) ?? null } : {}),
+      ...(data.bio !== undefined ? { bio: clean(data.bio) ?? null } : {}),
+      ...(photoPath ? { photo_url: photoPath } : {}),
+    };
+
+    const { error } = await supabaseAdmin.from("profiles").update(patch).eq("id", profile.id);
+    if (error) return { ok: false as const };
+    return { ok: true as const };
   });

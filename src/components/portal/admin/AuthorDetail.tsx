@@ -44,6 +44,8 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
   const queryClient = useQueryClient();
   const [bulk, setBulk] = useState("");
   const [fee, setFee] = useState<string | null>(null);
+  const [byline, setByline] = useState<string | null>(null);
+  const [institution, setInstitution] = useState<string | null>(null);
   const [form, setForm] = useState({ lot_code: "", subject_area: "", title: "", subtitle: "", brief_note: "", due_date: "" });
 
   const { data } = useQuery({
@@ -124,9 +126,29 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
     toast.success("Fee saved.");
   }
 
+  async function saveByline() {
+    if (byline === null && institution === null) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        ...(byline === null ? {} : { display_title: byline.trim() || null }),
+        ...(institution === null ? {} : { institution: institution.trim() || null }),
+      })
+      .eq("id", authorId);
+    if (error) {
+      toast.error("The byline could not be saved.");
+      return;
+    }
+    await refresh();
+    toast.success("Byline saved.");
+  }
+
   async function regenerateInvite() {
     const token = newInviteToken();
-    await supabase.from("profiles").update({ invite_token: token, invited_at: new Date().toISOString() }).eq("id", authorId);
+    await supabase
+      .from("profiles")
+      .update({ invite_token: token, invited_at: new Date().toISOString(), invite_expires_at: null })
+      .eq("id", authorId);
     await refresh();
     toast.success("New invite link generated.");
   }
@@ -189,12 +211,24 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
 
         <PortalCard>
           <h2 className="text-sm font-bold text-brand-navy">Access code</h2>
-          <p className="mt-3 font-mono text-base font-bold text-brand-navy">{author.access_code ?? "None assigned"}</p>
           {author.access_code ? (
-            <div className="mt-3">
-              <CopyButton value={author.access_code} label="Copy code" />
-            </div>
-          ) : null}
+            <>
+              <p className="mt-3 font-mono text-base font-bold text-brand-navy">{author.access_code}</p>
+              <div className="mt-3">
+                <CopyButton value={author.access_code} label="Copy code" />
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="mt-3 text-sm font-semibold text-brand-navySoft">No code</p>
+              <p className="mt-1 text-xs text-brand-navySoft">
+                Codes are only ever taken from the imported file.{" "}
+                <Link to="/auteurs/admin/codes" className="font-semibold text-portal-accent hover:underline">
+                  Access codes
+                </Link>
+              </p>
+            </>
+          )}
         </PortalCard>
 
         <PortalCard>
@@ -210,6 +244,47 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
           </div>
         </PortalCard>
       </div>
+
+      <PortalCard className="mt-6">
+        <h2 className="text-sm font-bold text-brand-navy">Published byline</h2>
+        <p className="mt-1 text-xs text-brand-navySoft">
+          The exact line printed under every course this author writes. The author can correct it when they claim their
+          profile.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="display-title">
+              Byline{" "}
+              {author.display_title ? null : (
+                <span className="ml-1 font-bold uppercase tracking-wide text-portal-amber">To confirm</span>
+              )}
+            </Label>
+            <Input
+              id="display-title"
+              className="h-11"
+              defaultValue={author.display_title ?? ""}
+              onChange={(event) => setByline(event.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="institution">
+              Institution{" "}
+              {author.institution ? null : (
+                <span className="ml-1 font-bold uppercase tracking-wide text-portal-amber">To confirm</span>
+              )}
+            </Label>
+            <Input
+              id="institution"
+              className="h-11"
+              defaultValue={author.institution ?? ""}
+              onChange={(event) => setInstitution(event.target.value)}
+            />
+          </div>
+        </div>
+        <Button type="button" variant="pillSecondary" size="pillSm" className="mt-4" onClick={saveByline}>
+          Save byline
+        </Button>
+      </PortalCard>
 
       <div className="mt-6">
         {data?.contract ? (
