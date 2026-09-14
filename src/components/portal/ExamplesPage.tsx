@@ -3,9 +3,16 @@ import sky2 from "@/assets/examples/sky-2.png.asset.json";
 import sky3 from "@/assets/examples/sky-3.png.asset.json";
 import sky4 from "@/assets/examples/sky-4.png.asset.json";
 import sky5 from "@/assets/examples/sky-5.png.asset.json";
+import sky6 from "@/assets/examples/sky-6.png.asset.json";
+import sky7 from "@/assets/examples/sky-7.png.asset.json";
+import sky8 from "@/assets/examples/sky-8.png.asset.json";
+import berlin1 from "@/assets/examples/berlin-1.png.asset.json";
 import berlin2 from "@/assets/examples/berlin-2.png.asset.json";
 import berlin3 from "@/assets/examples/berlin-3.png.asset.json";
+import berlin4 from "@/assets/examples/berlin-4.png.asset.json";
 import berlin5 from "@/assets/examples/berlin-5.png.asset.json";
+import berlin6 from "@/assets/examples/berlin-6.png.asset.json";
+import berlin7 from "@/assets/examples/berlin-7.png.asset.json";
 import berlin8 from "@/assets/examples/berlin-8.png.asset.json";
 
 const URLS: Record<string, string> = {
@@ -13,9 +20,16 @@ const URLS: Record<string, string> = {
   "sky-3.png": sky3.url,
   "sky-4.png": sky4.url,
   "sky-5.png": sky5.url,
+  "sky-6.png": sky6.url,
+  "sky-7.png": sky7.url,
+  "sky-8.png": sky8.url,
+  "berlin-1.png": berlin1.url,
   "berlin-2.png": berlin2.url,
   "berlin-3.png": berlin3.url,
+  "berlin-4.png": berlin4.url,
   "berlin-5.png": berlin5.url,
+  "berlin-6.png": berlin6.url,
+  "berlin-7.png": berlin7.url,
   "berlin-8.png": berlin8.url,
 };
 
