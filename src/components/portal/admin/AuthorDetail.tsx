@@ -84,6 +84,17 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
     toast.success(`${rows.length} courses assigned.`);
   }
 
+  async function saveFee() {
+    if (fee === null) return;
+    const { error } = await supabase.from("profiles").update({ fee: fee.trim() || null }).eq("id", authorId);
+    if (error) {
+      toast.error("The fee could not be saved.");
+      return;
+    }
+    await refresh();
+    toast.success("Fee saved.");
+  }
+
   async function regenerateInvite() {
     const token = newInviteToken();
     await supabase.from("profiles").update({ invite_token: token, invited_at: new Date().toISOString() }).eq("id", authorId);
