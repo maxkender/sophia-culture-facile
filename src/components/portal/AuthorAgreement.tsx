@@ -162,15 +162,13 @@ export function AuthorAgreement() {
         <PortalCard className="mt-6 max-w-2xl">
           <h2 className="text-lg font-extrabold text-brand-navy">Signature</h2>
           <p className="mt-3 text-sm leading-7 text-brand-navySoft">
-            <DocumentBody
-              blocks={[
-                {
-                  type: "paragraph",
-                  text: "By signing you confirm you are {{author_name}} and that you accept the terms above. A copy is available to download at any time.",
-                },
-              ]}
-              merge={merge}
-            />
+            By signing you confirm you are{" "}
+            {merge.author_name ? (
+              <strong className="text-brand-navy">{merge.author_name}</strong>
+            ) : (
+              <span className="italic text-brand-navySoft/60">[full name not provided]</span>
+            )}{" "}
+            and that you accept the terms above. A copy is available to download at any time.
           </p>
           <form onSubmit={submit} className="mt-5 space-y-5">
             <div className="flex items-start gap-3">
