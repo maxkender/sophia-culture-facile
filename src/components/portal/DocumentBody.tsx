@@ -1,10 +1,31 @@
+import { createContext, useContext } from "react";
 import { cn } from "@/lib/utils";
-import { inlineParts, type DocBlock } from "@/lib/documents";
+import { inlineParts, MERGE_PLACEHOLDER, type DocBlock, type MergeValues } from "@/lib/documents";
+
+/** Undefined means "show the raw tokens", i.e. the admin editor. */
+const MergeContext = createContext<MergeValues | undefined>(undefined);
 
 export function RichText({ text }: { text: string }) {
+  const merge = useContext(MergeContext);
   return (
     <>
       {inlineParts(text).map((part, index) => {
+        if (part.token) {
+          if (!merge) {
+            return (
+              <span key={index} className="rounded bg-portal-accent/10 px-1 font-mono text-[0.85em] text-portal-accent">
+                {part.text}
+              </span>
+            );
+          }
+          const value = merge[part.token];
+          if (value && String(value).trim()) return <span key={index}>{String(value)}</span>;
+          return (
+            <span key={index} className="text-brand-navySoft/60 italic">
+              [{MERGE_PLACEHOLDER[part.token]}]
+            </span>
+          );
+        }
         if (part.bold) return <strong key={index}>{part.text}</strong>;
         if (part.italic) return <em key={index}>{part.text}</em>;
         return <span key={index}>{part.text}</span>;
@@ -38,9 +59,21 @@ function Callout({ block }: { block: Extract<DocBlock, { type: "callout" }> }) {
   );
 }
 
-/** Renders document blocks exactly as an author sees them. Shared by the author pages and the admin preview. */
-export function DocumentBody({ blocks, className }: { blocks: DocBlock[]; className?: string }) {
+/**
+ * Renders document blocks exactly as an author sees them. Shared by the author pages and the admin preview.
+ * Pass `merge` to fill the {{tokens}}; omit it to show them raw, as the admin editor does.
+ */
+export function DocumentBody({
+  blocks,
+  className,
+  merge,
+}: {
+  blocks: DocBlock[];
+  className?: string;
+  merge?: MergeValues;
+}) {
   return (
+    <MergeContext.Provider value={merge}>
     <div className={cn("max-w-3xl space-y-5", className)}>
       {blocks.map((block, index) => {
         switch (block.type) {
@@ -105,5 +138,6 @@ export function DocumentBody({ blocks, className }: { blocks: DocBlock[]; classN
         }
       })}
     </div>
+    </MergeContext.Provider>
   );
 }

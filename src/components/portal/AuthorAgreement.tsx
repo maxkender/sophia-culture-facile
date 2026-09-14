@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Download } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { signAgreement } from "@/lib/portal.functions";
 import { downloadDocumentPdf } from "@/lib/documentPdf";
+import { applyMerge, type MergeValues } from "@/lib/documents";
 import { formatDate, formatDateTime } from "@/lib/portal";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -28,6 +30,31 @@ export function AuthorAgreement() {
   // An author who has signed stays bound to the version they signed, whatever the desk edits afterwards.
   const signedVersion = me?.signedVersion ?? null;
   const { data: signedDoc } = useDocumentVersion(doc?.row.id, signedAt ? signedVersion : null);
+
+  const profile = me?.profile ?? null;
+  const { data: courseCount } = useQuery({
+    queryKey: ["portal", "course-count", profile?.id],
+    enabled: Boolean(profile?.id),
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("courses")
+        .select("id", { count: "exact", head: true })
+        .eq("author_id", profile!.id);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+
+  const merge: MergeValues = {
+    author_name: profile?.full_name ?? null,
+    author_title: profile?.title ?? null,
+    author_institution: profile?.institution ?? null,
+    author_country: profile?.country ?? null,
+    course_count: courseCount ? String(courseCount) : null,
+    fee: profile?.fee ?? null,
+    today: formatDate(new Date().toISOString()),
+  };
+
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -61,6 +88,23 @@ export function AuthorAgreement() {
 
   if (!doc) {
     return <Banner tone="warning" title="The agreement has not been published yet" />;
+  }
+
+  // Nobody can read or sign a draft. The author simply waits.
+  if (!doc.row.published && !signedAt) {
+    return (
+      <div>
+        <PageTitle title="Author agreement" />
+        <PortalCard className="max-w-2xl">
+          <h2 className="text-lg font-extrabold text-brand-navy">The agreement is being finalised</h2>
+          <p className="mt-3 text-sm leading-7 text-brand-navySoft">
+            We are putting the final version in place. You will be notified in your author space as soon as it is
+            available to read and sign. There is nothing for you to do in the meantime, and you can start writing your
+            courses straight away.
+          </p>
+        </PortalCard>
+      </div>
+    );
   }
 
   const showingSigned = Boolean(signedAt && signedDoc);
@@ -98,19 +142,34 @@ export function AuthorAgreement() {
             variant="pillSecondary"
             size="pillSm"
             onClick={() =>
-              downloadDocumentPdf({ slug: "author-agreement", title, subtitle, version, blocks })
+              downloadDocumentPdf({
+                slug: "author-agreement",
+                title,
+                subtitle,
+                version,
+                blocks: applyMerge(blocks, merge),
+              })
             }
           >
             <Download className="size-4" />
             Download PDF
           </Button>
         </div>
-        <DocumentBody blocks={blocks} className="mt-8" />
+        <DocumentBody blocks={blocks} merge={merge} className="mt-8" />
       </PortalCard>
 
       {!signedAt ? (
         <PortalCard className="mt-6 max-w-2xl">
           <h2 className="text-lg font-extrabold text-brand-navy">Signature</h2>
+          <p className="mt-3 text-sm leading-7 text-brand-navySoft">
+            By signing you confirm you are{" "}
+            {merge.author_name ? (
+              <strong className="text-brand-navy">{merge.author_name}</strong>
+            ) : (
+              <span className="italic text-brand-navySoft/60">[full name not provided]</span>
+            )}{" "}
+            and that you accept the terms above. A copy is available to download at any time.
+          </p>
           <form onSubmit={submit} className="mt-5 space-y-5">
             <div className="flex items-start gap-3">
               <Checkbox

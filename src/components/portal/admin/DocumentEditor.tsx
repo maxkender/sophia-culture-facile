@@ -12,10 +12,12 @@ import {
   BLOCK_LABEL,
   DOCUMENT_LABEL,
   emptyBlock,
+  MERGE_TOKENS,
   parseBlocks,
   type DocBlock,
   type DocumentSlug,
 } from "@/lib/documents";
+import { Switch } from "@/components/ui/switch";
 import { downloadDocumentPdf } from "@/lib/documentPdf";
 import { formatDateTime } from "@/lib/portal";
 import { DocumentBody } from "../DocumentBody";
@@ -24,6 +26,21 @@ import { useDocument, useDocumentVersions } from "../useDocuments";
 import { Banner, PageTitle, PortalCard } from "../ui";
 
 const BLOCK_TYPES: DocBlock["type"][] = ["heading", "paragraph", "bullets", "table", "callout"];
+
+/** The state of the document at a glance. */
+function PublishState({ published }: { published: boolean }) {
+  return (
+    <span
+      className={
+        published
+          ? "rounded-full bg-portal-green/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-portal-green"
+          : "rounded-full bg-portal-amber/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-portal-amber"
+      }
+    >
+      {published ? "Published" : "Draft"}
+    </span>
+  );
+}
 
 /** Wraps the current selection of a field in ** or * markers. */
 function wrapSelection(element: HTMLTextAreaElement | HTMLInputElement, marker: string, apply: (value: string) => void) {
@@ -242,6 +259,23 @@ export function DocumentEditor({ slug }: { slug: DocumentSlug }) {
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const [viewing, setViewing] = useState<{ version: number; title: string; blocks: DocBlock[] } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+
+  async function setPublished(value: boolean) {
+    if (!doc) return;
+    setPublishing(true);
+    try {
+      const { error } = await supabase.from("documents").update({ published: value }).eq("id", doc.row.id);
+      if (error) throw error;
+      await queryClient.invalidateQueries({ queryKey: ["portal", "document", slug] });
+      await queryClient.invalidateQueries({ queryKey: ["portal", "documents"] });
+      toast.success(value ? "Published. Authors can now read and sign it." : "Back to draft. Authors cannot sign it.");
+    } catch {
+      toast.error("The visibility could not be changed.");
+    } finally {
+      setPublishing(false);
+    }
+  }
 
   useEffect(() => {
     if (doc && loadedFor !== doc.row.id) {
@@ -324,7 +358,8 @@ export function DocumentEditor({ slug }: { slug: DocumentSlug }) {
             : "Authors always read the current version of this guide."
         }
         action={
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <PublishState published={doc.row.published} />
             <Button
               type="button"
               variant="pillSecondary"
@@ -343,6 +378,32 @@ export function DocumentEditor({ slug }: { slug: DocumentSlug }) {
         }
       />
 
+      <div className="mb-6">
+        <PortalCard className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="flex items-center gap-3 text-sm font-bold text-brand-navy">
+              Visibility <PublishState published={doc.row.published} />
+            </p>
+            <p className="mt-1 text-sm text-brand-navySoft">
+              {doc.row.published
+                ? "Authors can read and sign this document."
+                : "Draft. Authors see a short message saying it is being finalised, and nobody can sign it."}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Label htmlFor="doc-published" className="text-sm font-semibold text-brand-navy">
+              {doc.row.published ? "Published" : "Draft"}
+            </Label>
+            <Switch
+              id="doc-published"
+              checked={doc.row.published}
+              disabled={publishing}
+              onCheckedChange={(value) => setPublished(value)}
+            />
+          </div>
+        </PortalCard>
+      </div>
+
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="space-y-5">
           <PortalCard className="space-y-3">
@@ -357,6 +418,22 @@ export function DocumentEditor({ slug }: { slug: DocumentSlug }) {
             <p className="text-xs text-brand-navySoft">
               {subtitle}. Saving writes a new version and leaves every earlier one intact.
             </p>
+          </PortalCard>
+
+          <PortalCard className="space-y-2">
+            <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Merge fields</p>
+            <p className="text-sm text-brand-navySoft">
+              Typed anywhere in the text, these are replaced with the author's own details when they read the document.
+              You always see the raw tokens here.
+            </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {MERGE_TOKENS.map((token) => (
+                <code
+                  key={token}
+                  className="rounded bg-portal-accent/10 px-2 py-1 text-xs font-semibold text-portal-accent"
+                >{`{{${token}}}`}</code>
+              ))}
+            </div>
           </PortalCard>
 
           {blocks.map((block, index) => (

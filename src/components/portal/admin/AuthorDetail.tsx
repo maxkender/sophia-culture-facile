@@ -14,6 +14,7 @@ import { Banner, CopyButton, PageTitle, PortalCard, StatusPill } from "../ui";
 export function AuthorDetail({ authorId }: { authorId: string }) {
   const queryClient = useQueryClient();
   const [bulk, setBulk] = useState("");
+  const [fee, setFee] = useState<string | null>(null);
   const [form, setForm] = useState({ lot_code: "", subject_area: "", title: "", subtitle: "", brief_note: "", due_date: "" });
 
   const { data } = useQuery({
@@ -83,6 +84,17 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
     toast.success(`${rows.length} courses assigned.`);
   }
 
+  async function saveFee() {
+    if (fee === null) return;
+    const { error } = await supabase.from("profiles").update({ fee: fee.trim() || null }).eq("id", authorId);
+    if (error) {
+      toast.error("The fee could not be saved.");
+      return;
+    }
+    await refresh();
+    toast.success("Fee saved.");
+  }
+
   async function regenerateInvite() {
     const token = newInviteToken();
     await supabase.from("profiles").update({ invite_token: token, invited_at: new Date().toISOString() }).eq("id", authorId);
@@ -110,6 +122,21 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
           <p className="mt-3 text-sm text-brand-navySoft">{author.email}</p>
           <p className="mt-1 text-sm text-brand-navySoft">{author.platform === "android" ? "Android" : "iOS"}</p>
           {author.bio ? <p className="mt-3 text-sm leading-relaxed text-brand-navySoft">{author.bio}</p> : null}
+          <div className="mt-4 space-y-1">
+            <Label htmlFor="fee">Fee (shown in their contract)</Label>
+            <div className="flex gap-2">
+              <Input
+                id="fee"
+                className="h-11"
+                placeholder="e.g. USD 600"
+                defaultValue={author.fee ?? ""}
+                onChange={(event) => setFee(event.target.value)}
+              />
+              <Button type="button" variant="pillSecondary" size="pillSm" onClick={saveFee}>
+                Save
+              </Button>
+            </div>
+          </div>
         </PortalCard>
 
         <PortalCard>
