@@ -1,6 +1,7 @@
 import {
   Activity,
   Code2,
+  Compass,
   BookMarked,
   BookOpen,
   FileSignature,
@@ -17,7 +18,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-export type NavBadge = "review" | "myCourses" | "codes" | "applications";
+export type NavBadge = "review" | "myCourses" | "codes" | "applications" | "requests";
 
 export type NavItem = {
   to: string;
@@ -35,6 +36,7 @@ export const AUTHOR_NAV: NavGroup[] = [
     items: [
       { to: "/auteurs", label: "Home", icon: Home, exact: true },
       { to: "/auteurs/courses", label: "My courses", icon: Library, badge: "myCourses" },
+      { to: "/auteurs/open", label: "Open courses", icon: Compass },
       { to: "/auteurs/examples", label: "Examples", icon: Sparkles },
       { to: "/auteurs/profile", label: "Profile", icon: UserCircle },
     ],
