@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { AlertTriangle, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -96,6 +96,7 @@ export function AuthorsList() {
                 <th className="py-3 pr-4">Name</th>
                 <th className="py-3 pr-4">Institution</th>
                 <th className="py-3 pr-4">Country</th>
+                <th className="py-3 pr-4">Upwork</th>
                 <th className="py-3 pr-4">Platform</th>
                 <th className="py-3 pr-4">Courses</th>
                 <th className="py-3 pr-4">Submitted</th>
@@ -107,7 +108,7 @@ export function AuthorsList() {
             <tbody className="divide-y divide-brand-line">
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-6 text-brand-navySoft">
+                  <td colSpan={10} className="py-6 text-brand-navySoft">
                     No author matches this search.
                   </td>
                 </tr>
@@ -131,7 +132,28 @@ export function AuthorsList() {
                     </td>
                     <td className="py-3 pr-4 text-brand-navySoft">{author.institution ?? "—"}</td>
                     <td className="py-3 pr-4 text-brand-navySoft">{author.country ?? "—"}</td>
-                    <td className="py-3 pr-4 text-brand-navySoft">{author.platform === "android" ? "Android" : "iOS"}</td>
+                    <td className="py-3 pr-4">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${
+                          author.upwork_status === "accepted"
+                            ? "bg-portal-green/10 text-portal-green"
+                            : "bg-brand-line text-brand-navySoft"
+                        }`}
+                      >
+                        {author.upwork_status === "accepted" ? "Accepted" : "Contacted"}
+                      </span>
+                    </td>
+                    <td className="py-3 pr-4 text-brand-navySoft">
+                      {author.platform === "android" ? (
+                        "Android"
+                      ) : author.platform === "ios" ? (
+                        "iOS"
+                      ) : (
+                        <span className="inline-flex items-center gap-1 font-semibold text-portal-amber" title="Platform unknown">
+                          <AlertTriangle className="size-4" aria-hidden="true" /> Unknown
+                        </span>
+                      )}
+                    </td>
                     <td className="py-3 pr-4 text-brand-navy">{total}</td>
                     <td className="py-3 pr-4 text-brand-navy">{submitted}</td>
                     <td className={`py-3 pr-4 font-semibold ${signed ? "text-portal-green" : "text-portal-amber"}`}>
