@@ -651,6 +651,27 @@ export function InvitePage({ token }: { token: string }) {
                     {errors.confirm ? <p className="text-sm font-semibold text-portal-red">{errors.confirm}</p> : null}
                   </div>
                   <div className="rounded-2xl bg-brand-surface p-4">
+                    <p className="text-sm font-bold text-brand-navy">
+                      Which phone do you use?<Tag kind="required" />
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-brand-navySoft">
+                      Sophia is on both stores. Your free access code only works on the store you pick.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-3">
+                      {(["ios", "android"] as const).map((value) => (
+                        <Button
+                          key={value}
+                          type="button"
+                          variant={platform === value ? "pill" : "pillSecondary"}
+                          size="pillSm"
+                          onClick={() => setPlatform(value)}
+                        >
+                          {value === "ios" ? "iPhone" : "Android"}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-2xl bg-brand-surface p-4">
                     <label htmlFor="claim-declaration" className="flex cursor-pointer items-start gap-3">
                       <input
                         id="claim-declaration"
@@ -669,7 +690,7 @@ export function InvitePage({ token }: { token: string }) {
                       them.
                     </p>
                   </div>
-                  <Button type="submit" variant="pill" size="pillSm" disabled={busy || !declared}>
+                  <Button type="submit" variant="pill" size="pillSm" disabled={busy || !declared || !platform}>
                     {busy ? "Opening your space…" : "This is me — open my space"}
                   </Button>
                 </form>
