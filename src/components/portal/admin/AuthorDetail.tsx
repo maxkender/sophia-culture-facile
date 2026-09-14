@@ -120,7 +120,12 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
   async function moveToPool(courseId: string) {
     const { error } = await supabase
       .from("courses")
-      .update({ author_id: null, status: "unassigned" })
+      .update({
+        author_id: null,
+        status: "unassigned",
+        released_from: authorId,
+        released_at: new Date().toISOString(),
+      })
       .eq("id", courseId);
     if (error) {
       toast.error("The course could not be moved back to the pool.");
@@ -204,12 +209,23 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
               className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${
                 author.upwork_status === "accepted"
                   ? "bg-portal-green/10 text-portal-green"
-                  : "bg-brand-line text-brand-navySoft"
+                  : author.upwork_status === "declined"
+                    ? "bg-portal-red/10 text-portal-red"
+                    : "bg-brand-line text-brand-navySoft"
               }`}
             >
-              {author.upwork_status === "accepted" ? "Accepted on Upwork" : "Contacted on Upwork"}
+              {author.upwork_status === "accepted"
+                ? "Accepted on Upwork"
+                : author.upwork_status === "declined"
+                  ? "Declined"
+                  : "Contacted on Upwork"}
             </span>
           </p>
+          {author.admin_note ? (
+            <p className="mt-3 rounded-2xl bg-brand-surface p-4 text-sm leading-relaxed text-brand-navy">
+              {author.admin_note}
+            </p>
+          ) : null}
           <p
             className={`mt-2 text-sm font-semibold ${author.examples_reviewed_at ? "text-portal-green" : "text-portal-amber"}`}
           >
