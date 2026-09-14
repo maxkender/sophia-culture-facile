@@ -91,18 +91,49 @@ export function parseBlocks(value: unknown): DocBlock[] {
   return blocks;
 }
 
-export type InlinePart = { text: string; bold?: boolean; italic?: boolean };
+/** Merge fields the contract may use. The admin editor shows them raw; the author page shows them filled. */
+export const MERGE_TOKENS = [
+  "author_name",
+  "author_title",
+  "author_institution",
+  "author_country",
+  "course_count",
+  "fee",
+  "today",
+] as const;
 
-/** Splits a string on **bold** and *italic* markers. */
+export type MergeToken = (typeof MERGE_TOKENS)[number];
+
+export type MergeValues = Partial<Record<MergeToken, string | null>>;
+
+/** What is shown when the profile has nothing for a field. */
+export const MERGE_PLACEHOLDER: Record<MergeToken, string> = {
+  author_name: "full name not provided",
+  author_title: "title not provided",
+  author_institution: "institution not provided",
+  author_country: "country not provided",
+  course_count: "no courses assigned",
+  fee: "fee not set",
+  today: "date not available",
+};
+
+export type InlinePart = { text: string; bold?: boolean; italic?: boolean; token?: MergeToken };
+
+/** Splits a string on **bold**, *italic* markers and {{merge_field}} tokens. */
 export function inlineParts(text: string): InlinePart[] {
   const parts: InlinePart[] = [];
-  const regex = /\*\*(.+?)\*\*|\*(.+?)\*/g;
+  const regex = /\*\*(.+?)\*\*|\*(.+?)\*|\{\{\s*([a-z_]+)\s*\}\}/g;
   let last = 0;
   let match = regex.exec(text);
   while (match) {
     if (match.index > last) parts.push({ text: text.slice(last, match.index) });
     if (match[1] !== undefined) parts.push({ text: match[1], bold: true });
-    else parts.push({ text: match[2] ?? "", italic: true });
+    else if (match[2] !== undefined) parts.push({ text: match[2], italic: true });
+    else {
+      const name = match[3] as MergeToken;
+      if ((MERGE_TOKENS as readonly string[]).includes(name)) parts.push({ text: match[0], token: name });
+      else parts.push({ text: match[0] });
+    }
     last = match.index + match[0].length;
     match = regex.exec(text);
   }
@@ -110,10 +141,51 @@ export function inlineParts(text: string): InlinePart[] {
   return parts;
 }
 
-export function stripMarkers(text: string): string {
+function partText(part: InlinePart, merge?: MergeValues): string {
+  if (!part.token) return part.text;
+  if (!merge) return part.text;
+  const value = merge[part.token];
+  return value && String(value).trim() ? String(value) : `[${MERGE_PLACEHOLDER[part.token]}]`;
+}
+
+export function stripMarkers(text: string, merge?: MergeValues): string {
   return inlineParts(text)
-    .map((part) => part.text)
+    .map((part) => partText(part, merge))
     .join("");
+}
+
+/** Replaces every token in a set of blocks, for exports such as the PDF. */
+export function applyMerge(blocks: DocBlock[], merge: MergeValues): DocBlock[] {
+  const fill = (text: string) => stripMarkersKeepingStyle(text, merge);
+  return blocks.map((block) => {
+    switch (block.type) {
+      case "heading":
+        return { ...block, text: fill(block.text) };
+      case "paragraph":
+        return { ...block, text: fill(block.text) };
+      case "bullets":
+        return { ...block, items: block.items.map(fill) };
+      case "table":
+        return {
+          ...block,
+          rows: block.rows.map(([left, right]) => [fill(left), fill(right)] as [string, string]),
+        };
+      case "callout":
+        return { ...block, title: fill(block.title), body: fill(block.body) };
+      default:
+        return block;
+    }
+  });
+}
+
+/** Replaces tokens only, leaving bold and italic markers in place. */
+function stripMarkersKeepingStyle(text: string, merge: MergeValues): string {
+  return text.replace(/\{\{\s*([a-z_]+)\s*\}\}/g, (raw, name: string) => {
+    if (!(MERGE_TOKENS as readonly string[]).includes(name)) return raw;
+    const token = name as MergeToken;
+    const value = merge[token];
+    return value && String(value).trim() ? String(value) : `[${MERGE_PLACEHOLDER[token]}]`;
+  });
 }
 
 export function documentPlainText(title: string, blocks: DocBlock[]): string {
