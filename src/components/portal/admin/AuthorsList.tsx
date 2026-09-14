@@ -33,7 +33,9 @@ export function AuthorsList() {
     const authors = data?.authors ?? [];
     const term = search.trim().toLowerCase();
     return authors
-      .filter((author) => (platform === "all" ? true : author.platform === platform))
+      .filter((author) =>
+        platform === "all" ? true : platform === "unknown" ? !author.platform : author.platform === platform,
+      )
       .filter((author) =>
         term
           ? [author.full_name, author.email, author.institution, author.country]
@@ -85,6 +87,7 @@ export function AuthorsList() {
               <SelectItem value="all">All platforms</SelectItem>
               <SelectItem value="ios">iOS</SelectItem>
               <SelectItem value="android">Android</SelectItem>
+              <SelectItem value="unknown">Unknown</SelectItem>
             </SelectContent>
           </Select>
         </div>
