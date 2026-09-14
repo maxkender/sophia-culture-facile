@@ -319,6 +319,7 @@ export type Database = {
           created_at: string
           current_version: number
           id: string
+          published: boolean
           slug: string
           title: string
           updated_at: string
@@ -329,6 +330,7 @@ export type Database = {
           created_at?: string
           current_version?: number
           id?: string
+          published?: boolean
           slug: string
           title: string
           updated_at?: string
@@ -339,6 +341,7 @@ export type Database = {
           created_at?: string
           current_version?: number
           id?: string
+          published?: boolean
           slug?: string
           title?: string
           updated_at?: string
@@ -363,6 +366,7 @@ export type Database = {
           country: string | null
           created_at: string
           email: string | null
+          fee: string | null
           full_name: string
           id: string
           institution: string | null
@@ -385,6 +389,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           email?: string | null
+          fee?: string | null
           full_name: string
           id?: string
           institution?: string | null
@@ -407,6 +412,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           email?: string | null
+          fee?: string | null
           full_name?: string
           id?: string
           institution?: string | null
