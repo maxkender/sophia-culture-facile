@@ -259,6 +259,23 @@ export function DocumentEditor({ slug }: { slug: DocumentSlug }) {
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const [viewing, setViewing] = useState<{ version: number; title: string; blocks: DocBlock[] } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+
+  async function setPublished(value: boolean) {
+    if (!doc) return;
+    setPublishing(true);
+    try {
+      const { error } = await supabase.from("documents").update({ published: value }).eq("id", doc.row.id);
+      if (error) throw error;
+      await queryClient.invalidateQueries({ queryKey: ["portal", "document", slug] });
+      await queryClient.invalidateQueries({ queryKey: ["portal", "documents"] });
+      toast.success(value ? "Published. Authors can now read and sign it." : "Back to draft. Authors cannot sign it.");
+    } catch {
+      toast.error("The visibility could not be changed.");
+    } finally {
+      setPublishing(false);
+    }
+  }
 
   useEffect(() => {
     if (doc && loadedFor !== doc.row.id) {
