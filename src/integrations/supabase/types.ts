@@ -657,6 +657,10 @@ export type Database = {
           bio: string | null
           country: string | null
           created_at: string
+          declaration_accepted_at: string | null
+          declaration_ip: string | null
+          declaration_snapshot: Json | null
+          declaration_user_agent: string | null
           display_name: string | null
           display_title: string | null
           email: string | null
@@ -691,6 +695,10 @@ export type Database = {
           bio?: string | null
           country?: string | null
           created_at?: string
+          declaration_accepted_at?: string | null
+          declaration_ip?: string | null
+          declaration_snapshot?: Json | null
+          declaration_user_agent?: string | null
           display_name?: string | null
           display_title?: string | null
           email?: string | null
@@ -725,6 +733,10 @@ export type Database = {
           bio?: string | null
           country?: string | null
           created_at?: string
+          declaration_accepted_at?: string | null
+          declaration_ip?: string | null
+          declaration_snapshot?: Json | null
+          declaration_user_agent?: string | null
           display_name?: string | null
           display_title?: string | null
           email?: string | null

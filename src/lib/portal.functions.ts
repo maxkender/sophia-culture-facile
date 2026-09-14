@@ -149,6 +149,8 @@ export const claimInvite = createServerFn({ method: "POST" })
         token: z.string().min(4).max(200),
         password: z.string().min(8).max(200),
         email: z.string().email().max(200).optional(),
+        declaration: z.literal(true),
+        userAgent: z.string().max(400).optional(),
       })
       .parse(data),
   )
@@ -192,11 +194,38 @@ export const claimInvite = createServerFn({ method: "POST" })
       userId = created.user.id;
     }
 
+    // The declaration is tied to the values the author actually declared, so snapshot them now.
+    const { data: current } = await supabaseAdmin
+      .from("profiles")
+      .select("display_name, display_title, institution")
+      .eq("id", profile.id)
+      .maybeSingle();
+    const { data: declaredEducation } = await supabaseAdmin
+      .from("education_records")
+      .select("degree, field, institution, year")
+      .eq("profile_id", profile.id)
+      .order("order_index");
+
+    const headers = getRequest()?.headers;
+    const forwarded = headers?.get("x-forwarded-for") ?? "";
+    const declarationIp =
+      headers?.get("cf-connecting-ip") ?? (forwarded ? forwarded.split(",")[0]?.trim() : null) ?? null;
+
+    const now = new Date().toISOString();
     const query = supabaseAdmin
       .from("profiles")
       .update({
         user_id: userId,
-        activated_at: new Date().toISOString(),
+        activated_at: now,
+        declaration_accepted_at: now,
+        declaration_ip: declarationIp,
+        declaration_user_agent: data.userAgent ?? headers?.get("user-agent") ?? null,
+        declaration_snapshot: {
+          display_name: current?.display_name ?? profile.display_name ?? profile.full_name ?? null,
+          display_title: current?.display_title ?? profile.display_title ?? null,
+          institution: current?.institution ?? profile.institution ?? null,
+          education: declaredEducation ?? [],
+        },
         ...(profile.is_test ? {} : { invite_token: null, invite_expires_at: null }),
       })
       .eq("id", profile.id);

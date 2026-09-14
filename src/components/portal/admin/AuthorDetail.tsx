@@ -46,6 +46,7 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
   const [bulk, setBulk] = useState("");
   const [fee, setFee] = useState<string | null>(null);
   const [byline, setByline] = useState<string | null>(null);
+  const [showDeclaration, setShowDeclaration] = useState(false);
   const [institution, setInstitution] = useState<string | null>(null);
   const [form, setForm] = useState({ lot_code: "", subject_area: "", title: "", subtitle: "", brief_note: "", due_date: "" });
 
@@ -233,6 +234,33 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
               ? `Examples read on ${formatDate(author.examples_reviewed_at)}`
               : "Examples not read yet — their courses are locked"}
           </p>
+          {author.declaration_accepted_at ? (
+            <p className="mt-1 text-sm font-semibold text-portal-green">
+              Declaration accepted on {formatDate(author.declaration_accepted_at)}
+              <button
+                type="button"
+                className="ml-2 text-sm font-semibold text-portal-accent underline-offset-4 hover:underline"
+                onClick={() => setShowDeclaration((open) => !open)}
+              >
+                {showDeclaration ? "Hide snapshot" : "View snapshot"}
+              </button>
+            </p>
+          ) : (
+            <p className="mt-1 text-sm font-semibold text-portal-amber">Not declared</p>
+          )}
+          {showDeclaration && author.declaration_accepted_at ? (
+            <div className="mt-2 rounded-2xl bg-brand-surface p-4 text-sm text-brand-navy">
+              <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">
+                Declared on {formatDateTime(author.declaration_accepted_at)}
+              </p>
+              <pre className="mt-2 whitespace-pre-wrap break-words text-xs leading-relaxed text-brand-navySoft">
+                {JSON.stringify(author.declaration_snapshot ?? {}, null, 2)}
+              </pre>
+              <p className="mt-2 text-xs text-brand-navySoft">
+                IP {author.declaration_ip ?? "unknown"} — {author.declaration_user_agent ?? "unknown device"}
+              </p>
+            </div>
+          ) : null}
           {author.bio ? <p className="mt-3 text-sm leading-relaxed text-brand-navySoft">{author.bio}</p> : null}
           <div className="mt-4 space-y-1">
             <Label htmlFor="fee">Fee (shown in their contract)</Label>

@@ -86,6 +86,7 @@ export function InvitePage({ token }: { token: string }) {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<{ password?: string; confirm?: string; email?: string }>({});
   const [busy, setBusy] = useState(false);
+  const [declared, setDeclared] = useState(false);
   const [sent, setSent] = useState(false);
   const saveProfile = useServerFn(updateInviteProfile);
   const [details, setDetails] = useState({
@@ -226,10 +227,26 @@ export function InvitePage({ token }: { token: string }) {
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
+    if (!declared) return;
+
     setBusy(true);
     try {
+      // Save the details first so the declaration snapshot matches what they just confirmed.
+      try {
+        await saveProfile({
+          data: { token, ...details, education, ...(photoFile ? { photo: photoFile } : {}) },
+        });
+      } catch {
+        /* the claim itself matters more than a failed detail save */
+      }
       const result = await claim({
-        data: { token, password, ...(needsEmail ? { email: email.trim().toLowerCase() } : {}) },
+        data: {
+          token,
+          password,
+          declaration: true,
+          userAgent: navigator.userAgent,
+          ...(needsEmail ? { email: email.trim().toLowerCase() } : {}),
+        },
       });
       if (!result.ok) {
         toast.error(
@@ -623,7 +640,26 @@ export function InvitePage({ token }: { token: string }) {
                     />
                     {errors.confirm ? <p className="text-sm font-semibold text-portal-red">{errors.confirm}</p> : null}
                   </div>
-                  <Button type="submit" variant="pill" size="pillSm" disabled={busy}>
+                  <div className="rounded-2xl bg-brand-surface p-4">
+                    <label htmlFor="claim-declaration" className="flex cursor-pointer items-start gap-3">
+                      <input
+                        id="claim-declaration"
+                        type="checkbox"
+                        checked={declared}
+                        onChange={(event) => setDeclared(event.target.checked)}
+                        className="mt-1 size-4 shrink-0 accent-brand-navy"
+                      />
+                      <span className="text-sm font-semibold leading-relaxed text-brand-navy">
+                        I confirm that the details above are accurate, and that the qualifications and titles I have
+                        given are genuinely mine.
+                      </span>
+                    </label>
+                    <p className="mt-2 pl-7 text-xs leading-relaxed text-brand-navySoft">
+                      Your courses are published under your name and your credentials, so this is how we stand behind
+                      them.
+                    </p>
+                  </div>
+                  <Button type="submit" variant="pill" size="pillSm" disabled={busy || !declared}>
                     {busy ? "Opening your space…" : "This is me — open my space"}
                   </Button>
                 </form>
