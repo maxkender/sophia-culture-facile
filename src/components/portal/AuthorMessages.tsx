@@ -10,7 +10,7 @@ import { PageTitle, PortalCard } from "./ui";
 
 type Row = Conversation & { courses: { id: string; title: string } | null; preview: string | null };
 
-export function AuthorMessages({ courseId }: { courseId?: string }) {
+export function AuthorMessages({ courseId }: { courseId?: string | undefined }) {
   const queryClient = useQueryClient();
   const { data: me } = usePortalProfile();
   const profileId = me?.profile?.id ?? null;

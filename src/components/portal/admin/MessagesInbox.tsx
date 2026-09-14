@@ -15,7 +15,7 @@ type Row = Conversation & {
   preview: string | null;
 };
 
-export function MessagesInbox({ conversationId }: { conversationId?: string }) {
+export function MessagesInbox({ conversationId }: { conversationId?: string | undefined }) {
   const { data: me } = usePortalProfile();
   const adminId = me?.profile?.id ?? null;
   const [selected, setSelected] = useState<string | null>(conversationId ?? null);
