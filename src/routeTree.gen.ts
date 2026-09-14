@@ -20,6 +20,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SophiaCultureGeneraleRouteImport } from './routes/sophia-culture-generale'
 import { Route as TelechargerRouteImport } from './routes/telecharger'
 import { Route as DotwellKnownAppleAppSiteAssociationRouteImport } from './routes/[.]well-known.apple-app-site-association'
+import { Route as AuteursSlugRouteImport } from './routes/auteurs.$slug'
 import { Route as AuteursInviteRouteImport } from './routes/auteurs.invite'
 import { Route as CoursIndexRouteImport } from './routes/cours/index'
 import { Route as CoursSlugRouteImport } from './routes/cours/$slug'
@@ -43,6 +44,7 @@ import { Route as AuthenticatedAuteursAdminCodesRouteImport } from './routes/_au
 import { Route as AuthenticatedAuteursAdminSettingsRouteImport } from './routes/_authenticated/auteurs/admin/settings'
 import { Route as AuthenticatedAuteursCoursesIndexRouteImport } from './routes/_authenticated/auteurs/courses.index'
 import { Route as AuthenticatedAuteursCoursesCourseIdRouteImport } from './routes/_authenticated/auteurs/courses.$courseId'
+import { Route as ApiPublicAppCoursesRouteImport } from './routes/api/public/app/courses'
 import { Route as AuthenticatedAuteursAdminAuthorsIndexRouteImport } from './routes/_authenticated/auteurs/admin/authors.index'
 import { Route as AuthenticatedAuteursAdminAuthorsAuthorIdRouteImport } from './routes/_authenticated/auteurs/admin/authors.$authorId'
 import { Route as AuthenticatedAuteursAdminAuthorsNewRouteImport } from './routes/_authenticated/auteurs/admin/authors.new'
@@ -52,6 +54,7 @@ import { Route as AuthenticatedAuteursAdminDocumentsIndexRouteImport } from './r
 import { Route as AuthenticatedAuteursAdminDocumentsSlugRouteImport } from './routes/_authenticated/auteurs/admin/documents.$slug'
 import { Route as AuthenticatedAuteursAdminReviewIndexRouteImport } from './routes/_authenticated/auteurs/admin/review.index'
 import { Route as AuthenticatedAuteursAdminReviewCourseIdRouteImport } from './routes/_authenticated/auteurs/admin/review.$courseId'
+import { Route as ApiPublicAppCoursesSlugRouteImport } from './routes/api/public/app/courses.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -108,6 +111,11 @@ const DotwellKnownAppleAppSiteAssociationRoute =
     path: '/.well-known/apple-app-site-association',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuteursSlugRoute = AuteursSlugRouteImport.update({
+  id: '/auteurs/$slug',
+  path: '/auteurs/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuteursInviteRoute = AuteursInviteRouteImport.update({
   id: '/auteurs/invite',
   path: '/auteurs/invite',
@@ -236,6 +244,11 @@ const AuthenticatedAuteursCoursesCourseIdRoute =
     path: '/auteurs/courses/$courseId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicAppCoursesRoute = ApiPublicAppCoursesRouteImport.update({
+  id: '/api/public/app/courses',
+  path: '/api/public/app/courses',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAuteursAdminAuthorsIndexRoute =
   AuthenticatedAuteursAdminAuthorsIndexRouteImport.update({
     id: '/auteurs/admin/authors/',
@@ -290,6 +303,11 @@ const AuthenticatedAuteursAdminReviewCourseIdRoute =
     path: '/auteurs/admin/review/$courseId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicAppCoursesSlugRoute = ApiPublicAppCoursesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ApiPublicAppCoursesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -302,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
+  '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
@@ -323,6 +342,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/codes': typeof AuthenticatedAuteursAdminCodesRoute
   '/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
+  '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
   '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
@@ -330,6 +350,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
+  '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/auteurs/admin/authors/': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
   '/auteurs/admin/courses/': typeof AuthenticatedAuteursAdminCoursesIndexRoute
   '/auteurs/admin/documents/': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
@@ -346,6 +367,7 @@ export interface FileRoutesByTo {
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
+  '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
@@ -367,6 +389,7 @@ export interface FileRoutesByTo {
   '/auteurs/admin/codes': typeof AuthenticatedAuteursAdminCodesRoute
   '/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
+  '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/auteurs/admin': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses': typeof AuthenticatedAuteursCoursesIndexRoute
   '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
@@ -374,6 +397,7 @@ export interface FileRoutesByTo {
   '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
+  '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/auteurs/admin/authors': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
   '/auteurs/admin/courses': typeof AuthenticatedAuteursAdminCoursesIndexRoute
   '/auteurs/admin/documents': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
@@ -392,6 +416,7 @@ export interface FileRoutesById {
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
+  '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
@@ -413,6 +438,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/codes': typeof AuthenticatedAuteursAdminCodesRoute
   '/_authenticated/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/_authenticated/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
+  '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/_authenticated/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/_authenticated/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
   '/_authenticated/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
@@ -420,6 +446,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   '/_authenticated/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/_authenticated/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
+  '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/_authenticated/auteurs/admin/authors/': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
   '/_authenticated/auteurs/admin/courses/': typeof AuthenticatedAuteursAdminCoursesIndexRoute
   '/_authenticated/auteurs/admin/documents/': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
@@ -438,6 +465,7 @@ export interface FileRouteTypes {
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
+    | '/auteurs/$slug'
     | '/auteurs/invite'
     | '/cours/$slug'
     | '/en/become-a-teacher'
@@ -459,6 +487,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/codes'
     | '/auteurs/admin/settings'
     | '/auteurs/courses/$courseId'
+    | '/api/public/app/courses'
     | '/auteurs/admin/'
     | '/auteurs/courses/'
     | '/auteurs/admin/authors/$authorId'
@@ -466,6 +495,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/courses/$courseId'
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
+    | '/api/public/app/courses/$slug'
     | '/auteurs/admin/authors/'
     | '/auteurs/admin/courses/'
     | '/auteurs/admin/documents/'
@@ -482,6 +512,7 @@ export interface FileRouteTypes {
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
+    | '/auteurs/$slug'
     | '/auteurs/invite'
     | '/cours/$slug'
     | '/en/become-a-teacher'
@@ -503,6 +534,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/codes'
     | '/auteurs/admin/settings'
     | '/auteurs/courses/$courseId'
+    | '/api/public/app/courses'
     | '/auteurs/admin'
     | '/auteurs/courses'
     | '/auteurs/admin/authors/$authorId'
@@ -510,6 +542,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/courses/$courseId'
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
+    | '/api/public/app/courses/$slug'
     | '/auteurs/admin/authors'
     | '/auteurs/admin/courses'
     | '/auteurs/admin/documents'
@@ -527,6 +560,7 @@ export interface FileRouteTypes {
     | '/sophia-culture-generale'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
+    | '/auteurs/$slug'
     | '/auteurs/invite'
     | '/cours/$slug'
     | '/en/become-a-teacher'
@@ -548,6 +582,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/codes'
     | '/_authenticated/auteurs/admin/settings'
     | '/_authenticated/auteurs/courses/$courseId'
+    | '/api/public/app/courses'
     | '/_authenticated/auteurs/admin/'
     | '/_authenticated/auteurs/courses/'
     | '/_authenticated/auteurs/admin/authors/$authorId'
@@ -555,6 +590,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/courses/$courseId'
     | '/_authenticated/auteurs/admin/documents/$slug'
     | '/_authenticated/auteurs/admin/review/$courseId'
+    | '/api/public/app/courses/$slug'
     | '/_authenticated/auteurs/admin/authors/'
     | '/_authenticated/auteurs/admin/courses/'
     | '/_authenticated/auteurs/admin/documents/'
@@ -573,6 +609,7 @@ export interface RootRouteChildren {
   SophiaCultureGeneraleRoute: typeof SophiaCultureGeneraleRoute
   TelechargerRoute: typeof TelechargerRoute
   DotwellKnownAppleAppSiteAssociationRoute: typeof DotwellKnownAppleAppSiteAssociationRoute
+  AuteursSlugRoute: typeof AuteursSlugRoute
   AuteursInviteRoute: typeof AuteursInviteRoute
   CoursSlugRoute: typeof CoursSlugRoute
   EnBecomeATeacherRoute: typeof EnBecomeATeacherRoute
@@ -584,6 +621,7 @@ export interface RootRouteChildren {
   EnIndexRoute: typeof EnIndexRoute
   EnLessonsSlugRoute: typeof EnLessonsSlugRoute
   EnLessonsIndexRoute: typeof EnLessonsIndexRoute
+  ApiPublicAppCoursesRoute: typeof ApiPublicAppCoursesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -663,6 +701,13 @@ declare module '@tanstack/react-router' {
       path: '/.well-known/apple-app-site-association'
       fullPath: '/.well-known/apple-app-site-association'
       preLoaderRoute: typeof DotwellKnownAppleAppSiteAssociationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auteurs/$slug': {
+      id: '/auteurs/$slug'
+      path: '/auteurs/$slug'
+      fullPath: '/auteurs/$slug'
+      preLoaderRoute: typeof AuteursSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auteurs/invite': {
@@ -826,6 +871,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursCoursesCourseIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/app/courses': {
+      id: '/api/public/app/courses'
+      path: '/api/public/app/courses'
+      fullPath: '/api/public/app/courses'
+      preLoaderRoute: typeof ApiPublicAppCoursesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/auteurs/admin/authors/': {
       id: '/_authenticated/auteurs/admin/authors/'
       path: '/auteurs/admin/authors'
@@ -888,6 +940,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auteurs/admin/review/$courseId'
       preLoaderRoute: typeof AuthenticatedAuteursAdminReviewCourseIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/app/courses/$slug': {
+      id: '/api/public/app/courses/$slug'
+      path: '/$slug'
+      fullPath: '/api/public/app/courses/$slug'
+      preLoaderRoute: typeof ApiPublicAppCoursesSlugRouteImport
+      parentRoute: typeof ApiPublicAppCoursesRoute
     }
   }
 }
@@ -956,6 +1015,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface ApiPublicAppCoursesRouteChildren {
+  ApiPublicAppCoursesSlugRoute: typeof ApiPublicAppCoursesSlugRoute
+}
+
+const ApiPublicAppCoursesRouteChildren: ApiPublicAppCoursesRouteChildren = {
+  ApiPublicAppCoursesSlugRoute: ApiPublicAppCoursesSlugRoute,
+}
+
+const ApiPublicAppCoursesRouteWithChildren =
+  ApiPublicAppCoursesRoute._addFileChildren(ApiPublicAppCoursesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -969,6 +1039,7 @@ const rootRouteChildren: RootRouteChildren = {
   TelechargerRoute: TelechargerRoute,
   DotwellKnownAppleAppSiteAssociationRoute:
     DotwellKnownAppleAppSiteAssociationRoute,
+  AuteursSlugRoute: AuteursSlugRoute,
   AuteursInviteRoute: AuteursInviteRoute,
   CoursSlugRoute: CoursSlugRoute,
   EnBecomeATeacherRoute: EnBecomeATeacherRoute,
@@ -980,6 +1051,7 @@ const rootRouteChildren: RootRouteChildren = {
   EnIndexRoute: EnIndexRoute,
   EnLessonsSlugRoute: EnLessonsSlugRoute,
   EnLessonsIndexRoute: EnLessonsIndexRoute,
+  ApiPublicAppCoursesRoute: ApiPublicAppCoursesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

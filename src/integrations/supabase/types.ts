@@ -213,7 +213,10 @@ export type Database = {
           lot_code: string | null
           lot_name: string | null
           order_index: number
+          public_full_text: boolean
+          published_at: string | null
           review_comment: string | null
+          slug: string | null
           status: Database["public"]["Enums"]["course_status"]
           subject_area: string | null
           submitted_at: string | null
@@ -230,7 +233,10 @@ export type Database = {
           lot_code?: string | null
           lot_name?: string | null
           order_index?: number
+          public_full_text?: boolean
+          published_at?: string | null
           review_comment?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["course_status"]
           subject_area?: string | null
           submitted_at?: string | null
@@ -247,7 +253,10 @@ export type Database = {
           lot_code?: string | null
           lot_name?: string | null
           order_index?: number
+          public_full_text?: boolean
+          published_at?: string | null
           review_comment?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["course_status"]
           subject_area?: string | null
           submitted_at?: string | null
@@ -357,6 +366,47 @@ export type Database = {
           },
         ]
       }
+      education_records: {
+        Row: {
+          created_at: string
+          degree: string | null
+          field: string | null
+          id: string
+          institution: string | null
+          order_index: number
+          profile_id: string
+          year: string | null
+        }
+        Insert: {
+          created_at?: string
+          degree?: string | null
+          field?: string | null
+          id?: string
+          institution?: string | null
+          order_index?: number
+          profile_id: string
+          year?: string | null
+        }
+        Update: {
+          created_at?: string
+          degree?: string | null
+          field?: string | null
+          id?: string
+          institution?: string | null
+          order_index?: number
+          profile_id?: string
+          year?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "education_records_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           access_code: string | null
@@ -365,6 +415,7 @@ export type Database = {
           bio: string | null
           country: string | null
           created_at: string
+          display_name: string | null
           display_title: string | null
           email: string | null
           examples_reviewed_at: string | null
@@ -377,9 +428,14 @@ export type Database = {
           invite_token: string | null
           invited_at: string | null
           is_test: boolean
+          orcid: string | null
+          personal_site: string | null
           photo_url: string | null
           platform: Database["public"]["Enums"]["device_platform"] | null
+          public_slug: string | null
           role: Database["public"]["Enums"]["portal_role"]
+          scholar_url: string | null
+          short_bio: string | null
           title: string | null
           updated_at: string
           upwork_status: string
@@ -392,6 +448,7 @@ export type Database = {
           bio?: string | null
           country?: string | null
           created_at?: string
+          display_name?: string | null
           display_title?: string | null
           email?: string | null
           examples_reviewed_at?: string | null
@@ -404,9 +461,14 @@ export type Database = {
           invite_token?: string | null
           invited_at?: string | null
           is_test?: boolean
+          orcid?: string | null
+          personal_site?: string | null
           photo_url?: string | null
           platform?: Database["public"]["Enums"]["device_platform"] | null
+          public_slug?: string | null
           role?: Database["public"]["Enums"]["portal_role"]
+          scholar_url?: string | null
+          short_bio?: string | null
           title?: string | null
           updated_at?: string
           upwork_status?: string
@@ -419,6 +481,7 @@ export type Database = {
           bio?: string | null
           country?: string | null
           created_at?: string
+          display_name?: string | null
           display_title?: string | null
           email?: string | null
           examples_reviewed_at?: string | null
@@ -431,9 +494,14 @@ export type Database = {
           invite_token?: string | null
           invited_at?: string | null
           is_test?: boolean
+          orcid?: string | null
+          personal_site?: string | null
           photo_url?: string | null
           platform?: Database["public"]["Enums"]["device_platform"] | null
+          public_slug?: string | null
           role?: Database["public"]["Enums"]["portal_role"]
+          scholar_url?: string | null
+          short_bio?: string | null
           title?: string | null
           updated_at?: string
           upwork_status?: string
@@ -519,7 +587,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      slugify: { Args: { value: string }; Returns: string }
+      unaccent_fallback: { Args: { value: string }; Returns: string }
     }
     Enums: {
       application_state: "pending" | "approved" | "rejected"
