@@ -26,6 +26,7 @@ import { usePortalProfile } from "./usePortal";
 import { useNavCounts } from "./useNavCounts";
 import { ADMIN_NAV, AUTHOR_NAV, sectionLabel, type NavGroup } from "./nav";
 import { CommandPalette } from "./CommandPalette";
+import { AnnouncementGate } from "./Announcements";
 import { Banner, PortalCard } from "./ui";
 
 const COLLAPSE_KEY = "sophia.portal.sidebar.collapsed";
@@ -222,6 +223,7 @@ export function PortalShell({
   return (
     <div className="min-h-screen bg-portal-bg">
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} isAdmin={Boolean(isAdmin)} />
+      {profile && !isAdmin ? <AnnouncementGate profileId={profile.id} /> : null}
 
       <aside
         className={cn(

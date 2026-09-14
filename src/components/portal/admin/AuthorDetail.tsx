@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatDate, formatDateTime, inviteUrl, newInviteToken, type Course, type Profile } from "@/lib/portal";
 import type { CourseStatus } from "@/config/portal";
 import { Banner, CopyButton, PageTitle, PortalCard, StatusPill } from "../ui";
+import { OpenThreadButton } from "../OpenThreadButton";
 
 type Lot = {
   key: string;
@@ -179,7 +180,11 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
           Test account — excluded from dashboard figures
         </p>
       ) : null}
-      <PageTitle title={author.full_name} lead={[author.title, author.institution, author.country].filter(Boolean).join(" · ")} />
+      <PageTitle
+        title={author.full_name}
+        lead={[author.title, author.institution, author.country].filter(Boolean).join(" · ")}
+        action={<OpenThreadButton profileId={author.id} />}
+      />
 
       <div className="grid gap-5 lg:grid-cols-3">
         <PortalCard>

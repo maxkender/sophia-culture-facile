@@ -9,6 +9,7 @@ import { formatDate, type Course } from "@/lib/portal";
 import { usePortalProfile } from "./usePortal";
 import { CourseCard, ExamplesLockNotice } from "./CourseCards";
 import { CopyButton, EmptyState, PageTitle, PortalCard } from "./ui";
+import { AnnouncementBanners } from "./Announcements";
 
 const TAAP_LINK = "https://taap.it/sophia.culture";
 
@@ -90,8 +91,10 @@ export function AuthorHome() {
     <div>
       <PageTitle
         title={`Welcome${firstName ? `, ${firstName}` : ""}`}
-        lead="Everything you need is here: the app, the format, the guide and your commissioned courses. Fees, invoices and messages stay in Upwork."
+        lead="Everything you need is here: the app, the format, the guide, your commissioned courses and your messages with the editorial desk. Fees and invoices stay in Upwork."
       />
+
+      {profile ? <AnnouncementBanners profileId={profile.id} /> : null}
 
       <div className="mb-4 flex items-baseline justify-between gap-4">
         <h2 className="text-xl font-extrabold text-brand-navy">Before you write</h2>

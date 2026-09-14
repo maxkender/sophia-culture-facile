@@ -10,6 +10,8 @@ import {
   KeyRound,
   LayoutDashboard,
   Library,
+  Megaphone,
+  MessageSquare,
   Settings,
   Sparkles,
   UserCircle,
@@ -18,7 +20,14 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-export type NavBadge = "review" | "myCourses" | "codes" | "applications" | "requests";
+export type NavBadge =
+  | "review"
+  | "myCourses"
+  | "codes"
+  | "applications"
+  | "requests"
+  | "messages"
+  | "adminMessages";
 
 export type NavItem = {
   to: string;
@@ -37,6 +46,7 @@ export const AUTHOR_NAV: NavGroup[] = [
       { to: "/auteurs", label: "Home", icon: Home, exact: true },
       { to: "/auteurs/courses", label: "My courses", icon: Library, badge: "myCourses" },
       { to: "/auteurs/open", label: "Open courses", icon: Compass },
+      { to: "/auteurs/messages", label: "Messages", icon: MessageSquare, badge: "messages" },
       { to: "/auteurs/examples", label: "Examples", icon: Sparkles },
       { to: "/auteurs/profile", label: "Profile", icon: UserCircle },
     ],
@@ -56,6 +66,7 @@ export const ADMIN_NAV: NavGroup[] = [
     items: [
       { to: "/auteurs/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
       { to: "/auteurs/admin/review", label: "Review queue", icon: UserCheck, badge: "review" },
+      { to: "/auteurs/admin/messages", label: "Messages", icon: MessageSquare, badge: "adminMessages" },
     ],
   },
   {
@@ -71,6 +82,7 @@ export const ADMIN_NAV: NavGroup[] = [
     heading: "Ressources",
     items: [
       { to: "/auteurs/admin/documents", label: "Documents", icon: Library },
+      { to: "/auteurs/admin/announcements", label: "Announcements", icon: Megaphone },
       { to: "/auteurs/admin/codes", label: "Access codes", icon: KeyRound, badge: "codes" },
     ],
   },

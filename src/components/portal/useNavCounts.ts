@@ -9,6 +9,7 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
     queryKey: ["portal", "nav-counts", "admin"],
     enabled: isAdmin,
     staleTime: 30_000,
+    refetchInterval: 60_000,
     queryFn: async () => {
       const count = async (
         table: "courses" | "access_codes" | "applications" | "course_requests",
@@ -21,13 +22,14 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
           .eq(column, value);
         return n ?? 0;
       };
-      const [review, codes, applications, requests] = await Promise.all([
+      const [review, codes, applications, requests, threads] = await Promise.all([
         count("courses", "status", "submitted"),
         count("access_codes", "state", "available"),
         count("applications", "status", "pending"),
         count("course_requests", "status", "pending"),
+        supabase.from("conversations").select("id", { count: "exact", head: true }).gt("admin_unread", 0),
       ]);
-      return { review, codes, applications, requests } satisfies NavCounts;
+      return { review, codes, applications, requests, adminMessages: threads.count ?? 0 } satisfies NavCounts;
     },
   });
 
@@ -35,13 +37,18 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
     queryKey: ["portal", "nav-counts", "author", profileId],
     enabled: !isAdmin && Boolean(profileId),
     staleTime: 30_000,
+    refetchInterval: 60_000,
     queryFn: async () => {
-      const { count } = await supabase
-        .from("courses")
-        .select("id", { count: "exact", head: true })
-        .eq("author_id", profileId!)
-        .in("status", ["assigned", "in_progress", "changes_requested"]);
-      return { myCourses: count ?? 0 } satisfies NavCounts;
+      const [{ count }, { data: threads }] = await Promise.all([
+        supabase
+          .from("courses")
+          .select("id", { count: "exact", head: true })
+          .eq("author_id", profileId!)
+          .in("status", ["assigned", "in_progress", "changes_requested"]),
+        supabase.from("conversations").select("author_unread").eq("profile_id", profileId!),
+      ]);
+      const messages = (threads ?? []).reduce((sum, row) => sum + (row.author_unread ?? 0), 0);
+      return { myCourses: count ?? 0, messages } satisfies NavCounts;
     },
   });
 
