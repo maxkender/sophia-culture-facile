@@ -12,13 +12,19 @@ export type InvitePreview = {
     full_name: string;
     email: string | null;
     title: string | null;
+    display_name: string | null;
     display_title: string | null;
     institution: string | null;
     country: string | null;
     bio: string | null;
+    short_bio: string | null;
+    orcid: string | null;
+    personal_site: string | null;
+    scholar_url: string | null;
     platform: string | null;
     photo_url: string | null;
   } | null;
+  education: { degree: string | null; field: string | null; institution: string | null; year: string | null }[];
   courses: { id: string; title: string; subtitle: string | null; lot_code: string | null; lot_name: string | null; subject_area: string | null; due_date: string | null }[];
   hasAccount: boolean;
 };
@@ -63,13 +69,19 @@ export const getInvite = createServerFn({ method: "POST" })
     const { supabaseAdmin, profile } = await loadInvite(data.token);
     const state = inviteState(profile);
     if (!profile || state !== "ok") {
-      return { state, profile: null, courses: [], hasAccount: false };
+      return { state, profile: null, courses: [], education: [], hasAccount: false };
     }
 
     const { data: courses } = await supabaseAdmin
       .from("courses")
       .select("id, title, subtitle, lot_code, lot_name, subject_area, due_date")
       .eq("author_id", profile.id)
+      .order("order_index");
+
+    const { data: education } = await supabaseAdmin
+      .from("education_records")
+      .select("degree, field, institution, year")
+      .eq("profile_id", profile.id)
       .order("order_index");
 
     let photo: string | null = null;
@@ -87,14 +99,25 @@ export const getInvite = createServerFn({ method: "POST" })
         full_name: profile.full_name,
         email: profile.email,
         title: profile.title,
+        display_name: profile.display_name ?? profile.full_name,
         display_title: profile.display_title,
         institution: profile.institution,
         country: profile.country,
         bio: profile.bio,
+        short_bio: profile.short_bio,
+        orcid: profile.orcid,
+        personal_site: profile.personal_site,
+        scholar_url: profile.scholar_url,
         platform: profile.platform,
         photo_url: photo,
       },
       courses: courses ?? [],
+      education: (education ?? []).map((row) => ({
+        degree: row.degree,
+        field: row.field,
+        institution: row.institution,
+        year: row.year,
+      })),
       hasAccount: profile.email ? await accountExists(profile.email) : false,
     };
   });
