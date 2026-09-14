@@ -11,6 +11,35 @@ import { formatDate, formatDateTime, inviteUrl, newInviteToken, type Course, typ
 import type { CourseStatus } from "@/config/portal";
 import { Banner, CopyButton, PageTitle, PortalCard, StatusPill } from "../ui";
 
+type Lot = {
+  key: string;
+  lot_code: string | null;
+  lot_name: string | null;
+  subject_area: string | null;
+  courses: Course[];
+};
+
+/** Groups an author's courses by lot, keeping the assigned order. */
+function groupByLot(courses: Course[]): Lot[] {
+  const lots: Lot[] = [];
+  for (const course of courses) {
+    const key = course.lot_code ?? course.lot_name ?? "none";
+    let lot = lots.find((entry) => entry.key === key);
+    if (!lot) {
+      lot = {
+        key,
+        lot_code: course.lot_code,
+        lot_name: course.lot_name,
+        subject_area: course.subject_area,
+        courses: [],
+      };
+      lots.push(lot);
+    }
+    lot.courses.push(course);
+  }
+  return lots;
+}
+
 export function AuthorDetail({ authorId }: { authorId: string }) {
   const queryClient = useQueryClient();
   const [bulk, setBulk] = useState("");
