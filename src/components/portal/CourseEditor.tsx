@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, ExternalLink, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, MessageSquare, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ import {
 import { countWords, formatDate, type Course, type Source } from "@/lib/portal";
 import { usePortalProfile } from "./usePortal";
 import { ExamplesLockNotice } from "./CourseCards";
+import { OpenThreadButton } from "./OpenThreadButton";
 import { Banner, BoldText, ConfirmButton, PageTitle, PortalCard, StatusPill } from "./ui";
 
 type ScreenDraft = { id: string | null; screen_title: string; body: string; image_idea: string };
@@ -312,6 +313,32 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
             <p className="mt-2 text-sm leading-relaxed text-brand-navy">{course.brief_note}</p>
           </PortalCard>
         ) : null}
+
+        <PortalCard className="flex flex-wrap items-center justify-between gap-4 bg-portal-bg shadow-none ring-1 ring-brand-line">
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-brand-navy">
+              {admin ? "Talk to the author about this course" : "Message us about this course"}
+            </p>
+            <p className="mt-1 text-sm text-brand-navySoft">
+              {admin
+                ? "Opens the thread attached to this course."
+                : "A question on the angle, a source or the deadline. It opens the thread for this course."}
+            </p>
+          </div>
+          {admin ? (
+            course.author_id ? (
+              <OpenThreadButton profileId={course.author_id} courseId={course.id} label="Open the thread" />
+            ) : (
+              <span className="text-sm text-brand-navySoft">No author assigned yet.</span>
+            )
+          ) : (
+            <Button asChild variant="pillSecondary" size="pillSm">
+              <Link to="/auteurs/messages" search={{ course: course.id }}>
+                <MessageSquare className="size-4" aria-hidden="true" /> Open the thread
+              </Link>
+            </Button>
+          )}
+        </PortalCard>
 
         <PortalCard className="space-y-4">
           <div className="space-y-2">
