@@ -40,7 +40,7 @@ export function AdminDashboard() {
 
   const accepted = authors.filter((author) => author.upwork_status === "accepted").length;
   const awaiting = authors.length - accepted;
-  const commissionedValue = courses.length * COURSE_FEE_USD;
+  const commissionedValue = assignedCourses.length * COURSE_FEE_USD;
 
   return (
     <div>
@@ -49,8 +49,13 @@ export function AdminDashboard() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <PortalCard>
           <p className="text-sm font-semibold text-brand-navySoft">Courses commissioned</p>
-          <p className="mt-2 text-3xl font-extrabold text-brand-navy">{courses.length}</p>
-          <p className="mt-1 text-xs text-brand-navySoft">across {authors.length} authors</p>
+          <p className="mt-2 text-3xl font-extrabold text-brand-navy">{assignedCourses.length}</p>
+          <p className="mt-1 text-xs text-brand-navySoft">across {authors.length} active authors</p>
+        </PortalCard>
+        <PortalCard>
+          <p className="text-sm font-semibold text-brand-navySoft">In the pool</p>
+          <p className="mt-2 text-3xl font-extrabold text-portal-amber">{pooledCourses.length}</p>
+          <p className="mt-1 text-xs text-brand-navySoft">waiting for an author</p>
         </PortalCard>
         <PortalCard>
           <p className="text-sm font-semibold text-brand-navySoft">Accepted on Upwork</p>
