@@ -136,15 +136,19 @@ export function AuthorsList() {
                     <td className="py-3 pr-4 text-brand-navySoft">{author.institution ?? "—"}</td>
                     <td className="py-3 pr-4 text-brand-navySoft">{author.country ?? "—"}</td>
                     <td className="py-3 pr-4">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${
-                          author.upwork_status === "accepted"
-                            ? "bg-portal-green/10 text-portal-green"
-                            : "bg-brand-line text-brand-navySoft"
-                        }`}
-                      >
-                        {author.upwork_status === "accepted" ? "Accepted" : "Contacted"}
-                      </span>
+                      {author.is_test ? (
+                        <span className="text-brand-navySoft">—</span>
+                      ) : (
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${
+                            author.upwork_status === "accepted"
+                              ? "bg-portal-green/10 text-portal-green"
+                              : "bg-brand-line text-brand-navySoft"
+                          }`}
+                        >
+                          {author.upwork_status === "accepted" ? "Accepted" : "Contacted"}
+                        </span>
+                      )}
                     </td>
                     <td className="py-3 pr-4 text-brand-navySoft">
                       {author.platform === "android" ? (
