@@ -44,26 +44,20 @@ const BERLIN: Shot[] = [
 ];
 
 function PhoneShot({ shot }: { shot: Shot }) {
-  const [broken, setBroken] = useState(false);
+  const url = URLS[shot.file];
   return (
     <figure className="mx-auto w-full max-w-[300px]">
       <figcaption className="mb-2 text-center text-xs font-semibold uppercase tracking-wide text-brand-navySoft">
         {shot.label}
       </figcaption>
       <div className="overflow-hidden rounded-[2rem] border border-brand-line bg-card shadow-portal">
-        {broken ? (
-          <div className="flex aspect-[9/19.5] flex-col items-center justify-center gap-2 bg-portal-bg px-6 text-center">
-            <p className="text-sm font-bold text-brand-navy">Screenshot missing</p>
-            <p className="font-mono text-xs text-brand-navySoft">/examples/{shot.file}</p>
-          </div>
+        {url ? (
+          <img src={url} alt={shot.label} loading="lazy" className="block w-full" />
         ) : (
-          <img
-            src={`/examples/${shot.file}`}
-            alt={shot.label}
-            loading="lazy"
-            className="block w-full"
-            onError={() => setBroken(true)}
-          />
+          <div className="flex aspect-[9/19.5] flex-col items-center justify-center gap-2 bg-portal-bg px-6 text-center">
+            <p className="text-sm font-bold text-brand-navy">Screenshot coming soon</p>
+            <p className="font-mono text-xs text-brand-navySoft">{shot.file}</p>
+          </div>
         )}
       </div>
     </figure>
