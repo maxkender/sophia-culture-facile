@@ -249,7 +249,7 @@ export function PortalShell({
             type="button"
             onClick={toggleCollapsed}
             className={cn(
-              "mt-2 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-brand-navySoft transition hover:bg-brand-navy/5",
+              "mt-2 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-brand-navy transition hover:bg-brand-navy/10",
               collapsed && "justify-center px-0",
             )}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
