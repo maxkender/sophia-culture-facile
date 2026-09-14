@@ -40,7 +40,14 @@ export function AdminDashboard() {
 
   const accepted = authors.filter((author) => author.upwork_status === "accepted").length;
   const awaiting = authors.length - accepted;
-  const commissionedValue = assignedCourses.length * COURSE_FEE_USD;
+  // Each course carries its own agreed fee; the default stays the standard rate.
+  const commissionedValue = assignedCourses.reduce(
+    (total, course) => total + (course.fee_usd ?? COURSE_FEE_USD),
+    0,
+  );
+  const rates = Array.from(new Set(assignedCourses.map((course) => course.fee_usd ?? COURSE_FEE_USD))).sort(
+    (a, b) => a - b,
+  );
 
   return (
     <div>
@@ -72,7 +79,11 @@ export function AdminDashboard() {
           <p className="mt-2 text-3xl font-extrabold text-brand-navy">
             ${commissionedValue.toLocaleString("en-US")}
           </p>
-          <p className="mt-1 text-xs text-brand-navySoft">at ${COURSE_FEE_USD} per course</p>
+          <p className="mt-1 text-xs text-brand-navySoft">
+            {rates.length > 1
+              ? `at $${rates[0]} to $${rates[rates.length - 1]} per course`
+              : `at $${rates[0] ?? COURSE_FEE_USD} per course`}
+          </p>
         </PortalCard>
         <PortalCard>
           <p className="text-sm font-semibold text-brand-navySoft">Examples reviewed</p>
