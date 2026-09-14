@@ -51,6 +51,21 @@ function groupByLot(courses: InviteCourse[]): InviteLot[] {
   return lots;
 }
 
+/** Small coloured tag telling the author whether a field must be filled in. */
+function Tag({ kind }: { kind: "optional" | "required" }) {
+  return (
+    <span
+      className={
+        kind === "optional"
+          ? "ml-2 rounded-full bg-portal-accent/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-portal-accent"
+          : "ml-2 rounded-full bg-portal-red/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-portal-red"
+      }
+    >
+      {kind === "optional" ? "Optional" : "Required"}
+    </span>
+  );
+}
+
 type EducationRow = { degree: string; field: string; institution: string; year: string };
 
 function patchRow(rows: EducationRow[], index: number, patch: Partial<EducationRow>): EducationRow[] {
@@ -328,9 +343,14 @@ export function InvitePage({ token }: { token: string }) {
                 <p className="mt-1 text-xs text-brand-navySoft">
                   This is the exact line printed under every course you write. Correct it if anything is wrong.
                 </p>
+                <p className="mt-3 text-xs font-semibold text-brand-navySoft">
+                  Everything in this card is <span className="text-portal-accent">optional</span> and can be changed later
+                  from your space. Only the email address and password at the bottom of the page are{" "}
+                  <span className="text-portal-red">required</span> to open your account.
+                </p>
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="inv-display">Byline</Label>
+                    <Label htmlFor="inv-display">Byline<Tag kind="optional" /></Label>
                     <Input
                       id="inv-display"
                       className="h-11"
@@ -339,7 +359,7 @@ export function InvitePage({ token }: { token: string }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="inv-title">Title</Label>
+                    <Label htmlFor="inv-title">Title<Tag kind="optional" /></Label>
                     <Input
                       id="inv-title"
                       className="h-11"
@@ -348,7 +368,7 @@ export function InvitePage({ token }: { token: string }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="inv-institution">Institution</Label>
+                    <Label htmlFor="inv-institution">Institution<Tag kind="optional" /></Label>
                     <Input
                       id="inv-institution"
                       className="h-11"
@@ -357,7 +377,7 @@ export function InvitePage({ token }: { token: string }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="inv-country">Country</Label>
+                    <Label htmlFor="inv-country">Country<Tag kind="optional" /></Label>
                     <Input
                       id="inv-country"
                       className="h-11"
@@ -366,7 +386,7 @@ export function InvitePage({ token }: { token: string }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="inv-photo">Photo</Label>
+                    <Label htmlFor="inv-photo">Photo<Tag kind="optional" /></Label>
                     <Input
                       id="inv-photo"
                       type="file"
@@ -376,7 +396,7 @@ export function InvitePage({ token }: { token: string }) {
                     />
                   </div>
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="inv-bio">Short biography</Label>
+                    <Label htmlFor="inv-bio">Short biography<Tag kind="optional" /></Label>
                     <Textarea
                       id="inv-bio"
                       rows={4}
@@ -387,7 +407,7 @@ export function InvitePage({ token }: { token: string }) {
                 </div>
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="inv-name">Name you publish under</Label>
+                    <Label htmlFor="inv-name">Name you publish under<Tag kind="optional" /></Label>
                     <Input
                       id="inv-name"
                       className="h-11"
@@ -396,7 +416,7 @@ export function InvitePage({ token }: { token: string }) {
                     />
                   </div>
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="inv-short">Published biography (300 characters)</Label>
+                    <Label htmlFor="inv-short">Published biography (300 characters)<Tag kind="optional" /></Label>
                     <Textarea
                       id="inv-short"
                       rows={3}
@@ -407,7 +427,7 @@ export function InvitePage({ token }: { token: string }) {
                     <p className="text-xs text-brand-navySoft">{details.short_bio.length} / 300</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="inv-orcid">ORCID</Label>
+                    <Label htmlFor="inv-orcid">ORCID<Tag kind="optional" /></Label>
                     <Input
                       id="inv-orcid"
                       className="h-11"
@@ -416,7 +436,7 @@ export function InvitePage({ token }: { token: string }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="inv-site">Personal site</Label>
+                    <Label htmlFor="inv-site">Personal site<Tag kind="optional" /></Label>
                     <Input
                       id="inv-site"
                       className="h-11"
@@ -425,7 +445,7 @@ export function InvitePage({ token }: { token: string }) {
                     />
                   </div>
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="inv-scholar">Google Scholar or publication list</Label>
+                    <Label htmlFor="inv-scholar">Google Scholar or publication list<Tag kind="optional" /></Label>
                     <Input
                       id="inv-scholar"
                       className="h-11"
@@ -436,7 +456,10 @@ export function InvitePage({ token }: { token: string }) {
                 </div>
 
                 <p className="mt-6 text-sm font-bold text-brand-navy">Education</p>
-                <p className="mt-1 text-xs text-brand-navySoft">Most recent first. This is published on your page.</p>
+                <p className="mt-1 text-xs text-brand-navySoft">
+                  Most recent first. This is published on your page.
+                  <span className="ml-1 font-semibold text-portal-accent">Optional.</span>
+                </p>
                 <div className="mt-3 space-y-3">
                   {education.map((row, index) => (
                     <div key={index} className="grid gap-3 md:grid-cols-[1fr_1fr_1.4fr_auto_auto]">
@@ -555,13 +578,13 @@ export function InvitePage({ token }: { token: string }) {
                 <h2 className="text-lg font-extrabold text-brand-navy">Confirm it is you</h2>
                 <p className="mt-2 text-sm text-brand-navySoft">
                   {needsEmail
-                    ? "Give the email address you want to sign in with, then set a password. This link works once and then stops working."
+                    ? "We do not have an email address for you: Upwork does not show it to us. Choose the address you want to sign in with, then set a password. This link works once and then stops working."
                     : `Set a password for ${profile.email}. This link works once and then stops working.`}
                 </p>
                 <form onSubmit={submit} className="mt-5 max-w-md space-y-5">
                   {needsEmail ? (
                     <div className="space-y-2">
-                      <Label htmlFor="claim-email">Your email address</Label>
+                      <Label htmlFor="claim-email">Your email address<Tag kind="required" /></Label>
                       <Input
                         id="claim-email"
                         type="email"
@@ -575,7 +598,7 @@ export function InvitePage({ token }: { token: string }) {
                     </div>
                   ) : null}
                   <div className="space-y-2">
-                    <Label htmlFor="claim-password">Password</Label>
+                    <Label htmlFor="claim-password">Password<Tag kind="required" /></Label>
                     <Input
                       id="claim-password"
                       type="password"
@@ -588,7 +611,7 @@ export function InvitePage({ token }: { token: string }) {
                     {errors.password ? <p className="text-sm font-semibold text-portal-red">{errors.password}</p> : null}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="claim-confirm">Repeat the password</Label>
+                    <Label htmlFor="claim-confirm">Repeat the password<Tag kind="required" /></Label>
                     <Input
                       id="claim-confirm"
                       type="password"
