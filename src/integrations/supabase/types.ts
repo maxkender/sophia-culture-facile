@@ -600,6 +600,7 @@ export type Database = {
         | "changes_requested"
         | "accepted"
         | "published"
+        | "unassigned"
       device_platform: "ios" | "android"
       portal_role: "admin" | "author"
     }
@@ -738,6 +739,7 @@ export const Constants = {
         "changes_requested",
         "accepted",
         "published",
+        "unassigned",
       ],
       device_platform: ["ios", "android"],
       portal_role: ["admin", "author"],
