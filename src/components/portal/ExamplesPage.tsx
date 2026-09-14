@@ -1,5 +1,23 @@
-import { useState } from "react";
 import { PageTitle } from "./ui";
+import sky2 from "@/assets/examples/sky-2.png.asset.json";
+import sky3 from "@/assets/examples/sky-3.png.asset.json";
+import sky4 from "@/assets/examples/sky-4.png.asset.json";
+import sky5 from "@/assets/examples/sky-5.png.asset.json";
+import berlin2 from "@/assets/examples/berlin-2.png.asset.json";
+import berlin3 from "@/assets/examples/berlin-3.png.asset.json";
+import berlin5 from "@/assets/examples/berlin-5.png.asset.json";
+import berlin8 from "@/assets/examples/berlin-8.png.asset.json";
+
+const URLS: Record<string, string> = {
+  "sky-2.png": sky2.url,
+  "sky-3.png": sky3.url,
+  "sky-4.png": sky4.url,
+  "sky-5.png": sky5.url,
+  "berlin-2.png": berlin2.url,
+  "berlin-3.png": berlin3.url,
+  "berlin-5.png": berlin5.url,
+  "berlin-8.png": berlin8.url,
+};
 
 type Shot = { file: string; label: string };
 
