@@ -9,6 +9,7 @@ import { countWords, formatDate, type Course, type Profile, type Screen, type So
 import { SCREEN_NUMBERS } from "@/config/portal";
 import { usePortalProfile } from "../usePortal";
 import { Banner, BoldText, PageTitle, PortalCard } from "../ui";
+import { PublishControls } from "./PublishControls";
 
 export function ReviewCourse({ courseId }: { courseId: string }) {
   const navigate = useNavigate();
@@ -107,6 +108,8 @@ export function ReviewCourse({ courseId }: { courseId: string }) {
         </div>
 
         <div className="space-y-5">
+          <PublishControls course={course} />
+
           <PortalCard>
             <h2 className="text-sm font-bold text-brand-navy">Course total</h2>
             <p className="mt-2 text-3xl font-extrabold text-brand-navy">{totalWords} words</p>

@@ -84,7 +84,11 @@ export function CoursesList() {
             {courses.map((course) => (
               <li key={course.id}>
                 <Link
-                  to="/auteurs/admin/courses/$courseId"
+                  to={
+                    course.status === "accepted" || course.status === "published" || course.status === "submitted"
+                      ? "/auteurs/admin/review/$courseId"
+                      : "/auteurs/admin/courses/$courseId"
+                  }
                   params={{ courseId: course.id }}
                   className="flex flex-wrap items-center gap-x-4 gap-y-2 px-6 py-4 transition hover:bg-portal-bg"
                 >

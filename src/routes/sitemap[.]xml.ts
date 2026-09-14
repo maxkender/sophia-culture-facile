@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getCourseSitemapEntries } from "@/content/api";
+import { getPublishedSitemapEntries } from "@/lib/public-content.functions";
 import { absUrl } from "@/config/site";
 import { ROUTES, coursePath, type RouteKey } from "@/i18n/routes";
 
@@ -34,7 +35,7 @@ const STATIC_PAGES: { key: RouteKey; changefreq: string; priority: string }[] = 
 ];
 
 /** Sitemap généré à la volée : les cours viennent de `src/content/api.ts`. */
-function buildSitemap(): string {
+async function buildSitemap(): Promise<string> {
   const today = new Date().toISOString().slice(0, 10);
 
   const staticXml = STATIC_PAGES.flatMap((page) => {
@@ -65,9 +66,25 @@ function buildSitemap(): string {
     });
   });
 
+  // Cours publiés depuis le portail auteur : URL françaises uniques, sans alternates.
+  let publishedXml: string[] = [];
+  try {
+    const entries = await getPublishedSitemapEntries();
+    publishedXml = entries.map(
+      (entry) => `  <url>
+    <loc>${absUrl(entry.path)}</loc>
+    <lastmod>${entry.lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>`,
+    );
+  } catch {
+    publishedXml = [];
+  }
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${[...staticXml, ...courseXml].join("\n")}
+${[...staticXml, ...courseXml, ...publishedXml].join("\n")}
 </urlset>
 `;
 }
@@ -75,8 +92,8 @@ ${[...staticXml, ...courseXml].join("\n")}
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
-      GET: () =>
-        new Response(buildSitemap(), {
+      GET: async () =>
+        new Response(await buildSitemap(), {
           headers: {
             "content-type": "application/xml; charset=utf-8",
             "cache-control": "public, max-age=3600",

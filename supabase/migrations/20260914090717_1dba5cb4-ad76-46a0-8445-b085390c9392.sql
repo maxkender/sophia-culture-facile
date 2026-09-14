@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.log_display_name_change() FROM PUBLIC, anon, authenticated;

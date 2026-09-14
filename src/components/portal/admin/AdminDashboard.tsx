@@ -14,10 +14,12 @@ export function AdminDashboard() {
         supabase.from("profiles").select("*").eq("role", "author"),
         supabase.from("contracts").select("author_id"),
       ]);
+      const { data: education } = await supabase.from("education_records").select("profile_id");
       return {
         courses: (courses ?? []) as Course[],
         authors: (authors ?? []) as Profile[],
         signedIds: new Set((contracts ?? []).map((row) => row.author_id)),
+        withEducation: new Set((education ?? []).map((row) => row.profile_id)),
       };
     },
   });
@@ -28,7 +30,9 @@ export function AdminDashboard() {
   const authors = (data?.authors ?? []).filter((author) => !author.is_test);
   const unsigned = authors.filter((author) => !data?.signedIds.has(author.id));
   const overdue = courses.filter(isOverdue);
-  const toConfirm = authors.filter((author) => !author.display_title || !author.institution);
+  // A byline counts as complete once it has a title line and at least one degree.
+  const hasEducation = (id: string) => Boolean(data?.withEducation.has(id));
+  const toConfirm = authors.filter((author) => !author.display_title || !hasEducation(author.id));
   const byAuthor = new Map(authors.map((author) => [author.id, author.full_name]));
 
   const accepted = authors.filter((author) => author.upwork_status === "accepted").length;
@@ -145,11 +149,11 @@ export function AdminDashboard() {
                   </Link>
                   <span className="font-semibold text-portal-amber">
                     {" "}
-                    — {!author.display_title && !author.institution
-                      ? "byline and institution missing"
+                    — {!author.display_title && !hasEducation(author.id)
+                      ? "byline and education missing"
                       : !author.display_title
                         ? "byline missing"
-                        : "institution missing"}
+                        : "no degree listed"}
                   </span>
                 </li>
               ))
