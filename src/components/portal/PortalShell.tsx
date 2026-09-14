@@ -43,6 +43,10 @@ function initials(name: string): string {
   );
 }
 
+function isNavActive(pathname: string, item: { to: string; exact?: boolean }): boolean {
+  return item.exact ? pathname === item.to : pathname === item.to || pathname.startsWith(`${item.to}/`);
+}
+
 function SidebarNav({
   groups,
   counts,
