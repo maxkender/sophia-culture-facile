@@ -36,6 +36,13 @@ export function AuthorsList() {
     const term = search.trim().toLowerCase();
     return authors
       .filter((author) =>
+        status === "all"
+          ? true
+          : status === "declined"
+            ? author.upwork_status === "declined"
+            : author.upwork_status !== "declined",
+      )
+      .filter((author) =>
         platform === "all" ? true : platform === "unknown" ? !author.platform : author.platform === platform,
       )
       .filter((author) =>
@@ -56,7 +63,7 @@ export function AuthorsList() {
           signed: data?.signed.has(author.id) ?? false,
         };
       });
-  }, [data, search, platform]);
+  }, [data, search, platform, status]);
 
   return (
     <div>
