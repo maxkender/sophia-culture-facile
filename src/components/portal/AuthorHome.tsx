@@ -91,7 +91,7 @@ export function AuthorHome() {
     <div>
       <PageTitle
         title={`Welcome${firstName ? `, ${firstName}` : ""}`}
-        lead="Everything you need is here: the app, the format, the guide and your commissioned courses. Fees, invoices and messages stay in Upwork."
+        lead="Everything you need is here: the app, the format, the guide, your commissioned courses and your messages with the editorial desk. Fees and invoices stay in Upwork."
       />
 
       {profile ? <AnnouncementBanners profileId={profile.id} /> : null}
