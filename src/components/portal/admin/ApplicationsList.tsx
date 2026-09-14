@@ -52,8 +52,7 @@ export function ApplicationsList() {
         return;
       }
       setInvite({ id: application.id, url: result.inviteUrl });
-      if (result.emailSent) toast.success(`Approved. Access email sent to ${application.email}.`);
-      else toast.warning("Approved, but the email could not be sent. Copy the access link and send it manually.");
+      toast.success("Approved. Copy the access link and send it to the author.");
       await queryClient.invalidateQueries({ queryKey: ["portal", "admin"] });
     } catch {
       toast.error("The candidature could not be approved.");
@@ -81,7 +80,7 @@ export function ApplicationsList() {
     <div>
       <PageTitle
         title="Applications"
-        lead="Candidatures sent from the public form. Approving creates the author record and emails their access link."
+        lead="Candidatures sent from the public form. Approving creates the author record and their access link to copy."
         action={
           <Select value={status} onValueChange={setStatus}>
             <SelectTrigger className="h-11 w-44" aria-label="Filter by status">
@@ -177,17 +176,14 @@ export function ApplicationsList() {
               {application.status === "pending" ? (
                 <div className="mt-5 flex flex-wrap gap-3">
                   <Button type="button" variant="pill" size="pillSm" disabled={busyId === application.id} onClick={() => void onApprove(application)}>
-                    {busyId === application.id ? "Working…" : "Approve and send access"}
+                    {busyId === application.id ? "Working…" : "Approve"}
                   </Button>
                   <Button type="button" variant="outline" size="pillSm" disabled={busyId === application.id} onClick={() => void onReject(application)}>
                     Decline
                   </Button>
                 </div>
               ) : (
-                <p className="mt-5 text-xs text-brand-navySoft">
-                  Reviewed {formatDateTime(application.reviewed_at)}
-                  {application.email_sent_at ? ` · access email sent ${formatDateTime(application.email_sent_at)}` : ""}
-                </p>
+                <p className="mt-5 text-xs text-brand-navySoft">Reviewed {formatDateTime(application.reviewed_at)}</p>
               )}
             </PortalCard>
           ))}

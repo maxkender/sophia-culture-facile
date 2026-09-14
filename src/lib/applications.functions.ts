@@ -16,29 +16,6 @@ async function assertAdmin(userId: string) {
   return supabaseAdmin;
 }
 
-function inviteEmail(name: string, inviteUrl: string) {
-  const text = [
-    `Hello ${name},`,
-    "",
-    "Good news: your application to write for Sophia has been accepted.",
-    "",
-    "Open the link below to set your password and access the author portal, where you will find your access code, the writing guide, the agreement and the courses assigned to you.",
-    "",
-    inviteUrl,
-    "",
-    "Welcome aboard.",
-    "The Sophia editorial team",
-  ].join("\n");
-  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1B3054;line-height:1.6">
-  <p>Hello ${name},</p>
-  <p>Good news: your application to write for <strong>Sophia</strong> has been accepted.</p>
-  <p>Open the link below to set your password and access the author portal, where you will find your access code, the writing guide, the agreement and the courses assigned to you.</p>
-  <p><a href="${inviteUrl}" style="display:inline-block;background:#1B3054;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:700">Open the author portal</a></p>
-  <p style="font-size:13px;color:#5A6B87">${inviteUrl}</p>
-  <p>Welcome aboard.<br/>The Sophia editorial team</p>
-</div>`;
-  return { text, html };
-}
 
 /** Admin: accepts a candidature, creates the author record and emails the access link. */
 export const approveApplication = createServerFn({ method: "POST" })
@@ -125,31 +102,6 @@ export const approveApplication = createServerFn({ method: "POST" })
 
     const inviteUrl = `${data.origin.replace(/\/$/, "")}/auteurs/invite?token=${encodeURIComponent(inviteToken)}`;
 
-    let emailSent = false;
-    let emailError: string | null = null;
-    try {
-      const { sendLovableEmail } = await import("@lovable.dev/email-js");
-      const apiKey = process.env["LOVABLE_API_KEY"];
-      const from = process.env["EMAIL_FROM"] ?? "Sophia <hello@sophia-culture.com>";
-      if (!apiKey) throw new Error("no_api_key");
-      const body = inviteEmail(application.full_name, inviteUrl);
-      await sendLovableEmail(
-        {
-          to: email,
-          from,
-          subject: "Your Sophia author access",
-          html: body.html,
-          text: body.text,
-          purpose: "transactional",
-          label: "author-invite",
-          idempotency_key: `application-${application.id}`,
-        },
-        { apiKey },
-      );
-      emailSent = true;
-    } catch (error) {
-      emailError = error instanceof Error ? error.message : "send_failed";
-    }
 
     await supabaseAdmin
       .from("applications")
@@ -158,11 +110,10 @@ export const approveApplication = createServerFn({ method: "POST" })
         reviewed_at: new Date().toISOString(),
         created_profile_id: profileId,
         admin_note: data.note ?? null,
-        email_sent_at: emailSent ? new Date().toISOString() : null,
       })
       .eq("id", application.id);
 
-    return { ok: true as const, inviteUrl, profileId, emailSent, emailError };
+    return { ok: true as const, inviteUrl, profileId };
   });
 
 /** Admin: declines a candidature. No email is sent. */
