@@ -18,15 +18,17 @@ export function AuthorsList() {
   const { data } = useQuery({
     queryKey: ["portal", "admin", "authors"],
     queryFn: async () => {
-      const [{ data: authors }, { data: courses }, { data: contracts }] = await Promise.all([
+      const [{ data: authors }, { data: courses }, { data: contracts }, { data: codes }] = await Promise.all([
         supabase.from("profiles").select("*").eq("role", "author").order("full_name"),
         supabase.from("courses").select("id, author_id, status"),
         supabase.from("contracts").select("author_id"),
+        supabase.from("access_codes").select("assigned_to, platform").not("assigned_to", "is", null),
       ]);
       return {
         authors: (authors ?? []) as Profile[],
         courses: (courses ?? []) as Pick<Course, "id" | "author_id" | "status">[],
         signed: new Set((contracts ?? []).map((row) => row.author_id)),
+        codePlatform: new Map((codes ?? []).map((row) => [row.assigned_to as string, row.platform as string])),
       };
     },
   });
@@ -61,6 +63,7 @@ export function AuthorsList() {
             ["submitted", "accepted", "published"].includes(course.status ?? ""),
           ).length,
           signed: data?.signed.has(author.id) ?? false,
+          codePlatform: data?.codePlatform.get(author.id) ?? null,
         };
       });
   }, [data, search, platform, status]);
@@ -137,7 +140,7 @@ export function AuthorsList() {
                   </td>
                 </tr>
               ) : (
-                rows.map(({ author, total, submitted, signed }) => (
+                rows.map(({ author, total, submitted, signed, codePlatform }) => (
                   <tr key={author.id}>
                     <td className="py-3 pr-4">
                       <Link
@@ -211,7 +214,17 @@ export function AuthorsList() {
                     </td>
                     <td className="py-3 pr-4 font-mono text-xs text-brand-navySoft">
                       {author.access_code ? (
-                        author.access_code
+                        <>
+                          {author.access_code}
+                          {author.platform && codePlatform && codePlatform !== author.platform ? (
+                            <span
+                              className="mt-1 flex items-center gap-1 font-sans text-[11px] font-bold uppercase tracking-wide text-portal-amber"
+                              title={`Code is ${codePlatform === "ios" ? "Apple" : "Google Play"}, author is on ${author.platform === "ios" ? "iPhone" : "Android"}`}
+                            >
+                              <AlertTriangle className="size-3.5" aria-hidden="true" /> Wrong store
+                            </span>
+                          ) : null}
+                        </>
                       ) : (
                         <Link to="/auteurs/admin/codes" className="font-sans font-semibold text-brand-navySoft hover:underline">
                           No code

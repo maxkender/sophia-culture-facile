@@ -1,0 +1,1 @@
+ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS fee_usd integer NOT NULL DEFAULT 20;

@@ -359,6 +359,93 @@ export const signAgreement = createServerFn({ method: "POST" })
     return { ok: true as const, alreadySigned: false, signedAt: new Date().toISOString() };
   });
 
+const platformSchema = z.enum(["ios", "android"]);
+
+/**
+ * Makes sure the author holds a code they can actually redeem: a code for the
+ * wrong store goes back to the pool and a matching one is taken from it.
+ */
+async function applyPlatform(profileId: string, platform: "ios" | "android", isTest: boolean) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  const { data: held } = await supabaseAdmin
+    .from("access_codes")
+    .select("id, platform, code, redeem_url")
+    .eq("assigned_to", profileId);
+
+  const rows = held ?? [];
+  const keep = rows.find((row) => row.platform === platform) ?? null;
+  const wrong = rows.filter((row) => row.platform !== platform);
+  if (wrong.length > 0) {
+    await supabaseAdmin
+      .from("access_codes")
+      .update({ state: "available", assigned_to: null, assigned_at: null })
+      .in(
+        "id",
+        wrong.map((row) => row.id),
+      );
+  }
+
+  let code: { code: string; redeem_url: string | null } | null = keep
+    ? { code: keep.code, redeem_url: keep.redeem_url }
+    : null;
+
+  // The internal test profile never holds a real store code.
+  if (!code && !isTest) {
+    const { data: free } = await supabaseAdmin
+      .from("access_codes")
+      .select("id, code, redeem_url")
+      .eq("platform", platform)
+      .eq("state", "available")
+      .is("assigned_to", null)
+      .limit(1)
+      .maybeSingle();
+    if (free) {
+      await supabaseAdmin
+        .from("access_codes")
+        .update({ state: "assigned", assigned_to: profileId, assigned_at: new Date().toISOString() })
+        .eq("id", free.id);
+      code = { code: free.code, redeem_url: free.redeem_url };
+    }
+  }
+
+  await supabaseAdmin
+    .from("profiles")
+    .update({
+      platform,
+      access_code: code?.code ?? null,
+      access_redeem_url: code?.redeem_url ?? null,
+    })
+    .eq("id", profileId);
+
+  return { ok: true as const, code: code?.code ?? null, redeemUrl: code?.redeem_url ?? null };
+}
+
+/** Public: the invited author picks their store before claiming the profile. */
+export const setInvitePlatform = createServerFn({ method: "POST" })
+  .inputValidator((data) =>
+    z.object({ token: z.string().min(4).max(200), platform: platformSchema }).parse(data),
+  )
+  .handler(async ({ data }) => {
+    const { profile } = await loadInvite(data.token);
+    if (!profile || inviteState(profile) !== "ok") return { ok: false as const, code: null, redeemUrl: null };
+    return applyPlatform(profile.id, data.platform, Boolean(profile.is_test));
+  });
+
+/** The author changes their store from their own space. */
+export const setMyPlatform = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ platform: platformSchema }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: profile } = await context.supabase
+      .from("profiles")
+      .select("id, is_test")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!profile) return { ok: false as const, code: null, redeemUrl: null };
+    return applyPlatform(profile.id, data.platform, Boolean(profile.is_test));
+  });
+
 /** Public: lets an invited author correct their own details before they claim the profile. */
 export const updateInviteProfile = createServerFn({ method: "POST" })
   .inputValidator((data) =>

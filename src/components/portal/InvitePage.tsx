@@ -9,6 +9,7 @@ import {
   claimInvite,
   getInvite,
   prepareMagicClaim,
+  setInvitePlatform,
   updateInviteProfile,
   type InvitePreview,
 } from "@/lib/portal.functions";
@@ -87,6 +88,8 @@ export function InvitePage({ token }: { token: string }) {
   const [errors, setErrors] = useState<{ password?: string; confirm?: string; email?: string }>({});
   const [busy, setBusy] = useState(false);
   const [declared, setDeclared] = useState(false);
+  const [platform, setPlatform] = useState<"ios" | "android" | null>(null);
+  const savePlatform = useServerFn(setInvitePlatform);
   const [sent, setSent] = useState(false);
   const saveProfile = useServerFn(updateInviteProfile);
   const [details, setDetails] = useState({
@@ -129,6 +132,7 @@ export function InvitePage({ token }: { token: string }) {
       personal_site: p.personal_site ?? "",
       scholar_url: p.scholar_url ?? "",
     });
+    setPlatform(p.platform === "ios" || p.platform === "android" ? p.platform : null);
     setEducation(
       (data?.education ?? []).map((row) => ({
         degree: row.degree ?? "",
@@ -227,10 +231,16 @@ export function InvitePage({ token }: { token: string }) {
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
-    if (!declared) return;
+    if (!declared || !platform) return;
 
     setBusy(true);
     try {
+      // The store they use decides which access code they can actually redeem.
+      try {
+        await savePlatform({ data: { token, platform } });
+      } catch {
+        /* the claim itself matters more than the code swap */
+      }
       // Save the details first so the declaration snapshot matches what they just confirmed.
       try {
         await saveProfile({
@@ -641,6 +651,27 @@ export function InvitePage({ token }: { token: string }) {
                     {errors.confirm ? <p className="text-sm font-semibold text-portal-red">{errors.confirm}</p> : null}
                   </div>
                   <div className="rounded-2xl bg-brand-surface p-4">
+                    <p className="text-sm font-bold text-brand-navy">
+                      Which phone do you use?<Tag kind="required" />
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-brand-navySoft">
+                      Sophia is on both stores. Your free access code only works on the store you pick.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-3">
+                      {(["ios", "android"] as const).map((value) => (
+                        <Button
+                          key={value}
+                          type="button"
+                          variant={platform === value ? "pill" : "pillSecondary"}
+                          size="pillSm"
+                          onClick={() => setPlatform(value)}
+                        >
+                          {value === "ios" ? "iPhone" : "Android"}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-2xl bg-brand-surface p-4">
                     <label htmlFor="claim-declaration" className="flex cursor-pointer items-start gap-3">
                       <input
                         id="claim-declaration"
@@ -659,7 +690,7 @@ export function InvitePage({ token }: { token: string }) {
                       them.
                     </p>
                   </div>
-                  <Button type="submit" variant="pill" size="pillSm" disabled={busy || !declared}>
+                  <Button type="submit" variant="pill" size="pillSm" disabled={busy || !declared || !platform}>
                     {busy ? "Opening your space…" : "This is me — open my space"}
                   </Button>
                 </form>

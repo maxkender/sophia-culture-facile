@@ -395,6 +395,7 @@ export type Database = {
           brief_note: string | null
           created_at: string
           due_date: string | null
+          fee_usd: number
           id: string
           lot_code: string | null
           lot_name: string | null
@@ -417,6 +418,7 @@ export type Database = {
           brief_note?: string | null
           created_at?: string
           due_date?: string | null
+          fee_usd?: number
           id?: string
           lot_code?: string | null
           lot_name?: string | null
@@ -439,6 +441,7 @@ export type Database = {
           brief_note?: string | null
           created_at?: string
           due_date?: string | null
+          fee_usd?: number
           id?: string
           lot_code?: string | null
           lot_name?: string | null
