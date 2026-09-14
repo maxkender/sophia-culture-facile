@@ -214,7 +214,17 @@ export function AuthorsList() {
                     </td>
                     <td className="py-3 pr-4 font-mono text-xs text-brand-navySoft">
                       {author.access_code ? (
-                        author.access_code
+                        <>
+                          {author.access_code}
+                          {author.platform && codePlatform && codePlatform !== author.platform ? (
+                            <span
+                              className="mt-1 flex items-center gap-1 font-sans text-[11px] font-bold uppercase tracking-wide text-portal-amber"
+                              title={`Code is ${codePlatform === "ios" ? "Apple" : "Google Play"}, author is on ${author.platform === "ios" ? "iPhone" : "Android"}`}
+                            >
+                              <AlertTriangle className="size-3.5" aria-hidden="true" /> Wrong store
+                            </span>
+                          ) : null}
+                        </>
                       ) : (
                         <Link to="/auteurs/admin/codes" className="font-sans font-semibold text-brand-navySoft hover:underline">
                           No code
