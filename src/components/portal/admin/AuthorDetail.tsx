@@ -110,6 +110,21 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
           <p className="mt-3 text-sm text-brand-navySoft">{author.email}</p>
           <p className="mt-1 text-sm text-brand-navySoft">{author.platform === "android" ? "Android" : "iOS"}</p>
           {author.bio ? <p className="mt-3 text-sm leading-relaxed text-brand-navySoft">{author.bio}</p> : null}
+          <div className="mt-4 space-y-1">
+            <Label htmlFor="fee">Fee (shown in their contract)</Label>
+            <div className="flex gap-2">
+              <Input
+                id="fee"
+                className="h-11"
+                placeholder="e.g. USD 600"
+                defaultValue={author.fee ?? ""}
+                onChange={(event) => setFee(event.target.value)}
+              />
+              <Button type="button" variant="pillSecondary" size="pillSm" onClick={saveFee}>
+                Save
+              </Button>
+            </div>
+          </div>
         </PortalCard>
 
         <PortalCard>
