@@ -227,10 +227,26 @@ export function InvitePage({ token }: { token: string }) {
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
+    if (!declared) return;
+
     setBusy(true);
     try {
+      // Save the details first so the declaration snapshot matches what they just confirmed.
+      try {
+        await saveProfile({
+          data: { token, ...details, education, ...(photoFile ? { photo: photoFile } : {}) },
+        });
+      } catch {
+        /* the claim itself matters more than a failed detail save */
+      }
       const result = await claim({
-        data: { token, password, ...(needsEmail ? { email: email.trim().toLowerCase() } : {}) },
+        data: {
+          token,
+          password,
+          declaration: true,
+          userAgent: navigator.userAgent,
+          ...(needsEmail ? { email: email.trim().toLowerCase() } : {}),
+        },
       });
       if (!result.ok) {
         toast.error(
