@@ -141,19 +141,11 @@ export function AuthorHome() {
 
       <PortalCard className="mt-8 bg-portal-bg shadow-none ring-1 ring-brand-line">
         <h3 className="text-lg font-extrabold leading-snug text-brand-navy">Want to read more Sophia courses?</h3>
-        <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
-          The two examples show you the format. If you would like to see more, here is a free code that unlocks the
-          whole app.
-        </p>
-        {profile?.platform === "android" ? (
-          <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
-            On Android: open the Play Store, tap your profile picture, choose Payments and subscriptions, then Redeem
-            code.
-          </p>
-        ) : profile?.platform === "ios" ? (
-          <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
-            On iPhone: open the App Store, tap your profile picture, choose Redeem Gift Card or Code, then Enter Code
-            Manually.
+        {profile?.platform ? (
+          <p className="mt-2 text-base font-extrabold leading-relaxed text-brand-navy">
+            {profile.platform === "ios"
+              ? "Your code goes into the App Store, not into the Sophia app."
+              : "Your code goes into the Play Store, not into the Sophia app."}
           </p>
         ) : (
           <p className="mt-2 text-sm font-semibold leading-relaxed text-portal-amber">
@@ -193,6 +185,23 @@ export function AuthorHome() {
             </p>
           </>
         )}
+
+        {profile?.platform && profile?.access_code ? (
+          <ol className="mt-4 list-decimal space-y-1 pl-5 text-sm leading-relaxed text-brand-navySoft">
+            <li>Open the {profile.platform === "ios" ? "App Store" : "Play Store"}, not Sophia</li>
+            <li>Tap your profile picture, top right</li>
+            <li>
+              {profile.platform === "ios" ? "Choose Redeem Gift Card or Code" : "Choose Payments and subscriptions"}
+            </li>
+            <li>{profile.platform === "ios" ? "Choose Enter Code Manually" : "Choose Redeem code"}</li>
+            <li>Paste the code above</li>
+          </ol>
+        ) : null}
+
+        <p className="mt-4 text-sm leading-relaxed text-brand-navySoft">
+          Then open Sophia and everything is unlocked. There is no trial to select and nothing to type inside the app
+          itself.
+        </p>
         <p className="mt-4 flex flex-wrap items-center gap-1 text-sm text-brand-navySoft">
           <Smartphone className="size-4" aria-hidden="true" />
           All the download links are here:{" "}
@@ -204,6 +213,13 @@ export function AuthorHome() {
           >
             taap.it/sophia.culture
           </a>
+        </p>
+        <p className="mt-3 text-xs text-brand-navySoft/70">
+          Wrong phone type? Change it on your{" "}
+          <Link to="/auteurs/profile" className="underline">
+            Profile page
+          </Link>{" "}
+          and your code will swap itself.
         </p>
       </PortalCard>
 

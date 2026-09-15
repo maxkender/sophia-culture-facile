@@ -655,7 +655,8 @@ export function InvitePage({ token }: { token: string }) {
                       Which phone do you use?<Tag kind="required" />
                     </p>
                     <p className="mt-1 text-xs leading-relaxed text-brand-navySoft">
-                      Sophia is on both stores. Your free access code only works on the store you pick.
+                      Sophia is on both stores. Your free access code only works on the store you pick: it goes into
+                      that store, not into the Sophia app.
                     </p>
                     <div className="mt-3 flex flex-wrap gap-3">
                       {(["ios", "android"] as const).map((value) => (
