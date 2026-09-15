@@ -40,7 +40,7 @@ function PlatformCard({ current }: { current: string | null }) {
       <h2 className="text-sm font-bold uppercase tracking-wide text-brand-navySoft">Your phone</h2>
       <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
         Sophia exists on both stores. Tell us which one you use and your free access code will be issued for that
-        store.
+        store. It goes into that store, not into the Sophia app.
       </p>
       <div className="mt-4 flex flex-wrap gap-3">
         {(["ios", "android"] as const).map((value) => (

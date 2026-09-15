@@ -186,8 +186,9 @@ export function ExamplesPage() {
       />
 
       <Callout tone="red">
-        These are screenshots of the real app. Your access code is on your home page: redeeming it and reading a few
-        courses on your own phone will teach you more than any of this.
+        These are screenshots of the real app. Your access code goes into the App Store or the Play Store, never inside
+        the Sophia app itself: it is on your home page. Redeeming it and reading a few courses on your own phone will
+        teach you more than any of this.
       </Callout>
 
       <CourseSection title="Why is the sky blue?" category="Light & atmosphere" shots={SKY} />
