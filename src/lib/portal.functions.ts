@@ -266,7 +266,7 @@ export const claimInvite = createServerFn({ method: "POST" })
           institution: current?.institution ?? profile.institution ?? null,
           education: declaredEducation ?? [],
         },
-        ...(profile.is_test ? {} : { invite_token: null, invite_expires_at: null }),
+        ...(profile.is_test ? {} : { invite_token: null, invite_expires_at: null, used_invite_token: data.token }),
       })
       .eq("id", profile.id);
     const { error } = profile.is_test ? await query : await query.is("activated_at", null);
@@ -327,7 +327,7 @@ export const acceptInvite = createServerFn({ method: "POST" })
       .update({
         user_id: context.userId,
         activated_at: profile.activated_at ?? new Date().toISOString(),
-        ...(profile.is_test ? {} : { invite_token: null, invite_expires_at: null }),
+        ...(profile.is_test ? {} : { invite_token: null, invite_expires_at: null, used_invite_token: data.token }),
       })
       .eq("id", profile.id);
     if (error) throw new Error("The invite could not be activated.");
