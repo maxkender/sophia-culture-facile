@@ -423,13 +423,16 @@ export function InvitePage({ token }: { token: string }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="inv-institution">Institution<Tag kind="optional" /></Label>
+                    <Label htmlFor="inv-institution">Where you work now<Tag kind="optional" /></Label>
                     <Input
                       id="inv-institution"
                       className="h-11"
                       value={details.institution}
                       onChange={(event) => setDetails({ ...details, institution: event.target.value })}
                     />
+                    <p className="text-xs text-brand-navySoft">
+                      Your current post. Where you studied goes in Education below.
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="inv-country">Country<Tag kind="optional" /></Label>
@@ -510,7 +513,7 @@ export function InvitePage({ token }: { token: string }) {
                   </div>
                 </div>
 
-                <p className="mt-6 text-sm font-bold text-brand-navy">Education</p>
+                <p className="mt-6 text-sm font-bold text-brand-navy">Where you studied</p>
                 <p className="mt-1 text-xs text-brand-navySoft">
                   Most recent first. This is published on your page.
                   <span className="ml-1 font-semibold text-portal-accent">Optional.</span>

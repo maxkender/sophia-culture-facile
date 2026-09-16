@@ -228,21 +228,24 @@ export function AuthorHome() {
           </ol>
         ) : null}
 
-        <p className="mt-4 text-sm leading-relaxed text-brand-navySoft">
-          Then open Sophia and everything is unlocked. There is no trial to select and nothing to type inside the app
-          itself.
-        </p>
-        <p className="mt-4 flex flex-wrap items-center gap-1 text-sm text-brand-navySoft">
-          <Smartphone className="size-4" aria-hidden="true" />
-          All the download links are here:{" "}
+        <div className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-brand-line">
+          <p className="flex items-start gap-2 text-sm font-semibold leading-relaxed text-brand-navy">
+            <Smartphone className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+            Searching for Sophia will bury you in results. This link goes straight to the right listing:
+          </p>
           <a
             href={TAAP_LINK}
             target="_blank"
             rel="noreferrer noopener"
-            className="font-semibold text-portal-accent hover:underline"
+            className="mt-2 inline-block text-lg font-extrabold text-portal-accent underline underline-offset-4"
           >
             taap.it/sophia.culture
           </a>
+        </div>
+
+        <p className="mt-4 text-sm leading-relaxed text-brand-navySoft">
+          Then open Sophia and everything is unlocked. There is no trial to select and nothing to type inside the app
+          itself.
         </p>
         <p className="mt-3 text-xs text-brand-navySoft/70">
           Wrong phone type? Change it on your{" "}

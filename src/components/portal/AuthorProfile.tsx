@@ -281,13 +281,18 @@ export function AuthorProfile() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="p-institution">Institution</Label>
+                <Label htmlFor="p-institution">Where you work now</Label>
                 <Input
                   id="p-institution"
                   value={form.institution}
                   onChange={(event) => setForm({ ...form, institution: event.target.value })}
+                  placeholder="Saint Xavier University, Chicago"
                   className="h-11"
                 />
+                <p className="text-xs text-brand-navySoft">
+                  Your current post only. The university where you took a degree goes under “Where you studied” below,
+                  not here.
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="p-country">Country</Label>
@@ -355,7 +360,7 @@ export function AuthorProfile() {
               <div className="md:col-span-2">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-bold uppercase tracking-wide text-brand-navySoft">
-                    Education (most recent first)
+                    Where you studied (most recent first)
                   </h3>
                   <Button type="button" variant="pillSecondary" size="pillSm" onClick={addRow}>
                     <Plus aria-hidden="true" className="mr-1 size-4" /> Add a degree
@@ -455,7 +460,8 @@ export function AuthorProfile() {
               ) : null}
             </div>
             <p className="mt-4 text-xs text-brand-navySoft">
-              Updates as you type. This is the byline printed under every course you publish.
+              Updates as you type. This is exactly the byline printed under every course you publish: your published
+              name, then your one-line byline — or, if you leave that empty, where you work now.
             </p>
           </PortalCard>
 
