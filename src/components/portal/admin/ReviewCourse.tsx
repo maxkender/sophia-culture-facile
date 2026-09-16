@@ -11,6 +11,7 @@ import { SCREEN_NUMBERS } from "@/config/portal";
 import { usePortalProfile } from "../usePortal";
 import { Banner, BoldText, PageTitle, PortalCard } from "../ui";
 import { PublishControls } from "./PublishControls";
+import { AiReviewPanel } from "./AiReviewPanel";
 
 export function ReviewCourse({ courseId }: { courseId: string }) {
   const navigate = useNavigate();
@@ -111,6 +112,8 @@ export function ReviewCourse({ courseId }: { courseId: string }) {
 
         <div className="space-y-5">
           <PublishControls course={course} />
+
+          <AiReviewPanel course={course} screens={data?.screens ?? []} />
 
           {course.status === "changes_requested" ? (
             <PortalCard>

@@ -93,6 +93,54 @@ export type Database = {
           },
         ]
       }
+      ai_reviews: {
+        Row: {
+          content_hash: string
+          course_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          model: string
+          result: Json
+          shared_with_author: boolean
+        }
+        Insert: {
+          content_hash: string
+          course_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          model: string
+          result: Json
+          shared_with_author?: boolean
+        }
+        Update: {
+          content_hash?: string
+          course_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          model?: string
+          result?: Json
+          shared_with_author?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_reviews_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_reviews_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       announcement_reads: {
         Row: {
           announcement_id: string
