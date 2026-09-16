@@ -35,6 +35,7 @@ import { Route as AuthenticatedAuteursGuideRouteImport } from './routes/_authent
 import { Route as AuthenticatedAuteursMessagesRouteImport } from './routes/_authenticated/auteurs/messages'
 import { Route as AuthenticatedAuteursOpenRouteImport } from './routes/_authenticated/auteurs/open'
 import { Route as AuthenticatedAuteursProfileRouteImport } from './routes/_authenticated/auteurs/profile'
+import { Route as EnAuthorsSlugRouteImport } from './routes/en/authors.$slug'
 import { Route as EnLessonsIndexRouteImport } from './routes/en/lessons/index'
 import { Route as EnLessonsSlugRouteImport } from './routes/en/lessons/$slug'
 import { Route as FrAuteursSlugRouteImport } from './routes/fr/auteurs.$slug'
@@ -201,6 +202,11 @@ const AuthenticatedAuteursProfileRoute =
     path: '/auteurs/profile',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const EnAuthorsSlugRoute = EnAuthorsSlugRouteImport.update({
+  id: '/en/authors/$slug',
+  path: '/en/authors/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnLessonsIndexRoute = EnLessonsIndexRouteImport.update({
   id: '/en/lessons/',
   path: '/en/lessons/',
@@ -382,6 +388,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/en/authors/$slug': typeof EnAuthorsSlugRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
   '/fr/cours/$slug': typeof FrCoursSlugRoute
@@ -436,6 +443,7 @@ export interface FileRoutesByTo {
   '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/en/authors/$slug': typeof EnAuthorsSlugRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
   '/fr/cours/$slug': typeof FrCoursSlugRoute
@@ -492,6 +500,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/_authenticated/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/_authenticated/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/en/authors/$slug': typeof EnAuthorsSlugRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
   '/fr/cours/$slug': typeof FrCoursSlugRoute
@@ -548,6 +557,7 @@ export interface FileRouteTypes {
     | '/auteurs/messages'
     | '/auteurs/open'
     | '/auteurs/profile'
+    | '/en/authors/$slug'
     | '/en/lessons/$slug'
     | '/fr/auteurs/$slug'
     | '/fr/cours/$slug'
@@ -602,6 +612,7 @@ export interface FileRouteTypes {
     | '/auteurs/messages'
     | '/auteurs/open'
     | '/auteurs/profile'
+    | '/en/authors/$slug'
     | '/en/lessons/$slug'
     | '/fr/auteurs/$slug'
     | '/fr/cours/$slug'
@@ -657,6 +668,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/messages'
     | '/_authenticated/auteurs/open'
     | '/_authenticated/auteurs/profile'
+    | '/en/authors/$slug'
     | '/en/lessons/$slug'
     | '/fr/auteurs/$slug'
     | '/fr/cours/$slug'
@@ -707,6 +719,7 @@ export interface RootRouteChildren {
   FrTelechargerRoute: typeof FrTelechargerRoute
   EnIndexRoute: typeof EnIndexRoute
   FrIndexRoute: typeof FrIndexRoute
+  EnAuthorsSlugRoute: typeof EnAuthorsSlugRoute
   EnLessonsSlugRoute: typeof EnLessonsSlugRoute
   FrAuteursSlugRoute: typeof FrAuteursSlugRoute
   FrCoursSlugRoute: typeof FrCoursSlugRoute
@@ -898,6 +911,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auteurs/profile'
       preLoaderRoute: typeof AuthenticatedAuteursProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/en/authors/$slug': {
+      id: '/en/authors/$slug'
+      path: '/en/authors/$slug'
+      fullPath: '/en/authors/$slug'
+      preLoaderRoute: typeof EnAuthorsSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/en/lessons/': {
       id: '/en/lessons/'
@@ -1201,6 +1221,7 @@ const rootRouteChildren: RootRouteChildren = {
   FrTelechargerRoute: FrTelechargerRoute,
   EnIndexRoute: EnIndexRoute,
   FrIndexRoute: FrIndexRoute,
+  EnAuthorsSlugRoute: EnAuthorsSlugRoute,
   EnLessonsSlugRoute: EnLessonsSlugRoute,
   FrAuteursSlugRoute: FrAuteursSlugRoute,
   FrCoursSlugRoute: FrCoursSlugRoute,
