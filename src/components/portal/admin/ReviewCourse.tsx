@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { countWords, formatDate, type Course, type Profile, type Screen, type Source } from "@/lib/portal";
+import { countWords, formatDate, formatDateTime, type Course, type Profile, type Screen, type Source } from "@/lib/portal";
+import { SeenBadge, useChangeRequestSeen } from "../SeenStatus";
 import { SCREEN_NUMBERS } from "@/config/portal";
 import { usePortalProfile } from "../usePortal";
 import { Banner, BoldText, PageTitle, PortalCard } from "../ui";
@@ -37,6 +38,7 @@ export function ReviewCourse({ courseId }: { courseId: string }) {
   });
 
   const course = data?.course ?? null;
+  const { data: seen } = useChangeRequestSeen(course?.status === "changes_requested" ? [course.id] : []);
 
   async function decide(action: "accepted" | "changes_requested") {
     if (!course) return;
@@ -109,6 +111,18 @@ export function ReviewCourse({ courseId }: { courseId: string }) {
 
         <div className="space-y-5">
           <PublishControls course={course} />
+
+          {course.status === "changes_requested" ? (
+            <PortalCard>
+              <h2 className="text-sm font-bold text-brand-navy">Change request</h2>
+              <p className="mt-2 text-xs text-brand-navySoft">
+                Sent {formatDateTime(seen?.[course.id]?.created_at ?? null)}
+              </p>
+              <p className="mt-2">
+                <SeenBadge info={seen?.[course.id]} />
+              </p>
+            </PortalCard>
+          ) : null}
 
           <PortalCard>
             <h2 className="text-sm font-bold text-brand-navy">Course total</h2>
