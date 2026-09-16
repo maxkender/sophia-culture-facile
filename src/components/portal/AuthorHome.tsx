@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Check, Smartphone } from "lucide-react";
+import { AlertTriangle, Check, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -86,6 +86,7 @@ export function AuthorHome() {
   });
 
   const firstName = (profile?.full_name ?? "").split(" ")[0] ?? "";
+  const needAttention = courses.filter((course) => course.status === "changes_requested");
 
   return (
     <div>
@@ -93,6 +94,31 @@ export function AuthorHome() {
         title={`Welcome${firstName ? `, ${firstName}` : ""}`}
         lead="Everything you need is here: the app, the format, the guide, your commissioned courses and your messages with the editorial desk. Fees and invoices stay in Upwork."
       />
+
+      {needAttention.length > 0 ? (
+        <div className="mb-6 rounded-portal border-2 border-portal-amber bg-portal-amber/10 p-5">
+          <p className="flex items-center gap-2 text-base font-extrabold text-brand-navy">
+            <AlertTriangle className="size-5 text-portal-amber" aria-hidden="true" />
+            {needAttention.length === 1 ? "One course needs your attention" : `${needAttention.length} courses need your attention`}
+          </p>
+          <ul className="mt-3 space-y-2">
+            {needAttention.map((course) => (
+              <li key={course.id} className="text-sm text-brand-navy">
+                <Link
+                  to="/auteurs/courses/$courseId"
+                  params={{ courseId: course.id }}
+                  className="font-bold text-portal-accent underline underline-offset-2"
+                >
+                  {course.title}
+                </Link>
+                {course.review_comment ? (
+                  <span className="text-brand-navySoft"> — {course.review_comment}</span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       {profile ? <AnnouncementBanners profileId={profile.id} /> : null}
 
