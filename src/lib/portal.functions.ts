@@ -133,6 +133,7 @@ export const getInvite = createServerFn({ method: "POST" })
 
     return {
       state: "ok",
+      usedProfile: null,
       profile: {
         id: profile.id,
         full_name: profile.full_name,
