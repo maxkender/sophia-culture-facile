@@ -338,7 +338,7 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="institution">
-              Institution{" "}
+              Where they work now{" "}
               {author.institution ? null : (
                 <span className="ml-1 font-bold uppercase tracking-wide text-portal-amber">To confirm</span>
               )}
@@ -349,6 +349,9 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
               defaultValue={author.institution ?? ""}
               onChange={(event) => setInstitution(event.target.value)}
             />
+            <p className="text-xs text-brand-navySoft">
+              Current post only. The university where they took a degree belongs in their education records.
+            </p>
           </div>
         </div>
         <Button type="button" variant="pillSecondary" size="pillSm" className="mt-4" onClick={saveByline}>
