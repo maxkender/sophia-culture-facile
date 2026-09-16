@@ -20,7 +20,7 @@ function urlEntry(opts: {
     <priority>${opts.priority}</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="${opts.frUrl}" />
     <xhtml:link rel="alternate" hreflang="en" href="${opts.enUrl}" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${opts.frUrl}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${opts.enUrl}" />
   </url>`;
 }
 

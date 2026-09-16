@@ -52,7 +52,7 @@ export function langLinks(key: RouteKey, lang: Lang) {
     { rel: "canonical", href: absUrl(pathFor(key, lang)) },
     { rel: "alternate", hrefLang: "fr", href: frUrl },
     { rel: "alternate", hrefLang: "en", href: enUrl },
-    { rel: "alternate", hrefLang: "x-default", href: frUrl },
+    { rel: "alternate", hrefLang: "x-default", href: enUrl },
   ];
 }
 
@@ -175,7 +175,7 @@ export function courseLinks(course: Course) {
     { rel: "canonical", href: course.locale === "fr" ? frUrl : enUrl },
     { rel: "alternate", hrefLang: "fr", href: frUrl },
     { rel: "alternate", hrefLang: "en", href: enUrl },
-    { rel: "alternate", hrefLang: "x-default", href: frUrl },
+    { rel: "alternate", hrefLang: "x-default", href: enUrl },
   ];
 }
 
