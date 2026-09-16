@@ -22,6 +22,7 @@ import {
 } from "@/config/portal";
 import { countWords, formatDate, type Course, type Source } from "@/lib/portal";
 import { usePortalProfile } from "./usePortal";
+import { useMarkNotifications, useNotifications } from "./useNotifications";
 import { ExamplesLockNotice } from "./CourseCards";
 import { OpenThreadButton } from "./OpenThreadButton";
 import { Banner, BoldText, ConfirmButton, PageTitle, PortalCard, StatusPill } from "./ui";
@@ -33,6 +34,18 @@ const EMPTY_SCREEN: ScreenDraft = { id: null, screen_title: "", body: "", image_
 export function CourseEditor({ courseId, admin = false }: { courseId: string; admin?: boolean }) {
   const queryClient = useQueryClient();
   const { data: me } = usePortalProfile();
+  const { data: notifications = [] } = useNotifications(admin ? null : me?.profile?.id);
+  const markNotifications = useMarkNotifications(me?.profile?.id);
+
+  // Opening the course counts as having seen the change request; the desk reads this back.
+  useEffect(() => {
+    if (admin) return;
+    const unread = notifications
+      .filter((item) => item.course_id === courseId && !item.read_at)
+      .map((item) => item.id);
+    if (unread.length > 0) markNotifications.mutate(unread);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [admin, courseId, notifications]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["portal", "course", courseId],
