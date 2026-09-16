@@ -7,6 +7,8 @@ export type InviteState = "ok" | "invalid" | "used" | "expired";
 
 export type InvitePreview = {
   state: InviteState;
+  /** Who the link belonged to, when it has already been used to create an account. */
+  usedProfile: { full_name: string; email: string | null } | null;
   profile: {
     id: string;
     full_name: string;
