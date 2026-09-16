@@ -739,6 +739,7 @@ export type Database = {
           title: string | null
           updated_at: string
           upwork_status: string
+          used_invite_token: string | null
           user_id: string | null
         }
         Insert: {
@@ -777,6 +778,7 @@ export type Database = {
           title?: string | null
           updated_at?: string
           upwork_status?: string
+          used_invite_token?: string | null
           user_id?: string | null
         }
         Update: {
@@ -815,6 +817,7 @@ export type Database = {
           title?: string | null
           updated_at?: string
           upwork_status?: string
+          used_invite_token?: string | null
           user_id?: string | null
         }
         Relationships: []
