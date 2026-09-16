@@ -91,6 +91,7 @@ export const ADMIN_NAV: NavGroup[] = [
     items: [
       { to: "/auteurs/admin/activity", label: "Activity log", icon: Activity },
       { to: "/auteurs/admin/api", label: "App export API", icon: Code2 },
+      { to: "/auteurs/admin/ai-review", label: "AI reviewer", icon: Sparkles },
       { to: "/auteurs/admin/settings", label: "Settings", icon: Settings },
     ],
   },

@@ -26,6 +26,7 @@ import { useMarkNotifications, useNotifications } from "./useNotifications";
 import { ExamplesLockNotice } from "./CourseCards";
 import { OpenThreadButton } from "./OpenThreadButton";
 import { Banner, BoldText, ConfirmButton, PageTitle, PortalCard, StatusPill } from "./ui";
+import { AiSuggestions } from "./AiSuggestions";
 
 type ScreenDraft = { id: string | null; screen_title: string; body: string; image_idea: string };
 
@@ -293,6 +294,9 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
             It is with the editorial desk. If changes are requested it reopens automatically.
           </Banner>
         ) : null}
+
+        {!admin ? <AiSuggestions courseId={courseId} /> : null}
+
 
         {admin ? (
           <PortalCard className="space-y-4">

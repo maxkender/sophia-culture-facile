@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatDate, formatDateTime, type Course, type Profile } from "@/lib/portal";
 import { EmptyState, PageTitle, PortalCard } from "../ui";
 import { SeenBadge, useChangeRequestSeen } from "../SeenStatus";
+import { AiReviewQueueButton } from "./AiReviewPanel";
 
 export function ReviewQueue() {
   const { data } = useQuery({
@@ -52,6 +53,11 @@ export function ReviewQueue() {
         {course.status === "changes_requested" ? (
           <p className="mt-1">
             <SeenBadge info={seen?.[course.id]} />
+          </p>
+        ) : null}
+        {course.status === "submitted" ? (
+          <p className="mt-2">
+            <AiReviewQueueButton courseId={course.id} />
           </p>
         ) : null}
       </div>
