@@ -6,6 +6,8 @@ import { MobileCtaBar } from "@/components/site/MobileCtaBar";
 import { DownloadCta } from "@/components/site/DownloadCta";
 import { AuthorByline } from "@/components/site/AuthorByline";
 import { subjectLabel } from "@/config/subjects";
+import { publicText } from "@/i18n/public-content";
+import { courseRoute, pathFor } from "@/i18n/routes";
 import { boldParts } from "@/lib/portal";
 import type { PublicCourse, PublicCourseCard } from "@/lib/public-content.functions";
 
@@ -19,7 +21,7 @@ function Rich({ text }: { text: string }) {
   );
 }
 
-/** Un cours publié, rendu comme un article continu. */
+/** Un cours publié, rendu comme un article continu, dans sa propre langue. */
 export function PublishedCoursePage({
   course,
   related,
@@ -27,25 +29,27 @@ export function PublishedCoursePage({
   course: PublicCourse;
   related: PublicCourseCard[];
 }) {
+  const lang = course.language;
+  const text = publicText(lang);
   const screens = course.public_full_text ? course.screens : course.screens.slice(0, 1);
   const truncated = !course.public_full_text && course.screens.length > 1;
 
   return (
     <>
       <SiteHeader />
-      <main className="bg-brand-surface">
+      <main className="bg-brand-surface" lang={lang}>
         <article className="mx-auto w-full max-w-[680px] px-5 py-10 md:py-14">
-          <nav aria-label="Fil d'Ariane" className="text-xs text-brand-navySoft">
+          <nav aria-label={text.breadcrumb} className="text-xs text-brand-navySoft">
             <ol className="flex flex-wrap items-center gap-2">
               <li>
-                <Link to="/" className="hover:underline">
-                  Accueil
+                <Link to={pathFor("home", lang)} className="hover:underline">
+                  {text.home}
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
               <li>
-                <Link to="/cours" className="hover:underline">
-                  Les cours
+                <Link to={pathFor("courses", lang)} className="hover:underline">
+                  {text.hub}
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
@@ -84,13 +88,15 @@ export function PublishedCoursePage({
 
           {truncated ? (
             <p className="mt-10 rounded-3xl bg-card p-6 text-[16px] leading-relaxed text-brand-navySoft shadow-card">
-              La suite de ce cours se lit dans l'application, avec le quiz et la révision quotidienne.
+              {text.truncated}
             </p>
           ) : null}
 
           {course.sources.length > 0 && course.public_full_text ? (
             <section className="mt-14 border-t border-brand-line pt-8">
-              <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-brand-navySoft">Sources</h2>
+              <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-brand-navySoft">
+                {text.sources}
+              </h2>
               <ul className="mt-4 space-y-3 text-[15px]">
                 {course.sources.map((source, index) => (
                   <li key={index}>
@@ -106,16 +112,11 @@ export function PublishedCoursePage({
           ) : null}
 
           <aside className="mt-12 rounded-3xl border border-brand-line bg-card p-7">
-            <p className="text-xl font-extrabold leading-snug text-brand-navy">
-              Lisez-le sur votre téléphone, avec le quiz et la révision quotidienne
-            </p>
-            <p className="mt-3 text-[15px] leading-relaxed text-brand-navySoft">
-              Sophia transforme chaque cours en cinq minutes par jour : un quiz après la lecture, puis des
-              rappels espacés pour ne rien oublier.
-            </p>
+            <p className="text-xl font-extrabold leading-snug text-brand-navy">{text.ctaTitle}</p>
+            <p className="mt-3 text-[15px] leading-relaxed text-brand-navySoft">{text.ctaText}</p>
             <div className="mt-6 max-w-xs">
               <DownloadCta variant="pillPink" size="pillSm">
-                Télécharger l'application
+                {text.ctaButton}
               </DownloadCta>
             </div>
           </aside>
@@ -124,13 +125,13 @@ export function PublishedCoursePage({
         {related.length > 0 ? (
           <section className="mx-auto w-full max-w-5xl px-5 pb-16">
             <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-brand-navySoft">
-              À lire ensuite
+              {text.next}
             </h2>
             <ul className="mt-6 grid gap-4 md:grid-cols-3">
               {related.map((item) => (
                 <li key={item.slug}>
                   <Link
-                    to="/cours/$slug"
+                    to={courseRoute(item.language)}
                     params={{ slug: item.slug }}
                     className="group flex h-full flex-col rounded-3xl bg-card p-6 shadow-card transition-transform duration-200 hover:-translate-y-1"
                   >
@@ -141,7 +142,7 @@ export function PublishedCoursePage({
                       {item.title}
                     </span>
                     <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand-navy">
-                      Lire
+                      {text.read}
                       <ArrowRight
                         aria-hidden="true"
                         className="size-4 transition-transform group-hover:translate-x-1"
@@ -152,8 +153,11 @@ export function PublishedCoursePage({
               ))}
             </ul>
             <p className="mt-8">
-              <Link to="/cours" className="text-sm font-bold text-brand-navy underline-offset-4 hover:underline">
-                Tous les cours
+              <Link
+                to={pathFor("courses", lang)}
+                className="text-sm font-bold text-brand-navy underline-offset-4 hover:underline"
+              >
+                {text.allCourses}
               </Link>
             </p>
           </section>

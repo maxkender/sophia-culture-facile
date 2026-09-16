@@ -2,12 +2,14 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { fr, type Dict } from "./fr";
 import { en } from "./en";
 import {
+  courseRoute,
   langFromPath,
   pathFor,
   routeKeyFromPath,
   type Lang,
   type RouteKey,
 } from "./routes";
+import { rememberLang } from "@/lib/detect-lang";
 
 export const DICTS: Record<Lang, Dict> = { fr, en };
 export type { Dict, Lang };
@@ -47,7 +49,7 @@ const TOGGLE_CLASS =
   "rounded-full border border-brand-line px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-navy transition-colors hover:bg-brand-navy/5";
 
 /**
- * Sélecteur de langue : conserve la page courante.
+ * Sélecteur de langue : mémorise le choix dans un cookie et conserve la page courante.
  * Sur une page de cours, `alternateSlug` donne l'équivalent dans l'autre langue.
  */
 export function LanguageToggle({
@@ -64,16 +66,13 @@ export function LanguageToggle({
   const common = {
     hrefLang: other,
     "aria-label": t.langSwitchAria,
+    onClick: () => rememberLang(other),
     className: `${TOGGLE_CLASS} ${className}`,
   };
 
   if (alternateSlug) {
-    return other === "en" ? (
-      <Link to="/en/lessons/$slug" params={{ slug: alternateSlug }} {...common}>
-        {t.langLabel}
-      </Link>
-    ) : (
-      <Link to="/cours/$slug" params={{ slug: alternateSlug }} {...common}>
+    return (
+      <Link to={courseRoute(other)} params={{ slug: alternateSlug }} {...common}>
         {t.langLabel}
       </Link>
     );

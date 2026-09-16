@@ -5,58 +5,61 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { MobileCtaBar } from "@/components/site/MobileCtaBar";
 import { AuthorByline } from "@/components/site/AuthorByline";
-import { SUBJECT_AREAS, subjectLabel } from "@/config/subjects";
+import { subjectLabel } from "@/config/subjects";
+import { useLang } from "@/i18n";
+import { publicText } from "@/i18n/public-content";
+import { courseRoute } from "@/i18n/routes";
 import type { PublicCourseCard } from "@/lib/public-content.functions";
 
-/** Index public des cours publiés, filtrable par domaine. */
+/** Index des cours publiés : la langue du visiteur d'abord, les autres sur demande. */
 export function PublishedCoursesHub({ courses }: { courses: PublicCourseCard[] }) {
-  const [active, setActive] = useState<string>("all");
-  const counts = new Map<string, number>();
-  for (const course of courses) {
-    const key = course.subject_area ?? "";
-    counts.set(key, (counts.get(key) ?? 0) + 1);
-  }
+  const lang = useLang();
+  const text = publicText(lang);
+  const [subject, setSubject] = useState<string>("all");
+  const [showOther, setShowOther] = useState(false);
+
+  const inLang = courses.filter((c) => c.language === lang);
+  const other = courses.filter((c) => c.language !== lang);
+  const pool = showOther ? [...inLang, ...other] : inLang;
+
+  const subjects = [...new Set(pool.map((c) => c.subject_area).filter(Boolean))] as string[];
   const filters = [
-    { id: "all", label: "Tous les cours", count: courses.length },
-    ...SUBJECT_AREAS.filter((area) => counts.get(area)).map((area) => ({
-      id: area,
-      label: subjectLabel(area),
-      count: counts.get(area) ?? 0,
+    { id: "all", label: text.all, count: pool.length },
+    ...subjects.map((id) => ({
+      id,
+      label: subjectLabel(id),
+      count: pool.filter((c) => c.subject_area === id).length,
     })),
   ];
-  const visible = active === "all" ? courses : courses.filter((course) => course.subject_area === active);
+  const visible = subject === "all" ? pool : pool.filter((c) => c.subject_area === subject);
 
   return (
     <>
       <SiteHeader />
       <main className="bg-brand-surface">
-        <div className="mx-auto w-full max-w-5xl px-5 py-14 md:py-20">
-          <h1 className="text-4xl font-extrabold leading-tight text-brand-navy md:text-6xl">
-            Les cours de Sophia
+        <div className="mx-auto w-full max-w-5xl px-5 py-12 md:py-16">
+          <h1 className="text-3xl font-extrabold leading-tight text-brand-navy md:text-5xl">
+            {text.hubTitle}
           </h1>
-          <p className="mt-5 max-w-2xl text-[17px] leading-relaxed text-brand-navySoft">
-            Chaque cours est écrit par un universitaire ou un spécialiste, signé de son nom, et relu avant
-            publication. À lire ici, à réviser dans l'application.
+          <p className="mt-4 max-w-2xl text-[17px] leading-relaxed text-brand-navySoft">
+            {text.hubIntro}
           </p>
 
-          {courses.length === 0 ? (
-            <p className="mt-12 rounded-3xl bg-card p-8 text-[17px] leading-relaxed text-brand-navySoft shadow-card">
-              Les premiers cours arrivent bientôt. En attendant, l'application en propose déjà plusieurs
-              centaines.
-            </p>
+          {pool.length === 0 ? (
+            <p className="mt-10 text-[17px] text-brand-navySoft">{text.empty}</p>
           ) : (
             <>
-              <div role="group" aria-label="Filtrer par domaine" className="mt-9 flex flex-wrap gap-2">
+              <div className="mt-8 flex flex-wrap gap-2">
                 {filters.map((filter) => (
                   <button
                     key={filter.id}
                     type="button"
-                    onClick={() => setActive(filter.id)}
-                    aria-pressed={active === filter.id}
+                    onClick={() => setSubject(filter.id)}
+                    aria-pressed={subject === filter.id}
                     className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${
-                      active === filter.id
+                      subject === filter.id
                         ? "bg-brand-navy text-white"
-                        : "bg-card text-brand-navy hover:bg-brand-navy/10"
+                        : "bg-card text-brand-navy shadow-card hover:bg-brand-navy/5"
                     }`}
                   >
                     {filter.label} ({filter.count})
@@ -64,16 +67,29 @@ export function PublishedCoursesHub({ courses }: { courses: PublicCourseCard[] }
                 ))}
               </div>
 
+              {other.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => setShowOther((v) => !v)}
+                  aria-pressed={showOther}
+                  className="mt-4 text-sm font-bold text-brand-navy underline-offset-4 hover:underline"
+                >
+                  {showOther ? text.otherLangHide : text.otherLangShow} ({other.length})
+                </button>
+              ) : null}
+
               <ul className="mt-10 grid gap-4 md:grid-cols-2">
                 {visible.map((course) => (
-                  <li key={course.slug}>
+                  <li key={`${course.language}-${course.slug}`}>
                     <div className="flex h-full flex-col rounded-3xl bg-card p-6 shadow-card">
                       <span className="text-[11px] font-extrabold uppercase tracking-wide text-brand-pink">
                         {subjectLabel(course.subject_area)}
+                        {course.language !== lang ? ` · ${text.otherLangBadge}` : ""}
                       </span>
                       <Link
-                        to="/cours/$slug"
+                        to={courseRoute(course.language)}
                         params={{ slug: course.slug }}
+                        hrefLang={course.language}
                         className="group mt-3 text-xl font-extrabold leading-snug text-brand-navy"
                       >
                         {course.title}

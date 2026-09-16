@@ -1,17 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { LegalPage } from "@/components/pages/LegalPage";
-import { langLinks, meta } from "@/lib/seo";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Ancienne URL française : redirection permanente vers la version /fr. */
 export const Route = createFileRoute("/mentions-legales")({
-  head: () => ({
-    meta: meta({
-      title: "Mentions légales | Sophia, culture générale",
-      description:
-        "Mentions légales du site de Sophia, culture générale, application mobile éditée par Vik Studios SAS, France.",
-      lang: "fr",
-      key: "legal",
-    }),
-    links: langLinks("legal", "fr"),
-  }),
-  component: LegalPage,
+  beforeLoad: () => {
+    throw redirect({ to: "/fr/mentions-legales", statusCode: 301, replace: true });
+  },
+  component: () => null,
 });

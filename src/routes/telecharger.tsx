@@ -1,17 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { DownloadPage } from "@/components/pages/DownloadPage";
-import { langLinks, meta } from "@/lib/seo";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Ancienne URL française : redirection permanente vers la version /fr. */
 export const Route = createFileRoute("/telecharger")({
-  head: () => ({
-    meta: meta({
-      title: "Télécharger Sophia, culture générale (iOS et Android)",
-      description:
-        "Télécharge Sophia, culture générale gratuitement sur l'App Store ou Google Play. L'application française de culture générale : cours courts, quiz et entraînement quotidien.",
-      lang: "fr",
-      key: "download",
-    }),
-    links: langLinks("download", "fr"),
-  }),
-  component: DownloadPage,
+  beforeLoad: () => {
+    throw redirect({ to: "/fr/telecharger", statusCode: 301, replace: true });
+  },
+  component: () => null,
 });

@@ -30,6 +30,12 @@ import { Route as EnDownloadRouteImport } from './routes/en/download'
 import { Route as EnLegalNoticeRouteImport } from './routes/en/legal-notice'
 import { Route as EnPrivacyRouteImport } from './routes/en/privacy'
 import { Route as EnSophiaGeneralKnowledgeRouteImport } from './routes/en/sophia-general-knowledge'
+import { Route as FrIndexRouteImport } from './routes/fr/index'
+import { Route as FrConfidentialiteRouteImport } from './routes/fr/confidentialite'
+import { Route as FrDevenirProfesseurRouteImport } from './routes/fr/devenir-professeur'
+import { Route as FrMentionsLegalesRouteImport } from './routes/fr/mentions-legales'
+import { Route as FrSophiaCultureGeneraleRouteImport } from './routes/fr/sophia-culture-generale'
+import { Route as FrTelechargerRouteImport } from './routes/fr/telecharger'
 import { Route as AuthenticatedAuteursIndexRouteImport } from './routes/_authenticated/auteurs/index'
 import { Route as AuthenticatedAuteursContractRouteImport } from './routes/_authenticated/auteurs/contract'
 import { Route as AuthenticatedAuteursExamplesRouteImport } from './routes/_authenticated/auteurs/examples'
@@ -37,8 +43,12 @@ import { Route as AuthenticatedAuteursGuideRouteImport } from './routes/_authent
 import { Route as AuthenticatedAuteursMessagesRouteImport } from './routes/_authenticated/auteurs/messages'
 import { Route as AuthenticatedAuteursOpenRouteImport } from './routes/_authenticated/auteurs/open'
 import { Route as AuthenticatedAuteursProfileRouteImport } from './routes/_authenticated/auteurs/profile'
+import { Route as EnAuthorsSlugRouteImport } from './routes/en/authors.$slug'
 import { Route as EnLessonsIndexRouteImport } from './routes/en/lessons/index'
 import { Route as EnLessonsSlugRouteImport } from './routes/en/lessons/$slug'
+import { Route as FrAuteursSlugRouteImport } from './routes/fr/auteurs.$slug'
+import { Route as FrCoursIndexRouteImport } from './routes/fr/cours/index'
+import { Route as FrCoursSlugRouteImport } from './routes/fr/cours/$slug'
 import { Route as AuthenticatedAuteursAdminIndexRouteImport } from './routes/_authenticated/auteurs/admin/index'
 import { Route as AuthenticatedAuteursAdminActivityRouteImport } from './routes/_authenticated/auteurs/admin/activity'
 import { Route as AuthenticatedAuteursAdminAnnouncementsRouteImport } from './routes/_authenticated/auteurs/admin/announcements'
@@ -168,6 +178,36 @@ const EnSophiaGeneralKnowledgeRoute =
     path: '/en/sophia-general-knowledge',
     getParentRoute: () => rootRouteImport,
   } as any)
+const FrIndexRoute = FrIndexRouteImport.update({
+  id: '/fr/',
+  path: '/fr/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrConfidentialiteRoute = FrConfidentialiteRouteImport.update({
+  id: '/fr/confidentialite',
+  path: '/fr/confidentialite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrDevenirProfesseurRoute = FrDevenirProfesseurRouteImport.update({
+  id: '/fr/devenir-professeur',
+  path: '/fr/devenir-professeur',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrMentionsLegalesRoute = FrMentionsLegalesRouteImport.update({
+  id: '/fr/mentions-legales',
+  path: '/fr/mentions-legales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrSophiaCultureGeneraleRoute = FrSophiaCultureGeneraleRouteImport.update({
+  id: '/fr/sophia-culture-generale',
+  path: '/fr/sophia-culture-generale',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrTelechargerRoute = FrTelechargerRouteImport.update({
+  id: '/fr/telecharger',
+  path: '/fr/telecharger',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAuteursIndexRoute =
   AuthenticatedAuteursIndexRouteImport.update({
     id: '/auteurs/',
@@ -210,6 +250,11 @@ const AuthenticatedAuteursProfileRoute =
     path: '/auteurs/profile',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const EnAuthorsSlugRoute = EnAuthorsSlugRouteImport.update({
+  id: '/en/authors/$slug',
+  path: '/en/authors/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnLessonsIndexRoute = EnLessonsIndexRouteImport.update({
   id: '/en/lessons/',
   path: '/en/lessons/',
@@ -218,6 +263,21 @@ const EnLessonsIndexRoute = EnLessonsIndexRouteImport.update({
 const EnLessonsSlugRoute = EnLessonsSlugRouteImport.update({
   id: '/en/lessons/$slug',
   path: '/en/lessons/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrAuteursSlugRoute = FrAuteursSlugRouteImport.update({
+  id: '/fr/auteurs/$slug',
+  path: '/fr/auteurs/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrCoursIndexRoute = FrCoursIndexRouteImport.update({
+  id: '/fr/cours/',
+  path: '/fr/cours/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrCoursSlugRoute = FrCoursSlugRouteImport.update({
+  id: '/fr/cours/$slug',
+  path: '/fr/cours/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAuteursAdminIndexRoute =
@@ -370,17 +430,27 @@ export interface FileRoutesByFullPath {
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
+  '/fr/confidentialite': typeof FrConfidentialiteRoute
+  '/fr/devenir-professeur': typeof FrDevenirProfesseurRoute
+  '/fr/mentions-legales': typeof FrMentionsLegalesRoute
+  '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
+  '/fr/telecharger': typeof FrTelechargerRoute
   '/cours/': typeof CoursIndexRoute
   '/en/': typeof EnIndexRoute
+  '/fr/': typeof FrIndexRoute
   '/auteurs/contract': typeof AuthenticatedAuteursContractRoute
   '/auteurs/examples': typeof AuthenticatedAuteursExamplesRoute
   '/auteurs/guide': typeof AuthenticatedAuteursGuideRoute
   '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/en/authors/$slug': typeof EnAuthorsSlugRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
+  '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
+  '/fr/cours/$slug': typeof FrCoursSlugRoute
   '/auteurs/': typeof AuthenticatedAuteursIndexRoute
   '/en/lessons/': typeof EnLessonsIndexRoute
+  '/fr/cours/': typeof FrCoursIndexRoute
   '/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
   '/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
   '/auteurs/admin/api': typeof AuthenticatedAuteursAdminApiRoute
@@ -423,17 +493,27 @@ export interface FileRoutesByTo {
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
+  '/fr/confidentialite': typeof FrConfidentialiteRoute
+  '/fr/devenir-professeur': typeof FrDevenirProfesseurRoute
+  '/fr/mentions-legales': typeof FrMentionsLegalesRoute
+  '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
+  '/fr/telecharger': typeof FrTelechargerRoute
   '/cours': typeof CoursIndexRoute
   '/en': typeof EnIndexRoute
+  '/fr': typeof FrIndexRoute
   '/auteurs/contract': typeof AuthenticatedAuteursContractRoute
   '/auteurs/examples': typeof AuthenticatedAuteursExamplesRoute
   '/auteurs/guide': typeof AuthenticatedAuteursGuideRoute
   '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/en/authors/$slug': typeof EnAuthorsSlugRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
+  '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
+  '/fr/cours/$slug': typeof FrCoursSlugRoute
   '/auteurs': typeof AuthenticatedAuteursIndexRoute
   '/en/lessons': typeof EnLessonsIndexRoute
+  '/fr/cours': typeof FrCoursIndexRoute
   '/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
   '/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
   '/auteurs/admin/api': typeof AuthenticatedAuteursAdminApiRoute
@@ -478,17 +558,27 @@ export interface FileRoutesById {
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
+  '/fr/confidentialite': typeof FrConfidentialiteRoute
+  '/fr/devenir-professeur': typeof FrDevenirProfesseurRoute
+  '/fr/mentions-legales': typeof FrMentionsLegalesRoute
+  '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
+  '/fr/telecharger': typeof FrTelechargerRoute
   '/cours/': typeof CoursIndexRoute
   '/en/': typeof EnIndexRoute
+  '/fr/': typeof FrIndexRoute
   '/_authenticated/auteurs/contract': typeof AuthenticatedAuteursContractRoute
   '/_authenticated/auteurs/examples': typeof AuthenticatedAuteursExamplesRoute
   '/_authenticated/auteurs/guide': typeof AuthenticatedAuteursGuideRoute
   '/_authenticated/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/_authenticated/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/_authenticated/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/en/authors/$slug': typeof EnAuthorsSlugRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
+  '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
+  '/fr/cours/$slug': typeof FrCoursSlugRoute
   '/_authenticated/auteurs/': typeof AuthenticatedAuteursIndexRoute
   '/en/lessons/': typeof EnLessonsIndexRoute
+  '/fr/cours/': typeof FrCoursIndexRoute
   '/_authenticated/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
   '/_authenticated/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
   '/_authenticated/auteurs/admin/api': typeof AuthenticatedAuteursAdminApiRoute
@@ -533,17 +623,27 @@ export interface FileRouteTypes {
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/sophia-general-knowledge'
+    | '/fr/confidentialite'
+    | '/fr/devenir-professeur'
+    | '/fr/mentions-legales'
+    | '/fr/sophia-culture-generale'
+    | '/fr/telecharger'
     | '/cours/'
     | '/en/'
+    | '/fr/'
     | '/auteurs/contract'
     | '/auteurs/examples'
     | '/auteurs/guide'
     | '/auteurs/messages'
     | '/auteurs/open'
     | '/auteurs/profile'
+    | '/en/authors/$slug'
     | '/en/lessons/$slug'
+    | '/fr/auteurs/$slug'
+    | '/fr/cours/$slug'
     | '/auteurs/'
     | '/en/lessons/'
+    | '/fr/cours/'
     | '/auteurs/admin/activity'
     | '/auteurs/admin/announcements'
     | '/auteurs/admin/api'
@@ -586,17 +686,27 @@ export interface FileRouteTypes {
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/sophia-general-knowledge'
+    | '/fr/confidentialite'
+    | '/fr/devenir-professeur'
+    | '/fr/mentions-legales'
+    | '/fr/sophia-culture-generale'
+    | '/fr/telecharger'
     | '/cours'
     | '/en'
+    | '/fr'
     | '/auteurs/contract'
     | '/auteurs/examples'
     | '/auteurs/guide'
     | '/auteurs/messages'
     | '/auteurs/open'
     | '/auteurs/profile'
+    | '/en/authors/$slug'
     | '/en/lessons/$slug'
+    | '/fr/auteurs/$slug'
+    | '/fr/cours/$slug'
     | '/auteurs'
     | '/en/lessons'
+    | '/fr/cours'
     | '/auteurs/admin/activity'
     | '/auteurs/admin/announcements'
     | '/auteurs/admin/api'
@@ -640,17 +750,27 @@ export interface FileRouteTypes {
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/sophia-general-knowledge'
+    | '/fr/confidentialite'
+    | '/fr/devenir-professeur'
+    | '/fr/mentions-legales'
+    | '/fr/sophia-culture-generale'
+    | '/fr/telecharger'
     | '/cours/'
     | '/en/'
+    | '/fr/'
     | '/_authenticated/auteurs/contract'
     | '/_authenticated/auteurs/examples'
     | '/_authenticated/auteurs/guide'
     | '/_authenticated/auteurs/messages'
     | '/_authenticated/auteurs/open'
     | '/_authenticated/auteurs/profile'
+    | '/en/authors/$slug'
     | '/en/lessons/$slug'
+    | '/fr/auteurs/$slug'
+    | '/fr/cours/$slug'
     | '/_authenticated/auteurs/'
     | '/en/lessons/'
+    | '/fr/cours/'
     | '/_authenticated/auteurs/admin/activity'
     | '/_authenticated/auteurs/admin/announcements'
     | '/_authenticated/auteurs/admin/api'
@@ -695,10 +815,20 @@ export interface RootRouteChildren {
   EnLegalNoticeRoute: typeof EnLegalNoticeRoute
   EnPrivacyRoute: typeof EnPrivacyRoute
   EnSophiaGeneralKnowledgeRoute: typeof EnSophiaGeneralKnowledgeRoute
+  FrConfidentialiteRoute: typeof FrConfidentialiteRoute
+  FrDevenirProfesseurRoute: typeof FrDevenirProfesseurRoute
+  FrMentionsLegalesRoute: typeof FrMentionsLegalesRoute
+  FrSophiaCultureGeneraleRoute: typeof FrSophiaCultureGeneraleRoute
+  FrTelechargerRoute: typeof FrTelechargerRoute
   CoursIndexRoute: typeof CoursIndexRoute
   EnIndexRoute: typeof EnIndexRoute
+  FrIndexRoute: typeof FrIndexRoute
+  EnAuthorsSlugRoute: typeof EnAuthorsSlugRoute
   EnLessonsSlugRoute: typeof EnLessonsSlugRoute
+  FrAuteursSlugRoute: typeof FrAuteursSlugRoute
+  FrCoursSlugRoute: typeof FrCoursSlugRoute
   EnLessonsIndexRoute: typeof EnLessonsIndexRoute
+  FrCoursIndexRoute: typeof FrCoursIndexRoute
   ApiPublicAppCoursesRoute: typeof ApiPublicAppCoursesRouteWithChildren
 }
 
@@ -851,6 +981,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnSophiaGeneralKnowledgeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fr/': {
+      id: '/fr/'
+      path: '/fr'
+      fullPath: '/fr/'
+      preLoaderRoute: typeof FrIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/confidentialite': {
+      id: '/fr/confidentialite'
+      path: '/fr/confidentialite'
+      fullPath: '/fr/confidentialite'
+      preLoaderRoute: typeof FrConfidentialiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/devenir-professeur': {
+      id: '/fr/devenir-professeur'
+      path: '/fr/devenir-professeur'
+      fullPath: '/fr/devenir-professeur'
+      preLoaderRoute: typeof FrDevenirProfesseurRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/mentions-legales': {
+      id: '/fr/mentions-legales'
+      path: '/fr/mentions-legales'
+      fullPath: '/fr/mentions-legales'
+      preLoaderRoute: typeof FrMentionsLegalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/sophia-culture-generale': {
+      id: '/fr/sophia-culture-generale'
+      path: '/fr/sophia-culture-generale'
+      fullPath: '/fr/sophia-culture-generale'
+      preLoaderRoute: typeof FrSophiaCultureGeneraleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/telecharger': {
+      id: '/fr/telecharger'
+      path: '/fr/telecharger'
+      fullPath: '/fr/telecharger'
+      preLoaderRoute: typeof FrTelechargerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/auteurs/': {
       id: '/_authenticated/auteurs/'
       path: '/auteurs'
@@ -900,6 +1072,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/en/authors/$slug': {
+      id: '/en/authors/$slug'
+      path: '/en/authors/$slug'
+      fullPath: '/en/authors/$slug'
+      preLoaderRoute: typeof EnAuthorsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/en/lessons/': {
       id: '/en/lessons/'
       path: '/en/lessons'
@@ -912,6 +1091,27 @@ declare module '@tanstack/react-router' {
       path: '/en/lessons/$slug'
       fullPath: '/en/lessons/$slug'
       preLoaderRoute: typeof EnLessonsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/auteurs/$slug': {
+      id: '/fr/auteurs/$slug'
+      path: '/fr/auteurs/$slug'
+      fullPath: '/fr/auteurs/$slug'
+      preLoaderRoute: typeof FrAuteursSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/cours/': {
+      id: '/fr/cours/'
+      path: '/fr/cours'
+      fullPath: '/fr/cours/'
+      preLoaderRoute: typeof FrCoursIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/cours/$slug': {
+      id: '/fr/cours/$slug'
+      path: '/fr/cours/$slug'
+      fullPath: '/fr/cours/$slug'
+      preLoaderRoute: typeof FrCoursSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/auteurs/admin/': {
@@ -1181,10 +1381,20 @@ const rootRouteChildren: RootRouteChildren = {
   EnLegalNoticeRoute: EnLegalNoticeRoute,
   EnPrivacyRoute: EnPrivacyRoute,
   EnSophiaGeneralKnowledgeRoute: EnSophiaGeneralKnowledgeRoute,
+  FrConfidentialiteRoute: FrConfidentialiteRoute,
+  FrDevenirProfesseurRoute: FrDevenirProfesseurRoute,
+  FrMentionsLegalesRoute: FrMentionsLegalesRoute,
+  FrSophiaCultureGeneraleRoute: FrSophiaCultureGeneraleRoute,
+  FrTelechargerRoute: FrTelechargerRoute,
   CoursIndexRoute: CoursIndexRoute,
   EnIndexRoute: EnIndexRoute,
+  FrIndexRoute: FrIndexRoute,
+  EnAuthorsSlugRoute: EnAuthorsSlugRoute,
   EnLessonsSlugRoute: EnLessonsSlugRoute,
+  FrAuteursSlugRoute: FrAuteursSlugRoute,
+  FrCoursSlugRoute: FrCoursSlugRoute,
   EnLessonsIndexRoute: EnLessonsIndexRoute,
+  FrCoursIndexRoute: FrCoursIndexRoute,
   ApiPublicAppCoursesRoute: ApiPublicAppCoursesRouteWithChildren,
 }
 export const routeTree = rootRouteImport

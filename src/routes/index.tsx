@@ -1,29 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { HomePage } from "@/components/pages/HomePage";
-import {
-  faqSchema,
-  ldScript,
-  langLinks,
-  meta,
-  mobileApplicationSchema,
-  organizationSchema,
-} from "@/lib/seo";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { detectLangInBrowser } from "@/lib/detect-lang";
 
+/**
+ * Racine du site : renvoie vers la version linguistique détectée.
+ * Le vrai aiguillage se fait côté serveur (302, voir `src/server.ts`) ;
+ * cette route couvre les navigations côté client vers « / ».
+ */
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: meta({
-      title: "Sophia, culture générale | L'application pour apprendre chaque jour",
-      description:
-        "Sophia, culture générale est l'application mobile française gratuite pour apprendre la culture générale chaque jour : cours courts, quiz et révision quotidienne. iOS et Android.",
-      lang: "fr",
-      key: "home",
-    }),
-    links: langLinks("home", "fr"),
-    scripts: [
-      ldScript(mobileApplicationSchema("fr")),
-      ldScript(organizationSchema("fr")),
-      ldScript(faqSchema("fr")),
-    ],
-  }),
-  component: HomePage,
+  beforeLoad: () => {
+    const lang = typeof document === "undefined" ? "en" : detectLangInBrowser();
+    throw redirect({ to: lang === "fr" ? "/fr" : "/en", replace: true });
+  },
+  component: () => null,
 });

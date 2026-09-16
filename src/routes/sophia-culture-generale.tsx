@@ -1,18 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { LandingPage } from "@/components/pages/LandingPage";
-import { langLinks, ldScript, meta, mobileApplicationSchema } from "@/lib/seo";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Ancienne URL française : redirection permanente vers la version /fr. */
 export const Route = createFileRoute("/sophia-culture-generale")({
-  head: () => ({
-    meta: meta({
-      title: "Sophia, culture générale : l'app française de culture générale",
-      description:
-        "Sophia, culture générale : cours courts, quiz et entraînement quotidien. Application française gratuite sur iOS et Android. Télécharge-la en une minute.",
-      lang: "fr",
-      key: "landing",
-    }),
-    links: langLinks("landing", "fr"),
-    scripts: [ldScript(mobileApplicationSchema("fr"))],
-  }),
-  component: LandingPage,
+  beforeLoad: () => {
+    throw redirect({ to: "/fr/sophia-culture-generale", statusCode: 301, replace: true });
+  },
+  component: () => null,
 });

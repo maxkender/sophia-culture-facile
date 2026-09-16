@@ -1,24 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PublishedCoursesHub } from "@/components/pages/PublishedCoursesHub";
-import { listPublishedCourses } from "@/lib/public-content.functions";
-import { langLinks, meta } from "@/lib/seo";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Ancienne URL française : redirection permanente vers la version /fr. */
 export const Route = createFileRoute("/cours/")({
-  loader: () => listPublishedCourses(),
-  head: () => ({
-    meta: meta({
-      title: "Les cours de culture générale de Sophia",
-      description:
-        "Tous les cours de culture générale de Sophia, écrits et signés par des universitaires et des spécialistes : histoire, sciences, littérature, art, mythologie, monde actuel.",
-      lang: "fr",
-      key: "courses",
-    }),
-    links: langLinks("courses", "fr"),
-  }),
-  component: CoursesRoute,
+  beforeLoad: () => {
+    throw redirect({ to: "/fr/cours", statusCode: 301, replace: true });
+  },
+  component: () => null,
 });
-
-function CoursesRoute() {
-  const courses = Route.useLoaderData();
-  return <PublishedCoursesHub courses={courses} />;
-}

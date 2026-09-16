@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { detectLangFromHeaders } from "./lib/detect-lang";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -46,6 +47,20 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const url = new URL(request.url);
+    if (request.method === "GET" && (url.pathname === "/" || url.pathname === "")) {
+      // Première visite : aiguillage temporaire vers la langue détectée.
+      const lang = detectLangFromHeaders(request.headers);
+      return new Response(null, {
+        status: 302,
+        headers: {
+          location: `/${lang}${url.search}`,
+          vary: "Accept-Language, Cookie",
+          "cache-control": "no-store",
+        },
+      });
+    }
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

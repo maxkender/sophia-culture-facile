@@ -7,7 +7,7 @@ import { MobileCtaBar } from "@/components/site/MobileCtaBar";
 import { DownloadCta } from "@/components/site/DownloadCta";
 import { getRelatedCourses, type Course } from "@/content/api";
 import { fill, useI18n } from "@/i18n";
-import { pathFor } from "@/i18n/routes";
+import { pathFor, courseRoute } from "@/i18n/routes";
 
 /** Formate une date ISO selon la langue de la page. */
 function formatDate(iso: string, lang: "fr" | "en") {
@@ -53,7 +53,7 @@ export function CoursePage({ course }: { course: Course }) {
   const { lang, t } = useI18n();
   const related = getRelatedCourses(course);
   const hubPath = pathFor("courses", lang);
-  const detailRoute = lang === "fr" ? "/cours/$slug" : "/en/lessons/$slug";
+  const detailRoute = courseRoute(lang);
 
   return (
     <>
