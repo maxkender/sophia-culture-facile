@@ -51,6 +51,7 @@ import { Route as FrCoursIndexRouteImport } from './routes/fr/cours/index'
 import { Route as FrCoursSlugRouteImport } from './routes/fr/cours/$slug'
 import { Route as AuthenticatedAuteursAdminIndexRouteImport } from './routes/_authenticated/auteurs/admin/index'
 import { Route as AuthenticatedAuteursAdminActivityRouteImport } from './routes/_authenticated/auteurs/admin/activity'
+import { Route as AuthenticatedAuteursAdminAiReviewRouteImport } from './routes/_authenticated/auteurs/admin/ai-review'
 import { Route as AuthenticatedAuteursAdminAnnouncementsRouteImport } from './routes/_authenticated/auteurs/admin/announcements'
 import { Route as AuthenticatedAuteursAdminApiRouteImport } from './routes/_authenticated/auteurs/admin/api'
 import { Route as AuthenticatedAuteursAdminApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/applications'
@@ -292,6 +293,12 @@ const AuthenticatedAuteursAdminActivityRoute =
     path: '/auteurs/admin/activity',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAuteursAdminAiReviewRoute =
+  AuthenticatedAuteursAdminAiReviewRouteImport.update({
+    id: '/auteurs/admin/ai-review',
+    path: '/auteurs/admin/ai-review',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAuteursAdminAnnouncementsRoute =
   AuthenticatedAuteursAdminAnnouncementsRouteImport.update({
     id: '/auteurs/admin/announcements',
@@ -452,6 +459,7 @@ export interface FileRoutesByFullPath {
   '/en/lessons/': typeof EnLessonsIndexRoute
   '/fr/cours/': typeof FrCoursIndexRoute
   '/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
+  '/auteurs/admin/ai-review': typeof AuthenticatedAuteursAdminAiReviewRoute
   '/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
   '/auteurs/admin/api': typeof AuthenticatedAuteursAdminApiRoute
   '/auteurs/admin/applications': typeof AuthenticatedAuteursAdminApplicationsRoute
@@ -515,6 +523,7 @@ export interface FileRoutesByTo {
   '/en/lessons': typeof EnLessonsIndexRoute
   '/fr/cours': typeof FrCoursIndexRoute
   '/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
+  '/auteurs/admin/ai-review': typeof AuthenticatedAuteursAdminAiReviewRoute
   '/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
   '/auteurs/admin/api': typeof AuthenticatedAuteursAdminApiRoute
   '/auteurs/admin/applications': typeof AuthenticatedAuteursAdminApplicationsRoute
@@ -580,6 +589,7 @@ export interface FileRoutesById {
   '/en/lessons/': typeof EnLessonsIndexRoute
   '/fr/cours/': typeof FrCoursIndexRoute
   '/_authenticated/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
+  '/_authenticated/auteurs/admin/ai-review': typeof AuthenticatedAuteursAdminAiReviewRoute
   '/_authenticated/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
   '/_authenticated/auteurs/admin/api': typeof AuthenticatedAuteursAdminApiRoute
   '/_authenticated/auteurs/admin/applications': typeof AuthenticatedAuteursAdminApplicationsRoute
@@ -645,6 +655,7 @@ export interface FileRouteTypes {
     | '/en/lessons/'
     | '/fr/cours/'
     | '/auteurs/admin/activity'
+    | '/auteurs/admin/ai-review'
     | '/auteurs/admin/announcements'
     | '/auteurs/admin/api'
     | '/auteurs/admin/applications'
@@ -708,6 +719,7 @@ export interface FileRouteTypes {
     | '/en/lessons'
     | '/fr/cours'
     | '/auteurs/admin/activity'
+    | '/auteurs/admin/ai-review'
     | '/auteurs/admin/announcements'
     | '/auteurs/admin/api'
     | '/auteurs/admin/applications'
@@ -772,6 +784,7 @@ export interface FileRouteTypes {
     | '/en/lessons/'
     | '/fr/cours/'
     | '/_authenticated/auteurs/admin/activity'
+    | '/_authenticated/auteurs/admin/ai-review'
     | '/_authenticated/auteurs/admin/announcements'
     | '/_authenticated/auteurs/admin/api'
     | '/_authenticated/auteurs/admin/applications'
@@ -1128,6 +1141,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursAdminActivityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auteurs/admin/ai-review': {
+      id: '/_authenticated/auteurs/admin/ai-review'
+      path: '/auteurs/admin/ai-review'
+      fullPath: '/auteurs/admin/ai-review'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminAiReviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/auteurs/admin/announcements': {
       id: '/_authenticated/auteurs/admin/announcements'
       path: '/auteurs/admin/announcements'
@@ -1280,6 +1300,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuteursProfileRoute: typeof AuthenticatedAuteursProfileRoute
   AuthenticatedAuteursIndexRoute: typeof AuthenticatedAuteursIndexRoute
   AuthenticatedAuteursAdminActivityRoute: typeof AuthenticatedAuteursAdminActivityRoute
+  AuthenticatedAuteursAdminAiReviewRoute: typeof AuthenticatedAuteursAdminAiReviewRoute
   AuthenticatedAuteursAdminAnnouncementsRoute: typeof AuthenticatedAuteursAdminAnnouncementsRoute
   AuthenticatedAuteursAdminApiRoute: typeof AuthenticatedAuteursAdminApiRoute
   AuthenticatedAuteursAdminApplicationsRoute: typeof AuthenticatedAuteursAdminApplicationsRoute
@@ -1311,6 +1332,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAuteursIndexRoute: AuthenticatedAuteursIndexRoute,
   AuthenticatedAuteursAdminActivityRoute:
     AuthenticatedAuteursAdminActivityRoute,
+  AuthenticatedAuteursAdminAiReviewRoute:
+    AuthenticatedAuteursAdminAiReviewRoute,
   AuthenticatedAuteursAdminAnnouncementsRoute:
     AuthenticatedAuteursAdminAnnouncementsRoute,
   AuthenticatedAuteursAdminApiRoute: AuthenticatedAuteursAdminApiRoute,
