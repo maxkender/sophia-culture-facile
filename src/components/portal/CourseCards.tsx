@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Lock } from "lucide-react";
+import { AlertTriangle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDate, isOverdue, type Course } from "@/lib/portal";
 import type { CourseStatus } from "@/config/portal";
@@ -35,7 +35,14 @@ function CardBody({ course }: { course: Course }) {
           <p className="mt-2 text-lg font-bold leading-snug text-brand-navy">{course.title}</p>
           {course.subtitle ? <p className="mt-1 text-sm text-brand-navySoft">{course.subtitle}</p> : null}
         </div>
-        <StatusPill status={course.status as CourseStatus} />
+        {course.status === "changes_requested" ? (
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-portal-amber px-3 py-1 text-xs font-extrabold text-brand-navy">
+            <AlertTriangle className="size-3.5" aria-hidden="true" />
+            Needs your attention
+          </span>
+        ) : (
+          <StatusPill status={course.status as CourseStatus} />
+        )}
       </div>
       <p className={`mt-4 text-sm ${isOverdue(course) ? "font-bold text-portal-red" : "text-brand-navySoft"}`}>
         Due {formatDate(course.due_date)}
