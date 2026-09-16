@@ -8,12 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function AuthPage() {
+export function AuthPage({ initialEmail = "", startWithReset = false }: { initialEmail?: string; startWithReset?: boolean } = {}) {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(
+    startWithReset ? "Enter your email address below and we will send you a reset link." : null,
+  );
 
   async function signIn(event: FormEvent) {
     event.preventDefault();
