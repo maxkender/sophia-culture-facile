@@ -99,7 +99,16 @@ export const getInvite = createServerFn({ method: "POST" })
     const { supabaseAdmin, profile } = await loadInvite(data.token);
     const state = inviteState(profile);
     if (!profile || state !== "ok") {
-      return { state, profile: null, courses: [], education: [], hasAccount: false };
+      const consumed = state === "expired" ? null : await loadConsumedInvite(data.token);
+      const used = consumed ?? (profile && state === "used" ? profile : null);
+      return {
+        state: used ? "used" : state,
+        usedProfile: used ? { full_name: used.full_name, email: used.email } : null,
+        profile: null,
+        courses: [],
+        education: [],
+        hasAccount: false,
+      };
     }
 
     const { data: courses } = await supabaseAdmin
