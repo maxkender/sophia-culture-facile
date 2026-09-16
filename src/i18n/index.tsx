@@ -2,12 +2,14 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { fr, type Dict } from "./fr";
 import { en } from "./en";
 import {
+  courseRoute,
   langFromPath,
   pathFor,
   routeKeyFromPath,
   type Lang,
   type RouteKey,
 } from "./routes";
+import { rememberLang } from "@/lib/detect-lang";
 
 export const DICTS: Record<Lang, Dict> = { fr, en };
 export type { Dict, Lang };
