@@ -460,7 +460,8 @@ export function AuthorProfile() {
               ) : null}
             </div>
             <p className="mt-4 text-xs text-brand-navySoft">
-              Updates as you type. This is the byline printed under every course you publish.
+              Updates as you type. This is exactly the byline printed under every course you publish: your published
+              name, then your one-line byline — or, if you leave that empty, where you work now.
             </p>
           </PortalCard>
 
