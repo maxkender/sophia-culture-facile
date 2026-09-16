@@ -8,7 +8,6 @@ export const ROUTES = {
   legal: { fr: "/fr/mentions-legales", en: "/en/legal-notice" },
   privacy: { fr: "/fr/confidentialite", en: "/en/privacy" },
   apply: { fr: "/fr/devenir-professeur", en: "/en/become-a-teacher" },
-  authors: { fr: "/fr/auteurs", en: "/en/authors" },
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;
@@ -40,9 +39,12 @@ export function authorRoute(lang: Lang): "/fr/auteurs/$slug" | "/en/authors/$slu
   return lang === "fr" ? "/fr/auteurs/$slug" : "/en/authors/$slug";
 }
 
+/** Base des pages d'auteur (hors ROUTES : il n'existe pas de page d'index). */
+export const AUTHOR_BASE = { fr: "/fr/auteurs", en: "/en/authors" } as const;
+
 /** Chemin d'une page d'auteur. */
 export function authorPath(lang: Lang, slug: string): string {
-  return `${ROUTES.authors[lang]}/${slug}`;
+  return `${AUTHOR_BASE[lang]}/${slug}`;
 }
 
 /** Retrouve la clé de route à partir d'un chemin (les deux langues). */
@@ -53,9 +55,6 @@ export function routeKeyFromPath(pathname: string): RouteKey {
   }
   if (clean.startsWith(`${ROUTES.courses.fr}/`) || clean.startsWith(`${ROUTES.courses.en}/`)) {
     return "courses";
-  }
-  if (clean.startsWith(`${ROUTES.authors.fr}/`) || clean.startsWith(`${ROUTES.authors.en}/`)) {
-    return "authors";
   }
   return "home";
 }
