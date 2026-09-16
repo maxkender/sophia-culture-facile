@@ -1,4 +1,6 @@
 import { Link } from "@tanstack/react-router";
+import { useLang } from "@/i18n";
+import { authorRoute } from "@/i18n/routes";
 
 export type BylineAuthor = {
   slug?: string | null;
@@ -21,6 +23,7 @@ export function AuthorByline({
   linked?: boolean;
   size?: "sm" | "md";
 }) {
+  const lang = useLang();
   const avatar = size === "sm" ? "size-10" : "size-12";
   const initials = author.display_name
     .split(/\s+/)
@@ -60,7 +63,7 @@ export function AuthorByline({
 
   if (linked && author.slug) {
     return (
-      <Link to="/auteurs/$slug" params={{ slug: author.slug }} className="inline-flex hover:opacity-80">
+      <Link to={authorRoute(lang)} params={{ slug: author.slug }} className="inline-flex hover:opacity-80">
         {body}
       </Link>
     );

@@ -7,7 +7,7 @@ import { MobileCtaBar } from "@/components/site/MobileCtaBar";
 import { DownloadCta } from "@/components/site/DownloadCta";
 import { getCategories, getCourses } from "@/content/api";
 import { fill, useI18n } from "@/i18n";
-import { coursePath } from "@/i18n/routes";
+import { coursePath, courseRoute } from "@/i18n/routes";
 
 /** Hub des cours : liste complète + filtre par catégorie. */
 export function CoursesHubPage() {
@@ -58,7 +58,7 @@ export function CoursesHubPage() {
             {visible.map((course) => (
               <li key={course.slug}>
                 <Link
-                  to={lang === "fr" ? "/cours/$slug" : "/en/lessons/$slug"}
+                  to={courseRoute(lang)}
                   params={{ slug: course.slug }}
                   className="group flex h-full flex-col overflow-hidden rounded-3xl bg-card shadow-card transition-transform duration-200 hover:-translate-y-1"
                 >

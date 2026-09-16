@@ -4,6 +4,9 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { MobileCtaBar } from "@/components/site/MobileCtaBar";
 import { subjectLabel } from "@/config/subjects";
+import { useLang } from "@/i18n";
+import { publicText } from "@/i18n/public-content";
+import { courseRoute } from "@/i18n/routes";
 import type { PublicAuthor, PublicCourseCard, PublicEducation } from "@/lib/public-content.functions";
 
 /** Page publique d'un auteur : qui il est, ses diplômes, ses cours. */
@@ -16,6 +19,8 @@ export function PublicAuthorPage({
   education: PublicEducation[];
   courses: PublicCourseCard[];
 }) {
+  const lang = useLang();
+  const text = publicText(lang);
   const links = [
     author.orcid
       ? {
@@ -24,7 +29,7 @@ export function PublicAuthorPage({
           icon: GraduationCap,
         }
       : null,
-    author.personal_site ? { href: author.personal_site, label: "Site personnel", icon: Globe } : null,
+    author.personal_site ? { href: author.personal_site, label: text.personalSite, icon: Globe } : null,
     author.scholar_url ? { href: author.scholar_url, label: "Google Scholar", icon: ExternalLink } : null,
   ].filter(Boolean) as { href: string; label: string; icon: typeof Globe }[];
 
@@ -81,7 +86,7 @@ export function PublicAuthorPage({
 
           {education.length > 0 ? (
             <section className="mt-12">
-              <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-brand-navySoft">Formation</h2>
+              <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-brand-navySoft">{text.education}</h2>
               <ul className="mt-4 space-y-3 text-[16px] leading-relaxed">
                 {education.map((record, index) => (
                   <li key={index} className="text-brand-navy">
@@ -100,14 +105,15 @@ export function PublicAuthorPage({
 
           <section className="mt-14">
             <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-brand-navySoft">
-              Ses cours sur Sophia
+              {text.authorCourses}
             </h2>
             <ul className="mt-6 grid gap-4 md:grid-cols-2">
               {courses.map((course) => (
                 <li key={course.slug}>
                   <Link
-                    to="/cours/$slug"
+                    to={courseRoute(course.language)}
                     params={{ slug: course.slug }}
+                    hrefLang={course.language}
                     className="group flex h-full flex-col rounded-3xl bg-card p-6 shadow-card transition-transform duration-200 hover:-translate-y-1"
                   >
                     <span className="text-[11px] font-extrabold uppercase tracking-wide text-brand-pink">
@@ -117,7 +123,7 @@ export function PublicAuthorPage({
                       {course.title}
                     </span>
                     <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand-navy">
-                      Lire
+                      {text.read}
                       <ArrowRight
                         aria-hidden="true"
                         className="size-4 transition-transform group-hover:translate-x-1"
