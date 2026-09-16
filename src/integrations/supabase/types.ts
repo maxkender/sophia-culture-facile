@@ -391,12 +391,14 @@ export type Database = {
       }
       courses: {
         Row: {
+          alternate_slug: string | null
           author_id: string | null
           brief_note: string | null
           created_at: string
           due_date: string | null
           fee_usd: number
           id: string
+          language: string
           lot_code: string | null
           lot_name: string | null
           order_index: number
@@ -414,12 +416,14 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          alternate_slug?: string | null
           author_id?: string | null
           brief_note?: string | null
           created_at?: string
           due_date?: string | null
           fee_usd?: number
           id?: string
+          language?: string
           lot_code?: string | null
           lot_name?: string | null
           order_index?: number
@@ -437,12 +441,14 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          alternate_slug?: string | null
           author_id?: string | null
           brief_note?: string | null
           created_at?: string
           due_date?: string | null
           fee_usd?: number
           id?: string
+          language?: string
           lot_code?: string | null
           lot_name?: string | null
           order_index?: number
