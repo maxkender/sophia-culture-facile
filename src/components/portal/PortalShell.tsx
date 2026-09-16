@@ -27,6 +27,7 @@ import { useNavCounts } from "./useNavCounts";
 import { ADMIN_NAV, AUTHOR_NAV, sectionLabel, type NavGroup } from "./nav";
 import { CommandPalette } from "./CommandPalette";
 import { AnnouncementGate } from "./Announcements";
+import { NotificationBell } from "./NotificationBell";
 import { Banner, PortalCard } from "./ui";
 
 const COLLAPSE_KEY = "sophia.portal.sidebar.collapsed";
@@ -329,6 +330,7 @@ export function PortalShell({
             >
               <Search className="size-5" />
             </Button>
+            {profile && !isAdmin ? <NotificationBell profileId={profile.id} /> : null}
             {action}
           </div>
         </header>

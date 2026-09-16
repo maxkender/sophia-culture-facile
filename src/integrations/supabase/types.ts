@@ -651,6 +651,51 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string
+          course_id: string | null
+          created_at: string
+          id: string
+          profile_id: string
+          read_at: string | null
+          type: string
+        }
+        Insert: {
+          body: string
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          profile_id: string
+          read_at?: string | null
+          type: string
+        }
+        Update: {
+          body?: string
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          profile_id?: string
+          read_at?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           access_code: string | null
@@ -846,6 +891,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      notify_author: {
+        Args: {
+          _body: string
+          _course_id: string
+          _profile_id: string
+          _type: string
+        }
+        Returns: undefined
+      }
       slugify: { Args: { value: string }; Returns: string }
       unaccent_fallback: { Args: { value: string }; Returns: string }
     }

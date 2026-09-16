@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, ExternalLink, MessageSquare, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ExternalLink, MessageSquare, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
 } from "@/config/portal";
 import { countWords, formatDate, type Course, type Source } from "@/lib/portal";
 import { usePortalProfile } from "./usePortal";
+import { useMarkNotifications, useNotifications } from "./useNotifications";
 import { ExamplesLockNotice } from "./CourseCards";
 import { OpenThreadButton } from "./OpenThreadButton";
 import { Banner, BoldText, ConfirmButton, PageTitle, PortalCard, StatusPill } from "./ui";
@@ -33,6 +34,18 @@ const EMPTY_SCREEN: ScreenDraft = { id: null, screen_title: "", body: "", image_
 export function CourseEditor({ courseId, admin = false }: { courseId: string; admin?: boolean }) {
   const queryClient = useQueryClient();
   const { data: me } = usePortalProfile();
+  const { data: notifications = [] } = useNotifications(admin ? null : me?.profile?.id);
+  const markNotifications = useMarkNotifications(me?.profile?.id);
+
+  // Opening the course counts as having seen the change request; the desk reads this back.
+  useEffect(() => {
+    if (admin) return;
+    const unread = notifications
+      .filter((item) => item.course_id === courseId && !item.read_at)
+      .map((item) => item.id);
+    if (unread.length > 0) markNotifications.mutate(unread);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [admin, courseId, notifications]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["portal", "course", courseId],
@@ -240,6 +253,16 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
         </Link>
       )}
 
+      {liveStatus === "changes_requested" && course.review_comment ? (
+        <div className="sticky top-16 z-20 mb-6 rounded-portal border-2 border-portal-amber bg-portal-amber/15 p-5 shadow-portal backdrop-blur">
+          <p className="flex items-center gap-2 text-base font-extrabold text-brand-navy">
+            <AlertTriangle className="size-5 text-portal-amber" aria-hidden="true" />
+            Changes requested by the editorial desk
+          </p>
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-brand-navy">{course.review_comment}</p>
+        </div>
+      ) : null}
+
       <PageTitle
         title={course.title}
         lead={`${course.lot_code ?? "—"} · ${course.subject_area ?? "—"} · due ${formatDate(course.due_date)}`}
@@ -264,9 +287,6 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
           <Banner tone="info" title="Editing as the editorial desk">
             Your changes overwrite the author's text. The author keeps access according to the status you set here.
           </Banner>
-        ) : null}
-        {liveStatus === "changes_requested" && course.review_comment ? (
-          <Banner tone="warning" title="Changes requested">{course.review_comment}</Banner>
         ) : null}
         {!admin && (liveStatus === "submitted" || liveStatus === "accepted" || liveStatus === "published") ? (
           <Banner tone="info" title="This course is read-only">

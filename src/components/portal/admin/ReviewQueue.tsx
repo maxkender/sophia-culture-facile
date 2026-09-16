@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate, formatDateTime, type Course, type Profile } from "@/lib/portal";
 import { EmptyState, PageTitle, PortalCard } from "../ui";
+import { SeenBadge, useChangeRequestSeen } from "../SeenStatus";
 
 export function ReviewQueue() {
   const { data } = useQuery({
@@ -25,6 +26,7 @@ export function ReviewQueue() {
   const submitted = all.filter((course) => course.status === "submitted");
   const returned = all.filter((course) => course.status === "changes_requested");
   const authorById = new Map((data?.authors ?? []).map((author) => [author.id, author.full_name]));
+  const { data: seen } = useChangeRequestSeen(returned.map((course) => course.id));
 
   const row = (course: Course) => (
     <li key={course.id} className="flex flex-wrap items-center justify-between gap-3 py-4">
@@ -41,11 +43,18 @@ export function ReviewQueue() {
           {formatDate(course.due_date)}
         </p>
       </div>
-      <p className="text-xs text-brand-navySoft">
-        {course.status === "submitted"
-          ? `Submitted ${formatDateTime(course.submitted_at)}`
-          : `Changes requested · last submitted ${formatDateTime(course.submitted_at)}`}
-      </p>
+      <div className="text-right">
+        <p className="text-xs text-brand-navySoft">
+          {course.status === "submitted"
+            ? `Submitted ${formatDateTime(course.submitted_at)}`
+            : `Changes requested · last submitted ${formatDateTime(course.submitted_at)}`}
+        </p>
+        {course.status === "changes_requested" ? (
+          <p className="mt-1">
+            <SeenBadge info={seen?.[course.id]} />
+          </p>
+        ) : null}
+      </div>
     </li>
   );
 
