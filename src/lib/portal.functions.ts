@@ -41,6 +41,34 @@ async function loadInvite(token: string) {
   return { supabaseAdmin, profile };
 }
 
+/**
+ * A consumed token is cleared from the profile, so returning authors clicking their
+ * only link would otherwise get "invalid". We remember the token they used, and for
+ * links consumed before that was recorded we recognise the seeded `inv_seed_NN_name`
+ * shape by matching the first name of an already-activated author.
+ */
+async function loadConsumedInvite(token: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: recorded } = await supabaseAdmin
+    .from("profiles")
+    .select("id, full_name, email, activated_at")
+    .eq("used_invite_token", token)
+    .maybeSingle();
+  if (recorded) return recorded;
+
+  const seeded = /^inv_seed_\d+_([a-z-]+)$/i.exec(token.trim());
+  if (!seeded) return null;
+  const firstName = (seeded[1] ?? "").toLowerCase();
+  if (firstName.length < 3) return null;
+  const { data: candidates } = await supabaseAdmin
+    .from("profiles")
+    .select("id, full_name, email, activated_at")
+    .not("activated_at", "is", null)
+    .ilike("full_name", `${firstName} %`);
+  if (!candidates || candidates.length !== 1) return null;
+  return candidates[0];
+}
+
 function inviteState(
   profile: { activated_at: string | null; invite_expires_at: string | null; is_test?: boolean } | null,
 ): InviteState {
