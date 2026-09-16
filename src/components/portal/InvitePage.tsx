@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -71,6 +71,36 @@ type EducationRow = { degree: string; field: string; institution: string; year: 
 
 function patchRow(rows: EducationRow[], index: number, patch: Partial<EducationRow>): EducationRow[] {
   return rows.map((row, i) => (i === index ? { ...row, ...patch } : row));
+}
+
+/** A consumed invite is the link a returning author is most likely to click: guide them to sign in. */
+function AlreadySetUp({ name, email }: { name: string | null; email: string | null }) {
+  const firstName = (name ?? "").split(" ")[0] ?? "";
+  return (
+    <PortalCard>
+      <h2 className="text-2xl font-extrabold text-brand-navy">
+        {firstName ? `${firstName}, you have already set up your account` : "You have already set up your account"}
+      </h2>
+      <p className="mt-3 text-sm leading-relaxed text-brand-navySoft">
+        This invitation link was used to create your account, so it only works once. Sign in below and everything will
+        be where you left it.
+      </p>
+      <Button asChild variant="pill" size="pillSm" className="mt-6">
+        <Link to="/auth" search={email ? { email } : {}}>
+          Sign in
+        </Link>
+      </Button>
+      <p className="mt-4 text-sm text-brand-navySoft">
+        Forgotten your password?{" "}
+        <Link to="/auth" search={email ? { email, reset: true } : { reset: true }} className="font-semibold text-portal-accent underline underline-offset-2">
+          Reset it here.
+        </Link>
+      </p>
+      <p className="mt-6 border-t border-brand-line pt-4 text-xs text-brand-navySoft">
+        Bookmark sophia-culture.com/auteurs — that is where you sign in from now on.
+      </p>
+    </PortalCard>
+  );
 }
 
 export function InvitePage({ token }: { token: string }) {
@@ -339,12 +369,10 @@ export function InvitePage({ token }: { token: string }) {
             <PortalCard>
               <p className="text-sm text-brand-navySoft">Opening your invitation…</p>
             </PortalCard>
+          ) : data && data.state === "used" ? (
+            <AlreadySetUp name={data.usedProfile?.full_name ?? null} email={data.usedProfile?.email ?? null} />
           ) : !data || data.state === "invalid" ? (
             <Banner tone="error" title="This invitation link is not valid">{CONTACT}</Banner>
-          ) : data.state === "used" ? (
-            <Banner tone="warning" title="This invitation has already been used">
-              Your space is already open. Sign in with your email address, or {CONTACT.toLowerCase()}
-            </Banner>
           ) : data.state === "expired" ? (
             <Banner tone="warning" title="This invitation has expired">{CONTACT}</Banner>
           ) : profile ? (

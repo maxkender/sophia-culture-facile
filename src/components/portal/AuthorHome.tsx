@@ -120,6 +120,10 @@ export function AuthorHome() {
         </div>
       ) : null}
 
+      <p className="-mt-4 mb-6 text-xs text-brand-navySoft/80">
+        Bookmark this page: sophia-culture.com/auteurs is where you sign in from now on.
+      </p>
+
       {profile ? <AnnouncementBanners profileId={profile.id} /> : null}
 
       <div className="mb-4 flex items-baseline justify-between gap-4">

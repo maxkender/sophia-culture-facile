@@ -7,6 +7,8 @@ export type InviteState = "ok" | "invalid" | "used" | "expired";
 
 export type InvitePreview = {
   state: InviteState;
+  /** Who the link belonged to, when it has already been used to create an account. */
+  usedProfile: { full_name: string; email: string | null } | null;
   profile: {
     id: string;
     full_name: string;
@@ -41,6 +43,34 @@ async function loadInvite(token: string) {
   return { supabaseAdmin, profile };
 }
 
+/**
+ * A consumed token is cleared from the profile, so returning authors clicking their
+ * only link would otherwise get "invalid". We remember the token they used, and for
+ * links consumed before that was recorded we recognise the seeded `inv_seed_NN_name`
+ * shape by matching the first name of an already-activated author.
+ */
+async function loadConsumedInvite(token: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: recorded } = await supabaseAdmin
+    .from("profiles")
+    .select("id, full_name, email, activated_at")
+    .eq("used_invite_token", token)
+    .maybeSingle();
+  if (recorded) return recorded;
+
+  const seeded = /^inv_seed_\d+_([a-z-]+)$/i.exec(token.trim());
+  if (!seeded) return null;
+  const firstName = (seeded[1] ?? "").toLowerCase();
+  if (firstName.length < 3) return null;
+  const { data: candidates } = await supabaseAdmin
+    .from("profiles")
+    .select("id, full_name, email, activated_at")
+    .not("activated_at", "is", null)
+    .ilike("full_name", `${firstName} %`);
+  if (!candidates || candidates.length !== 1) return null;
+  return candidates[0];
+}
+
 function inviteState(
   profile: { activated_at: string | null; invite_expires_at: string | null; is_test?: boolean } | null,
 ): InviteState {
@@ -69,7 +99,16 @@ export const getInvite = createServerFn({ method: "POST" })
     const { supabaseAdmin, profile } = await loadInvite(data.token);
     const state = inviteState(profile);
     if (!profile || state !== "ok") {
-      return { state, profile: null, courses: [], education: [], hasAccount: false };
+      const consumed = state === "expired" ? null : await loadConsumedInvite(data.token);
+      const used = consumed ?? (profile && state === "used" ? profile : null);
+      return {
+        state: used ? "used" : state,
+        usedProfile: used ? { full_name: used.full_name, email: used.email } : null,
+        profile: null,
+        courses: [],
+        education: [],
+        hasAccount: false,
+      };
     }
 
     const { data: courses } = await supabaseAdmin
@@ -94,6 +133,7 @@ export const getInvite = createServerFn({ method: "POST" })
 
     return {
       state: "ok",
+      usedProfile: null,
       profile: {
         id: profile.id,
         full_name: profile.full_name,
@@ -226,7 +266,7 @@ export const claimInvite = createServerFn({ method: "POST" })
           institution: current?.institution ?? profile.institution ?? null,
           education: declaredEducation ?? [],
         },
-        ...(profile.is_test ? {} : { invite_token: null, invite_expires_at: null }),
+        ...(profile.is_test ? {} : { invite_token: null, invite_expires_at: null, used_invite_token: data.token }),
       })
       .eq("id", profile.id);
     const { error } = profile.is_test ? await query : await query.is("activated_at", null);
@@ -287,7 +327,7 @@ export const acceptInvite = createServerFn({ method: "POST" })
       .update({
         user_id: context.userId,
         activated_at: profile.activated_at ?? new Date().toISOString(),
-        ...(profile.is_test ? {} : { invite_token: null, invite_expires_at: null }),
+        ...(profile.is_test ? {} : { invite_token: null, invite_expires_at: null, used_invite_token: data.token }),
       })
       .eq("id", profile.id);
     if (error) throw new Error("The invite could not be activated.");
