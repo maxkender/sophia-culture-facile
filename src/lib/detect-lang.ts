@@ -16,9 +16,9 @@ export function langFromAcceptLanguage(header: string | null | undefined): Lang 
   const tags = header
     .split(",")
     .map((part) => {
-      const [tag, ...params] = part.trim().split(";");
+      const [rawTag, ...params] = part.trim().split(";");
       const q = params.find((p) => p.trim().startsWith("q="));
-      return { tag: tag.toLowerCase(), q: q ? Number(q.split("=")[1]) : 1 };
+      return { tag: (rawTag ?? "").toLowerCase(), q: q ? Number(q.split("=")[1]) : 1 };
     })
     .filter((item) => item.tag && !Number.isNaN(item.q))
     .sort((a, b) => b.q - a.q);

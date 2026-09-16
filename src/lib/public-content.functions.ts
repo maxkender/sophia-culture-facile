@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { authorPath, coursePath } from "@/i18n/routes";
 
 /**
  * Lecture publique des cours publiés.
@@ -23,6 +24,8 @@ export type PublicAuthor = {
 
 export type PublicCourseCard = {
   slug: string;
+  language: "fr" | "en";
+  alternate_slug: string | null;
   title: string;
   subtitle: string | null;
   subject_area: string | null;
@@ -99,7 +102,7 @@ export const listPublishedCourses = createServerFn({ method: "GET" }).handler(
     const supabaseAdmin = await admin();
     const { data } = await supabaseAdmin
       .from("courses")
-      .select(`slug, title, subtitle, subject_area, published_at, author:profiles!courses_author_id_fkey(${PROFILE_FIELDS})`)
+      .select(`slug, language, alternate_slug, title, subtitle, subject_area, published_at, author:profiles!courses_author_id_fkey(${PROFILE_FIELDS})`)
       .eq("status", "published")
       .not("slug", "is", null)
       .order("published_at", { ascending: false });
@@ -108,6 +111,8 @@ export const listPublishedCourses = createServerFn({ method: "GET" }).handler(
     return Promise.all(
       rows.map(async (row) => ({
         slug: row.slug,
+        language: row.language,
+        alternate_slug: row.alternate_slug,
         title: row.title,
         subtitle: row.subtitle,
         subject_area: row.subject_area,
@@ -126,7 +131,7 @@ export const getPublishedCourse = createServerFn({ method: "GET" })
     const { data: row } = await supabaseAdmin
       .from("courses")
       .select(
-        `id, slug, title, subtitle, subject_area, published_at, public_full_text, author:profiles!courses_author_id_fkey(${PROFILE_FIELDS})`,
+        `id, slug, language, alternate_slug, title, subtitle, subject_area, published_at, public_full_text, author:profiles!courses_author_id_fkey(${PROFILE_FIELDS})`,
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -136,6 +141,8 @@ export const getPublishedCourse = createServerFn({ method: "GET" })
     const course = row as unknown as {
       id: string;
       slug: string;
+      language: "fr" | "en";
+      alternate_slug: string | null;
       title: string;
       subtitle: string | null;
       subject_area: string | null;
@@ -153,9 +160,10 @@ export const getPublishedCourse = createServerFn({ method: "GET" })
       supabaseAdmin.from("sources").select("claim, reference, page").eq("course_id", course.id).order("created_at"),
       supabaseAdmin
         .from("courses")
-        .select(`slug, title, subtitle, subject_area, published_at, author:profiles!courses_author_id_fkey(${PROFILE_FIELDS})`)
+        .select(`slug, language, alternate_slug, title, subtitle, subject_area, published_at, author:profiles!courses_author_id_fkey(${PROFILE_FIELDS})`)
         .eq("status", "published")
         .eq("subject_area", course.subject_area ?? "")
+        .eq("language", course.language)
         .neq("slug", course.slug)
         .limit(3),
     ]);
@@ -165,6 +173,8 @@ export const getPublishedCourse = createServerFn({ method: "GET" })
       ((relatedRows ?? []) as unknown as (Omit<PublicCourseCard, "author"> & { author: ProfileRow | null })[]).map(
         async (item) => ({
           slug: item.slug,
+          language: item.language,
+          alternate_slug: item.alternate_slug,
           title: item.title,
           subtitle: item.subtitle,
           subject_area: item.subject_area,
@@ -177,6 +187,8 @@ export const getPublishedCourse = createServerFn({ method: "GET" })
     return {
       course: {
         slug: course.slug,
+        language: course.language,
+        alternate_slug: course.alternate_slug,
         title: course.title,
         subtitle: course.subtitle,
         subject_area: course.subject_area,
@@ -214,7 +226,7 @@ export const getPublishedAuthor = createServerFn({ method: "GET" })
           .order("order_index"),
         supabaseAdmin
           .from("courses")
-          .select("slug, title, subtitle, subject_area, published_at")
+          .select("slug, language, alternate_slug, title, subtitle, subject_area, published_at")
           .eq("author_id", profile.id)
           .eq("status", "published")
           .not("slug", "is", null)
@@ -238,21 +250,26 @@ export const getPublishedSitemapEntries = createServerFn({ method: "GET" }).hand
     const supabaseAdmin = await admin();
     const { data: courses } = await supabaseAdmin
       .from("courses")
-      .select("slug, updated_at, author:profiles!courses_author_id_fkey(public_slug, updated_at)")
+      .select("slug, language, alternate_slug, updated_at, author:profiles!courses_author_id_fkey(public_slug, updated_at)")
       .eq("status", "published")
       .not("slug", "is", null);
 
     const rows = ((courses ?? []) as unknown as {
       slug: string;
+      language: "fr" | "en";
+      alternate_slug: string | null;
       updated_at: string;
       author: { public_slug: string | null; updated_at: string } | null;
     }[]);
 
     const entries = new Map<string, string>();
     for (const row of rows) {
-      entries.set(`/cours/${row.slug}`, row.updated_at.slice(0, 10));
+      entries.set(coursePath(row.language, row.slug), row.updated_at.slice(0, 10));
       if (row.author?.public_slug) {
-        entries.set(`/auteurs/${row.author.public_slug}`, row.author.updated_at.slice(0, 10));
+        entries.set(
+          authorPath(row.language, row.author.public_slug),
+          row.author.updated_at.slice(0, 10),
+        );
       }
     }
     return [...entries.entries()].map(([path, lastmod]) => ({ path, lastmod }));
