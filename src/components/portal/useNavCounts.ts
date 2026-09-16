@@ -44,7 +44,7 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
           .from("courses")
           .select("id", { count: "exact", head: true })
           .eq("author_id", profileId!)
-          .in("status", ["assigned", "in_progress", "changes_requested"]),
+          .eq("status", "changes_requested"),
         supabase.from("conversations").select("author_unread").eq("profile_id", profileId!),
       ]);
       const messages = (threads ?? []).reduce((sum, row) => sum + (row.author_unread ?? 0), 0);
