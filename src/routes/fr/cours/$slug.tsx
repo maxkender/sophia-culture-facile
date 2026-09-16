@@ -7,7 +7,7 @@ import { absUrl, OG_IMAGE_URL } from "@/config/site";
 import { subjectLabel } from "@/config/subjects";
 import { courseBreadcrumbSchema, courseLinks, courseMeta, courseSchema, ldScript } from "@/lib/seo";
 
-export const Route = createFileRoute("/cours/$slug")({
+export const Route = createFileRoute("/fr/cours/$slug")({
   loader: async ({ params }) => {
     const published = await getPublishedCourse({ data: { slug: params.slug } });
     if (published) return { kind: "published" as const, ...published };

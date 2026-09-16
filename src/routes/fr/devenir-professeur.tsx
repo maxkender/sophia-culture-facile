@@ -3,7 +3,7 @@ import { ApplyPage } from "@/components/pages/ApplyPage";
 import { fr } from "@/i18n/fr";
 import { langLinks, meta } from "@/lib/seo";
 
-export const Route = createFileRoute("/devenir-professeur")({
+export const Route = createFileRoute("/fr/devenir-professeur")({
   ssr: false,
   head: () => ({
     meta: meta({

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PrivacyPage } from "@/components/pages/PrivacyPage";
 import { langLinks, meta } from "@/lib/seo";
 
-export const Route = createFileRoute("/confidentialite")({
+export const Route = createFileRoute("/fr/confidentialite")({
   head: () => ({
     meta: meta({
       title: "Politique de confidentialité | Sophia, culture générale",

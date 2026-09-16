@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LandingPage } from "@/components/pages/LandingPage";
 import { langLinks, ldScript, meta, mobileApplicationSchema } from "@/lib/seo";
 
-export const Route = createFileRoute("/sophia-culture-generale")({
+export const Route = createFileRoute("/fr/sophia-culture-generale")({
   head: () => ({
     meta: meta({
       title: "Sophia, culture générale : l'app française de culture générale",

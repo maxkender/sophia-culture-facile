@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { DownloadPage } from "@/components/pages/DownloadPage";
 import { langLinks, meta } from "@/lib/seo";
 
-export const Route = createFileRoute("/telecharger")({
+export const Route = createFileRoute("/fr/telecharger")({
   head: () => ({
     meta: meta({
       title: "Télécharger Sophia, culture générale (iOS et Android)",

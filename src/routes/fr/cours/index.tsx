@@ -3,7 +3,7 @@ import { PublishedCoursesHub } from "@/components/pages/PublishedCoursesHub";
 import { listPublishedCourses } from "@/lib/public-content.functions";
 import { langLinks, meta } from "@/lib/seo";
 
-export const Route = createFileRoute("/cours/")({
+export const Route = createFileRoute("/fr/cours/")({
   loader: () => listPublishedCourses(),
   head: () => ({
     meta: meta({

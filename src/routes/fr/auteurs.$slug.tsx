@@ -4,7 +4,7 @@ import { getPublishedAuthor } from "@/lib/public-content.functions";
 import { absUrl } from "@/config/site";
 import { ldScript } from "@/lib/seo";
 
-export const Route = createFileRoute("/auteurs/$slug")({
+export const Route = createFileRoute("/fr/auteurs/$slug")({
   loader: async ({ params }) => {
     const data = await getPublishedAuthor({ data: { slug: params.slug } });
     if (!data) throw notFound();
