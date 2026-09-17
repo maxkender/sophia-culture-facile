@@ -27,6 +27,7 @@ import { ExamplesLockNotice } from "./CourseCards";
 import { OpenThreadButton } from "./OpenThreadButton";
 import { Banner, BoldText, ConfirmButton, PageTitle, PortalCard, StatusPill } from "./ui";
 import { AiSuggestions } from "./AiSuggestions";
+import { CopyCourseButton } from "./CopyCourseButton";
 
 type ScreenDraft = { id: string | null; screen_title: string; body: string; image_idea: string };
 
@@ -270,6 +271,19 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
         action={
           <div className="flex items-center gap-3">
             <StatusPill status={liveStatus} />
+            <CopyCourseButton
+              title={title || course.title}
+              subtitle={subtitle}
+              authorName={admin ? null : (me?.profile?.display_name ?? me?.profile?.full_name)}
+              lotCode={meta.lot_code || course.lot_code}
+              subjectArea={meta.subject_area || course.subject_area}
+              screens={screens.map((screen, index) => ({
+                screen_number: index + 1,
+                screen_title: screen.screen_title,
+                body: screen.body,
+              }))}
+              sources={sourceRows}
+            />
             <Button asChild variant="pillSecondary" size="pillSm">
               <a href="/auteurs/examples" target="_blank" rel="noreferrer noopener">
                 <ExternalLink className="size-4" aria-hidden="true" />
