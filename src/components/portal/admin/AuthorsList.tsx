@@ -11,6 +11,7 @@ import { AuthorAvatar, useSignedPhotos } from "../AuthorPhoto";
 import { PageTitle, PortalCard } from "../ui";
 
 export function AuthorsList() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [platform, setPlatform] = useState("all");
   // Authors who declined stay reachable, but they are hidden by default.
