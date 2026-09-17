@@ -142,13 +142,25 @@ export function AuthorsList() {
             <tbody className="divide-y divide-brand-line">
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={12} className="py-6 text-brand-navySoft">
+                  <td colSpan={13} className="py-6 text-brand-navySoft">
                     No author matches this search.
                   </td>
                 </tr>
               ) : (
                 rows.map(({ author, total, submitted, signed, codePlatform }) => (
-                  <tr key={author.id}>
+                  <tr
+                    key={author.id}
+                    onClick={() =>
+                      navigate({ to: "/auteurs/admin/authors/$authorId", params: { authorId: author.id } })
+                    }
+                    className="cursor-pointer transition-colors hover:bg-brand-surface"
+                  >
+                    <td className="py-3 pr-4">
+                      <AuthorAvatar
+                        url={author.photo_url ? photos?.get(author.photo_url) : null}
+                        name={author.display_name ?? author.full_name}
+                      />
+                    </td>
                     <td className="py-3 pr-4">
                       <Link
                         to="/auteurs/admin/authors/$authorId"
