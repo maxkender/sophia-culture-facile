@@ -12,6 +12,7 @@ import { SUBJECT_AREAS, subjectLabel } from "@/config/subjects";
 import { formatDate, formatDateTime, type Course, type Profile } from "@/lib/portal";
 import { usePortalProfile } from "../usePortal";
 import { EmptyState, PageTitle, PortalCard } from "../ui";
+import { DeleteCourseButton } from "./DeleteCourseButton";
 
 type RequestRow = {
   id: string;
