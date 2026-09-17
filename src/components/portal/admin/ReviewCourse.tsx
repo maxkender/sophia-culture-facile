@@ -12,6 +12,7 @@ import { usePortalProfile } from "../usePortal";
 import { Banner, BoldText, PageTitle, PortalCard } from "../ui";
 import { PublishControls } from "./PublishControls";
 import { AiReviewPanel } from "./AiReviewPanel";
+import { CopyCourseButton } from "../CopyCourseButton";
 
 export function ReviewCourse({ courseId }: { courseId: string }) {
   const navigate = useNavigate();
@@ -85,6 +86,17 @@ export function ReviewCourse({ courseId }: { courseId: string }) {
       <PageTitle
         title={course.title}
         lead={`${data?.author?.full_name ?? "Unassigned"} · ${course.lot_code ?? "—"} · ${course.subject_area ?? "—"} · due ${formatDate(course.due_date)}`}
+        action={
+          <CopyCourseButton
+            title={course.title}
+            subtitle={course.subtitle}
+            authorName={data?.author?.full_name}
+            lotCode={course.lot_code}
+            subjectArea={course.subject_area}
+            screens={data?.screens ?? []}
+            sources={data?.sources ?? []}
+          />
+        }
       />
 
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
