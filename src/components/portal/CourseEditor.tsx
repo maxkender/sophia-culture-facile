@@ -119,6 +119,7 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
       const base = {
         title: title.trim() || course.title,
         subtitle: subtitle.trim() || null,
+        did_you_know: didYouKnow.map((fact) => fact.trim()).filter(Boolean).slice(0, 3),
       };
       const patch = admin
         ? {
