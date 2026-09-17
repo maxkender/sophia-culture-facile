@@ -73,6 +73,7 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
   const [meta, setMeta] = useState({ lot_code: "", subject_area: "", brief_note: "", due_date: "", status: "assigned" as CourseStatus });
   const [screens, setScreens] = useState<ScreenDraft[]>(SCREEN_NUMBERS.map(() => ({ ...EMPTY_SCREEN })));
   const [sourceRows, setSourceRows] = useState<Source[]>([]);
+  const [didYouKnow, setDidYouKnow] = useState<string[]>([]);
   const [preview, setPreview] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [saving, setSaving] = useState(false);
@@ -92,6 +93,7 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
       status: (data.course.status ?? "assigned") as CourseStatus,
     });
     setSourceRows(data.sources);
+    setDidYouKnow((data.course.did_you_know ?? []).slice(0, 3));
     setScreens(
       SCREEN_NUMBERS.map((number) => {
         const existing = data.screens.find((screen) => screen.screen_number === number);
