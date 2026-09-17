@@ -19,6 +19,7 @@ export function CopyCourseButton({
   subjectArea,
   screens,
   sources,
+  didYouKnow = [],
 }: {
   title: string;
   subtitle?: string | null;
@@ -27,6 +28,7 @@ export function CopyCourseButton({
   subjectArea?: string | null;
   screens: CopyScreen[];
   sources: CopySource[];
+  didYouKnow?: string[];
 }) {
   const [copied, setCopied] = useState(false);
 
