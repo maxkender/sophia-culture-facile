@@ -122,6 +122,9 @@ export function AuthorsList() {
           <table className="w-full min-w-4xl text-left text-sm">
             <thead className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">
               <tr>
+                <th className="py-3 pr-4">
+                  <span className="sr-only">Photo</span>
+                </th>
                 <th className="py-3 pr-4">Name</th>
                 <th className="py-3 pr-4">Institution</th>
                 <th className="py-3 pr-4">Byline</th>
