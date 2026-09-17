@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatDate, type Course, type Profile } from "@/lib/portal";
+import { AuthorAvatar, useSignedPhotos } from "../AuthorPhoto";
 import { PageTitle, PortalCard } from "../ui";
 
 export function AuthorsList() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [platform, setPlatform] = useState("all");
   // Authors who declined stay reachable, but they are hidden by default.
@@ -68,6 +70,8 @@ export function AuthorsList() {
       });
   }, [data, search, platform, status]);
 
+  const { data: photos } = useSignedPhotos((data?.authors ?? []).map((author) => author.photo_url));
+
   return (
     <div>
       <PageTitle
@@ -118,6 +122,9 @@ export function AuthorsList() {
           <table className="w-full min-w-4xl text-left text-sm">
             <thead className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">
               <tr>
+                <th className="py-3 pr-4">
+                  <span className="sr-only">Photo</span>
+                </th>
                 <th className="py-3 pr-4">Name</th>
                 <th className="py-3 pr-4">Institution</th>
                 <th className="py-3 pr-4">Byline</th>
@@ -135,13 +142,25 @@ export function AuthorsList() {
             <tbody className="divide-y divide-brand-line">
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={12} className="py-6 text-brand-navySoft">
+                  <td colSpan={13} className="py-6 text-brand-navySoft">
                     No author matches this search.
                   </td>
                 </tr>
               ) : (
                 rows.map(({ author, total, submitted, signed, codePlatform }) => (
-                  <tr key={author.id}>
+                  <tr
+                    key={author.id}
+                    onClick={() =>
+                      navigate({ to: "/auteurs/admin/authors/$authorId", params: { authorId: author.id } })
+                    }
+                    className="cursor-pointer transition-colors hover:bg-brand-surface"
+                  >
+                    <td className="py-3 pr-4">
+                      <AuthorAvatar
+                        url={author.photo_url ? photos?.get(author.photo_url) : null}
+                        name={author.display_name ?? author.full_name}
+                      />
+                    </td>
                     <td className="py-3 pr-4">
                       <Link
                         to="/auteurs/admin/authors/$authorId"
