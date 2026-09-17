@@ -44,13 +44,24 @@ export function DeleteCourseButton({
     enabled: open,
     queryKey: ["portal", "admin", "delete-counts", courseId],
     queryFn: async () => {
-      const [{ data: screens }, { count: sources }] = await Promise.all([
+      const [{ data: screens }, { count: sources }, { data: course }] = await Promise.all([
         supabase.from("screens").select("body").eq("course_id", courseId),
         supabase.from("sources").select("id", { count: "exact", head: true }).eq("course_id", courseId),
+        supabase.from("courses").select("author_id").eq("id", courseId).maybeSingle(),
       ]);
+      let author: string | null = null;
+      if (course?.author_id) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", course.author_id)
+          .maybeSingle();
+        author = profile?.full_name ?? null;
+      }
       return {
         screens: (screens ?? []).filter((row) => (row.body ?? "").trim().length > 0).length,
         sources: sources ?? 0,
+        author,
       };
     },
   });
