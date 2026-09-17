@@ -13,6 +13,7 @@ import { Banner, BoldText, PageTitle, PortalCard } from "../ui";
 import { PublishControls } from "./PublishControls";
 import { AiReviewPanel } from "./AiReviewPanel";
 import { CopyCourseButton } from "../CopyCourseButton";
+import { DeleteCourseButton } from "./DeleteCourseButton";
 
 export function ReviewCourse({ courseId }: { courseId: string }) {
   const navigate = useNavigate();
@@ -182,6 +183,16 @@ export function ReviewCourse({ courseId }: { courseId: string }) {
               </Button>
             </div>
           </PortalCard>
+
+          <div className="pt-2 text-right">
+            <DeleteCourseButton
+              courseId={course.id}
+              title={course.title}
+              authorName={data?.author?.full_name ?? null}
+              status={course.status}
+              redirectTo="/auteurs/admin/review"
+            />
+          </div>
         </div>
       </div>
     </div>

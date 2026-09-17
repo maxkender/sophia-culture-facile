@@ -12,6 +12,7 @@ import { SUBJECT_AREAS, subjectLabel } from "@/config/subjects";
 import { formatDate, formatDateTime, type Course, type Profile } from "@/lib/portal";
 import { usePortalProfile } from "../usePortal";
 import { EmptyState, PageTitle, PortalCard } from "../ui";
+import { DeleteCourseButton } from "./DeleteCourseButton";
 
 type RequestRow = {
   id: string;
@@ -225,6 +226,7 @@ export function PoolCourses() {
                     <th className="px-6 py-4">Brief note</th>
                     <th className="px-6 py-4">Requests</th>
                     <th className="px-6 py-4">Added</th>
+                    <th className="px-6 py-4"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-line">
@@ -256,6 +258,14 @@ export function PoolCourses() {
                         {pending.filter((request) => request.course_id === course.id).length}
                       </td>
                       <td className="px-6 py-4 align-top text-brand-navySoft">{formatDate(course.created_at)}</td>
+                      <td className="px-6 py-4 align-top text-right">
+                        <DeleteCourseButton
+                          courseId={course.id}
+                          title={course.title}
+                          authorName={null}
+                          status={course.status}
+                        />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
