@@ -22,7 +22,7 @@ export function CopyCourseButton({
 }: {
   title: string;
   subtitle?: string | null;
-  authorName?: string | null;
+  authorName?: string | null | undefined;
   lotCode?: string | null;
   subjectArea?: string | null;
   screens: CopyScreen[];
