@@ -287,6 +287,7 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
                 body: screen.body,
               }))}
               sources={sourceRows}
+              didYouKnow={didYouKnow}
             />
             <Button asChild variant="pillSecondary" size="pillSm">
               <a href="/auteurs/examples" target="_blank" rel="noreferrer noopener">

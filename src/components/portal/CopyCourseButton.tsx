@@ -51,6 +51,10 @@ export function CopyCourseButton({
       blocks.push(`SCREEN ${number} — ${(screen.screen_title ?? "").trim() || "Untitled"}${body ? `\n${body}` : ""}`);
     });
 
+    const facts = didYouKnow.map((fact) => fact.trim()).filter(Boolean);
+    if (facts.length > 0) blocks.push(["DID YOU KNOW", ...facts].join("\n"));
+
+
     const sourceLines = sources
       .map((source) => {
         const parts = [source.claim?.trim(), source.reference?.trim()]

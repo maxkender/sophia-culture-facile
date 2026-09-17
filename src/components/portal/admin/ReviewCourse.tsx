@@ -96,6 +96,7 @@ export function ReviewCourse({ courseId }: { courseId: string }) {
             subjectArea={course.subject_area}
             screens={data?.screens ?? []}
             sources={data?.sources ?? []}
+            didYouKnow={course.did_you_know ?? []}
           />
         }
       />
