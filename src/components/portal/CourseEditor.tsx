@@ -175,7 +175,7 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
     const timer = window.setTimeout(() => void save({ silent: true }), 2000);
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, subtitle, screens, meta, readOnly]);
+  }, [title, subtitle, screens, meta, didYouKnow, readOnly]);
 
   function patchScreen(index: number, patch: Partial<ScreenDraft>) {
     dirty.current = true;
