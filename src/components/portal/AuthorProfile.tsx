@@ -247,6 +247,14 @@ export function AuthorProfile() {
         lead="This is what readers see under every course you publish, in the app and on the site. It is yours to control."
       />
 
+      {!profile.photo_url && !photo ? (
+        <div className="mb-6">
+          <Banner tone="warning" title="Your photo is published with your courses.">
+            Add one so your byline is complete.
+          </Banner>
+        </div>
+      ) : null}
+
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <div className="space-y-6">
           <PlatformCard current={profile.platform ?? null} />
