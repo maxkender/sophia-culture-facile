@@ -35,9 +35,9 @@ export function AuthorAvatar({
   name,
   className,
 }: {
-  url?: string | null;
-  name?: string | null;
-  className?: string;
+  url?: string | null | undefined;
+  name?: string | null | undefined;
+  className?: string | undefined;
 }) {
   const box = cn("shrink-0 rounded-full object-cover", className ?? "size-10");
   if (url) return <img src={url} alt="" loading="lazy" decoding="async" className={box} />;
