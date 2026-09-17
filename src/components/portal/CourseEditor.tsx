@@ -467,6 +467,68 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
           );
         })}
 
+        <PortalCard className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-extrabold text-brand-navy">Did you know?</h2>
+              <p className="mt-1 text-sm text-brand-navySoft">
+                Optional. Up to three genuinely surprising facts that did not fit into the five screens, one or two
+                sentences each. They do not count toward the word target, and we decide whether to use them.
+              </p>
+            </div>
+            {!readOnly && didYouKnow.length < 3 ? (
+              <Button
+                type="button"
+                variant="pillSecondary"
+                size="pillSm"
+                onClick={() => {
+                  dirty.current = true;
+                  setDidYouKnow((current) => [...current, ""]);
+                }}
+              >
+                <Plus className="size-4" /> Add a fact
+              </Button>
+            ) : null}
+          </div>
+          {didYouKnow.length === 0 ? (
+            <p className="text-sm text-brand-navySoft">Nothing here yet. This field is entirely optional.</p>
+          ) : (
+            <div className="space-y-3">
+              {didYouKnow.map((fact, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <Textarea
+                    aria-label={`Did you know fact ${index + 1}`}
+                    rows={2}
+                    maxLength={300}
+                    disabled={readOnly}
+                    value={fact}
+                    onChange={(event) => {
+                      dirty.current = true;
+                      const value = event.target.value;
+                      setDidYouKnow((current) => current.map((item, i) => (i === index ? value : item)));
+                    }}
+                  />
+                  {!readOnly ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Remove this fact"
+                      onClick={() => {
+                        dirty.current = true;
+                        setDidYouKnow((current) => current.filter((_, i) => i !== index));
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          )}
+        </PortalCard>
+
+
         <PortalCard>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
