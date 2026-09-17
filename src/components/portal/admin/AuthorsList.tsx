@@ -70,6 +70,8 @@ export function AuthorsList() {
       });
   }, [data, search, platform, status]);
 
+  const { data: photos } = useSignedPhotos((data?.authors ?? []).map((author) => author.photo_url));
+
   return (
     <div>
       <PageTitle
