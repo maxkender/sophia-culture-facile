@@ -19,6 +19,7 @@ export function CopyCourseButton({
   subjectArea,
   screens,
   sources,
+  didYouKnow = [],
 }: {
   title: string;
   subtitle?: string | null;
@@ -27,6 +28,7 @@ export function CopyCourseButton({
   subjectArea?: string | null;
   screens: CopyScreen[];
   sources: CopySource[];
+  didYouKnow?: string[];
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -48,6 +50,10 @@ export function CopyCourseButton({
       const body = (screen.body ?? "").trim();
       blocks.push(`SCREEN ${number} — ${(screen.screen_title ?? "").trim() || "Untitled"}${body ? `\n${body}` : ""}`);
     });
+
+    const facts = didYouKnow.map((fact) => fact.trim()).filter(Boolean);
+    if (facts.length > 0) blocks.push(["DID YOU KNOW", ...facts].join("\n"));
+
 
     const sourceLines = sources
       .map((source) => {

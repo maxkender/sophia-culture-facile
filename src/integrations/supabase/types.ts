@@ -443,6 +443,7 @@ export type Database = {
           author_id: string | null
           brief_note: string | null
           created_at: string
+          did_you_know: string[]
           due_date: string | null
           fee_usd: number
           id: string
@@ -468,6 +469,7 @@ export type Database = {
           author_id?: string | null
           brief_note?: string | null
           created_at?: string
+          did_you_know?: string[]
           due_date?: string | null
           fee_usd?: number
           id?: string
@@ -493,6 +495,7 @@ export type Database = {
           author_id?: string | null
           brief_note?: string | null
           created_at?: string
+          did_you_know?: string[]
           due_date?: string | null
           fee_usd?: number
           id?: string

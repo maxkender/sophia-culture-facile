@@ -73,6 +73,7 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
   const [meta, setMeta] = useState({ lot_code: "", subject_area: "", brief_note: "", due_date: "", status: "assigned" as CourseStatus });
   const [screens, setScreens] = useState<ScreenDraft[]>(SCREEN_NUMBERS.map(() => ({ ...EMPTY_SCREEN })));
   const [sourceRows, setSourceRows] = useState<Source[]>([]);
+  const [didYouKnow, setDidYouKnow] = useState<string[]>([]);
   const [preview, setPreview] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [saving, setSaving] = useState(false);
@@ -92,6 +93,7 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
       status: (data.course.status ?? "assigned") as CourseStatus,
     });
     setSourceRows(data.sources);
+    setDidYouKnow((data.course.did_you_know ?? []).slice(0, 3));
     setScreens(
       SCREEN_NUMBERS.map((number) => {
         const existing = data.screens.find((screen) => screen.screen_number === number);
@@ -117,6 +119,7 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
       const base = {
         title: title.trim() || course.title,
         subtitle: subtitle.trim() || null,
+        did_you_know: didYouKnow.map((fact) => fact.trim()).filter(Boolean).slice(0, 3),
       };
       const patch = admin
         ? {
@@ -172,7 +175,7 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
     const timer = window.setTimeout(() => void save({ silent: true }), 2000);
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, subtitle, screens, meta, readOnly]);
+  }, [title, subtitle, screens, meta, didYouKnow, readOnly]);
 
   function patchScreen(index: number, patch: Partial<ScreenDraft>) {
     dirty.current = true;
@@ -284,6 +287,7 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
                 body: screen.body,
               }))}
               sources={sourceRows}
+              didYouKnow={didYouKnow}
             />
             <Button asChild variant="pillSecondary" size="pillSm">
               <a href="/auteurs/examples" target="_blank" rel="noreferrer noopener">
@@ -463,6 +467,68 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
             </PortalCard>
           );
         })}
+
+        <PortalCard className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-extrabold text-brand-navy">Did you know?</h2>
+              <p className="mt-1 text-sm text-brand-navySoft">
+                Optional. Up to three genuinely surprising facts that did not fit into the five screens, one or two
+                sentences each. They do not count toward the word target, and we decide whether to use them.
+              </p>
+            </div>
+            {!readOnly && didYouKnow.length < 3 ? (
+              <Button
+                type="button"
+                variant="pillSecondary"
+                size="pillSm"
+                onClick={() => {
+                  dirty.current = true;
+                  setDidYouKnow((current) => [...current, ""]);
+                }}
+              >
+                <Plus className="size-4" /> Add a fact
+              </Button>
+            ) : null}
+          </div>
+          {didYouKnow.length === 0 ? (
+            <p className="text-sm text-brand-navySoft">Nothing here yet. This field is entirely optional.</p>
+          ) : (
+            <div className="space-y-3">
+              {didYouKnow.map((fact, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <Textarea
+                    aria-label={`Did you know fact ${index + 1}`}
+                    rows={2}
+                    maxLength={300}
+                    disabled={readOnly}
+                    value={fact}
+                    onChange={(event) => {
+                      dirty.current = true;
+                      const value = event.target.value;
+                      setDidYouKnow((current) => current.map((item, i) => (i === index ? value : item)));
+                    }}
+                  />
+                  {!readOnly ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Remove this fact"
+                      onClick={() => {
+                        dirty.current = true;
+                        setDidYouKnow((current) => current.filter((_, i) => i !== index));
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          )}
+        </PortalCard>
+
 
         <PortalCard>
           <div className="flex flex-wrap items-center justify-between gap-3">

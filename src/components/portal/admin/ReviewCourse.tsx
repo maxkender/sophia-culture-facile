@@ -96,6 +96,7 @@ export function ReviewCourse({ courseId }: { courseId: string }) {
             subjectArea={course.subject_area}
             screens={data?.screens ?? []}
             sources={data?.sources ?? []}
+            didYouKnow={course.did_you_know ?? []}
           />
         }
       />
@@ -121,6 +122,19 @@ export function ReviewCourse({ courseId }: { courseId: string }) {
               </PortalCard>
             );
           })}
+
+          {(course.did_you_know ?? []).length > 0 ? (
+            <PortalCard className="bg-portal-bg shadow-none ring-1 ring-brand-line">
+              <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Did you know?</p>
+              <ul className="mt-3 space-y-2">
+                {(course.did_you_know ?? []).map((fact, index) => (
+                  <li key={index} className="text-sm leading-relaxed text-brand-navy">
+                    <BoldText text={fact} />
+                  </li>
+                ))}
+              </ul>
+            </PortalCard>
+          ) : null}
         </div>
 
         <div className="space-y-5">
