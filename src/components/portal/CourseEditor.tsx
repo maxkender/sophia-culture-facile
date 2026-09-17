@@ -28,6 +28,7 @@ import { OpenThreadButton } from "./OpenThreadButton";
 import { Banner, BoldText, ConfirmButton, PageTitle, PortalCard, StatusPill } from "./ui";
 import { AiSuggestions } from "./AiSuggestions";
 import { CopyCourseButton } from "./CopyCourseButton";
+import { DeleteCourseButton } from "./admin/DeleteCourseButton";
 
 type ScreenDraft = { id: string | null; screen_title: string; body: string; image_idea: string };
 
@@ -549,6 +550,16 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
           <p className="text-right text-xs text-brand-navySoft">
             Every screen needs a title and a body before you can submit.
           </p>
+        ) : null}
+        {admin ? (
+          <div className="pt-6 text-right">
+            <DeleteCourseButton
+              courseId={courseId}
+              title={course.title}
+              status={liveStatus}
+              redirectTo="/auteurs/admin/courses"
+            />
+          </div>
         ) : null}
       </div>
     </div>

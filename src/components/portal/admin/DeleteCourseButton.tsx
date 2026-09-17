@@ -104,7 +104,10 @@ export function DeleteCourseButton({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete “{title}” permanently?</AlertDialogTitle>
             <AlertDialogDescription>
-              {authorName ? `Author: ${authorName}.` : "No author assigned."} Status: {status.replace("_", " ")}.{" "}
+              {authorName ?? counts?.author
+                ? `Author: ${authorName ?? counts?.author}.`
+                : "No author assigned."}{" "}
+              Status: {status.replace("_", " ")}.{" "}
               {counts
                 ? `${counts.screens} screen${counts.screens === 1 ? "" : "s"} contain text and there ${
                     counts.sources === 1 ? "is 1 source" : `are ${counts.sources} sources`
