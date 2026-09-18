@@ -390,7 +390,6 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
               id="course-title"
               value={title}
               disabled={readOnly}
-              maxLength={160}
               onChange={(event) => {
                 dirty.current = true;
                 setTitle(event.target.value);
@@ -404,7 +403,6 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
               id="course-subtitle"
               value={subtitle}
               disabled={readOnly}
-              maxLength={200}
               onChange={(event) => {
                 dirty.current = true;
                 setSubtitle(event.target.value);
@@ -431,7 +429,6 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
                   id={`screen-title-${index}`}
                   value={screen.screen_title}
                   disabled={readOnly}
-                  maxLength={120}
                   onChange={(event) => patchScreen(index, { screen_title: event.target.value })}
                   className="h-11"
                 />
@@ -459,7 +456,6 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
                   id={`screen-image-${index}`}
                   value={screen.image_idea}
                   disabled={readOnly}
-                  maxLength={200}
                   onChange={(event) => patchScreen(index, { image_idea: event.target.value })}
                   className="h-11"
                 />
@@ -500,7 +496,6 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
                   <Textarea
                     aria-label={`Did you know fact ${index + 1}`}
                     rows={2}
-                    maxLength={300}
                     disabled={readOnly}
                     value={fact}
                     onChange={(event) => {
