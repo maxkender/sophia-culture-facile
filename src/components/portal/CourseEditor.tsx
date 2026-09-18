@@ -390,7 +390,6 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
               id="course-title"
               value={title}
               disabled={readOnly}
-              maxLength={160}
               onChange={(event) => {
                 dirty.current = true;
                 setTitle(event.target.value);
@@ -404,7 +403,6 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
               id="course-subtitle"
               value={subtitle}
               disabled={readOnly}
-              maxLength={200}
               onChange={(event) => {
                 dirty.current = true;
                 setSubtitle(event.target.value);
@@ -419,11 +417,17 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
           const over = words > WORDS_WARN;
           return (
             <PortalCard key={index} className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-lg font-extrabold text-brand-navy">Screen {index + 1}</h2>
-                <span className={`text-sm font-semibold ${over ? "text-portal-amber" : "text-brand-navySoft"}`}>
-                  {words} words · target {WORDS_MIN}–{WORDS_MAX}
-                </span>
+                <div className="text-right">
+                  <span className={`text-sm font-semibold ${over ? "text-portal-amber" : "text-brand-navySoft"}`}>
+                    {words} words
+                  </span>
+                  <p className="text-xs text-brand-navySoft">
+                    Target {WORDS_MIN} to {WORDS_MAX} words per screen, {COURSE_WORDS_MIN} to {COURSE_WORDS_MAX} for the
+                    course. A guide, not a limit.
+                  </p>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor={`screen-title-${index}`}>Screen title</Label>
@@ -431,7 +435,6 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
                   id={`screen-title-${index}`}
                   value={screen.screen_title}
                   disabled={readOnly}
-                  maxLength={120}
                   onChange={(event) => patchScreen(index, { screen_title: event.target.value })}
                   className="h-11"
                 />
@@ -459,7 +462,6 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
                   id={`screen-image-${index}`}
                   value={screen.image_idea}
                   disabled={readOnly}
-                  maxLength={200}
                   onChange={(event) => patchScreen(index, { image_idea: event.target.value })}
                   className="h-11"
                 />
@@ -500,7 +502,6 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
                   <Textarea
                     aria-label={`Did you know fact ${index + 1}`}
                     rows={2}
-                    maxLength={300}
                     disabled={readOnly}
                     value={fact}
                     onChange={(event) => {
@@ -595,10 +596,24 @@ export function CourseEditor({ courseId, admin = false }: { courseId: string; ad
         </PortalCard>
 
         <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-4 rounded-portal bg-card p-5 shadow-portal">
-          <p className="text-sm text-brand-navySoft">
-            {totalWords} words in total · target {COURSE_WORDS_MIN}–{COURSE_WORDS_MAX}
-            {readOnly ? "" : saving ? " · Saving…" : savedAt ? ` · Saved at ${savedAt.toLocaleTimeString("en-GB")}` : ""}
-          </p>
+          <div>
+            <p
+              className={`text-sm font-semibold ${totalWords > COURSE_WORDS_MAX ? "text-portal-amber" : "text-brand-navySoft"}`}
+            >
+              {totalWords} words in total
+              {readOnly
+                ? ""
+                : saving
+                  ? " · Saving…"
+                  : savedAt
+                    ? ` · Saved at ${savedAt.toLocaleTimeString("en-GB")}`
+                    : ""}
+            </p>
+            <p className="text-xs text-brand-navySoft">
+              Target {WORDS_MIN} to {WORDS_MAX} words per screen, {COURSE_WORDS_MIN} to {COURSE_WORDS_MAX} for the
+              course. A guide, not a limit.
+            </p>
+          </div>
           {!readOnly ? (
             <div className="flex flex-wrap gap-3">
               <Button type="button" variant="pillSecondary" size="pillSm" disabled={saving} onClick={() => save()}>
