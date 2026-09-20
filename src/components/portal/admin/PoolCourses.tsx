@@ -293,6 +293,7 @@ export function PoolCourses() {
         <TabsList>
           <TabsTrigger value="pool">The pool ({pool.length})</TabsTrigger>
           <TabsTrigger value="requests">Requests ({pending.length})</TabsTrigger>
+          <TabsTrigger value="proposals">Proposals ({pendingProposals.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pool" className="mt-6 space-y-6">
