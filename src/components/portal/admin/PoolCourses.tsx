@@ -336,6 +336,11 @@ export function PoolCourses() {
                       </td>
                       <td className="max-w-sm px-6 py-4 align-top text-brand-navySoft">
                         {course.brief_note ?? "—"}
+                        {course.admin_note ? (
+                          <span className="mt-2 block rounded-xl bg-portal-amber/10 p-2 text-xs font-semibold text-brand-navy">
+                            {course.admin_note}
+                          </span>
+                        ) : null}
                       </td>
                       <td className="px-6 py-4 align-top font-bold text-brand-navy">
                         {pending.filter((request) => request.course_id === course.id).length}
