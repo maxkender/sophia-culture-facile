@@ -626,3 +626,107 @@ function RequestRowCard({
     </PortalCard>
   );
 }
+
+function ProposalRowCard({
+  proposal,
+  author,
+  onDecide,
+}: {
+  proposal: ProposalRow;
+  author: Profile | null;
+  onDecide: (mode: "assign" | "pool" | "decline", reason?: string) => void;
+}) {
+  const [declining, setDeclining] = useState(false);
+  const [reason, setReason] = useState("");
+
+  return (
+    <PortalCard>
+      <div className="flex flex-wrap items-start justify-between gap-6">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">
+            {subjectLabel(proposal.subject_area)} · proposed {formatDateTime(proposal.created_at)}
+          </p>
+          <p className="mt-1 text-lg font-bold text-brand-navy">{proposal.title}</p>
+          {proposal.subtitle ? <p className="text-sm text-brand-navySoft">{proposal.subtitle}</p> : null}
+
+          <div className="mt-4">
+            {author ? (
+              <Link
+                to="/auteurs/admin/authors/$authorId"
+                params={{ authorId: author.id }}
+                className="text-sm font-bold text-portal-accent hover:underline"
+              >
+                {author.display_name ?? author.full_name}
+              </Link>
+            ) : (
+              <span className="text-sm font-bold text-brand-navy">Unknown author</span>
+            )}
+            <p className="text-xs text-brand-navySoft">{author?.display_title ?? "Byline to confirm"}</p>
+          </div>
+
+          <p className="mt-4 rounded-2xl bg-brand-surface p-4 text-sm italic leading-relaxed text-brand-navy">
+            “{proposal.reveal}”
+          </p>
+        </div>
+
+        <div className="w-full max-w-xs space-y-3">
+          <Button
+            type="button"
+            variant="pill"
+            size="pillSm"
+            className="w-full"
+            onClick={() => onDecide("assign")}
+          >
+            Approve and assign to them
+          </Button>
+          <Button
+            type="button"
+            variant="pillSecondary"
+            size="pillSm"
+            className="w-full"
+            onClick={() => onDecide("pool")}
+          >
+            Approve into the pool
+          </Button>
+          {declining ? (
+            <div className="space-y-3">
+              <Textarea
+                rows={3}
+                placeholder="Short reason (optional), shown to the author"
+                value={reason}
+                onChange={(event) => setReason(event.target.value)}
+              />
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="pillSecondary"
+                  size="pillSm"
+                  onClick={() => {
+                    onDecide("decline", reason);
+                    setDeclining(false);
+                    setReason("");
+                  }}
+                >
+                  Confirm decline
+                </Button>
+                <Button type="button" variant="pillSecondary" size="pillSm" onClick={() => setDeclining(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="pillSecondary"
+              size="pillSm"
+              className="w-full"
+              onClick={() => setDeclining(true)}
+            >
+              Decline
+            </Button>
+          )}
+        </div>
+      </div>
+    </PortalCard>
+  );
+}
