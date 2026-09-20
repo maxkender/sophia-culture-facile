@@ -25,6 +25,18 @@ type RequestRow = {
   decline_reason: string | null;
 };
 
+type ProposalRow = {
+  id: string;
+  profile_id: string;
+  title: string;
+  subtitle: string | null;
+  subject_area: string | null;
+  reveal: string;
+  status: string;
+  decline_reason: string | null;
+  created_at: string;
+};
+
 export function PoolCourses() {
   const queryClient = useQueryClient();
   const { data: me } = usePortalProfile();
@@ -42,18 +54,20 @@ export function PoolCourses() {
   const { data } = useQuery({
     queryKey: ["portal", "admin", "pool"],
     queryFn: async () => {
-      const [{ data: courses }, { data: requests }, { data: profiles }, { data: allCourses }] =
+      const [{ data: courses }, { data: requests }, { data: profiles }, { data: allCourses }, { data: proposals }] =
         await Promise.all([
           supabase.from("courses").select("*").eq("status", "unassigned").order("created_at", { ascending: false }),
           supabase.from("course_requests").select("*").order("created_at", { ascending: false }),
           supabase.from("profiles").select("*").eq("role", "author"),
           supabase.from("courses").select("id, author_id, status"),
+          supabase.from("course_proposals").select("*").order("created_at", { ascending: false }),
         ]);
       return {
         pool: (courses ?? []) as Course[],
         requests: (requests ?? []) as RequestRow[],
         authors: (profiles ?? []) as Profile[],
         workload: (allCourses ?? []) as { id: string; author_id: string | null; status: string }[],
+        proposals: (proposals ?? []) as ProposalRow[],
       };
     },
   });
@@ -63,6 +77,74 @@ export function PoolCourses() {
   const pending = requests.filter((request) => request.status === "pending");
   const authorsById = new Map((data?.authors ?? []).map((author) => [author.id, author]));
   const courseById = new Map(pool.map((course) => [course.id, course]));
+  const proposals = data?.proposals ?? [];
+  const pendingProposals = proposals.filter((row) => row.status === "pending");
+
+  async function decideProposal(
+    row: ProposalRow,
+    mode: "assign" | "pool" | "decline",
+    reason = "",
+  ) {
+    const now = new Date().toISOString();
+    const author = authorsById.get(row.profile_id);
+    let courseId: string | null = null;
+
+    if (mode !== "decline") {
+      const { data: created, error } = await supabase
+        .from("courses")
+        .insert({
+          title: row.title.trim(),
+          subtitle: row.subtitle?.trim() || null,
+          subject_area: row.subject_area,
+          brief_note:
+            mode === "assign"
+              ? row.reveal
+              : `${row.reveal}\n\nProposed by ${author?.full_name ?? "an author"}.`,
+          author_id: mode === "assign" ? row.profile_id : null,
+          status: mode === "assign" ? "assigned" : "unassigned",
+        })
+        .select("id")
+        .single();
+      if (error || !created) {
+        toast.error("The course could not be created.");
+        return;
+      }
+      courseId = created.id;
+    }
+
+    const { error: updateError } = await supabase
+      .from("course_proposals")
+      .update({
+        status:
+          mode === "assign" ? "approved_assigned" : mode === "pool" ? "approved_to_pool" : "declined",
+        decline_reason: mode === "decline" ? reason.trim() || null : null,
+        course_id: courseId,
+        decided_at: now,
+        decided_by: me?.profile?.id ?? null,
+      })
+      .eq("id", row.id);
+    if (updateError) {
+      toast.error("The decision could not be saved.");
+      return;
+    }
+
+    await supabase.from("activity_log").insert({
+      actor_id: me?.profile?.id ?? null,
+      entity: "course_proposal",
+      entity_id: row.id,
+      action: mode === "decline" ? "proposal_declined" : "proposal_approved",
+      comment: `${row.title} — proposed by ${author?.full_name ?? "an author"}`,
+    });
+
+    await refresh();
+    toast.success(
+      mode === "assign"
+        ? "Course created and assigned to that author."
+        : mode === "pool"
+          ? "Course added to the pool."
+          : "Proposal declined.",
+    );
+  }
 
   async function refresh() {
     await queryClient.invalidateQueries({ queryKey: ["portal"] });
@@ -211,6 +293,7 @@ export function PoolCourses() {
         <TabsList>
           <TabsTrigger value="pool">The pool ({pool.length})</TabsTrigger>
           <TabsTrigger value="requests">Requests ({pending.length})</TabsTrigger>
+          <TabsTrigger value="proposals">Proposals ({pendingProposals.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pool" className="mt-6 space-y-6">
@@ -253,6 +336,11 @@ export function PoolCourses() {
                       </td>
                       <td className="max-w-sm px-6 py-4 align-top text-brand-navySoft">
                         {course.brief_note ?? "—"}
+                        {course.admin_note ? (
+                          <span className="mt-2 block rounded-xl bg-portal-amber/10 p-2 text-xs font-semibold text-brand-navy">
+                            {course.admin_note}
+                          </span>
+                        ) : null}
                       </td>
                       <td className="px-6 py-4 align-top font-bold text-brand-navy">
                         {pending.filter((request) => request.course_id === course.id).length}
@@ -399,6 +487,45 @@ export function PoolCourses() {
             ))
           )}
         </TabsContent>
+
+        <TabsContent value="proposals" className="mt-6 space-y-4">
+          {pendingProposals.length === 0 ? (
+            <EmptyState title="No pending proposal" text="Authors can propose subjects from their Open courses page." />
+          ) : (
+            pendingProposals.map((row) => (
+              <ProposalRowCard
+                key={row.id}
+                proposal={row}
+                author={authorsById.get(row.profile_id) ?? null}
+                onDecide={(mode, reason) => decideProposal(row, mode, reason)}
+              />
+            ))
+          )}
+
+          {proposals.filter((row) => row.status !== "pending").length > 0 ? (
+            <div className="pt-4">
+              <h3 className="text-sm font-bold uppercase tracking-wide text-brand-navySoft">Decided</h3>
+              <div className="mt-3 space-y-2">
+                {proposals
+                  .filter((row) => row.status !== "pending")
+                  .map((row) => (
+                    <PortalCard key={row.id} className="py-4">
+                      <p className="text-sm font-bold text-brand-navy">{row.title}</p>
+                      <p className="text-xs text-brand-navySoft">
+                        {authorsById.get(row.profile_id)?.full_name ?? "Unknown author"} ·{" "}
+                        {row.status === "approved_assigned"
+                          ? "Approved and assigned"
+                          : row.status === "approved_to_pool"
+                            ? "Approved into the pool"
+                            : "Declined"}
+                        {row.decline_reason ? ` — ${row.decline_reason}` : ""}
+                      </p>
+                    </PortalCard>
+                  ))}
+              </div>
+            </div>
+          ) : null}
+        </TabsContent>
       </Tabs>
     </div>
   );
@@ -472,6 +599,110 @@ function RequestRowCard({
                   size="pillSm"
                   onClick={() => {
                     onDecline(reason);
+                    setDeclining(false);
+                    setReason("");
+                  }}
+                >
+                  Confirm decline
+                </Button>
+                <Button type="button" variant="pillSecondary" size="pillSm" onClick={() => setDeclining(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="pillSecondary"
+              size="pillSm"
+              className="w-full"
+              onClick={() => setDeclining(true)}
+            >
+              Decline
+            </Button>
+          )}
+        </div>
+      </div>
+    </PortalCard>
+  );
+}
+
+function ProposalRowCard({
+  proposal,
+  author,
+  onDecide,
+}: {
+  proposal: ProposalRow;
+  author: Profile | null;
+  onDecide: (mode: "assign" | "pool" | "decline", reason?: string) => void;
+}) {
+  const [declining, setDeclining] = useState(false);
+  const [reason, setReason] = useState("");
+
+  return (
+    <PortalCard>
+      <div className="flex flex-wrap items-start justify-between gap-6">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">
+            {subjectLabel(proposal.subject_area)} · proposed {formatDateTime(proposal.created_at)}
+          </p>
+          <p className="mt-1 text-lg font-bold text-brand-navy">{proposal.title}</p>
+          {proposal.subtitle ? <p className="text-sm text-brand-navySoft">{proposal.subtitle}</p> : null}
+
+          <div className="mt-4">
+            {author ? (
+              <Link
+                to="/auteurs/admin/authors/$authorId"
+                params={{ authorId: author.id }}
+                className="text-sm font-bold text-portal-accent hover:underline"
+              >
+                {author.display_name ?? author.full_name}
+              </Link>
+            ) : (
+              <span className="text-sm font-bold text-brand-navy">Unknown author</span>
+            )}
+            <p className="text-xs text-brand-navySoft">{author?.display_title ?? "Byline to confirm"}</p>
+          </div>
+
+          <p className="mt-4 rounded-2xl bg-brand-surface p-4 text-sm italic leading-relaxed text-brand-navy">
+            “{proposal.reveal}”
+          </p>
+        </div>
+
+        <div className="w-full max-w-xs space-y-3">
+          <Button
+            type="button"
+            variant="pill"
+            size="pillSm"
+            className="w-full"
+            onClick={() => onDecide("assign")}
+          >
+            Approve and assign to them
+          </Button>
+          <Button
+            type="button"
+            variant="pillSecondary"
+            size="pillSm"
+            className="w-full"
+            onClick={() => onDecide("pool")}
+          >
+            Approve into the pool
+          </Button>
+          {declining ? (
+            <div className="space-y-3">
+              <Textarea
+                rows={3}
+                placeholder="Short reason (optional), shown to the author"
+                value={reason}
+                onChange={(event) => setReason(event.target.value)}
+              />
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="pillSecondary"
+                  size="pillSm"
+                  onClick={() => {
+                    onDecide("decline", reason);
                     setDeclining(false);
                     setReason("");
                   }}

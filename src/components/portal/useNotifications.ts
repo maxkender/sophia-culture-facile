@@ -20,6 +20,8 @@ export const NOTIFICATION_LABEL: Record<string, string> = {
   message: "New message",
   request_approved: "Request approved",
   request_declined: "Request declined",
+  proposal_approved: "Proposal approved",
+  proposal_declined: "Proposal declined",
 };
 
 export function useNotifications(profileId: string | null | undefined) {
