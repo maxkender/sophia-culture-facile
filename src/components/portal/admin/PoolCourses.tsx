@@ -77,6 +77,74 @@ export function PoolCourses() {
   const pending = requests.filter((request) => request.status === "pending");
   const authorsById = new Map((data?.authors ?? []).map((author) => [author.id, author]));
   const courseById = new Map(pool.map((course) => [course.id, course]));
+  const proposals = data?.proposals ?? [];
+  const pendingProposals = proposals.filter((row) => row.status === "pending");
+
+  async function decideProposal(
+    row: ProposalRow,
+    mode: "assign" | "pool" | "decline",
+    reason = "",
+  ) {
+    const now = new Date().toISOString();
+    const author = authorsById.get(row.profile_id);
+    let courseId: string | null = null;
+
+    if (mode !== "decline") {
+      const { data: created, error } = await supabase
+        .from("courses")
+        .insert({
+          title: row.title.trim(),
+          subtitle: row.subtitle?.trim() || null,
+          subject_area: row.subject_area,
+          brief_note:
+            mode === "assign"
+              ? row.reveal
+              : `${row.reveal}\n\nProposed by ${author?.full_name ?? "an author"}.`,
+          author_id: mode === "assign" ? row.profile_id : null,
+          status: mode === "assign" ? "assigned" : "unassigned",
+        })
+        .select("id")
+        .single();
+      if (error || !created) {
+        toast.error("The course could not be created.");
+        return;
+      }
+      courseId = created.id;
+    }
+
+    const { error: updateError } = await supabase
+      .from("course_proposals")
+      .update({
+        status:
+          mode === "assign" ? "approved_assigned" : mode === "pool" ? "approved_to_pool" : "declined",
+        decline_reason: mode === "decline" ? reason.trim() || null : null,
+        course_id: courseId,
+        decided_at: now,
+        decided_by: me?.profile?.id ?? null,
+      })
+      .eq("id", row.id);
+    if (updateError) {
+      toast.error("The decision could not be saved.");
+      return;
+    }
+
+    await supabase.from("activity_log").insert({
+      actor_id: me?.profile?.id ?? null,
+      entity: "course_proposal",
+      entity_id: row.id,
+      action: mode === "decline" ? "proposal_declined" : "proposal_approved",
+      comment: `${row.title} — proposed by ${author?.full_name ?? "an author"}`,
+    });
+
+    await refresh();
+    toast.success(
+      mode === "assign"
+        ? "Course created and assigned to that author."
+        : mode === "pool"
+          ? "Course added to the pool."
+          : "Proposal declined.",
+    );
+  }
 
   async function refresh() {
     await queryClient.invalidateQueries({ queryKey: ["portal"] });
