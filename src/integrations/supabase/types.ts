@@ -379,6 +379,73 @@ export type Database = {
           },
         ]
       }
+      course_proposals: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decline_reason: string | null
+          id: string
+          profile_id: string
+          reveal: string
+          status: string
+          subject_area: string | null
+          subtitle: string | null
+          title: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decline_reason?: string | null
+          id?: string
+          profile_id: string
+          reveal: string
+          status?: string
+          subject_area?: string | null
+          subtitle?: string | null
+          title: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decline_reason?: string | null
+          id?: string
+          profile_id?: string
+          reveal?: string
+          status?: string
+          subject_area?: string | null
+          subtitle?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_proposals_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_proposals_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_proposals_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_requests: {
         Row: {
           course_id: string
@@ -439,6 +506,7 @@ export type Database = {
       }
       courses: {
         Row: {
+          admin_note: string | null
           alternate_slug: string | null
           author_id: string | null
           brief_note: string | null
@@ -465,6 +533,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          admin_note?: string | null
           alternate_slug?: string | null
           author_id?: string | null
           brief_note?: string | null
@@ -491,6 +560,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          admin_note?: string | null
           alternate_slug?: string | null
           author_id?: string | null
           brief_note?: string | null
