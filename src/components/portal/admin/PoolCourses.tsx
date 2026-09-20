@@ -54,18 +54,20 @@ export function PoolCourses() {
   const { data } = useQuery({
     queryKey: ["portal", "admin", "pool"],
     queryFn: async () => {
-      const [{ data: courses }, { data: requests }, { data: profiles }, { data: allCourses }] =
+      const [{ data: courses }, { data: requests }, { data: profiles }, { data: allCourses }, { data: proposals }] =
         await Promise.all([
           supabase.from("courses").select("*").eq("status", "unassigned").order("created_at", { ascending: false }),
           supabase.from("course_requests").select("*").order("created_at", { ascending: false }),
           supabase.from("profiles").select("*").eq("role", "author"),
           supabase.from("courses").select("id, author_id, status"),
+          supabase.from("course_proposals").select("*").order("created_at", { ascending: false }),
         ]);
       return {
         pool: (courses ?? []) as Course[],
         requests: (requests ?? []) as RequestRow[],
         authors: (profiles ?? []) as Profile[],
         workload: (allCourses ?? []) as { id: string; author_id: string | null; status: string }[],
+        proposals: (proposals ?? []) as ProposalRow[],
       };
     },
   });
