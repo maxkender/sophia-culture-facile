@@ -15,13 +15,32 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { subjectLabel } from "@/config/subjects";
+import { SUBJECT_AREAS, subjectLabel } from "@/config/subjects";
 import { formatDate, type Course } from "@/lib/portal";
 import { usePortalProfile } from "./usePortal";
 import { EmptyState, PageTitle, PortalCard } from "./ui";
 
 const MAX_PENDING = 3;
 const NOTE_MAX = 150;
+const REVEAL_MAX = 300;
+
+export type ProposalRow = {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  subject_area: string | null;
+  reveal: string;
+  status: string;
+  decline_reason: string | null;
+  created_at: string;
+};
+
+const PROPOSAL_LABEL: Record<string, string> = {
+  pending: "Pending",
+  approved_assigned: "Approved — assigned to you",
+  approved_to_pool: "Approved — added to the pool",
+  declined: "Declined",
+};
 
 type MyRequest = {
   id: string;
