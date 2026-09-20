@@ -487,6 +487,45 @@ export function PoolCourses() {
             ))
           )}
         </TabsContent>
+
+        <TabsContent value="proposals" className="mt-6 space-y-4">
+          {pendingProposals.length === 0 ? (
+            <EmptyState title="No pending proposal" text="Authors can propose subjects from their Open courses page." />
+          ) : (
+            pendingProposals.map((row) => (
+              <ProposalRowCard
+                key={row.id}
+                proposal={row}
+                author={authorsById.get(row.profile_id) ?? null}
+                onDecide={(mode, reason) => decideProposal(row, mode, reason)}
+              />
+            ))
+          )}
+
+          {proposals.filter((row) => row.status !== "pending").length > 0 ? (
+            <div className="pt-4">
+              <h3 className="text-sm font-bold uppercase tracking-wide text-brand-navySoft">Decided</h3>
+              <div className="mt-3 space-y-2">
+                {proposals
+                  .filter((row) => row.status !== "pending")
+                  .map((row) => (
+                    <PortalCard key={row.id} className="py-4">
+                      <p className="text-sm font-bold text-brand-navy">{row.title}</p>
+                      <p className="text-xs text-brand-navySoft">
+                        {authorsById.get(row.profile_id)?.full_name ?? "Unknown author"} ·{" "}
+                        {row.status === "approved_assigned"
+                          ? "Approved and assigned"
+                          : row.status === "approved_to_pool"
+                            ? "Approved into the pool"
+                            : "Declined"}
+                        {row.decline_reason ? ` — ${row.decline_reason}` : ""}
+                      </p>
+                    </PortalCard>
+                  ))}
+              </div>
+            </div>
+          ) : null}
+        </TabsContent>
       </Tabs>
     </div>
   );
