@@ -60,12 +60,14 @@ export function OpenCourses() {
   const [asking, setAsking] = useState<Course | null>(null);
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
+  const [proposal, setProposal] = useState({ title: "", subtitle: "", subject_area: "", reveal: "" });
+  const [proposing, setProposing] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["portal", "open-courses", profile?.id],
     enabled: Boolean(profile?.id),
     queryFn: async () => {
-      const [{ data: pool }, { data: mine }, { data: requests }] = await Promise.all([
+      const [{ data: pool }, { data: mine }, { data: requests }, { data: proposals }] = await Promise.all([
         supabase.from("courses").select("*").eq("status", "unassigned").order("created_at", { ascending: false }),
         supabase.from("courses").select("subject_area").eq("author_id", profile!.id),
         supabase
@@ -73,17 +75,51 @@ export function OpenCourses() {
           .select("*, course:courses(title)")
           .eq("profile_id", profile!.id)
           .order("created_at", { ascending: false }),
+        supabase
+          .from("course_proposals")
+          .select("*")
+          .eq("profile_id", profile!.id)
+          .order("created_at", { ascending: false }),
       ]);
       return {
         pool: (pool ?? []) as Course[],
         mySubjects: [...new Set((mine ?? []).map((row) => row.subject_area).filter(Boolean))] as string[],
         requests: (requests ?? []) as unknown as MyRequest[],
+        proposals: (proposals ?? []) as ProposalRow[],
       };
     },
   });
 
   const pool = data?.pool ?? [];
   const requests = data?.requests ?? [];
+  const proposals = data?.proposals ?? [];
+  const pendingProposals = proposals.filter((row) => row.status === "pending").length;
+  const proposalCapped = pendingProposals >= MAX_PENDING;
+
+  async function submitProposal(event: FormEvent) {
+    event.preventDefault();
+    if (!profile) return;
+    setProposing(true);
+    const { error } = await supabase.from("course_proposals").insert({
+      profile_id: profile.id,
+      title: proposal.title.trim(),
+      subtitle: proposal.subtitle.trim() || null,
+      subject_area: proposal.subject_area || null,
+      reveal: proposal.reveal.trim(),
+    });
+    setProposing(false);
+    if (error) {
+      toast.error(
+        error.message.includes("Three proposals")
+          ? "You already have three proposals pending."
+          : "Your proposal could not be sent.",
+      );
+      return;
+    }
+    setProposal({ title: "", subtitle: "", subject_area: "", reveal: "" });
+    await queryClient.invalidateQueries({ queryKey: ["portal"] });
+    toast.success("Your proposal has been sent to the editorial desk.");
+  }
   const pendingCount = requests.filter((request) => request.status === "pending").length;
   const capped = pendingCount >= MAX_PENDING;
   const requestByCourse = useMemo(
