@@ -25,6 +25,18 @@ type RequestRow = {
   decline_reason: string | null;
 };
 
+type ProposalRow = {
+  id: string;
+  profile_id: string;
+  title: string;
+  subtitle: string | null;
+  subject_area: string | null;
+  reveal: string;
+  status: string;
+  decline_reason: string | null;
+  created_at: string;
+};
+
 export function PoolCourses() {
   const queryClient = useQueryClient();
   const { data: me } = usePortalProfile();
