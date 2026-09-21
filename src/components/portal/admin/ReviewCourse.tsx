@@ -194,22 +194,66 @@ export function ReviewCourse({ courseId }: { courseId: string }) {
 
           <PortalCard>
             <h2 className="text-sm font-bold text-brand-navy">Decision</h2>
-            <Textarea
-              rows={5}
-              className="mt-3"
-              placeholder="Comment for the author (required to request changes)"
-              aria-label="Review comment"
-              value={comment}
-              onChange={(event) => setComment(event.target.value)}
-            />
-            <div className="mt-4 flex flex-wrap gap-3">
-              <Button type="button" variant="pill" size="pillSm" disabled={busy} onClick={() => decide("accepted")}>
-                Accept
-              </Button>
-              <Button type="button" variant="pillSecondary" size="pillSm" disabled={busy} onClick={() => decide("changes_requested")}>
-                Request changes
-              </Button>
-            </div>
+            {course.status === "published" ? (
+              <p className="mt-3 text-sm text-brand-navySoft">
+                This course is published. Unpublish it first to change the decision.
+              </p>
+            ) : (
+              <>
+                <Textarea
+                  rows={5}
+                  className="mt-3"
+                  placeholder="Comment for the author (required to request changes)"
+                  aria-label="Review comment"
+                  value={comment}
+                  onChange={(event) => setComment(event.target.value)}
+                />
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {course.status === "accepted" ? (
+                    <Button
+                      type="button"
+                      variant="pillSecondary"
+                      size="pillSm"
+                      disabled={busy}
+                      onClick={() => decide("changes_requested", "reopened")}
+                    >
+                      Reopen for changes
+                    </Button>
+                  ) : course.status === "changes_requested" ? (
+                    <Button
+                      type="button"
+                      variant="pill"
+                      size="pillSm"
+                      disabled={busy}
+                      onClick={() => decide("accepted", "accepted_after_changes")}
+                    >
+                      Accept anyway
+                    </Button>
+                  ) : (
+                    <>
+                      <Button type="button" variant="pill" size="pillSm" disabled={busy} onClick={() => decide("accepted")}>
+                        Accept
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="pillSecondary"
+                        size="pillSm"
+                        disabled={busy}
+                        onClick={() => decide("changes_requested")}
+                      >
+                        Request changes
+                      </Button>
+                    </>
+                  )}
+                </div>
+                {course.status === "accepted" ? (
+                  <p className="mt-3 text-xs text-brand-navySoft">
+                    The author is notified, your notes appear at the top of their course, and the activity log
+                    records who reopened it.
+                  </p>
+                ) : null}
+              </>
+            )}
           </PortalCard>
 
           <div className="pt-2 text-right">
