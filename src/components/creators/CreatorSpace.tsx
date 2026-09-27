@@ -7,6 +7,7 @@ import { claimCreatorInvite } from "@/lib/creator-space.functions";
 import { startStripeOnboarding, syncStripeStatus } from "@/lib/creator-payouts.functions";
 import { CreatorMessages } from "./CreatorMessages";
 import { CreatorOnboarding } from "./CreatorOnboarding";
+import { WeeklyGuides } from "./WeeklyGuides";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -103,6 +104,7 @@ function Workspace() {
           <div className="h-2 rounded-full bg-primary" style={{ width: `${Math.min(100, (week / Math.max(1, data.me.weekly_target)) * 100)}%` }} />
         </div>
       </section>
+      <WeeklyGuides />
       <section className="space-y-2">
         <h2 className="font-bold text-brand-navy">Briefs</h2>
         {data.briefs.length === 0 && <p className="text-sm text-brand-navySoft">No brief yet.</p>}
