@@ -388,7 +388,7 @@ function ZonePanel({ app, onChange }: { app: SlideshowApplication; onChange: (ne
         {info?.pz ? (
           <span className="text-brand-navy">Trial ${Number(info.pz.trial_amount)} · Monthly ${Number(info.pz.monthly_amount)}</span>
         ) : null}
-        {app.zone === "A" && info?.ceiling && !app.zone_override && info.pz?.ceiling_amount ? (
+        {app.zone === "A" && info?.ceiling && info.pz?.ceiling_amount ? (
           <span className="text-xs text-brand-navySoft">ceiling ${Number(info.pz.ceiling_amount)}, only as a response to a refusal</span>
         ) : null}
       </div>
