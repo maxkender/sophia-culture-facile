@@ -311,9 +311,9 @@ export function UgcApplyPage() {
           <p className="text-sm leading-relaxed text-brand-navySoft">
             {copy.videoHelp}
           </p>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {(["link", "file"] as const).map((m) => (
-              <Button key={m} type="button" size="pillSm" variant={form.video_mode === m ? "pill" : "pillSecondary"} onClick={() => set("video_mode", m)}>
+              <Button key={m} type="button" size="pillSm" className="h-auto min-h-11 whitespace-normal px-3 text-center" variant={form.video_mode === m ? "pill" : "pillSecondary"} onClick={() => set("video_mode", m)}>
                 {m === "link" ? copy.sendLink : copy.uploadFile}
               </Button>
             ))}
@@ -329,7 +329,7 @@ export function UgcApplyPage() {
               <Input
                 id="video_file"
                 type="file"
-                accept="video/mp4,video/quicktime,.mp4,.mov"
+                accept="video/*,.mp4,.mov"
                 className="h-11"
                 onChange={(e) => {
                   const f = e.target.files?.[0] ?? null;
