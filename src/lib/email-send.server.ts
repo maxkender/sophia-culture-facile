@@ -88,8 +88,10 @@ export async function sendAppEmail(options: {
   if (options.idempotencyKey) payload.idempotency_key = options.idempotencyKey;
   if (options.label) payload.label = options.label;
   if (options.purpose) payload.purpose = options.purpose;
+  const sendOptions: import("@lovable.dev/email-js").SendEmailOptions = { apiKey };
+  if (options.idempotencyKey) sendOptions.idempotencyKey = options.idempotencyKey;
   try {
-    const response = await sendLovableEmail(payload, { apiKey, idempotencyKey: options.idempotencyKey });
+    const response = await sendLovableEmail(payload, sendOptions);
     return { sent: Boolean(response.success), ...(response.success ? {} : { reason: response.status ?? "send_failed" }) };
   } catch (error) {
     const code = error instanceof EmailAPIError ? error.code : null;
