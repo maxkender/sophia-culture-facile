@@ -24,13 +24,15 @@ import {
 import { cn } from "@/lib/utils";
 import { usePortalProfile } from "./usePortal";
 import { useNavCounts } from "./useNavCounts";
-import { ADMIN_NAV, AUTHOR_NAV, sectionLabel, type NavGroup } from "./nav";
+import { ADMIN_AUTHOR_NAV, ADMIN_CREATOR_NAV, ADMIN_NAV, AUTHOR_NAV, sectionLabel, type NavGroup } from "./nav";
 import { CommandPalette } from "./CommandPalette";
 import { AnnouncementGate } from "./Announcements";
 import { NotificationBell } from "./NotificationBell";
 import { Banner, PortalCard } from "./ui";
 
 const COLLAPSE_KEY = "sophia.portal.sidebar.collapsed";
+const MODE_KEY = "sophia.portal.admin.mode";
+type AdminMode = "authors" | "creators";
 
 export type Crumb = { label: string; to?: string };
 
@@ -125,11 +127,13 @@ function SidebarNav({
 export function PortalShell({
   children,
   adminOnly = false,
+  wide = false,
   breadcrumb,
   action,
 }: {
   children: ReactNode;
   adminOnly?: boolean;
+  wide?: boolean;
   breadcrumb?: Crumb[];
   action?: ReactNode;
 }) {
@@ -138,9 +142,42 @@ export function PortalShell({
   const { data, isLoading } = usePortalProfile();
   const profile = data?.profile ?? null;
   const isAdmin = profile?.role === "admin";
-  const groups = isAdmin ? ADMIN_NAV : AUTHOR_NAV;
   const counts = useNavCounts(Boolean(isAdmin), profile?.id);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const [mode, setMode] = useState<AdminMode>("authors");
+  useEffect(() => {
+    const onCreators = pathname.startsWith("/auteurs/admin/creators");
+    const stored = window.localStorage.getItem(MODE_KEY) as AdminMode | null;
+    const next: AdminMode = onCreators ? "creators" : pathname.startsWith("/auteurs/admin") && pathname !== "/auteurs/admin" ? "authors" : (stored ?? "authors");
+    setMode(next);
+    window.localStorage.setItem(MODE_KEY, next);
+  }, [pathname]);
+  function switchMode(next: AdminMode) {
+    setMode(next);
+    window.localStorage.setItem(MODE_KEY, next);
+    void navigate({ to: next === "creators" ? "/auteurs/admin/creators" : "/auteurs/admin" });
+  }
+  const groups = isAdmin ? (mode === "creators" ? ADMIN_CREATOR_NAV : ADMIN_AUTHOR_NAV) : AUTHOR_NAV;
+  const modeTabs = isAdmin ? (
+    <div className="mx-3 mt-1 grid grid-cols-2 rounded-xl bg-portal-bg p-1" role="tablist" aria-label="Portal mode">
+      {(["authors", "creators"] as const).map((m) => (
+        <button
+          key={m}
+          type="button"
+          role="tab"
+          aria-selected={mode === m}
+          onClick={() => switchMode(m)}
+          title={m === "authors" ? "Authors" : "Creators"}
+          className={cn(
+            "rounded-lg py-1.5 text-xs font-bold transition",
+            mode === m ? "bg-brand-navy text-card shadow-sm" : "text-brand-navy hover:bg-brand-navy/10",
+          )}
+        >
+          {collapsed ? (m === "authors" ? "A" : "C") : m === "authors" ? "Authors" : "Creators"}
+        </button>
+      ))}
+    </div>
+  ) : null;
 
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -177,7 +214,7 @@ export function PortalShell({
   }
 
   const name = profile?.full_name ?? data?.email ?? "";
-  const crumbs: Crumb[] = breadcrumb?.length ? breadcrumb : [{ label: sectionLabel(pathname, groups) }];
+  const crumbs: Crumb[] = breadcrumb?.length ? breadcrumb : [{ label: sectionLabel(pathname, isAdmin ? ADMIN_NAV : AUTHOR_NAV) }];
 
   const userMenu = (
     <DropdownMenu>
@@ -243,6 +280,7 @@ export function PortalShell({
             )}
           </Link>
         </div>
+        {modeTabs}
         <div className="flex-1 overflow-y-auto px-3 py-4">
           <SidebarNav groups={groups} counts={counts} collapsed={collapsed} />
         </div>
@@ -277,7 +315,8 @@ export function PortalShell({
                 <div className="flex h-16 items-center px-4">
                   <Logo />
                 </div>
-                <div className="px-3 pb-4">
+                {modeTabs}
+                <div className="px-3 py-4">
                   <SidebarNav
                     groups={groups}
                     counts={counts}
@@ -335,7 +374,7 @@ export function PortalShell({
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
+        <main className={cn("mx-auto w-full px-4 py-8 sm:px-6 sm:py-10", wide ? "max-w-none" : "max-w-5xl")}>
           {isLoading ? (
             <PortalCard>
               <p className="text-sm text-brand-navySoft">Loading…</p>

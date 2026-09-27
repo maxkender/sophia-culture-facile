@@ -49,11 +49,10 @@ function LinkOut({ href, label }: { href: string | null; label: string }) {
   );
 }
 
-export function CreatorApplications() {
+export function CreatorApplications({ track }: { track: Track }) {
   const queryClient = useQueryClient();
   const { data: portal } = usePortalProfile();
   const profile = portal?.profile;
-  const [track, setTrack] = useState<Track>("ugc");
   const [status, setStatus] = useState("pending");
   const [selected, setSelected] = useState<UgcApplication | SlideshowApplication | null>(null);
   const [notes, setNotes] = useState("");
@@ -141,23 +140,9 @@ export function CreatorApplications() {
 
   return (
     <div className="space-y-6">
-      <PageTitle title="Creator applications" lead="Review UGC and slideshow creator applications. These never mix with author applications." />
+      <PageTitle title={track === "ugc" ? "UGC applications" : "Slideshow applications"} lead="These never mix with author applications." />
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex rounded-xl border border-brand-line bg-card p-1">
-          {(["ugc", "slideshow"] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setTrack(value)}
-              className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition ${
-                track === value ? "bg-brand-navy text-card" : "text-brand-navy hover:bg-brand-navy/10"
-              }`}
-            >
-              {value === "ugc" ? "UGC creators" : "Slideshow creators"}
-            </button>
-          ))}
-        </div>
         <Select value={status} onValueChange={setStatus}>
           <SelectTrigger className="w-44">
             <SelectValue />

@@ -1,12 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PortalShell } from "@/components/portal/PortalShell";
-import { CreatorApplications } from "@/components/portal/admin/CreatorApplications";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/auteurs/admin/creators/applications")({
-  head: () => ({ meta: [{ title: "Creator applications | Sophia" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: () => (
-    <PortalShell adminOnly>
-      <CreatorApplications />
-    </PortalShell>
-  ),
+  beforeLoad: () => {
+    throw redirect({ to: "/auteurs/admin/creators/ugc-applications" });
+  },
 });
