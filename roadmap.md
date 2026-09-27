@@ -7,6 +7,7 @@
 - [x] Read-only: report Raphael Seguin's invite URL, access code, redeem URL, store; regenerate token if missing/consumed
 
 ## UGC creator programme (27 Sep)
+- [ ] UGC acceptance automation: editable acceptance email, password-creation invite, four-step onboarding checklist, automatic pipeline progress, and mandatory post logging reminder
 - [x] Public creators landing (fr/en) + /creators/apply form
 - [x] Creator data model (creators, briefs, posts, calls)
 - [ ] Admin creators mode (dashboard, applications, creators, briefs, posts, calls, announcements, messages)
