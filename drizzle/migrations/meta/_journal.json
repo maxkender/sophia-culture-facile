@@ -22,6 +22,13 @@
       "when": 1790495532924,
       "tag": "0002_creator_applications",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790497144519,
+      "tag": "0003_creator_core_tables",
+      "breakpoints": true
     }
   ]
 }

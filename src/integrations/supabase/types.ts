@@ -296,6 +296,47 @@ export type Database = {
         }
         Relationships: []
       }
+      briefs: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          due_date: string | null
+          hook: string | null
+          id: string
+          status: string
+          title: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          due_date?: string | null
+          hook?: string | null
+          id?: string
+          status?: string
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          due_date?: string | null
+          hook?: string | null
+          id?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "briefs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contracts: {
         Row: {
           author_id: string
@@ -693,6 +734,146 @@ export type Database = {
           {
             foreignKeyName: "creator_applications_decided_by_fkey"
             columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_calls: {
+        Row: {
+          created_at: string
+          id: string
+          link: string | null
+          notes: string | null
+          starts_at: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          notes?: string | null
+          starts_at: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          notes?: string | null
+          starts_at?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      creator_posts: {
+        Row: {
+          brief_id: string | null
+          created_at: string
+          creator_id: string
+          feedback: string | null
+          id: string
+          likes: number | null
+          platform: string
+          posted_on: string
+          status: string
+          url: string
+          views: number | null
+        }
+        Insert: {
+          brief_id?: string | null
+          created_at?: string
+          creator_id: string
+          feedback?: string | null
+          id?: string
+          likes?: number | null
+          platform?: string
+          posted_on?: string
+          status?: string
+          url: string
+          views?: number | null
+        }
+        Update: {
+          brief_id?: string | null
+          created_at?: string
+          creator_id?: string
+          feedback?: string | null
+          id?: string
+          likes?: number | null
+          platform?: string
+          posted_on?: string
+          status?: string
+          url?: string
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_posts_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_posts_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creators: {
+        Row: {
+          admin_notes: string | null
+          application_id: string | null
+          assigned_hm_id: string | null
+          country: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          invite_token: string | null
+          status: string
+          track: string
+          user_id: string | null
+          weekly_target: number
+        }
+        Insert: {
+          admin_notes?: string | null
+          application_id?: string | null
+          assigned_hm_id?: string | null
+          country?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          invite_token?: string | null
+          status?: string
+          track?: string
+          user_id?: string | null
+          weekly_target?: number
+        }
+        Update: {
+          admin_notes?: string | null
+          application_id?: string | null
+          assigned_hm_id?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          invite_token?: string | null
+          status?: string
+          track?: string
+          user_id?: string | null
+          weekly_target?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creators_assigned_hm_id_fkey"
+            columns: ["assigned_hm_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
