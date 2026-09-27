@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { claimCreatorInvite } from "@/lib/creator-space.functions";
+import { claimCreatorInvite, linkCreatorByEmail } from "@/lib/creator-space.functions";
 import { logCreatorPost } from "@/lib/creator-onboarding.functions";
 import { startStripeOnboarding, syncStripeStatus } from "@/lib/creator-payouts.functions";
 import { CreatorMessages } from "./CreatorMessages";
@@ -75,11 +75,19 @@ function Workspace() {
       return { me, signed: Boolean(signature.data), briefs: briefs.data ?? [], posts: posts.data ?? [], calls: calls.data ?? [], refs: refs.data ?? [], payoutProfile: payoutProfile.data ?? null, payoutItems: payoutItems.data ?? [] };
     },
   });
+  const linkByEmail = useServerFn(linkCreatorByEmail);
+  useEffect(() => {
+    if (data !== null) return;
+    linkByEmail({} as never).then((r) => {
+      if (r?.ok) qc.invalidateQueries({ queryKey: ["creator-space"] });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
   if (data === undefined) return <p className="p-6 text-sm">Loading…</p>;
   if (data === null)
     return (
       <div className="mx-auto max-w-md p-6 text-sm text-brand-navySoft">
-        This account is not linked to a creator invite. Open the invite link you received.
+        This account is not linked to a creator invite. Open the invite link you received, or sign in with the email the invite was sent to.
         <Button variant="outline" className="mt-4" onClick={() => supabase.auth.signOut()}>Sign out</Button>
       </div>
     );
