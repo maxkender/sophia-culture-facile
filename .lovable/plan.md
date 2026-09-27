@@ -11,6 +11,12 @@ A second product surface, kept separate from authors in data and routes, reusing
 - Home page (fr/en): outlined "Devenir créateur" / "Become a creator" button beside the download button, same size, above the fold; plain link in the footer.
 - Home page reviews replaced by the three App Store reviews verbatim, five stars, name and "App Store"; English page shows your faithful translations with "Reviews translated from French. Original wording on the App Store."
 
+## Stage 1b — Two tracks (publish with stage 1)
+- `/creators` (fr/en) becomes the chooser: "Create for Sophia", two cards (UGC, Slideshow) with your wording and buttons.
+- UGC landing and form live at `/creators/ugc` and `/creators/ugc/apply`, unchanged.
+- `/creators/slideshow` (fr/en) landing with your hero, four steps, pay, audience and requirements; `/creators/slideshow/apply` short form (no video, no social links), same honeypot and rate limit, own confirmation.
+- Home "Become a creator" button points to the chooser.
+
 ## Stage 2 — Data model
 - Add `creator` to the role enum; add `space` (author | creator, default author) to conversations, announcements, notifications; existing rows stay author.
 - New tables: creator_applications, creators, briefs, brief_assignments, posts, calls, call_rsvps, payments (schema only, no screens).
@@ -19,7 +25,11 @@ A second product surface, kept separate from authors in data and routes, reusing
 - Private storage bucket `creator-videos`.
 - Triggers for notifications: new brief, post feedback, post approved, new message, new announcement (creators); new application, post logged, RSVP (admin, creator space). The 24h call reminder runs from a scheduled job.
 
+- slideshow_applications table as specified, kept apart from creator_applications; country → USD rate-per-post table (seeded empty). Both application types matched to prospects (UGC by email/handle, slideshow by email/phone).
+
 ## Stage 3 — Admin, creators mode (publish)
+- Sidebar: "UGC applications" and "Slideshow applications", each with its own new-count badge; dashboard shows both counts.
+- Slideshow applications: table, filters, search, bulk HM/status, detail page with notes and actions. Accepting only sets the status and shows "Handed to [HM name] for Upwork onboarding." — no account or invite. Settings gets the editable country rate table.
 - Mode switcher "Authors | Creators" under the logo, remembered; sidebar swaps contents. Dashboard, Messages, Settings, Announcements and Activity log filter by mode.
 - Dashboard, Applications (table, filters, search, bulk actions, detail page with inline video, autosaving notes, status actions, HM assignment, accept → creator + invite link with copy), Creators (table + editable page with weekly bar, posts, briefs, RSVPs, notes, log, actions), Briefs (list, editor, draft/publish, duplicate), Posts (queue, embed where possible, approve/flag/not counting, manual views/likes), Calls (list, create, RSVPs, attendance).
 - Every action logged to the activity log.

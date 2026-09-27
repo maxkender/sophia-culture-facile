@@ -17,3 +17,4 @@
 - [ ] Minimum age 18 everywhere; remove all guardian fields/UI/hold reason
 - [ ] Stripe Connect Express payouts (onboarding, status refresh, dashboard link, transfers per batch, webhook, country note config)
 - [ ] Admin "Stripe setup" checklist page (9 persisted steps, live balance vs accrued, editable countries list)
+- [ ] Slideshow track: /creators chooser, /creators/slideshow landing + short form, slideshow_applications, admin page, country rate table, prospect matching; UGC moves to /creators/ugc
