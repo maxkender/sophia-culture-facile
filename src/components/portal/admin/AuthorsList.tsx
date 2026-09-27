@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { formatDate, type Course, type Profile } from "@/lib/portal";
 import { AuthorAvatar, useSignedPhotos } from "../AuthorPhoto";
 import { PageTitle, PortalCard } from "../ui";
+import { ExportButtons } from "./ExportButtons";
 
 export function AuthorsList() {
   const navigate = useNavigate();
@@ -78,11 +79,14 @@ export function AuthorsList() {
         title="Authors"
         lead="Every contributor, their commissioned courses and where their onboarding stands."
         action={
-          <Button asChild variant="pill" size="pillSm">
-            <Link to="/auteurs/admin/authors/new">
-              <Plus className="size-4" /> New author
-            </Link>
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <ExportButtons />
+            <Button asChild variant="pill" size="pillSm">
+              <Link to="/auteurs/admin/authors/new">
+                <Plus className="size-4" /> New author
+              </Link>
+            </Button>
+          </div>
         }
       />
 
