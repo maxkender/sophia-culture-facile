@@ -4,6 +4,7 @@ import { Check, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CopyButton, PageTitle, PortalCard } from "@/components/portal/ui";
+import { WeeklyGuides } from "../WeeklyGuides";
 import { TAAP_LINK, useCreator, weekStart } from "./useCreator";
 
 function Step({ n, title, done, current, children }: { n: number; title: string; done: boolean; current: boolean; children: ReactNode }) {
@@ -92,6 +93,7 @@ export function CreatorHomePage() {
             ) : <p className="mt-2 text-sm text-brand-navySoft">Nothing waiting.</p>}
           </PortalCard>
           <AccessCodeCard />
+          <div className="md:col-span-2"><WeeklyGuides /></div>
         </div>
       )}
     </div>
