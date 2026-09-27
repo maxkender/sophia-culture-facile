@@ -61,11 +61,8 @@ export function HomePage() {
     },
   ];
 
-  /* À REMPLACER PAR DE VRAIS AVIS : aucun faux témoignage ne doit être publié. */
-  const testimonials = [0, 1, 2].map(() => ({
-    name: t.testimonials.name,
-    text: t.testimonials.text,
-  }));
+  /* Vrais avis App Store (version anglaise : traduction fidèle, signalée). */
+  const testimonials = t.testimonials.items;
 
   return (
     <>
@@ -221,16 +218,26 @@ export function HomePage() {
             {testimonials.map((item, i) => (
               <li key={i}>
                 <Reveal delay={i * 60}>
-                  <div className="h-full rounded-3xl bg-card p-7 shadow-card">
-                    <p className="text-[17px] font-semibold leading-relaxed text-brand-navy">
-                      « {item.text} »
-                    </p>
-                    <p className="mt-5 text-sm text-brand-navySoft">{item.name}</p>
-                  </div>
+                  <figure className="h-full rounded-3xl bg-card p-7 shadow-card">
+                    <div className="flex gap-0.5 text-brand-navy" aria-label="5/5">
+                      {[0, 1, 2, 3, 4].map((s) => (
+                        <Star key={s} aria-hidden="true" className="size-4 fill-current" />
+                      ))}
+                    </div>
+                    <blockquote className="mt-4 text-[17px] font-semibold leading-relaxed text-brand-navy">
+                      {lang === "fr" ? `« ${item.text} »` : `“${item.text}”`}
+                    </blockquote>
+                    <figcaption className="mt-5 text-sm text-brand-navySoft">
+                      — {item.name}, {t.testimonials.source}
+                    </figcaption>
+                  </figure>
                 </Reveal>
               </li>
             ))}
           </ul>
+          {t.testimonials.note ? (
+            <p className="mt-6 text-xs text-brand-navySoft">{t.testimonials.note}</p>
+          ) : null}
         </section>
 
         {/* FAQ */}

@@ -5,6 +5,7 @@ export const fr = {
   langSwitchAria: "Switch to English",
   brand: "Sophia, culture générale",
   nav: {
+    becomeCreator: "Devenir créateur",
     download: "Télécharger",
     teacherLogin: "Connexion professeur",
     becomeTeacher: "Devenir professeur certifié",
@@ -95,9 +96,14 @@ export const fr = {
   },
   testimonials: {
     title: "Ils apprennent avec Sophia",
-    subtitle: "Avis à remplacer par de vrais retours d'utilisateurs avant publication.",
-    name: "Prénom À REMPLACER",
-    text: "Témoignage à remplacer",
+    subtitle: "Ce qu'en disent les utilisateurs sur l'App Store.",
+    source: "App Store",
+    note: "",
+    items: [
+      { text: "Une appli simple d'utilisation et hyper pratique pour se cultiver au quotidien !", name: "gab24738" },
+      { text: "Celle-ci fait partie des rares que j'utilise quotidiennement. […] Quelques minutes suffisent pour progresser.", name: "Pauline2105" },
+      { text: "Difficile de se lasser face à la pléthore de cours et d'informations nouvelles à retenir et à apprécier.", name: "Simon Bafa" },
+    ],
   },
   faqTitle: "Questions fréquentes",
   about: {

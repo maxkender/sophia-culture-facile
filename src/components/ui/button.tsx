@@ -21,6 +21,8 @@ const buttonVariants = cva(
           "rounded-full bg-brand-surface text-brand-navy font-bold border border-brand-line hover:bg-brand-surfaceStrong",
         pillLight:
           "rounded-full bg-brand-onNavy text-brand-navy font-bold shadow-[0_18px_40px_-12px_rgba(10,18,35,0.55)] hover:bg-brand-onNavy/90",
+        pillOutlineLight:
+          "rounded-full border-2 border-brand-onNavy/70 bg-transparent text-brand-onNavy font-bold hover:bg-brand-onNavy/10",
         pillPink:
           "rounded-full bg-brand-pink text-brand-navy font-bold shadow-soft hover:brightness-105",
       },

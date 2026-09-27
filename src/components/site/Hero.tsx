@@ -1,7 +1,9 @@
 import { DownloadCta } from "./DownloadCta";
 import { PhoneMock } from "./PhoneMock";
 import { StoreBadges } from "./StoreBadges";
-import { useI18n } from "@/i18n";
+import { Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { useI18n, useLocalePath } from "@/i18n";
 import shotCours from "@/assets/shot-cours.png.asset.json";
 import shotQuiz from "@/assets/shot-quiz.png.asset.json";
 
@@ -11,6 +13,7 @@ import shotQuiz from "@/assets/shot-quiz.png.asset.json";
  */
 export function Hero({ compact = false }: { compact?: boolean }) {
   const { t } = useI18n();
+  const creatorsPath = useLocalePath("creators");
 
   return (
     <section
@@ -29,11 +32,18 @@ export function Hero({ compact = false }: { compact?: boolean }) {
           <p className="mt-6 max-w-[520px] text-base leading-relaxed text-brand-onNavy/75 md:text-lg">
             {t.hero.subtitle}
           </p>
-          <div className="mt-8 max-w-sm">
-            <DownloadCta variant="pillLight" size="pillLg" className="w-full">
-              {t.hero.cta}
-            </DownloadCta>
-            <p className="mt-3 text-center text-xs text-brand-onNavy/55">{t.hero.note}</p>
+          <div className={compact ? "mt-8 max-w-sm" : "mt-8 max-w-xl"}>
+            <div className={compact ? "" : "grid gap-3 sm:grid-cols-2"}>
+              <DownloadCta variant="pillLight" size="pillLg" className="w-full">
+                {t.hero.cta}
+              </DownloadCta>
+              {compact ? null : (
+                <Button asChild variant="pillOutlineLight" size="pillLg" className="w-full">
+                  <Link to={creatorsPath}>{t.nav.becomeCreator}</Link>
+                </Button>
+              )}
+            </div>
+            <p className={`mt-3 text-xs text-brand-onNavy/55 ${compact ? "text-center" : "sm:max-w-[50%] text-center"}`}>{t.hero.note}</p>
           </div>
           {compact ? null : <StoreBadges className="mt-8" />}
         </div>
