@@ -78,7 +78,10 @@ export const enterPostViews = createServerFn({ method: "POST" })
 /** Creator records a Wise or PayPal fallback when Stripe is not available in their country. */
 export const savePayoutFallback = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ method: z.enum(["wise", "paypal"]), email: z.string().trim().email().max(255) }).parse(d))
+  .inputValidator((d) => z.object({
+    method: z.enum(["wise", "paypal"]),
+    email: z.string().trim().email("Enter a complete email address, for example name@example.com.").max(255),
+  }).parse(d))
   .handler(async ({ data, context }) => {
     const me = await myCreator(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

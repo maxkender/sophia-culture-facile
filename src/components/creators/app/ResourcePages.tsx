@@ -287,7 +287,7 @@ function PayoutDetails() {
             <Button className="mt-3" disabled={busy} onClick={async () => {
               setBusy(true);
               try { const { url } = await onboard({} as never); window.location.href = url; }
-              catch (e: any) { toast.error(e?.message ?? "Could not start Stripe onboarding."); setBusy(false); }
+              catch (e: unknown) { toast.error(friendlyCreatorError(e)); setBusy(false); }
             }}>{busy ? "Opening Stripe…" : profile?.stripe_account_id ? "Continue Stripe setup" : "Set up payouts with Stripe"}</Button>
           </div>
         )}
