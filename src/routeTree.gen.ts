@@ -26,6 +26,7 @@ import { Route as AuteursInviteRouteImport } from './routes/auteurs.invite'
 import { Route as CoursIndexRouteImport } from './routes/cours/index'
 import { Route as CoursSlugRouteImport } from './routes/cours/$slug'
 import { Route as CreatorsIndexRouteImport } from './routes/creators.index'
+import { Route as CreatorsAppRouteImport } from './routes/creators.app'
 import { Route as EnIndexRouteImport } from './routes/en/index'
 import { Route as EnBecomeATeacherRouteImport } from './routes/en/become-a-teacher'
 import { Route as EnCareersRouteImport } from './routes/en/careers'
@@ -173,6 +174,11 @@ const CoursSlugRoute = CoursSlugRouteImport.update({
 const CreatorsIndexRoute = CreatorsIndexRouteImport.update({
   id: '/creators/',
   path: '/creators/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsAppRoute = CreatorsAppRouteImport.update({
+  id: '/creators/app',
+  path: '/creators/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnIndexRoute = EnIndexRouteImport.update({
@@ -538,6 +544,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
+  '/creators/app': typeof CreatorsAppRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -619,6 +626,7 @@ export interface FileRoutesByTo {
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
+  '/creators/app': typeof CreatorsAppRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -702,6 +710,7 @@ export interface FileRoutesById {
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
+  '/creators/app': typeof CreatorsAppRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -785,6 +794,7 @@ export interface FileRouteTypes {
     | '/auteurs/$slug'
     | '/auteurs/invite'
     | '/cours/$slug'
+    | '/creators/app'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -866,6 +876,7 @@ export interface FileRouteTypes {
     | '/auteurs/$slug'
     | '/auteurs/invite'
     | '/cours/$slug'
+    | '/creators/app'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -948,6 +959,7 @@ export interface FileRouteTypes {
     | '/auteurs/$slug'
     | '/auteurs/invite'
     | '/cours/$slug'
+    | '/creators/app'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -1031,6 +1043,7 @@ export interface RootRouteChildren {
   AuteursSlugRoute: typeof AuteursSlugRoute
   AuteursInviteRoute: typeof AuteursInviteRoute
   CoursSlugRoute: typeof CoursSlugRoute
+  CreatorsAppRoute: typeof CreatorsAppRoute
   EnBecomeATeacherRoute: typeof EnBecomeATeacherRoute
   EnCareersRoute: typeof EnCareersRoute
   EnDownloadRoute: typeof EnDownloadRoute
@@ -1185,6 +1198,13 @@ declare module '@tanstack/react-router' {
       path: '/creators'
       fullPath: '/creators/'
       preLoaderRoute: typeof CreatorsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/app': {
+      id: '/creators/app'
+      path: '/creators/app'
+      fullPath: '/creators/app'
+      preLoaderRoute: typeof CreatorsAppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/': {
@@ -1749,6 +1769,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuteursSlugRoute: AuteursSlugRoute,
   AuteursInviteRoute: AuteursInviteRoute,
   CoursSlugRoute: CoursSlugRoute,
+  CreatorsAppRoute: CreatorsAppRoute,
   EnBecomeATeacherRoute: EnBecomeATeacherRoute,
   EnCareersRoute: EnCareersRoute,
   EnDownloadRoute: EnDownloadRoute,
