@@ -31,7 +31,7 @@ export const exportValidatedCourses = createServerFn({ method: "POST" })
 
     const { data: courses, error } = await supabaseAdmin
       .from("courses")
-      .select("title, subject_area, status, language, published_at, author_id")
+      .select("title, subtitle, subject_area, status, language, published_at, author_id, did_you_know, public_full_text")
       .in("status", ["accepted", "published"])
       .order("title");
     if (error) throw new Error("Could not read courses.");
@@ -57,6 +57,7 @@ export const exportValidatedCourses = createServerFn({ method: "POST" })
       const author = course.author_id ? authorById.get(course.author_id) : undefined;
       return [
         course.title,
+        course.subtitle ?? "",
         course.subject_area,
         course.status,
         course.language,
@@ -65,13 +66,79 @@ export const exportValidatedCourses = createServerFn({ method: "POST" })
         author?.institution ?? "",
         course.author_id ? (educationById.get(course.author_id) ?? "") : "",
         course.published_at ?? "",
+        course.did_you_know ?? "",
+        course.public_full_text ?? "",
       ];
     });
 
     return {
       filename: "cours_valides.csv",
       csv: toCsv(
-        ["course_title", "subject_area", "status", "language", "professor", "professor_title", "institution", "formation", "published_at"],
+        [
+          "course_title", "subtitle", "subject_area", "status", "language", "professor", "professor_title",
+          "institution", "formation", "published_at", "did_you_know", "full_text",
+        ],
+        rows,
+      ),
+    };
+  });
+
+/** CSV with one row per page of every validated course: page number, page title and full content. */
+export const exportCoursePages = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ filename: string; csv: string }> => {
+    const { supabaseAdmin } = await assertAdmin(context.userId);
+
+    const [{ data: courses, error }, { data: screens }, { data: sources }] = await Promise.all([
+      supabaseAdmin
+        .from("courses")
+        .select("id, title, subtitle, subject_area, language, did_you_know")
+        .in("status", ["accepted", "published"])
+        .order("title"),
+      supabaseAdmin
+        .from("screens")
+        .select("course_id, screen_number, screen_title, body")
+        .order("course_id")
+        .order("screen_number"),
+      supabaseAdmin.from("sources").select("course_id, claim, reference, page"),
+    ]);
+    if (error) throw new Error("Could not read courses.");
+
+    const screensByCourse = new Map<string, { screen_number: number; screen_title: string | null; body: string | null }[]>();
+    for (const screen of screens ?? []) {
+      const list = screensByCourse.get(screen.course_id) ?? [];
+      list.push(screen);
+      screensByCourse.set(screen.course_id, list);
+    }
+    const sourcesByCourse = new Map<string, string>();
+    for (const source of sources ?? []) {
+      const label = [source.claim, source.reference, source.page].filter(Boolean).join(" — ");
+      if (!label) continue;
+      const current = sourcesByCourse.get(source.course_id);
+      sourcesByCourse.set(source.course_id, current ? `${current} | ${label}` : label);
+    }
+
+    const rows: unknown[][] = [];
+    for (const course of courses ?? []) {
+      for (const page of screensByCourse.get(course.id) ?? []) {
+        rows.push([
+          course.title,
+          course.subtitle ?? "",
+          course.subject_area ?? "",
+          course.language ?? "",
+          page.screen_number,
+          page.screen_title ?? "",
+          page.body ?? "",
+          sourcesByCourse.get(course.id) ?? "",
+          course.did_you_know ?? "",
+        ]);
+      }
+    }
+
+    return {
+      filename: "cours_pages.csv",
+      csv: toCsv(
+        ["course_title", "subtitle", "subject_area", "language", "page_number", "page_title", "content", "sources", "did_you_know"],
         rows,
       ),
     };
