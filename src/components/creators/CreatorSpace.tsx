@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { claimCreatorInvite } from "@/lib/creator-space.functions";
+import { logCreatorPost } from "@/lib/creator-onboarding.functions";
 import { startStripeOnboarding, syncStripeStatus } from "@/lib/creator-payouts.functions";
 import { CreatorMessages } from "./CreatorMessages";
 import { CreatorOnboarding } from "./CreatorOnboarding";
@@ -21,8 +22,8 @@ function useSessionUser() {
   return user;
 }
 
-function SignIn({ invite }: { invite: string | null }) {
-  const [email, setEmail] = useState("");
+function SignIn({ invite, invitedEmail }: { invite: string | null; invitedEmail: string }) {
+  const [email, setEmail] = useState(invitedEmail);
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"in" | "up">(invite ? "up" : "in");
   const [busy, setBusy] = useState(false);
@@ -56,6 +57,7 @@ function Workspace() {
   const [platform, setPlatform] = useState("tiktok");
   const [briefId, setBriefId] = useState("");
   const [refId, setRefId] = useState<string | null>(null);
+  const submitPost = useServerFn(logCreatorPost);
   const { data } = useQuery({
     queryKey: ["creator-space"],
     queryFn: async () => {
@@ -81,15 +83,18 @@ function Workspace() {
         <Button variant="outline" className="mt-4" onClick={() => supabase.auth.signOut()}>Sign out</Button>
       </div>
     );
-  if (!data.signed) return <CreatorOnboarding me={data.me} refs={data.refs} />;
+  if (!data.me.onboarding_completed_at) return <CreatorOnboarding me={{ ...data.me, agreementSigned: data.signed }} refs={data.refs} />;
   const monday = new Date(); monday.setUTCHours(0, 0, 0, 0); monday.setUTCDate(monday.getUTCDate() - ((monday.getUTCDay() + 6) % 7));
   const week = data.posts.filter((p) => p.posted_on >= monday.toISOString().slice(0, 10) && p.status !== "flagged").length;
 
   async function logPost() {
     if (!/^https?:\/\//.test(url)) return toast.error("Paste the full link to your post.");
-    const { error } = await supabase.from("creator_posts").insert({ creator_id: data!.me.id, url, platform, brief_id: briefId || null, reference_video_id: refId });
-    if (error) return toast.error("Could not log the post.");
-    setUrl(""); setRefId(null); toast.success("Post logged."); return qc.invalidateQueries({ queryKey: ["creator-space"] });
+    try {
+      await submitPost({ data: { url, platform: platform as "tiktok" | "instagram", briefId: briefId || null, referenceVideoId: refId } });
+      setUrl(""); setRefId(null); toast.success("Post logged."); return qc.invalidateQueries({ queryKey: ["creator-space"] });
+    } catch (error: any) {
+      toast.error(error?.message ?? "Could not log the post.");
+    }
   }
 
   return (
@@ -224,7 +229,12 @@ export function CreatorSpace() {
   const claim = useServerFn(claimCreatorInvite);
   const qc = useQueryClient();
   const [invite, setInvite] = useState<string | null>(null);
-  useEffect(() => setInvite(new URLSearchParams(window.location.search).get("invite")), []);
+  const [invitedEmail, setInvitedEmail] = useState("");
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setInvite(params.get("invite"));
+    setInvitedEmail(params.get("email") ?? "");
+  }, []);
   useEffect(() => {
     if (!user || !invite) return;
     claim({ data: { token: invite } }).then((r) => {
@@ -235,6 +245,6 @@ export function CreatorSpace() {
     });
   }, [user, invite, claim, qc]);
   if (user === undefined) return null;
-  if (!user) return <SignIn invite={invite} />;
+  if (!user) return <SignIn invite={invite} invitedEmail={invitedEmail} />;
   return <Workspace />;
 }
