@@ -36,11 +36,31 @@ A second product surface, kept separate from authors in data and routes, reusing
 - Admin dashboard block: library size by category and the five most-used videos this month.
 - Instagram oEmbed normally needs a Meta app token; without one, Instagram cards use the placeholder.
 
+## Stage 6 — Monthly payments (publish)
+- Tables payout_profiles, rate_cards, payment_lines, payout_batches, payout_statements (replacing the earlier placeholder payments table, left unused). Bank and payout fields readable only by the creator and admins; guardian consent, view screenshots and statements in private storage.
+- Rules: approving a post creates an accrued line from the rate card active on the post date; day-7 prompt for views + screenshot computes the bonus from tiers (capped); day 14 without views → bonus zero, flagged "views not reported"; post removed before day 30 → line cancelled; missing/unverified profile, missing SIRET for FR, or missing guardian consent → held with the reason. A daily scheduled job applies the day-14 and hold rules.
+- Admin: Settings > Rate cards (new card with effective date, past lines untouched); Payments page with Accrued (grouped by creator, amber holds, release/cancel/edit views with note), Batches (month → verified lines, grouped by creator, currency and app; Wise bulk CSV and PayPal Mass Pay CSV; export → in batch; "Mark as paid" with reference → paid + statements), Statements (filter, download). Creator page gets a Payments block with Verify.
+- Creator: Profile > Payout details (method fields, payee, guardian + consent upload, tax country, SIRET when FR, one-line reason each, green Verified tag); Earnings page (month accrued per video, holds in plain words, views to report with upload, past statements).
+- Statement PDF generated in the browser at "Mark as paid" and stored: Vik Studios header, creator and payee, month, video table, footer "Payment statement for services rendered as an independent creator."
+
+## Stage 7 — Outreach pipeline (publish)
+- Tables creator_prospects, prospect_touches, outreach_templates; admin-only.
+- Prospects page under CRÉATEURS before Applications: CSV import with column mapping and duplicate skip (TikTok handle, email) with a count; quick add; table with the filters listed and a kanban by status.
+- Prospect page: editable fields, direct links, touch history, "Log a touch" with template fill ({first_name}, {handle}, {app}) and copy button, next action date, status, HM.
+- Templates manager. "Convert to application" creates a prefilled application and links it; public applications are auto-matched by email or handle and set the prospect to applied.
+- Dashboard block: prospects by status, touches this week, contacted → applied rate.
+
 ## Assumptions to correct if wrong
 - Creators get Apple codes from the same real pool as authors (no codes invented). If the pool runs short, the card says a code is coming.
 - Posts count toward the weekly target by posted date, Monday–Sunday UTC; "not counting" and flagged posts are excluded.
 - Hiring managers are chosen from existing admin users only.
 - TikTok/Instagram embeds use their official embed links; anything else shows a plain link.
+- No rate card figures are invented: until you add a card, approved posts create lines at 0 and are held "no rate card".
+- Wise/PayPal files follow their published bulk formats; nothing is sent to Wise or PayPal automatically — you upload the files yourself.
+- Prospect list is imported by you; nothing is scraped by the app.
 
 ## Not built (as requested)
-- Payments screens, hiring-manager role.
+- Hiring-manager role (data is ready for it).
+
+## Delivery
+Stages publish one at a time as each is finished; given the size, this runs over several working sessions, and I will report what is live after each.
