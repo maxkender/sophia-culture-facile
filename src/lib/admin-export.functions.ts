@@ -202,7 +202,6 @@ export const exportCoursePages = createServerFn({ method: "POST" })
           page.screen_title ?? "",
           page.body ?? "",
           sourcesByCourse.get(course.id) ?? "",
-          course.did_you_know ?? "",
         ]);
       }
     }
@@ -210,7 +209,7 @@ export const exportCoursePages = createServerFn({ method: "POST" })
     return {
       filename: "cours_pages.csv",
       csv: toCsv(
-        ["course_title", "subtitle", "subject_area", "language", "page_number", "page_title", "content", "sources", "did_you_know"],
+        ["course_title", "subtitle", "subject_area", "language", "page_number", "page_title", "content", "sources"],
         rows,
       ),
     };
