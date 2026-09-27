@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { claimCreatorInvite } from "@/lib/creator-space.functions";
 import { startStripeOnboarding, syncStripeStatus } from "@/lib/creator-payouts.functions";
 import { CreatorMessages } from "./CreatorMessages";
+import { CreatorOnboarding } from "./CreatorOnboarding";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -59,15 +60,16 @@ function Workspace() {
     queryFn: async () => {
       const { data: me } = await supabase.from("creators").select("*").maybeSingle();
       if (!me) return null;
-      const [briefs, posts, calls, refs, payoutProfile, payoutItems] = await Promise.all([
+      const [briefs, posts, calls, refs, payoutProfile, payoutItems, signature] = await Promise.all([
         supabase.from("briefs").select("*").eq("status", "published").order("created_at", { ascending: false }),
         supabase.from("creator_posts").select("*").order("posted_on", { ascending: false }),
         supabase.from("creator_calls").select("*").gte("starts_at", new Date().toISOString()).order("starts_at"),
         supabase.from("reference_videos").select("*").order("pinned", { ascending: false }).order("created_at", { ascending: false }),
         supabase.from("creator_payout_profiles").select("*").eq("creator_id", me.id).maybeSingle(),
         supabase.from("payout_items").select("*, payout_batches(period, status)").eq("creator_id", me.id).order("created_at", { ascending: false }),
+        supabase.from("creator_signatures").select("signed_at").eq("creator_id", me.id).maybeSingle(),
       ]);
-      return { me, briefs: briefs.data ?? [], posts: posts.data ?? [], calls: calls.data ?? [], refs: refs.data ?? [], payoutProfile: payoutProfile.data ?? null, payoutItems: payoutItems.data ?? [] };
+      return { me, signed: Boolean(signature.data), briefs: briefs.data ?? [], posts: posts.data ?? [], calls: calls.data ?? [], refs: refs.data ?? [], payoutProfile: payoutProfile.data ?? null, payoutItems: payoutItems.data ?? [] };
     },
   });
   if (data === undefined) return <p className="p-6 text-sm">Loading…</p>;
@@ -78,6 +80,7 @@ function Workspace() {
         <Button variant="outline" className="mt-4" onClick={() => supabase.auth.signOut()}>Sign out</Button>
       </div>
     );
+  if (!data.signed) return <CreatorOnboarding me={data.me} refs={data.refs} />;
   const monday = new Date(); monday.setUTCHours(0, 0, 0, 0); monday.setUTCDate(monday.getUTCDate() - ((monday.getUTCDay() + 6) % 7));
   const week = data.posts.filter((p) => p.posted_on >= monday.toISOString().slice(0, 10) && p.status !== "flagged").length;
 
