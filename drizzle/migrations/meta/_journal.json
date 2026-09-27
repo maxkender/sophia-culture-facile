@@ -78,6 +78,13 @@
       "when": 1790499020495,
       "tag": "0010_align_creator_application_statuses",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790499293739,
+      "tag": "0011_restrict_documents_read",
+      "breakpoints": true
     }
   ]
 }
