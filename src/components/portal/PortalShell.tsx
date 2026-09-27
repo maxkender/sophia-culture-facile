@@ -210,7 +210,7 @@ export function PortalShell({
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
-    await navigate({ to: "/auth", replace: true });
+    await navigate({ to: "/auteurs/login", replace: true });
   }
 
   const name = profile?.full_name ?? data?.email ?? "";
@@ -302,12 +302,17 @@ export function PortalShell({
       </aside>
 
       <div className={cn(collapsed ? "lg:pl-[76px]" : "lg:pl-64")}>
-        <header className="sticky top-0 z-30 border-b border-brand-line bg-card/95 backdrop-blur">
+        <header className="safe-top sticky top-0 z-30 border-b border-brand-line bg-card/95 backdrop-blur">
           <div className="flex min-h-14 items-center gap-3 px-4 py-2 sm:px-6">
             <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
               <SheetTrigger asChild>
-                <Button type="button" variant="ghost" size="icon" className="lg:hidden" aria-label="Open navigation">
+                <Button type="button" variant="ghost" size="icon" className="relative lg:hidden" aria-label="Open navigation">
                   <Menu className="size-5" />
+                  {Object.values(counts).reduce((a: number, b) => a + (Number(b) || 0), 0) > 0 ? (
+                    <span className="absolute right-1 top-1 min-w-4 rounded-full bg-portal-accent px-1 text-[10px] font-bold leading-4 text-card">
+                      {Object.values(counts).reduce((a: number, b) => a + (Number(b) || 0), 0)}
+                    </span>
+                  ) : null}
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-72 overflow-y-auto bg-card p-0">
@@ -374,7 +379,7 @@ export function PortalShell({
           </div>
         </header>
 
-        <main className={cn("mx-auto w-full px-4 py-8 sm:px-6 sm:py-10", wide ? "max-w-none" : "max-w-5xl")}>
+        <main className={cn("safe-bottom mx-auto w-full min-w-0 px-4 py-8 sm:px-6 sm:py-10", wide ? "max-w-none" : "max-w-5xl")}>
           {isLoading ? (
             <PortalCard>
               <p className="text-sm text-brand-navySoft">Loading…</p>

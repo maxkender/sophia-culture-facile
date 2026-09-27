@@ -24,7 +24,7 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
 
   return (
     <header
-      className={`sticky top-0 z-40 transition-colors duration-300 motion-reduce:transition-none ${
+      className={`safe-top sticky top-0 z-40 transition-colors duration-300 motion-reduce:transition-none ${
         scrolled
           ? "border-b border-brand-line/70 bg-brand-surface/80 backdrop-blur-xl"
           : "border-b border-transparent bg-brand-surface"

@@ -10,6 +10,8 @@ import { CreatorShell } from "./app/CreatorShell";
 import { CREATOR_KEY, useCreatorQuery } from "./app/useCreator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NotSetUp } from "@/components/auth/NotSetUp";
+import { homeFor, resolveAccountRole, type AccountRole } from "@/lib/account-role";
 
 function useSessionUser() {
   const [user, setUser] = useState<{ id: string; email?: string } | null | undefined>(undefined);
@@ -21,7 +23,7 @@ function useSessionUser() {
   return user;
 }
 
-function SignIn({ invite, invitedEmail }: { invite: string | null; invitedEmail: string }) {
+export function SignIn({ invite, invitedEmail, standalone = false }: { invite: string | null; invitedEmail: string; standalone?: boolean }) {
   const [email, setEmail] = useState(invitedEmail);
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"in" | "up">(invite ? "up" : "in");
@@ -41,11 +43,13 @@ function SignIn({ invite, invitedEmail }: { invite: string | null; invitedEmail:
         : await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
     if (res.error) toast.error(res.error.message);
+    else if (standalone && res.data.session) { const role = await resolveAccountRole(); window.location.assign(role ? homeFor(role) : "/creators/app"); }
     else if (mode === "up" && !res.data.session) toast.success("Check your inbox to confirm your email, then come back to this link.");
   }
   return (
-    <div className="mx-auto max-w-sm space-y-3 p-6">
-      <h1 className="text-2xl font-extrabold text-brand-navy">Sophia creators</h1>
+    <div className="mx-auto max-w-sm space-y-3 p-6 pt-[max(1.5rem,env(safe-area-inset-top))] [&_input:not([type=checkbox])]:min-h-11 [&_button]:min-h-11">
+      <h1 className="text-2xl font-extrabold text-brand-navy">Sophia creator space</h1>
+      <p className="text-xs text-brand-navySoft">Authors: your space is at sophia-culture.com/auteurs/login.</p>
       {state === "used" && <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy">You have already set up your account. Sign in below with your email and password.</p>}
       {state === "expired" && <p className="rounded-xl bg-portal-amber/10 p-3 text-sm text-brand-navy">This invite is more than 30 days old. Ask the Sophia team for a new one, or sign in if you already created your account.</p>}
       {state === "invalid" && <p className="rounded-xl bg-portal-amber/10 p-3 text-sm text-brand-navy">This invite link is not valid. If you already have an account, sign in below.</p>}
@@ -61,7 +65,7 @@ function SignIn({ invite, invitedEmail }: { invite: string | null; invitedEmail:
       {mode === "in" && (
         <button className="block text-xs text-brand-navySoft underline" onClick={async () => {
           if (!email) { toast.error("Enter your email first."); return; }
-          const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+          const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password?space=creators` });
           if (error) toast.error(error.message); else toast.success("Check your inbox for a reset link.");
         }}>Forgot password?</button>
       )}
@@ -77,6 +81,14 @@ function Workspace() {
   const qc = useQueryClient();
   const { data } = useCreatorQuery();
   const linkByEmail = useServerFn(linkCreatorByEmail);
+  const [role, setRole] = useState<AccountRole | null | undefined>(undefined);
+  useEffect(() => {
+    if (data !== null) return;
+    resolveAccountRole().then((r) => {
+      if (r === "author" || r === "admin") window.location.replace(homeFor(r));
+      else setRole(r);
+    });
+  }, [data]);
   useEffect(() => {
     if (data !== null) return;
     linkByEmail({} as never).then((r) => {
@@ -85,13 +97,10 @@ function Workspace() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
   if (data === undefined) return <p className="p-6 text-sm">Loading…</p>;
-  if (data === null)
-    return (
-      <div className="mx-auto max-w-md p-6 text-sm text-brand-navySoft">
-        This account is not linked to a creator invite. Open the invite link you received, or sign in with the email the invite was sent to.
-        <Button variant="outline" className="mt-4" onClick={() => supabase.auth.signOut()}>Sign out</Button>
-      </div>
-    );
+  if (data === null) {
+    if (role === undefined || role === "creator") return <p className="p-6 text-sm">Loading…</p>;
+    return <NotSetUp loginTo="/creators/login" />;
+  }
   return <CreatorShell><Outlet /></CreatorShell>;
 }
 

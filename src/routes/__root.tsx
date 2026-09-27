@@ -81,7 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "author", content: COMPANY },
       // Smart App Banner iOS — APPLE_ITUNES_APP_ID est un placeholder à remplacer.
       { name: "apple-itunes-app", content: `app-id=${APPLE_ITUNES_APP_ID}` },

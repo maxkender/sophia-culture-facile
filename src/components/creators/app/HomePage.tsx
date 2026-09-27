@@ -38,6 +38,7 @@ export function CreatorHomePage() {
   return (
     <div>
       <PageTitle title={`Welcome, ${first}`} lead="Your creator space: briefs, the reference library, your posts, calls, earnings and messages with the Sophia team." />
+      <p className="-mt-4 mb-6 text-xs text-brand-navySoft">Bookmark this page: sophia-culture.com/creators/login is where you sign in from now on.</p>
 
       <div className="mb-4 flex items-baseline justify-between gap-4">
         <h2 className="text-xl font-extrabold text-brand-navy">Before you post</h2>

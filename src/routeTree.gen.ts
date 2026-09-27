@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AccountNotSetUpRouteImport } from './routes/account-not-set-up'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
@@ -23,10 +24,13 @@ import { Route as TelechargerRouteImport } from './routes/telecharger'
 import { Route as DotwellKnownAppleAppSiteAssociationRouteImport } from './routes/[.]well-known.apple-app-site-association'
 import { Route as AuteursSlugRouteImport } from './routes/auteurs.$slug'
 import { Route as AuteursInviteRouteImport } from './routes/auteurs.invite'
+import { Route as AuteursLoginRouteImport } from './routes/auteurs.login'
 import { Route as CoursIndexRouteImport } from './routes/cours/index'
 import { Route as CoursSlugRouteImport } from './routes/cours/$slug'
 import { Route as CreatorsIndexRouteImport } from './routes/creators.index'
 import { Route as CreatorsAppRouteImport } from './routes/creators.app'
+import { Route as CreatorsInviteRouteImport } from './routes/creators.invite'
+import { Route as CreatorsLoginRouteImport } from './routes/creators.login'
 import { Route as EnIndexRouteImport } from './routes/en/index'
 import { Route as EnBecomeATeacherRouteImport } from './routes/en/become-a-teacher'
 import { Route as EnCareersRouteImport } from './routes/en/careers'
@@ -123,6 +127,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountNotSetUpRoute = AccountNotSetUpRouteImport.update({
+  id: '/account-not-set-up',
+  path: '/account-not-set-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -184,6 +193,11 @@ const AuteursInviteRoute = AuteursInviteRouteImport.update({
   path: '/auteurs/invite',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuteursLoginRoute = AuteursLoginRouteImport.update({
+  id: '/auteurs/login',
+  path: '/auteurs/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CoursIndexRoute = CoursIndexRouteImport.update({
   id: '/cours/',
   path: '/cours/',
@@ -202,6 +216,16 @@ const CreatorsIndexRoute = CreatorsIndexRouteImport.update({
 const CreatorsAppRoute = CreatorsAppRouteImport.update({
   id: '/creators/app',
   path: '/creators/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsInviteRoute = CreatorsInviteRouteImport.update({
+  id: '/creators/invite',
+  path: '/creators/invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsLoginRoute = CreatorsLoginRouteImport.update({
+  id: '/creators/login',
+  path: '/creators/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnIndexRoute = EnIndexRouteImport.update({
@@ -676,6 +700,7 @@ const ApiPublicAppCoursesSlugRoute = ApiPublicAppCoursesSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account-not-set-up': typeof AccountNotSetUpRoute
   '/auth': typeof AuthRoute
   '/careers': typeof CareersRoute
   '/confidentialite': typeof ConfidentialiteRoute
@@ -688,8 +713,11 @@ export interface FileRoutesByFullPath {
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
+  '/auteurs/login': typeof AuteursLoginRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/creators/app': typeof CreatorsAppRouteWithChildren
+  '/creators/invite': typeof CreatorsInviteRoute
+  '/creators/login': typeof CreatorsLoginRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -781,6 +809,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account-not-set-up': typeof AccountNotSetUpRoute
   '/auth': typeof AuthRoute
   '/careers': typeof CareersRoute
   '/confidentialite': typeof ConfidentialiteRoute
@@ -793,7 +822,10 @@ export interface FileRoutesByTo {
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
+  '/auteurs/login': typeof AuteursLoginRoute
   '/cours/$slug': typeof CoursSlugRoute
+  '/creators/invite': typeof CreatorsInviteRoute
+  '/creators/login': typeof CreatorsLoginRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -887,6 +919,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/account-not-set-up': typeof AccountNotSetUpRoute
   '/auth': typeof AuthRoute
   '/careers': typeof CareersRoute
   '/confidentialite': typeof ConfidentialiteRoute
@@ -899,8 +932,11 @@ export interface FileRoutesById {
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
+  '/auteurs/login': typeof AuteursLoginRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/creators/app': typeof CreatorsAppRouteWithChildren
+  '/creators/invite': typeof CreatorsInviteRoute
+  '/creators/login': typeof CreatorsLoginRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -994,6 +1030,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account-not-set-up'
     | '/auth'
     | '/careers'
     | '/confidentialite'
@@ -1006,8 +1043,11 @@ export interface FileRouteTypes {
     | '/.well-known/apple-app-site-association'
     | '/auteurs/$slug'
     | '/auteurs/invite'
+    | '/auteurs/login'
     | '/cours/$slug'
     | '/creators/app'
+    | '/creators/invite'
+    | '/creators/login'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -1099,6 +1139,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account-not-set-up'
     | '/auth'
     | '/careers'
     | '/confidentialite'
@@ -1111,7 +1152,10 @@ export interface FileRouteTypes {
     | '/.well-known/apple-app-site-association'
     | '/auteurs/$slug'
     | '/auteurs/invite'
+    | '/auteurs/login'
     | '/cours/$slug'
+    | '/creators/invite'
+    | '/creators/login'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -1204,6 +1248,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/account-not-set-up'
     | '/auth'
     | '/careers'
     | '/confidentialite'
@@ -1216,8 +1261,11 @@ export interface FileRouteTypes {
     | '/.well-known/apple-app-site-association'
     | '/auteurs/$slug'
     | '/auteurs/invite'
+    | '/auteurs/login'
     | '/cours/$slug'
     | '/creators/app'
+    | '/creators/invite'
+    | '/creators/login'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -1311,6 +1359,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AccountNotSetUpRoute: typeof AccountNotSetUpRoute
   AuthRoute: typeof AuthRoute
   CareersRoute: typeof CareersRoute
   ConfidentialiteRoute: typeof ConfidentialiteRoute
@@ -1323,8 +1372,11 @@ export interface RootRouteChildren {
   DotwellKnownAppleAppSiteAssociationRoute: typeof DotwellKnownAppleAppSiteAssociationRoute
   AuteursSlugRoute: typeof AuteursSlugRoute
   AuteursInviteRoute: typeof AuteursInviteRoute
+  AuteursLoginRoute: typeof AuteursLoginRoute
   CoursSlugRoute: typeof CoursSlugRoute
   CreatorsAppRoute: typeof CreatorsAppRouteWithChildren
+  CreatorsInviteRoute: typeof CreatorsInviteRoute
+  CreatorsLoginRoute: typeof CreatorsLoginRoute
   EnBecomeATeacherRoute: typeof EnBecomeATeacherRoute
   EnCareersRoute: typeof EnCareersRoute
   EnDownloadRoute: typeof EnDownloadRoute
@@ -1379,6 +1431,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account-not-set-up': {
+      id: '/account-not-set-up'
+      path: '/account-not-set-up'
+      fullPath: '/account-not-set-up'
+      preLoaderRoute: typeof AccountNotSetUpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1465,6 +1524,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuteursInviteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auteurs/login': {
+      id: '/auteurs/login'
+      path: '/auteurs/login'
+      fullPath: '/auteurs/login'
+      preLoaderRoute: typeof AuteursLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cours/': {
       id: '/cours/'
       path: '/cours'
@@ -1491,6 +1557,20 @@ declare module '@tanstack/react-router' {
       path: '/creators/app'
       fullPath: '/creators/app'
       preLoaderRoute: typeof CreatorsAppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/invite': {
+      id: '/creators/invite'
+      path: '/creators/invite'
+      fullPath: '/creators/invite'
+      preLoaderRoute: typeof CreatorsInviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/login': {
+      id: '/creators/login'
+      path: '/creators/login'
+      fullPath: '/creators/login'
+      preLoaderRoute: typeof CreatorsLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/': {
@@ -2254,6 +2334,7 @@ const ApiPublicAppCoursesRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AccountNotSetUpRoute: AccountNotSetUpRoute,
   AuthRoute: AuthRoute,
   CareersRoute: CareersRoute,
   ConfidentialiteRoute: ConfidentialiteRoute,
@@ -2267,8 +2348,11 @@ const rootRouteChildren: RootRouteChildren = {
     DotwellKnownAppleAppSiteAssociationRoute,
   AuteursSlugRoute: AuteursSlugRoute,
   AuteursInviteRoute: AuteursInviteRoute,
+  AuteursLoginRoute: AuteursLoginRoute,
   CoursSlugRoute: CoursSlugRoute,
   CreatorsAppRoute: CreatorsAppRouteWithChildren,
+  CreatorsInviteRoute: CreatorsInviteRoute,
+  CreatorsLoginRoute: CreatorsLoginRoute,
   EnBecomeATeacherRoute: EnBecomeATeacherRoute,
   EnCareersRoute: EnCareersRoute,
   EnDownloadRoute: EnDownloadRoute,

@@ -92,7 +92,7 @@ export const approveUgcApplication = createServerFn({ method: "POST" })
       })
       .eq("id", application.id);
 
-    const inviteUrl = `${data.origin.replace(/\/$/, "")}/creators/app?invite=${encodeURIComponent(inviteToken)}&email=${encodeURIComponent(application.email)}`;
+    const inviteUrl = `${data.origin.replace(/\/$/, "")}/creators/invite?token=${encodeURIComponent(inviteToken)}&email=${encodeURIComponent(application.email)}`;
 
     const { data: settings } = await supabaseAdmin
       .from("creator_email_settings")
