@@ -146,7 +146,7 @@ export function ProspectPanel({ prospect, touches, hms, templates, onClose, onSt
           <Textarea rows={4} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="What you sent, or what they replied (pick channel “reply”)" />
           <div className="flex justify-between gap-2">
             <Button size="sm" variant="ghost" onClick={() => void saveTemplate()}>Save as template</Button>
-            <Button size="sm" onClick={async () => { if (!message.trim()) return toast.error("Write what you sent."); if (await onLog(channel, message.trim())) setMessage(""); }}>Log touch</Button>
+            <Button size="sm" onClick={async () => { if (!message.trim()) { toast.error("Write what you sent."); return; } if (await onLog(channel, message.trim())) setMessage(""); }}>Log touch</Button>
           </div>
         </section>
 
