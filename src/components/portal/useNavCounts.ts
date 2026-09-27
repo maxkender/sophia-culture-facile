@@ -39,6 +39,8 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
         requests: requests + proposals,
         adminMessages: threads.count ?? 0,
         creatorApps: ugcPending + slidePending,
+        ugcApps: ugcPending,
+        slideApps: slidePending,
       } satisfies NavCounts;
     },
   });

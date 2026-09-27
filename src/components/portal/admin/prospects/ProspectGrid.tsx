@@ -97,8 +97,7 @@ export function ProspectGrid({ table, hms, activeId, onOpen, onSave }: Props) {
                     onClick={h.column.getToggleSortingHandler()}
                     className="flex w-full items-center gap-1 truncate text-left text-[11px] font-bold uppercase tracking-wide text-brand-navy"
                   >
-                    {h.isPlaceholder ? null : flexRender(h.column.columnDef.header ?? meta?.label, h.getContext()) ?? meta?.label}
-                    {typeof h.column.columnDef.header !== "function" && meta?.label && !h.column.columnDef.header ? meta.label : null}
+                    {typeof h.column.columnDef.header === "function" ? flexRender(h.column.columnDef.header, h.getContext()) : meta?.label}
                     {sorted === "asc" ? <ArrowUp className="size-3" /> : sorted === "desc" ? <ArrowDown className="size-3" /> : null}
                   </button>
                   {h.column.getCanFilter() ? (
