@@ -1264,6 +1264,7 @@ export type Database = {
           motivation_confirmed_at: string | null
           onboarding_completed_at: string | null
           profile_picture_confirmed: boolean
+          slack_joined_at: string | null
           social_account_created_at: string | null
           social_bio: string | null
           social_handle: string | null
@@ -1288,6 +1289,7 @@ export type Database = {
           motivation_confirmed_at?: string | null
           onboarding_completed_at?: string | null
           profile_picture_confirmed?: boolean
+          slack_joined_at?: string | null
           social_account_created_at?: string | null
           social_bio?: string | null
           social_handle?: string | null
@@ -1312,6 +1314,7 @@ export type Database = {
           motivation_confirmed_at?: string | null
           onboarding_completed_at?: string | null
           profile_picture_confirmed?: boolean
+          slack_joined_at?: string | null
           social_account_created_at?: string | null
           social_bio?: string | null
           social_handle?: string | null

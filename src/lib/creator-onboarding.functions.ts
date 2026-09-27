@@ -3,6 +3,12 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { buildEmailHtml, buildEmailText, replaceMergeFields, sendAppEmail } from "./email-send.server";
 
+/** Team Slack — included verbatim in the acceptance email and in the onboarding checklist. */
+export const SLACK_INVITE_URL = "https://join.slack.com/t/ugc-vikstudios/shared_invite/zt-4b6fwnseu-KrYV8Y0~IZ9C~7uo9HipbQ";
+export const SLACK_INVITE_TEXT =
+  "Travaillons ensemble dans UGC - Vik Studios sur Slack. Cette invitation n'a pas de date d'expiration :";
+export const SLACK_INVITE_LABEL = "Join our Slack";
+
 const originSchema = z.string().url().max(300).refine((value) => {
   const url = new URL(value);
   return url.protocol === "https:" || url.hostname === "localhost";
@@ -98,7 +104,7 @@ export const approveUgcApplication = createServerFn({ method: "POST" })
       intro:
         "Hi {full_name},\n\nGreat news: your application has been accepted. Welcome to the Sophia creator team.",
       instructions:
-        "Open the button below to create your account with the email this message was sent to. Your onboarding checklist — examples, agreement, account setup and your first post — is waiting for you in your creator space.",
+        "Open the button below to create your account with the email this message was sent to. Your onboarding checklist — examples, agreement, account setup, Slack and your first post — is waiting for you in your creator space.",
       button_label: "Create my account",
     };
     const template = settings ?? defaults;
@@ -113,11 +119,13 @@ export const approveUgcApplication = createServerFn({ method: "POST" })
       paragraphs: paragraphs.flatMap((p) => p.split(/\n/)).filter(Boolean),
       buttonLabel,
       buttonUrl: inviteUrl,
+      linkSection: { text: SLACK_INVITE_TEXT, url: SLACK_INVITE_URL, linkLabel: SLACK_INVITE_LABEL },
     });
     const text = buildEmailText({
       paragraphs: [`Hi ${firstName},`, ...instructions],
       buttonLabel,
       buttonUrl: inviteUrl,
+      linkSection: { text: SLACK_INVITE_TEXT, url: SLACK_INVITE_URL, linkLabel: SLACK_INVITE_LABEL },
     });
 
     const send = await sendAppEmail({
@@ -211,5 +219,17 @@ export const logCreatorPost = createServerFn({ method: "POST" })
     });
     if (error) throw new Error("The post could not be logged.");
     await supabaseAdmin.from("creators").update({ status: "active", onboarding_completed_at: new Date().toISOString() }).eq("id", creator.id).is("onboarding_completed_at", null);
+    return { ok: true as const };
+  });
+
+export const joinCreatorSlack = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: creator } = await context.supabase.from("creators").select("id").eq("user_id", context.userId).maybeSingle();
+    if (!creator) throw new Error("Creator account not found.");
+    const now = new Date().toISOString();
+    const { error } = await supabaseAdmin.from("creators").update({ slack_joined_at: now }).eq("id", creator.id);
+    if (error) throw new Error("Slack step could not be recorded.");
     return { ok: true as const };
   });

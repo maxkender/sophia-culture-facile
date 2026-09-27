@@ -94,7 +94,7 @@ export function CreatorOps() {
                 <span className="min-w-0 flex-1">
                   <span className="block font-semibold text-brand-navy">{r.full_name ?? r.title ?? r.url}</span>
                   <span className="block text-xs text-brand-navySoft">
-                    {tab === "creators" && `${r.email} · ${r.status} · ${creatorProgress(r)} / 4 onboarding steps`}
+                    {tab === "creators" && `${r.email} · ${r.status} · ${creatorProgress(r)} / 5 onboarding steps`}
                     {tab === "briefs" && `${r.status} · ${formatDateTime(r.created_at)}`}
                     {tab === "posts" && `${r.creators?.full_name ?? ""} · ${r.platform} · ${r.posted_on} · ${r.status}`}
                     {tab === "calls" && formatDateTime(r.starts_at)}
@@ -134,7 +134,7 @@ export function CreatorOps() {
 }
 
 function creatorProgress(creator: any) {
-  return [creator.motivation_confirmed_at, creator.creator_signatures?.length, creator.social_account_created_at, creator.onboarding_completed_at].filter(Boolean).length;
+  return [creator.motivation_confirmed_at, creator.creator_signatures?.length, creator.social_account_created_at, creator.slack_joined_at, creator.onboarding_completed_at].filter(Boolean).length;
 }
 
 function AcceptanceEmailEditor({ row, onSaved }: { row: any; onSaved: () => void }) {

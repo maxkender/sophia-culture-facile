@@ -12,7 +12,7 @@ import { CreatorAgreementForm } from "./CreatorAgreementForm";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { completeSocialAccountStep, logCreatorPost } from "@/lib/creator-onboarding.functions";
+import { completeSocialAccountStep, joinCreatorSlack, logCreatorPost, SLACK_INVITE_URL } from "@/lib/creator-onboarding.functions";
 import { CheckCircle2, Circle } from "lucide-react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -21,6 +21,7 @@ export function CreatorOnboarding({ me, refs }: { me: any; refs: any[] }) {
   const mark = useServerFn(markCreatorStep);
   const sign = useServerFn(signCreatorAgreement);
   const completeAccount = useServerFn(completeSocialAccountStep);
+  const join = useServerFn(joinCreatorSlack);
   const logPost = useServerFn(logCreatorPost);
   const [motivated, setMotivated] = useState(false);
   const [handle, setHandle] = useState("");
@@ -34,7 +35,7 @@ export function CreatorOnboarding({ me, refs }: { me: any; refs: any[] }) {
   });
   const agreement = docs?.find((d) => d.slug === "creator-agreement");
   const reload = () => qc.invalidateQueries({ queryKey: ["creator-space"] });
-  const step = !me.motivation_confirmed_at ? 1 : !me.agreementSigned ? 2 : !me.social_account_created_at ? 3 : 4;
+  const step = !me.motivation_confirmed_at ? 1 : !me.agreementSigned ? 2 : !me.social_account_created_at ? 3 : !me.slack_joined_at ? 4 : 5;
 
   async function done() {
     if (!motivated) {
@@ -49,7 +50,7 @@ export function CreatorOnboarding({ me, refs }: { me: any; refs: any[] }) {
     <div className="mx-auto max-w-3xl space-y-6 p-6">
       <h1 className="text-2xl font-extrabold text-brand-navy">Welcome {me.full_name.split(" ")[0]}</h1>
       <ol className="grid gap-2 text-sm font-semibold sm:grid-cols-2">
-        {["Check examples and commitment", "Sign the contract", "Create my Sophia account", "Post my first post"].map((l, i) => (
+        {["Check examples and commitment", "Sign the contract", "Create my Sophia account", "Join our Slack", "Post my first post"].map((l, i) => (
           <li key={l} className={`flex min-h-12 items-center gap-2 rounded-lg border px-3 py-2 ${step === i + 1 ? "border-primary bg-primary/5 text-brand-navy" : step > i + 1 ? "border-portal-green/30 bg-portal-green/10 text-portal-green" : "border-brand-line text-muted-foreground"}`}>
             {step > i + 1 ? <CheckCircle2 className="size-5 shrink-0" /> : <Circle className="size-5 shrink-0" />} {l}
           </li>
@@ -127,6 +128,28 @@ export function CreatorOnboarding({ me, refs }: { me: any; refs: any[] }) {
       )}
 
       {step === 4 && (
+        <section className="space-y-4 rounded-lg border border-brand-line p-4">
+          <div>
+            <h2 className="font-bold text-brand-navy">Join our Slack</h2>
+            <p className="mt-1 text-sm text-brand-navySoft">Our team coordinates in Slack. Travaillons ensemble dans UGC - Vik Studios sur Slack. Cette invitation n'a pas de date d'expiration.</p>
+          </div>
+          <Button asChild className="w-fit">
+            <a
+              href={SLACK_INVITE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                join({}).catch(() => {});
+              }}
+            >
+              Join our Slack
+            </a>
+          </Button>
+          <p className="text-xs text-muted-foreground">Open the link to join UGC - Vik Studios on Slack. It never expires. The step is checked automatically.</p>
+        </section>
+      )}
+
+      {step === 5 && (
         <section className="space-y-4 rounded-lg border border-brand-line p-4">
           <div>
             <h2 className="font-bold text-brand-navy">Post and log your first post</h2>
