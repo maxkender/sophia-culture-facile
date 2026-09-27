@@ -3,11 +3,13 @@ import type { Database } from "@/integrations/supabase/types";
 export type DocumentRow = Database["public"]["Tables"]["documents"]["Row"];
 export type DocumentVersionRow = Database["public"]["Tables"]["document_versions"]["Row"];
 
-export type DocumentSlug = "guide" | "contract";
+export type DocumentSlug = "guide" | "contract" | "creator-agreement" | "creator-guide";
 
 export const DOCUMENT_LABEL: Record<DocumentSlug, string> = {
   guide: "Writing guide",
   contract: "Author contract",
+  "creator-agreement": "Creator Account Agreement",
+  "creator-guide": "Creator brief guide",
 };
 
 export type CalloutTone = "red" | "blue";
@@ -100,6 +102,10 @@ export const MERGE_TOKENS = [
   "course_count",
   "fee",
   "today",
+  "legal_name",
+  "country",
+  "email",
+  "track",
 ] as const;
 
 export type MergeToken = (typeof MERGE_TOKENS)[number];
@@ -115,6 +121,10 @@ export const MERGE_PLACEHOLDER: Record<MergeToken, string> = {
   course_count: "no courses assigned",
   fee: "fee not set",
   today: "date not available",
+  legal_name: "legal name not provided",
+  country: "country not provided",
+  email: "email not provided",
+  track: "track not set",
 };
 
 export type InlinePart = { text: string; bold?: boolean; italic?: boolean; token?: MergeToken };
