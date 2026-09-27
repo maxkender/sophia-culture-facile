@@ -302,7 +302,7 @@ export function PortalShell({
       </aside>
 
       <div className={cn(collapsed ? "lg:pl-[76px]" : "lg:pl-64")}>
-        <header className="sticky top-0 z-30 border-b border-brand-line bg-card/95 backdrop-blur">
+        <header className="safe-top sticky top-0 z-30 border-b border-brand-line bg-card/95 backdrop-blur">
           <div className="flex min-h-14 items-center gap-3 px-4 py-2 sm:px-6">
             <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
               <SheetTrigger asChild>
