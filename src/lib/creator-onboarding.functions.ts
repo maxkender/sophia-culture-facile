@@ -221,3 +221,15 @@ export const logCreatorPost = createServerFn({ method: "POST" })
     await supabaseAdmin.from("creators").update({ status: "active", onboarding_completed_at: new Date().toISOString() }).eq("id", creator.id).is("onboarding_completed_at", null);
     return { ok: true as const };
   });
+
+export const joinCreatorSlack = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: creator } = await context.supabase.from("creators").select("id").eq("user_id", context.userId).maybeSingle();
+    if (!creator) throw new Error("Creator account not found.");
+    const now = new Date().toISOString();
+    const { error } = await supabaseAdmin.from("creators").update({ slack_joined_at: now }).eq("id", creator.id);
+    if (error) throw new Error("Slack step could not be recorded.");
+    return { ok: true as const };
+  });
