@@ -127,6 +127,13 @@
       "when": 1790504727841,
       "tag": "0017_dated_rate_cards",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1790505329179,
+      "tag": "0018_creator_app_shell",
+      "breakpoints": true
     }
   ]
 }
