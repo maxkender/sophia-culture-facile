@@ -15,6 +15,7 @@
 - [x] Minimum age 18 everywhere; guardian fields removed
 - [x] Home page: "Devenir créateur / Become a creator" CTA + footer link; real App Store reviews
 - [x] Creator forms: free-choice TikTok username guidance and clear email, phone, link and action error messages
+- [x] Creator account warm-up reduced to 24 hours: scroll 10 minutes, follow 10 niche accounts, like and repost
 
 ## Waiting on the user (not buildable by us)
 - [ ] Creator payout rates — admin enters them in-app; never invented

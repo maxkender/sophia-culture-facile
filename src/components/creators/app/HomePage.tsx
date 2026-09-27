@@ -33,7 +33,7 @@ export function CreatorHomePage() {
   const nextCall = [...calls].filter((c) => new Date(c.starts_at).getTime() > Date.now()).sort((a, b) => a.starts_at.localeCompare(b.starts_at))[0];
   const feedback = posts.filter((p) => p.status === "flagged");
   const warm = (me.warmup ?? {}) as Record<string, string>;
-  const warmCount = [1, 2, 3, 4, 5].filter((d) => warm[String(d)]).length;
+  const warmDone = Boolean(warm["1"]);
 
   return (
     <div>
@@ -55,8 +55,8 @@ export function CreatorHomePage() {
           {steps.signed ? <p className="mt-3 text-sm font-semibold text-portal-green">Signed on {fmt(signature!.signed_at)}</p> : <Button asChild className="mt-4" variant={steps.rules ? "default" : "outline"}><Link to="/creators/app/contract">Open the agreement</Link></Button>}
         </Step>
         <Step n={3} title="Set up your Sophia account" done={steps.account} current={currentIdx === 2}>
-          <p className="mt-2 text-sm text-brand-navySoft">Create the TikTok account following the guide, register it here, then do the five-day warm-up.</p>
-          {!steps.account && <p className="mt-2 text-xs font-semibold text-brand-navySoft">{me.social_account_created_at ? "Account registered" : "Account not registered yet"} · warm-up {warmCount}/5 days</p>}
+          <p className="mt-2 text-sm text-brand-navySoft">Create the TikTok account following the guide, register it here, then complete the 24-hour warm-up.</p>
+          {!steps.account && <p className="mt-2 text-xs font-semibold text-brand-navySoft">{me.social_account_created_at ? "Account registered" : "Account not registered yet"} · 24-hour warm-up {warmDone ? "done" : "not done"}</p>}
           {steps.account ? <p className="mt-3 text-sm font-semibold text-portal-green">Account {me.social_handle} registered and warmed up</p> : <Button asChild className="mt-4" variant={steps.signed ? "default" : "outline"}><Link to="/creators/app/account">Open account setup</Link></Button>}
         </Step>
         <Step n={4} title="Set up payouts" done={steps.payouts} current={currentIdx === 3}>

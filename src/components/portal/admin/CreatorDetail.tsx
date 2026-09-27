@@ -77,7 +77,7 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
         <PortalCard>
           <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Warm-up</p>
           <ul className="mt-2 space-y-1 text-sm">
-            {WARMUP_DAYS.map((d) => <li key={d.day}>{warm[String(d.day)] ? "✓" : "○"} Day {d.day} {warm[String(d.day)] ? <span className="text-brand-navySoft">· {fmt(warm[String(d.day)])}</span> : null}</li>)}
+            {WARMUP_DAYS.map((d) => <li key={d.day}>{warm[String(d.day)] ? "✓" : "○"} 24-hour warm-up {warm[String(d.day)] ? <span className="text-brand-navySoft">· {fmt(warm[String(d.day)])}</span> : null}</li>)}
           </ul>
         </PortalCard>
 
