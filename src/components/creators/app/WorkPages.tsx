@@ -243,7 +243,7 @@ function FeedbackReply({ post }: { post: Post }) {
       <Input placeholder="Reply to this feedback" value={text} onChange={(e) => setText(e.target.value)} />
       <Button size="sm" disabled={!text.trim()} onClick={async () => {
         const { error } = await supabase.from("creator_messages").insert({ creator_id: me.id, from_admin: false, body: text.trim(), post_id: post.id });
-        if (error) return void toast.error("Could not send.");
+        if (error) return void toast.error("Your reply was not sent. Check your connection and try again.");
         setText(""); toast.success("Reply sent."); reload();
       }}>Reply</Button>
     </div>
@@ -315,7 +315,7 @@ export function CallsPage() {
                   {(["yes", "maybe", "no"] as const).map((a) => (
                     <Button key={a} size="sm" variant={mine === a ? "default" : "outline"} onClick={async () => {
                       const { error } = await supabase.from("creator_call_rsvps").upsert({ call_id: c.id, creator_id: me.id, answer: a }, { onConflict: "call_id,creator_id" });
-                      if (error) toast.error("Could not save."); else reload();
+                      if (error) toast.error("Your RSVP was not saved. Check your connection and try again."); else reload();
                     }}>{a === "yes" ? "Yes" : a === "no" ? "No" : "Maybe"}</Button>
                   ))}
                 </div>
@@ -432,7 +432,7 @@ export function MessagesPage() {
   async function send() {
     if (!text.trim()) return;
     const { error } = await supabase.from("creator_messages").insert({ creator_id: me.id, from_admin: false, body: text.trim(), post_id: postId });
-    if (error) return void toast.error("Could not send.");
+    if (error) return void toast.error("Your message was not sent. Check your connection and try again.");
     setText(""); qc.invalidateQueries({ queryKey: ["creator-messages-all", me.id] });
   }
   return (
