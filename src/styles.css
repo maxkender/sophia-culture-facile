@@ -209,6 +209,6 @@
 
 @utility h1-hero {
   font-size: clamp(2.8rem, 8vw, 5.5rem);
-  line-height: 0.95;
-  letter-spacing: -0.03em;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
 }
