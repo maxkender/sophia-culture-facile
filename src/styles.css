@@ -232,6 +232,7 @@
 /* Phone ergonomics: thumb-sized targets, no zoom-on-focus, no sideways scroll, safe areas. */
 @media (max-width: 767px) {
   html, body { overflow-x: clip; }
+  .grid > *, .flex > * { min-width: 0; }
   body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
   button:not([role="checkbox"]):not([role="switch"]):not([role="radio"]), [role="button"], select, [role="combobox"],
   input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]) { min-height: 44px; }
