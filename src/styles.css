@@ -237,6 +237,7 @@
   button:not([role="checkbox"]):not([role="switch"]):not([role="radio"]), [role="button"], select, [role="combobox"],
   input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]) { min-height: 44px; }
   button[data-size="icon"], button.size-9, button.size-8 { min-width: 44px; }
+  main a:not(p a):not(li a):not([role="grid"] a) { display: inline-flex; align-items: center; min-height: 44px; }
   [role="checkbox"], input[type="checkbox"], input[type="radio"] { min-width: 22px; min-height: 22px; }
   input, select, textarea { font-size: 16px !important; }
   [role="grid"] input, [role="grid"] select, [role="grid"] button { min-height: 0; font-size: 12px !important; }
