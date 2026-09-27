@@ -767,6 +767,50 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_payout_profiles: {
+        Row: {
+          created_at: string
+          creator_id: string
+          id: string
+          method: string
+          paypal_email: string | null
+          stripe_account_id: string | null
+          stripe_onboarded: boolean
+          updated_at: string
+          wise_email: string | null
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          id?: string
+          method?: string
+          paypal_email?: string | null
+          stripe_account_id?: string | null
+          stripe_onboarded?: boolean
+          updated_at?: string
+          wise_email?: string | null
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          id?: string
+          method?: string
+          paypal_email?: string | null
+          stripe_account_id?: string | null
+          stripe_onboarded?: boolean
+          updated_at?: string
+          wise_email?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_payout_profiles_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: true
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_posts: {
         Row: {
           brief_id: string | null
@@ -870,6 +914,30 @@ export type Database = {
           notes?: string | null
           platform?: string
           status?: string
+        }
+        Relationships: []
+      }
+      creator_rates: {
+        Row: {
+          country: string | null
+          created_at: string
+          id: string
+          rate_usd: number
+          track: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          id?: string
+          rate_usd: number
+          track: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          id?: string
+          rate_usd?: number
+          track?: string
         }
         Relationships: []
       }
@@ -1145,6 +1213,95 @@ export type Database = {
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payout_batches: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          paid_at: string | null
+          period: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          paid_at?: string | null
+          period: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          paid_at?: string | null
+          period?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_batches_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payout_items: {
+        Row: {
+          amount_usd: number
+          batch_id: string
+          created_at: string
+          creator_id: string
+          id: string
+          note: string | null
+          posts_count: number
+          rate_usd: number
+          status: string
+          stripe_transfer_id: string | null
+        }
+        Insert: {
+          amount_usd?: number
+          batch_id: string
+          created_at?: string
+          creator_id: string
+          id?: string
+          note?: string | null
+          posts_count?: number
+          rate_usd?: number
+          status?: string
+          stripe_transfer_id?: string | null
+        }
+        Update: {
+          amount_usd?: number
+          batch_id?: string
+          created_at?: string
+          creator_id?: string
+          id?: string
+          note?: string | null
+          posts_count?: number
+          rate_usd?: number
+          status?: string
+          stripe_transfer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_items_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "payout_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payout_items_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
             referencedColumns: ["id"]
           },
         ]

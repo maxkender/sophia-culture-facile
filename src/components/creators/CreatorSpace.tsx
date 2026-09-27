@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { claimCreatorInvite } from "@/lib/creator-space.functions";
+import { startStripeOnboarding, syncStripeStatus } from "@/lib/creator-payouts.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -57,13 +58,15 @@ function Workspace() {
     queryFn: async () => {
       const { data: me } = await supabase.from("creators").select("*").maybeSingle();
       if (!me) return null;
-      const [briefs, posts, calls, refs] = await Promise.all([
+      const [briefs, posts, calls, refs, payoutProfile, payoutItems] = await Promise.all([
         supabase.from("briefs").select("*").eq("status", "published").order("created_at", { ascending: false }),
         supabase.from("creator_posts").select("*").order("posted_on", { ascending: false }),
         supabase.from("creator_calls").select("*").gte("starts_at", new Date().toISOString()).order("starts_at"),
         supabase.from("reference_videos").select("*").order("pinned", { ascending: false }).order("created_at", { ascending: false }),
+        supabase.from("creator_payout_profiles").select("*").eq("creator_id", me.id).maybeSingle(),
+        supabase.from("payout_items").select("*, payout_batches(period, status)").eq("creator_id", me.id).order("created_at", { ascending: false }),
       ]);
-      return { me, briefs: briefs.data ?? [], posts: posts.data ?? [], calls: calls.data ?? [], refs: refs.data ?? [] };
+      return { me, briefs: briefs.data ?? [], posts: posts.data ?? [], calls: calls.data ?? [], refs: refs.data ?? [], payoutProfile: payoutProfile.data ?? null, payoutItems: payoutItems.data ?? [] };
     },
   });
   if (data === undefined) return <p className="p-6 text-sm">Loading…</p>;
@@ -140,6 +143,7 @@ function Workspace() {
           </div>
         ))}
       </section>
+      <PayoutSection profile={data.payoutProfile} items={data.payoutItems} />
       <section className="space-y-2">
         <h2 className="font-bold text-brand-navy">Upcoming calls</h2>
         {data.calls.length === 0 && <p className="text-sm text-brand-navySoft">No call scheduled.</p>}
@@ -150,6 +154,61 @@ function Workspace() {
         ))}
       </section>
     </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function PayoutSection({ profile, items }: { profile: any; items: any[] }) {
+  const qc = useQueryClient();
+  const onboard = useServerFn(startStripeOnboarding);
+  const sync = useServerFn(syncStripeStatus);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (profile?.stripe_account_id && !profile.stripe_onboarded) {
+      sync({} as never).then(() => qc.invalidateQueries({ queryKey: ["creator-space"] }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.stripe_account_id]);
+
+  async function connect() {
+    setBusy(true);
+    try {
+      const { url } = await onboard({} as never);
+      window.location.href = url;
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not start Stripe onboarding.");
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="space-y-2">
+      <h2 className="font-bold text-brand-navy">Payouts</h2>
+      <div className="rounded-2xl border border-brand-line p-4 text-sm">
+        {profile?.stripe_onboarded ? (
+          <p className="text-green-700">Your Stripe account is connected. Monthly payouts are sent automatically.</p>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-brand-navySoft">Connect your Stripe account to receive your monthly payouts.</p>
+            <Button size="sm" disabled={busy} onClick={connect}>{busy ? "Opening Stripe…" : "Connect Stripe"}</Button>
+          </div>
+        )}
+        {items.length > 0 && (
+          <div className="mt-3 divide-y">
+            {items.map((i) => (
+              <div key={i.id} className="flex items-center justify-between py-1.5">
+                <span>{i.payout_batches?.period} — {i.posts_count} post(s)</span>
+                <span className="flex items-center gap-2">
+                  <b>${Number(i.amount_usd).toFixed(2)}</b>
+                  <span className="rounded bg-muted px-1.5 py-0.5 text-xs">{i.status}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 

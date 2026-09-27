@@ -43,6 +43,13 @@
       "when": 1790497528739,
       "tag": "0005_creator_prospects",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790498245556,
+      "tag": "0006_creator_payouts",
+      "breakpoints": true
     }
   ]
 }
