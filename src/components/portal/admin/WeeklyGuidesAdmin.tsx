@@ -24,7 +24,7 @@ export function WeeklyGuidesAdmin() {
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["portal", "admin", "weekly-guides"] });
 
-  async function create() {
+  async function create(): Promise<unknown> {
     if (!week || !title.trim()) return toast.error("Week and title required.");
     const { error } = await supabase.from("creator_weekly_guides").insert({ week_start: week, title: title.trim(), body, track: track || null });
     if (error) return toast.error("Could not save.");
@@ -44,13 +44,13 @@ export function WeeklyGuidesAdmin() {
     refresh();
   }
 
-  async function addLink(g: Guide, url: string, caption: string) {
+  async function addLink(g: Guide, url: string, caption: string): Promise<unknown> {
     if (!/^https?:\/\//.test(url)) return toast.error("Paste a valid link.");
     const { error } = await supabase.from("creator_guide_media").insert({ guide_id: g.id, url, caption: caption || null });
     if (error) toast.error("Could not add."); else refresh();
   }
 
-  async function upload(g: Guide, file: File, caption: string) {
+  async function upload(g: Guide, file: File, caption: string): Promise<unknown> {
     const path = `${g.id}/${Date.now()}-${file.name.replace(/[^\w.-]/g, "_")}`;
     const t = toast.loading("Uploading…");
     const { error } = await supabase.storage.from("guide-media").upload(path, file);
