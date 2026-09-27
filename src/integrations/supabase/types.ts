@@ -777,6 +777,7 @@ export type Database = {
           likes: number | null
           platform: string
           posted_on: string
+          reference_video_id: string | null
           status: string
           url: string
           views: number | null
@@ -790,6 +791,7 @@ export type Database = {
           likes?: number | null
           platform?: string
           posted_on?: string
+          reference_video_id?: string | null
           status?: string
           url: string
           views?: number | null
@@ -803,6 +805,7 @@ export type Database = {
           likes?: number | null
           platform?: string
           posted_on?: string
+          reference_video_id?: string | null
           status?: string
           url?: string
           views?: number | null
@@ -820,6 +823,13 @@ export type Database = {
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_posts_reference_video_id_fkey"
+            columns: ["reference_video_id"]
+            isOneToOne: false
+            referencedRelation: "reference_videos"
             referencedColumns: ["id"]
           },
         ]
@@ -1217,6 +1227,39 @@ export type Database = {
           upwork_status?: string
           used_invite_token?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      reference_videos: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          id: string
+          note: string | null
+          pinned: boolean
+          platform: string
+          url: string
+        }
+        Insert: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          pinned?: boolean
+          platform?: string
+          url: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          pinned?: boolean
+          platform?: string
+          url?: string
         }
         Relationships: []
       }

@@ -51,17 +51,19 @@ function Workspace() {
   const [url, setUrl] = useState("");
   const [platform, setPlatform] = useState("tiktok");
   const [briefId, setBriefId] = useState("");
+  const [refId, setRefId] = useState<string | null>(null);
   const { data } = useQuery({
     queryKey: ["creator-space"],
     queryFn: async () => {
       const { data: me } = await supabase.from("creators").select("*").maybeSingle();
       if (!me) return null;
-      const [briefs, posts, calls] = await Promise.all([
+      const [briefs, posts, calls, refs] = await Promise.all([
         supabase.from("briefs").select("*").eq("status", "published").order("created_at", { ascending: false }),
         supabase.from("creator_posts").select("*").order("posted_on", { ascending: false }),
         supabase.from("creator_calls").select("*").gte("starts_at", new Date().toISOString()).order("starts_at"),
+        supabase.from("reference_videos").select("*").order("pinned", { ascending: false }).order("created_at", { ascending: false }),
       ]);
-      return { me, briefs: briefs.data ?? [], posts: posts.data ?? [], calls: calls.data ?? [] };
+      return { me, briefs: briefs.data ?? [], posts: posts.data ?? [], calls: calls.data ?? [], refs: refs.data ?? [] };
     },
   });
   if (data === undefined) return <p className="p-6 text-sm">Loading…</p>;
@@ -77,9 +79,9 @@ function Workspace() {
 
   async function logPost() {
     if (!/^https?:\/\//.test(url)) return toast.error("Paste the full link to your post.");
-    const { error } = await supabase.from("creator_posts").insert({ creator_id: data!.me.id, url, platform, brief_id: briefId || null });
+    const { error } = await supabase.from("creator_posts").insert({ creator_id: data!.me.id, url, platform, brief_id: briefId || null, reference_video_id: refId });
     if (error) return toast.error("Could not log the post.");
-    setUrl(""); toast.success("Post logged."); return qc.invalidateQueries({ queryKey: ["creator-space"] });
+    setUrl(""); setRefId(null); toast.success("Post logged."); return qc.invalidateQueries({ queryKey: ["creator-space"] });
   }
 
   return (
@@ -105,8 +107,18 @@ function Workspace() {
           </div>
         ))}
       </section>
+      <section className="space-y-2">
+        <h2 className="font-bold text-brand-navy">Library</h2>
+        {data.refs.length === 0 && <p className="text-sm text-brand-navySoft">No reference video yet.</p>}
+        {data.refs.map((r) => (
+          <div key={r.id} className="flex items-center gap-2 rounded-xl border border-brand-line p-3 text-sm">
+            <a href={r.url} target="_blank" rel="noopener noreferrer" className="flex-1 font-semibold text-portal-accent">{r.platform} · {r.category}{r.note ? ` — ${r.note}` : ""}</a>
+            <Button size="sm" variant="outline" onClick={() => { setRefId(r.id); toast.success("Linked. Now log your post below."); }}>Use this</Button>
+          </div>
+        ))}
+      </section>
       <section className="space-y-2 rounded-2xl border border-brand-line p-4">
-        <h2 className="font-bold text-brand-navy">I posted a video</h2>
+        <h2 className="font-bold text-brand-navy">I posted a video{refId ? " (linked to a reference)" : ""}</h2>
         <Input placeholder="https://www.tiktok.com/@…/video/…" value={url} onChange={(e) => setUrl(e.target.value)} />
         <div className="flex gap-2">
           <select className="rounded-md border px-2 text-sm" value={platform} onChange={(e) => setPlatform(e.target.value)}>
