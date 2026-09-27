@@ -58,7 +58,7 @@ export const markCreatorStep = createServerFn({ method: "POST" })
     if (!creator) throw new Error("Not a creator");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const col = data.step === "examples" ? "examples_read_at" : "guide_read_at";
-    await supabaseAdmin.from("creators").update({ [col]: new Date().toISOString() }).eq("id", creator.id).is(col, null);
+    await (supabaseAdmin.from("creators") as any).update({ [col]: new Date().toISOString() }).eq("id", creator.id).is(col, null);
     return { ok: true };
   });
 
