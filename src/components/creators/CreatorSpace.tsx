@@ -157,6 +157,61 @@ function Workspace() {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function PayoutSection({ profile, items }: { profile: any; items: any[] }) {
+  const qc = useQueryClient();
+  const onboard = useServerFn(startStripeOnboarding);
+  const sync = useServerFn(syncStripeStatus);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (profile?.stripe_account_id && !profile.stripe_onboarded) {
+      sync({ data: {} }).then(() => qc.invalidateQueries({ queryKey: ["creator-space"] }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.stripe_account_id]);
+
+  async function connect() {
+    setBusy(true);
+    try {
+      const { url } = await onboard({ data: {} });
+      window.location.href = url;
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not start Stripe onboarding.");
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="space-y-2">
+      <h2 className="font-bold text-brand-navy">Payouts</h2>
+      <div className="rounded-2xl border border-brand-line p-4 text-sm">
+        {profile?.stripe_onboarded ? (
+          <p className="text-green-700">Your Stripe account is connected. Monthly payouts are sent automatically.</p>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-brand-navySoft">Connect your Stripe account to receive your monthly payouts.</p>
+            <Button size="sm" disabled={busy} onClick={connect}>{busy ? "Opening Stripe…" : "Connect Stripe"}</Button>
+          </div>
+        )}
+        {items.length > 0 && (
+          <div className="mt-3 divide-y">
+            {items.map((i) => (
+              <div key={i.id} className="flex items-center justify-between py-1.5">
+                <span>{i.payout_batches?.period} — {i.posts_count} post(s)</span>
+                <span className="flex items-center gap-2">
+                  <b>${Number(i.amount_usd).toFixed(2)}</b>
+                  <span className="rounded bg-muted px-1.5 py-0.5 text-xs">{i.status}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export function CreatorSpace() {
   const user = useSessionUser();
   const claim = useServerFn(claimCreatorInvite);
