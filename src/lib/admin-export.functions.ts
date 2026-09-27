@@ -80,7 +80,7 @@ export const exportValidatedCourses = createServerFn({ method: "POST" })
 
     /** Same plain text as the admin/author "Copy course" button. */
     function buildFullText(course: {
-      title: string; subtitle: string | null; lot_code: string | null; subject_area: string | null; did_you_know: string[] | null;
+      id: string; title: string; subtitle: string | null; lot_code: string | null; subject_area: string | null; did_you_know: string[] | null;
     }, authorName: string): string {
       const ordered = [...(screensByCourse.get(course.id) ?? [])].sort(
         (a, b) => (a.screen_number ?? 0) - (b.screen_number ?? 0),
