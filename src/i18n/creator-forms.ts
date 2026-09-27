@@ -18,6 +18,8 @@ export type CreatorFormCopy = {
     searchCountry: string;
     noCountry: string;
     requiredError: string;
+    emailError: string;
+    phoneError: string;
     consentError: string;
     rateError: string;
     genericError: string;
@@ -88,6 +90,8 @@ export const CREATOR_FORMS: Record<Lang, CreatorFormCopy> = {
       searchCountry: "Search a country…",
       noCountry: "No country found.",
       requiredError: "Please fill in every required field.",
+      emailError: "Enter a complete email address, for example name@example.com.",
+      phoneError: "Enter a valid phone number with the country code, for example +44 7700 900123.",
       consentError: "Please tick the consent box.",
       rateError: "We have already received an application from you recently. We will be in touch.",
       genericError: "Something went wrong. Please check your answers and try again.",
@@ -156,6 +160,8 @@ export const CREATOR_FORMS: Record<Lang, CreatorFormCopy> = {
       searchCountry: "Rechercher un pays…",
       noCountry: "Aucun pays trouvé.",
       requiredError: "Veuillez remplir tous les champs obligatoires.",
+      emailError: "Saisissez une adresse e-mail complète, par exemple nom@exemple.com.",
+      phoneError: "Saisissez un numéro de téléphone valide avec l’indicatif du pays, par exemple +33 6 12 34 56 78.",
       consentError: "Veuillez cocher la case de consentement.",
       rateError: "Nous avons déjà reçu une candidature de votre part récemment. Nous vous recontacterons.",
       genericError: "Une erreur est survenue. Vérifiez vos réponses puis réessayez.",
