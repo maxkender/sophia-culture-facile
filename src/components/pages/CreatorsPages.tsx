@@ -25,7 +25,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Hero({ title, subtitle, cta, to, note }: { title: string; subtitle: string; cta: string; to: ReturnType<typeof useLocalePath>; note?: string }) {
+function Hero({ title, subtitle, cta, to, note }: { title: string; subtitle: string; cta: string; to: "/fr/candidature-ugc" | "/en/ugc-application" | "/fr/candidature-slideshow" | "/en/slideshow-application"; note?: string }) {
   return (
     <section className="relative isolate overflow-hidden bg-brand-navy">
       <span aria-hidden="true" className="grid-texture absolute inset-0 -z-10" />

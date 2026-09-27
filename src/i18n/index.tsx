@@ -32,7 +32,7 @@ export function useI18n() {
 }
 
 /** Chemin localisé d'une page dans la langue courante. */
-export function useLocalePath(key: RouteKey) {
+export function useLocalePath<K extends RouteKey>(key: K): (typeof import("./routes").ROUTES)[K][Lang] {
   const lang = useLang();
   return pathFor(key, lang);
 }

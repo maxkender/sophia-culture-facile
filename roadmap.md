@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Localize UGC/slideshow application forms in French and English; add dedicated localized routes and current-language flag switcher
+
 - [x] Rewrite author-home access-code card: bold store-not-Sophia first line, platform-dependent numbered steps, closing line, small grey "wrong phone type" line
 - [x] Apply same correction to other places the code / redemption appears (Examples page callout, claim page platform note, profile platform card)
 - [x] Read-only: report Raphael Seguin's invite URL, access code, redeem URL, store; regenerate token if missing/consumed
