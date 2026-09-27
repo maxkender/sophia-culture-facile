@@ -10,8 +10,7 @@ import { useI18n, useLocalePath } from "@/i18n";
  * professeurs (cours) et créateurs (contenus vidéo).
  */
 export function CareersPage() {
-  const { lang } = useI18n();
-  const t = useI18n().t.careers;
+  const { t } = useI18n().t ? { t: useI18n().t.careers } : { t: useI18n().t.careers };
   const applyPath = useLocalePath("apply");
   const creatorsPath = useLocalePath("creators");
 

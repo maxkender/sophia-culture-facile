@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CareersRouteImport } from './routes/careers'
 import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
 import { Route as DevenirProfesseurRouteImport } from './routes/devenir-professeur'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
@@ -27,11 +28,13 @@ import { Route as CoursSlugRouteImport } from './routes/cours/$slug'
 import { Route as CreatorsIndexRouteImport } from './routes/creators.index'
 import { Route as EnIndexRouteImport } from './routes/en/index'
 import { Route as EnBecomeATeacherRouteImport } from './routes/en/become-a-teacher'
+import { Route as EnCareersRouteImport } from './routes/en/careers'
 import { Route as EnDownloadRouteImport } from './routes/en/download'
 import { Route as EnLegalNoticeRouteImport } from './routes/en/legal-notice'
 import { Route as EnPrivacyRouteImport } from './routes/en/privacy'
 import { Route as EnSophiaGeneralKnowledgeRouteImport } from './routes/en/sophia-general-knowledge'
 import { Route as FrIndexRouteImport } from './routes/fr/index'
+import { Route as FrCareersRouteImport } from './routes/fr/careers'
 import { Route as FrConfidentialiteRouteImport } from './routes/fr/confidentialite'
 import { Route as FrDevenirProfesseurRouteImport } from './routes/fr/devenir-professeur'
 import { Route as FrMentionsLegalesRouteImport } from './routes/fr/mentions-legales'
@@ -96,6 +99,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConfidentialiteRoute = ConfidentialiteRouteImport.update({
@@ -174,6 +182,11 @@ const EnBecomeATeacherRoute = EnBecomeATeacherRouteImport.update({
   path: '/en/become-a-teacher',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnCareersRoute = EnCareersRouteImport.update({
+  id: '/en/careers',
+  path: '/en/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnDownloadRoute = EnDownloadRouteImport.update({
   id: '/en/download',
   path: '/en/download',
@@ -198,6 +211,11 @@ const EnSophiaGeneralKnowledgeRoute =
 const FrIndexRoute = FrIndexRouteImport.update({
   id: '/fr/',
   path: '/fr/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrCareersRoute = FrCareersRouteImport.update({
+  id: '/fr/careers',
+  path: '/fr/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FrConfidentialiteRoute = FrConfidentialiteRouteImport.update({
@@ -487,6 +505,7 @@ const ApiPublicAppCoursesSlugRoute = ApiPublicAppCoursesSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/careers': typeof CareersRoute
   '/confidentialite': typeof ConfidentialiteRoute
   '/devenir-professeur': typeof DevenirProfesseurRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -499,10 +518,12 @@ export interface FileRoutesByFullPath {
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
+  '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
+  '/fr/careers': typeof FrCareersRoute
   '/fr/confidentialite': typeof FrConfidentialiteRoute
   '/fr/devenir-professeur': typeof FrDevenirProfesseurRoute
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
@@ -562,6 +583,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/careers': typeof CareersRoute
   '/confidentialite': typeof ConfidentialiteRoute
   '/devenir-professeur': typeof DevenirProfesseurRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -574,10 +596,12 @@ export interface FileRoutesByTo {
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
+  '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
+  '/fr/careers': typeof FrCareersRoute
   '/fr/confidentialite': typeof FrConfidentialiteRoute
   '/fr/devenir-professeur': typeof FrDevenirProfesseurRoute
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
@@ -639,6 +663,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/careers': typeof CareersRoute
   '/confidentialite': typeof ConfidentialiteRoute
   '/devenir-professeur': typeof DevenirProfesseurRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -651,10 +676,12 @@ export interface FileRoutesById {
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
+  '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
+  '/fr/careers': typeof FrCareersRoute
   '/fr/confidentialite': typeof FrConfidentialiteRoute
   '/fr/devenir-professeur': typeof FrDevenirProfesseurRoute
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
@@ -716,6 +743,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/careers'
     | '/confidentialite'
     | '/devenir-professeur'
     | '/mentions-legales'
@@ -728,10 +756,12 @@ export interface FileRouteTypes {
     | '/auteurs/invite'
     | '/cours/$slug'
     | '/en/become-a-teacher'
+    | '/en/careers'
     | '/en/download'
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/sophia-general-knowledge'
+    | '/fr/careers'
     | '/fr/confidentialite'
     | '/fr/devenir-professeur'
     | '/fr/mentions-legales'
@@ -791,6 +821,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/careers'
     | '/confidentialite'
     | '/devenir-professeur'
     | '/mentions-legales'
@@ -803,10 +834,12 @@ export interface FileRouteTypes {
     | '/auteurs/invite'
     | '/cours/$slug'
     | '/en/become-a-teacher'
+    | '/en/careers'
     | '/en/download'
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/sophia-general-knowledge'
+    | '/fr/careers'
     | '/fr/confidentialite'
     | '/fr/devenir-professeur'
     | '/fr/mentions-legales'
@@ -867,6 +900,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/careers'
     | '/confidentialite'
     | '/devenir-professeur'
     | '/mentions-legales'
@@ -879,10 +913,12 @@ export interface FileRouteTypes {
     | '/auteurs/invite'
     | '/cours/$slug'
     | '/en/become-a-teacher'
+    | '/en/careers'
     | '/en/download'
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/sophia-general-knowledge'
+    | '/fr/careers'
     | '/fr/confidentialite'
     | '/fr/devenir-professeur'
     | '/fr/mentions-legales'
@@ -944,6 +980,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CareersRoute: typeof CareersRoute
   ConfidentialiteRoute: typeof ConfidentialiteRoute
   DevenirProfesseurRoute: typeof DevenirProfesseurRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
@@ -956,10 +993,12 @@ export interface RootRouteChildren {
   AuteursInviteRoute: typeof AuteursInviteRoute
   CoursSlugRoute: typeof CoursSlugRoute
   EnBecomeATeacherRoute: typeof EnBecomeATeacherRoute
+  EnCareersRoute: typeof EnCareersRoute
   EnDownloadRoute: typeof EnDownloadRoute
   EnLegalNoticeRoute: typeof EnLegalNoticeRoute
   EnPrivacyRoute: typeof EnPrivacyRoute
   EnSophiaGeneralKnowledgeRoute: typeof EnSophiaGeneralKnowledgeRoute
+  FrCareersRoute: typeof FrCareersRoute
   FrConfidentialiteRoute: typeof FrConfidentialiteRoute
   FrDevenirProfesseurRoute: typeof FrDevenirProfesseurRoute
   FrMentionsLegalesRoute: typeof FrMentionsLegalesRoute
@@ -1009,6 +1048,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/confidentialite': {
@@ -1116,6 +1162,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnBecomeATeacherRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/en/careers': {
+      id: '/en/careers'
+      path: '/en/careers'
+      fullPath: '/en/careers'
+      preLoaderRoute: typeof EnCareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/en/download': {
       id: '/en/download'
       path: '/en/download'
@@ -1149,6 +1202,13 @@ declare module '@tanstack/react-router' {
       path: '/fr'
       fullPath: '/fr/'
       preLoaderRoute: typeof FrIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/careers': {
+      id: '/fr/careers'
+      path: '/fr/careers'
+      fullPath: '/fr/careers'
+      preLoaderRoute: typeof FrCareersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fr/confidentialite': {
@@ -1607,6 +1667,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CareersRoute: CareersRoute,
   ConfidentialiteRoute: ConfidentialiteRoute,
   DevenirProfesseurRoute: DevenirProfesseurRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
@@ -1620,10 +1681,12 @@ const rootRouteChildren: RootRouteChildren = {
   AuteursInviteRoute: AuteursInviteRoute,
   CoursSlugRoute: CoursSlugRoute,
   EnBecomeATeacherRoute: EnBecomeATeacherRoute,
+  EnCareersRoute: EnCareersRoute,
   EnDownloadRoute: EnDownloadRoute,
   EnLegalNoticeRoute: EnLegalNoticeRoute,
   EnPrivacyRoute: EnPrivacyRoute,
   EnSophiaGeneralKnowledgeRoute: EnSophiaGeneralKnowledgeRoute,
+  FrCareersRoute: FrCareersRoute,
   FrConfidentialiteRoute: FrConfidentialiteRoute,
   FrDevenirProfesseurRoute: FrDevenirProfesseurRoute,
   FrMentionsLegalesRoute: FrMentionsLegalesRoute,
