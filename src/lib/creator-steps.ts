@@ -1,13 +1,8 @@
 /** Client-safe onboarding rules shared by the creator app, admin pages and server checks. */
-export const WARMUP_REQUIRED = [1, 2, 3, 4, 5] as const;
+export const WARMUP_REQUIRED = [1] as const;
 
 export const WARMUP_DAYS: { day: number; text: string }[] = [
-  { day: 1, text: "15 minutes scrolling general-knowledge and educational content. Like 10 videos. Follow 5 accounts in the niche. No posting." },
-  { day: 2, text: "Same as day 1. Save 5 videos to favourites." },
-  { day: 3, text: "Same, plus comment on 5 videos with a real sentence, not an emoji." },
-  { day: 4, text: "Same as day 3." },
-  { day: 5, text: "Same as day 3. Watch the reference videos in your Library." },
-  { day: 6, text: "Your first post, from your first brief." },
+  { day: 1, text: "During the first 24 hours: scroll for 10 minutes, follow 10 accounts in the niche (education and less screen time), and like and repost relevant content. That is all—do not post yet." },
 ];
 
 export const SETUP_GUIDE: { key: string; text: string }[] = [

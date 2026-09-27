@@ -108,7 +108,7 @@ export const revealMyPassword = createServerFn({ method: "POST" })
 
 export const tickWarmupDay = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ day: z.number().int().min(1).max(6), checked: z.boolean() }).parse(d))
+    .inputValidator((d) => z.object({ day: z.literal(1), checked: z.boolean() }).parse(d))
   .handler(async ({ data, context }) => {
     const me = await myCreator(context.supabase, context.userId);
     if (!me.social_account_created_at) throw new Error("Register the account first.");

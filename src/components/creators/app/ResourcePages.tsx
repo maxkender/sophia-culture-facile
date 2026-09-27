@@ -145,7 +145,7 @@ export function AccountSetupPage() {
   const showForm = !account || editing;
   return (
     <div>
-      <PageTitle title="Account setup" lead="Create the Sophia TikTok account, register it, then warm it up for five days before your first post." />
+      <PageTitle title="Account setup" lead="Create the Sophia TikTok account, register it, then complete the 24-hour warm-up before your first post." />
       {steps.account && <div className="mb-6"><Banner tone="success" title="Step 3 is done: the account is registered and warmed up." /></div>}
 
       <h2 className="mb-3 text-xl font-extrabold text-brand-navy">A. The guide</h2>
@@ -198,10 +198,10 @@ export function AccountSetupPage() {
       <PortalCard className="divide-y divide-brand-line p-0">
         {WARMUP_DAYS.map((d) => (
           <label key={d.day} className="flex items-start gap-3 px-6 py-4">
-            <Checkbox className="mt-1" disabled={!me.social_account_created_at || d.day === 6} checked={Boolean(warm[String(d.day)])} onCheckedChange={async (v) => {
+            <Checkbox className="mt-1" disabled={!me.social_account_created_at} checked={Boolean(warm[String(d.day)])} onCheckedChange={async (v) => {
                try { await tick({ data: { day: d.day, checked: v === true } }); reload(); } catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
             }} />
-            <span className="flex-1 text-sm text-brand-navy"><b>Day {d.day}:</b> {d.text}{d.day === 6 && <> <Link to="/creators/app/briefs" className="font-semibold text-portal-accent underline">Open briefs</Link></>}</span>
+            <span className="flex-1 text-sm text-brand-navy"><b>24-hour warm-up:</b> {d.text}</span>
             {warm[String(d.day)] && <span className="text-xs font-semibold text-portal-green">{fmt(warm[String(d.day)]!)}</span>}
           </label>
         ))}
