@@ -213,7 +213,7 @@ export function CreatorShell({ children }: { children: ReactNode }) {
             <CreatorBell />
           </div>
         </header>
-        <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
+        <main className="safe-bottom mx-auto w-full min-w-0 max-w-5xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
       </div>
     </div>
   );

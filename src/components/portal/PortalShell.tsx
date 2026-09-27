@@ -374,7 +374,7 @@ export function PortalShell({
           </div>
         </header>
 
-        <main className={cn("mx-auto w-full px-4 py-8 sm:px-6 sm:py-10", wide ? "max-w-none" : "max-w-5xl")}>
+        <main className={cn("safe-bottom mx-auto w-full min-w-0 px-4 py-8 sm:px-6 sm:py-10", wide ? "max-w-none" : "max-w-5xl")}>
           {isLoading ? (
             <PortalCard>
               <p className="text-sm text-brand-navySoft">Loading…</p>
