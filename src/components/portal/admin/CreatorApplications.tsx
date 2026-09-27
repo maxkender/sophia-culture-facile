@@ -92,8 +92,12 @@ export function CreatorApplications() {
     try {
       if (track === "ugc" && next === "approved") {
         const result = await approveUgc({ data: { applicationId: id, origin: window.location.origin, notes: notes.trim() || undefined } });
-        await navigator.clipboard.writeText(result.inviteUrl);
-        toast.success("Application approved. Invite prepared and copied; email activates after the sender domain is set up.");
+        if (result.emailSent) {
+          toast.success("Application approved. The invite email has been sent to the creator.");
+        } else {
+          await navigator.clipboard.writeText(result.inviteUrl).catch(() => {});
+          toast.error("Application approved, but the email could not be sent. The invite link was copied — send it to the creator yourself.");
+        }
         setSelected(null);
         await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-applications"] });
         await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-ops"] });
