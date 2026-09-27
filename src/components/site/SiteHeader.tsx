@@ -60,10 +60,21 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
               {t.courses.hubLink}
             </Link>
           )}
+          {!bare && (
+            <Link
+              to="/auth"
+              className="inline-flex rounded-full border border-brand-navy px-3 py-1.5 text-xs font-semibold text-brand-navy transition-colors hover:bg-brand-navy hover:text-brand-surface sm:text-sm"
+            >
+              <span className="sm:hidden">{t.nav.teacherLogin.split(" ")[0]}</span>
+              <span className="hidden sm:inline">{t.nav.teacherLogin}</span>
+            </Link>
+          )}
           <LanguageToggle />
-          <DownloadCta variant="pillPink" size="pillSm">
-            {t.nav.download}
-          </DownloadCta>
+          <span className="hidden sm:inline-flex">
+            <DownloadCta variant="pillPink" size="pillSm">
+              {t.nav.download}
+            </DownloadCta>
+          </span>
         </div>
       </nav>
     </header>

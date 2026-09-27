@@ -8,7 +8,7 @@ export const fr = {
     becomeCreator: "Devenir créateur",
     careers: "Careers",
     download: "Télécharger",
-    teacherLogin: "Connexion professeur",
+    teacherLogin: "Connexion prof / admin",
     becomeTeacher: "Devenir professeur certifié",
     home: "Sophia, culture générale, accueil",
     main: "Navigation principale",
