@@ -144,6 +144,7 @@ export function PortalShell({
   const isAdmin = profile?.role === "admin";
   const counts = useNavCounts(Boolean(isAdmin), profile?.id);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const [collapsed, setCollapsed] = useState(false);
   const [mode, setMode] = useState<AdminMode>("authors");
   useEffect(() => {
     const onCreators = pathname.startsWith("/auteurs/admin/creators");
@@ -179,7 +180,6 @@ export function PortalShell({
     </div>
   ) : null;
 
-  const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
 
