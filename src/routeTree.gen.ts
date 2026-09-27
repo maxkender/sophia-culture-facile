@@ -81,6 +81,8 @@ import { Route as AuthenticatedAuteursAdminAuthorsAuthorIdRouteImport } from './
 import { Route as AuthenticatedAuteursAdminAuthorsNewRouteImport } from './routes/_authenticated/auteurs/admin/authors.new'
 import { Route as AuthenticatedAuteursAdminCoursesIndexRouteImport } from './routes/_authenticated/auteurs/admin/courses.index'
 import { Route as AuthenticatedAuteursAdminCoursesCourseIdRouteImport } from './routes/_authenticated/auteurs/admin/courses.$courseId'
+import { Route as AuthenticatedAuteursAdminCreatorsIndexRouteImport } from './routes/_authenticated/auteurs/admin/creators.index'
+import { Route as AuthenticatedAuteursAdminCreatorsApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.applications'
 import { Route as AuthenticatedAuteursAdminDocumentsIndexRouteImport } from './routes/_authenticated/auteurs/admin/documents.index'
 import { Route as AuthenticatedAuteursAdminDocumentsSlugRouteImport } from './routes/_authenticated/auteurs/admin/documents.$slug'
 import { Route as AuthenticatedAuteursAdminReviewIndexRouteImport } from './routes/_authenticated/auteurs/admin/review.index'
@@ -472,6 +474,18 @@ const AuthenticatedAuteursAdminCoursesCourseIdRoute =
     path: '/auteurs/admin/courses/$courseId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAuteursAdminCreatorsIndexRoute =
+  AuthenticatedAuteursAdminCreatorsIndexRouteImport.update({
+    id: '/auteurs/admin/creators/',
+    path: '/auteurs/admin/creators/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursAdminCreatorsApplicationsRoute =
+  AuthenticatedAuteursAdminCreatorsApplicationsRouteImport.update({
+    id: '/auteurs/admin/creators/applications',
+    path: '/auteurs/admin/creators/applications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAuteursAdminDocumentsIndexRoute =
   AuthenticatedAuteursAdminDocumentsIndexRouteImport.update({
     id: '/auteurs/admin/documents/',
@@ -572,11 +586,13 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
   '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
+  '/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/auteurs/admin/authors/': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
   '/auteurs/admin/courses/': typeof AuthenticatedAuteursAdminCoursesIndexRoute
+  '/auteurs/admin/creators/': typeof AuthenticatedAuteursAdminCreatorsIndexRoute
   '/auteurs/admin/documents/': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
   '/auteurs/admin/review/': typeof AuthenticatedAuteursAdminReviewIndexRoute
 }
@@ -650,11 +666,13 @@ export interface FileRoutesByTo {
   '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
   '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
+  '/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/auteurs/admin/authors': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
   '/auteurs/admin/courses': typeof AuthenticatedAuteursAdminCoursesIndexRoute
+  '/auteurs/admin/creators': typeof AuthenticatedAuteursAdminCreatorsIndexRoute
   '/auteurs/admin/documents': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
   '/auteurs/admin/review': typeof AuthenticatedAuteursAdminReviewIndexRoute
 }
@@ -730,11 +748,13 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/_authenticated/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
   '/_authenticated/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
+  '/_authenticated/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
   '/_authenticated/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/_authenticated/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/_authenticated/auteurs/admin/authors/': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
   '/_authenticated/auteurs/admin/courses/': typeof AuthenticatedAuteursAdminCoursesIndexRoute
+  '/_authenticated/auteurs/admin/creators/': typeof AuthenticatedAuteursAdminCreatorsIndexRoute
   '/_authenticated/auteurs/admin/documents/': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
   '/_authenticated/auteurs/admin/review/': typeof AuthenticatedAuteursAdminReviewIndexRoute
 }
@@ -810,11 +830,13 @@ export interface FileRouteTypes {
     | '/auteurs/admin/authors/$authorId'
     | '/auteurs/admin/authors/new'
     | '/auteurs/admin/courses/$courseId'
+    | '/auteurs/admin/creators/applications'
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/api/public/app/courses/$slug'
     | '/auteurs/admin/authors/'
     | '/auteurs/admin/courses/'
+    | '/auteurs/admin/creators/'
     | '/auteurs/admin/documents/'
     | '/auteurs/admin/review/'
   fileRoutesByTo: FileRoutesByTo
@@ -888,11 +910,13 @@ export interface FileRouteTypes {
     | '/auteurs/admin/authors/$authorId'
     | '/auteurs/admin/authors/new'
     | '/auteurs/admin/courses/$courseId'
+    | '/auteurs/admin/creators/applications'
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/api/public/app/courses/$slug'
     | '/auteurs/admin/authors'
     | '/auteurs/admin/courses'
+    | '/auteurs/admin/creators'
     | '/auteurs/admin/documents'
     | '/auteurs/admin/review'
   id:
@@ -967,11 +991,13 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/authors/$authorId'
     | '/_authenticated/auteurs/admin/authors/new'
     | '/_authenticated/auteurs/admin/courses/$courseId'
+    | '/_authenticated/auteurs/admin/creators/applications'
     | '/_authenticated/auteurs/admin/documents/$slug'
     | '/_authenticated/auteurs/admin/review/$courseId'
     | '/api/public/app/courses/$slug'
     | '/_authenticated/auteurs/admin/authors/'
     | '/_authenticated/auteurs/admin/courses/'
+    | '/_authenticated/auteurs/admin/creators/'
     | '/_authenticated/auteurs/admin/documents/'
     | '/_authenticated/auteurs/admin/review/'
   fileRoutesById: FileRoutesById
@@ -1533,6 +1559,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursAdminCoursesCourseIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auteurs/admin/creators/': {
+      id: '/_authenticated/auteurs/admin/creators/'
+      path: '/auteurs/admin/creators'
+      fullPath: '/auteurs/admin/creators/'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/admin/creators/applications': {
+      id: '/_authenticated/auteurs/admin/creators/applications'
+      path: '/auteurs/admin/creators/applications'
+      fullPath: '/auteurs/admin/creators/applications'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsApplicationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/auteurs/admin/documents/': {
       id: '/_authenticated/auteurs/admin/documents/'
       path: '/auteurs/admin/documents'
@@ -1594,10 +1634,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuteursAdminAuthorsAuthorIdRoute: typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   AuthenticatedAuteursAdminAuthorsNewRoute: typeof AuthenticatedAuteursAdminAuthorsNewRoute
   AuthenticatedAuteursAdminCoursesCourseIdRoute: typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
+  AuthenticatedAuteursAdminCreatorsApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
   AuthenticatedAuteursAdminDocumentsSlugRoute: typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   AuthenticatedAuteursAdminReviewCourseIdRoute: typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   AuthenticatedAuteursAdminAuthorsIndexRoute: typeof AuthenticatedAuteursAdminAuthorsIndexRoute
   AuthenticatedAuteursAdminCoursesIndexRoute: typeof AuthenticatedAuteursAdminCoursesIndexRoute
+  AuthenticatedAuteursAdminCreatorsIndexRoute: typeof AuthenticatedAuteursAdminCreatorsIndexRoute
   AuthenticatedAuteursAdminDocumentsIndexRoute: typeof AuthenticatedAuteursAdminDocumentsIndexRoute
   AuthenticatedAuteursAdminReviewIndexRoute: typeof AuthenticatedAuteursAdminReviewIndexRoute
 }
@@ -1635,6 +1677,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAuteursAdminAuthorsNewRoute,
   AuthenticatedAuteursAdminCoursesCourseIdRoute:
     AuthenticatedAuteursAdminCoursesCourseIdRoute,
+  AuthenticatedAuteursAdminCreatorsApplicationsRoute:
+    AuthenticatedAuteursAdminCreatorsApplicationsRoute,
   AuthenticatedAuteursAdminDocumentsSlugRoute:
     AuthenticatedAuteursAdminDocumentsSlugRoute,
   AuthenticatedAuteursAdminReviewCourseIdRoute:
@@ -1643,6 +1687,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAuteursAdminAuthorsIndexRoute,
   AuthenticatedAuteursAdminCoursesIndexRoute:
     AuthenticatedAuteursAdminCoursesIndexRoute,
+  AuthenticatedAuteursAdminCreatorsIndexRoute:
+    AuthenticatedAuteursAdminCreatorsIndexRoute,
   AuthenticatedAuteursAdminDocumentsIndexRoute:
     AuthenticatedAuteursAdminDocumentsIndexRoute,
   AuthenticatedAuteursAdminReviewIndexRoute:

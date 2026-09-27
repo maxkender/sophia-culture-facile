@@ -4,6 +4,7 @@ import {
   Compass,
   BookMarked,
   BookOpen,
+  Clapperboard,
   FileSignature,
   FileText,
   Home,
@@ -17,6 +18,7 @@ import {
   UserCircle,
   UserCheck,
   Users,
+  Video,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -27,7 +29,8 @@ export type NavBadge =
   | "applications"
   | "requests"
   | "messages"
-  | "adminMessages";
+  | "adminMessages"
+  | "creatorApps";
 
 export type NavItem = {
   to: string;
