@@ -140,7 +140,7 @@ export function CreatorOps() {
                   <Button asChild size="sm" variant="outline"><Link to="/auteurs/admin/creators/$creatorId" params={{ creatorId: r.id }}>Open</Link></Button>
                 )}
                 {tab === "creators" && r.invite_token && !r.user_id && (
-                  <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(`${origin}/creators/app?invite=${r.invite_token}`); toast.success("Invite link copied."); }}>Copy invite</Button>
+                  <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(`${origin}/creators/invite?token=${r.invite_token}`); toast.success("Invite link copied."); }}>Copy invite</Button>
                 )}
                 {tab === "briefs" && (
                   r.status === "published" ? (
