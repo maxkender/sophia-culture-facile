@@ -29,33 +29,36 @@ export const generatePayoutBatch = createServerFn({ method: "POST" })
     const from = new Date(Date.UTC(y, m - 1, 1)).toISOString().slice(0, 10);
     const to = new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 10);
 
+    // Each approved post is priced at approval by the dated rate card; held posts (no card) are excluded.
     const { data: posts } = await supabase
       .from("creator_posts")
-      .select("creator_id")
+      .select("creator_id, amount_usd, pay_status")
       .eq("status", "approved")
       .gte("posted_on", from)
       .lt("posted_on", to);
-    const { data: creators } = await supabase.from("creators").select("id, track, country, full_name");
-    const { data: rates } = await supabase.from("creator_rates").select("*");
+    const { data: creators } = await supabase.from("creators").select("id, full_name");
+    const { data: profiles } = await supabase.from("creator_payout_profiles").select("creator_id, method, stripe_onboarded");
 
-    const rateFor = (track: string, country: string | null) => {
-      const specific = rates?.find((r: any) => r.track === track && r.country === country);
-      const fallback = rates?.find((r: any) => r.track === track && r.country === null);
-      return specific?.rate_usd ?? fallback?.rate_usd ?? null;
-    };
-
-    const counts = new Map<string, number>();
-    for (const p of posts ?? []) counts.set(p.creator_id, (counts.get(p.creator_id) ?? 0) + 1);
+    const sums = new Map<string, { count: number; amount: number }>();
+    let held = 0;
+    for (const p of posts ?? []) {
+      if (p.pay_status !== "due" || p.amount_usd === null) { held++; continue; }
+      const s = sums.get(p.creator_id) ?? { count: 0, amount: 0 };
+      s.count++; s.amount += Number(p.amount_usd);
+      sums.set(p.creator_id, s);
+    }
 
     const items: any[] = [];
     const missing: string[] = [];
-    for (const [creatorId, count] of counts) {
+    const byMethod: Record<string, { creators: number; usd: number }> = {};
+    for (const [creatorId, s] of sums) {
       const creator = creators?.find((c: any) => c.id === creatorId);
       if (!creator) continue;
-      const rate = rateFor(creator.track, creator.country);
-      if (rate === null) { missing.push(creator.full_name); continue; }
-      items.push({ creator_id: creatorId, posts_count: count, rate_usd: rate, amount_usd: count * Number(rate) });
+      const method = profiles?.find((p: any) => p.creator_id === creatorId)?.method ?? "none";
+      byMethod[method] = { creators: (byMethod[method]?.creators ?? 0) + 1, usd: (byMethod[method]?.usd ?? 0) + s.amount };
+      items.push({ creator_id: creatorId, posts_count: s.count, rate_usd: s.count ? s.amount / s.count : 0, amount_usd: s.amount, note: `method:${method}` });
     }
+    if (held) missing.push(`${held} approved post(s) held: no rate card in force`);
 
     const { data: profile } = await supabase.from("profiles").select("id").eq("user_id", userId).maybeSingle();
     const { data: existing } = await supabase.from("payout_batches").select("status").eq("period", data.period).maybeSingle();
