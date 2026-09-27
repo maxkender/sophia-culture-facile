@@ -71,7 +71,7 @@ export const generatePayoutBatch = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     await supabase.from("payout_items").delete().eq("batch_id", batch.id);
     if (items.length) await supabase.from("payout_items").insert(items.map((i) => ({ ...i, batch_id: batch.id })));
-    return { batchId: batch.id, items: items.length, missingRates: missing };
+    return { batchId: batch.id, items: items.length, missingRates: missing, byMethod };
   });
 
 // Creator starts Stripe Connect Express onboarding; returns the Stripe URL.

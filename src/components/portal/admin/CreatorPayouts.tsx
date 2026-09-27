@@ -52,7 +52,9 @@ export function CreatorPayouts() {
     try {
       const res = await gen({ data: { period } });
       toast.success(`Batch created: ${res.items} payout line(s).`);
-      if (res.missingRates.length) toast.warning(`No rate for: ${res.missingRates.join(", ")}`);
+      if (res.missingRates.length) toast.warning(res.missingRates.join(", "));
+      const split = Object.entries(res.byMethod ?? {}).map(([m, v]) => `${m}: ${v.creators} creator(s), $${v.usd.toFixed(2)}`).join(" · ");
+      if (split) toast.info(`Split by payout method (USD) — ${split}`);
       refresh();
     } catch (e: any) {
       toast.error(e?.message ?? "Could not generate batch.");
