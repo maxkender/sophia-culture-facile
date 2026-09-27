@@ -48,17 +48,17 @@ export const signCreatorAgreement = createServerFn({ method: "POST" })
     return { alreadySigned: false };
   });
 
-// Onboarding steps 1 and 2 for UGC creators.
+// Creator motivation/examples confirmation.
 export const markCreatorStep = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ step: z.enum(["examples", "guide"]) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ step: z.literal("examples"), motivated: z.literal(true) }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as any;
     const { data: creator } = await supabase.from("creators").select("id").eq("user_id", userId).maybeSingle();
     if (!creator) throw new Error("Not a creator");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const col = data.step === "examples" ? "examples_read_at" : "guide_read_at";
-    await (supabaseAdmin.from("creators") as any).update({ [col]: new Date().toISOString() }).eq("id", creator.id).is(col, null);
+    const now = new Date().toISOString();
+    await supabaseAdmin.from("creators").update({ examples_read_at: now, motivation_confirmed_at: now, status: "onboarding" }).eq("id", creator.id);
     return { ok: true };
   });
 

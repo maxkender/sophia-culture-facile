@@ -673,12 +673,14 @@ export type Database = {
       }
       creator_applications: {
         Row: {
+          acceptance_email_sent_at: string | null
           admin_notes: string | null
           age: number
           assigned_hm_id: string | null
           consent_at: string
           country: string
           created_at: string
+          created_creator_id: string | null
           decided_at: string | null
           decided_by: string | null
           email: string
@@ -699,12 +701,14 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          acceptance_email_sent_at?: string | null
           admin_notes?: string | null
           age: number
           assigned_hm_id?: string | null
           consent_at?: string
           country: string
           created_at?: string
+          created_creator_id?: string | null
           decided_at?: string | null
           decided_by?: string | null
           email: string
@@ -725,12 +729,14 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          acceptance_email_sent_at?: string | null
           admin_notes?: string | null
           age?: number
           assigned_hm_id?: string | null
           consent_at?: string
           country?: string
           created_at?: string
+          created_creator_id?: string | null
           decided_at?: string | null
           decided_by?: string | null
           email?: string
@@ -756,6 +762,13 @@ export type Database = {
             columns: ["assigned_hm_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_applications_created_creator_id_fkey"
+            columns: ["created_creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
             referencedColumns: ["id"]
           },
           {
@@ -793,6 +806,50 @@ export type Database = {
           title?: string
         }
         Relationships: []
+      }
+      creator_email_settings: {
+        Row: {
+          button_label: string
+          created_at: string
+          id: string
+          instructions: string
+          intro: string
+          subject: string
+          template_key: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          button_label: string
+          created_at?: string
+          id?: string
+          instructions: string
+          intro: string
+          subject: string
+          template_key: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          button_label?: string
+          created_at?: string
+          id?: string
+          instructions?: string
+          intro?: string
+          subject?: string
+          template_key?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_email_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       creator_guide_media: {
         Row: {
@@ -1131,7 +1188,14 @@ export type Database = {
           full_name: string
           guide_read_at: string | null
           id: string
+          invite_sent_at: string | null
           invite_token: string | null
+          motivation_confirmed_at: string | null
+          onboarding_completed_at: string | null
+          profile_picture_confirmed: boolean
+          social_account_created_at: string | null
+          social_bio: string | null
+          social_handle: string | null
           status: string
           track: string
           user_id: string | null
@@ -1148,7 +1212,14 @@ export type Database = {
           full_name: string
           guide_read_at?: string | null
           id?: string
+          invite_sent_at?: string | null
           invite_token?: string | null
+          motivation_confirmed_at?: string | null
+          onboarding_completed_at?: string | null
+          profile_picture_confirmed?: boolean
+          social_account_created_at?: string | null
+          social_bio?: string | null
+          social_handle?: string | null
           status?: string
           track?: string
           user_id?: string | null
@@ -1165,7 +1236,14 @@ export type Database = {
           full_name?: string
           guide_read_at?: string | null
           id?: string
+          invite_sent_at?: string | null
           invite_token?: string | null
+          motivation_confirmed_at?: string | null
+          onboarding_completed_at?: string | null
+          profile_picture_confirmed?: boolean
+          social_account_created_at?: string | null
+          social_bio?: string | null
+          social_handle?: string | null
           status?: string
           track?: string
           user_id?: string | null
