@@ -24,3 +24,26 @@ export const claimCreatorInvite = createServerFn({ method: "POST" })
     if (error) return { ok: false, error: "Could not activate your account." };
     return { ok: true, error: null };
   });
+
+/** Auto-links the signed-in account to an unlinked creator row with the same email. */
+export const linkCreatorByEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const email = String((context.claims as { email?: string }).email ?? "").toLowerCase();
+    if (!email) return { ok: false, error: "No email on this account." };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("creators")
+      .select("id")
+      .ilike("email", email)
+      .is("user_id", null)
+      .maybeSingle();
+    if (!row) return { ok: false, error: null };
+    const { error } = await supabaseAdmin
+      .from("creators")
+      .update({ user_id: context.userId, status: "onboarding" })
+      .eq("id", row.id)
+      .is("user_id", null);
+    if (error) return { ok: false, error: "Could not activate your account." };
+    return { ok: true, error: null };
+  });
