@@ -92,7 +92,7 @@ export async function sendAppEmail(options: {
       },
       { apiKey, idempotencyKey: options.idempotencyKey },
     );
-    return { sent: Boolean(response.success), reason: response.success ? undefined : response.status ?? "send_failed" };
+    return { sent: Boolean(response.success), ...(response.success ? {} : { reason: response.status ?? "send_failed" }) };
   } catch (error) {
     const code = error instanceof EmailAPIError ? error.code : null;
     return { sent: false, reason: code ?? "send_error" };
