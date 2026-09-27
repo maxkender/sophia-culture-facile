@@ -603,6 +603,102 @@ export type Database = {
           },
         ]
       }
+      creator_applications: {
+        Row: {
+          admin_notes: string | null
+          age: number
+          assigned_hm_id: string | null
+          consent_at: string
+          country: string
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          email: string
+          full_name: string
+          id: string
+          instagram_url: string | null
+          interview_at: string | null
+          meets_criteria: boolean
+          occupation: string
+          other_links: string | null
+          phone: string
+          referral_source: string
+          rejection_reason: string | null
+          status: string
+          submit_ip_hash: string | null
+          tiktok_url: string | null
+          video_file_path: string | null
+          video_url: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          age: number
+          assigned_hm_id?: string | null
+          consent_at?: string
+          country: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          email: string
+          full_name: string
+          id?: string
+          instagram_url?: string | null
+          interview_at?: string | null
+          meets_criteria?: boolean
+          occupation: string
+          other_links?: string | null
+          phone: string
+          referral_source: string
+          rejection_reason?: string | null
+          status?: string
+          submit_ip_hash?: string | null
+          tiktok_url?: string | null
+          video_file_path?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          age?: number
+          assigned_hm_id?: string | null
+          consent_at?: string
+          country?: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          instagram_url?: string | null
+          interview_at?: string | null
+          meets_criteria?: boolean
+          occupation?: string
+          other_links?: string | null
+          phone?: string
+          referral_source?: string
+          rejection_reason?: string | null
+          status?: string
+          submit_ip_hash?: string | null
+          tiktok_url?: string | null
+          video_file_path?: string | null
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_applications_assigned_hm_id_fkey"
+            columns: ["assigned_hm_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_applications_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_versions: {
         Row: {
           content: Json
@@ -980,6 +1076,102 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      slideshow_applications: {
+        Row: {
+          admin_notes: string | null
+          assigned_hm_id: string | null
+          consent_at: string
+          country: string
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          email: string
+          full_name: string
+          has_upwork: boolean
+          id: string
+          is_adult: boolean
+          phone: string
+          referral_source: string | null
+          rejection_reason: string | null
+          status: string
+          submit_ip_hash: string | null
+          upwork_profile_url: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          assigned_hm_id?: string | null
+          consent_at?: string
+          country: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          email: string
+          full_name: string
+          has_upwork?: boolean
+          id?: string
+          is_adult: boolean
+          phone: string
+          referral_source?: string | null
+          rejection_reason?: string | null
+          status?: string
+          submit_ip_hash?: string | null
+          upwork_profile_url?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          assigned_hm_id?: string | null
+          consent_at?: string
+          country?: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          email?: string
+          full_name?: string
+          has_upwork?: boolean
+          id?: string
+          is_adult?: boolean
+          phone?: string
+          referral_source?: string | null
+          rejection_reason?: string | null
+          status?: string
+          submit_ip_hash?: string | null
+          upwork_profile_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slideshow_applications_assigned_hm_id_fkey"
+            columns: ["assigned_hm_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "slideshow_applications_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      slideshow_country_rates: {
+        Row: {
+          country: string
+          rate_usd: number
+          updated_at: string
+        }
+        Insert: {
+          country: string
+          rate_usd: number
+          updated_at?: string
+        }
+        Update: {
+          country?: string
+          rate_usd?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       sources: {
         Row: {
