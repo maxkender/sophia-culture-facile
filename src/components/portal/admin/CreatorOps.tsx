@@ -28,7 +28,7 @@ export function CreatorOps() {
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["portal", "admin", "creator-ops"] });
 
-  async function add() {
+  async function add(): Promise<unknown> {
     let error;
     if (tab === "creators") {
       if (!a.trim() || !b.trim()) return toast.error("Name and email required.");
