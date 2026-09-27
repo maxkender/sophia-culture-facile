@@ -139,6 +139,11 @@ function Workspace() {
         <h1 className="text-2xl font-extrabold text-brand-navy">Hi {data.me.full_name.split(" ")[0]}</h1>
         <Button variant="outline" size="sm" onClick={() => supabase.auth.signOut()}>Sign out</Button>
       </div>
+      {!onboardingDone && (
+        <section className="rounded-2xl border border-brand-line bg-white p-4">
+          <CreatorOnboarding me={{ ...data.me, agreementSigned: data.signed }} refs={data.refs} />
+        </section>
+      )}
       {data.notes.length > 0 && (
         <section className="space-y-1 rounded-2xl border border-portal-amber/40 bg-portal-amber/10 p-4 text-sm">
           {data.notes.map((n) => <p key={n.id}>{n.body}</p>)}
