@@ -31,7 +31,9 @@ export type NavBadge =
   | "requests"
   | "messages"
   | "adminMessages"
-  | "creatorApps";
+  | "creatorApps"
+  | "ugcApps"
+  | "slideApps";
 
 export type NavItem = {
   to: string;
@@ -64,7 +66,7 @@ export const AUTHOR_NAV: NavGroup[] = [
   },
 ];
 
-export const ADMIN_NAV: NavGroup[] = [
+export const ADMIN_AUTHOR_NAV: NavGroup[] = [
   {
     heading: "Pilotage",
     items: [
@@ -80,17 +82,6 @@ export const ADMIN_NAV: NavGroup[] = [
       { to: "/auteurs/admin/courses", label: "Courses", icon: BookMarked },
       { to: "/auteurs/admin/pool", label: "Unassigned courses", icon: Compass, badge: "requests" },
       { to: "/auteurs/admin/applications", label: "Applications", icon: FileText, badge: "applications" },
-    ],
-  },
-  {
-    heading: "Créateurs",
-    items: [
-      { to: "/auteurs/admin/creators", label: "Creators", icon: Clapperboard, exact: true },
-      { to: "/auteurs/admin/creators/prospects", label: "Prospects", icon: Users },
-      { to: "/auteurs/admin/creators/applications", label: "Creator applications", icon: Video, badge: "creatorApps" },
-      { to: "/auteurs/admin/creators/ops", label: "Briefs, posts & calls", icon: Megaphone },
-      { to: "/auteurs/admin/creators/messages", label: "Creator messages", icon: Megaphone },
-      { to: "/auteurs/admin/creators/payouts", label: "Payouts", icon: Banknote },
     ],
   },
   {
@@ -111,6 +102,28 @@ export const ADMIN_NAV: NavGroup[] = [
     ],
   },
 ];
+
+export const ADMIN_CREATOR_NAV: NavGroup[] = [
+  {
+    heading: "Créateurs",
+    items: [
+      { to: "/auteurs/admin/creators", label: "Creators", icon: Clapperboard, exact: true },
+      { to: "/auteurs/admin/creators/prospects", label: "Prospects", icon: Users },
+      { to: "/auteurs/admin/creators/ugc-applications", label: "UGC applications", icon: Video, badge: "ugcApps" },
+      { to: "/auteurs/admin/creators/slideshow-applications", label: "Slideshow applications", icon: Clapperboard, badge: "slideApps" },
+    ],
+  },
+  {
+    heading: "Opérations",
+    items: [
+      { to: "/auteurs/admin/creators/ops", label: "Briefs, posts & calls", icon: Megaphone },
+      { to: "/auteurs/admin/creators/messages", label: "Creator messages", icon: MessageSquare },
+      { to: "/auteurs/admin/creators/payouts", label: "Payouts", icon: Banknote },
+    ],
+  },
+];
+
+export const ADMIN_NAV: NavGroup[] = [...ADMIN_AUTHOR_NAV, ...ADMIN_CREATOR_NAV];
 
 export function sectionLabel(pathname: string, groups: NavGroup[]): string {
   const items = groups.flatMap((group) => group.items);

@@ -93,6 +93,8 @@ import { Route as AuthenticatedAuteursAdminCreatorsMessagesRouteImport } from '.
 import { Route as AuthenticatedAuteursAdminCreatorsOpsRouteImport } from './routes/_authenticated/auteurs/admin/creators.ops'
 import { Route as AuthenticatedAuteursAdminCreatorsPayoutsRouteImport } from './routes/_authenticated/auteurs/admin/creators.payouts'
 import { Route as AuthenticatedAuteursAdminCreatorsProspectsRouteImport } from './routes/_authenticated/auteurs/admin/creators.prospects'
+import { Route as AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.slideshow-applications'
+import { Route as AuthenticatedAuteursAdminCreatorsUgcApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.ugc-applications'
 import { Route as AuthenticatedAuteursAdminDocumentsIndexRouteImport } from './routes/_authenticated/auteurs/admin/documents.index'
 import { Route as AuthenticatedAuteursAdminDocumentsSlugRouteImport } from './routes/_authenticated/auteurs/admin/documents.$slug'
 import { Route as AuthenticatedAuteursAdminReviewIndexRouteImport } from './routes/_authenticated/auteurs/admin/review.index'
@@ -550,6 +552,18 @@ const AuthenticatedAuteursAdminCreatorsProspectsRoute =
     path: '/auteurs/admin/creators/prospects',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute =
+  AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRouteImport.update({
+    id: '/auteurs/admin/creators/slideshow-applications',
+    path: '/auteurs/admin/creators/slideshow-applications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute =
+  AuthenticatedAuteursAdminCreatorsUgcApplicationsRouteImport.update({
+    id: '/auteurs/admin/creators/ugc-applications',
+    path: '/auteurs/admin/creators/ugc-applications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAuteursAdminDocumentsIndexRoute =
   AuthenticatedAuteursAdminDocumentsIndexRouteImport.update({
     id: '/auteurs/admin/documents/',
@@ -661,6 +675,8 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/creators/ops': typeof AuthenticatedAuteursAdminCreatorsOpsRoute
   '/auteurs/admin/creators/payouts': typeof AuthenticatedAuteursAdminCreatorsPayoutsRoute
   '/auteurs/admin/creators/prospects': typeof AuthenticatedAuteursAdminCreatorsProspectsRoute
+  '/auteurs/admin/creators/slideshow-applications': typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute
+  '/auteurs/admin/creators/ugc-applications': typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
@@ -751,6 +767,8 @@ export interface FileRoutesByTo {
   '/auteurs/admin/creators/ops': typeof AuthenticatedAuteursAdminCreatorsOpsRoute
   '/auteurs/admin/creators/payouts': typeof AuthenticatedAuteursAdminCreatorsPayoutsRoute
   '/auteurs/admin/creators/prospects': typeof AuthenticatedAuteursAdminCreatorsProspectsRoute
+  '/auteurs/admin/creators/slideshow-applications': typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute
+  '/auteurs/admin/creators/ugc-applications': typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
@@ -843,6 +861,8 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/creators/ops': typeof AuthenticatedAuteursAdminCreatorsOpsRoute
   '/_authenticated/auteurs/admin/creators/payouts': typeof AuthenticatedAuteursAdminCreatorsPayoutsRoute
   '/_authenticated/auteurs/admin/creators/prospects': typeof AuthenticatedAuteursAdminCreatorsProspectsRoute
+  '/_authenticated/auteurs/admin/creators/slideshow-applications': typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute
+  '/_authenticated/auteurs/admin/creators/ugc-applications': typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute
   '/_authenticated/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/_authenticated/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
@@ -935,6 +955,8 @@ export interface FileRouteTypes {
     | '/auteurs/admin/creators/ops'
     | '/auteurs/admin/creators/payouts'
     | '/auteurs/admin/creators/prospects'
+    | '/auteurs/admin/creators/slideshow-applications'
+    | '/auteurs/admin/creators/ugc-applications'
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/api/public/app/courses/$slug'
@@ -1025,6 +1047,8 @@ export interface FileRouteTypes {
     | '/auteurs/admin/creators/ops'
     | '/auteurs/admin/creators/payouts'
     | '/auteurs/admin/creators/prospects'
+    | '/auteurs/admin/creators/slideshow-applications'
+    | '/auteurs/admin/creators/ugc-applications'
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/api/public/app/courses/$slug'
@@ -1116,6 +1140,8 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/creators/ops'
     | '/_authenticated/auteurs/admin/creators/payouts'
     | '/_authenticated/auteurs/admin/creators/prospects'
+    | '/_authenticated/auteurs/admin/creators/slideshow-applications'
+    | '/_authenticated/auteurs/admin/creators/ugc-applications'
     | '/_authenticated/auteurs/admin/documents/$slug'
     | '/_authenticated/auteurs/admin/review/$courseId'
     | '/api/public/app/courses/$slug'
@@ -1773,6 +1799,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsProspectsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auteurs/admin/creators/slideshow-applications': {
+      id: '/_authenticated/auteurs/admin/creators/slideshow-applications'
+      path: '/auteurs/admin/creators/slideshow-applications'
+      fullPath: '/auteurs/admin/creators/slideshow-applications'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/admin/creators/ugc-applications': {
+      id: '/_authenticated/auteurs/admin/creators/ugc-applications'
+      path: '/auteurs/admin/creators/ugc-applications'
+      fullPath: '/auteurs/admin/creators/ugc-applications'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/auteurs/admin/documents/': {
       id: '/_authenticated/auteurs/admin/documents/'
       path: '/auteurs/admin/documents'
@@ -1839,6 +1879,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuteursAdminCreatorsOpsRoute: typeof AuthenticatedAuteursAdminCreatorsOpsRoute
   AuthenticatedAuteursAdminCreatorsPayoutsRoute: typeof AuthenticatedAuteursAdminCreatorsPayoutsRoute
   AuthenticatedAuteursAdminCreatorsProspectsRoute: typeof AuthenticatedAuteursAdminCreatorsProspectsRoute
+  AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute
+  AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute
   AuthenticatedAuteursAdminDocumentsSlugRoute: typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   AuthenticatedAuteursAdminReviewCourseIdRoute: typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   AuthenticatedAuteursAdminAuthorsIndexRoute: typeof AuthenticatedAuteursAdminAuthorsIndexRoute
@@ -1891,6 +1933,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAuteursAdminCreatorsPayoutsRoute,
   AuthenticatedAuteursAdminCreatorsProspectsRoute:
     AuthenticatedAuteursAdminCreatorsProspectsRoute,
+  AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute:
+    AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute,
+  AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute:
+    AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute,
   AuthenticatedAuteursAdminDocumentsSlugRoute:
     AuthenticatedAuteursAdminDocumentsSlugRoute,
   AuthenticatedAuteursAdminReviewCourseIdRoute:

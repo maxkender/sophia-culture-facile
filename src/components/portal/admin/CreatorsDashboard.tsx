@@ -64,7 +64,7 @@ export function CreatorsDashboard() {
         lead="UGC and slideshow creator applications, kept fully separate from the author side."
         action={
           <Button asChild variant="pill" size="sm">
-            <Link to="/auteurs/admin/creators/applications">
+            <Link to="/auteurs/admin/creators/ugc-applications">
               Open the queue <ArrowRight className="size-4" />
             </Link>
           </Button>

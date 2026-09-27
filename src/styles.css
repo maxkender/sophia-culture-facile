@@ -77,6 +77,14 @@
   --color-portal-amber: var(--portal-amber);
   --color-portal-green: var(--portal-green);
   --color-portal-red: var(--portal-red);
+  --color-status-new: var(--status-new);
+  --color-status-contacted: var(--status-contacted);
+  --color-status-replied: var(--status-replied);
+  --color-status-interested: var(--status-interested);
+  --color-status-not-interested: var(--status-not-interested);
+  --color-status-applied: var(--status-applied);
+  --color-status-converted: var(--status-converted);
+  --color-status-unreachable: var(--status-unreachable);
   --radius-portal: 16px;
   --shadow-portal: 0 12px 34px -20px rgb(27 48 84 / 0.28);
 
@@ -103,6 +111,14 @@
   --portal-amber: oklch(0.769 0.163 70.1);
   --portal-green: oklch(0.452 0.106 152.5);
   --portal-red: oklch(0.479 0.176 26.5);
+  --status-new: oklch(0.6 0.01 260);
+  --status-contacted: oklch(0.58 0.19 255);
+  --status-replied: oklch(0.55 0.2 300);
+  --status-interested: oklch(0.62 0.17 150);
+  --status-not-interested: oklch(0.55 0.2 27);
+  --status-applied: oklch(0.6 0.11 190);
+  --status-converted: oklch(0.42 0.11 152);
+  --status-unreachable: oklch(0.72 0.16 70);
 
   --radius: 0.625rem;
   --background: oklch(0.968 0.006 254);

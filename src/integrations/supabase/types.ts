@@ -93,6 +93,27 @@ export type Database = {
           },
         ]
       }
+      admin_ui_prefs: {
+        Row: {
+          key: string
+          updated_at: string
+          user_id: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          user_id?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          user_id?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       ai_reviews: {
         Row: {
           content_hash: string
@@ -1034,42 +1055,92 @@ export type Database = {
       }
       creator_prospects: {
         Row: {
+          age: number | null
+          applied_at: string | null
+          assigned_hm_id: string | null
           country: string | null
           created_at: string
+          device: string | null
           email: string | null
+          followers: number | null
           handle: string | null
           id: string
+          instagram_handle: string | null
+          language: string | null
           name: string | null
           next_action_on: string | null
           notes: string | null
+          phone: string | null
           platform: string
+          presentation: string | null
+          source: string
           status: string
+          tags: string[]
+          target_app: string | null
+          tiktok_handle: string | null
+          track: string | null
         }
         Insert: {
+          age?: number | null
+          applied_at?: string | null
+          assigned_hm_id?: string | null
           country?: string | null
           created_at?: string
+          device?: string | null
           email?: string | null
+          followers?: number | null
           handle?: string | null
           id?: string
+          instagram_handle?: string | null
+          language?: string | null
           name?: string | null
           next_action_on?: string | null
           notes?: string | null
+          phone?: string | null
           platform?: string
+          presentation?: string | null
+          source?: string
           status?: string
+          tags?: string[]
+          target_app?: string | null
+          tiktok_handle?: string | null
+          track?: string | null
         }
         Update: {
+          age?: number | null
+          applied_at?: string | null
+          assigned_hm_id?: string | null
           country?: string | null
           created_at?: string
+          device?: string | null
           email?: string | null
+          followers?: number | null
           handle?: string | null
           id?: string
+          instagram_handle?: string | null
+          language?: string | null
           name?: string | null
           next_action_on?: string | null
           notes?: string | null
+          phone?: string | null
           platform?: string
+          presentation?: string | null
+          source?: string
           status?: string
+          tags?: string[]
+          target_app?: string | null
+          tiktok_handle?: string | null
+          track?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "creator_prospects_assigned_hm_id_fkey"
+            columns: ["assigned_hm_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       creator_rates: {
         Row: {
@@ -1685,6 +1756,30 @@ export type Database = {
           upwork_status?: string
           used_invite_token?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      prospect_templates: {
+        Row: {
+          body: string
+          channel: string
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          body: string
+          channel?: string
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          body?: string
+          channel?: string
+          created_at?: string
+          id?: string
+          name?: string
         }
         Relationships: []
       }
