@@ -60,6 +60,14 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
               {t.courses.hubLink}
             </Link>
           )}
+          {!bare && (
+            <Link
+              to="/auth"
+              className="inline-flex rounded-full border border-brand-navy px-3 py-1.5 text-xs font-semibold text-brand-navy transition-colors hover:bg-brand-navy hover:text-brand-surface sm:text-sm"
+            >
+              {t.nav.teacherLogin}
+            </Link>
+          )}
           <LanguageToggle />
           <DownloadCta variant="pillPink" size="pillSm">
             {t.nav.download}
