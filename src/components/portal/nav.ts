@@ -4,6 +4,7 @@ import {
   Compass,
   BookMarked,
   BookOpen,
+  Clapperboard,
   FileSignature,
   FileText,
   Home,
@@ -17,6 +18,7 @@ import {
   UserCircle,
   UserCheck,
   Users,
+  Video,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -27,7 +29,8 @@ export type NavBadge =
   | "applications"
   | "requests"
   | "messages"
-  | "adminMessages";
+  | "adminMessages"
+  | "creatorApps";
 
 export type NavItem = {
   to: string;
@@ -76,6 +79,13 @@ export const ADMIN_NAV: NavGroup[] = [
       { to: "/auteurs/admin/courses", label: "Courses", icon: BookMarked },
       { to: "/auteurs/admin/pool", label: "Unassigned courses", icon: Compass, badge: "requests" },
       { to: "/auteurs/admin/applications", label: "Applications", icon: FileText, badge: "applications" },
+    ],
+  },
+  {
+    heading: "Créateurs",
+    items: [
+      { to: "/auteurs/admin/creators", label: "Creators", icon: Clapperboard, exact: true },
+      { to: "/auteurs/admin/creators/applications", label: "Creator applications", icon: Video, badge: "creatorApps" },
     ],
   },
   {
