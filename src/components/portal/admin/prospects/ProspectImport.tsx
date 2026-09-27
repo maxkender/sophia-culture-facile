@@ -26,6 +26,8 @@ const TARGETS: { key: string; label: string; match: RegExp }[] = [
   { key: "notes", label: "Notes", match: /note|comment/i },
 ];
 
+type Row = Record<string, unknown> & { name?: unknown; email?: unknown; phone?: unknown; country?: unknown; language?: unknown; track?: unknown; followers?: unknown; tiktok_handle?: unknown; instagram_handle?: unknown; source?: unknown; status?: unknown; age?: unknown; device?: unknown; presentation?: unknown; notes?: unknown };
+type FRow = Record<string, string> & { name?: string; email?: string; phone?: string; country?: string; language?: string; track?: string; followers?: string; tiktok_handle?: string; instagram_handle?: string; source?: string; status?: string; age?: string; device?: string; presentation?: string; notes?: string };
 type Existing = Pick<Prospect, "email" | "tiktok_handle" | "instagram_handle" | "handle">;
 const norm = (s: unknown) => String(s ?? "").trim().toLowerCase().replace(/^@/, "");
 
@@ -53,7 +55,7 @@ export function ProspectImport({ open, onOpenChange, existing, onDone }: { open:
 
   const mapped = useMemo(() => {
     const out = rows.map((r) => {
-      const o: Record<string, unknown> = {};
+      const o: Row = {};
       for (const [h, k] of Object.entries(map)) {
         if (!k) continue;
         const v = (r[h] ?? "").trim();
@@ -70,7 +72,7 @@ export function ProspectImport({ open, onOpenChange, existing, onDone }: { open:
     });
     const emails = new Set(existing.map((e) => norm(e.email)).filter(Boolean));
     const handles = new Set(existing.flatMap((e) => [e.tiktok_handle, e.instagram_handle, e.handle]).map(norm).filter(Boolean));
-    const fresh: Record<string, unknown>[] = [];
+    const fresh: Row[] = [];
     let dup = 0;
     for (const o of out) {
       const e = norm(o.email);
@@ -155,10 +157,10 @@ export function ProspectImport({ open, onOpenChange, existing, onDone }: { open:
 }
 
 export function AddOneDialog({ open, onOpenChange, onDone }: { open: boolean; onOpenChange: (o: boolean) => void; onDone: () => void }) {
-  const [f, setF] = useState<Record<string, string>>({});
+  const [f, setF] = useState<FRow>({});
   async function save() {
     if (!f.email && !f.tiktok_handle && !f.instagram_handle) return toast.error("Add an email or a handle.");
-    const row: Record<string, unknown> = { ...f, source: f.source || "manual", email: f.email?.toLowerCase() || null };
+    const row: Row = { ...f, source: f.source || "manual", email: f.email?.toLowerCase() || null };
     if (f.followers) row.followers = Number(f.followers);
     const { error } = await supabase.from("creator_prospects").insert(row as never);
     if (error) return toast.error(error.message);

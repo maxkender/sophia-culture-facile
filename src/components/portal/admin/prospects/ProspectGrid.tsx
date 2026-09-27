@@ -58,9 +58,10 @@ export function ProspectGrid({ table, hms, activeId, onOpen, onSave }: Props) {
   function onKey(e: KeyboardEvent<HTMLDivElement>) {
     if (editing) return;
     const map: Record<string, [number, number]> = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1], Tab: [0, e.shiftKey ? -1 : 1] };
-    if (map[e.key]) {
+    const d = map[e.key];
+    if (d) {
       e.preventDefault();
-      move(...map[e.key]);
+      move(d[0], d[1]);
     } else if (e.key === "Enter" || e.key === "F2") {
       e.preventDefault();
       const col = cols[focus.c];
