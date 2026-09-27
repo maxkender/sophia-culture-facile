@@ -52,8 +52,8 @@ export const createVideoUploadSlot = createServerFn({ method: "POST" })
 const ugcSchema = z.object({
   website: z.string().max(200).optional(), // honeypot
   full_name: z.string().trim().min(2).max(120),
-  email: z.string().trim().email().max(200),
-  phone: z.string().trim().min(6).max(40),
+  email: z.string().trim().email("Enter a complete email address, for example name@example.com.").max(200),
+  phone: z.string().trim().regex(/^\+?[0-9\s().-]{7,40}$/, "Enter a valid phone number with the country code."),
   country: z.string().trim().min(2).max(80),
   age: z.number().int().min(18).max(120),
   occupation: z.enum(["studying", "working", "both", "other"]),
@@ -102,8 +102,8 @@ export const submitUgcApplication = createServerFn({ method: "POST" })
 const slideSchema = z.object({
   website: z.string().max(200).optional(),
   full_name: z.string().trim().min(2).max(120),
-  email: z.string().trim().email().max(200),
-  phone: z.string().trim().min(6).max(40),
+  email: z.string().trim().email("Enter a complete email address, for example name@example.com.").max(200),
+  phone: z.string().trim().regex(/^\+?[0-9\s().-]{7,40}$/, "Enter a valid phone number with the country code."),
   country: z.string().trim().min(2).max(80),
   is_adult: z.literal(true),
   has_upwork: z.boolean(),

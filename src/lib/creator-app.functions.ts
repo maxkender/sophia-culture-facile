@@ -64,9 +64,9 @@ export const registerSocialAccount = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({
       handle: z.string().trim().min(2).max(60).regex(/^@?[a-zA-Z0-9._]+$/, "Use only letters, numbers, dots and underscores."),
-      email: z.string().trim().email().max(255),
+       email: z.string().trim().email("Enter a complete email address, for example name@example.com.").max(255),
       password: z.string().min(1).max(200).optional(),
-      phone: z.string().trim().max(40).optional().nullable(),
+       phone: z.string().trim().regex(/^\+?[0-9\s().-]{7,40}$/, "Enter a valid phone number with the country code.").optional().nullable().or(z.literal("")),
       device: z.string().trim().max(80).optional().nullable(),
     }).parse(d),
   )
@@ -172,7 +172,7 @@ export const saveCreatorProfile = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({
       country: z.string().trim().max(80).nullable(),
-      phone: z.string().trim().max(40).nullable(),
+       phone: z.string().trim().regex(/^\+?[0-9\s().-]{7,40}$/, "Enter a valid phone number with the country code.").nullable().or(z.literal("")),
       platform: z.enum(["ios", "android"]).nullable(),
       photoBase64: z.string().max(7_000_000).optional(),
       photoType: z.enum(["image/png", "image/jpeg", "image/webp"]).optional(),

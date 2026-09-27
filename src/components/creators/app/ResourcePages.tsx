@@ -22,6 +22,7 @@ import { startStripeOnboarding, syncStripeStatus } from "@/lib/creator-payouts.f
 import { savePayoutFallback } from "@/lib/creator-extras.functions";
 import { SLACK_INVITE_URL } from "@/lib/creator-onboarding.functions";
 import { SETUP_GUIDE, WARMUP_DAYS } from "@/lib/creator-steps";
+import { friendlyCreatorError, isValidEmail, isValidInternationalPhone } from "@/lib/creator-validation";
 import { CountrySelect } from "../CountrySelect";
 import { CreatorAgreementForm } from "../CreatorAgreementForm";
 import { AccessCodeCard } from "./HomePage";
@@ -60,7 +61,7 @@ export function RulesPage() {
             <Button className="mt-4" disabled={!ticked || busy} onClick={async () => {
               setBusy(true);
               try { await accept({ data: { version: doc.current_version } }); toast.success("Rules accepted."); await reload(); }
-              catch (e: any) { toast.error(e?.message ?? "Could not save."); }
+               catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
               setBusy(false);
             }}>Accept the rules</Button>
           </div>
@@ -98,7 +99,7 @@ export function ContractPage() {
               await sign({ data: { signedName, documentVersion: String(doc.current_version), userAgent: navigator.userAgent.slice(0, 400) } });
               toast.success("Agreement signed.");
               await reload();
-            } catch (e: any) { toast.error(e?.message ?? "The signature could not be recorded."); }
+             } catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
           }}
         />
       )}
@@ -126,6 +127,10 @@ export function AccountSetupPage() {
   }, [account]);
 
   async function save() {
+    if (!form.handle.trim()) return void toast.error("Choose a TikTok username.");
+    if (!isValidEmail(form.email)) return void toast.error("Enter a complete email address, for example name@example.com.");
+    if (form.phone.trim() && !isValidInternationalPhone(form.phone)) return void toast.error("Enter a valid phone number with the country code, for example +44 7700 900123.");
+    if (!account && !form.password) return void toast.error("Enter the TikTok account password.");
     setBusy(true);
     try {
       await register({ data: { handle: form.handle, email: form.email, password: form.password || undefined, phone: form.phone || null, device: form.device || null } });
@@ -133,7 +138,7 @@ export function AccountSetupPage() {
       setEditing(false); setShown(null);
       await qc.invalidateQueries({ queryKey: ["creator-social-account"] });
       await reload();
-    } catch (e: any) { toast.error(e?.message ?? "Could not save."); }
+    } catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
     setBusy(false);
   }
 
@@ -159,10 +164,10 @@ export function AccountSetupPage() {
       <PortalCard>
         {showForm ? (
           <div className="grid gap-4 sm:grid-cols-2">
-            <div><Label>TikTok handle *</Label><Input placeholder="@sophia.yourname" value={form.handle} onChange={(e) => setForm({ ...form, handle: e.target.value })} /></div>
+            <div><Label>TikTok username *</Label><Input placeholder="@cultureminute" autoComplete="off" value={form.handle} onChange={(e) => setForm({ ...form, handle: e.target.value })} /><p className="mt-1 text-xs text-brand-navySoft">Choose any available name suitable for a general-knowledge account. There is no required format.</p></div>
             <div><Label>Email used for the account *</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             <div><Label>Password *{account ? " (leave empty to keep)" : ""}</Label><Input type="password" autoComplete="new-password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></div>
-            <div><Label>Phone number linked (if any)</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+            <div><Label>Phone number linked (if any)</Label><Input type="tel" placeholder="+44 7700 900123" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /><p className="mt-1 text-xs text-brand-navySoft">If entered, include the country code.</p></div>
             <div className="sm:col-span-2"><Label>Device used</Label><Input placeholder="e.g. iPhone 12, second phone" value={form.device} onChange={(e) => setForm({ ...form, device: e.target.value })} /></div>
             <p className="text-xs text-brand-navySoft sm:col-span-2">The password is stored encrypted. Only the Sophia team and you can reveal it. From the moment you save, the account is registered as Sophia's.</p>
             <div className="flex gap-2 sm:col-span-2">
@@ -176,7 +181,7 @@ export function AccountSetupPage() {
             <div><dt className="text-brand-navySoft">Email</dt><dd className="font-bold text-brand-navy">{account!.account_email}</dd></div>
             <div><dt className="text-brand-navySoft">Password</dt><dd className="flex items-center gap-2 font-mono font-bold text-brand-navy">
               {shown ?? "••••••••••"}
-              <Button size="sm" variant="ghost" onClick={async () => { if (shown) return setShown(null); try { setShown((await reveal()).password); } catch (e: any) { toast.error(e?.message); } }}>
+               <Button size="sm" variant="ghost" onClick={async () => { if (shown) return setShown(null); try { setShown((await reveal()).password); } catch (e: unknown) { toast.error(friendlyCreatorError(e)); } }}>
                 {shown ? <EyeOff className="size-4" /> : <Eye className="size-4" />} {shown ? "Hide" : "Reveal"}
               </Button>
             </dd></div>
@@ -194,7 +199,7 @@ export function AccountSetupPage() {
         {WARMUP_DAYS.map((d) => (
           <label key={d.day} className="flex items-start gap-3 px-6 py-4">
             <Checkbox className="mt-1" disabled={!me.social_account_created_at || d.day === 6} checked={Boolean(warm[String(d.day)])} onCheckedChange={async (v) => {
-              try { await tick({ data: { day: d.day, checked: v === true } }); reload(); } catch (e: any) { toast.error(e?.message); }
+               try { await tick({ data: { day: d.day, checked: v === true } }); reload(); } catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
             }} />
             <span className="flex-1 text-sm text-brand-navy"><b>Day {d.day}:</b> {d.text}{d.day === 6 && <> <Link to="/creators/app/briefs" className="font-semibold text-portal-accent underline">Open briefs</Link></>}</span>
             {warm[String(d.day)] && <span className="text-xs font-semibold text-portal-green">{fmt(warm[String(d.day)]!)}</span>}
@@ -222,7 +227,7 @@ export function ProfilePage() {
           <div><Label>Name</Label><Input value={me.full_name} readOnly /></div>
           <div><Label>Email</Label><Input value={me.email} readOnly /></div>
           <div><Label>Country</Label><CountrySelect value={country} onChange={setCountry} lang="en" labels={{ select: "Choose a country", search: "Search…", empty: "No country found" }} /></div>
-          <div><Label>Phone</Label><Input value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+           <div><Label>Phone</Label><Input type="tel" placeholder="+44 7700 900123" value={phone} onChange={(e) => setPhone(e.target.value)} /><p className="mt-1 text-xs text-brand-navySoft">Include the country code.</p></div>
           <div><Label>Phone type</Label>
             <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={platform} onChange={(e) => setPlatform(e.target.value as typeof platform)}>
               <option value="">Choose…</option><option value="ios">iPhone</option><option value="android">Android</option>
@@ -232,12 +237,13 @@ export function ProfilePage() {
         </div>
         <Button className="mt-4" disabled={busy} onClick={async () => {
           if (file && file.size > 5_000_000) return void toast.error("Photo must be under 5 MB.");
+           if (phone.trim() && !isValidInternationalPhone(phone)) return void toast.error("Enter a valid phone number with the country code, for example +44 7700 900123.");
           setBusy(true);
           try {
             await save({ data: { country: country || null, phone: phone || null, platform: platform || null, ...(file ? { photoBase64: await fileToBase64(file), photoType: file.type as "image/png" } : {}) } });
             toast.success("Profile saved."); setFile(null);
             await reload(); qc.invalidateQueries({ queryKey: ["creator-photo"] });
-          } catch (e: any) { toast.error(e?.message ?? "Could not save."); }
+           } catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
           setBusy(false);
         }}>Save profile</Button>
       </PortalCard>
@@ -294,8 +300,9 @@ function PayoutDetails() {
             </select>
             <Input className="min-w-56 flex-1" type="email" placeholder={`${alt === "wise" ? "Wise" : "PayPal"} email`} value={altEmail} onChange={(e) => setAltEmail(e.target.value)} />
             <Button variant="outline" onClick={async () => {
-              try { await fallback({ data: { method: alt, email: altEmail } }); toast.success("Payout details saved."); qc.invalidateQueries({ queryKey: CREATOR_KEY }); }
-              catch (e: any) { toast.error(e?.message ?? "Could not save."); }
+               if (!isValidEmail(altEmail)) return void toast.error(`Enter the email address used for your ${alt === "wise" ? "Wise" : "PayPal"} account, for example name@example.com.`);
+               try { await fallback({ data: { method: alt, email: altEmail } }); toast.success("Payout details saved."); qc.invalidateQueries({ queryKey: CREATOR_KEY }); }
+               catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
             }}>Save</Button>
           </div>
           {(profile?.method === "wise" || profile?.method === "paypal") && <p className="mt-2 text-xs font-semibold text-portal-green">Saved: {profile.method} · {profile.wise_email ?? profile.paypal_email}</p>}
