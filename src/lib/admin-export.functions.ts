@@ -23,17 +23,28 @@ function toCsv(headers: string[], rows: unknown[][]): string {
   return lines.join("\r\n");
 }
 
-/** CSV of every validated (accepted or published) course, with the professor's name and education. */
+/** CSV of every validated (accepted or published) course, with professor info and the full course text. */
 export const exportValidatedCourses = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ filename: string; csv: string }> => {
     const { supabaseAdmin } = await assertAdmin(context.userId);
 
-    const { data: courses, error } = await supabaseAdmin
-      .from("courses")
-      .select("title, subtitle, subject_area, status, language, published_at, author_id, did_you_know, public_full_text")
-      .in("status", ["accepted", "published"])
-      .order("title");
+    const [{ data: courses, error }, { data: screens }, { data: sources }] = await Promise.all([
+      supabaseAdmin
+        .from("courses")
+        .select("id, title, subtitle, lot_code, subject_area, status, language, published_at, author_id, did_you_know")
+        .in("status", ["accepted", "published"])
+        .order("title"),
+      supabaseAdmin
+        .from("screens")
+        .select("course_id, screen_number, screen_title, body")
+        .order("course_id")
+        .order("screen_number"),
+      supabaseAdmin
+        .from("sources")
+        .select("course_id, claim, reference, page")
+        .order("created_at"),
+    ]);
     if (error) throw new Error("Could not read courses.");
 
     const authorIds = [...new Set((courses ?? []).map((c) => c.author_id).filter(Boolean))] as string[];
@@ -53,21 +64,76 @@ export const exportValidatedCourses = createServerFn({ method: "POST" })
       educationById.set(record.profile_id, educationById.has(record.profile_id) ? `${educationById.get(record.profile_id)} | ${label}` : label);
     }
 
+    const screensByCourse = new Map<string, { screen_number: number; screen_title: string | null; body: string | null }[]>();
+    for (const screen of screens ?? []) {
+      const list = screensByCourse.get(screen.course_id) ?? [];
+      list.push(screen);
+      screensByCourse.set(screen.course_id, list);
+    }
+    const sourcesByCourse = new Map<string, { claim: string | null; reference: string | null; page: string | null }[]>();
+    for (const source of sources ?? []) {
+      const list = sourcesByCourse.get(source.course_id) ?? [];
+      list.push(source);
+      sourcesByCourse.set(source.course_id, list);
+    }
+
+    /** Same plain text as the admin/author "Copy course" button. */
+    function buildFullText(course: {
+      title: string; subtitle: string | null; lot_code: string | null; subject_area: string | null; did_you_know: string[] | null;
+    }, authorName: string): string {
+      const ordered = [...(screensByCourse.get(course.id) ?? [])].sort(
+        (a, b) => (a.screen_number ?? 0) - (b.screen_number ?? 0),
+      );
+      const blocks: string[] = [];
+
+      const header = [course.title.trim()];
+      if (course.subtitle?.trim()) header.push(course.subtitle.trim());
+      blocks.push(header.join("\n"));
+
+      const meta = [authorName.trim() || null, course.lot_code?.trim() || null, course.subject_area?.trim() || null]
+        .filter(Boolean)
+        .join(" · ");
+      if (meta) blocks.push(meta);
+
+      ordered.forEach((screen, index) => {
+        const number = screen.screen_number ?? index + 1;
+        const body = (screen.body ?? "").trim();
+        blocks.push(`SCREEN ${number} — ${(screen.screen_title ?? "").trim() || "Untitled"}${body ? `\n${body}` : ""}`);
+      });
+
+      const facts = (course.did_you_know ?? []).map((fact) => fact.trim()).filter(Boolean);
+      if (facts.length > 0) blocks.push(["DID YOU KNOW", ...facts].join("\n"));
+
+      const sourceLines = (sourcesByCourse.get(course.id) ?? [])
+        .map((source) => {
+          const parts = [source.claim?.trim(), source.reference?.trim()].filter(Boolean).join(" — ");
+          const page = source.page?.trim();
+          return page ? `${parts}${parts ? ", " : ""}p. ${page}` : parts;
+        })
+        .filter(Boolean);
+      if (sourceLines.length > 0) blocks.push(["SOURCES", ...sourceLines].join("\n"));
+
+      const totalWords = ordered.reduce((sum, screen) => sum + countWords(screen.body), 0);
+      blocks.push(`Total: ${totalWords} words`);
+
+      return blocks.join("\n\n");
+    }
+
     const rows = (courses ?? []).map((course) => {
       const author = course.author_id ? authorById.get(course.author_id) : undefined;
+      const authorName = String(author?.display_name ?? author?.full_name ?? "");
       return [
         course.title,
         course.subtitle ?? "",
         course.subject_area,
         course.status,
         course.language,
-        author?.display_name ?? author?.full_name ?? "",
+        authorName,
         author?.title ?? "",
         author?.institution ?? "",
         course.author_id ? (educationById.get(course.author_id) ?? "") : "",
         course.published_at ?? "",
-        course.did_you_know ?? "",
-        course.public_full_text ?? "",
+        buildFullText(course, authorName),
       ];
     });
 
@@ -76,7 +142,7 @@ export const exportValidatedCourses = createServerFn({ method: "POST" })
       csv: toCsv(
         [
           "course_title", "subtitle", "subject_area", "status", "language", "professor", "professor_title",
-          "institution", "formation", "published_at", "did_you_know", "full_text",
+          "institution", "formation", "published_at", "full_text",
         ],
         rows,
       ),
