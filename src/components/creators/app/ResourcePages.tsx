@@ -221,7 +221,7 @@ export function ProfilePage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div><Label>Name</Label><Input value={me.full_name} readOnly /></div>
           <div><Label>Email</Label><Input value={me.email} readOnly /></div>
-          <div><Label>Country</Label><CountrySelect value={country} onChange={setCountry} /></div>
+          <div><Label>Country</Label><CountrySelect value={country} onChange={setCountry} lang="en" labels={{ select: "Choose a country", search: "Search…", empty: "No country found" }} /></div>
           <div><Label>Phone</Label><Input value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
           <div><Label>Phone type</Label>
             <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={platform} onChange={(e) => setPlatform(e.target.value as typeof platform)}>
