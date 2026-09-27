@@ -47,8 +47,8 @@ export function CreatorOnboarding({ me, refs }: { me: any; refs: any[] }) {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 p-6">
-      <h1 className="text-2xl font-extrabold text-brand-navy">Welcome {me.full_name.split(" ")[0]}</h1>
+    <div className="space-y-4">
+      <h2 className="text-lg font-extrabold text-brand-navy">Getting started</h2>
       <ol className="grid gap-2 text-sm font-semibold sm:grid-cols-2">
         {["Check examples and commitment", "Sign the contract", "Create my Sophia account", "Join our Slack", "Post my first post"].map((l, i) => (
           <li key={l} className={`flex min-h-12 items-center gap-2 rounded-lg border px-3 py-2 ${step === i + 1 ? "border-primary bg-primary/5 text-brand-navy" : step > i + 1 ? "border-portal-green/30 bg-portal-green/10 text-portal-green" : "border-brand-line text-muted-foreground"}`}>
