@@ -8,6 +8,7 @@ export const en: Dict = {
   brand: "Sophia: General Knowledge",
   nav: {
     becomeCreator: "Become a creator",
+    careers: "Careers",
     download: "Download",
     teacherLogin: "Teacher sign in",
     becomeTeacher: "Become a certified teacher",
@@ -124,10 +125,34 @@ export const en: Dict = {
     cta: "Download free",
   },
   teacherAccess: {
-    title: "Teach with Sophia",
-    text: "Suggest topics and contribute lessons that our team reviews before publication.",
-    login: "Teacher sign in",
-    join: "Become a certified teacher",
+    title: "Teachers and creators",
+    text: "Sign in to your Sophia workspace: courses for teachers, video content for creators.",
+    login: "Sign in",
+  },
+  careers: {
+    metaTitle: "Careers — Sophia: General Knowledge",
+    metaDescription:
+      "Work with Sophia: become a certified teacher and write short courses, or a creator producing videos and slideshows. Two paths, pick the one that fits you.",
+    title: "Careers",
+    lead: "Two ways to work with Sophia. Pick the one that fits you.",
+    profs: {
+      title: "Professors",
+      lines: [
+        "Write short, five-screen courses on general knowledge topics.",
+        "Every course is checked by our editorial team before publication.",
+        "You reach readers worldwide, in French and in English.",
+      ],
+      cta: "Become a certified teacher",
+    },
+    creators: {
+      title: "Creators",
+      lines: [
+        "Produce short videos and slideshows for Sophia's channels.",
+        "Two tracks: UGC creator (on camera) and slideshow creator.",
+        "Paid monthly, topics provided, fully remote work.",
+      ],
+      cta: "Become a creator",
+    },
   },
   apply: {
     metaTitle: "Become a certified teacher on Sophia",

@@ -6,6 +6,7 @@ export const fr = {
   brand: "Sophia, culture générale",
   nav: {
     becomeCreator: "Devenir créateur",
+    careers: "Careers",
     download: "Télécharger",
     teacherLogin: "Connexion professeur",
     becomeTeacher: "Devenir professeur certifié",
@@ -123,10 +124,34 @@ export const fr = {
     cta: "Télécharger gratuitement",
   },
   teacherAccess: {
-    title: "Enseignez avec Sophia",
-    text: "Proposez des sujets et contribuez à des cours vérifiés par notre équipe avant publication.",
-    login: "Connexion professeur",
-    join: "Devenir professeur certifié",
+    title: "Espace professeurs et créateurs",
+    text: "Connectez-vous à votre espace de travail Sophia : cours pour les professeurs, contenus vidéo pour les créateurs.",
+    login: "Connexion",
+  },
+  careers: {
+    metaTitle: "Careers — Sophia, culture générale",
+    metaDescription:
+      "Travaillez avec Sophia : devenez professeur certifié pour rédiger des cours, ou créateur pour produire des vidéos et des slideshows. Deux voies, choisissez la vôtre.",
+    title: "Careers",
+    lead: "Deux façons de travailler avec Sophia. Choisissez la vôtre.",
+    profs: {
+      title: "Professeurs",
+      lines: [
+        "Rédigez des cours courts, en cinq écrans, sur les sujets de culture générale.",
+        "Chaque cours est vérifié par notre équipe éditoriale avant publication.",
+        "Vous touchez des lecteurs dans le monde entier, en français et en anglais.",
+      ],
+      cta: "Devenir professeur certifié",
+    },
+    creators: {
+      title: "Créateurs",
+      lines: [
+        "Produisez des vidéos courtes et des slideshows pour les chaînes de Sophia.",
+        "Deux voies : créateur UGC (face caméra) et créateur slideshow.",
+        "Rémunération mensuelle, sujets fournis, travail 100 % à distance.",
+      ],
+      cta: "Devenir créateur",
+    },
   },
   apply: {
     metaTitle: "Devenir professeur certifié sur Sophia",

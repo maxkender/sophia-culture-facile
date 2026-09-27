@@ -13,7 +13,7 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
   const { t } = useI18n();
   const homePath = useLocalePath("home");
   const coursesPath = useLocalePath("courses");
-  const applyPath = useLocalePath("apply");
+  const careersPath = useLocalePath("careers");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -44,18 +44,11 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
         <div className="flex items-center gap-2">
           {!bare && (
             <Link
-              to="/auth"
-              className="hidden rounded-full px-3 py-1.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy/5 md:inline-flex"
+              to={careersPath}
+              className="hidden rounded-full border border-brand-line px-3 py-1.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy/5 md:inline-flex"
+              activeProps={{ className: "underline underline-offset-4" }}
             >
-              {t.nav.teacherLogin}
-            </Link>
-          )}
-          {!bare && (
-            <Link
-              to={applyPath}
-              className="hidden rounded-full border border-brand-line px-3 py-1.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy/5 lg:inline-flex"
-            >
-              {t.nav.becomeTeacher}
+              {t.nav.careers}
             </Link>
           )}
           {!bare && (

@@ -8,6 +8,7 @@ export const ROUTES = {
   legal: { fr: "/fr/mentions-legales", en: "/en/legal-notice" },
   privacy: { fr: "/fr/confidentialite", en: "/en/privacy" },
   apply: { fr: "/fr/devenir-professeur", en: "/en/become-a-teacher" },
+  careers: { fr: "/fr/careers", en: "/en/careers" },
   creators: { fr: "/fr/createurs", en: "/en/creators" },
   creatorsUgc: { fr: "/fr/createurs/ugc", en: "/en/creators/ugc" },
   creatorsSlideshow: { fr: "/fr/createurs/slideshow", en: "/en/creators/slideshow" },
