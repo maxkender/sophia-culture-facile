@@ -86,12 +86,17 @@ export function UgcApplyPage() {
   const [progress, setProgress] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const [resume, setResume] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(KEY);
-      if (saved) setForm({ ...EMPTY, ...(JSON.parse(saved) as Partial<Form>) });
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<Form>;
+        setForm({ ...EMPTY, ...parsed });
+        if (Object.values(parsed).some((v) => typeof v === "string" && v.trim() !== "")) setResume(true);
+      }
     } catch {
       /* ignore */
     }
