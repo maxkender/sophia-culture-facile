@@ -249,7 +249,7 @@ function FeedbackReply({ post }: { post: Post }) {
   );
 }
 
-export function PostsPage({ refId }: { refId?: string }) {
+export function PostsPage({ refId }: { refId?: string | undefined }) {
   const { posts, briefs } = useCreator();
   return (
     <div>

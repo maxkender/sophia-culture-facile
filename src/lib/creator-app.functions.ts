@@ -31,8 +31,8 @@ async function encrypt(plain: string) {
   return `${b64(iv)}.${b64(ct)}`;
 }
 async function decrypt(value: string) {
-  const [iv, ct] = value.split(".");
-  const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: Buffer.from(iv, "base64") }, await aesKey(), Buffer.from(ct, "base64"));
+  const [iv = "", ct = ""] = value.split(".");
+  const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: new Uint8Array(Buffer.from(iv, "base64")) }, await aesKey(), new Uint8Array(Buffer.from(ct, "base64")));
   return new TextDecoder().decode(pt);
 }
 
@@ -76,7 +76,7 @@ export const registerSocialAccount = createServerFn({ method: "POST" })
     const handle = data.handle.startsWith("@") ? data.handle : `@${data.handle}`;
     const { data: existing } = await supabaseAdmin.from("creator_social_accounts").select("id").eq("creator_id", me.id).maybeSingle();
     if (!existing && !data.password) throw new Error("Enter the account password.");
-    const patch: Record<string, unknown> = { handle, account_email: data.email, phone: data.phone || null, device: data.device || null, updated_at: new Date().toISOString() };
+    const patch: any = { handle, account_email: data.email, phone: data.phone || null, device: data.device || null, updated_at: new Date().toISOString() };
     if (data.password) patch.password_encrypted = await encrypt(data.password);
     const { error } = existing
       ? await supabaseAdmin.from("creator_social_accounts").update(patch).eq("id", existing.id)
@@ -181,7 +181,7 @@ export const saveCreatorProfile = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const me = await myCreator(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: Record<string, unknown> = { country: data.country || null, phone: data.phone || null, platform: data.platform };
+    const patch: any = { country: data.country || null, phone: data.phone || null, platform: data.platform };
     if (data.photoBase64 && data.photoType) {
       const path = `photos/${me.id}.${data.photoType.split("/")[1]}`;
       const up = await supabaseAdmin.storage.from("creator-videos").upload(path, Buffer.from(data.photoBase64, "base64"), { contentType: data.photoType, upsert: true });
