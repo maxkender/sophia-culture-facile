@@ -5,6 +5,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { useI18n, useLocalePath } from "@/i18n";
 import { CREATORS } from "@/i18n/creators";
+import { useEffect } from "react";
+import { trackFunnel } from "@/lib/funnel-events";
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
@@ -62,9 +64,10 @@ export function CreatorsChooserPage() {
   const ugcPath = useLocalePath("creatorsUgc");
   const slidePath = useLocalePath("creatorsSlideshow");
   const cards = [
-    { ...c.ugc, icon: Camera, to: ugcPath },
-    { ...c.slideshow, icon: Layers, to: slidePath },
+    { ...c.ugc, icon: Camera, to: ugcPath, track: "ugc" },
+    { ...c.slideshow, icon: Layers, to: slidePath, track: "slideshow" },
   ];
+  useEffect(() => trackFunnel("creators_page_view", { lang }), [lang]);
   return (
     <Shell>
       <section className="mx-auto w-full max-w-5xl px-5 py-14 md:py-20">
@@ -83,7 +86,7 @@ export function CreatorsChooserPage() {
                   ))}
                 </div>
                 <Button asChild variant="pill" size="pill" className="mt-6 w-full whitespace-normal text-center">
-                  <Link to={card.to}>{card.cta}</Link>
+                  <Link to={card.to} data-funnel="track_selected" data-track={card.track} onClick={() => trackFunnel("track_selected", { track: card.track })}>{card.cta}</Link>
                 </Button>
               </article>
             );
