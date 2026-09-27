@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { claimCreatorInvite } from "@/lib/creator-space.functions";
 import { startStripeOnboarding, syncStripeStatus } from "@/lib/creator-payouts.functions";
+import { CreatorMessages } from "./CreatorMessages";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -143,6 +144,7 @@ function Workspace() {
           </div>
         ))}
       </section>
+      <CreatorMessages creatorId={data.me.id} />
       <PayoutSection profile={data.payoutProfile} items={data.payoutItems} />
       <section className="space-y-2">
         <h2 className="font-bold text-brand-navy">Upcoming calls</h2>

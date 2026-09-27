@@ -644,6 +644,33 @@ export type Database = {
           },
         ]
       }
+      creator_announcements: {
+        Row: {
+          active: boolean
+          body: string
+          created_at: string
+          id: string
+          title: string
+          track: string | null
+        }
+        Insert: {
+          active?: boolean
+          body: string
+          created_at?: string
+          id?: string
+          title: string
+          track?: string | null
+        }
+        Update: {
+          active?: boolean
+          body?: string
+          created_at?: string
+          id?: string
+          title?: string
+          track?: string | null
+        }
+        Relationships: []
+      }
       creator_applications: {
         Row: {
           admin_notes: string | null
@@ -766,6 +793,41 @@ export type Database = {
           title?: string
         }
         Relationships: []
+      }
+      creator_messages: {
+        Row: {
+          body: string
+          created_at: string
+          creator_id: string
+          from_admin: boolean
+          id: string
+          read_at: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          creator_id: string
+          from_admin: boolean
+          id?: string
+          read_at?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          creator_id?: string
+          from_admin?: boolean
+          id?: string
+          read_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_messages_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       creator_payout_profiles: {
         Row: {

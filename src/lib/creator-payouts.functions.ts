@@ -7,9 +7,15 @@ async function requireAdmin(supabase: any, userId: string) {
   if (data?.role !== "admin") throw new Error("Forbidden");
 }
 
+// Safety: live keys are refused unless STRIPE_ALLOW_LIVE=true is explicitly set.
 async function stripe() {
+  const key = process.env["STRIPE_SECRET_KEY"];
+  if (!key) throw new Error("Stripe is not configured");
+  if (key.startsWith("sk_live_") && process.env["STRIPE_ALLOW_LIVE"] !== "true") {
+    throw new Error("Stripe is in live mode. Add a test key (sk_test_…) to try payouts safely.");
+  }
   const Stripe = (await import("stripe")).default;
-  return new Stripe(process.env["STRIPE_SECRET_KEY"]!);
+  return new Stripe(key);
 }
 
 // Generate a monthly batch: approved posts per creator in the period, priced by rate card.
@@ -52,6 +58,8 @@ export const generatePayoutBatch = createServerFn({ method: "POST" })
     }
 
     const { data: profile } = await supabase.from("profiles").select("id").eq("user_id", userId).maybeSingle();
+    const { data: existing } = await supabase.from("payout_batches").select("status").eq("period", data.period).maybeSingle();
+    if (existing && existing.status !== "draft") throw new Error("This month's batch is already approved or paid");
     const { data: batch, error } = await supabase
       .from("payout_batches")
       .upsert({ period: data.period, status: "draft", created_by: profile?.id }, { onConflict: "period" })
@@ -71,21 +79,25 @@ export const startStripeOnboarding = createServerFn({ method: "POST" })
     const { data: creator } = await supabase.from("creators").select("*").eq("user_id", userId).maybeSingle();
     if (!creator) throw new Error("Not a creator");
     const s = await stripe();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    let { data: profile } = await supabase.from("creator_payout_profiles").select("*").eq("creator_id", creator.id).maybeSingle();
+    const { data: profile } = await supabaseAdmin.from("creator_payout_profiles").select("*").eq("creator_id", creator.id).maybeSingle();
     let accountId = profile?.stripe_account_id as string | undefined;
     if (!accountId) {
-      const account = await s.accounts.create({
-        type: "express",
-        email: creator.email,
-        capabilities: { transfers: { requested: true } },
-        metadata: { creator_id: creator.id },
-      });
+      const account = await s.accounts.create(
+        {
+          type: "express",
+          email: creator.email,
+          capabilities: { transfers: { requested: true } },
+          metadata: { creator_id: creator.id },
+        },
+        { idempotencyKey: `creator-account-${creator.id}` },
+      );
       accountId = account.id;
       if (profile) {
-        await supabase.from("creator_payout_profiles").update({ stripe_account_id: accountId, method: "stripe" }).eq("id", profile.id);
+        await supabaseAdmin.from("creator_payout_profiles").update({ stripe_account_id: accountId, method: "stripe" }).eq("id", profile.id);
       } else {
-        await supabase.from("creator_payout_profiles").insert({ creator_id: creator.id, stripe_account_id: accountId, method: "stripe" });
+        await supabaseAdmin.from("creator_payout_profiles").insert({ creator_id: creator.id, stripe_account_id: accountId, method: "stripe" });
       }
     }
     const origin = process.env["SITE_URL"] ?? "https://sophia-culture.com";
@@ -110,7 +122,8 @@ export const syncStripeStatus = createServerFn({ method: "POST" })
     const s = await stripe();
     const account = await s.accounts.retrieve(profile.stripe_account_id);
     const onboarded = Boolean(account.details_submitted && account.payouts_enabled);
-    await supabase.from("creator_payout_profiles").update({ stripe_onboarded: onboarded }).eq("id", profile.id);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("creator_payout_profiles").update({ stripe_onboarded: onboarded }).eq("id", profile.id);
     return { onboarded };
   });
 
@@ -123,7 +136,8 @@ export const payPayoutBatch = createServerFn({ method: "POST" })
     await requireAdmin(supabase, userId);
     const { data: batch } = await supabase.from("payout_batches").select("*").eq("id", data.batchId).single();
     if (!batch || batch.status === "paid") throw new Error("Batch not payable");
-    const { data: items } = await supabase.from("payout_items").select("*").eq("batch_id", batch.id).eq("status", "pending");
+    if (batch.status !== "approved") throw new Error("Approve the batch first");
+    const { data: items } = await supabase.from("payout_items").select("*").eq("batch_id", batch.id).in("status", ["pending", "skipped", "failed"]);
     const { data: profiles } = await supabase.from("creator_payout_profiles").select("*");
     const s = await stripe();
 
@@ -136,12 +150,15 @@ export const payPayoutBatch = createServerFn({ method: "POST" })
         continue;
       }
       try {
-        const transfer = await s.transfers.create({
-          amount: Math.round(Number(item.amount_usd) * 100),
-          currency: "usd",
-          destination: profile.stripe_account_id,
-          metadata: { batch_id: batch.id, payout_item_id: item.id },
-        });
+        const transfer = await s.transfers.create(
+          {
+            amount: Math.round(Number(item.amount_usd) * 100),
+            currency: "usd",
+            destination: profile.stripe_account_id,
+            metadata: { batch_id: batch.id, payout_item_id: item.id },
+          },
+          { idempotencyKey: `payout-item-${item.id}` },
+        );
         await supabase.from("payout_items").update({ status: "paid", stripe_transfer_id: transfer.id }).eq("id", item.id);
         results.paid++;
       } catch (e: any) {
@@ -149,6 +166,10 @@ export const payPayoutBatch = createServerFn({ method: "POST" })
         results.failed++;
       }
     }
-    await supabase.from("payout_batches").update({ status: "paid", paid_at: new Date().toISOString() }).eq("id", batch.id);
+    const complete = results.failed === 0 && results.skipped === 0;
+    await supabase
+      .from("payout_batches")
+      .update(complete ? { status: "paid", paid_at: new Date().toISOString() } : { status: "approved" })
+      .eq("id", batch.id);
     return results;
   });

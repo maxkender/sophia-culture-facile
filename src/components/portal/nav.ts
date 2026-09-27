@@ -89,6 +89,7 @@ export const ADMIN_NAV: NavGroup[] = [
       { to: "/auteurs/admin/creators/prospects", label: "Prospects", icon: Users },
       { to: "/auteurs/admin/creators/applications", label: "Creator applications", icon: Video, badge: "creatorApps" },
       { to: "/auteurs/admin/creators/ops", label: "Briefs, posts & calls", icon: Megaphone },
+      { to: "/auteurs/admin/creators/messages", label: "Creator messages", icon: Megaphone },
       { to: "/auteurs/admin/creators/payouts", label: "Payouts", icon: Banknote },
     ],
   },

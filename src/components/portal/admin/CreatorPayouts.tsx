@@ -70,6 +70,26 @@ export function CreatorPayouts() {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function exportCsv(b: any, kind: "wise" | "paypal") {
+    const ids = (b.payout_items ?? []).map((i: any) => i.creator_id);
+    const { data: profs } = await supabase.from("creator_payout_profiles").select("creator_id, paypal_email, wise_email").in("creator_id", ids);
+    const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const header = kind === "wise" ? ["name", "recipientEmail", "amount", "currency", "reference"] : ["email", "amount", "currency", "note"];
+    const lines = (b.payout_items ?? []).map((i: any) => {
+      const p = profs?.find((x) => x.creator_id === i.creator_id);
+      const amt = Number(i.amount_usd).toFixed(2);
+      return kind === "wise"
+        ? [i.creators?.full_name, p?.wise_email, amt, "USD", `Sophia ${b.period}`]
+        : [p?.paypal_email, amt, "USD", `Sophia ${b.period}`];
+    });
+    const csv = [header, ...lines].map((r) => r.map(esc).join(",")).join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = `payouts-${b.period}-${kind}.csv`;
+    a.click();
+  }
+
   async function setBatchStatus(id: string, status: string) {
     await supabase.from("payout_batches").update({ status }).eq("id", id);
     refresh();
@@ -133,6 +153,8 @@ export function CreatorPayouts() {
                       <span className="ml-2 text-sm text-muted-foreground">${total.toFixed(2)} total</span>
                     </div>
                     <div className="flex gap-2">
+                      <Button size="sm" variant="ghost" onClick={() => exportCsv(b, "wise")}>Wise CSV</Button>
+                      <Button size="sm" variant="ghost" onClick={() => exportCsv(b, "paypal")}>PayPal CSV</Button>
                       {b.status === "draft" && <Button size="sm" variant="outline" onClick={() => setBatchStatus(b.id, "approved")}>Approve</Button>}
                       {b.status === "approved" && <Button size="sm" onClick={() => payBatch(b.id)}>Pay via Stripe</Button>}
                     </div>
