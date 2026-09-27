@@ -72,7 +72,7 @@ export function CreatorProspects() {
       <PortalCard className="grid gap-2 p-4 text-sm sm:grid-cols-3">
         <p>{STATUSES.map((s) => `${s}: ${counts[s]}`).join(" · ")}</p>
         <p>Touches this week: {touchesWeek}</p>
-        <p>Contacted → applied: {contacted ? Math.round((counts.applied / contacted) * 100) : 0}%</p>
+        <p>Contacted → applied: {contacted ? Math.round(((counts["applied"] ?? 0) / contacted) * 100) : 0}%</p>
       </PortalCard>
       <PortalCard className="space-y-2 p-4">
         <p className="text-sm font-bold text-brand-navy">Import (one per line: name, handle, email, country)</p>
