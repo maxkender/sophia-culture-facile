@@ -14,6 +14,7 @@ import { EmptyState, PageTitle, PortalCard } from "../ui";
 import { usePortalProfile } from "../usePortal";
 import { useServerFn } from "@tanstack/react-start";
 import { generateSigningLink } from "@/lib/creator-agreement.functions";
+import { approveUgcApplication } from "@/lib/creator-onboarding.functions";
 
 type UgcApplication = Database["public"]["Tables"]["creator_applications"]["Row"];
 type SlideshowApplication = Database["public"]["Tables"]["slideshow_applications"]["Row"];
@@ -60,6 +61,7 @@ export function CreatorApplications() {
   const [busy, setBusy] = useState(false);
   const [signedFilter, setSignedFilter] = useState<"any" | "signed" | "unsigned">("any");
   const genLink = useServerFn(generateSigningLink);
+  const approveUgc = useServerFn(approveUgcApplication);
 
   const { data } = useQuery({
     queryKey: ["portal", "admin", "creator-applications", track, status, signedFilter],
@@ -88,6 +90,15 @@ export function CreatorApplications() {
     }
     setBusy(true);
     try {
+      if (track === "ugc" && next === "approved") {
+        const result = await approveUgc({ data: { applicationId: id, origin: window.location.origin, notes: notes.trim() || undefined } });
+        await navigator.clipboard.writeText(result.inviteUrl);
+        toast.success("Application approved. Invite prepared and copied; email activates after the sender domain is set up.");
+        setSelected(null);
+        await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-applications"] });
+        await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-ops"] });
+        return;
+      }
       const table = track === "ugc" ? "creator_applications" : "slideshow_applications";
       const { error } = await supabase
         .from(table)
@@ -227,6 +238,11 @@ export function CreatorApplications() {
                       <LinkOut href={selected.video_url} label="Video" />
                       <LinkOut href={selected.other_links} label="Other links" />
                     </div>
+                    {selected.status === "approved" && selected.created_creator_id ? (
+                      <div className="sm:col-span-2 rounded-lg border border-brand-line bg-brand-surface p-3 text-xs text-brand-navySoft">
+                        The creator account and secure invitation have been prepared. Automatic email delivery starts once Sophia’s sender domain is configured.
+                      </div>
+                    ) : null}
                   </>
                 ) : (
                   <>
