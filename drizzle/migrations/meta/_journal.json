@@ -71,6 +71,13 @@
       "when": 1790498918923,
       "tag": "0009_lock_briefs_until_agreement_signed",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790499020495,
+      "tag": "0010_align_creator_application_statuses",
+      "breakpoints": true
     }
   ]
 }
