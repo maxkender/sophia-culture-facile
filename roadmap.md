@@ -14,6 +14,7 @@
 - [x] Outreach pipeline: import, dedupe, statuses, touches, auto-match, stats
 - [x] Minimum age 18 everywhere; guardian fields removed
 - [x] Home page: "Devenir créateur / Become a creator" CTA + footer link; real App Store reviews
+- [x] Creator forms: free-choice TikTok username guidance and clear email, phone, link and action error messages
 
 ## Waiting on the user (not buildable by us)
 - [ ] Creator payout rates — admin enters them in-app; never invented
