@@ -1003,6 +1003,57 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_signatures: {
+        Row: {
+          creator_id: string | null
+          document_version: string
+          id: string
+          signature_ip: string | null
+          signed_at: string
+          signed_name: string
+          slideshow_application_id: string | null
+          user_agent: string | null
+          variant: string
+        }
+        Insert: {
+          creator_id?: string | null
+          document_version: string
+          id?: string
+          signature_ip?: string | null
+          signed_at?: string
+          signed_name: string
+          slideshow_application_id?: string | null
+          user_agent?: string | null
+          variant: string
+        }
+        Update: {
+          creator_id?: string | null
+          document_version?: string
+          id?: string
+          signature_ip?: string | null
+          signed_at?: string
+          signed_name?: string
+          slideshow_application_id?: string | null
+          user_agent?: string | null
+          variant?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_signatures_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: true
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_signatures_slideshow_application_id_fkey"
+            columns: ["slideshow_application_id"]
+            isOneToOne: true
+            referencedRelation: "slideshow_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creators: {
         Row: {
           admin_notes: string | null
@@ -1011,7 +1062,9 @@ export type Database = {
           country: string | null
           created_at: string
           email: string
+          examples_read_at: string | null
           full_name: string
+          guide_read_at: string | null
           id: string
           invite_token: string | null
           status: string
@@ -1026,7 +1079,9 @@ export type Database = {
           country?: string | null
           created_at?: string
           email: string
+          examples_read_at?: string | null
           full_name: string
+          guide_read_at?: string | null
           id?: string
           invite_token?: string | null
           status?: string
@@ -1041,7 +1096,9 @@ export type Database = {
           country?: string | null
           created_at?: string
           email?: string
+          examples_read_at?: string | null
           full_name?: string
+          guide_read_at?: string | null
           id?: string
           invite_token?: string | null
           status?: string
@@ -1594,6 +1651,7 @@ export type Database = {
       slideshow_applications: {
         Row: {
           admin_notes: string | null
+          agreement_signed_at: string | null
           assigned_hm_id: string | null
           consent_at: string
           country: string
@@ -1608,12 +1666,15 @@ export type Database = {
           phone: string
           referral_source: string | null
           rejection_reason: string | null
+          signing_token: string | null
+          signing_token_created_at: string | null
           status: string
           submit_ip_hash: string | null
           upwork_profile_url: string | null
         }
         Insert: {
           admin_notes?: string | null
+          agreement_signed_at?: string | null
           assigned_hm_id?: string | null
           consent_at?: string
           country: string
@@ -1628,12 +1689,15 @@ export type Database = {
           phone: string
           referral_source?: string | null
           rejection_reason?: string | null
+          signing_token?: string | null
+          signing_token_created_at?: string | null
           status?: string
           submit_ip_hash?: string | null
           upwork_profile_url?: string | null
         }
         Update: {
           admin_notes?: string | null
+          agreement_signed_at?: string | null
           assigned_hm_id?: string | null
           consent_at?: string
           country?: string
@@ -1648,6 +1712,8 @@ export type Database = {
           phone?: string
           referral_source?: string | null
           rejection_reason?: string | null
+          signing_token?: string | null
+          signing_token_created_at?: string | null
           status?: string
           submit_ip_hash?: string | null
           upwork_profile_url?: string | null

@@ -48,6 +48,7 @@ import { Route as AuthenticatedAuteursGuideRouteImport } from './routes/_authent
 import { Route as AuthenticatedAuteursMessagesRouteImport } from './routes/_authenticated/auteurs/messages'
 import { Route as AuthenticatedAuteursOpenRouteImport } from './routes/_authenticated/auteurs/open'
 import { Route as AuthenticatedAuteursProfileRouteImport } from './routes/_authenticated/auteurs/profile'
+import { Route as CreatorsSignTokenRouteImport } from './routes/creators.sign.$token'
 import { Route as CreatorsSlideshowIndexRouteImport } from './routes/creators.slideshow.index'
 import { Route as CreatorsSlideshowApplyRouteImport } from './routes/creators.slideshow.apply'
 import { Route as CreatorsUgcIndexRouteImport } from './routes/creators.ugc.index'
@@ -297,6 +298,11 @@ const AuthenticatedAuteursProfileRoute =
     path: '/auteurs/profile',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const CreatorsSignTokenRoute = CreatorsSignTokenRouteImport.update({
+  id: '/creators/sign/$token',
+  path: '/creators/sign/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreatorsSlideshowIndexRoute = CreatorsSlideshowIndexRouteImport.update({
   id: '/creators/slideshow/',
   path: '/creators/slideshow/',
@@ -588,6 +594,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
   '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
@@ -673,6 +680,7 @@ export interface FileRoutesByTo {
   '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
   '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
@@ -760,6 +768,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/_authenticated/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/_authenticated/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
   '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
@@ -847,6 +856,7 @@ export interface FileRouteTypes {
     | '/auteurs/messages'
     | '/auteurs/open'
     | '/auteurs/profile'
+    | '/creators/sign/$token'
     | '/creators/slideshow/apply'
     | '/creators/ugc/apply'
     | '/en/authors/$slug'
@@ -932,6 +942,7 @@ export interface FileRouteTypes {
     | '/auteurs/messages'
     | '/auteurs/open'
     | '/auteurs/profile'
+    | '/creators/sign/$token'
     | '/creators/slideshow/apply'
     | '/creators/ugc/apply'
     | '/en/authors/$slug'
@@ -1018,6 +1029,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/messages'
     | '/_authenticated/auteurs/open'
     | '/_authenticated/auteurs/profile'
+    | '/creators/sign/$token'
     | '/creators/slideshow/apply'
     | '/creators/ugc/apply'
     | '/en/authors/$slug'
@@ -1099,6 +1111,7 @@ export interface RootRouteChildren {
   CreatorsIndexRoute: typeof CreatorsIndexRoute
   EnIndexRoute: typeof EnIndexRoute
   FrIndexRoute: typeof FrIndexRoute
+  CreatorsSignTokenRoute: typeof CreatorsSignTokenRoute
   CreatorsSlideshowApplyRoute: typeof CreatorsSlideshowApplyRoute
   CreatorsUgcApplyRoute: typeof CreatorsUgcApplyRoute
   EnAuthorsSlugRoute: typeof EnAuthorsSlugRoute
@@ -1392,6 +1405,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auteurs/profile'
       preLoaderRoute: typeof AuthenticatedAuteursProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/creators/sign/$token': {
+      id: '/creators/sign/$token'
+      path: '/creators/sign/$token'
+      fullPath: '/creators/sign/$token'
+      preLoaderRoute: typeof CreatorsSignTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/creators/slideshow/': {
       id: '/creators/slideshow/'
@@ -1855,6 +1875,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsIndexRoute: CreatorsIndexRoute,
   EnIndexRoute: EnIndexRoute,
   FrIndexRoute: FrIndexRoute,
+  CreatorsSignTokenRoute: CreatorsSignTokenRoute,
   CreatorsSlideshowApplyRoute: CreatorsSlideshowApplyRoute,
   CreatorsUgcApplyRoute: CreatorsUgcApplyRoute,
   EnAuthorsSlugRoute: EnAuthorsSlugRoute,

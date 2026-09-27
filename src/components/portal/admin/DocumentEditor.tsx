@@ -353,7 +353,11 @@ export function DocumentEditor({ slug }: { slug: DocumentSlug }) {
       <PageTitle
         title={DOCUMENT_LABEL[slug]}
         lead={
-          slug === "contract"
+          slug === "creator-agreement"
+            ? "Creators who have signed keep the version they signed. UGC creators see clause 5; slideshow creators get a version without it, renumbered automatically."
+            : slug === "creator-guide"
+            ? "UGC creators read this guide as step two of onboarding, once published."
+            : slug === "contract"
             ? "Authors who have already signed stay bound to the version they signed. Only authors who have not signed see a new version."
             : "Authors always read the current version of this guide."
         }

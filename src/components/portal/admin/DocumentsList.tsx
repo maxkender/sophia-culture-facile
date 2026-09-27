@@ -7,7 +7,7 @@ import { DOCUMENT_LABEL, type DocumentSlug } from "@/lib/documents";
 import { formatDateTime } from "@/lib/portal";
 import { PageTitle, PortalCard } from "../ui";
 
-const SLUGS: DocumentSlug[] = ["guide", "contract"];
+const SLUGS: DocumentSlug[] = ["guide", "contract", "creator-agreement", "creator-guide"];
 
 export function DocumentsList() {
   const { data = [] } = useQuery({

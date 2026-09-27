@@ -12,6 +12,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import type { Database } from "@/integrations/supabase/types";
 import { EmptyState, PageTitle, PortalCard } from "../ui";
 import { usePortalProfile } from "../usePortal";
+import { useServerFn } from "@tanstack/react-start";
+import { generateSigningLink } from "@/lib/creator-agreement.functions";
 
 type UgcApplication = Database["public"]["Tables"]["creator_applications"]["Row"];
 type SlideshowApplication = Database["public"]["Tables"]["slideshow_applications"]["Row"];
@@ -56,13 +58,17 @@ export function CreatorApplications() {
   const [notes, setNotes] = useState("");
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
+  const [signedFilter, setSignedFilter] = useState<"any" | "signed" | "unsigned">("any");
+  const genLink = useServerFn(generateSigningLink);
 
   const { data } = useQuery({
-    queryKey: ["portal", "admin", "creator-applications", track, status],
+    queryKey: ["portal", "admin", "creator-applications", track, status, signedFilter],
     queryFn: async () => {
       const table = track === "ugc" ? "creator_applications" : "slideshow_applications";
       let query = supabase.from(table).select("*").order("created_at", { ascending: false });
       if (status !== "all") query = query.eq("status", status);
+      if (track === "slideshow" && signedFilter === "signed") query = query.not("agreement_signed_at", "is", null);
+      if (track === "slideshow" && signedFilter === "unsigned") query = query.is("agreement_signed_at", null);
       const { data: rows, error } = await query;
       if (error) throw error;
       return (rows ?? []) as (UgcApplication | SlideshowApplication)[];
@@ -94,6 +100,9 @@ export function CreatorApplications() {
         })
         .eq("id", id);
       if (error) throw error;
+      if (track === "slideshow" && next === "approved") {
+        try { await genLink({ data: { applicationId: id } }); } catch { toast.error("Signing link could not be generated. Use Regenerate."); }
+      }
       toast.success(next === "approved" ? "Application approved." : next === "rejected" ? "Application rejected." : "Moved to interview.");
       setSelected(null);
       await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-applications"] });
@@ -146,6 +155,16 @@ export function CreatorApplications() {
             <SelectItem value="all">All</SelectItem>
           </SelectContent>
         </Select>
+        {track === "slideshow" && (
+          <Select value={signedFilter} onValueChange={(v) => setSignedFilter(v as typeof signedFilter)}>
+            <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any">Any agreement status</SelectItem>
+              <SelectItem value="signed">Agreement signed</SelectItem>
+              <SelectItem value="unsigned">Agreement not signed</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <PortalCard className="overflow-hidden">
@@ -167,6 +186,11 @@ export function CreatorApplications() {
                       {row.email} · {row.country} · {formatDateTime(row.created_at)}
                     </span>
                   </span>
+                  {track === "slideshow" && row.status === "approved" ? (
+                    <span className={`text-[11px] font-bold ${(row as SlideshowApplication).agreement_signed_at ? "text-portal-green" : "text-portal-amber"}`}>
+                      {(row as SlideshowApplication).agreement_signed_at ? "Signed" : "Not signed"}
+                    </span>
+                  ) : null}
                   <StatusBadge status={row.status} />
                 </button>
               </li>
@@ -211,6 +235,9 @@ export function CreatorApplications() {
                     <div className="flex flex-wrap gap-3 sm:col-span-2">
                       <LinkOut href={selected.upwork_profile_url} label="Upwork profile" />
                     </div>
+                    <div className="sm:col-span-2">
+                      <SlideshowAgreement app={selected as SlideshowApplication} onChange={(next) => setSelected(next)} />
+                    </div>
                   </>
                 )}
               </dl>
@@ -243,6 +270,46 @@ export function CreatorApplications() {
           ) : null}
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function SlideshowAgreement({ app, onChange }: { app: SlideshowApplication; onChange: (next: SlideshowApplication) => void }) {
+  const queryClient = useQueryClient();
+  const gen = useServerFn(generateSigningLink);
+  const [busy, setBusy] = useState(false);
+  const link = app.signing_token && typeof window !== "undefined" ? `${window.location.origin}/creators/sign/${app.signing_token}` : null;
+  if (app.status !== "approved") return null;
+  if (app.agreement_signed_at)
+    return <p className="rounded-xl bg-portal-green/10 p-3 text-sm font-semibold text-portal-green">Agreement signed on {formatDateTime(app.agreement_signed_at)}</p>;
+  async function regenerate() {
+    setBusy(true);
+    try {
+      const { token } = await gen({ data: { applicationId: app.id } });
+      onChange({ ...app, signing_token: token, signing_token_created_at: new Date().toISOString() });
+      await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-applications"] });
+      toast.success("New signing link ready. The old one no longer works.");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not generate the link.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="space-y-2 rounded-xl border border-portal-amber/40 bg-portal-amber/10 p-3 text-sm">
+      <p className="font-semibold text-portal-amber">Agreement not signed</p>
+      {link ? (
+        <div className="flex gap-2">
+          <Input readOnly value={link} className="text-xs" />
+          <Button type="button" size="sm" onClick={() => { void navigator.clipboard.writeText(link); toast.success("Link copied."); }}>Copy</Button>
+        </div>
+      ) : (
+        <p className="text-xs text-brand-navySoft">No signing link yet.</p>
+      )}
+      <p className="text-xs text-brand-navySoft">Send this single-use link on Upwork. It stops working once signed.</p>
+      <Button type="button" size="sm" variant="outline" disabled={busy} onClick={() => void regenerate()}>
+        {link ? "Regenerate link" : "Generate link"}
+      </Button>
     </div>
   );
 }

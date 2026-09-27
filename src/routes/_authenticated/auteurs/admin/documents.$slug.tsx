@@ -11,11 +11,18 @@ export const Route = createFileRoute("/_authenticated/auteurs/admin/documents/$s
 
 function DocumentEditorRoute() {
   const { slug } = Route.useParams();
-  const valid = slug === "guide" || slug === "contract";
+  const valid = ["guide", "contract", "creator-agreement", "creator-guide"].includes(slug);
   return (
     <PortalShell adminOnly>
       {valid ? (
-        <DocumentEditor slug={slug as DocumentSlug} />
+        <>
+          {slug === "creator-agreement" ? (
+            <div className="mb-6">
+              <Banner tone="warning" title="This agreement has not been reviewed by a lawyer. Clause 5 on image rights and clause 12 on jurisdiction are the ones most worth checking." />
+            </div>
+          ) : null}
+          <DocumentEditor slug={slug as DocumentSlug} />
+        </>
       ) : (
         <Banner tone="error" title="Unknown document" />
       )}
