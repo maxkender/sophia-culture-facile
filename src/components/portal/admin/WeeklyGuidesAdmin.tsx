@@ -28,7 +28,7 @@ export function WeeklyGuidesAdmin() {
     if (!week || !title.trim()) return toast.error("Week and title required.");
     const { error } = await supabase.from("creator_weekly_guides").insert({ week_start: week, title: title.trim(), body, track: track || null });
     if (error) return toast.error("Could not save.");
-    setWeek(""); setTitle(""); setBody(""); setTrack(""); toast.success("Guide created (draft)."); refresh();
+    setWeek(""); setTitle(""); setBody(""); setTrack(""); toast.success("Guide created (draft)."); return refresh();
   }
 
   async function patch(id: string, p: Record<string, unknown>) {
@@ -47,7 +47,7 @@ export function WeeklyGuidesAdmin() {
   async function addLink(g: Guide, url: string, caption: string): Promise<unknown> {
     if (!/^https?:\/\//.test(url)) return toast.error("Paste a valid link.");
     const { error } = await supabase.from("creator_guide_media").insert({ guide_id: g.id, url, caption: caption || null });
-    if (error) toast.error("Could not add."); else refresh();
+    return error ? toast.error("Could not add.") : refresh();
   }
 
   async function upload(g: Guide, file: File, caption: string): Promise<unknown> {
@@ -56,7 +56,7 @@ export function WeeklyGuidesAdmin() {
     const { error } = await supabase.storage.from("guide-media").upload(path, file);
     if (error) { toast.dismiss(t); return toast.error("Upload failed."); }
     await supabase.from("creator_guide_media").insert({ guide_id: g.id, file_path: path, caption: caption || file.name });
-    toast.dismiss(t); toast.success("Video attached."); refresh();
+    toast.dismiss(t); toast.success("Video attached."); return refresh();
   }
 
   async function removeMedia(m: Media) {
