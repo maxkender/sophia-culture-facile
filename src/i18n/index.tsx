@@ -5,6 +5,7 @@ import {
   courseRoute,
   langFromPath,
   pathFor,
+  ROUTES,
   routeKeyFromPath,
   type Lang,
   type RouteKey,
@@ -32,9 +33,9 @@ export function useI18n() {
 }
 
 /** Chemin localisé d'une page dans la langue courante. */
-export function useLocalePath<K extends RouteKey>(key: K): (typeof import("./routes").ROUTES)[K][Lang] {
+export function useLocalePath<K extends RouteKey>(key: K): (typeof ROUTES)[K][Lang] {
   const lang = useLang();
-  return pathFor(key, lang);
+  return ROUTES[key][lang];
 }
 
 /** Remplace {company} et consorts dans une chaîne traduite. */
