@@ -44,7 +44,7 @@ export function CreatorPayouts() {
     const { error } = await supabase
       .from("creator_rates")
       .upsert({ track, country: country.trim() || null, rate_usd: amount }, { onConflict: "track,country" });
-    if (error) return toast.error("Could not save rate.");
+    if (error) { toast.error("Could not save rate."); return; }
     setRate(""); setCountry(""); toast.success("Rate saved."); refresh();
   }
 
