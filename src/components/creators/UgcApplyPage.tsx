@@ -10,21 +10,11 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { CountrySelect } from "./CountrySelect";
 import { ApplyShell, Confirmation, FormSection, Honeypot, YesNo } from "./ApplyShell";
+import { useI18n, useLocalePath } from "@/i18n";
+import { CREATOR_FORMS } from "@/i18n/creator-forms";
 
 const KEY = "sophia-ugc-application";
-const REQUIREMENTS = [
-  "You have an iPhone",
-  "You can post at least five times a week, consistently",
-  "You do not currently work for a competing app",
-  "You are at least 18 years old",
-  "You are good on camera",
-];
-const OCCUPATIONS = [
-  ["studying", "Studying"],
-  ["working", "Working"],
-  ["both", "Both"],
-  ["other", "Other"],
-] as const;
+const OCCUPATIONS = ["studying", "working", "both", "other"] as const;
 
 type Form = {
   full_name: string;
@@ -83,6 +73,9 @@ function uploadWithProgress(url: string, file: File, onProgress: (p: number) => 
 }
 
 export function UgcApplyPage() {
+  const { lang } = useI18n();
+  const privacyPath = useLocalePath("privacy");
+  const { common, ugc: copy } = CREATOR_FORMS[lang];
   const slot = useServerFn(createVideoUploadSlot);
   const submitFn = useServerFn(submitUgcApplication);
   const [form, setForm] = useState<Form>(EMPTY);
@@ -122,28 +115,28 @@ export function UgcApplyPage() {
     setError(null);
     if (blocked) return;
     if (!form.full_name.trim() || !form.email.trim() || !form.phone.trim() || !form.country || !form.age || !form.occupation) {
-      setError("Please fill in every required field in Contact.");
+      setError(common.requiredError);
       return;
     }
     if (form.meets !== "yes") {
-      setError("Please confirm you meet the requirements.");
+      setError(copy.notMeeting);
       return;
     }
     if (!hasVideo) {
-      setError("Please add a video: a link, or a file upload.");
+      setError(copy.videoMissing);
       return;
     }
     if (!form.referral_source.trim()) {
-      setError("Please tell us how you heard about us.");
+      setError(copy.referralError);
       return;
     }
     if (!form.consent) {
-      setError("Please tick the consent box.");
+      setError(common.consentError);
       return;
     }
     for (const u of [form.tiktok_url, form.instagram_url]) {
       if (u && !isUrl(u)) {
-        setError("Links must start with https://");
+        setError(copy.linksError);
         return;
       }
     }
@@ -152,12 +145,12 @@ export function UgcApplyPage() {
       let path = uploadedPath;
       if (form.video_mode === "file" && file && !path) {
         if (file.size > 200 * 1024 * 1024) {
-          setError("The video is over 200 MB.");
+          setError(copy.videoTooLarge);
           return;
         }
         const res = await slot({ data: { name: file.name, type: file.type, size: file.size } });
         if (!res.ok) {
-          setError(res.reason === "size" ? "The video is over 200 MB." : "Please upload an .mp4 or .mov file.");
+          setError(res.reason === "size" ? copy.videoTooLarge : copy.videoType);
           return;
         }
         setProgress(0);
@@ -187,8 +180,8 @@ export function UgcApplyPage() {
       if (!result.ok) {
         setError(
           result.reason === "rate"
-            ? "We have already received an application from you recently. We will be in touch."
-            : "Something went wrong. Please try again in a moment.",
+            ? common.rateError
+            : common.genericError,
         );
         return;
       }
@@ -196,7 +189,7 @@ export function UgcApplyPage() {
       setDone(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
-      setError("Something went wrong. Please check your answers and try again.");
+      setError(common.genericError);
     } finally {
       setBusy(false);
     }
@@ -204,47 +197,47 @@ export function UgcApplyPage() {
 
   if (done) {
     return (
-      <ApplyShell title="Apply as a UGC creator">
-        <Confirmation text="Thank you. We read every application and reply within five days by email." />
+      <ApplyShell title={copy.title}>
+        <Confirmation text={copy.confirmation} />
       </ApplyShell>
     );
   }
 
   return (
-    <ApplyShell title="Apply as a UGC creator" lead="Two minutes. Your answers are saved on this device as you type.">
+    <ApplyShell title={copy.title} lead={copy.lead}>
       <form onSubmit={onSubmit} className="relative mt-10 grid gap-8 rounded-2xl border border-brand-line bg-card p-6" noValidate>
         <Honeypot value={honey} onChange={setHoney} />
 
-        <FormSection title="Contact">
+        <FormSection title={common.contact}>
           <div className="space-y-2">
-            <Label htmlFor="full_name">Full name *</Label>
+            <Label htmlFor="full_name">{common.fullName}</Label>
             <Input id="full_name" className="h-11" autoComplete="name" value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
+            <Label htmlFor="email">{common.email}</Label>
             <Input id="email" type="email" className="h-11" autoComplete="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone number, with country code *</Label>
+            <Label htmlFor="phone">{common.phone}</Label>
             <Input id="phone" type="tel" className="h-11" placeholder="+33 6 12 34 56 78" autoComplete="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="country">Which country are you in? *</Label>
-            <CountrySelect id="country" value={form.country} onChange={(v) => set("country", v)} />
+            <Label htmlFor="country">{common.country}</Label>
+            <CountrySelect id="country" value={form.country} onChange={(v) => set("country", v)} lang={lang} labels={{ select: common.selectCountry, search: common.searchCountry, empty: common.noCountry }} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="age">How old are you? *</Label>
+            <Label htmlFor="age">{common.age}</Label>
             <Input id="age" type="number" inputMode="numeric" min={18} className="h-11 w-32" value={form.age} onChange={(e) => set("age", e.target.value)} />
             {underage ? (
               <p role="alert" className="text-sm font-semibold text-portal-red">
-                You need to be at least 18 to apply.
+                {copy.underage}
               </p>
             ) : null}
           </div>
           <div className="space-y-2">
-            <Label>What do you do? *</Label>
+            <Label>{copy.occupation}</Label>
             <div role="radiogroup" className="flex flex-wrap gap-2">
-              {OCCUPATIONS.map(([v, label]) => (
+              {OCCUPATIONS.map((v) => (
                 <button
                   key={v}
                   type="button"
@@ -255,66 +248,65 @@ export function UgcApplyPage() {
                     form.occupation === v ? "border-brand-navy bg-brand-navy text-brand-onNavy" : "border-brand-line bg-card text-brand-navy"
                   }`}
                 >
-                  {label}
+                  {copy.occupations[v]}
                 </button>
               ))}
             </div>
           </div>
         </FormSection>
 
-        <FormSection title="Your content">
-          <p className="text-sm text-brand-navySoft">Past content experience is not required, but it helps to see what you have made.</p>
+        <FormSection title={copy.content}>
+          <p className="text-sm text-brand-navySoft">{copy.contentHint}</p>
           <div className="space-y-2">
-            <Label htmlFor="tiktok">TikTok link</Label>
+            <Label htmlFor="tiktok">{copy.tiktok}</Label>
             <Input id="tiktok" type="url" className="h-11" placeholder="https://www.tiktok.com/@…" value={form.tiktok_url} onChange={(e) => set("tiktok_url", e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="instagram">Instagram link</Label>
+            <Label htmlFor="instagram">{copy.instagram}</Label>
             <Input id="instagram" type="url" className="h-11" placeholder="https://www.instagram.com/…" value={form.instagram_url} onChange={(e) => set("instagram_url", e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="other">Other links</Label>
+            <Label htmlFor="other">{copy.otherLinks}</Label>
             <Textarea id="other" rows={2} value={form.other_links} onChange={(e) => set("other_links", e.target.value)} />
           </div>
         </FormSection>
 
-        <FormSection title="Requirements">
+        <FormSection title={copy.requirements}>
           <ul className="list-disc space-y-1 pl-5 text-sm text-brand-navy">
-            {REQUIREMENTS.map((r) => (
+            {copy.requirementItems.map((r) => (
               <li key={r}>{r}</li>
             ))}
           </ul>
           <div className="space-y-2">
-            <Label htmlFor="meets">Do you meet all of the above? *</Label>
-            <YesNo id="meets" value={form.meets} onChange={(v) => set("meets", v)} />
+            <Label htmlFor="meets">{copy.meets}</Label>
+            <YesNo id="meets" value={form.meets} onChange={(v) => set("meets", v)} yes={common.yes} no={common.no} />
             {notMeeting ? (
               <p role="alert" className="text-sm font-semibold text-portal-red">
-                Please do not apply if you do not meet these.
+                {copy.notMeeting}
               </p>
             ) : null}
           </div>
         </FormSection>
 
-        <FormSection title="A video of you talking *">
+        <FormSection title={copy.videoTitle}>
           <p className="text-sm leading-relaxed text-brand-navySoft">
-            A 30 to 90 second video of you talking to the camera. Any subject. Be casual, like you are on a call with a friend. Decent light, no
-            influencer voice. You can send a link to a video you have already made, as long as you are facing the camera and speaking.
+            {copy.videoHelp}
           </p>
           <div className="flex gap-2">
             {(["link", "file"] as const).map((m) => (
               <Button key={m} type="button" size="pillSm" variant={form.video_mode === m ? "pill" : "pillSecondary"} onClick={() => set("video_mode", m)}>
-                {m === "link" ? "Send a link" : "Upload a file"}
+                {m === "link" ? copy.sendLink : copy.uploadFile}
               </Button>
             ))}
           </div>
           {form.video_mode === "link" ? (
             <div className="space-y-2">
-              <Label htmlFor="video_url">Video link</Label>
+              <Label htmlFor="video_url">{copy.videoLink}</Label>
               <Input id="video_url" type="url" className="h-11" placeholder="https://…" value={form.video_url} onChange={(e) => set("video_url", e.target.value)} />
             </div>
           ) : (
             <div className="space-y-2">
-              <Label htmlFor="video_file">Video file (.mp4 or .mov, 200 MB maximum)</Label>
+              <Label htmlFor="video_file">{copy.videoFile}</Label>
               <Input
                 id="video_file"
                 type="file"
@@ -325,7 +317,7 @@ export function UgcApplyPage() {
                   setUploadedPath(null);
                   setProgress(null);
                   if (f && f.size > 200 * 1024 * 1024) {
-                    setError("The video is over 200 MB.");
+                    setError(copy.videoTooLarge);
                     setFile(null);
                     return;
                   }
@@ -336,25 +328,25 @@ export function UgcApplyPage() {
               {progress !== null ? (
                 <div className="space-y-1">
                   <Progress value={progress} />
-                  <p className="text-xs text-brand-navySoft">{progress < 100 ? `Uploading… ${progress}%` : "Uploaded"}</p>
+                  <p className="text-xs text-brand-navySoft">{progress < 100 ? `${copy.uploading}… ${progress}%` : copy.uploaded}</p>
                 </div>
               ) : null}
             </div>
           )}
         </FormSection>
 
-        <FormSection title="How did you hear about us? *">
+        <FormSection title={copy.referral}>
           <Textarea id="referral" rows={2} value={form.referral_source} onChange={(e) => set("referral_source", e.target.value)} />
-          <p className="text-xs text-brand-navySoft">If a friend referred you, give their name and contact so we can thank them.</p>
+          <p className="text-xs text-brand-navySoft">{copy.referralHint}</p>
         </FormSection>
 
-        <FormSection title="Consent *">
+        <FormSection title={common.consent}>
           <label className="flex items-start gap-3 text-sm text-brand-navy">
             <Checkbox checked={form.consent} onCheckedChange={(v) => set("consent", v === true)} className="mt-0.5" />
             <span>
-              I agree that Sophia stores this application and contacts me about it.{" "}
-              <Link to="/en/privacy" className="underline underline-offset-4">
-                Privacy policy
+              {common.consentText}{" "}
+              <Link to={privacyPath} className="underline underline-offset-4">
+                {common.privacy}
               </Link>
             </span>
           </label>
@@ -367,7 +359,7 @@ export function UgcApplyPage() {
         ) : null}
         <div>
           <Button type="submit" variant="pill" size="pill" disabled={busy || blocked}>
-            {busy ? (progress !== null && progress < 100 ? `Uploading ${progress}%…` : "Sending…") : "Submit my application"}
+            {busy ? (progress !== null && progress < 100 ? `${copy.uploading} ${progress}%…` : common.sending) : common.submit}
           </Button>
         </div>
       </form>
