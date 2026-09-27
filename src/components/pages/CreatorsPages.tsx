@@ -26,9 +26,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function Hero({ title, subtitle, cta, to, note }: { title: string; subtitle: string; cta: string; to: "/creators/ugc/apply" | "/creators/slideshow/apply"; note?: string }) {
-  const { t } = useI18n();
-  const formsNote = CREATORS[useI18n().lang].formsNote;
-  void t;
+  const { lang } = useI18n();
+  const formsNote = CREATORS[lang].formsNote;
   return (
     <section className="relative isolate overflow-hidden bg-brand-navy">
       <span aria-hidden="true" className="grid-texture absolute inset-0 -z-10" />

@@ -45,7 +45,9 @@ import { Route as AuthenticatedAuteursMessagesRouteImport } from './routes/_auth
 import { Route as AuthenticatedAuteursOpenRouteImport } from './routes/_authenticated/auteurs/open'
 import { Route as AuthenticatedAuteursProfileRouteImport } from './routes/_authenticated/auteurs/profile'
 import { Route as CreatorsSlideshowIndexRouteImport } from './routes/creators.slideshow.index'
+import { Route as CreatorsSlideshowApplyRouteImport } from './routes/creators.slideshow.apply'
 import { Route as CreatorsUgcIndexRouteImport } from './routes/creators.ugc.index'
+import { Route as CreatorsUgcApplyRouteImport } from './routes/creators.ugc.apply'
 import { Route as EnAuthorsSlugRouteImport } from './routes/en/authors.$slug'
 import { Route as EnCreatorsIndexRouteImport } from './routes/en/creators/index'
 import { Route as EnCreatorsSlideshowRouteImport } from './routes/en/creators/slideshow'
@@ -270,9 +272,19 @@ const CreatorsSlideshowIndexRoute = CreatorsSlideshowIndexRouteImport.update({
   path: '/creators/slideshow/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CreatorsSlideshowApplyRoute = CreatorsSlideshowApplyRouteImport.update({
+  id: '/creators/slideshow/apply',
+  path: '/creators/slideshow/apply',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreatorsUgcIndexRoute = CreatorsUgcIndexRouteImport.update({
   id: '/creators/ugc/',
   path: '/creators/ugc/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsUgcApplyRoute = CreatorsUgcApplyRouteImport.update({
+  id: '/creators/ugc/apply',
+  path: '/creators/ugc/apply',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnAuthorsSlugRoute = EnAuthorsSlugRouteImport.update({
@@ -506,6 +518,8 @@ export interface FileRoutesByFullPath {
   '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
+  '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
   '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
   '/en/creators/ugc': typeof EnCreatorsUgcRoute
@@ -579,6 +593,8 @@ export interface FileRoutesByTo {
   '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
+  '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
   '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
   '/en/creators/ugc': typeof EnCreatorsUgcRoute
@@ -654,6 +670,8 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/_authenticated/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/_authenticated/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
+  '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
   '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
   '/en/creators/ugc': typeof EnCreatorsUgcRoute
@@ -729,6 +747,8 @@ export interface FileRouteTypes {
     | '/auteurs/messages'
     | '/auteurs/open'
     | '/auteurs/profile'
+    | '/creators/slideshow/apply'
+    | '/creators/ugc/apply'
     | '/en/authors/$slug'
     | '/en/creators/slideshow'
     | '/en/creators/ugc'
@@ -802,6 +822,8 @@ export interface FileRouteTypes {
     | '/auteurs/messages'
     | '/auteurs/open'
     | '/auteurs/profile'
+    | '/creators/slideshow/apply'
+    | '/creators/ugc/apply'
     | '/en/authors/$slug'
     | '/en/creators/slideshow'
     | '/en/creators/ugc'
@@ -876,6 +898,8 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/messages'
     | '/_authenticated/auteurs/open'
     | '/_authenticated/auteurs/profile'
+    | '/creators/slideshow/apply'
+    | '/creators/ugc/apply'
     | '/en/authors/$slug'
     | '/en/creators/slideshow'
     | '/en/creators/ugc'
@@ -945,6 +969,8 @@ export interface RootRouteChildren {
   CreatorsIndexRoute: typeof CreatorsIndexRoute
   EnIndexRoute: typeof EnIndexRoute
   FrIndexRoute: typeof FrIndexRoute
+  CreatorsSlideshowApplyRoute: typeof CreatorsSlideshowApplyRoute
+  CreatorsUgcApplyRoute: typeof CreatorsUgcApplyRoute
   EnAuthorsSlugRoute: typeof EnAuthorsSlugRoute
   EnCreatorsSlideshowRoute: typeof EnCreatorsSlideshowRoute
   EnCreatorsUgcRoute: typeof EnCreatorsUgcRoute
@@ -1216,11 +1242,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreatorsSlideshowIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/creators/slideshow/apply': {
+      id: '/creators/slideshow/apply'
+      path: '/creators/slideshow/apply'
+      fullPath: '/creators/slideshow/apply'
+      preLoaderRoute: typeof CreatorsSlideshowApplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/creators/ugc/': {
       id: '/creators/ugc/'
       path: '/creators/ugc'
       fullPath: '/creators/ugc/'
       preLoaderRoute: typeof CreatorsUgcIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/ugc/apply': {
+      id: '/creators/ugc/apply'
+      path: '/creators/ugc/apply'
+      fullPath: '/creators/ugc/apply'
+      preLoaderRoute: typeof CreatorsUgcApplyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/authors/$slug': {
@@ -1593,6 +1633,8 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsIndexRoute: CreatorsIndexRoute,
   EnIndexRoute: EnIndexRoute,
   FrIndexRoute: FrIndexRoute,
+  CreatorsSlideshowApplyRoute: CreatorsSlideshowApplyRoute,
+  CreatorsUgcApplyRoute: CreatorsUgcApplyRoute,
   EnAuthorsSlugRoute: EnAuthorsSlugRoute,
   EnCreatorsSlideshowRoute: EnCreatorsSlideshowRoute,
   EnCreatorsUgcRoute: EnCreatorsUgcRoute,

@@ -42,10 +42,8 @@ export const createVideoUploadSlot = createServerFn({ method: "POST" })
     const ext = data.name.toLowerCase().endsWith(".mov") ? "mov" : data.name.toLowerCase().endsWith(".mp4") ? "mp4" : null;
     if (!ext || (data.type && !VIDEO_TYPES.includes(data.type))) return { ok: false as const, reason: "type" as const };
     if (data.size > 200 * 1024 * 1024) return { ok: false as const, reason: "size" as const };
-    const hash = await ipHash();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const path = `${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}.${ext}`;
-    void hash;
     const { data: slot, error } = await supabaseAdmin.storage.from("creator-videos").createSignedUploadUrl(path);
     if (error || !slot) return { ok: false as const, reason: "server" as const };
     return { ok: true as const, path, signedUrl: slot.signedUrl };
