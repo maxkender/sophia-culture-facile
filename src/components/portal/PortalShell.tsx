@@ -306,8 +306,13 @@ export function PortalShell({
           <div className="flex min-h-14 items-center gap-3 px-4 py-2 sm:px-6">
             <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
               <SheetTrigger asChild>
-                <Button type="button" variant="ghost" size="icon" className="lg:hidden" aria-label="Open navigation">
+                <Button type="button" variant="ghost" size="icon" className="relative lg:hidden" aria-label="Open navigation">
                   <Menu className="size-5" />
+                  {Object.values(counts).reduce((a: number, b) => a + (Number(b) || 0), 0) > 0 ? (
+                    <span className="absolute right-1 top-1 min-w-4 rounded-full bg-portal-accent px-1 text-[10px] font-bold leading-4 text-card">
+                      {Object.values(counts).reduce((a: number, b) => a + (Number(b) || 0), 0)}
+                    </span>
+                  ) : null}
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-72 overflow-y-auto bg-card p-0">
