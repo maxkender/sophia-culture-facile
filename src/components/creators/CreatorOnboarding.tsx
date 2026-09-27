@@ -12,7 +12,7 @@ import { CreatorAgreementForm } from "./CreatorAgreementForm";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { completeSocialAccountStep, logCreatorPost } from "@/lib/creator-onboarding.functions";
+import { completeSocialAccountStep, joinCreatorSlack, logCreatorPost, SLACK_INVITE_URL } from "@/lib/creator-onboarding.functions";
 import { CheckCircle2, Circle } from "lucide-react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -21,6 +21,7 @@ export function CreatorOnboarding({ me, refs }: { me: any; refs: any[] }) {
   const mark = useServerFn(markCreatorStep);
   const sign = useServerFn(signCreatorAgreement);
   const completeAccount = useServerFn(completeSocialAccountStep);
+  const join = useServerFn(joinCreatorSlack);
   const logPost = useServerFn(logCreatorPost);
   const [motivated, setMotivated] = useState(false);
   const [handle, setHandle] = useState("");
