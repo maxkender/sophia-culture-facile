@@ -7,6 +7,8 @@ A second product surface, kept separate from authors in data and routes, reusing
 - `/creators/apply` (English only): the form exactly as specified, local autosave, age and requirements blocks, video link or upload (mp4/mov, 200 MB, progress bar), consent + privacy link, confirmation screen.
 - Honeypot field and rate limit (per email and per IP, stored server-side) on a public server function that writes the application.
 - No creator handles or example accounts anywhere.
+- Home page (fr/en): outlined "Devenir créateur" / "Become a creator" button beside the download button, same size, above the fold; plain link in the footer.
+- Home page reviews replaced by the three App Store reviews verbatim, five stars, name and "App Store"; English page shows your faithful translations with "Reviews translated from French. Original wording on the App Store."
 
 ## Stage 2 — Data model
 - Add `creator` to the role enum; add `space` (author | creator, default author) to conversations, announcements, notifications; existing rows stay author.
