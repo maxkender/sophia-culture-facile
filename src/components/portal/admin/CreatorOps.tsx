@@ -41,7 +41,7 @@ export function CreatorOps() {
       ({ error } = await supabase.from("creator_calls").insert({ title: a.trim(), starts_at: new Date(b).toISOString(), link: c.trim() || null }));
     }
     if (error) return toast.error("Could not save.");
-    setA(""); setB(""); setC(""); toast.success("Saved."); refresh();
+    setA(""); setB(""); setC(""); toast.success("Saved."); return refresh();
   }
 
   async function update(table: "briefs" | "creator_posts", id: string, patch: Record<string, unknown>) {
