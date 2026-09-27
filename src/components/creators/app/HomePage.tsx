@@ -100,30 +100,35 @@ export function CreatorHomePage() {
 
 export function AccessCodeCard() {
   const { me } = useCreator();
-  const ios = me.platform !== "android";
+  const store = me.platform === "android" ? "Play Store" : "App Store";
   return (
     <PortalCard>
       <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-brand-navySoft"><Smartphone className="size-4" /> Your Sophia app access</p>
-      {me.access_code ? (
-        <div className="mt-2 space-y-2 text-sm">
-          <p className="font-mono text-lg font-extrabold text-brand-navy">{me.access_code}</p>
-          <div className="flex flex-wrap gap-2">
-            <CopyButton value={me.access_code} label="Copy code" />
-            {me.access_redeem_url && <Button asChild size="sm" variant="outline"><a href={me.access_redeem_url} target="_blank" rel="noopener noreferrer">Redeem</a></Button>}
-          </div>
-          <p className="text-brand-navySoft">
-            {ios
-              ? "On your iPhone, open the App Store, tap your profile picture, then Redeem Gift Card or Code, and enter the code."
-              : "On your Android phone, open the Google Play Store, tap your profile icon, then Payments & subscriptions, Redeem code, and enter the code."}
-          </p>
-          <a href={TAAP_LINK} target="_blank" rel="noopener noreferrer" className="block font-semibold text-portal-accent underline">Get the Sophia app: {TAAP_LINK.replace("https://", "")}</a>
-        </div>
+      {me.platform ? (
+        <p className="mt-2 text-base font-extrabold text-brand-navy">Your code goes into the {store}, not into the Sophia app.</p>
       ) : (
-        <div className="mt-2 space-y-2 text-sm text-brand-navySoft">
-          <p>Your access code has not been assigned yet. The Sophia team will add it here.</p>
-          <a href={TAAP_LINK} target="_blank" rel="noopener noreferrer" className="block font-semibold text-portal-accent underline">Get the Sophia app: {TAAP_LINK.replace("https://", "")}</a>
-        </div>
+        <p className="mt-2 text-sm font-semibold text-portal-amber">Tell us whether you use an iPhone or an Android phone on <Link to="/creators/app/profile" className="underline">your profile page</Link> and we will give you a code for the right store.</p>
       )}
+      {me.access_code ? (
+        <>
+          <p className="mt-4 rounded-2xl bg-portal-bg px-4 py-3 font-mono text-xl font-bold tracking-[0.12em] text-brand-navy">{me.access_code}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <CopyButton value={me.access_code} label="Copy code" />
+            {me.access_redeem_url ? <Button asChild variant="pillSecondary" size="pillSm"><a href={me.access_redeem_url} target="_blank" rel="noreferrer noopener">Redeem</a></Button> : null}
+          </div>
+          <ol className="mt-4 list-decimal space-y-1 pl-5 text-sm leading-relaxed text-brand-navySoft">
+            <li>Open the {store}, not Sophia</li>
+            <li>Tap your profile picture, top right</li>
+            <li>{store === "App Store" ? "Choose Redeem Gift Card or Code" : "Choose Payments and subscriptions"}</li>
+            <li>{store === "App Store" ? "Choose Enter Code Manually" : "Choose Redeem code"}</li>
+            <li>Paste the code above</li>
+          </ol>
+        </>
+      ) : (
+        <p className="mt-4 text-sm text-brand-navySoft">Your code is on its way. The Sophia team will add it here as soon as it is issued.</p>
+      )}
+      <p className="mt-4 text-sm font-semibold text-brand-navy">Searching for Sophia will bury you in results. This link goes straight to the right listing:</p>
+      <a href={TAAP_LINK} target="_blank" rel="noopener noreferrer" className="mt-1 block font-bold text-portal-accent underline">{TAAP_LINK.replace("https://", "")}</a>
     </PortalCard>
   );
 }
