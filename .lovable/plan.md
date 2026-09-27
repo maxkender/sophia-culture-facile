@@ -26,6 +26,14 @@ A second product surface, kept separate from authors in data and routes, reusing
 - Home (weekly bar, newest brief, next call, pending feedback, access code card), Briefs (detail, "I posted this", Skip with reason), My posts (log form, amber feedback with reply), Calls (RSVP), Messages, Profile. Bell and banners scoped to creator space.
 - Authors can never reach creator pages and vice versa.
 
+## Stage 5 — Reference library (publish with stage 4)
+- Tables reference_accounts and reference_videos with the shared four-value category, tags, pinned, active; `reference_video_id` on posts; a brief-to-video link table.
+- Admin "Library" page under CRÉATEURS: Accounts and Videos tabs, platform/category/tag filters, pinned first then newest. Account cards (handle parsed from URL, colour per category, follower count, video count); video cards with thumbnail from TikTok/Instagram oEmbed via a server function, platform-coloured placeholder otherwise. Add, edit, deactivate inline; bulk add from pasted URLs.
+- Creator "Library" page between Briefs and My posts: read-only, category legend with your four lines, "Use this" opens the log-a-post form linked to the video.
+- Brief editor gets a reference-video picker; briefs show attached videos as a strip of cards.
+- Admin dashboard block: library size by category and the five most-used videos this month.
+- Instagram oEmbed normally needs a Meta app token; without one, Instagram cards use the placeholder.
+
 ## Assumptions to correct if wrong
 - Creators get Apple codes from the same real pool as authors (no codes invented). If the pool runs short, the card says a code is coming.
 - Posts count toward the weekly target by posted date, Monday–Sunday UTC; "not counting" and flagged posts are excluded.
