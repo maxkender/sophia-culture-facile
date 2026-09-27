@@ -834,6 +834,45 @@ export type Database = {
           },
         ]
       }
+      creator_prospects: {
+        Row: {
+          country: string | null
+          created_at: string
+          email: string | null
+          handle: string | null
+          id: string
+          name: string | null
+          next_action_on: string | null
+          notes: string | null
+          platform: string
+          status: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          handle?: string | null
+          id?: string
+          name?: string | null
+          next_action_on?: string | null
+          notes?: string | null
+          platform?: string
+          status?: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          handle?: string | null
+          id?: string
+          name?: string | null
+          next_action_on?: string | null
+          notes?: string | null
+          platform?: string
+          status?: string
+        }
+        Relationships: []
+      }
       creators: {
         Row: {
           admin_notes: string | null
@@ -1229,6 +1268,38 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      prospect_touches: {
+        Row: {
+          channel: string
+          created_at: string
+          id: string
+          message: string | null
+          prospect_id: string
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          prospect_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          prospect_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospect_touches_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "creator_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reference_videos: {
         Row: {
