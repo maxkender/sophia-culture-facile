@@ -86,7 +86,49 @@ export const approveUgcApplication = createServerFn({ method: "POST" })
       .eq("id", application.id);
 
     const inviteUrl = `${data.origin.replace(/\/$/, "")}/creators/app?invite=${encodeURIComponent(inviteToken)}&email=${encodeURIComponent(application.email)}`;
-    return { ok: true as const, creatorId, inviteUrl, emailSent: false as const, emailReason: "domain_not_configured" as const };
+
+    const { data: settings } = await supabaseAdmin
+      .from("creator_email_settings")
+      .select("subject, intro, instructions, button_label")
+      .eq("template_key", "ugc-acceptance")
+      .maybeSingle();
+    const defaults = {
+      subject: "You're in — welcome to the Sophia creator team",
+      intro:
+        "Hi {full_name},\n\nGreat news: your application has been accepted. Welcome to the Sophia creator team.",
+      instructions:
+        "Open the button below to create your account with the email this message was sent to. Your onboarding checklist — examples, agreement, account setup and your first post — is waiting for you in your creator space.",
+      button_label: "Create my account",
+    };
+    const template = settings ?? defaults;
+    const fields = { full_name: application.full_name || "there", invite_url: inviteUrl };
+    const subject = replaceMergeFields(template.subject, fields).slice(0, 160);
+    const paragraphs = replaceMergeFields(template.intro, fields).split(/\n{2,}/).filter(Boolean);
+    const instructions = replaceMergeFields(template.instructions, fields).split(/\n{2,}/).filter(Boolean);
+    const buttonLabel = replaceMergeFields(template.button_label || defaults.button_label, fields).slice(0, 80);
+
+    const firstName = application.full_name.split(/\s+/)[0] || "there";
+    const html = buildEmailHtml({
+      paragraphs: paragraphs.flatMap((p) => p.split(/\n/)).filter(Boolean),
+      buttonLabel,
+      buttonUrl: inviteUrl,
+    });
+    const text = buildEmailText({
+      paragraphs: [`Hi ${firstName},`, ...instructions],
+      buttonLabel,
+      buttonUrl: inviteUrl,
+    });
+
+    const send = await sendAppEmail({
+      to: application.email.toLowerCase(),
+      subject,
+      html,
+      text,
+      idempotencyKey: `ugc-acceptance-${application.id}`,
+      label: "ugc-acceptance",
+    });
+
+    return { ok: true as const, creatorId, inviteUrl, emailSent: send.sent, emailReason: send.reason ?? null };
   });
 
 export const saveCreatorEmailSettings = createServerFn({ method: "POST" })
