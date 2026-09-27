@@ -415,6 +415,7 @@ export type Database = {
           due_date: string | null
           hook: string | null
           id: string
+          reference_video_ids: string[]
           status: string
           title: string
         }
@@ -427,6 +428,7 @@ export type Database = {
           due_date?: string | null
           hook?: string | null
           id?: string
+          reference_video_ids?: string[]
           status?: string
           title: string
         }
@@ -439,6 +441,7 @@ export type Database = {
           due_date?: string | null
           hook?: string | null
           id?: string
+          reference_video_ids?: string[]
           status?: string
           title?: string
         }
@@ -2106,34 +2109,43 @@ export type Database = {
           active: boolean
           category: string
           created_at: string
+          format_notes: string | null
           id: string
           note: string | null
           pinned: boolean
           platform: string
           thumbnail_url: string | null
+          title: string | null
           url: string
+          why_it_works: string | null
         }
         Insert: {
           active?: boolean
           category?: string
           created_at?: string
+          format_notes?: string | null
           id?: string
           note?: string | null
           pinned?: boolean
           platform?: string
           thumbnail_url?: string | null
+          title?: string | null
           url: string
+          why_it_works?: string | null
         }
         Update: {
           active?: boolean
           category?: string
           created_at?: string
+          format_notes?: string | null
           id?: string
           note?: string | null
           pinned?: boolean
           platform?: string
           thumbnail_url?: string | null
+          title?: string | null
           url?: string
+          why_it_works?: string | null
         }
         Relationships: []
       }
