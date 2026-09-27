@@ -6,9 +6,9 @@
 
 ## UGC creator programme (27 Sep)
 - [x] Public creators landing (fr/en) + /creators/apply form
-- [ ] Creator data model (applications, creators, briefs, posts, calls, payments schema) + space column
+- [x] Creator data model (creators, briefs, posts, calls)
 - [ ] Admin creators mode (dashboard, applications, creators, briefs, posts, calls, announcements, messages)
-- [ ] Creator space /creators/app
+- [x] Creator space /creators/app (basic: invite claim, briefs, log post, feedback, calls)
 - [ ] Reference library (accounts + videos, admin + creator pages, "Use this", brief picker, dashboard block)
 - [x] Home page: "Devenir créateur / Become a creator" outlined button next to download + footer link
 - [x] Home page: replace testimonials with the three real App Store reviews (EN translated, with note)
