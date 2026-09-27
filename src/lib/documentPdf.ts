@@ -17,6 +17,7 @@ export async function downloadDocumentPdf(options: {
   subtitle: string;
   version: number;
   blocks: DocBlock[];
+  filename?: string;
 }) {
   const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ unit: "pt", format: "a4" });
@@ -96,7 +97,7 @@ export async function downloadDocumentPdf(options: {
     }
   }
 
-  pdf.save(documentFilename(options.slug, options.version, "pdf"));
+  pdf.save(options.filename ?? documentFilename(options.slug, options.version, "pdf"));
 }
 
 /** Kept for the plain-text fallback used in tests and copy actions. */

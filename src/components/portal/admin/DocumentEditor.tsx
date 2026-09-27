@@ -355,6 +355,8 @@ export function DocumentEditor({ slug }: { slug: DocumentSlug }) {
         lead={
           slug === "creator-agreement"
             ? "Creators who have signed keep the version they signed. UGC creators see clause 5; slideshow creators get a version without it, renumbered automatically."
+            : slug === "slideshow-guide"
+            ? "Slideshow applicants read this after signing. Use {trial_amount}, {monthly_amount} and {posts_per_day}; each person sees only their own zone's figures."
             : slug === "creator-guide"
             ? "UGC creators read this guide as step two of onboarding, once published."
             : slug === "contract"

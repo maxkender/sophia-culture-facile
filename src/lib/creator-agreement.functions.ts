@@ -72,7 +72,11 @@ export const getSigningPage = createServerFn({ method: "GET" })
       .select("full_name, country, email, status")
       .eq("signing_token", data.token)
       .maybeSingle();
-    if (!app || app.status !== "approved") return { state: "invalid" as const };
+    if (!app) {
+      const { data: signed } = await supabaseAdmin.from("slideshow_applications").select("status").eq("guide_token", data.token).maybeSingle();
+      return signed?.status === "approved" ? { state: "signed" as const } : { state: "invalid" as const };
+    }
+    if (app.status !== "approved") return { state: "invalid" as const };
     const { data: doc } = await supabaseAdmin.from("documents").select("title, content, current_version, published").eq("slug", "creator-agreement").maybeSingle();
     if (!doc?.published) return { state: "unpublished" as const };
     return {
@@ -111,7 +115,7 @@ export const signWithToken = createServerFn({ method: "POST" })
     if (error) throw new Error("This agreement has already been signed.");
     await supabaseAdmin
       .from("slideshow_applications")
-      .update({ signing_token: null, agreement_signed_at: new Date().toISOString() })
+      .update({ signing_token: null, guide_token: data.token, agreement_signed_at: new Date().toISOString() })
       .eq("id", app.id);
     return { ok: true };
   });
