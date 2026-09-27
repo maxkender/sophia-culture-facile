@@ -23,6 +23,13 @@ export function CreatorOps() {
   const [a, setA] = useState("");
   const [b, setB] = useState("");
   const [c, setC] = useState("");
+  const [videoEdit, setVideoEdit] = useState<{ id: string; title: string; why_it_works: string; format_notes: string } | null>(null);
+  const [refEdit, setRefEdit] = useState<{ id: string; ids: string[] } | null>(null);
+  const { data: libraryVideos } = useQuery({
+    queryKey: ["portal", "admin", "creator-ops", "library-picker"],
+    enabled: refEdit !== null,
+    queryFn: async () => (await supabase.from("reference_videos").select("id, url, title, platform, category").eq("active", true).order("pinned", { ascending: false })).data ?? [],
+  });
 
   const { data } = useQuery({
     queryKey: ["portal", "admin", "creator-ops", tab],
@@ -101,6 +108,36 @@ export function CreatorOps() {
       {tab === "library" && (
         <Button size="sm" variant="outline" onClick={async () => { const r = await thumbs({} as never); toast.success(`Thumbnails: ${r.found} found, ${r.missed} unavailable (Instagram needs a Meta token).`); refresh(); }}>Fetch thumbnails</Button>
       )}
+      {videoEdit && (
+        <PortalCard className="space-y-3 p-4">
+          <p className="text-sm font-semibold text-brand-navy">Video details shown to creators</p>
+          <Input placeholder="Title" value={videoEdit.title} onChange={(e) => setVideoEdit({ ...videoEdit, title: e.target.value })} />
+          <Textarea placeholder="Why it works" value={videoEdit.why_it_works} onChange={(e) => setVideoEdit({ ...videoEdit, why_it_works: e.target.value })} />
+          <Textarea placeholder="Format notes (length, framing, hook, sound…)" value={videoEdit.format_notes} onChange={(e) => setVideoEdit({ ...videoEdit, format_notes: e.target.value })} />
+          <div className="flex gap-2">
+            <Button size="sm" onClick={async () => { const { id, ...rest } = videoEdit; await update("reference_videos", id, { title: rest.title.trim() || null, why_it_works: rest.why_it_works.trim() || null, format_notes: rest.format_notes.trim() || null }); setVideoEdit(null); }}>Save</Button>
+            <Button size="sm" variant="outline" onClick={() => setVideoEdit(null)}>Cancel</Button>
+          </div>
+        </PortalCard>
+      )}
+      {refEdit && (
+        <PortalCard className="space-y-3 p-4">
+          <p className="text-sm font-semibold text-brand-navy">Reference videos for this brief ({refEdit.ids.length} picked)</p>
+          <div className="grid max-h-80 gap-1 overflow-y-auto sm:grid-cols-2">
+            {(libraryVideos ?? []).map((v) => (
+              <label key={v.id} className="flex min-h-11 items-center gap-2 text-sm">
+                <input type="checkbox" checked={refEdit.ids.includes(v.id)} onChange={(e) => setRefEdit({ ...refEdit, ids: e.target.checked ? [...refEdit.ids, v.id] : refEdit.ids.filter((x) => x !== v.id) })} />
+                <span className="truncate">{v.title || v.url} <span className="text-brand-navySoft">· {v.platform} · {v.category}</span></span>
+              </label>
+            ))}
+            {libraryVideos?.length === 0 && <p className="text-sm text-brand-navySoft">The library has no active video yet.</p>}
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={async () => { await update("briefs", refEdit.id, { reference_video_ids: refEdit.ids }); setRefEdit(null); }}>Save</Button>
+            <Button size="sm" variant="outline" onClick={() => setRefEdit(null)}>Cancel</Button>
+          </div>
+        </PortalCard>
+      )}
       {briefTarget && (
         <PortalCard className="space-y-3 p-4">
           <p className="text-sm font-semibold text-brand-navy">Who gets this brief? Leave everyone unticked to send it to all creators.</p>
@@ -133,7 +170,7 @@ export function CreatorOps() {
                     {tab === "briefs" && `${r.status}${r.status === "published" ? ` · ${r.audience === "selected" ? "selected creators" : "all creators"}` : ""} · ${formatDateTime(r.created_at)}`}
                     {tab === "posts" && `${r.creators?.full_name ?? ""} · ${r.platform} · ${r.posted_on} · ${r.status}${r.pay_status === "due" ? ` · $${Number(r.amount_usd).toFixed(2)} due` : r.pay_status === "held" ? " · held: no rate card" : ""}${r.views != null ? ` · ${r.views.toLocaleString()} views` : ""}`}
                     {tab === "calls" && formatDateTime(r.starts_at)}
-                    {tab === "library" && `${r.platform} · ${r.category}${r.pinned ? " · pinned" : ""}${r.active ? "" : " · inactive"}`}
+                    {tab === "library" && `${r.title ? r.title + " · " : ""}${r.platform} · ${r.category}${r.pinned ? " · pinned" : ""}${r.active ? "" : " · inactive"}`}
                   </span>
                 </span>
                 {tab === "creators" && (
@@ -141,6 +178,9 @@ export function CreatorOps() {
                 )}
                 {tab === "creators" && r.invite_token && !r.user_id && (
                   <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(`${origin}/creators/invite?token=${r.invite_token}`); toast.success("Invite link copied."); }}>Copy invite</Button>
+                )}
+                {tab === "briefs" && (
+                  <Button size="sm" variant="outline" onClick={() => setRefEdit({ id: r.id, ids: r.reference_video_ids ?? [] })}>References ({(r.reference_video_ids ?? []).length})</Button>
                 )}
                 {tab === "briefs" && (
                   r.status === "published" ? (
@@ -153,6 +193,7 @@ export function CreatorOps() {
                   <>
                     {r.thumbnail_url && <img src={r.thumbnail_url} alt="" loading="lazy" className="h-12 w-9 rounded object-cover" />}
                     <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-portal-accent">Open</a>
+                    <Button size="sm" variant="outline" onClick={() => setVideoEdit({ id: r.id, title: r.title ?? "", why_it_works: r.why_it_works ?? "", format_notes: r.format_notes ?? "" })}>Details</Button>
                     <Button size="sm" variant="outline" onClick={() => update("reference_videos", r.id, { pinned: !r.pinned })}>{r.pinned ? "Unpin" : "Pin"}</Button>
                     <Button size="sm" variant="outline" onClick={() => update("reference_videos", r.id, { active: !r.active })}>{r.active ? "Deactivate" : "Activate"}</Button>
                   </>
