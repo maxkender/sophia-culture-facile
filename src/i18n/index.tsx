@@ -33,9 +33,9 @@ export function useI18n() {
 }
 
 /** Chemin localisé d'une page dans la langue courante. */
-export function useLocalePath<K extends RouteKey>(key: K): (typeof ROUTES)[K][Lang] {
+export function useLocalePath<K extends RouteKey>(key: K): (typeof ROUTES)[K]["fr"] | (typeof ROUTES)[K]["en"] {
   const lang = useLang();
-  return ROUTES[key][lang];
+  return lang === "fr" ? ROUTES[key].fr : ROUTES[key].en;
 }
 
 /** Remplace {company} et consorts dans une chaîne traduite. */
