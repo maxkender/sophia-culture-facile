@@ -218,7 +218,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       howTitle: "Comment ça marche",
       steps: [
         "Vous postulez ci-dessous. Nous répondons sous cinq jours.",
-        "Si vous êtes retenu, vous recevez un accès à notre espace et vous créez un nouveau compte TikTok en suivant nos consignes.",
+        "Si vous êtes retenu, vous recevez un accès à notre espace et vous créez un nouveau compte TikTok pour Sophia, en suivant nos consignes. Le compte appartient à Sophia ; c'est vous qui l'animez.",
         "Vous « chauffez » le compte pendant quelques jours, exactement comme indiqué. Ensuite, les posts commencent.",
         "Chaque jour, deux posts vous attendent dans votre espace : les slides, la légende, la musique. Vous assemblez et publiez. Rien à inventer.",
       ],
@@ -233,6 +233,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         "Vous avez un smartphone et une connexion fiable",
         "Vous pouvez publier deux slideshows par jour, tous les jours",
         "Vous ne travaillez pas actuellement pour une appli concurrente",
+        "Vous acceptez de signer un contrat de compte avant de commencer",
       ],
     },
     formsNote: "Le formulaire de candidature est en anglais.",
