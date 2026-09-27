@@ -113,6 +113,20 @@
       "when": 1790503743852,
       "tag": "0015_add_slack_joined_at",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1790504637580,
+      "tag": "0016_creator_space_completion",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790504727841,
+      "tag": "0017_dated_rate_cards",
+      "breakpoints": true
     }
   ]
 }

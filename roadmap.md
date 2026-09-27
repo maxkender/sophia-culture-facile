@@ -19,3 +19,14 @@
 - [ ] Creator payout rates — admin enters them in-app; never invented
 - [ ] Stripe: live key saved; switch to a test key before payment testing / first real payout run
 - [ ] Review French marketing/creator copy (translation spot-check)
+
+## E2E follow-up (27 Sep)
+- [x] "Handed to [HM] for Upwork onboarding" on slideshow applications
+- [x] Invite page: already-set-up / expired / invalid states, 18+ tick box, forgot password
+- [x] Briefs to selected creators (assignments) + creator notifications; "I posted this" / Skip with reason
+- [x] Post approval prices the post from the dated rate card in force, or holds it; batches exclude held posts and split by payout method
+- [x] Day-7 views entry; call RSVP + 24h reminder banner; Wise/PayPal fallback
+- [x] TikTok thumbnails (Instagram needs a Meta token)
+- [x] "Continue your application?" prompt; funnel events (dataLayer + data attributes)
+- [ ] Bonus tiers from views — waiting on the tiers
+- [ ] Emailed 24h call reminders — in-app banner only for now

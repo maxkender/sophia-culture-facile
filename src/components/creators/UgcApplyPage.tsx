@@ -1,4 +1,5 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { trackFunnel } from "@/lib/funnel-events";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { createVideoUploadSlot, submitUgcApplication } from "@/lib/creator-apply.functions";
@@ -86,12 +87,18 @@ export function UgcApplyPage() {
   const [progress, setProgress] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const [resume, setResume] = useState(false);
+  const started = useRef(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(KEY);
-      if (saved) setForm({ ...EMPTY, ...(JSON.parse(saved) as Partial<Form>) });
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<Form>;
+        setForm({ ...EMPTY, ...parsed });
+        if (Object.values(parsed).some((v) => typeof v === "string" && v.trim() !== "")) setResume(true);
+      }
     } catch {
       /* ignore */
     }
@@ -109,6 +116,10 @@ export function UgcApplyPage() {
   const notMeeting = form.meets === "no";
   const hasVideo = form.video_mode === "link" ? isUrl(form.video_url) : Boolean(file);
   const blocked = underage || notMeeting;
+
+  useEffect(() => {
+    if (error) trackFunnel("apply_blocked", { track: "ugc", reason: error });
+  }, [error]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -186,6 +197,7 @@ export function UgcApplyPage() {
         return;
       }
       localStorage.removeItem(KEY);
+      trackFunnel("apply_submitted", { track: "ugc" });
       setDone(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
@@ -205,7 +217,14 @@ export function UgcApplyPage() {
 
   return (
     <ApplyShell title={copy.title} lead={copy.lead}>
-      <form onSubmit={onSubmit} className="relative mt-10 grid gap-8 rounded-2xl border border-brand-line bg-card p-6" noValidate>
+      {resume && (
+        <div className="mt-8 flex flex-wrap items-center gap-3 rounded-2xl border border-brand-line bg-card p-4 text-sm">
+          <span className="flex-1">You have an application in progress, continue?</span>
+          <button type="button" className="font-semibold underline" onClick={() => setResume(false)}>Continue</button>
+          <button type="button" className="text-brand-navySoft underline" onClick={() => { localStorage.removeItem(KEY); setForm(EMPTY); setResume(false); }}>Start over</button>
+        </div>
+      )}
+      <form data-funnel="apply" data-track="ugc" onFocusCapture={() => { if (!started.current) { started.current = true; trackFunnel("apply_started", { track: "ugc" }); } }} onSubmit={onSubmit} className="relative mt-10 grid gap-8 rounded-2xl border border-brand-line bg-card p-6" noValidate>
         <Honeypot value={honey} onChange={setHoney} />
 
         <FormSection title={common.contact}>

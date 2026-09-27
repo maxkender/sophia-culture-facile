@@ -11,6 +11,7 @@ import { EmptyState, PageTitle, PortalCard } from "../ui";
 
 import { WeeklyGuidesAdmin } from "./WeeklyGuidesAdmin";
 import { saveCreatorEmailSettings } from "@/lib/creator-onboarding.functions";
+import { fetchReferenceThumbnails, publishBrief } from "@/lib/creator-extras.functions";
 
 type Tab = "creators" | "briefs" | "guides" | "posts" | "calls" | "library" | "email";
 
@@ -31,6 +32,15 @@ export function CreatorOps() {
       if (tab === "email") return (await supabase.from("creator_email_settings").select("*").eq("template_key", "ugc-acceptance").maybeSingle()).data;
       return (await supabase.from("creator_calls").select("*").order("starts_at", { ascending: false })).data ?? [];
     },
+  });
+  const publish = useServerFn(publishBrief);
+  const thumbs = useServerFn(fetchReferenceThumbnails);
+  const [briefTarget, setBriefTarget] = useState<string | null>(null);
+  const [picked, setPicked] = useState<string[]>([]);
+  const { data: activeCreators } = useQuery({
+    queryKey: ["portal", "admin", "creator-ops", "active-creators"],
+    enabled: tab === "briefs",
+    queryFn: async () => (await supabase.from("creators").select("id, full_name").not("user_id", "is", null).order("full_name")).data ?? [],
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["portal", "admin", "creator-ops"] });
 
@@ -86,6 +96,29 @@ export function CreatorOps() {
         </PortalCard>
       )}
 
+      {tab === "library" && (
+        <Button size="sm" variant="outline" onClick={async () => { const r = await thumbs({} as never); toast.success(`Thumbnails: ${r.found} found, ${r.missed} unavailable (Instagram needs a Meta token).`); refresh(); }}>Fetch thumbnails</Button>
+      )}
+      {briefTarget && (
+        <PortalCard className="space-y-3 p-4">
+          <p className="text-sm font-semibold text-brand-navy">Who gets this brief? Leave everyone unticked to send it to all creators.</p>
+          <div className="grid gap-1 sm:grid-cols-3">
+            {(activeCreators ?? []).map((c) => (
+              <label key={c.id} className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={picked.includes(c.id)} onChange={(e) => setPicked(e.target.checked ? [...picked, c.id] : picked.filter((x) => x !== c.id))} />
+                {c.full_name}
+              </label>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={async () => {
+              try { const r = await publish({ data: { briefId: briefTarget, creatorIds: picked } }); toast.success(`Published. ${r.notified} creator(s) notified.`); setBriefTarget(null); refresh(); }
+              catch (e: any) { toast.error(e?.message ?? "Could not publish."); }
+            }}>Publish to {picked.length ? `${picked.length} creator(s)` : "all creators"}</Button>
+            <Button size="sm" variant="ghost" onClick={() => setBriefTarget(null)}>Cancel</Button>
+          </div>
+        </PortalCard>
+      )}
       <PortalCard className="p-4">
         {rows.length === 0 ? <EmptyState title="Nothing yet" text="Items will appear here." /> : (
           <ul className="divide-y divide-brand-line">
@@ -95,8 +128,8 @@ export function CreatorOps() {
                   <span className="block font-semibold text-brand-navy">{r.full_name ?? r.title ?? r.url}</span>
                   <span className="block text-xs text-brand-navySoft">
                     {tab === "creators" && `${r.email} · ${r.status} · ${creatorProgress(r)} / 5 onboarding steps`}
-                    {tab === "briefs" && `${r.status} · ${formatDateTime(r.created_at)}`}
-                    {tab === "posts" && `${r.creators?.full_name ?? ""} · ${r.platform} · ${r.posted_on} · ${r.status}`}
+                    {tab === "briefs" && `${r.status}${r.status === "published" ? ` · ${r.audience === "selected" ? "selected creators" : "all creators"}` : ""} · ${formatDateTime(r.created_at)}`}
+                    {tab === "posts" && `${r.creators?.full_name ?? ""} · ${r.platform} · ${r.posted_on} · ${r.status}${r.pay_status === "due" ? ` · $${Number(r.amount_usd).toFixed(2)} due` : r.pay_status === "held" ? " · held: no rate card" : ""}${r.views != null ? ` · ${r.views.toLocaleString()} views` : ""}`}
                     {tab === "calls" && formatDateTime(r.starts_at)}
                     {tab === "library" && `${r.platform} · ${r.category}${r.pinned ? " · pinned" : ""}${r.active ? "" : " · inactive"}`}
                   </span>
@@ -105,12 +138,15 @@ export function CreatorOps() {
                   <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(`${origin}/creators/app?invite=${r.invite_token}`); toast.success("Invite link copied."); }}>Copy invite</Button>
                 )}
                 {tab === "briefs" && (
-                  <Button size="sm" variant="outline" onClick={() => update("briefs", r.id, { status: r.status === "published" ? "draft" : "published" })}>
-                    {r.status === "published" ? "Unpublish" : "Publish"}
-                  </Button>
+                  r.status === "published" ? (
+                    <Button size="sm" variant="outline" onClick={() => update("briefs", r.id, { status: "draft" })}>Unpublish</Button>
+                  ) : (
+                    <Button size="sm" variant="outline" onClick={() => { setBriefTarget(r.id); setPicked([]); }}>Publish…</Button>
+                  )
                 )}
                 {tab === "library" && (
                   <>
+                    {r.thumbnail_url && <img src={r.thumbnail_url} alt="" loading="lazy" className="h-12 w-9 rounded object-cover" />}
                     <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-portal-accent">Open</a>
                     <Button size="sm" variant="outline" onClick={() => update("reference_videos", r.id, { pinned: !r.pinned })}>{r.pinned ? "Unpin" : "Pin"}</Button>
                     <Button size="sm" variant="outline" onClick={() => update("reference_videos", r.id, { active: !r.active })}>{r.active ? "Deactivate" : "Activate"}</Button>

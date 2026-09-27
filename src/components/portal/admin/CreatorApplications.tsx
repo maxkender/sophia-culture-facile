@@ -284,9 +284,15 @@ function SlideshowAgreement({ app, onChange }: { app: SlideshowApplication; onCh
   const gen = useServerFn(generateSigningLink);
   const [busy, setBusy] = useState(false);
   const link = app.signing_token && typeof window !== "undefined" ? `${window.location.origin}/creators/sign/${app.signing_token}` : null;
+  const { data: hm } = useQuery({
+    queryKey: ["portal", "admin", "hm-name", app.assigned_hm_id],
+    enabled: Boolean(app.assigned_hm_id),
+    queryFn: async () => (await supabase.from("profiles").select("full_name").eq("id", app.assigned_hm_id!).maybeSingle()).data,
+  });
   if (app.status !== "approved") return null;
+  const handoff = hm?.full_name ? <p className="rounded-xl bg-portal-accent/10 p-3 text-sm font-semibold text-portal-accent">Handed to {hm.full_name} for Upwork onboarding</p> : null;
   if (app.agreement_signed_at)
-    return <p className="rounded-xl bg-portal-green/10 p-3 text-sm font-semibold text-portal-green">Agreement signed on {formatDateTime(app.agreement_signed_at)}</p>;
+    return <>{handoff}<p className="rounded-xl bg-portal-green/10 p-3 text-sm font-semibold text-portal-green">Agreement signed on {formatDateTime(app.agreement_signed_at)}</p></>;
   async function regenerate() {
     setBusy(true);
     try {
@@ -301,6 +307,7 @@ function SlideshowAgreement({ app, onChange }: { app: SlideshowApplication; onCh
     }
   }
   return (
+    <>{handoff}
     <div className="space-y-2 rounded-xl border border-portal-amber/40 bg-portal-amber/10 p-3 text-sm">
       <p className="font-semibold text-portal-amber">Agreement not signed</p>
       {link ? (
@@ -316,5 +323,6 @@ function SlideshowAgreement({ app, onChange }: { app: SlideshowApplication; onCh
         {link ? "Regenerate link" : "Generate link"}
       </Button>
     </div>
+    </>
   );
 }

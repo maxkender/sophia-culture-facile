@@ -38,12 +38,13 @@ export function CreatorPayouts() {
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["portal", "admin", "payouts"] });
 
+  const [effectiveFrom, setEffectiveFrom] = useState(new Date().toISOString().slice(0, 10));
   async function addRate() {
     const amount = Number(rate);
     if (!rate || isNaN(amount) || amount < 0) { toast.error("Enter a valid amount."); return; }
     const { error } = await supabase
       .from("creator_rates")
-      .upsert({ track, country: country.trim() || null, rate_usd: amount }, { onConflict: "track,country" });
+      .insert({ track, country: country.trim() || null, rate_usd: amount, effective_from: effectiveFrom });
     if (error) { toast.error("Could not save rate."); return; }
     setRate(""); setCountry(""); toast.success("Rate saved."); refresh();
   }
@@ -52,7 +53,9 @@ export function CreatorPayouts() {
     try {
       const res = await gen({ data: { period } });
       toast.success(`Batch created: ${res.items} payout line(s).`);
-      if (res.missingRates.length) toast.warning(`No rate for: ${res.missingRates.join(", ")}`);
+      if (res.missingRates.length) toast.warning(res.missingRates.join(", "));
+      const split = Object.entries(res.byMethod ?? {}).map(([m, v]) => `${m}: ${v.creators} creator(s), $${v.usd.toFixed(2)}`).join(" · ");
+      if (split) toast.info(`Split by payout method (USD) — ${split}`);
       refresh();
     } catch (e: any) {
       toast.error(e?.message ?? "Could not generate batch.");
@@ -116,6 +119,7 @@ export function CreatorPayouts() {
             </select>
             <Input placeholder="Country (empty = default)" value={country} onChange={(e) => setCountry(e.target.value)} />
             <Input placeholder="Rate per post (USD)" type="number" min="0" step="0.01" value={rate} onChange={(e) => setRate(e.target.value)} />
+            <Input type="date" aria-label="Effective from" value={effectiveFrom} onChange={(e) => setEffectiveFrom(e.target.value)} />
             <Button onClick={addRate}>Save rate</Button>
           </PortalCard>
           {rows.length === 0 ? (
@@ -124,7 +128,7 @@ export function CreatorPayouts() {
             <PortalCard className="divide-y p-0">
               {rows.map((r) => (
                 <div key={r.id} className="flex items-center justify-between px-4 py-2 text-sm">
-                  <span>{r.track} · {r.country ?? "all countries"}</span>
+                  <span>{r.track} · {r.country ?? "all countries"} · from {r.effective_from}</span>
                   <span className="font-semibold">${Number(r.rate_usd).toFixed(2)} / post</span>
                 </div>
               ))}

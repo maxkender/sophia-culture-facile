@@ -317,8 +317,45 @@ export type Database = {
         }
         Relationships: []
       }
+      brief_assignments: {
+        Row: {
+          brief_id: string
+          created_at: string
+          creator_id: string
+          id: string
+        }
+        Insert: {
+          brief_id: string
+          created_at?: string
+          creator_id: string
+          id?: string
+        }
+        Update: {
+          brief_id?: string
+          created_at?: string
+          creator_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brief_assignments_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brief_assignments_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       briefs: {
         Row: {
+          audience: string
           body: string
           created_at: string
           created_by: string | null
@@ -329,6 +366,7 @@ export type Database = {
           title: string
         }
         Insert: {
+          audience?: string
           body?: string
           created_at?: string
           created_by?: string | null
@@ -339,6 +377,7 @@ export type Database = {
           title: string
         }
         Update: {
+          audience?: string
           body?: string
           created_at?: string
           created_by?: string | null
@@ -801,6 +840,48 @@ export type Database = {
           },
         ]
       }
+      creator_call_rsvps: {
+        Row: {
+          answer: string
+          call_id: string
+          created_at: string
+          creator_id: string
+          id: string
+          reminded_at: string | null
+        }
+        Insert: {
+          answer?: string
+          call_id: string
+          created_at?: string
+          creator_id: string
+          id?: string
+          reminded_at?: string | null
+        }
+        Update: {
+          answer?: string
+          call_id?: string
+          created_at?: string
+          creator_id?: string
+          id?: string
+          reminded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_call_rsvps_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "creator_calls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_call_rsvps_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_calls: {
         Row: {
           created_at: string
@@ -942,6 +1023,38 @@ export type Database = {
           },
         ]
       }
+      creator_notifications: {
+        Row: {
+          body: string
+          created_at: string
+          creator_id: string
+          id: string
+          read_at: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          creator_id: string
+          id?: string
+          read_at?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          creator_id?: string
+          id?: string
+          read_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_notifications_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_payout_profiles: {
         Row: {
           created_at: string
@@ -988,46 +1101,61 @@ export type Database = {
       }
       creator_posts: {
         Row: {
+          amount_usd: number | null
           brief_id: string | null
           created_at: string
           creator_id: string
           feedback: string | null
           id: string
           likes: number | null
+          pay_status: string | null
           platform: string
           posted_on: string
+          rate_id: string | null
           reference_video_id: string | null
+          skip_reason: string | null
           status: string
           url: string
           views: number | null
+          views_entered_at: string | null
         }
         Insert: {
+          amount_usd?: number | null
           brief_id?: string | null
           created_at?: string
           creator_id: string
           feedback?: string | null
           id?: string
           likes?: number | null
+          pay_status?: string | null
           platform?: string
           posted_on?: string
+          rate_id?: string | null
           reference_video_id?: string | null
+          skip_reason?: string | null
           status?: string
           url: string
           views?: number | null
+          views_entered_at?: string | null
         }
         Update: {
+          amount_usd?: number | null
           brief_id?: string | null
           created_at?: string
           creator_id?: string
           feedback?: string | null
           id?: string
           likes?: number | null
+          pay_status?: string | null
           platform?: string
           posted_on?: string
+          rate_id?: string | null
           reference_video_id?: string | null
+          skip_reason?: string | null
           status?: string
           url?: string
           views?: number | null
+          views_entered_at?: string | null
         }
         Relationships: [
           {
@@ -1042,6 +1170,13 @@ export type Database = {
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_posts_rate_id_fkey"
+            columns: ["rate_id"]
+            isOneToOne: false
+            referencedRelation: "creator_rates"
             referencedColumns: ["id"]
           },
           {
@@ -1146,6 +1281,7 @@ export type Database = {
         Row: {
           country: string | null
           created_at: string
+          effective_from: string
           id: string
           rate_usd: number
           track: string
@@ -1153,6 +1289,7 @@ export type Database = {
         Insert: {
           country?: string | null
           created_at?: string
+          effective_from?: string
           id?: string
           rate_usd: number
           track: string
@@ -1160,6 +1297,7 @@ export type Database = {
         Update: {
           country?: string | null
           created_at?: string
+          effective_from?: string
           id?: string
           rate_usd?: number
           track?: string
@@ -1827,6 +1965,7 @@ export type Database = {
           note: string | null
           pinned: boolean
           platform: string
+          thumbnail_url: string | null
           url: string
         }
         Insert: {
@@ -1837,6 +1976,7 @@ export type Database = {
           note?: string | null
           pinned?: boolean
           platform?: string
+          thumbnail_url?: string | null
           url: string
         }
         Update: {
@@ -1847,6 +1987,7 @@ export type Database = {
           note?: string | null
           pinned?: boolean
           platform?: string
+          thumbnail_url?: string | null
           url?: string
         }
         Relationships: []
