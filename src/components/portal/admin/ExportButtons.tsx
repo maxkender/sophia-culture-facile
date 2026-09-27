@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { exportAuthors, exportValidatedCourses } from "@/lib/admin-export.functions";
+import { exportAuthors, exportCoursePages, exportValidatedCourses } from "@/lib/admin-export.functions";
 
 function downloadCsv(filename: string, csv: string) {
   const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
@@ -16,14 +16,15 @@ function downloadCsv(filename: string, csv: string) {
 }
 
 export function ExportButtons() {
-  const [busy, setBusy] = useState<"courses" | "authors" | null>(null);
+  const [busy, setBusy] = useState<"courses" | "pages" | "authors" | null>(null);
   const runCourses = useServerFn(exportValidatedCourses);
+  const runPages = useServerFn(exportCoursePages);
   const runAuthors = useServerFn(exportAuthors);
 
-  const handle = async (kind: "courses" | "authors") => {
+  const handle = async (kind: "courses" | "pages" | "authors") => {
     setBusy(kind);
     try {
-      const result = kind === "courses" ? await runCourses() : await runAuthors();
+      const result = kind === "courses" ? await runCourses() : kind === "pages" ? await runPages() : await runAuthors();
       downloadCsv(result.filename, result.csv);
       toast.success("Export downloaded.");
     } catch {
@@ -38,6 +39,10 @@ export function ExportButtons() {
       <Button variant="pill" size="pillSm" onClick={() => handle("courses")} disabled={busy !== null}>
         {busy === "courses" ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
         Validated courses CSV
+      </Button>
+      <Button variant="pill" size="pillSm" onClick={() => handle("pages")} disabled={busy !== null}>
+        {busy === "pages" ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+        Course content CSV
       </Button>
       <Button variant="pill" size="pillSm" onClick={() => handle("authors")} disabled={busy !== null}>
         {busy === "authors" ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
