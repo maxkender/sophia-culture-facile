@@ -129,10 +129,10 @@ export const fr = {
     login: "Connexion",
   },
   careers: {
-    metaTitle: "Careers — Sophia, culture générale",
+    metaTitle: "Carrières — Sophia, culture générale",
     metaDescription:
       "Travaillez avec Sophia : devenez professeur certifié pour rédiger des cours, ou créateur pour produire des vidéos et des slideshows. Deux voies, choisissez la vôtre.",
-    title: "Careers",
+    title: "Carrières",
     lead: "Deux façons de travailler avec Sophia. Choisissez la vôtre.",
     profs: {
       title: "Professeurs",

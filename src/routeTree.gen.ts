@@ -33,8 +33,12 @@ import { Route as EnCareersRouteImport } from './routes/en/careers'
 import { Route as EnDownloadRouteImport } from './routes/en/download'
 import { Route as EnLegalNoticeRouteImport } from './routes/en/legal-notice'
 import { Route as EnPrivacyRouteImport } from './routes/en/privacy'
+import { Route as EnSlideshowApplicationRouteImport } from './routes/en/slideshow-application'
 import { Route as EnSophiaGeneralKnowledgeRouteImport } from './routes/en/sophia-general-knowledge'
+import { Route as EnUgcApplicationRouteImport } from './routes/en/ugc-application'
 import { Route as FrIndexRouteImport } from './routes/fr/index'
+import { Route as FrCandidatureSlideshowRouteImport } from './routes/fr/candidature-slideshow'
+import { Route as FrCandidatureUgcRouteImport } from './routes/fr/candidature-ugc'
 import { Route as FrCareersRouteImport } from './routes/fr/careers'
 import { Route as FrConfidentialiteRouteImport } from './routes/fr/confidentialite'
 import { Route as FrDevenirProfesseurRouteImport } from './routes/fr/devenir-professeur'
@@ -215,15 +219,35 @@ const EnPrivacyRoute = EnPrivacyRouteImport.update({
   path: '/en/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnSlideshowApplicationRoute = EnSlideshowApplicationRouteImport.update({
+  id: '/en/slideshow-application',
+  path: '/en/slideshow-application',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnSophiaGeneralKnowledgeRoute =
   EnSophiaGeneralKnowledgeRouteImport.update({
     id: '/en/sophia-general-knowledge',
     path: '/en/sophia-general-knowledge',
     getParentRoute: () => rootRouteImport,
   } as any)
+const EnUgcApplicationRoute = EnUgcApplicationRouteImport.update({
+  id: '/en/ugc-application',
+  path: '/en/ugc-application',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FrIndexRoute = FrIndexRouteImport.update({
   id: '/fr/',
   path: '/fr/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrCandidatureSlideshowRoute = FrCandidatureSlideshowRouteImport.update({
+  id: '/fr/candidature-slideshow',
+  path: '/fr/candidature-slideshow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrCandidatureUgcRoute = FrCandidatureUgcRouteImport.update({
+  id: '/fr/candidature-ugc',
+  path: '/fr/candidature-ugc',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FrCareersRoute = FrCareersRouteImport.update({
@@ -577,7 +601,11 @@ export interface FileRoutesByFullPath {
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
+  '/en/slideshow-application': typeof EnSlideshowApplicationRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
+  '/en/ugc-application': typeof EnUgcApplicationRoute
+  '/fr/candidature-slideshow': typeof FrCandidatureSlideshowRoute
+  '/fr/candidature-ugc': typeof FrCandidatureUgcRoute
   '/fr/careers': typeof FrCareersRoute
   '/fr/confidentialite': typeof FrConfidentialiteRoute
   '/fr/devenir-professeur': typeof FrDevenirProfesseurRoute
@@ -663,7 +691,11 @@ export interface FileRoutesByTo {
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
+  '/en/slideshow-application': typeof EnSlideshowApplicationRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
+  '/en/ugc-application': typeof EnUgcApplicationRoute
+  '/fr/candidature-slideshow': typeof FrCandidatureSlideshowRoute
+  '/fr/candidature-ugc': typeof FrCandidatureUgcRoute
   '/fr/careers': typeof FrCareersRoute
   '/fr/confidentialite': typeof FrConfidentialiteRoute
   '/fr/devenir-professeur': typeof FrDevenirProfesseurRoute
@@ -751,7 +783,11 @@ export interface FileRoutesById {
   '/en/download': typeof EnDownloadRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
+  '/en/slideshow-application': typeof EnSlideshowApplicationRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
+  '/en/ugc-application': typeof EnUgcApplicationRoute
+  '/fr/candidature-slideshow': typeof FrCandidatureSlideshowRoute
+  '/fr/candidature-ugc': typeof FrCandidatureUgcRoute
   '/fr/careers': typeof FrCareersRoute
   '/fr/confidentialite': typeof FrConfidentialiteRoute
   '/fr/devenir-professeur': typeof FrDevenirProfesseurRoute
@@ -839,7 +875,11 @@ export interface FileRouteTypes {
     | '/en/download'
     | '/en/legal-notice'
     | '/en/privacy'
+    | '/en/slideshow-application'
     | '/en/sophia-general-knowledge'
+    | '/en/ugc-application'
+    | '/fr/candidature-slideshow'
+    | '/fr/candidature-ugc'
     | '/fr/careers'
     | '/fr/confidentialite'
     | '/fr/devenir-professeur'
@@ -925,7 +965,11 @@ export interface FileRouteTypes {
     | '/en/download'
     | '/en/legal-notice'
     | '/en/privacy'
+    | '/en/slideshow-application'
     | '/en/sophia-general-knowledge'
+    | '/en/ugc-application'
+    | '/fr/candidature-slideshow'
+    | '/fr/candidature-ugc'
     | '/fr/careers'
     | '/fr/confidentialite'
     | '/fr/devenir-professeur'
@@ -1012,7 +1056,11 @@ export interface FileRouteTypes {
     | '/en/download'
     | '/en/legal-notice'
     | '/en/privacy'
+    | '/en/slideshow-application'
     | '/en/sophia-general-knowledge'
+    | '/en/ugc-application'
+    | '/fr/candidature-slideshow'
+    | '/fr/candidature-ugc'
     | '/fr/careers'
     | '/fr/confidentialite'
     | '/fr/devenir-professeur'
@@ -1100,7 +1148,11 @@ export interface RootRouteChildren {
   EnDownloadRoute: typeof EnDownloadRoute
   EnLegalNoticeRoute: typeof EnLegalNoticeRoute
   EnPrivacyRoute: typeof EnPrivacyRoute
+  EnSlideshowApplicationRoute: typeof EnSlideshowApplicationRoute
   EnSophiaGeneralKnowledgeRoute: typeof EnSophiaGeneralKnowledgeRoute
+  EnUgcApplicationRoute: typeof EnUgcApplicationRoute
+  FrCandidatureSlideshowRoute: typeof FrCandidatureSlideshowRoute
+  FrCandidatureUgcRoute: typeof FrCandidatureUgcRoute
   FrCareersRoute: typeof FrCareersRoute
   FrConfidentialiteRoute: typeof FrConfidentialiteRoute
   FrDevenirProfesseurRoute: typeof FrDevenirProfesseurRoute
@@ -1301,6 +1353,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/en/slideshow-application': {
+      id: '/en/slideshow-application'
+      path: '/en/slideshow-application'
+      fullPath: '/en/slideshow-application'
+      preLoaderRoute: typeof EnSlideshowApplicationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/en/sophia-general-knowledge': {
       id: '/en/sophia-general-knowledge'
       path: '/en/sophia-general-knowledge'
@@ -1308,11 +1367,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnSophiaGeneralKnowledgeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/en/ugc-application': {
+      id: '/en/ugc-application'
+      path: '/en/ugc-application'
+      fullPath: '/en/ugc-application'
+      preLoaderRoute: typeof EnUgcApplicationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/fr/': {
       id: '/fr/'
       path: '/fr'
       fullPath: '/fr/'
       preLoaderRoute: typeof FrIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/candidature-slideshow': {
+      id: '/fr/candidature-slideshow'
+      path: '/fr/candidature-slideshow'
+      fullPath: '/fr/candidature-slideshow'
+      preLoaderRoute: typeof FrCandidatureSlideshowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/candidature-ugc': {
+      id: '/fr/candidature-ugc'
+      path: '/fr/candidature-ugc'
+      fullPath: '/fr/candidature-ugc'
+      preLoaderRoute: typeof FrCandidatureUgcRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fr/careers': {
@@ -1864,7 +1944,11 @@ const rootRouteChildren: RootRouteChildren = {
   EnDownloadRoute: EnDownloadRoute,
   EnLegalNoticeRoute: EnLegalNoticeRoute,
   EnPrivacyRoute: EnPrivacyRoute,
+  EnSlideshowApplicationRoute: EnSlideshowApplicationRoute,
   EnSophiaGeneralKnowledgeRoute: EnSophiaGeneralKnowledgeRoute,
+  EnUgcApplicationRoute: EnUgcApplicationRoute,
+  FrCandidatureSlideshowRoute: FrCandidatureSlideshowRoute,
+  FrCandidatureUgcRoute: FrCandidatureUgcRoute,
   FrCareersRoute: FrCareersRoute,
   FrConfidentialiteRoute: FrConfidentialiteRoute,
   FrDevenirProfesseurRoute: FrDevenirProfesseurRoute,

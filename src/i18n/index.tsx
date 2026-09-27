@@ -5,6 +5,7 @@ import {
   courseRoute,
   langFromPath,
   pathFor,
+  ROUTES,
   routeKeyFromPath,
   type Lang,
   type RouteKey,
@@ -32,9 +33,9 @@ export function useI18n() {
 }
 
 /** Chemin localisé d'une page dans la langue courante. */
-export function useLocalePath(key: RouteKey) {
+export function useLocalePath<K extends RouteKey>(key: K): (typeof ROUTES)[K]["fr"] | (typeof ROUTES)[K]["en"] {
   const lang = useLang();
-  return pathFor(key, lang);
+  return lang === "fr" ? ROUTES[key].fr : ROUTES[key].en;
 }
 
 /** Remplace {company} et consorts dans une chaîne traduite. */
@@ -46,7 +47,9 @@ export function fill(template: string, values: Record<string, string>) {
 }
 
 const TOGGLE_CLASS =
-  "rounded-full border border-brand-line px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-navy transition-colors hover:bg-brand-navy/5";
+  "inline-flex min-h-9 min-w-10 items-center justify-center rounded-full border border-brand-line px-2.5 py-1.5 text-base leading-none text-brand-navy transition-colors hover:bg-brand-navy/5";
+
+const FLAGS: Record<Lang, string> = { fr: "🇫🇷", en: "🇬🇧" };
 
 /**
  * Sélecteur de langue : mémorise le choix dans un cookie et conserve la page courante.
@@ -73,14 +76,14 @@ export function LanguageToggle({
   if (alternateSlug) {
     return (
       <Link to={courseRoute(other)} params={{ slug: alternateSlug }} {...common}>
-        {t.langLabel}
+        <span aria-hidden="true">{FLAGS[lang]}</span>
       </Link>
     );
   }
 
   return (
     <Link to={pathFor(key, other)} {...common}>
-      {t.langLabel}
+      <span aria-hidden="true">{FLAGS[lang]}</span>
     </Link>
   );
 }

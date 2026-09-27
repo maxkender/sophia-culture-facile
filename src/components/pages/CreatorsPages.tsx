@@ -25,9 +25,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Hero({ title, subtitle, cta, to, note }: { title: string; subtitle: string; cta: string; to: "/creators/ugc/apply" | "/creators/slideshow/apply"; note?: string }) {
-  const { lang } = useI18n();
-  const formsNote = CREATORS[lang].formsNote;
+function Hero({ title, subtitle, cta, to, note }: { title: string; subtitle: string; cta: string; to: "/fr/candidature-ugc" | "/en/ugc-application" | "/fr/candidature-slideshow" | "/en/slideshow-application"; note?: string }) {
   return (
     <section className="relative isolate overflow-hidden bg-brand-navy">
       <span aria-hidden="true" className="grid-texture absolute inset-0 -z-10" />
@@ -39,7 +37,6 @@ function Hero({ title, subtitle, cta, to, note }: { title: string; subtitle: str
             <Link to={to}>{cta}</Link>
           </Button>
           {note ? <p className="mt-3 text-center text-xs text-brand-onNavy/60">{note}</p> : null}
-          {formsNote ? <p className="mt-1 text-center text-xs text-brand-onNavy/50">{formsNote}</p> : null}
         </div>
       </div>
     </section>
@@ -100,9 +97,10 @@ export function CreatorsChooserPage() {
 export function UgcLandingPage() {
   const { lang } = useI18n();
   const u = CREATORS[lang].ugc;
+  const applyPath = useLocalePath("creatorsUgcApply");
   return (
     <Shell>
-      <Hero title={u.heroTitle} subtitle={u.heroSubtitle} cta={u.cta} to="/creators/ugc/apply" note={u.replyLine} />
+      <Hero title={u.heroTitle} subtitle={u.heroSubtitle} cta={u.cta} to={applyPath} note={u.replyLine} />
       <Section title={u.aboutTitle}>
         <p>{u.about}</p>
       </Section>
@@ -123,7 +121,7 @@ export function UgcLandingPage() {
         <div className="rounded-3xl bg-card p-7 shadow-card">
           <p className="text-[17px] font-semibold text-brand-navy">{u.bottom}</p>
           <Button asChild variant="pill" size="pill" className="mt-5">
-            <Link to="/creators/ugc/apply">{u.cta}</Link>
+            <Link to={applyPath}>{u.cta}</Link>
           </Button>
         </div>
       </section>
@@ -134,9 +132,10 @@ export function UgcLandingPage() {
 export function SlideshowLandingPage() {
   const { lang } = useI18n();
   const s = CREATORS[lang].slideshow;
+  const applyPath = useLocalePath("creatorsSlideshowApply");
   return (
     <Shell>
-      <Hero title={s.heroTitle} subtitle={s.heroSubtitle} cta={s.cta} to="/creators/slideshow/apply" />
+      <Hero title={s.heroTitle} subtitle={s.heroSubtitle} cta={s.cta} to={applyPath} />
       <Section title={s.howTitle}>
         <ol className="space-y-3">
           {s.steps.map((step, i) => (
@@ -160,7 +159,7 @@ export function SlideshowLandingPage() {
       </Section>
       <section className="mx-auto w-full max-w-3xl px-5 pb-20 pt-2">
         <Button asChild variant="pill" size="pill">
-          <Link to="/creators/slideshow/apply">{s.cta}</Link>
+          <Link to={applyPath}>{s.cta}</Link>
         </Button>
       </section>
     </Shell>

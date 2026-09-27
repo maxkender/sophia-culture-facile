@@ -1,18 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { SlideshowApplyPage } from "@/components/creators/SlideshowApplyPage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { detectLangInBrowser } from "@/lib/detect-lang";
 
 export const Route = createFileRoute("/creators/slideshow/apply")({
-  ssr: false,
-  head: () => ({
-    meta: [
-      { title: "Apply as a slideshow creator | Sophia" },
-      { name: "description", content: "Application form to become a slideshow creator for Sophia, the general-knowledge app." },
-      { property: "og:title", content: "Apply as a slideshow creator | Sophia" },
-      { property: "og:description", content: "Application form to become a slideshow creator for Sophia." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex, follow" },
-    ],
-  }),
-  component: SlideshowApplyPage,
+  beforeLoad: () => {
+    const lang = typeof document === "undefined" ? "en" : detectLangInBrowser();
+    throw redirect({ to: lang === "fr" ? "/fr/candidature-slideshow" : "/en/slideshow-application", replace: true });
+  },
+  component: () => null,
 });
