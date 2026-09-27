@@ -58,7 +58,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       ugc: {
         title: "UGC creator",
         lines: [
-          "You appear on camera. You post videos about Sophia on your own account, five times a week, from our daily briefs.",
+          "You appear on camera. You set up a new account that belongs to Sophia and post videos there, five times a week, from our daily briefs.",
           "Paid per video: a fixed fee plus a bonus that grows with views. The best-paid track, and the most demanding.",
           "Requires an iPhone, being comfortable on camera, and posting consistently.",
         ],
@@ -67,7 +67,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       slideshow: {
         title: "Slideshow creator",
         lines: [
-          "You do not appear on camera. You set up a TikTok account, and every day we send you two ready-made posts to assemble and publish.",
+          "You do not appear on camera. You set up a new TikTok account that belongs to Sophia, and every day we send you two ready-made posts to assemble and publish.",
           "Paid a fixed amount per post, between $0.40 and $1.10 depending on your country. Simple, predictable, no performance pressure.",
           "Requires a phone, thirty minutes a day, and following instructions exactly.",
         ],
@@ -77,7 +77,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
     ugc: {
       metaTitle: "Become a Sophia UGC creator: paid per video",
       metaDescription:
-        "Post short videos about Sophia on your own TikTok. Daily briefs, a hiring manager for your country, and a fee for every video.",
+        "Post short videos on a Sophia TikTok account you run. Daily briefs, a hiring manager for your country, and a fee for every video.",
       heroTitle: "Create content for Sophia",
       heroSubtitle:
         "Post about an app that makes people smarter. Daily briefs, a team behind you, and a fee for every video.",
@@ -88,7 +88,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         "Sophia is a general-knowledge app: short courses on history, science, art, literature, mythology and the world today, read in under ten minutes. It is one of the fastest-growing general-knowledge apps, with 200,000 active users a few months after launch. More than a hundred creators already work with us.",
       doingTitle: "What you will be doing",
       doing: [
-        "You post short videos about Sophia on your own TikTok account, at least five times a week. We send you daily briefs and inspiration so you never start from a blank page. Sometimes the videos will be about other apps we work with, and we tell you when.",
+        "You set up a new TikTok account for Sophia, following our instructions, and post short videos there at least five times a week. The account belongs to Sophia; you run it. We send you daily briefs and inspiration so you never start from a blank page.",
         "You are paid per video: a fixed fee for each one, plus a bonus when it performs. We explain the exact figures at the interview.",
         "You work with a hiring manager for your country who answers your questions, reviews your videos and helps you get better.",
       ],
@@ -101,6 +101,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         "You do not currently work for a competing app",
         "You are at least 18 years old",
         "You are good on camera",
+        "You agree to sign an account agreement before starting",
       ],
       whyTitle: "Why Sophia",
       why: [
@@ -122,7 +123,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       howTitle: "How it works",
       steps: [
         "You apply below. We reply within five days.",
-        "If accepted, you get an account in our system and you set up a fresh TikTok account following our instructions.",
+        "If accepted, you get an account in our system and you set up a fresh TikTok account for Sophia, following our instructions. The account belongs to Sophia; you run it.",
         "You warm the account up for a few days, exactly as we tell you. Then the posts start.",
         "Every day, two posts are waiting for you in your space: the slides, the caption, the music. You assemble and publish. Nothing to invent.",
       ],
@@ -137,6 +138,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         "You have a smartphone and a reliable connection",
         "You can post two slideshows a day, every day",
         "You do not currently work for a competing app",
+        "You agree to sign an account agreement before starting",
       ],
     },
     formsNote: "",
@@ -151,7 +153,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       ugc: {
         title: "Créateur UGC",
         lines: [
-          "Vous apparaissez à l'écran. Vous publiez des vidéos sur Sophia depuis votre propre compte, cinq fois par semaine, à partir de nos briefs quotidiens.",
+          "Vous apparaissez à l'écran. Vous créez un nouveau compte qui appartient à Sophia et vous y publiez des vidéos, cinq fois par semaine, à partir de nos briefs quotidiens.",
           "Payé à la vidéo : un montant fixe, plus un bonus qui augmente avec les vues. La formule la mieux rémunérée, et la plus exigeante.",
           "Il faut un iPhone, être à l'aise face caméra et publier avec régularité.",
         ],
@@ -160,7 +162,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       slideshow: {
         title: "Créateur de slideshows",
         lines: [
-          "Vous n'apparaissez pas à l'écran. Vous créez un compte TikTok, et chaque jour nous vous envoyons deux posts prêts à assembler et à publier.",
+          "Vous n'apparaissez pas à l'écran. Vous créez un nouveau compte TikTok qui appartient à Sophia, et chaque jour nous vous envoyons deux posts prêts à assembler et à publier.",
           "Un montant fixe par post, entre 0,40 $ et 1,10 $ selon votre pays. Simple, prévisible, sans pression sur les performances.",
           "Il faut un téléphone, trente minutes par jour, et suivre les consignes à la lettre.",
         ],
@@ -170,7 +172,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
     ugc: {
       metaTitle: "Devenir créateur UGC pour Sophia : payé à la vidéo",
       metaDescription:
-        "Publiez de courtes vidéos sur Sophia depuis votre compte TikTok. Des briefs chaque jour, un responsable pour votre pays et une rémunération pour chaque vidéo.",
+        "Publiez de courtes vidéos sur un compte TikTok Sophia que vous animez. Des briefs chaque jour, un responsable pour votre pays et une rémunération pour chaque vidéo.",
       heroTitle: "Créez du contenu pour Sophia",
       heroSubtitle:
         "Parlez d'une appli qui rend les gens plus cultivés. Des briefs chaque jour, une équipe derrière vous, et une rémunération pour chaque vidéo.",
@@ -181,7 +183,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         "Sophia est une appli de culture générale : des cours courts sur l'histoire, les sciences, l'art, la littérature, la mythologie et le monde actuel, qui se lisent en moins de dix minutes. C'est l'une des applis de culture générale qui grandit le plus vite, avec 200 000 utilisateurs actifs quelques mois après son lancement. Plus d'une centaine de créateurs travaillent déjà avec nous.",
       doingTitle: "Ce que vous ferez",
       doing: [
-        "Vous publiez de courtes vidéos sur Sophia depuis votre propre compte TikTok, au moins cinq fois par semaine. Nous vous envoyons des briefs et des idées chaque jour : vous ne partez jamais d'une page blanche. Certaines vidéos porteront sur d'autres applis avec lesquelles nous travaillons, et nous vous le signalons.",
+        "Vous créez un nouveau compte TikTok pour Sophia, en suivant nos consignes, et vous y publiez de courtes vidéos au moins cinq fois par semaine. Le compte appartient à Sophia ; c'est vous qui l'animez. Nous vous envoyons des briefs et des idées chaque jour : vous ne partez jamais d'une page blanche.",
         "Vous êtes payé à la vidéo : un montant fixe pour chacune, plus un bonus quand elle marche bien. Nous détaillons les chiffres exacts lors de l'entretien.",
         "Vous travaillez avec un responsable pour votre pays, qui répond à vos questions, relit vos vidéos et vous aide à progresser.",
       ],
@@ -194,6 +196,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         "Vous ne travaillez pas actuellement pour une appli concurrente",
         "Vous avez au moins 18 ans",
         "Vous êtes à l'aise face caméra",
+        "Vous acceptez de signer un contrat de compte avant de commencer",
       ],
       whyTitle: "Pourquoi Sophia",
       why: [
