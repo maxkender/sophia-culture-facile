@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+import { creatorSteps } from "@/lib/creator-steps";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -25,7 +27,7 @@ export function CreatorOps() {
   const { data } = useQuery({
     queryKey: ["portal", "admin", "creator-ops", tab],
     queryFn: async () => {
-      if (tab === "creators") return (await supabase.from("creators").select("*, creator_signatures(id)").order("created_at", { ascending: false })).data ?? [];
+      if (tab === "creators") return (await supabase.from("creators").select("*, creator_signatures(id), creator_payout_profiles(*)").order("created_at", { ascending: false })).data ?? [];
       if (tab === "briefs") return (await supabase.from("briefs").select("*").order("created_at", { ascending: false })).data ?? [];
       if (tab === "posts") return (await supabase.from("creator_posts").select("*, creators(full_name)").order("created_at", { ascending: false })).data ?? [];
       if (tab === "library") return (await supabase.from("reference_videos").select("*").order("pinned", { ascending: false }).order("created_at", { ascending: false })).data ?? [];
@@ -127,13 +129,16 @@ export function CreatorOps() {
                 <span className="min-w-0 flex-1">
                   <span className="block font-semibold text-brand-navy">{r.full_name ?? r.title ?? r.url}</span>
                   <span className="block text-xs text-brand-navySoft">
-                    {tab === "creators" && `${r.email} · ${r.status} · ${creatorProgress(r)} / 5 onboarding steps`}
+                    {tab === "creators" && `${r.email} · ${r.status} · Onboarding ${creatorProgress(r)}/4`}
                     {tab === "briefs" && `${r.status}${r.status === "published" ? ` · ${r.audience === "selected" ? "selected creators" : "all creators"}` : ""} · ${formatDateTime(r.created_at)}`}
                     {tab === "posts" && `${r.creators?.full_name ?? ""} · ${r.platform} · ${r.posted_on} · ${r.status}${r.pay_status === "due" ? ` · $${Number(r.amount_usd).toFixed(2)} due` : r.pay_status === "held" ? " · held: no rate card" : ""}${r.views != null ? ` · ${r.views.toLocaleString()} views` : ""}`}
                     {tab === "calls" && formatDateTime(r.starts_at)}
                     {tab === "library" && `${r.platform} · ${r.category}${r.pinned ? " · pinned" : ""}${r.active ? "" : " · inactive"}`}
                   </span>
                 </span>
+                {tab === "creators" && (
+                  <Button asChild size="sm" variant="outline"><Link to="/auteurs/admin/creators/$creatorId" params={{ creatorId: r.id }}>Open</Link></Button>
+                )}
                 {tab === "creators" && r.invite_token && !r.user_id && (
                   <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(`${origin}/creators/app?invite=${r.invite_token}`); toast.success("Invite link copied."); }}>Copy invite</Button>
                 )}
@@ -170,7 +175,8 @@ export function CreatorOps() {
 }
 
 function creatorProgress(creator: any) {
-  return [creator.motivation_confirmed_at, creator.creator_signatures?.length, creator.social_account_created_at, creator.slack_joined_at, creator.onboarding_completed_at].filter(Boolean).length;
+  const payout = Array.isArray(creator.creator_payout_profiles) ? creator.creator_payout_profiles[0] : creator.creator_payout_profiles;
+  return creatorSteps(creator, Boolean(creator.creator_signatures?.length), payout).count;
 }
 
 function AcceptanceEmailEditor({ row, onSaved }: { row: any; onSaved: () => void }) {

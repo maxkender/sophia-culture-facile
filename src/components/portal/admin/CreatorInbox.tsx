@@ -78,7 +78,7 @@ export function CreatorInbox() {
                 {thread.length === 0 && <p className="text-sm text-muted-foreground">No messages yet.</p>}
                 {thread.map((m) => (
                   <div key={m.id} className={`rounded-lg p-2 text-sm ${m.from_admin ? "ml-8 bg-primary/10" : "mr-8 bg-muted"}`}>
-                    <p className="whitespace-pre-wrap">{m.body}</p>
+                    <p className="whitespace-pre-wrap">{m.post_id ? "[On a post] " : ""}{m.body}</p>
                     <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(m.created_at)}</p>
                   </div>
                 ))}

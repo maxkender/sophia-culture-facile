@@ -17,6 +17,7 @@ export type Database = {
       access_codes: {
         Row: {
           assigned_at: string | null
+          assigned_creator_id: string | null
           assigned_to: string | null
           code: string
           created_at: string
@@ -27,6 +28,7 @@ export type Database = {
         }
         Insert: {
           assigned_at?: string | null
+          assigned_creator_id?: string | null
           assigned_to?: string | null
           code: string
           created_at?: string
@@ -37,6 +39,7 @@ export type Database = {
         }
         Update: {
           assigned_at?: string | null
+          assigned_creator_id?: string | null
           assigned_to?: string | null
           code?: string
           created_at?: string
@@ -46,6 +49,13 @@ export type Database = {
           state?: Database["public"]["Enums"]["code_state"]
         }
         Relationships: [
+          {
+            foreignKeyName: "access_codes_assigned_creator_id_fkey"
+            columns: ["assigned_creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "access_codes_assigned_to_fkey"
             columns: ["assigned_to"]
@@ -353,8 +363,51 @@ export type Database = {
           },
         ]
       }
+      brief_reads: {
+        Row: {
+          brief_id: string
+          creator_id: string
+          id: string
+          seen_at: string
+          skip_reason: string | null
+          skipped_at: string | null
+        }
+        Insert: {
+          brief_id: string
+          creator_id: string
+          id?: string
+          seen_at?: string
+          skip_reason?: string | null
+          skipped_at?: string | null
+        }
+        Update: {
+          brief_id?: string
+          creator_id?: string
+          id?: string
+          seen_at?: string
+          skip_reason?: string | null
+          skipped_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brief_reads_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brief_reads_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       briefs: {
         Row: {
+          app: string
           audience: string
           body: string
           created_at: string
@@ -362,10 +415,12 @@ export type Database = {
           due_date: string | null
           hook: string | null
           id: string
+          reference_video_ids: string[]
           status: string
           title: string
         }
         Insert: {
+          app?: string
           audience?: string
           body?: string
           created_at?: string
@@ -373,10 +428,12 @@ export type Database = {
           due_date?: string | null
           hook?: string | null
           id?: string
+          reference_video_ids?: string[]
           status?: string
           title: string
         }
         Update: {
+          app?: string
           audience?: string
           body?: string
           created_at?: string
@@ -384,6 +441,7 @@ export type Database = {
           due_date?: string | null
           hook?: string | null
           id?: string
+          reference_video_ids?: string[]
           status?: string
           title?: string
         }
@@ -843,6 +901,7 @@ export type Database = {
       creator_call_rsvps: {
         Row: {
           answer: string
+          attended: boolean | null
           call_id: string
           created_at: string
           creator_id: string
@@ -851,6 +910,7 @@ export type Database = {
         }
         Insert: {
           answer?: string
+          attended?: boolean | null
           call_id: string
           created_at?: string
           creator_id: string
@@ -859,6 +919,7 @@ export type Database = {
         }
         Update: {
           answer?: string
+          attended?: boolean | null
           call_id?: string
           created_at?: string
           creator_id?: string
@@ -995,6 +1056,7 @@ export type Database = {
           creator_id: string
           from_admin: boolean
           id: string
+          post_id: string | null
           read_at: string | null
         }
         Insert: {
@@ -1003,6 +1065,7 @@ export type Database = {
           creator_id: string
           from_admin: boolean
           id?: string
+          post_id?: string | null
           read_at?: string | null
         }
         Update: {
@@ -1011,6 +1074,7 @@ export type Database = {
           creator_id?: string
           from_admin?: boolean
           id?: string
+          post_id?: string | null
           read_at?: string | null
         }
         Relationships: [
@@ -1019,6 +1083,13 @@ export type Database = {
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_messages_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "creator_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -1102,6 +1173,7 @@ export type Database = {
       creator_posts: {
         Row: {
           amount_usd: number | null
+          bonus_usd: number | null
           brief_id: string | null
           created_at: string
           creator_id: string
@@ -1118,9 +1190,11 @@ export type Database = {
           url: string
           views: number | null
           views_entered_at: string | null
+          views_screenshot_path: string | null
         }
         Insert: {
           amount_usd?: number | null
+          bonus_usd?: number | null
           brief_id?: string | null
           created_at?: string
           creator_id: string
@@ -1137,9 +1211,11 @@ export type Database = {
           url: string
           views?: number | null
           views_entered_at?: string | null
+          views_screenshot_path?: string | null
         }
         Update: {
           amount_usd?: number | null
+          bonus_usd?: number | null
           brief_id?: string | null
           created_at?: string
           creator_id?: string
@@ -1156,6 +1232,7 @@ export type Database = {
           url?: string
           views?: number | null
           views_entered_at?: string | null
+          views_screenshot_path?: string | null
         }
         Relationships: [
           {
@@ -1355,6 +1432,50 @@ export type Database = {
           },
         ]
       }
+      creator_social_accounts: {
+        Row: {
+          account_email: string
+          creator_id: string
+          device: string | null
+          handle: string
+          id: string
+          password_encrypted: string
+          phone: string | null
+          registered_at: string
+          updated_at: string
+        }
+        Insert: {
+          account_email: string
+          creator_id: string
+          device?: string | null
+          handle: string
+          id?: string
+          password_encrypted: string
+          phone?: string | null
+          registered_at?: string
+          updated_at?: string
+        }
+        Update: {
+          account_email?: string
+          creator_id?: string
+          device?: string | null
+          handle?: string
+          id?: string
+          password_encrypted?: string
+          phone?: string | null
+          registered_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_social_accounts_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: true
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_weekly_guides: {
         Row: {
           body: string
@@ -1387,6 +1508,8 @@ export type Database = {
       }
       creators: {
         Row: {
+          access_code: string | null
+          access_redeem_url: string | null
           admin_notes: string | null
           application_id: string | null
           assigned_hm_id: string | null
@@ -1401,7 +1524,13 @@ export type Database = {
           invite_token: string | null
           motivation_confirmed_at: string | null
           onboarding_completed_at: string | null
+          phone: string | null
+          photo_path: string | null
+          platform: string | null
           profile_picture_confirmed: boolean
+          rules_accepted_at: string | null
+          rules_version: number | null
+          setup_guide_checks: Json
           slack_joined_at: string | null
           social_account_created_at: string | null
           social_bio: string | null
@@ -1409,9 +1538,12 @@ export type Database = {
           status: string
           track: string
           user_id: string | null
+          warmup: Json
           weekly_target: number
         }
         Insert: {
+          access_code?: string | null
+          access_redeem_url?: string | null
           admin_notes?: string | null
           application_id?: string | null
           assigned_hm_id?: string | null
@@ -1426,7 +1558,13 @@ export type Database = {
           invite_token?: string | null
           motivation_confirmed_at?: string | null
           onboarding_completed_at?: string | null
+          phone?: string | null
+          photo_path?: string | null
+          platform?: string | null
           profile_picture_confirmed?: boolean
+          rules_accepted_at?: string | null
+          rules_version?: number | null
+          setup_guide_checks?: Json
           slack_joined_at?: string | null
           social_account_created_at?: string | null
           social_bio?: string | null
@@ -1434,9 +1572,12 @@ export type Database = {
           status?: string
           track?: string
           user_id?: string | null
+          warmup?: Json
           weekly_target?: number
         }
         Update: {
+          access_code?: string | null
+          access_redeem_url?: string | null
           admin_notes?: string | null
           application_id?: string | null
           assigned_hm_id?: string | null
@@ -1451,7 +1592,13 @@ export type Database = {
           invite_token?: string | null
           motivation_confirmed_at?: string | null
           onboarding_completed_at?: string | null
+          phone?: string | null
+          photo_path?: string | null
+          platform?: string | null
           profile_picture_confirmed?: boolean
+          rules_accepted_at?: string | null
+          rules_version?: number | null
+          setup_guide_checks?: Json
           slack_joined_at?: string | null
           social_account_created_at?: string | null
           social_bio?: string | null
@@ -1459,6 +1606,7 @@ export type Database = {
           status?: string
           track?: string
           user_id?: string | null
+          warmup?: Json
           weekly_target?: number
         }
         Relationships: [
@@ -1961,34 +2109,43 @@ export type Database = {
           active: boolean
           category: string
           created_at: string
+          format_notes: string | null
           id: string
           note: string | null
           pinned: boolean
           platform: string
           thumbnail_url: string | null
+          title: string | null
           url: string
+          why_it_works: string | null
         }
         Insert: {
           active?: boolean
           category?: string
           created_at?: string
+          format_notes?: string | null
           id?: string
           note?: string | null
           pinned?: boolean
           platform?: string
           thumbnail_url?: string | null
+          title?: string | null
           url: string
+          why_it_works?: string | null
         }
         Update: {
           active?: boolean
           category?: string
           created_at?: string
+          format_notes?: string | null
           id?: string
           note?: string | null
           pinned?: boolean
           platform?: string
           thumbnail_url?: string | null
+          title?: string | null
           url?: string
+          why_it_works?: string | null
         }
         Relationships: []
       }

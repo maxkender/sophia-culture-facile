@@ -52,6 +52,16 @@ import { Route as AuthenticatedAuteursGuideRouteImport } from './routes/_authent
 import { Route as AuthenticatedAuteursMessagesRouteImport } from './routes/_authenticated/auteurs/messages'
 import { Route as AuthenticatedAuteursOpenRouteImport } from './routes/_authenticated/auteurs/open'
 import { Route as AuthenticatedAuteursProfileRouteImport } from './routes/_authenticated/auteurs/profile'
+import { Route as CreatorsAppIndexRouteImport } from './routes/creators.app.index'
+import { Route as CreatorsAppAccountRouteImport } from './routes/creators.app.account'
+import { Route as CreatorsAppCallsRouteImport } from './routes/creators.app.calls'
+import { Route as CreatorsAppContractRouteImport } from './routes/creators.app.contract'
+import { Route as CreatorsAppEarningsRouteImport } from './routes/creators.app.earnings'
+import { Route as CreatorsAppLibraryRouteImport } from './routes/creators.app.library'
+import { Route as CreatorsAppMessagesRouteImport } from './routes/creators.app.messages'
+import { Route as CreatorsAppPostsRouteImport } from './routes/creators.app.posts'
+import { Route as CreatorsAppProfileRouteImport } from './routes/creators.app.profile'
+import { Route as CreatorsAppRulesRouteImport } from './routes/creators.app.rules'
 import { Route as CreatorsSignTokenRouteImport } from './routes/creators.sign.$token'
 import { Route as CreatorsSlideshowIndexRouteImport } from './routes/creators.slideshow.index'
 import { Route as CreatorsSlideshowApplyRouteImport } from './routes/creators.slideshow.apply'
@@ -82,12 +92,15 @@ import { Route as AuthenticatedAuteursAdminSettingsRouteImport } from './routes/
 import { Route as AuthenticatedAuteursCoursesIndexRouteImport } from './routes/_authenticated/auteurs/courses.index'
 import { Route as AuthenticatedAuteursCoursesCourseIdRouteImport } from './routes/_authenticated/auteurs/courses.$courseId'
 import { Route as ApiPublicAppCoursesRouteImport } from './routes/api/public/app/courses'
+import { Route as CreatorsAppBriefsIndexRouteImport } from './routes/creators.app.briefs.index'
+import { Route as CreatorsAppBriefsBriefIdRouteImport } from './routes/creators.app.briefs.$briefId'
 import { Route as AuthenticatedAuteursAdminAuthorsIndexRouteImport } from './routes/_authenticated/auteurs/admin/authors.index'
 import { Route as AuthenticatedAuteursAdminAuthorsAuthorIdRouteImport } from './routes/_authenticated/auteurs/admin/authors.$authorId'
 import { Route as AuthenticatedAuteursAdminAuthorsNewRouteImport } from './routes/_authenticated/auteurs/admin/authors.new'
 import { Route as AuthenticatedAuteursAdminCoursesIndexRouteImport } from './routes/_authenticated/auteurs/admin/courses.index'
 import { Route as AuthenticatedAuteursAdminCoursesCourseIdRouteImport } from './routes/_authenticated/auteurs/admin/courses.$courseId'
 import { Route as AuthenticatedAuteursAdminCreatorsIndexRouteImport } from './routes/_authenticated/auteurs/admin/creators.index'
+import { Route as AuthenticatedAuteursAdminCreatorsCreatorIdRouteImport } from './routes/_authenticated/auteurs/admin/creators.$creatorId'
 import { Route as AuthenticatedAuteursAdminCreatorsApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.applications'
 import { Route as AuthenticatedAuteursAdminCreatorsMessagesRouteImport } from './routes/_authenticated/auteurs/admin/creators.messages'
 import { Route as AuthenticatedAuteursAdminCreatorsOpsRouteImport } from './routes/_authenticated/auteurs/admin/creators.ops'
@@ -324,6 +337,56 @@ const AuthenticatedAuteursProfileRoute =
     path: '/auteurs/profile',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const CreatorsAppIndexRoute = CreatorsAppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppAccountRoute = CreatorsAppAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppCallsRoute = CreatorsAppCallsRouteImport.update({
+  id: '/calls',
+  path: '/calls',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppContractRoute = CreatorsAppContractRouteImport.update({
+  id: '/contract',
+  path: '/contract',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppEarningsRoute = CreatorsAppEarningsRouteImport.update({
+  id: '/earnings',
+  path: '/earnings',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppLibraryRoute = CreatorsAppLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppMessagesRoute = CreatorsAppMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppPostsRoute = CreatorsAppPostsRouteImport.update({
+  id: '/posts',
+  path: '/posts',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppProfileRoute = CreatorsAppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppRulesRoute = CreatorsAppRulesRouteImport.update({
+  id: '/rules',
+  path: '/rules',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
 const CreatorsSignTokenRoute = CreatorsSignTokenRouteImport.update({
   id: '/creators/sign/$token',
   path: '/creators/sign/$token',
@@ -486,6 +549,17 @@ const ApiPublicAppCoursesRoute = ApiPublicAppCoursesRouteImport.update({
   path: '/api/public/app/courses',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CreatorsAppBriefsIndexRoute = CreatorsAppBriefsIndexRouteImport.update({
+  id: '/briefs/',
+  path: '/briefs/',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppBriefsBriefIdRoute =
+  CreatorsAppBriefsBriefIdRouteImport.update({
+    id: '/briefs/$briefId',
+    path: '/briefs/$briefId',
+    getParentRoute: () => CreatorsAppRoute,
+  } as any)
 const AuthenticatedAuteursAdminAuthorsIndexRoute =
   AuthenticatedAuteursAdminAuthorsIndexRouteImport.update({
     id: '/auteurs/admin/authors/',
@@ -520,6 +594,12 @@ const AuthenticatedAuteursAdminCreatorsIndexRoute =
   AuthenticatedAuteursAdminCreatorsIndexRouteImport.update({
     id: '/auteurs/admin/creators/',
     path: '/auteurs/admin/creators/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursAdminCreatorsCreatorIdRoute =
+  AuthenticatedAuteursAdminCreatorsCreatorIdRouteImport.update({
+    id: '/auteurs/admin/creators/$creatorId',
+    path: '/auteurs/admin/creators/$creatorId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAuteursAdminCreatorsApplicationsRoute =
@@ -609,7 +689,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
-  '/creators/app': typeof CreatorsAppRoute
+  '/creators/app': typeof CreatorsAppRouteWithChildren
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -636,6 +716,15 @@ export interface FileRoutesByFullPath {
   '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/creators/app/account': typeof CreatorsAppAccountRoute
+  '/creators/app/calls': typeof CreatorsAppCallsRoute
+  '/creators/app/contract': typeof CreatorsAppContractRoute
+  '/creators/app/earnings': typeof CreatorsAppEarningsRoute
+  '/creators/app/library': typeof CreatorsAppLibraryRoute
+  '/creators/app/messages': typeof CreatorsAppMessagesRoute
+  '/creators/app/posts': typeof CreatorsAppPostsRoute
+  '/creators/app/profile': typeof CreatorsAppProfileRoute
+  '/creators/app/rules': typeof CreatorsAppRulesRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
   '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
@@ -648,6 +737,7 @@ export interface FileRoutesByFullPath {
   '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
   '/fr/createurs/ugc': typeof FrCreateursUgcRoute
   '/auteurs/': typeof AuthenticatedAuteursIndexRoute
+  '/creators/app/': typeof CreatorsAppIndexRoute
   '/creators/slideshow/': typeof CreatorsSlideshowIndexRoute
   '/creators/ugc/': typeof CreatorsUgcIndexRoute
   '/en/creators/': typeof EnCreatorsIndexRoute
@@ -665,11 +755,14 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
+  '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
   '/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
+  '/creators/app/briefs/': typeof CreatorsAppBriefsIndexRoute
   '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
   '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
+  '/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   '/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
   '/auteurs/admin/creators/messages': typeof AuthenticatedAuteursAdminCreatorsMessagesRoute
   '/auteurs/admin/creators/ops': typeof AuthenticatedAuteursAdminCreatorsOpsRoute
@@ -701,7 +794,6 @@ export interface FileRoutesByTo {
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
-  '/creators/app': typeof CreatorsAppRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -728,6 +820,15 @@ export interface FileRoutesByTo {
   '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/creators/app/account': typeof CreatorsAppAccountRoute
+  '/creators/app/calls': typeof CreatorsAppCallsRoute
+  '/creators/app/contract': typeof CreatorsAppContractRoute
+  '/creators/app/earnings': typeof CreatorsAppEarningsRoute
+  '/creators/app/library': typeof CreatorsAppLibraryRoute
+  '/creators/app/messages': typeof CreatorsAppMessagesRoute
+  '/creators/app/posts': typeof CreatorsAppPostsRoute
+  '/creators/app/profile': typeof CreatorsAppProfileRoute
+  '/creators/app/rules': typeof CreatorsAppRulesRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
   '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
@@ -740,6 +841,7 @@ export interface FileRoutesByTo {
   '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
   '/fr/createurs/ugc': typeof FrCreateursUgcRoute
   '/auteurs': typeof AuthenticatedAuteursIndexRoute
+  '/creators/app': typeof CreatorsAppIndexRoute
   '/creators/slideshow': typeof CreatorsSlideshowIndexRoute
   '/creators/ugc': typeof CreatorsUgcIndexRoute
   '/en/creators': typeof EnCreatorsIndexRoute
@@ -757,11 +859,14 @@ export interface FileRoutesByTo {
   '/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
+  '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
   '/auteurs/admin': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses': typeof AuthenticatedAuteursCoursesIndexRoute
+  '/creators/app/briefs': typeof CreatorsAppBriefsIndexRoute
   '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
   '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
+  '/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   '/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
   '/auteurs/admin/creators/messages': typeof AuthenticatedAuteursAdminCreatorsMessagesRoute
   '/auteurs/admin/creators/ops': typeof AuthenticatedAuteursAdminCreatorsOpsRoute
@@ -795,7 +900,7 @@ export interface FileRoutesById {
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
   '/cours/$slug': typeof CoursSlugRoute
-  '/creators/app': typeof CreatorsAppRoute
+  '/creators/app': typeof CreatorsAppRouteWithChildren
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -822,6 +927,15 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/_authenticated/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/_authenticated/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/creators/app/account': typeof CreatorsAppAccountRoute
+  '/creators/app/calls': typeof CreatorsAppCallsRoute
+  '/creators/app/contract': typeof CreatorsAppContractRoute
+  '/creators/app/earnings': typeof CreatorsAppEarningsRoute
+  '/creators/app/library': typeof CreatorsAppLibraryRoute
+  '/creators/app/messages': typeof CreatorsAppMessagesRoute
+  '/creators/app/posts': typeof CreatorsAppPostsRoute
+  '/creators/app/profile': typeof CreatorsAppProfileRoute
+  '/creators/app/rules': typeof CreatorsAppRulesRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
   '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
@@ -834,6 +948,7 @@ export interface FileRoutesById {
   '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
   '/fr/createurs/ugc': typeof FrCreateursUgcRoute
   '/_authenticated/auteurs/': typeof AuthenticatedAuteursIndexRoute
+  '/creators/app/': typeof CreatorsAppIndexRoute
   '/creators/slideshow/': typeof CreatorsSlideshowIndexRoute
   '/creators/ugc/': typeof CreatorsUgcIndexRoute
   '/en/creators/': typeof EnCreatorsIndexRoute
@@ -851,11 +966,14 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/_authenticated/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
+  '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
   '/_authenticated/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/_authenticated/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
+  '/creators/app/briefs/': typeof CreatorsAppBriefsIndexRoute
   '/_authenticated/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/_authenticated/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
   '/_authenticated/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
+  '/_authenticated/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   '/_authenticated/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
   '/_authenticated/auteurs/admin/creators/messages': typeof AuthenticatedAuteursAdminCreatorsMessagesRoute
   '/_authenticated/auteurs/admin/creators/ops': typeof AuthenticatedAuteursAdminCreatorsOpsRoute
@@ -916,6 +1034,15 @@ export interface FileRouteTypes {
     | '/auteurs/messages'
     | '/auteurs/open'
     | '/auteurs/profile'
+    | '/creators/app/account'
+    | '/creators/app/calls'
+    | '/creators/app/contract'
+    | '/creators/app/earnings'
+    | '/creators/app/library'
+    | '/creators/app/messages'
+    | '/creators/app/posts'
+    | '/creators/app/profile'
+    | '/creators/app/rules'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
     | '/creators/ugc/apply'
@@ -928,6 +1055,7 @@ export interface FileRouteTypes {
     | '/fr/createurs/slideshow'
     | '/fr/createurs/ugc'
     | '/auteurs/'
+    | '/creators/app/'
     | '/creators/slideshow/'
     | '/creators/ugc/'
     | '/en/creators/'
@@ -945,11 +1073,14 @@ export interface FileRouteTypes {
     | '/auteurs/admin/settings'
     | '/auteurs/courses/$courseId'
     | '/api/public/app/courses'
+    | '/creators/app/briefs/$briefId'
     | '/auteurs/admin/'
     | '/auteurs/courses/'
+    | '/creators/app/briefs/'
     | '/auteurs/admin/authors/$authorId'
     | '/auteurs/admin/authors/new'
     | '/auteurs/admin/courses/$courseId'
+    | '/auteurs/admin/creators/$creatorId'
     | '/auteurs/admin/creators/applications'
     | '/auteurs/admin/creators/messages'
     | '/auteurs/admin/creators/ops'
@@ -981,7 +1112,6 @@ export interface FileRouteTypes {
     | '/auteurs/$slug'
     | '/auteurs/invite'
     | '/cours/$slug'
-    | '/creators/app'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -1008,6 +1138,15 @@ export interface FileRouteTypes {
     | '/auteurs/messages'
     | '/auteurs/open'
     | '/auteurs/profile'
+    | '/creators/app/account'
+    | '/creators/app/calls'
+    | '/creators/app/contract'
+    | '/creators/app/earnings'
+    | '/creators/app/library'
+    | '/creators/app/messages'
+    | '/creators/app/posts'
+    | '/creators/app/profile'
+    | '/creators/app/rules'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
     | '/creators/ugc/apply'
@@ -1020,6 +1159,7 @@ export interface FileRouteTypes {
     | '/fr/createurs/slideshow'
     | '/fr/createurs/ugc'
     | '/auteurs'
+    | '/creators/app'
     | '/creators/slideshow'
     | '/creators/ugc'
     | '/en/creators'
@@ -1037,11 +1177,14 @@ export interface FileRouteTypes {
     | '/auteurs/admin/settings'
     | '/auteurs/courses/$courseId'
     | '/api/public/app/courses'
+    | '/creators/app/briefs/$briefId'
     | '/auteurs/admin'
     | '/auteurs/courses'
+    | '/creators/app/briefs'
     | '/auteurs/admin/authors/$authorId'
     | '/auteurs/admin/authors/new'
     | '/auteurs/admin/courses/$courseId'
+    | '/auteurs/admin/creators/$creatorId'
     | '/auteurs/admin/creators/applications'
     | '/auteurs/admin/creators/messages'
     | '/auteurs/admin/creators/ops'
@@ -1101,6 +1244,15 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/messages'
     | '/_authenticated/auteurs/open'
     | '/_authenticated/auteurs/profile'
+    | '/creators/app/account'
+    | '/creators/app/calls'
+    | '/creators/app/contract'
+    | '/creators/app/earnings'
+    | '/creators/app/library'
+    | '/creators/app/messages'
+    | '/creators/app/posts'
+    | '/creators/app/profile'
+    | '/creators/app/rules'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
     | '/creators/ugc/apply'
@@ -1113,6 +1265,7 @@ export interface FileRouteTypes {
     | '/fr/createurs/slideshow'
     | '/fr/createurs/ugc'
     | '/_authenticated/auteurs/'
+    | '/creators/app/'
     | '/creators/slideshow/'
     | '/creators/ugc/'
     | '/en/creators/'
@@ -1130,11 +1283,14 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/settings'
     | '/_authenticated/auteurs/courses/$courseId'
     | '/api/public/app/courses'
+    | '/creators/app/briefs/$briefId'
     | '/_authenticated/auteurs/admin/'
     | '/_authenticated/auteurs/courses/'
+    | '/creators/app/briefs/'
     | '/_authenticated/auteurs/admin/authors/$authorId'
     | '/_authenticated/auteurs/admin/authors/new'
     | '/_authenticated/auteurs/admin/courses/$courseId'
+    | '/_authenticated/auteurs/admin/creators/$creatorId'
     | '/_authenticated/auteurs/admin/creators/applications'
     | '/_authenticated/auteurs/admin/creators/messages'
     | '/_authenticated/auteurs/admin/creators/ops'
@@ -1168,7 +1324,7 @@ export interface RootRouteChildren {
   AuteursSlugRoute: typeof AuteursSlugRoute
   AuteursInviteRoute: typeof AuteursInviteRoute
   CoursSlugRoute: typeof CoursSlugRoute
-  CreatorsAppRoute: typeof CreatorsAppRoute
+  CreatorsAppRoute: typeof CreatorsAppRouteWithChildren
   EnBecomeATeacherRoute: typeof EnBecomeATeacherRoute
   EnCareersRoute: typeof EnCareersRoute
   EnDownloadRoute: typeof EnDownloadRoute
@@ -1512,6 +1668,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/creators/app/': {
+      id: '/creators/app/'
+      path: '/'
+      fullPath: '/creators/app/'
+      preLoaderRoute: typeof CreatorsAppIndexRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/account': {
+      id: '/creators/app/account'
+      path: '/account'
+      fullPath: '/creators/app/account'
+      preLoaderRoute: typeof CreatorsAppAccountRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/calls': {
+      id: '/creators/app/calls'
+      path: '/calls'
+      fullPath: '/creators/app/calls'
+      preLoaderRoute: typeof CreatorsAppCallsRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/contract': {
+      id: '/creators/app/contract'
+      path: '/contract'
+      fullPath: '/creators/app/contract'
+      preLoaderRoute: typeof CreatorsAppContractRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/earnings': {
+      id: '/creators/app/earnings'
+      path: '/earnings'
+      fullPath: '/creators/app/earnings'
+      preLoaderRoute: typeof CreatorsAppEarningsRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/library': {
+      id: '/creators/app/library'
+      path: '/library'
+      fullPath: '/creators/app/library'
+      preLoaderRoute: typeof CreatorsAppLibraryRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/messages': {
+      id: '/creators/app/messages'
+      path: '/messages'
+      fullPath: '/creators/app/messages'
+      preLoaderRoute: typeof CreatorsAppMessagesRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/posts': {
+      id: '/creators/app/posts'
+      path: '/posts'
+      fullPath: '/creators/app/posts'
+      preLoaderRoute: typeof CreatorsAppPostsRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/profile': {
+      id: '/creators/app/profile'
+      path: '/profile'
+      fullPath: '/creators/app/profile'
+      preLoaderRoute: typeof CreatorsAppProfileRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/rules': {
+      id: '/creators/app/rules'
+      path: '/rules'
+      fullPath: '/creators/app/rules'
+      preLoaderRoute: typeof CreatorsAppRulesRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
     '/creators/sign/$token': {
       id: '/creators/sign/$token'
       path: '/creators/sign/$token'
@@ -1722,6 +1948,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAppCoursesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/creators/app/briefs/': {
+      id: '/creators/app/briefs/'
+      path: '/briefs'
+      fullPath: '/creators/app/briefs/'
+      preLoaderRoute: typeof CreatorsAppBriefsIndexRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/briefs/$briefId': {
+      id: '/creators/app/briefs/$briefId'
+      path: '/briefs/$briefId'
+      fullPath: '/creators/app/briefs/$briefId'
+      preLoaderRoute: typeof CreatorsAppBriefsBriefIdRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
     '/_authenticated/auteurs/admin/authors/': {
       id: '/_authenticated/auteurs/admin/authors/'
       path: '/auteurs/admin/authors'
@@ -1762,6 +2002,13 @@ declare module '@tanstack/react-router' {
       path: '/auteurs/admin/creators'
       fullPath: '/auteurs/admin/creators/'
       preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/admin/creators/$creatorId': {
+      id: '/_authenticated/auteurs/admin/creators/$creatorId'
+      path: '/auteurs/admin/creators/$creatorId'
+      fullPath: '/auteurs/admin/creators/$creatorId'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsCreatorIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/auteurs/admin/creators/applications': {
@@ -1874,6 +2121,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuteursAdminAuthorsAuthorIdRoute: typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   AuthenticatedAuteursAdminAuthorsNewRoute: typeof AuthenticatedAuteursAdminAuthorsNewRoute
   AuthenticatedAuteursAdminCoursesCourseIdRoute: typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
+  AuthenticatedAuteursAdminCreatorsCreatorIdRoute: typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   AuthenticatedAuteursAdminCreatorsApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
   AuthenticatedAuteursAdminCreatorsMessagesRoute: typeof AuthenticatedAuteursAdminCreatorsMessagesRoute
   AuthenticatedAuteursAdminCreatorsOpsRoute: typeof AuthenticatedAuteursAdminCreatorsOpsRoute
@@ -1923,6 +2171,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAuteursAdminAuthorsNewRoute,
   AuthenticatedAuteursAdminCoursesCourseIdRoute:
     AuthenticatedAuteursAdminCoursesCourseIdRoute,
+  AuthenticatedAuteursAdminCreatorsCreatorIdRoute:
+    AuthenticatedAuteursAdminCreatorsCreatorIdRoute,
   AuthenticatedAuteursAdminCreatorsApplicationsRoute:
     AuthenticatedAuteursAdminCreatorsApplicationsRoute,
   AuthenticatedAuteursAdminCreatorsMessagesRoute:
@@ -1956,6 +2206,40 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface CreatorsAppRouteChildren {
+  CreatorsAppAccountRoute: typeof CreatorsAppAccountRoute
+  CreatorsAppCallsRoute: typeof CreatorsAppCallsRoute
+  CreatorsAppContractRoute: typeof CreatorsAppContractRoute
+  CreatorsAppEarningsRoute: typeof CreatorsAppEarningsRoute
+  CreatorsAppLibraryRoute: typeof CreatorsAppLibraryRoute
+  CreatorsAppMessagesRoute: typeof CreatorsAppMessagesRoute
+  CreatorsAppPostsRoute: typeof CreatorsAppPostsRoute
+  CreatorsAppProfileRoute: typeof CreatorsAppProfileRoute
+  CreatorsAppRulesRoute: typeof CreatorsAppRulesRoute
+  CreatorsAppIndexRoute: typeof CreatorsAppIndexRoute
+  CreatorsAppBriefsBriefIdRoute: typeof CreatorsAppBriefsBriefIdRoute
+  CreatorsAppBriefsIndexRoute: typeof CreatorsAppBriefsIndexRoute
+}
+
+const CreatorsAppRouteChildren: CreatorsAppRouteChildren = {
+  CreatorsAppAccountRoute: CreatorsAppAccountRoute,
+  CreatorsAppCallsRoute: CreatorsAppCallsRoute,
+  CreatorsAppContractRoute: CreatorsAppContractRoute,
+  CreatorsAppEarningsRoute: CreatorsAppEarningsRoute,
+  CreatorsAppLibraryRoute: CreatorsAppLibraryRoute,
+  CreatorsAppMessagesRoute: CreatorsAppMessagesRoute,
+  CreatorsAppPostsRoute: CreatorsAppPostsRoute,
+  CreatorsAppProfileRoute: CreatorsAppProfileRoute,
+  CreatorsAppRulesRoute: CreatorsAppRulesRoute,
+  CreatorsAppIndexRoute: CreatorsAppIndexRoute,
+  CreatorsAppBriefsBriefIdRoute: CreatorsAppBriefsBriefIdRoute,
+  CreatorsAppBriefsIndexRoute: CreatorsAppBriefsIndexRoute,
+}
+
+const CreatorsAppRouteWithChildren = CreatorsAppRoute._addFileChildren(
+  CreatorsAppRouteChildren,
+)
+
 interface ApiPublicAppCoursesRouteChildren {
   ApiPublicAppCoursesSlugRoute: typeof ApiPublicAppCoursesSlugRoute
 }
@@ -1984,7 +2268,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuteursSlugRoute: AuteursSlugRoute,
   AuteursInviteRoute: AuteursInviteRoute,
   CoursSlugRoute: CoursSlugRoute,
-  CreatorsAppRoute: CreatorsAppRoute,
+  CreatorsAppRoute: CreatorsAppRouteWithChildren,
   EnBecomeATeacherRoute: EnBecomeATeacherRoute,
   EnCareersRoute: EnCareersRoute,
   EnDownloadRoute: EnDownloadRoute,
