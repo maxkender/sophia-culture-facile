@@ -19,7 +19,7 @@ export const claimCreatorInvite = createServerFn({ method: "POST" })
     if (row.email.toLowerCase() !== email) return { ok: false, error: "Sign in with the email this invite was sent to." };
     const { error } = await supabaseAdmin
       .from("creators")
-      .update({ user_id: context.userId, status: "active" })
+      .update({ user_id: context.userId, status: "onboarding" })
       .eq("id", row.id);
     if (error) return { ok: false, error: "Could not activate your account." };
     return { ok: true, error: null };
