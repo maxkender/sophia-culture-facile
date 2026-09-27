@@ -84,7 +84,7 @@ export function SlideshowApplyPage() {
 
   return (
     <ApplyShell title={copy.title} lead={copy.lead}>
-      <form data-funnel="apply" data-track="slideshow" onFocusCapture={(e) => { const f = e.currentTarget; if (!f.dataset.started) { f.dataset.started = "1"; trackFunnel("apply_started", { track: "slideshow" }); } }} onSubmit={onSubmit} className="relative mt-10 grid gap-8 rounded-2xl border border-brand-line bg-card p-6" noValidate>
+      <form data-funnel="apply" data-track="slideshow" onFocusCapture={(e) => { const f = e.currentTarget; if (!f.dataset["started"]) { f.dataset["started"] = "1"; trackFunnel("apply_started", { track: "slideshow" }); } }} onSubmit={onSubmit} className="relative mt-10 grid gap-8 rounded-2xl border border-brand-line bg-card p-6" noValidate>
         <Honeypot value={honey} onChange={setHoney} />
         <FormSection title={copy.about}>
           <div className="space-y-2">

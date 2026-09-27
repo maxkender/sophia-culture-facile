@@ -35,7 +35,7 @@ function SignIn({ invite, invitedEmail }: { invite: string | null; invitedEmail:
     if (invite) check({ data: { token: invite } }).then((r) => { setState(r.state); if (r.state !== "fresh") setMode("in"); }).catch(() => setState("fresh"));
   }, [invite, check]);
   async function go() {
-    if (mode === "up" && !adult) return toast.error("Confirm you are at least 18.");
+    if (mode === "up" && !adult) { toast.error("Confirm you are at least 18."); return; }
     setBusy(true);
     const res =
       mode === "up"
@@ -62,7 +62,7 @@ function SignIn({ invite, invitedEmail }: { invite: string | null; invitedEmail:
       )}
       {mode === "in" && (
         <button className="block text-xs text-brand-navySoft underline" onClick={async () => {
-          if (!email) return toast.error("Enter your email first.");
+          if (!email) { toast.error("Enter your email first."); return; }
           const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
           if (error) toast.error(error.message); else toast.success("Check your inbox for a reset link.");
         }}>Forgot password?</button>
