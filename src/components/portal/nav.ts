@@ -1,5 +1,6 @@
 import {
   Activity,
+  Banknote,
   Code2,
   Compass,
   BookMarked,
