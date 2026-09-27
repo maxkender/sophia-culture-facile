@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AccountNotSetUpRouteImport } from './routes/account-not-set-up'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
@@ -121,6 +122,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountNotSetUpRoute = AccountNotSetUpRouteImport.update({
+  id: '/account-not-set-up',
+  path: '/account-not-set-up',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -676,6 +682,7 @@ const ApiPublicAppCoursesSlugRoute = ApiPublicAppCoursesSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account-not-set-up': typeof AccountNotSetUpRoute
   '/auth': typeof AuthRoute
   '/careers': typeof CareersRoute
   '/confidentialite': typeof ConfidentialiteRoute
@@ -781,6 +788,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account-not-set-up': typeof AccountNotSetUpRoute
   '/auth': typeof AuthRoute
   '/careers': typeof CareersRoute
   '/confidentialite': typeof ConfidentialiteRoute
@@ -887,6 +895,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/account-not-set-up': typeof AccountNotSetUpRoute
   '/auth': typeof AuthRoute
   '/careers': typeof CareersRoute
   '/confidentialite': typeof ConfidentialiteRoute
@@ -994,6 +1003,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account-not-set-up'
     | '/auth'
     | '/careers'
     | '/confidentialite'
@@ -1099,6 +1109,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account-not-set-up'
     | '/auth'
     | '/careers'
     | '/confidentialite'
@@ -1204,6 +1215,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/account-not-set-up'
     | '/auth'
     | '/careers'
     | '/confidentialite'
@@ -1311,6 +1323,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AccountNotSetUpRoute: typeof AccountNotSetUpRoute
   AuthRoute: typeof AuthRoute
   CareersRoute: typeof CareersRoute
   ConfidentialiteRoute: typeof ConfidentialiteRoute
@@ -1379,6 +1392,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account-not-set-up': {
+      id: '/account-not-set-up'
+      path: '/account-not-set-up'
+      fullPath: '/account-not-set-up'
+      preLoaderRoute: typeof AccountNotSetUpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -2254,6 +2274,7 @@ const ApiPublicAppCoursesRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AccountNotSetUpRoute: AccountNotSetUpRoute,
   AuthRoute: AuthRoute,
   CareersRoute: CareersRoute,
   ConfidentialiteRoute: ConfidentialiteRoute,

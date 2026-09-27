@@ -210,7 +210,7 @@ export function PortalShell({
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
-    await navigate({ to: "/auth", replace: true });
+    await navigate({ to: "/auteurs/login", replace: true });
   }
 
   const name = profile?.full_name ?? data?.email ?? "";

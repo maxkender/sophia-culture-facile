@@ -4,6 +4,7 @@ import { Mail, LockKeyhole } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthShell } from "./AuthShell";
+import { homeFor, resolveAccountRole } from "@/lib/account-role";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,7 +27,8 @@ export function AuthPage({ initialEmail = "", startWithReset = false }: { initia
       toast.error("Incorrect email address or password.");
       return;
     }
-    await navigate({ to: "/auteurs", replace: true });
+    const role = await resolveAccountRole();
+    window.location.assign(role ? homeFor(role) : "/auteurs");
   }
 
   async function magicLink() {
@@ -54,7 +56,7 @@ export function AuthPage({ initialEmail = "", startWithReset = false }: { initia
     }
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${window.location.origin}/reset-password?space=authors`,
     });
     setLoading(false);
     if (error) {
@@ -65,7 +67,7 @@ export function AuthPage({ initialEmail = "", startWithReset = false }: { initia
   }
 
   return (
-    <AuthShell title="Author portal" intro="Sign in to write and review Sophia courses.">
+    <AuthShell title="Sophia author space" intro="Sign in to write and review Sophia courses. Creators: your space is at sophia-culture.com/creators/login.">
       <form onSubmit={signIn} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="email">Email address</Label>

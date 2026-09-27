@@ -144,7 +144,7 @@ export function CreatorShell({ children }: { children: ReactNode }) {
     await qc.cancelQueries();
     qc.clear();
     await supabase.auth.signOut();
-    await navigate({ to: "/creators/app" });
+    await navigate({ to: "/creators/login", replace: true });
   }
 
   const all = CREATOR_NAV.flatMap((g) => g.items);
