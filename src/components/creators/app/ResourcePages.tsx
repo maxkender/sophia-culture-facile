@@ -197,7 +197,7 @@ export function AccountSetupPage() {
               try { await tick({ data: { day: d.day, checked: v === true } }); reload(); } catch (e: any) { toast.error(e?.message); }
             }} />
             <span className="flex-1 text-sm text-brand-navy"><b>Day {d.day}:</b> {d.text}{d.day === 6 && <> <Link to="/creators/app/briefs" className="font-semibold text-portal-accent underline">Open briefs</Link></>}</span>
-            {warm[String(d.day)] && <span className="text-xs font-semibold text-portal-green">{fmt(warm[String(d.day)])}</span>}
+            {warm[String(d.day)] && <span className="text-xs font-semibold text-portal-green">{fmt(warm[String(d.day)]!)}</span>}
           </label>
         ))}
       </PortalCard>
