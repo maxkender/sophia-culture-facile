@@ -71,7 +71,7 @@ const BERLIN: Shot[] = [
 function PhoneShot({ shot }: { shot: Shot }) {
   const url = URLS[shot.file];
   return (
-    <figure className="mx-auto w-full max-w-[300px]">
+    <figure className="mx-auto w-full sm:max-w-[300px]">
       <figcaption className="mb-2 text-center text-xs font-semibold uppercase tracking-wide text-brand-navySoft">
         {shot.label}
       </figcaption>

@@ -87,11 +87,11 @@ export function ProspectGrid({ table, hms, activeId, onOpen, onSave }: Props) {
       <div style={{ width }} className="min-w-full">
         <div className="sticky top-0 z-20 border-b border-brand-line bg-brand-surface" role="row">
           <div className="flex">
-            {table.getHeaderGroups()[0]!.headers.map((h) => {
+            {table.getHeaderGroups()[0]!.headers.map((h, hi) => {
               const meta = h.column.columnDef.meta as ColMeta;
               const sorted = h.column.getIsSorted();
               return (
-                <div key={h.id} style={{ width: h.getSize() }} className="relative shrink-0 border-r border-brand-line px-2 py-1.5" role="columnheader">
+                <div key={h.id} style={{ width: h.getSize() }} className={cn("relative shrink-0 border-r border-brand-line px-2 py-1.5", hi === 0 && "sticky left-0 z-30 bg-brand-surface")} role="columnheader">
                   <button
                     type="button"
                     disabled={!h.column.getCanSort()}
@@ -161,6 +161,7 @@ export function ProspectGrid({ table, hms, activeId, onOpen, onSave }: Props) {
                       style={{ width: cell.column.getSize() }}
                       className={cn(
                         "flex shrink-0 items-center overflow-hidden whitespace-nowrap border-r border-brand-line/60 px-2",
+                        ci === 0 && "sticky left-0 z-10 bg-card",
                         focused && "outline outline-2 -outline-offset-2 outline-portal-accent",
                       )}
                       onClick={() => {

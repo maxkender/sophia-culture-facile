@@ -239,6 +239,7 @@
   button[data-size="icon"], button.size-9, button.size-8 { min-width: 44px; }
   [role="checkbox"], input[type="checkbox"], input[type="radio"] { min-width: 22px; min-height: 22px; }
   input, select, textarea { font-size: 16px !important; }
+  [role="grid"] input, [role="grid"] select, [role="grid"] button { min-height: 0; font-size: 12px !important; }
   input[type="file"] { width: 100%; }
   pre, table { max-width: 100%; }
   img, video { max-width: 100%; height: auto; }
