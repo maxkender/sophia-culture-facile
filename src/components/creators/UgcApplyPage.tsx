@@ -1,5 +1,5 @@
 import { trackFunnel } from "@/lib/funnel-events";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { createVideoUploadSlot, submitUgcApplication } from "@/lib/creator-apply.functions";
