@@ -15,3 +15,5 @@ UGC creator acceptance and onboarding mutations use authenticated server functio
 - Public creator application forms use distinct localized routes (`/fr/candidature-*`, `/en/*-application`); legacy `/creators/*/apply` paths only detect language and redirect.
 - Admin sidebar has two modes (ADMIN_AUTHOR_NAV / ADMIN_CREATOR_NAV in nav.ts), picked from the URL then localStorage; why: authors and creators must stay visually separate.
 - Prospects grid prefs and saved views live in admin_ui_prefs (per user); why: choices must follow the admin across devices.
+
+- Space routing is decided by src/lib/account-role.ts (admin > author > creator > none) in the /auteurs gate, the creator space and both login pages; why: one shared login must never show a person the wrong space.
