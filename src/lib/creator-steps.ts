@@ -12,7 +12,7 @@ export const WARMUP_DAYS: { day: number; text: string }[] = [
 
 export const SETUP_GUIDE: { key: string; text: string }[] = [
   { key: "1", text: "Create a new TikTok account. Use a new email address, not one already tied to a TikTok account, and do not link it to a phone number that has another TikTok. Do not log in to this account from the TikTok app where your personal account is signed in; use a separate device or log out first." },
-  { key: "2", text: "Username: sophia.[yourfirstname], all lowercase, no spaces. If it is taken, add your country code: sophia.[yourfirstname].[cc]. Display name: your first name." },
+  { key: "2", text: "Username: your first name, all lowercase, no spaces. If it is taken, add your country code: [yourfirstname].[cc]. Display name: your first name." },
   { key: "3", text: "Profile photo: a clear photo of your face, well lit, looking at the camera. No filters, no group photos." },
   { key: "4", text: "Bio, paste exactly: \"Learning something new every day with Sophia 📚 Get the app 👇\"" },
   { key: "5", text: "Link in bio: taap.it/sophia.culture" },
