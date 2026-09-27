@@ -10,6 +10,7 @@ export function SiteFooter() {
   const privacyPath = useLocalePath("privacy");
   const coursesPath = useLocalePath("courses");
   const applyPath = useLocalePath("apply");
+  const creatorsPath = useLocalePath("creators");
 
   return (
     <footer className="border-t border-brand-line bg-brand-surface">
@@ -37,6 +38,11 @@ export function SiteFooter() {
           <li>
             <Link to={applyPath} className="underline-offset-4 hover:underline">
               {t.nav.becomeTeacher}
+            </Link>
+          </li>
+          <li>
+            <Link to={creatorsPath} className="underline-offset-4 hover:underline">
+              {t.nav.becomeCreator}
             </Link>
           </li>
           <li>
