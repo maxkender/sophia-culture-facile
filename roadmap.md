@@ -10,3 +10,5 @@
 - [ ] Admin creators mode (dashboard, applications, creators, briefs, posts, calls, announcements, messages)
 - [ ] Creator space /creators/app
 - [ ] Reference library (accounts + videos, admin + creator pages, "Use this", brief picker, dashboard block)
+- [ ] Home page: "Devenir créateur / Become a creator" outlined button next to download + footer link
+- [ ] Home page: replace testimonials with the three real App Store reviews (EN translated, with note)
