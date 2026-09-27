@@ -92,6 +92,13 @@
       "when": 1790499422182,
       "tag": "0012_creator_weekly_guides",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1790500633339,
+      "tag": "0013_ugc_creator_onboarding_pipeline",
+      "breakpoints": true
     }
   ]
 }
