@@ -60,6 +60,19 @@ export default {
         },
       });
     }
+    const creatorShort = url.pathname.replace(/\/$/, "").match(/^\/creators(\/ugc|\/slideshow)?$/);
+    if (request.method === "GET" && creatorShort) {
+      const lang = detectLangFromHeaders(request.headers);
+      const base = lang === "fr" ? "/fr/createurs" : "/en/creators";
+      return new Response(null, {
+        status: 302,
+        headers: {
+          location: `${base}${creatorShort[1] ?? ""}${url.search}`,
+          vary: "Accept-Language, Cookie",
+          "cache-control": "no-store",
+        },
+      });
+    }
 
     try {
       const handler = await getServerEntry();

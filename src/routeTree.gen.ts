@@ -24,6 +24,7 @@ import { Route as AuteursSlugRouteImport } from './routes/auteurs.$slug'
 import { Route as AuteursInviteRouteImport } from './routes/auteurs.invite'
 import { Route as CoursIndexRouteImport } from './routes/cours/index'
 import { Route as CoursSlugRouteImport } from './routes/cours/$slug'
+import { Route as CreatorsIndexRouteImport } from './routes/creators.index'
 import { Route as EnIndexRouteImport } from './routes/en/index'
 import { Route as EnBecomeATeacherRouteImport } from './routes/en/become-a-teacher'
 import { Route as EnDownloadRouteImport } from './routes/en/download'
@@ -43,12 +44,20 @@ import { Route as AuthenticatedAuteursGuideRouteImport } from './routes/_authent
 import { Route as AuthenticatedAuteursMessagesRouteImport } from './routes/_authenticated/auteurs/messages'
 import { Route as AuthenticatedAuteursOpenRouteImport } from './routes/_authenticated/auteurs/open'
 import { Route as AuthenticatedAuteursProfileRouteImport } from './routes/_authenticated/auteurs/profile'
+import { Route as CreatorsSlideshowIndexRouteImport } from './routes/creators.slideshow.index'
+import { Route as CreatorsUgcIndexRouteImport } from './routes/creators.ugc.index'
 import { Route as EnAuthorsSlugRouteImport } from './routes/en/authors.$slug'
+import { Route as EnCreatorsIndexRouteImport } from './routes/en/creators/index'
+import { Route as EnCreatorsSlideshowRouteImport } from './routes/en/creators/slideshow'
+import { Route as EnCreatorsUgcRouteImport } from './routes/en/creators/ugc'
 import { Route as EnLessonsIndexRouteImport } from './routes/en/lessons/index'
 import { Route as EnLessonsSlugRouteImport } from './routes/en/lessons/$slug'
 import { Route as FrAuteursSlugRouteImport } from './routes/fr/auteurs.$slug'
 import { Route as FrCoursIndexRouteImport } from './routes/fr/cours/index'
 import { Route as FrCoursSlugRouteImport } from './routes/fr/cours/$slug'
+import { Route as FrCreateursIndexRouteImport } from './routes/fr/createurs/index'
+import { Route as FrCreateursSlideshowRouteImport } from './routes/fr/createurs/slideshow'
+import { Route as FrCreateursUgcRouteImport } from './routes/fr/createurs/ugc'
 import { Route as AuthenticatedAuteursAdminIndexRouteImport } from './routes/_authenticated/auteurs/admin/index'
 import { Route as AuthenticatedAuteursAdminActivityRouteImport } from './routes/_authenticated/auteurs/admin/activity'
 import { Route as AuthenticatedAuteursAdminAiReviewRouteImport } from './routes/_authenticated/auteurs/admin/ai-review'
@@ -146,6 +155,11 @@ const CoursIndexRoute = CoursIndexRouteImport.update({
 const CoursSlugRoute = CoursSlugRouteImport.update({
   id: '/cours/$slug',
   path: '/cours/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsIndexRoute = CreatorsIndexRouteImport.update({
+  id: '/creators/',
+  path: '/creators/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnIndexRoute = EnIndexRouteImport.update({
@@ -251,9 +265,34 @@ const AuthenticatedAuteursProfileRoute =
     path: '/auteurs/profile',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const CreatorsSlideshowIndexRoute = CreatorsSlideshowIndexRouteImport.update({
+  id: '/creators/slideshow/',
+  path: '/creators/slideshow/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsUgcIndexRoute = CreatorsUgcIndexRouteImport.update({
+  id: '/creators/ugc/',
+  path: '/creators/ugc/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnAuthorsSlugRoute = EnAuthorsSlugRouteImport.update({
   id: '/en/authors/$slug',
   path: '/en/authors/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnCreatorsIndexRoute = EnCreatorsIndexRouteImport.update({
+  id: '/en/creators/',
+  path: '/en/creators/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnCreatorsSlideshowRoute = EnCreatorsSlideshowRouteImport.update({
+  id: '/en/creators/slideshow',
+  path: '/en/creators/slideshow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnCreatorsUgcRoute = EnCreatorsUgcRouteImport.update({
+  id: '/en/creators/ugc',
+  path: '/en/creators/ugc',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnLessonsIndexRoute = EnLessonsIndexRouteImport.update({
@@ -279,6 +318,21 @@ const FrCoursIndexRoute = FrCoursIndexRouteImport.update({
 const FrCoursSlugRoute = FrCoursSlugRouteImport.update({
   id: '/fr/cours/$slug',
   path: '/fr/cours/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrCreateursIndexRoute = FrCreateursIndexRouteImport.update({
+  id: '/fr/createurs/',
+  path: '/fr/createurs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrCreateursSlideshowRoute = FrCreateursSlideshowRouteImport.update({
+  id: '/fr/createurs/slideshow',
+  path: '/fr/createurs/slideshow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrCreateursUgcRoute = FrCreateursUgcRouteImport.update({
+  id: '/fr/createurs/ugc',
+  path: '/fr/createurs/ugc',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAuteursAdminIndexRoute =
@@ -443,6 +497,7 @@ export interface FileRoutesByFullPath {
   '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
   '/fr/telecharger': typeof FrTelechargerRoute
   '/cours/': typeof CoursIndexRoute
+  '/creators/': typeof CreatorsIndexRoute
   '/en/': typeof EnIndexRoute
   '/fr/': typeof FrIndexRoute
   '/auteurs/contract': typeof AuthenticatedAuteursContractRoute
@@ -452,12 +507,20 @@ export interface FileRoutesByFullPath {
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
+  '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
+  '/en/creators/ugc': typeof EnCreatorsUgcRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
   '/fr/cours/$slug': typeof FrCoursSlugRoute
+  '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
+  '/fr/createurs/ugc': typeof FrCreateursUgcRoute
   '/auteurs/': typeof AuthenticatedAuteursIndexRoute
+  '/creators/slideshow/': typeof CreatorsSlideshowIndexRoute
+  '/creators/ugc/': typeof CreatorsUgcIndexRoute
+  '/en/creators/': typeof EnCreatorsIndexRoute
   '/en/lessons/': typeof EnLessonsIndexRoute
   '/fr/cours/': typeof FrCoursIndexRoute
+  '/fr/createurs/': typeof FrCreateursIndexRoute
   '/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
   '/auteurs/admin/ai-review': typeof AuthenticatedAuteursAdminAiReviewRoute
   '/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
@@ -507,6 +570,7 @@ export interface FileRoutesByTo {
   '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
   '/fr/telecharger': typeof FrTelechargerRoute
   '/cours': typeof CoursIndexRoute
+  '/creators': typeof CreatorsIndexRoute
   '/en': typeof EnIndexRoute
   '/fr': typeof FrIndexRoute
   '/auteurs/contract': typeof AuthenticatedAuteursContractRoute
@@ -516,12 +580,20 @@ export interface FileRoutesByTo {
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
+  '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
+  '/en/creators/ugc': typeof EnCreatorsUgcRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
   '/fr/cours/$slug': typeof FrCoursSlugRoute
+  '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
+  '/fr/createurs/ugc': typeof FrCreateursUgcRoute
   '/auteurs': typeof AuthenticatedAuteursIndexRoute
+  '/creators/slideshow': typeof CreatorsSlideshowIndexRoute
+  '/creators/ugc': typeof CreatorsUgcIndexRoute
+  '/en/creators': typeof EnCreatorsIndexRoute
   '/en/lessons': typeof EnLessonsIndexRoute
   '/fr/cours': typeof FrCoursIndexRoute
+  '/fr/createurs': typeof FrCreateursIndexRoute
   '/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
   '/auteurs/admin/ai-review': typeof AuthenticatedAuteursAdminAiReviewRoute
   '/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
@@ -573,6 +645,7 @@ export interface FileRoutesById {
   '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
   '/fr/telecharger': typeof FrTelechargerRoute
   '/cours/': typeof CoursIndexRoute
+  '/creators/': typeof CreatorsIndexRoute
   '/en/': typeof EnIndexRoute
   '/fr/': typeof FrIndexRoute
   '/_authenticated/auteurs/contract': typeof AuthenticatedAuteursContractRoute
@@ -582,12 +655,20 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/_authenticated/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
+  '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
+  '/en/creators/ugc': typeof EnCreatorsUgcRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
   '/fr/cours/$slug': typeof FrCoursSlugRoute
+  '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
+  '/fr/createurs/ugc': typeof FrCreateursUgcRoute
   '/_authenticated/auteurs/': typeof AuthenticatedAuteursIndexRoute
+  '/creators/slideshow/': typeof CreatorsSlideshowIndexRoute
+  '/creators/ugc/': typeof CreatorsUgcIndexRoute
+  '/en/creators/': typeof EnCreatorsIndexRoute
   '/en/lessons/': typeof EnLessonsIndexRoute
   '/fr/cours/': typeof FrCoursIndexRoute
+  '/fr/createurs/': typeof FrCreateursIndexRoute
   '/_authenticated/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
   '/_authenticated/auteurs/admin/ai-review': typeof AuthenticatedAuteursAdminAiReviewRoute
   '/_authenticated/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
@@ -639,6 +720,7 @@ export interface FileRouteTypes {
     | '/fr/sophia-culture-generale'
     | '/fr/telecharger'
     | '/cours/'
+    | '/creators/'
     | '/en/'
     | '/fr/'
     | '/auteurs/contract'
@@ -648,12 +730,20 @@ export interface FileRouteTypes {
     | '/auteurs/open'
     | '/auteurs/profile'
     | '/en/authors/$slug'
+    | '/en/creators/slideshow'
+    | '/en/creators/ugc'
     | '/en/lessons/$slug'
     | '/fr/auteurs/$slug'
     | '/fr/cours/$slug'
+    | '/fr/createurs/slideshow'
+    | '/fr/createurs/ugc'
     | '/auteurs/'
+    | '/creators/slideshow/'
+    | '/creators/ugc/'
+    | '/en/creators/'
     | '/en/lessons/'
     | '/fr/cours/'
+    | '/fr/createurs/'
     | '/auteurs/admin/activity'
     | '/auteurs/admin/ai-review'
     | '/auteurs/admin/announcements'
@@ -703,6 +793,7 @@ export interface FileRouteTypes {
     | '/fr/sophia-culture-generale'
     | '/fr/telecharger'
     | '/cours'
+    | '/creators'
     | '/en'
     | '/fr'
     | '/auteurs/contract'
@@ -712,12 +803,20 @@ export interface FileRouteTypes {
     | '/auteurs/open'
     | '/auteurs/profile'
     | '/en/authors/$slug'
+    | '/en/creators/slideshow'
+    | '/en/creators/ugc'
     | '/en/lessons/$slug'
     | '/fr/auteurs/$slug'
     | '/fr/cours/$slug'
+    | '/fr/createurs/slideshow'
+    | '/fr/createurs/ugc'
     | '/auteurs'
+    | '/creators/slideshow'
+    | '/creators/ugc'
+    | '/en/creators'
     | '/en/lessons'
     | '/fr/cours'
+    | '/fr/createurs'
     | '/auteurs/admin/activity'
     | '/auteurs/admin/ai-review'
     | '/auteurs/admin/announcements'
@@ -768,6 +867,7 @@ export interface FileRouteTypes {
     | '/fr/sophia-culture-generale'
     | '/fr/telecharger'
     | '/cours/'
+    | '/creators/'
     | '/en/'
     | '/fr/'
     | '/_authenticated/auteurs/contract'
@@ -777,12 +877,20 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/open'
     | '/_authenticated/auteurs/profile'
     | '/en/authors/$slug'
+    | '/en/creators/slideshow'
+    | '/en/creators/ugc'
     | '/en/lessons/$slug'
     | '/fr/auteurs/$slug'
     | '/fr/cours/$slug'
+    | '/fr/createurs/slideshow'
+    | '/fr/createurs/ugc'
     | '/_authenticated/auteurs/'
+    | '/creators/slideshow/'
+    | '/creators/ugc/'
+    | '/en/creators/'
     | '/en/lessons/'
     | '/fr/cours/'
+    | '/fr/createurs/'
     | '/_authenticated/auteurs/admin/activity'
     | '/_authenticated/auteurs/admin/ai-review'
     | '/_authenticated/auteurs/admin/announcements'
@@ -834,14 +942,23 @@ export interface RootRouteChildren {
   FrSophiaCultureGeneraleRoute: typeof FrSophiaCultureGeneraleRoute
   FrTelechargerRoute: typeof FrTelechargerRoute
   CoursIndexRoute: typeof CoursIndexRoute
+  CreatorsIndexRoute: typeof CreatorsIndexRoute
   EnIndexRoute: typeof EnIndexRoute
   FrIndexRoute: typeof FrIndexRoute
   EnAuthorsSlugRoute: typeof EnAuthorsSlugRoute
+  EnCreatorsSlideshowRoute: typeof EnCreatorsSlideshowRoute
+  EnCreatorsUgcRoute: typeof EnCreatorsUgcRoute
   EnLessonsSlugRoute: typeof EnLessonsSlugRoute
   FrAuteursSlugRoute: typeof FrAuteursSlugRoute
   FrCoursSlugRoute: typeof FrCoursSlugRoute
+  FrCreateursSlideshowRoute: typeof FrCreateursSlideshowRoute
+  FrCreateursUgcRoute: typeof FrCreateursUgcRoute
+  CreatorsSlideshowIndexRoute: typeof CreatorsSlideshowIndexRoute
+  CreatorsUgcIndexRoute: typeof CreatorsUgcIndexRoute
+  EnCreatorsIndexRoute: typeof EnCreatorsIndexRoute
   EnLessonsIndexRoute: typeof EnLessonsIndexRoute
   FrCoursIndexRoute: typeof FrCoursIndexRoute
+  FrCreateursIndexRoute: typeof FrCreateursIndexRoute
   ApiPublicAppCoursesRoute: typeof ApiPublicAppCoursesRouteWithChildren
 }
 
@@ -950,6 +1067,13 @@ declare module '@tanstack/react-router' {
       path: '/cours/$slug'
       fullPath: '/cours/$slug'
       preLoaderRoute: typeof CoursSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/': {
+      id: '/creators/'
+      path: '/creators'
+      fullPath: '/creators/'
+      preLoaderRoute: typeof CreatorsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/': {
@@ -1085,11 +1209,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/creators/slideshow/': {
+      id: '/creators/slideshow/'
+      path: '/creators/slideshow'
+      fullPath: '/creators/slideshow/'
+      preLoaderRoute: typeof CreatorsSlideshowIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/ugc/': {
+      id: '/creators/ugc/'
+      path: '/creators/ugc'
+      fullPath: '/creators/ugc/'
+      preLoaderRoute: typeof CreatorsUgcIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/en/authors/$slug': {
       id: '/en/authors/$slug'
       path: '/en/authors/$slug'
       fullPath: '/en/authors/$slug'
       preLoaderRoute: typeof EnAuthorsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/creators/': {
+      id: '/en/creators/'
+      path: '/en/creators'
+      fullPath: '/en/creators/'
+      preLoaderRoute: typeof EnCreatorsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/creators/slideshow': {
+      id: '/en/creators/slideshow'
+      path: '/en/creators/slideshow'
+      fullPath: '/en/creators/slideshow'
+      preLoaderRoute: typeof EnCreatorsSlideshowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/creators/ugc': {
+      id: '/en/creators/ugc'
+      path: '/en/creators/ugc'
+      fullPath: '/en/creators/ugc'
+      preLoaderRoute: typeof EnCreatorsUgcRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/lessons/': {
@@ -1125,6 +1284,27 @@ declare module '@tanstack/react-router' {
       path: '/fr/cours/$slug'
       fullPath: '/fr/cours/$slug'
       preLoaderRoute: typeof FrCoursSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/createurs/': {
+      id: '/fr/createurs/'
+      path: '/fr/createurs'
+      fullPath: '/fr/createurs/'
+      preLoaderRoute: typeof FrCreateursIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/createurs/slideshow': {
+      id: '/fr/createurs/slideshow'
+      path: '/fr/createurs/slideshow'
+      fullPath: '/fr/createurs/slideshow'
+      preLoaderRoute: typeof FrCreateursSlideshowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/createurs/ugc': {
+      id: '/fr/createurs/ugc'
+      path: '/fr/createurs/ugc'
+      fullPath: '/fr/createurs/ugc'
+      preLoaderRoute: typeof FrCreateursUgcRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/auteurs/admin/': {
@@ -1410,14 +1590,23 @@ const rootRouteChildren: RootRouteChildren = {
   FrSophiaCultureGeneraleRoute: FrSophiaCultureGeneraleRoute,
   FrTelechargerRoute: FrTelechargerRoute,
   CoursIndexRoute: CoursIndexRoute,
+  CreatorsIndexRoute: CreatorsIndexRoute,
   EnIndexRoute: EnIndexRoute,
   FrIndexRoute: FrIndexRoute,
   EnAuthorsSlugRoute: EnAuthorsSlugRoute,
+  EnCreatorsSlideshowRoute: EnCreatorsSlideshowRoute,
+  EnCreatorsUgcRoute: EnCreatorsUgcRoute,
   EnLessonsSlugRoute: EnLessonsSlugRoute,
   FrAuteursSlugRoute: FrAuteursSlugRoute,
   FrCoursSlugRoute: FrCoursSlugRoute,
+  FrCreateursSlideshowRoute: FrCreateursSlideshowRoute,
+  FrCreateursUgcRoute: FrCreateursUgcRoute,
+  CreatorsSlideshowIndexRoute: CreatorsSlideshowIndexRoute,
+  CreatorsUgcIndexRoute: CreatorsUgcIndexRoute,
+  EnCreatorsIndexRoute: EnCreatorsIndexRoute,
   EnLessonsIndexRoute: EnLessonsIndexRoute,
   FrCoursIndexRoute: FrCoursIndexRoute,
+  FrCreateursIndexRoute: FrCreateursIndexRoute,
   ApiPublicAppCoursesRoute: ApiPublicAppCoursesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
