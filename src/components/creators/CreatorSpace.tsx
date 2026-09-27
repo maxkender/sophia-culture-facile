@@ -246,6 +246,11 @@ export function CreatorSpace() {
   }, []);
   useEffect(() => {
     if (!user || !invite) return;
+    if (invitedEmail && user.email && user.email.toLowerCase() !== invitedEmail.toLowerCase()) {
+      // Signed in with another account: switch to the invited email instead of dead-ending.
+      supabase.auth.signOut();
+      return;
+    }
     claim({ data: { token: invite } }).then((r) => {
       if (!r.ok) toast.error(r.error);
       window.history.replaceState(null, "", "/creators/app");
