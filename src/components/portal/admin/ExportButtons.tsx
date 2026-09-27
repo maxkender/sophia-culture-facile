@@ -23,7 +23,7 @@ export function ExportButtons() {
   const handle = async (kind: "courses" | "authors") => {
     setBusy(kind);
     try {
-      const result = kind === "courses" ? await runCourses({ data: {} }) : await runAuthors({ data: {} });
+      const result = kind === "courses" ? await runCourses() : await runAuthors();
       downloadCsv(result.filename, result.csv);
       toast.success("Export downloaded.");
     } catch {
