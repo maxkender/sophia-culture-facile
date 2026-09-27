@@ -4,18 +4,20 @@ const CODES =
     " ",
   );
 
-let cache: string[] | null = null;
+const cache: Partial<Record<"fr" | "en", string[]>> = {};
 
-/** Sorted English country names. */
-export function countryNames(): string[] {
-  if (cache) return cache;
+/** Country names sorted in the requested language. */
+export function countryNames(locale: "fr" | "en" = "en"): string[] {
+  const cached = cache[locale];
+  if (cached) return cached;
   let names: string[];
   try {
-    const dn = new Intl.DisplayNames(["en"], { type: "region" });
+    const dn = new Intl.DisplayNames([locale], { type: "region" });
     names = CODES.map((c) => dn.of(c) ?? c);
   } catch {
     names = CODES;
   }
-  cache = Array.from(new Set(names)).sort((a, b) => a.localeCompare(b));
-  return cache;
+  const sorted = Array.from(new Set(names)).sort((a, b) => a.localeCompare(b, locale));
+  cache[locale] = sorted;
+  return sorted;
 }

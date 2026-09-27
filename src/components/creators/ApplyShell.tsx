@@ -2,19 +2,24 @@ import { Link } from "@tanstack/react-router";
 import { CheckCircle2 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { useI18n, useLocalePath } from "@/i18n";
+import { CREATOR_FORMS } from "@/i18n/creator-forms";
 
 export function ApplyShell({ title, lead, children }: { title: string; lead?: string; children: React.ReactNode }) {
+  const { lang } = useI18n();
+  const copy = CREATOR_FORMS[lang].common;
+  const privacyPath = useLocalePath("privacy");
   return (
-    <div className="flex min-h-screen flex-col bg-brand-surface" lang="en">
+    <div className="flex min-h-screen flex-col bg-brand-surface" lang={lang}>
       <SiteHeader />
       <main className="mx-auto w-full max-w-2xl flex-1 px-5 py-12 md:py-16">
         <h1 className="text-3xl font-extrabold tracking-tight text-brand-navy md:text-4xl">{title}</h1>
         {lead ? <p className="mt-3 text-base leading-relaxed text-brand-navySoft">{lead}</p> : null}
         {children}
         <p className="mt-8 text-xs text-brand-navySoft">
-          Your application is stored by Vik Studios to process it and contact you about it. See our{" "}
-          <Link to="/en/privacy" className="underline underline-offset-4">
-            privacy policy
+          {copy.privacyNotice}{" "}
+          <Link to={privacyPath} className="underline underline-offset-4">
+            {copy.privacy}
           </Link>
           .
         </p>
@@ -43,7 +48,7 @@ export function Confirmation({ text }: { text: string }) {
   );
 }
 
-export function YesNo({ id, value, onChange }: { id: string; value: "" | "yes" | "no"; onChange: (v: "yes" | "no") => void }) {
+export function YesNo({ id, value, onChange, yes = "Yes", no = "No" }: { id: string; value: "" | "yes" | "no"; onChange: (v: "yes" | "no") => void; yes?: string; no?: string }) {
   return (
     <div role="radiogroup" id={id} className="flex gap-3">
       {(["yes", "no"] as const).map((v) => (
@@ -57,7 +62,7 @@ export function YesNo({ id, value, onChange }: { id: string; value: "" | "yes" |
             value === v ? "border-brand-navy bg-brand-navy text-brand-onNavy" : "border-brand-line bg-card text-brand-navy"
           }`}
         >
-          {v === "yes" ? "Yes" : "No"}
+          {v === "yes" ? yes : no}
         </button>
       ))}
     </div>

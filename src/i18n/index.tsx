@@ -46,7 +46,9 @@ export function fill(template: string, values: Record<string, string>) {
 }
 
 const TOGGLE_CLASS =
-  "rounded-full border border-brand-line px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-navy transition-colors hover:bg-brand-navy/5";
+  "inline-flex min-h-9 min-w-10 items-center justify-center rounded-full border border-brand-line px-2.5 py-1.5 text-base leading-none text-brand-navy transition-colors hover:bg-brand-navy/5";
+
+const FLAGS: Record<Lang, string> = { fr: "🇫🇷", en: "🇬🇧" };
 
 /**
  * Sélecteur de langue : mémorise le choix dans un cookie et conserve la page courante.
@@ -73,14 +75,14 @@ export function LanguageToggle({
   if (alternateSlug) {
     return (
       <Link to={courseRoute(other)} params={{ slug: alternateSlug }} {...common}>
-        {t.langLabel}
+        <span aria-hidden="true">{FLAGS[lang]}</span>
       </Link>
     );
   }
 
   return (
     <Link to={pathFor(key, other)} {...common}>
-      {t.langLabel}
+      <span aria-hidden="true">{FLAGS[lang]}</span>
     </Link>
   );
 }

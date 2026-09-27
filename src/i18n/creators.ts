@@ -44,7 +44,6 @@ type CreatorsCopy = {
     reqTitle: string;
     requirements: string[];
   };
-  formsNote: string;
 };
 
 export const CREATORS: Record<Lang, CreatorsCopy> = {
@@ -141,7 +140,6 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         "You agree to sign an account agreement before starting",
       ],
     },
-    formsNote: "",
   },
   fr: {
     chooser: {
@@ -236,6 +234,5 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         "Vous acceptez de signer un contrat de compte avant de commencer",
       ],
     },
-    formsNote: "Le formulaire de candidature est en anglais.",
   },
 };
