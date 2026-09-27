@@ -7,6 +7,7 @@ export const en: Dict = {
   langSwitchAria: "Passer en français",
   brand: "Sophia: General Knowledge",
   nav: {
+    becomeCreator: "Become a creator",
     download: "Download",
     teacherLogin: "Teacher sign in",
     becomeTeacher: "Become a certified teacher",
@@ -96,9 +97,14 @@ export const en: Dict = {
   },
   testimonials: {
     title: "They learn with Sophia",
-    subtitle: "Placeholder reviews, to be replaced with real user feedback before publishing.",
-    name: "NAME TO REPLACE",
-    text: "Testimonial to replace",
+    subtitle: "What people say on the App Store.",
+    source: "App Store",
+    note: "Reviews translated from French. Original wording on the App Store.",
+    items: [
+      { text: "A simple, incredibly handy app for learning something every day.", name: "gab24738" },
+      { text: "One of the rare apps I actually use daily. […] A few minutes are enough to make progress.", name: "Pauline2105" },
+      { text: "Hard to get tired of it, with so many courses and new things to learn and enjoy.", name: "Simon Bafa" },
+    ],
   },
   faqTitle: "Frequently asked questions",
   about: {
