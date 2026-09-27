@@ -57,6 +57,13 @@
       "when": 1790498467052,
       "tag": "0007_creator_messages_and_payout_hardening",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790498804090,
+      "tag": "0008_creator_account_agreement",
+      "breakpoints": true
     }
   ]
 }
