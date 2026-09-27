@@ -217,7 +217,7 @@ export function CreatorApplications() {
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wide text-brand-navySoft" htmlFor="creator-notes">Admin notes</label>
                 <Textarea id="creator-notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Internal notes, never shown to the applicant." />
-                <Button type="button" variant="portalOutline" size="sm" onClick={() => void saveNotes()}>Save notes</Button>
+                <Button type="button" variant="pillSecondary" size="sm" onClick={() => void saveNotes()}>Save notes</Button>
               </div>
 
               {selected.status === "pending" || selected.status === "interview" ? (
@@ -227,9 +227,9 @@ export function CreatorApplications() {
                     <Input id="creator-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Not enough video examples" />
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <Button type="button" variant="portal" size="sm" disabled={busy} onClick={() => void decide(selected.id, "approved")}>Approve</Button>
-                    <Button type="button" variant="portalOutline" size="sm" disabled={busy} onClick={() => void decide(selected.id, "interview")}>Move to interview</Button>
-                    <Button type="button" variant="portalDanger" size="sm" disabled={busy} onClick={() => void decide(selected.id, "rejected")}>Reject</Button>
+                    <Button type="button" variant="pill" size="sm" disabled={busy} onClick={() => void decide(selected.id, "approved")}>Approve</Button>
+                    <Button type="button" variant="pillSecondary" size="sm" disabled={busy} onClick={() => void decide(selected.id, "interview")}>Move to interview</Button>
+                    <Button type="button" variant="destructive" size="sm" disabled={busy} onClick={() => void decide(selected.id, "rejected")}>Reject</Button>
                   </div>
                 </div>
               ) : (
