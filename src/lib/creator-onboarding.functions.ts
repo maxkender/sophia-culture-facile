@@ -127,6 +127,7 @@ export const approveUgcApplication = createServerFn({ method: "POST" })
       text,
       idempotencyKey: `ugc-acceptance-${application.id}`,
       label: "ugc-acceptance",
+      purpose: "transactional",
     });
 
     return { ok: true as const, creatorId, inviteUrl, emailSent: send.sent, emailReason: send.reason ?? null };
