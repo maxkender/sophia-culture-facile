@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { countWords } from "@/lib/portal";
 
 async function assertAdmin(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -158,7 +159,7 @@ export const exportCoursePages = createServerFn({ method: "POST" })
     const [{ data: courses, error }, { data: screens }, { data: sources }] = await Promise.all([
       supabaseAdmin
         .from("courses")
-        .select("id, title, subtitle, subject_area, language, did_you_know")
+        .select("id, title, subtitle, subject_area, language")
         .in("status", ["accepted", "published"])
         .order("title"),
       supabaseAdmin
@@ -166,7 +167,10 @@ export const exportCoursePages = createServerFn({ method: "POST" })
         .select("course_id, screen_number, screen_title, body")
         .order("course_id")
         .order("screen_number"),
-      supabaseAdmin.from("sources").select("course_id, claim, reference, page"),
+      supabaseAdmin
+        .from("sources")
+        .select("course_id, claim, reference, page")
+        .order("created_at"),
     ]);
     if (error) throw new Error("Could not read courses.");
 
@@ -178,10 +182,12 @@ export const exportCoursePages = createServerFn({ method: "POST" })
     }
     const sourcesByCourse = new Map<string, string>();
     for (const source of sources ?? []) {
-      const label = [source.claim, source.reference, source.page].filter(Boolean).join(" — ");
+      const parts = [source.claim?.trim(), source.reference?.trim()].filter(Boolean).join(" — ");
+      const page = source.page?.trim();
+      const label = page ? `${parts}${parts ? ", " : ""}p. ${page}` : parts;
       if (!label) continue;
       const current = sourcesByCourse.get(source.course_id);
-      sourcesByCourse.set(source.course_id, current ? `${current} | ${label}` : label);
+      sourcesByCourse.set(source.course_id, current ? `${current}\n${label}` : label);
     }
 
     const rows: unknown[][] = [];
