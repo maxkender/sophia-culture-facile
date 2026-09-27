@@ -16,3 +16,4 @@
 - [ ] Outreach pipeline: prospects (CSV import, table + kanban), touches, templates, convert/match to applications, dashboard block
 - [ ] Minimum age 18 everywhere; remove all guardian fields/UI/hold reason
 - [ ] Stripe Connect Express payouts (onboarding, status refresh, dashboard link, transfers per batch, webhook, country note config)
+- [ ] Admin "Stripe setup" checklist page (9 persisted steps, live balance vs accrued, editable countries list)

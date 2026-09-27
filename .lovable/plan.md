@@ -51,6 +51,11 @@ A second product surface, kept separate from authors in data and routes, reusing
 - Creator: "Set up payouts with Stripe" button, green "Payouts enabled", amber "Finish your Stripe setup", "Manage on Stripe"; small link reveals Wise/PayPal fallback.
 - Admin: method and Stripe status on each creator row; batch page counts Stripe transfers vs CSV; grey note on application and creator pages when the country is not on Stripe's Express list (editable list in Settings).
 
+## Stage 6c — "Stripe setup" checklist (creators mode, SYSTÈME)
+- Nine steps in your order and wording, each with a checkbox saved in the database; step 7 in amber with the live Stripe balance (Refresh) next to this month's accrued total.
+- Steps 4–6 adapted to how this project works: the two keys go in the project's Secrets settings (names shown exactly), the webhook URL is shown with a copy button, and the six payment actions are listed by the names you gave with one line each; they ship with the app, so step 6 becomes "confirm the status check shows all six ready" instead of a manual deploy.
+- Countries block seeded with your 44 countries, editable; the same list drives the grey "bank transfer route" note.
+
 ## Stage 7 — Outreach pipeline (publish)
 - Tables creator_prospects, prospect_touches, outreach_templates; admin-only.
 - Prospects page under CRÉATEURS before Applications: CSV import with column mapping and duplicate skip (TikTok handle, email) with a count; quick add; table with the filters listed and a kanban by status.
