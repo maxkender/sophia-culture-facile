@@ -1,0 +1,2 @@
+ALTER TABLE public.creator_rates DROP CONSTRAINT creator_rates_track_country_key;
+CREATE UNIQUE INDEX creator_rates_track_country_from_key ON public.creator_rates (track, coalesce(country, ''), effective_from);
