@@ -37,9 +37,12 @@ export function CreatorOnboarding({ me, refs }: { me: any; refs: any[] }) {
   const step = !me.motivation_confirmed_at ? 1 : !me.agreementSigned ? 2 : !me.social_account_created_at ? 3 : 4;
 
   async function done() {
-    if (!motivated) return toast.error("Confirm the commitment before continuing.");
+    if (!motivated) {
+      toast.error("Confirm the commitment before continuing.");
+      return;
+    }
     await mark({ data: { step: "examples", motivated: true } });
-    reload();
+    await reload();
   }
 
   return (

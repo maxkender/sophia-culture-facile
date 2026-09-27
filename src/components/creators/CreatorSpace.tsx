@@ -41,7 +41,7 @@ function SignIn({ invite, invitedEmail }: { invite: string | null; invitedEmail:
     <div className="mx-auto max-w-sm space-y-3 p-6">
       <h1 className="text-2xl font-extrabold text-brand-navy">Sophia creators</h1>
       <p className="text-sm text-brand-navySoft">{mode === "up" ? "Create your account with the email your invite was sent to." : "Sign in to your creator space."}</p>
-      <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+      <Input type="email" placeholder="Email" value={email} readOnly={Boolean(invite && invitedEmail)} onChange={(e) => setEmail(e.target.value)} />
       <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
       <Button className="w-full" disabled={busy} onClick={go}>{mode === "up" ? "Create account" : "Sign in"}</Button>
       <button className="text-xs text-brand-navySoft underline" onClick={() => setMode(mode === "up" ? "in" : "up")}>
@@ -132,7 +132,8 @@ function Workspace() {
         ))}
       </section>
       <section className="space-y-2 rounded-2xl border border-brand-line p-4">
-        <h2 className="font-bold text-brand-navy">I posted a video{refId ? " (linked to a reference)" : ""}</h2>
+        <h2 className="font-bold text-brand-navy">Log every post{refId ? " (linked to a reference)" : ""}</h2>
+        <p className="text-sm text-brand-navySoft">Every video published on the Sophia account must be added here.</p>
         <Input placeholder="https://www.tiktok.com/@…/video/…" value={url} onChange={(e) => setUrl(e.target.value)} />
         <div className="flex gap-2">
           <select className="rounded-md border px-2 text-sm" value={platform} onChange={(e) => setPlatform(e.target.value)}>

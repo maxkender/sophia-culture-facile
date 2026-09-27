@@ -24,7 +24,7 @@ export function CreatorOps() {
   const { data } = useQuery({
     queryKey: ["portal", "admin", "creator-ops", tab],
     queryFn: async () => {
-      if (tab === "creators") return (await supabase.from("creators").select("*").order("created_at", { ascending: false })).data ?? [];
+      if (tab === "creators") return (await supabase.from("creators").select("*, creator_signatures(id)").order("created_at", { ascending: false })).data ?? [];
       if (tab === "briefs") return (await supabase.from("briefs").select("*").order("created_at", { ascending: false })).data ?? [];
       if (tab === "posts") return (await supabase.from("creator_posts").select("*, creators(full_name)").order("created_at", { ascending: false })).data ?? [];
       if (tab === "library") return (await supabase.from("reference_videos").select("*").order("pinned", { ascending: false }).order("created_at", { ascending: false })).data ?? [];
@@ -134,7 +134,7 @@ export function CreatorOps() {
 }
 
 function creatorProgress(creator: any) {
-  return [creator.motivation_confirmed_at, creator.social_account_created_at, creator.onboarding_completed_at].filter(Boolean).length + (creator.social_account_created_at ? 1 : 0);
+  return [creator.motivation_confirmed_at, creator.creator_signatures?.length, creator.social_account_created_at, creator.onboarding_completed_at].filter(Boolean).length;
 }
 
 function AcceptanceEmailEditor({ row, onSaved }: { row: any; onSaved: () => void }) {
