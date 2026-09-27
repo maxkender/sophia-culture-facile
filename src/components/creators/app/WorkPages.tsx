@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { friendlyCreatorError, isHttpUrl } from "@/lib/creator-validation";
 import { Banner, EmptyState, PageTitle, PortalCard } from "@/components/portal/ui";
 import { logPostChecked, markBriefSkipped, markMyMessagesRead, reportPostViews } from "@/lib/creator-app.functions";
 import { CATEGORY_LEGEND, briefStatus, fileToBase64, useCreator, type CreatorData } from "./useCreator";
@@ -59,12 +60,12 @@ export function LogPostForm({ briefId: initialBrief = "", refId = null, url: ini
         <div><Label>Date posted</Label><Input type="date" max={today()} value={date} onChange={(e) => setDate(e.target.value)} /></div>
       </div>
       <Button disabled={busy} onClick={async () => {
-        if (!/^https:\/\//.test(url.trim())) return void toast.error("Paste the full link to your post.");
+        if (!isHttpUrl(url) || !url.trim().startsWith("https://")) return void toast.error("Paste the complete secure link to your post, beginning with https://.");
         setBusy(true);
         try {
           await submit({ data: { url: url.trim(), platform, briefId: briefId || null, referenceVideoId: refId, postedOn: date } });
           toast.success("Post logged."); setUrl(""); await reload(); onDone?.();
-        } catch (e: any) { toast.error(e?.message ?? "Could not log the post."); }
+        } catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
         setBusy(false);
       }}>Log post</Button>
     </div>
@@ -152,7 +153,7 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
           <Textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} />
           <Button variant="outline" disabled={reason.trim().length < 3} onClick={async () => {
             try { await skip({ data: { briefId: brief.id, reason } }); toast.success("Skipped. The team has your reason."); setMode("none"); d.reload(); }
-            catch (e: any) { toast.error(e?.message ?? "Could not skip."); }
+            catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
           }}>Skip this brief</Button>
         </PortalCard>
       )}
@@ -228,7 +229,7 @@ function ReportViews({ post }: { post: Post }) {
         if (!file) return void toast.error("Add a screenshot showing the views.");
         if (file.size > 5_000_000) return void toast.error("Screenshot must be under 5 MB.");
         try { await report({ data: { postId: post.id, views: Math.round(v), screenshotBase64: await fileToBase64(file), contentType: file.type as "image/png" } }); toast.success("Views reported."); reload(); }
-        catch (e: any) { toast.error(e?.message ?? "Could not save."); }
+        catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
       }}>Send</Button>
     </div>
   );
@@ -242,7 +243,7 @@ function FeedbackReply({ post }: { post: Post }) {
       <Input placeholder="Reply to this feedback" value={text} onChange={(e) => setText(e.target.value)} />
       <Button size="sm" disabled={!text.trim()} onClick={async () => {
         const { error } = await supabase.from("creator_messages").insert({ creator_id: me.id, from_admin: false, body: text.trim(), post_id: post.id });
-        if (error) return void toast.error("Could not send.");
+        if (error) return void toast.error("Your reply was not sent. Check your connection and try again.");
         setText(""); toast.success("Reply sent."); reload();
       }}>Reply</Button>
     </div>
@@ -314,7 +315,7 @@ export function CallsPage() {
                   {(["yes", "maybe", "no"] as const).map((a) => (
                     <Button key={a} size="sm" variant={mine === a ? "default" : "outline"} onClick={async () => {
                       const { error } = await supabase.from("creator_call_rsvps").upsert({ call_id: c.id, creator_id: me.id, answer: a }, { onConflict: "call_id,creator_id" });
-                      if (error) toast.error("Could not save."); else reload();
+                      if (error) toast.error("Your RSVP was not saved. Check your connection and try again."); else reload();
                     }}>{a === "yes" ? "Yes" : a === "no" ? "No" : "Maybe"}</Button>
                   ))}
                 </div>
@@ -431,7 +432,7 @@ export function MessagesPage() {
   async function send() {
     if (!text.trim()) return;
     const { error } = await supabase.from("creator_messages").insert({ creator_id: me.id, from_admin: false, body: text.trim(), post_id: postId });
-    if (error) return void toast.error("Could not send.");
+    if (error) return void toast.error("Your message was not sent. Check your connection and try again.");
     setText(""); qc.invalidateQueries({ queryKey: ["creator-messages-all", me.id] });
   }
   return (

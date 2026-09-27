@@ -68,7 +68,7 @@ export const generatePayoutBatch = createServerFn({ method: "POST" })
       .upsert({ period: data.period, status: "draft", created_by: profile?.id }, { onConflict: "period" })
       .select("id")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) throw new Error("The payout batch could not be prepared. Check the period and try again.");
     await supabase.from("payout_items").delete().eq("batch_id", batch.id);
     if (items.length) await supabase.from("payout_items").insert(items.map((i) => ({ ...i, batch_id: batch.id })));
     return { batchId: batch.id, items: items.length, missingRates: missing, byMethod };

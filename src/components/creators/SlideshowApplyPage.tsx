@@ -12,6 +12,7 @@ import { CountrySelect } from "./CountrySelect";
 import { ApplyShell, Confirmation, FormSection, Honeypot, YesNo } from "./ApplyShell";
 import { useI18n, useLocalePath } from "@/i18n";
 import { CREATOR_FORMS } from "@/i18n/creator-forms";
+import { isHttpUrl, isValidEmail, isValidInternationalPhone } from "@/lib/creator-validation";
 
 export function SlideshowApplyPage() {
   const { lang } = useI18n();
@@ -34,6 +35,18 @@ export function SlideshowApplyPage() {
     if (adult === "no") return;
     if (!f.full_name.trim() || !f.email.trim() || !f.phone.trim() || !f.country || !adult || !upwork) {
       setError(common.requiredError);
+      return;
+    }
+    if (!isValidEmail(f.email)) {
+      setError(common.emailError);
+      return;
+    }
+    if (!isValidInternationalPhone(f.phone)) {
+      setError(common.phoneError);
+      return;
+    }
+    if (upwork === "yes" && f.upwork_url.trim() && !isHttpUrl(f.upwork_url)) {
+      setError(lang === "fr" ? "Saisissez un lien Upwork complet commençant par https://." : "Enter a complete Upwork link beginning with https://.");
       return;
     }
     if (!consent) {
@@ -93,11 +106,13 @@ export function SlideshowApplyPage() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">{common.email}</Label>
-            <Input id="email" type="email" className="h-11" autoComplete="email" value={f.email} onChange={(e) => set("email", e.target.value)} />
+            <Input id="email" type="email" className="h-11" autoComplete="email" aria-describedby="email-help" value={f.email} onChange={(e) => set("email", e.target.value)} />
+            <p id="email-help" className="text-xs text-brand-navySoft">{lang === "fr" ? "Exemple : nom@exemple.com" : "Example: name@example.com"}</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="phone">{common.phone}</Label>
-            <Input id="phone" type="tel" className="h-11" placeholder="+33 6 12 34 56 78" value={f.phone} onChange={(e) => set("phone", e.target.value)} />
+            <Input id="phone" type="tel" className="h-11" placeholder="+33 6 12 34 56 78" autoComplete="tel" aria-describedby="phone-help" value={f.phone} onChange={(e) => set("phone", e.target.value)} />
+            <p id="phone-help" className="text-xs text-brand-navySoft">{lang === "fr" ? "Incluez l’indicatif du pays, par exemple +33." : "Include the country code, for example +44."}</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="country">{common.country}</Label>

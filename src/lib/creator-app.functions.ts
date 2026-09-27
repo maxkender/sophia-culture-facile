@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { WARMUP_REQUIRED } from "./creator-steps";
+import { isValidInternationalPhone } from "./creator-validation";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Sb = any;
@@ -64,9 +65,9 @@ export const registerSocialAccount = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({
       handle: z.string().trim().min(2).max(60).regex(/^@?[a-zA-Z0-9._]+$/, "Use only letters, numbers, dots and underscores."),
-      email: z.string().trim().email().max(255),
+       email: z.string().trim().email("Enter a complete email address, for example name@example.com.").max(255),
       password: z.string().min(1).max(200).optional(),
-      phone: z.string().trim().max(40).optional().nullable(),
+       phone: z.string().trim().max(40).refine((value) => value === "" || isValidInternationalPhone(value), "Enter a valid phone number with the country code.").optional().nullable(),
       device: z.string().trim().max(80).optional().nullable(),
     }).parse(d),
   )
@@ -172,7 +173,7 @@ export const saveCreatorProfile = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z.object({
       country: z.string().trim().max(80).nullable(),
-      phone: z.string().trim().max(40).nullable(),
+       phone: z.string().trim().max(40).refine((value) => value === "" || isValidInternationalPhone(value), "Enter a valid phone number with the country code.").nullable(),
       platform: z.enum(["ios", "android"]).nullable(),
       photoBase64: z.string().max(7_000_000).optional(),
       photoType: z.enum(["image/png", "image/jpeg", "image/webp"]).optional(),

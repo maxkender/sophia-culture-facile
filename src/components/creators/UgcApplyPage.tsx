@@ -13,6 +13,7 @@ import { CountrySelect } from "./CountrySelect";
 import { ApplyShell, Confirmation, FormSection, Honeypot, YesNo } from "./ApplyShell";
 import { useI18n, useLocalePath } from "@/i18n";
 import { CREATOR_FORMS } from "@/i18n/creator-forms";
+import { isHttpUrl, isValidEmail, isValidInternationalPhone } from "@/lib/creator-validation";
 
 const KEY = "sophia-ugc-application";
 const OCCUPATIONS = ["studying", "working", "both", "other"] as const;
@@ -50,15 +51,6 @@ const EMPTY: Form = {
   referral_source: "",
   consent: false,
 };
-
-function isUrl(v: string) {
-  try {
-    const u = new URL(v);
-    return u.protocol === "https:" || u.protocol === "http:";
-  } catch {
-    return false;
-  }
-}
 
 function uploadWithProgress(url: string, file: File, onProgress: (p: number) => void) {
   return new Promise<void>((resolve, reject) => {
@@ -114,7 +106,7 @@ export function UgcApplyPage() {
   const ageNum = Number(form.age);
   const underage = form.age !== "" && (!Number.isFinite(ageNum) || ageNum < 18);
   const notMeeting = form.meets === "no";
-  const hasVideo = form.video_mode === "link" ? isUrl(form.video_url) : Boolean(file);
+  const hasVideo = form.video_mode === "link" ? isHttpUrl(form.video_url) : Boolean(file);
   const blocked = underage || notMeeting;
 
   useEffect(() => {
@@ -127,6 +119,14 @@ export function UgcApplyPage() {
     if (blocked) return;
     if (!form.full_name.trim() || !form.email.trim() || !form.phone.trim() || !form.country || !form.age || !form.occupation) {
       setError(common.requiredError);
+      return;
+    }
+    if (!isValidEmail(form.email)) {
+      setError(common.emailError);
+      return;
+    }
+    if (!isValidInternationalPhone(form.phone)) {
+      setError(common.phoneError);
       return;
     }
     if (form.meets !== "yes") {
@@ -146,7 +146,7 @@ export function UgcApplyPage() {
       return;
     }
     for (const u of [form.tiktok_url, form.instagram_url]) {
-      if (u && !isUrl(u)) {
+      if (u && !isHttpUrl(u)) {
         setError(copy.linksError);
         return;
       }
@@ -234,11 +234,13 @@ export function UgcApplyPage() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">{common.email}</Label>
-            <Input id="email" type="email" className="h-11" autoComplete="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
+            <Input id="email" type="email" className="h-11" autoComplete="email" aria-describedby="email-help" value={form.email} onChange={(e) => set("email", e.target.value)} />
+            <p id="email-help" className="text-xs text-brand-navySoft">{lang === "fr" ? "Exemple : nom@exemple.com" : "Example: name@example.com"}</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="phone">{common.phone}</Label>
-            <Input id="phone" type="tel" className="h-11" placeholder="+33 6 12 34 56 78" autoComplete="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+            <Input id="phone" type="tel" className="h-11" placeholder="+33 6 12 34 56 78" autoComplete="tel" aria-describedby="phone-help" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+            <p id="phone-help" className="text-xs text-brand-navySoft">{lang === "fr" ? "Incluez l’indicatif du pays, par exemple +33." : "Include the country code, for example +44."}</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="country">{common.country}</Label>
