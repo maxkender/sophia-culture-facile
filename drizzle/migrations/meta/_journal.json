@@ -106,6 +106,13 @@
       "when": 1790502694543,
       "tag": "0014_prospects_grid",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1790503743852,
+      "tag": "0015_add_slack_joined_at",
+      "breakpoints": true
     }
   ]
 }

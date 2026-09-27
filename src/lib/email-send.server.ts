@@ -35,6 +35,7 @@ export function buildEmailHtml(options: {
   bullets?: string[];
   buttonLabel?: string;
   buttonUrl?: string;
+  linkSection?: { text: string; url: string; linkLabel: string };
 }): string {
   const { paragraphs, bullets, buttonLabel, buttonUrl } = options;
   const body = paragraphs
@@ -46,10 +47,13 @@ export function buildEmailHtml(options: {
   const button = buttonLabel && buttonUrl
     ? `<p style="margin:24px 0;"><a href="${escapeAttribute(buttonUrl)}" style="display:inline-block;background:#1f3a5f;color:#ffffff;text-decoration:none;font-weight:600;padding:12px 24px;border-radius:8px;">${escapeHtml(buttonLabel)}</a></p><p style="margin:0;font-size:13px;color:#555555;word-break:break-all;">${escapeHtml(buttonUrl)}</p>`
     : "";
+  const linkSection = options.linkSection
+    ? `<hr style="margin:24px 0;border:none;border-top:1px solid #e2e2dd;" /><p style="margin:0 0 8px;">${escapeHtml(options.linkSection.text)} <a href="${escapeAttribute(options.linkSection.url)}" style="color:#1f3a5f;font-weight:600;">${escapeHtml(options.linkSection.linkLabel)}</a></p><p style="margin:0;font-size:13px;color:#555555;word-break:break-all;">${escapeHtml(options.linkSection.url)}</p>`
+    : "";
   return `<!doctype html><html><body style="margin:0;padding:0;background:#f5f5f2;">
 <div style="max-width:560px;margin:0 auto;padding:32px 24px;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;font-size:15px;line-height:1.6;">
 <p style="margin:0 0 24px;font-weight:700;letter-spacing:0.02em;">Sophia</p>
-${body}${list}${button}
+${body}${list}${button}${linkSection}
 <p style="margin:24px 0 0;font-size:12px;color:#888888;">Sophia — apprendre la culture facilement. sophia-culture.com</p>
 </div></body></html>`;
 }
@@ -59,10 +63,12 @@ export function buildEmailText(options: {
   bullets?: string[];
   buttonLabel?: string;
   buttonUrl?: string;
+  linkSection?: { text: string; url: string; linkLabel: string };
 }): string {
   const parts = [...options.paragraphs];
   if (options.bullets?.length) parts.push("", ...options.bullets.map((b) => `- ${b}`));
   if (options.buttonUrl) parts.push("", options.buttonLabel ?? "Open the link:", options.buttonUrl);
+  if (options.linkSection) parts.push("", options.linkSection.text, options.linkSection.url);
   return parts.join("\n\n");
 }
 
