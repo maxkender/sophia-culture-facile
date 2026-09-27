@@ -3,7 +3,7 @@ import type { Database } from "@/integrations/supabase/types";
 export type DocumentRow = Database["public"]["Tables"]["documents"]["Row"];
 export type DocumentVersionRow = Database["public"]["Tables"]["document_versions"]["Row"];
 
-export type DocumentSlug = "guide" | "contract" | "creator-agreement" | "creator-guide" | "creator-rules";
+export type DocumentSlug = "guide" | "contract" | "creator-agreement" | "creator-guide" | "creator-rules" | "slideshow-guide";
 
 export const DOCUMENT_LABEL: Record<DocumentSlug, string> = {
   guide: "Writing guide",
@@ -11,6 +11,7 @@ export const DOCUMENT_LABEL: Record<DocumentSlug, string> = {
   "creator-agreement": "Creator Account Agreement",
   "creator-guide": "Creator brief guide",
   "creator-rules": "Creator rules",
+  "slideshow-guide": "Slideshow Creator Guide",
 };
 
 export type CalloutTone = "red" | "blue";

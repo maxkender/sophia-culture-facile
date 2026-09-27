@@ -67,7 +67,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         title: "Slideshow creator",
         lines: [
           "You do not appear on camera. You set up a new TikTok account that belongs to Sophia, and every day we send you two ready-made posts to assemble and publish.",
-          "Paid a fixed amount per post, between $0.40 and $1.10 depending on your country. Simple, predictable, no performance pressure.",
+          "A fixed monthly amount, set by the country you live in, for two posts a day. The exact figure is confirmed when you are accepted. Paid through Upwork.",
           "Requires a phone, thirty minutes a day, and following instructions exactly.",
         ],
         cta: "Apply as a slideshow creator",
@@ -114,10 +114,10 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
     slideshow: {
       metaTitle: "Become a Sophia slideshow creator: two posts a day",
       metaDescription:
-        "No camera, no experience. Publish two ready-made TikTok slideshows a day for Sophia and get paid per post.",
+        "No camera, no experience. Publish two ready-made TikTok slideshows a day for Sophia for a fixed monthly amount.",
       heroTitle: "Post two slideshows a day. That is the whole job.",
       heroSubtitle:
-        "We give you the posts. You assemble them, add the music, and publish. Paid per post.",
+        "We give you the posts. You assemble them, add the music, and publish. A fixed monthly amount.",
       cta: "Apply now (1 minute)",
       howTitle: "How it works",
       steps: [
@@ -127,7 +127,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         "Every day, two posts are waiting for you in your space: the slides, the caption, the music. You assemble and publish. Nothing to invent.",
       ],
       paidTitle: "What you are paid",
-      paid: "A fixed amount for every post published, between $0.40 and $1.10 depending on the country you are in. The rate for your country is confirmed when you are accepted. Paid monthly.",
+      paid: "A fixed monthly amount, set by the country you live in, for two posts a day. The exact figure is confirmed when you are accepted. Paid through Upwork.",
       forTitle: "Who this is for",
       forText:
         "People who want a simple, regular task they can do from their phone in under thirty minutes a day, and who follow instructions to the letter. You do not appear on camera and you do not need any experience.",
@@ -161,7 +161,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         title: "Créateur de slideshows",
         lines: [
           "Vous n'apparaissez pas à l'écran. Vous créez un nouveau compte TikTok qui appartient à Sophia, et chaque jour nous vous envoyons deux posts prêts à assembler et à publier.",
-          "Un montant fixe par post, entre 0,40 $ et 1,10 $ selon votre pays. Simple, prévisible, sans pression sur les performances.",
+          "Un montant mensuel fixe, selon le pays où vous vivez, pour deux posts par jour. Le montant exact vous est confirmé à l'acceptation. Paiement via Upwork.",
           "Il faut un téléphone, trente minutes par jour, et suivre les consignes à la lettre.",
         ],
         cta: "Postuler comme créateur de slideshows",
@@ -208,10 +208,10 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
     slideshow: {
       metaTitle: "Devenir créateur de slideshows pour Sophia : deux posts par jour",
       metaDescription:
-        "Pas de caméra, pas d'expérience requise. Publiez chaque jour deux slideshows TikTok prêts à l'emploi pour Sophia, payés au post.",
+        "Pas de caméra, pas d'expérience requise. Publiez chaque jour deux slideshows TikTok prêts à l'emploi pour Sophia, pour un montant mensuel fixe.",
       heroTitle: "Deux slideshows par jour. C'est tout le travail.",
       heroSubtitle:
-        "Nous vous donnons les posts. Vous les assemblez, ajoutez la musique et publiez. Payé au post.",
+        "Nous vous donnons les posts. Vous les assemblez, ajoutez la musique et publiez. Un montant mensuel fixe.",
       cta: "Postuler (1 minute)",
       howTitle: "Comment ça marche",
       steps: [
@@ -221,7 +221,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         "Chaque jour, deux posts vous attendent dans votre espace : les slides, la légende, la musique. Vous assemblez et publiez. Rien à inventer.",
       ],
       paidTitle: "Votre rémunération",
-      paid: "Un montant fixe pour chaque post publié, entre 0,40 $ et 1,10 $ selon le pays où vous êtes. Le tarif de votre pays vous est confirmé à l'acceptation. Paiement mensuel.",
+      paid: "Un montant mensuel fixe, selon le pays où vous vivez, pour deux posts par jour. Le montant exact vous est confirmé à l'acceptation. Paiement via Upwork.",
       forTitle: "Pour qui",
       forText:
         "Pour celles et ceux qui veulent une tâche simple et régulière, faisable depuis leur téléphone en moins de trente minutes par jour, et qui suivent les consignes à la lettre. Vous n'apparaissez pas à l'écran et aucune expérience n'est nécessaire.",

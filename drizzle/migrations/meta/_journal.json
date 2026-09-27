@@ -169,6 +169,13 @@
       "when": 1790507023786,
       "tag": "0023_creator_announcements_track_scope",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1790513473322,
+      "tag": "0024_slideshow_pay_zones",
+      "breakpoints": true
     }
   ]
 }

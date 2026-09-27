@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { usePortalProfile } from "../usePortal";
 import { PageTitle, PortalCard } from "../ui";
+import { PayZonesSettings } from "./PayZonesSettings";
 
 export function AdminSettings() {
   const { data: me } = usePortalProfile();
@@ -62,6 +63,7 @@ export function AdminSettings() {
             ))}
           </dl>
         </PortalCard>
+        <PayZonesSettings />
       </div>
     </div>
   );

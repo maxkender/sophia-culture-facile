@@ -15,6 +15,8 @@ import { usePortalProfile } from "../usePortal";
 import { useServerFn } from "@tanstack/react-start";
 import { generateSigningLink } from "@/lib/creator-agreement.functions";
 import { approveUgcApplication } from "@/lib/creator-onboarding.functions";
+import { getGuideForApplication, setApplicationZone } from "@/lib/slideshow-zones.functions";
+import { GUIDE_PDF_NAME, ZONE_BADGE } from "@/lib/slideshow-guide";
 
 type UgcApplication = Database["public"]["Tables"]["creator_applications"]["Row"];
 type SlideshowApplication = Database["public"]["Tables"]["slideshow_applications"]["Row"];
@@ -186,6 +188,7 @@ export function CreatorApplications({ track }: { track: Track }) {
                       {row.email} · {row.country} · {formatDateTime(row.created_at)}
                     </span>
                   </span>
+                  {track === "slideshow" ? <ZoneBadge zone={(row as SlideshowApplication).zone} /> : null}
                   {track === "slideshow" && row.status === "approved" ? (
                     <span className={`text-[11px] font-bold ${(row as SlideshowApplication).agreement_signed_at ? "text-portal-green" : "text-portal-amber"}`}>
                       {(row as SlideshowApplication).agreement_signed_at ? "Signed" : "Not signed"}
@@ -241,6 +244,9 @@ export function CreatorApplications({ track }: { track: Track }) {
                       <LinkOut href={selected.upwork_profile_url} label="Upwork profile" />
                     </div>
                     <div className="sm:col-span-2">
+                      <ZonePanel app={selected as SlideshowApplication} onChange={(next) => setSelected(next)} />
+                    </div>
+                    <div className="sm:col-span-2">
                       <SlideshowAgreement app={selected as SlideshowApplication} onChange={(next) => setSelected(next)} />
                     </div>
                   </>
@@ -259,8 +265,11 @@ export function CreatorApplications({ track }: { track: Track }) {
                     <label className="text-xs font-bold uppercase tracking-wide text-brand-navySoft" htmlFor="creator-reason">Rejection reason (required to reject)</label>
                     <Input id="creator-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Not enough video examples" />
                   </div>
+                  {track === "slideshow" && !(selected as SlideshowApplication).zone ? (
+                    <p className="text-sm font-semibold text-portal-red">This country has no pay zone. Ask Adrien or Max before accepting.</p>
+                  ) : null}
                   <div className="flex flex-wrap gap-2">
-                    <Button type="button" variant="pill" size="sm" disabled={busy} onClick={() => void decide(selected.id, "approved")}>Approve</Button>
+                    <Button type="button" variant="pill" size="sm" disabled={busy || (track === "slideshow" && !(selected as SlideshowApplication).zone)} onClick={() => void decide(selected.id, "approved")}>Approve</Button>
                     <Button type="button" variant="pillSecondary" size="sm" disabled={busy} onClick={() => void decide(selected.id, "interview")}>Move to interview</Button>
                     <Button type="button" variant="destructive" size="sm" disabled={busy} onClick={() => void decide(selected.id, "rejected")}>Reject</Button>
                   </div>
@@ -324,5 +333,89 @@ function SlideshowAgreement({ app, onChange }: { app: SlideshowApplication; onCh
       </Button>
     </div>
     </>
+  );
+}
+
+function ZoneBadge({ zone }: { zone: string | null }) {
+  return zone ? (
+    <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${ZONE_BADGE[zone] ?? ""}`}>Zone {zone}</span>
+  ) : (
+    <span className="rounded-full bg-portal-red/10 px-2 py-0.5 text-[11px] font-bold text-portal-red">No zone</span>
+  );
+}
+
+function ZonePanel({ app, onChange }: { app: SlideshowApplication; onChange: (next: SlideshowApplication) => void }) {
+  const queryClient = useQueryClient();
+  const setZone = useServerFn(setApplicationZone);
+  const loadGuide = useServerFn(getGuideForApplication);
+  const [zone, setZ] = useState<"A" | "B" | "C">("A");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  const { data: info } = useQuery({
+    queryKey: ["portal", "admin", "zone-info", app.zone, app.country],
+    queryFn: async () => {
+      const [pz, cz] = await Promise.all([
+        app.zone ? supabase.from("pay_zones").select("*").eq("zone", app.zone).maybeSingle() : Promise.resolve({ data: null }),
+        supabase.from("country_zones").select("country_code, country_name, ceiling_applies"),
+      ]);
+      const c = (app.country ?? "").trim().toLowerCase();
+      const match = (cz.data ?? []).find((r) => r.country_name.toLowerCase() === c || r.country_code.toLowerCase() === c);
+      return { pz: pz.data as any, ceiling: Boolean(match?.ceiling_applies) };
+    },
+  });
+  async function save() {
+    if (note.trim().length < 3) { toast.error("Add a note explaining the zone."); return; }
+    setBusy(true);
+    try {
+      await setZone({ data: { applicationId: app.id, zone, note: note.trim() } });
+      onChange({ ...app, zone, zone_override: true, zone_note: note.trim() });
+      await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-applications"] });
+      toast.success(`Zone ${zone} set.`);
+    } catch (e: any) { toast.error(e?.message ?? "Could not set the zone."); } finally { setBusy(false); }
+  }
+  async function pdf() {
+    try {
+      const g = await loadGuide({ data: { applicationId: app.id } });
+      const { downloadDocumentPdf } = await import("@/lib/documentPdf");
+      await downloadDocumentPdf({ slug: "slideshow-guide", title: g.title, subtitle: "Sophia · TikTok slideshow programme", version: g.version, blocks: g.blocks, filename: GUIDE_PDF_NAME });
+    } catch (e: any) { toast.error(e?.message ?? "Could not build the PDF."); }
+  }
+  const shown = app.guide_figures_shown as { trial_amount?: number; monthly_amount?: number } | null;
+  return (
+    <div className="space-y-3 rounded-xl border border-brand-line p-3 text-sm">
+      <div className="flex flex-wrap items-center gap-2">
+        <ZoneBadge zone={app.zone} />
+        {info?.pz ? (
+          <span className="text-brand-navy">Trial ${Number(info.pz.trial_amount)} · Monthly ${Number(info.pz.monthly_amount)}</span>
+        ) : null}
+        {app.zone === "A" && info?.ceiling && info.pz?.ceiling_amount ? (
+          <span className="text-xs text-brand-navySoft">ceiling ${Number(info.pz.ceiling_amount)}, only as a response to a refusal</span>
+        ) : null}
+      </div>
+      {app.zone_override ? <p className="text-xs text-brand-navySoft">Set manually{app.zone_note ? `: ${app.zone_note}` : ""}</p> : null}
+      {!app.zone ? (
+        <div className="space-y-2">
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Set a zone manually</p>
+          <div className="flex flex-wrap gap-2">
+            <Select value={zone} onValueChange={(v) => setZ(v as "A" | "B" | "C")}>
+              <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+              <SelectContent><SelectItem value="A">Zone A</SelectItem><SelectItem value="B">Zone B</SelectItem><SelectItem value="C">Zone C</SelectItem></SelectContent>
+            </Select>
+            <Input className="min-w-0 flex-1" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note (who approved, why)" />
+            <Button type="button" size="sm" disabled={busy} onClick={() => void save()}>Set zone</Button>
+          </div>
+        </div>
+      ) : null}
+      {app.status === "approved" ? (
+        <div className="space-y-1 border-t border-brand-line pt-3">
+          <p className="text-xs text-brand-navySoft">
+            {app.guide_opened_at
+              ? `Guide opened ${formatDateTime(app.guide_opened_at)} · Zone ${app.guide_zone_shown ?? "?"} figures shown${shown ? ` (trial $${shown.trial_amount}, monthly $${shown.monthly_amount})` : ""}`
+              : "Guide not opened yet."}
+          </p>
+          {app.zone ? <Button type="button" size="sm" variant="outline" onClick={() => void pdf()}>Download guide PDF</Button> : null}
+        </div>
+      ) : null}
+    </div>
   );
 }

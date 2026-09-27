@@ -538,6 +538,38 @@ export type Database = {
           },
         ]
       }
+      country_zones: {
+        Row: {
+          ceiling_applies: boolean
+          country_code: string
+          country_name: string
+          created_at: string
+          zone: string
+        }
+        Insert: {
+          ceiling_applies?: boolean
+          country_code: string
+          country_name: string
+          created_at?: string
+          zone: string
+        }
+        Update: {
+          ceiling_applies?: boolean
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          zone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "country_zones_zone_fkey"
+            columns: ["zone"]
+            isOneToOne: false
+            referencedRelation: "pay_zones"
+            referencedColumns: ["zone"]
+          },
+        ]
+      }
       course_proposals: {
         Row: {
           course_id: string | null
@@ -1839,6 +1871,36 @@ export type Database = {
           },
         ]
       }
+      pay_zones: {
+        Row: {
+          ceiling_amount: number | null
+          currency: string
+          monthly_amount: number
+          posts_per_day: number
+          trial_amount: number
+          updated_at: string
+          zone: string
+        }
+        Insert: {
+          ceiling_amount?: number | null
+          currency?: string
+          monthly_amount: number
+          posts_per_day?: number
+          trial_amount: number
+          updated_at?: string
+          zone: string
+        }
+        Update: {
+          ceiling_amount?: number | null
+          currency?: string
+          monthly_amount?: number
+          posts_per_day?: number
+          trial_amount?: number
+          updated_at?: string
+          zone?: string
+        }
+        Relationships: []
+      }
       payout_batches: {
         Row: {
           created_at: string
@@ -2199,6 +2261,10 @@ export type Database = {
           decided_by: string | null
           email: string
           full_name: string
+          guide_figures_shown: Json | null
+          guide_opened_at: string | null
+          guide_token: string | null
+          guide_zone_shown: string | null
           has_upwork: boolean
           id: string
           is_adult: boolean
@@ -2210,6 +2276,9 @@ export type Database = {
           status: string
           submit_ip_hash: string | null
           upwork_profile_url: string | null
+          zone: string | null
+          zone_note: string | null
+          zone_override: boolean
         }
         Insert: {
           admin_notes?: string | null
@@ -2222,6 +2291,10 @@ export type Database = {
           decided_by?: string | null
           email: string
           full_name: string
+          guide_figures_shown?: Json | null
+          guide_opened_at?: string | null
+          guide_token?: string | null
+          guide_zone_shown?: string | null
           has_upwork?: boolean
           id?: string
           is_adult: boolean
@@ -2233,6 +2306,9 @@ export type Database = {
           status?: string
           submit_ip_hash?: string | null
           upwork_profile_url?: string | null
+          zone?: string | null
+          zone_note?: string | null
+          zone_override?: boolean
         }
         Update: {
           admin_notes?: string | null
@@ -2245,6 +2321,10 @@ export type Database = {
           decided_by?: string | null
           email?: string
           full_name?: string
+          guide_figures_shown?: Json | null
+          guide_opened_at?: string | null
+          guide_token?: string | null
+          guide_zone_shown?: string | null
           has_upwork?: boolean
           id?: string
           is_adult?: boolean
@@ -2256,6 +2336,9 @@ export type Database = {
           status?: string
           submit_ip_hash?: string | null
           upwork_profile_url?: string | null
+          zone?: string | null
+          zone_note?: string | null
+          zone_override?: boolean
         }
         Relationships: [
           {
@@ -2332,6 +2415,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      lookup_country_zone: { Args: { _country: string }; Returns: string }
       notify_author: {
         Args: {
           _body: string

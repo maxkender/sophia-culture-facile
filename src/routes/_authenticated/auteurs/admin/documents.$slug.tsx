@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/auteurs/admin/documents/$s
 
 function DocumentEditorRoute() {
   const { slug } = Route.useParams();
-  const valid = ["guide", "contract", "creator-agreement", "creator-guide"].includes(slug);
+  const valid = ["guide", "contract", "creator-agreement", "creator-guide", "creator-rules", "slideshow-guide"].includes(slug);
   return (
     <PortalShell adminOnly>
       {valid ? (
