@@ -40,7 +40,7 @@ export function CreatorPayouts() {
 
   async function addRate() {
     const amount = Number(rate);
-    if (!rate || isNaN(amount) || amount < 0) return toast.error("Enter a valid amount.");
+    if (!rate || isNaN(amount) || amount < 0) { toast.error("Enter a valid amount."); return; }
     const { error } = await supabase
       .from("creator_rates")
       .upsert({ track, country: country.trim() || null, rate_usd: amount }, { onConflict: "track,country" });
@@ -99,7 +99,7 @@ export function CreatorPayouts() {
             <Button onClick={addRate}>Save rate</Button>
           </PortalCard>
           {rows.length === 0 ? (
-            <EmptyState title="No rates yet" body="Add a rate per track (and optionally per country) before generating a batch." />
+            <EmptyState title="No rates yet" text="Add a rate per track (and optionally per country) before generating a batch." />
           ) : (
             <PortalCard className="divide-y p-0">
               {rows.map((r) => (
@@ -120,7 +120,7 @@ export function CreatorPayouts() {
             <Button onClick={generate}>Generate batch</Button>
           </PortalCard>
           {rows.length === 0 ? (
-            <EmptyState title="No batches" body="Pick a month and generate a batch from approved posts." />
+            <EmptyState title="No batches" text="Pick a month and generate a batch from approved posts." />
           ) : (
             rows.map((b) => {
               const total = (b.payout_items ?? []).reduce((s: number, i: any) => s + Number(i.amount_usd), 0);
@@ -157,7 +157,7 @@ export function CreatorPayouts() {
 
       {tab === "creators" && (
         <PortalCard className="divide-y p-0">
-          {rows.length === 0 && <EmptyState title="No creators" body="Add creators from the ops page first." />}
+          {rows.length === 0 && <EmptyState title="No creators" text="Add creators from the ops page first." />}
           {rows.map((c) => {
             const p = Array.isArray(c.creator_payout_profiles) ? c.creator_payout_profiles[0] : c.creator_payout_profiles;
             return (

@@ -19,7 +19,7 @@ export const generatePayoutBatch = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as any;
     await requireAdmin(supabase, userId);
-    const [y, m] = data.period.split("-").map(Number);
+    const [y = 0, m = 1] = data.period.split("-").map(Number);
     const from = new Date(Date.UTC(y, m - 1, 1)).toISOString().slice(0, 10);
     const to = new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 10);
 

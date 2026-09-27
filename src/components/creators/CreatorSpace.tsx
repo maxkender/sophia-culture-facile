@@ -166,7 +166,7 @@ function PayoutSection({ profile, items }: { profile: any; items: any[] }) {
 
   useEffect(() => {
     if (profile?.stripe_account_id && !profile.stripe_onboarded) {
-      sync({ data: {} }).then(() => qc.invalidateQueries({ queryKey: ["creator-space"] }));
+      sync({} as never).then(() => qc.invalidateQueries({ queryKey: ["creator-space"] }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.stripe_account_id]);
@@ -174,7 +174,7 @@ function PayoutSection({ profile, items }: { profile: any; items: any[] }) {
   async function connect() {
     setBusy(true);
     try {
-      const { url } = await onboard({ data: {} });
+      const { url } = await onboard({} as never);
       window.location.href = url;
     } catch (e: any) {
       toast.error(e?.message ?? "Could not start Stripe onboarding.");
