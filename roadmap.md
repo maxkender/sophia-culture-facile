@@ -9,7 +9,7 @@
 - [x] Creator data model (creators, briefs, posts, calls)
 - [ ] Admin creators mode (dashboard, applications, creators, briefs, posts, calls, announcements, messages)
 - [x] Creator space /creators/app (basic: invite claim, briefs, log post, feedback, calls)
-- [ ] Reference library (accounts + videos, admin + creator pages, "Use this", brief picker, dashboard block)
+- [x] Reference library (basic: admin bulk add, pin, deactivate; creator "Use this")
 - [x] Home page: "Devenir créateur / Become a creator" outlined button next to download + footer link
 - [x] Home page: replace testimonials with the three real App Store reviews (EN translated, with note)
 - [ ] Creator payments: payout profiles, rate cards, payment lines, monthly batches (Wise + PayPal CSV), statements PDF, Earnings page
