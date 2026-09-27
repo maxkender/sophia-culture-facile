@@ -4,6 +4,7 @@ A second product surface, kept separate from authors in data and routes, reusing
 
 ## Stage 1 — Public page and application form (publish)
 - `/fr/createurs` and `/en/creators` landing page, bilingual, hreflang + canonicals, added to the sitemap; `/creators` follows the same language detection as the root.
+- Minimum age 18 everywhere (landing requirement, form block "You need to be at least 18 to apply."); no mention of 16.
 - `/creators/apply` (English only): the form exactly as specified, local autosave, age and requirements blocks, video link or upload (mp4/mov, 200 MB, progress bar), consent + privacy link, confirmation screen.
 - Honeypot field and rate limit (per email and per IP, stored server-side) on a public server function that writes the application.
 - No creator handles or example accounts anywhere.
@@ -24,7 +25,7 @@ A second product surface, kept separate from authors in data and routes, reusing
 - Every action logged to the activity log.
 
 ## Stage 4 — Creator space `/creators/app` (publish)
-- Invite claim identical to authors, with the "I confirm the details above are accurate and I am at least 16" declaration; iOS fixed.
+- Invite claim identical to authors, with the "I confirm the details above are accurate and that I am at least 18." declaration; iOS fixed.
 - Home (weekly bar, newest brief, next call, pending feedback, access code card), Briefs (detail, "I posted this", Skip with reason), My posts (log form, amber feedback with reply), Calls (RSVP), Messages, Profile. Bell and banners scoped to creator space.
 - Authors can never reach creator pages and vice versa.
 
@@ -37,11 +38,18 @@ A second product surface, kept separate from authors in data and routes, reusing
 - Instagram oEmbed normally needs a Meta app token; without one, Instagram cards use the placeholder.
 
 ## Stage 6 — Monthly payments (publish)
-- Tables payout_profiles, rate_cards, payment_lines, payout_batches, payout_statements (replacing the earlier placeholder payments table, left unused). Bank and payout fields readable only by the creator and admins; guardian consent, view screenshots and statements in private storage.
-- Rules: approving a post creates an accrued line from the rate card active on the post date; day-7 prompt for views + screenshot computes the bonus from tiers (capped); day 14 without views → bonus zero, flagged "views not reported"; post removed before day 30 → line cancelled; missing/unverified profile, missing SIRET for FR, or missing guardian consent → held with the reason. A daily scheduled job applies the day-14 and hold rules.
+- Tables payout_profiles, rate_cards, payment_lines, payout_batches, payout_statements (replacing the earlier placeholder payments table, left unused). Bank and payout fields readable only by the creator and admins; view screenshots and statements in private storage.
+- Rules: approving a post creates an accrued line from the rate card active on the post date; day-7 prompt for views + screenshot computes the bonus from tiers (capped); day 14 without views → bonus zero, flagged "views not reported"; post removed before day 30 → line cancelled; missing/unverified profile, or missing SIRET for FR → held with the reason; a line stays held "payouts not enabled" until Stripe payouts are enabled or a Wise/PayPal profile is verified. A daily scheduled job applies the day-14 and hold rules.
 - Admin: Settings > Rate cards (new card with effective date, past lines untouched); Payments page with Accrued (grouped by creator, amber holds, release/cancel/edit views with note), Batches (month → verified lines, grouped by creator, currency and app; Wise bulk CSV and PayPal Mass Pay CSV; export → in batch; "Mark as paid" with reference → paid + statements), Statements (filter, download). Creator page gets a Payments block with Verify.
-- Creator: Profile > Payout details (method fields, payee, guardian + consent upload, tax country, SIRET when FR, one-line reason each, green Verified tag); Earnings page (month accrued per video, holds in plain words, views to report with upload, past statements).
+- Creator: Profile > Payout details (method fields, payee, tax country, SIRET when FR, one-line reason each, green Verified tag); Earnings page (month accrued per video, holds in plain words, views to report with upload, past statements).
 - Statement PDF generated in the browser at "Mark as paid" and stored: Vik Studios header, creator and payee, month, video table, footer "Payment statement for services rendered as an independent creator."
+
+## Stage 6b — Stripe Connect Express (primary payout rail)
+- payout_profiles: method stripe | wise | paypal (default stripe), stripe_account_id, onboarding/payouts/details booleans, last checked. No guardian fields anywhere.
+- New projects here cannot use separate backend functions, so these are built as server endpoints inside the app (same as the AI reviewer), inert until the keys are added: create account + onboarding link, refresh status on return, Express dashboard login link, batch transfers (one per creator, metadata batch/creator/month/app breakdown, failures isolated and shown to the admin), and a signature-verified webhook for account.updated and transfer.reversed at https://sophia-culture.com/api/public/stripe/webhook.
+- Settings: STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET, documented on the admin setup page with the webhook URL.
+- Creator: "Set up payouts with Stripe" button, green "Payouts enabled", amber "Finish your Stripe setup", "Manage on Stripe"; small link reveals Wise/PayPal fallback.
+- Admin: method and Stripe status on each creator row; batch page counts Stripe transfers vs CSV; grey note on application and creator pages when the country is not on Stripe's Express list (editable list in Settings).
 
 ## Stage 7 — Outreach pipeline (publish)
 - Tables creator_prospects, prospect_touches, outreach_templates; admin-only.

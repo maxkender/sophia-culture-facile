@@ -14,3 +14,5 @@
 - [ ] Home page: replace testimonials with the three real App Store reviews (EN translated, with note)
 - [ ] Creator payments: payout profiles, rate cards, payment lines, monthly batches (Wise + PayPal CSV), statements PDF, Earnings page
 - [ ] Outreach pipeline: prospects (CSV import, table + kanban), touches, templates, convert/match to applications, dashboard block
+- [ ] Minimum age 18 everywhere; remove all guardian fields/UI/hold reason
+- [ ] Stripe Connect Express payouts (onboarding, status refresh, dashboard link, transfers per batch, webhook, country note config)
