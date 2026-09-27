@@ -1187,6 +1187,7 @@ export type Database = {
           url: string
           views: number | null
           views_entered_at: string | null
+          views_screenshot_path: string | null
         }
         Insert: {
           amount_usd?: number | null
@@ -1207,6 +1208,7 @@ export type Database = {
           url: string
           views?: number | null
           views_entered_at?: string | null
+          views_screenshot_path?: string | null
         }
         Update: {
           amount_usd?: number | null
@@ -1227,6 +1229,7 @@ export type Database = {
           url?: string
           views?: number | null
           views_entered_at?: string | null
+          views_screenshot_path?: string | null
         }
         Relationships: [
           {

@@ -1,0 +1,1 @@
+ALTER TABLE public.creator_posts ADD COLUMN IF NOT EXISTS views_screenshot_path text;
