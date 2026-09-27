@@ -10,7 +10,7 @@ export const en: Dict = {
     becomeCreator: "Become a creator",
     careers: "Careers",
     download: "Download",
-    teacherLogin: "Teacher / admin sign in",
+    teacherLogin: "Sign in",
     becomeTeacher: "Become a certified teacher",
     home: "Sophia: General Knowledge, home",
     main: "Main navigation",
