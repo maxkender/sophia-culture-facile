@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { EmptyState, PageTitle, PortalCard } from "../ui";
 
-type Tab = "creators" | "briefs" | "posts" | "calls";
+type Tab = "creators" | "briefs" | "posts" | "calls" | "library";
 
 export function CreatorOps() {
   const qc = useQueryClient();
@@ -23,6 +23,7 @@ export function CreatorOps() {
       if (tab === "creators") return (await supabase.from("creators").select("*").order("created_at", { ascending: false })).data ?? [];
       if (tab === "briefs") return (await supabase.from("briefs").select("*").order("created_at", { ascending: false })).data ?? [];
       if (tab === "posts") return (await supabase.from("creator_posts").select("*, creators(full_name)").order("created_at", { ascending: false })).data ?? [];
+      if (tab === "library") return (await supabase.from("reference_videos").select("*").order("pinned", { ascending: false }).order("created_at", { ascending: false })).data ?? [];
       return (await supabase.from("creator_calls").select("*").order("starts_at", { ascending: false })).data ?? [];
     },
   });
@@ -36,6 +37,10 @@ export function CreatorOps() {
     } else if (tab === "briefs") {
       if (!a.trim()) return toast.error("Title required.");
       ({ error } = await supabase.from("briefs").insert({ title: a.trim(), body: b, hook: c.trim() || null }));
+    } else if (tab === "library") {
+      const urls = a.split(/\s+/).filter((u) => /^https?:\/\//.test(u));
+      if (!urls.length) return toast.error("Paste one or more video links.");
+      ({ error } = await supabase.from("reference_videos").insert(urls.map((url) => ({ url, platform: url.includes("instagram") ? "instagram" : "tiktok", category: b.trim() || "hook", note: c.trim() || null }))));
     } else if (tab === "calls") {
       if (!a.trim() || !b) return toast.error("Title and date required.");
       ({ error } = await supabase.from("creator_calls").insert({ title: a.trim(), starts_at: new Date(b).toISOString(), link: c.trim() || null }));
@@ -44,7 +49,7 @@ export function CreatorOps() {
     setA(""); setB(""); setC(""); toast.success("Saved."); return refresh();
   }
 
-  async function update(table: "briefs" | "creator_posts", id: string, patch: Record<string, unknown>) {
+  async function update(table: "briefs" | "creator_posts" | "reference_videos", id: string, patch: Record<string, unknown>) {
     const { error } = await supabase.from(table).update(patch as never).eq("id", id);
     if (error) toast.error("Could not update."); else refresh();
   }
@@ -57,20 +62,20 @@ export function CreatorOps() {
     <div className="space-y-6">
       <PageTitle title="Creator operations" lead="Creators, briefs, posts and calls — separate from authors." />
       <div className="flex flex-wrap gap-2">
-        {(["creators", "briefs", "posts", "calls"] as Tab[]).map((t) => (
+        {(["creators", "briefs", "posts", "calls", "library"] as Tab[]).map((t) => (
           <Button key={t} size="sm" variant={tab === t ? "default" : "outline"} onClick={() => setTab(t)}>{t}</Button>
         ))}
       </div>
 
       {tab !== "posts" && (
         <PortalCard className="grid gap-2 p-4 sm:grid-cols-4">
-          <Input placeholder={tab === "creators" ? "Full name" : "Title"} value={a} onChange={(e) => setA(e.target.value)} />
+          <Input placeholder={tab === "creators" ? "Full name" : tab === "library" ? "Video links (space separated)" : "Title"} value={a} onChange={(e) => setA(e.target.value)} />
           {tab === "briefs" ? (
             <Textarea placeholder="Brief" value={b} onChange={(e) => setB(e.target.value)} />
           ) : (
-            <Input type={tab === "calls" ? "datetime-local" : "email"} placeholder="Email" value={b} onChange={(e) => setB(e.target.value)} />
+            <Input type={tab === "calls" ? "datetime-local" : tab === "library" ? "text" : "email"} placeholder={tab === "library" ? "Category" : "Email"} value={b} onChange={(e) => setB(e.target.value)} />
           )}
-          <Input placeholder={tab === "creators" ? "Country" : tab === "briefs" ? "Hook" : "Meeting link"} value={c} onChange={(e) => setC(e.target.value)} />
+          <Input placeholder={tab === "creators" ? "Country" : tab === "briefs" ? "Hook" : tab === "library" ? "Note" : "Meeting link"} value={c} onChange={(e) => setC(e.target.value)} />
           <Button onClick={add}>Add</Button>
         </PortalCard>
       )}
@@ -87,6 +92,7 @@ export function CreatorOps() {
                     {tab === "briefs" && `${r.status} · ${formatDateTime(r.created_at)}`}
                     {tab === "posts" && `${r.creators?.full_name ?? ""} · ${r.platform} · ${r.posted_on} · ${r.status}`}
                     {tab === "calls" && formatDateTime(r.starts_at)}
+                    {tab === "library" && `${r.platform} · ${r.category}${r.pinned ? " · pinned" : ""}${r.active ? "" : " · inactive"}`}
                   </span>
                 </span>
                 {tab === "creators" && r.invite_token && !r.user_id && (
@@ -96,6 +102,13 @@ export function CreatorOps() {
                   <Button size="sm" variant="outline" onClick={() => update("briefs", r.id, { status: r.status === "published" ? "draft" : "published" })}>
                     {r.status === "published" ? "Unpublish" : "Publish"}
                   </Button>
+                )}
+                {tab === "library" && (
+                  <>
+                    <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-portal-accent">Open</a>
+                    <Button size="sm" variant="outline" onClick={() => update("reference_videos", r.id, { pinned: !r.pinned })}>{r.pinned ? "Unpin" : "Pin"}</Button>
+                    <Button size="sm" variant="outline" onClick={() => update("reference_videos", r.id, { active: !r.active })}>{r.active ? "Deactivate" : "Activate"}</Button>
+                  </>
                 )}
                 {tab === "posts" && (
                   <>
