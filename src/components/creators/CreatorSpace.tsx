@@ -119,7 +119,7 @@ function Workspace() {
         <Button variant="outline" className="mt-4" onClick={() => supabase.auth.signOut()}>Sign out</Button>
       </div>
     );
-  if (!data.me.onboarding_completed_at) return <CreatorOnboarding me={{ ...data.me, agreementSigned: data.signed }} refs={data.refs} />;
+  const onboardingDone = Boolean(data.me.onboarding_completed_at);
   const monday = new Date(); monday.setUTCHours(0, 0, 0, 0); monday.setUTCDate(monday.getUTCDate() - ((monday.getUTCDay() + 6) % 7));
   const week = data.posts.filter((p) => p.posted_on >= monday.toISOString().slice(0, 10) && p.status !== "flagged").length;
 
