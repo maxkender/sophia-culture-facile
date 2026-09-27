@@ -794,6 +794,41 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_guide_media: {
+        Row: {
+          caption: string | null
+          created_at: string
+          file_path: string | null
+          guide_id: string
+          id: string
+          url: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          file_path?: string | null
+          guide_id: string
+          id?: string
+          url?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          file_path?: string | null
+          guide_id?: string
+          id?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_guide_media_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "creator_weekly_guides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_messages: {
         Row: {
           body: string
@@ -1053,6 +1088,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      creator_weekly_guides: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          published: boolean
+          title: string
+          track: string | null
+          week_start: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          title: string
+          track?: string | null
+          week_start: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          title?: string
+          track?: string | null
+          week_start?: string
+        }
+        Relationships: []
       }
       creators: {
         Row: {

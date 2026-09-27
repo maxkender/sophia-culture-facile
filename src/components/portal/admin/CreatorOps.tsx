@@ -8,7 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { EmptyState, PageTitle, PortalCard } from "../ui";
 
-type Tab = "creators" | "briefs" | "posts" | "calls" | "library";
+import { WeeklyGuidesAdmin } from "./WeeklyGuidesAdmin";
+
+type Tab = "creators" | "briefs" | "guides" | "posts" | "calls" | "library";
 
 export function CreatorOps() {
   const qc = useQueryClient();
@@ -62,11 +64,12 @@ export function CreatorOps() {
     <div className="space-y-6">
       <PageTitle title="Creator operations" lead="Creators, briefs, posts and calls — separate from authors." />
       <div className="flex flex-wrap gap-2">
-        {(["creators", "briefs", "posts", "calls", "library"] as Tab[]).map((t) => (
-          <Button key={t} size="sm" variant={tab === t ? "default" : "outline"} onClick={() => setTab(t)}>{t}</Button>
+        {(["creators", "briefs", "guides", "posts", "calls", "library"] as Tab[]).map((t) => (
+          <Button key={t} size="sm" variant={tab === t ? "default" : "outline"} onClick={() => setTab(t)}>{t === "guides" ? "weekly guides" : t}</Button>
         ))}
       </div>
 
+      {tab === "guides" ? <WeeklyGuidesAdmin /> : <>
       {tab !== "posts" && (
         <PortalCard className="grid gap-2 p-4 sm:grid-cols-4">
           <Input placeholder={tab === "creators" ? "Full name" : tab === "library" ? "Video links (space separated)" : "Title"} value={a} onChange={(e) => setA(e.target.value)} />
@@ -122,6 +125,7 @@ export function CreatorOps() {
           </ul>
         )}
       </PortalCard>
+      </>}
     </div>
   );
 }
