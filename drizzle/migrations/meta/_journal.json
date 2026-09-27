@@ -64,6 +64,13 @@
       "when": 1790498804090,
       "tag": "0008_creator_account_agreement",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790498918923,
+      "tag": "0009_lock_briefs_until_agreement_signed",
+      "breakpoints": true
     }
   ]
 }
