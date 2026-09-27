@@ -48,7 +48,8 @@ function LinkOut({ href, label }: { href: string | null; label: string }) {
 
 export function CreatorApplications() {
   const queryClient = useQueryClient();
-  const { data: profile } = usePortalProfile();
+  const { data: portal } = usePortalProfile();
+  const profile = portal?.profile;
   const [track, setTrack] = useState<Track>("ugc");
   const [status, setStatus] = useState("pending");
   const [selected, setSelected] = useState<UgcApplication | SlideshowApplication | null>(null);
