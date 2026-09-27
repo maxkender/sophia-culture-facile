@@ -106,8 +106,8 @@ export const startStripeOnboarding = createServerFn({ method: "POST" })
     const origin = process.env["SITE_URL"] ?? "https://sophia-culture.com";
     const link = await s.accountLinks.create({
       account: accountId,
-      refresh_url: `${origin}/creators/app`,
-      return_url: `${origin}/creators/app`,
+      refresh_url: `${origin}/creators/app/profile`,
+      return_url: `${origin}/creators/app/profile`,
       type: "account_onboarding",
     });
     return { url: link.url };
