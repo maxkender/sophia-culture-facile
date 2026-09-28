@@ -60,6 +60,13 @@ export default {
         },
       });
     }
+    const frEnglishPath = url.pathname.replace(/\/$/, "").match(/^\/fr\/creators(\/ugc|\/slideshow)?$/);
+    if (request.method === "GET" && frEnglishPath) {
+      return new Response(null, {
+        status: 301,
+        headers: { location: `/fr/createurs${frEnglishPath[1] ?? ""}${url.search}` },
+      });
+    }
     const creatorShort = url.pathname.replace(/\/$/, "").match(/^\/creators(\/ugc|\/slideshow)?$/);
     if (request.method === "GET" && creatorShort) {
       const lang = detectLangFromHeaders(request.headers);
