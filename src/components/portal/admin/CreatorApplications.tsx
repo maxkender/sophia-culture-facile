@@ -17,6 +17,7 @@ import { generateSigningLink } from "@/lib/creator-agreement.functions";
 import { approveUgcApplication } from "@/lib/creator-onboarding.functions";
 import { getGuideForApplication, setApplicationZone } from "@/lib/slideshow-zones.functions";
 import { GUIDE_PDF_NAME, ZONE_BADGE } from "@/lib/slideshow-guide";
+import { SocialLinks, TalkingVideo, VideoStatusIcon } from "./ApplicationVideo";
 
 type UgcApplication = Database["public"]["Tables"]["creator_applications"]["Row"];
 type SlideshowApplication = Database["public"]["Tables"]["slideshow_applications"]["Row"];
@@ -188,6 +189,7 @@ export function CreatorApplications({ track }: { track: Track }) {
                       {row.email} · {row.country} · {formatDateTime(row.created_at)}
                     </span>
                   </span>
+                  {track === "ugc" ? <VideoStatusIcon file={(row as UgcApplication).video_file_path} url={(row as UgcApplication).video_url} /> : null}
                   {track === "slideshow" ? <ZoneBadge zone={(row as SlideshowApplication).zone} /> : null}
                   {track === "slideshow" && row.status === "approved" ? (
                     <span className={`text-[11px] font-bold ${(row as SlideshowApplication).agreement_signed_at ? "text-portal-green" : "text-portal-amber"}`}>
@@ -213,6 +215,7 @@ export function CreatorApplications({ track }: { track: Track }) {
                   {selected.full_name} <StatusBadge status={selected.status} />
                 </DialogTitle>
               </DialogHeader>
+              {isUgc(selected) ? <TalkingVideo key={selected.id} file={selected.video_file_path} url={selected.video_url} /> : null}
               <dl className="grid gap-3 text-sm sm:grid-cols-2">
                 <div><dt className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Email</dt><dd className="text-brand-navy">{selected.email}</dd></div>
                 <div><dt className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Phone</dt><dd className="text-brand-navy">{selected.phone}</dd></div>
@@ -224,11 +227,8 @@ export function CreatorApplications({ track }: { track: Track }) {
                     <div><dt className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Occupation</dt><dd className="text-brand-navy">{selected.occupation}</dd></div>
                     <div><dt className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Referral</dt><dd className="text-brand-navy">{selected.referral_source}</dd></div>
                     <div><dt className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Meets criteria</dt><dd className="text-brand-navy">{selected.meets_criteria ? "Yes" : "No"}</dd></div>
-                    <div className="flex flex-wrap gap-3 sm:col-span-2">
-                      <LinkOut href={selected.tiktok_url} label="TikTok" />
-                      <LinkOut href={selected.instagram_url} label="Instagram" />
-                      <LinkOut href={selected.video_url} label="Video" />
-                      <LinkOut href={selected.other_links} label="Other links" />
+                    <div className="sm:col-span-2">
+                      <SocialLinks tiktok={selected.tiktok_url} instagram={selected.instagram_url} other={selected.other_links} />
                     </div>
                     {selected.status === "approved" && selected.created_creator_id ? (
                       <div className="sm:col-span-2 rounded-lg border border-brand-line bg-brand-surface p-3 text-xs text-brand-navySoft">
