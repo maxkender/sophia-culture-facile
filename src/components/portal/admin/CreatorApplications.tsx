@@ -1,4 +1,4 @@
-import { useAdminApp } from "@/lib/apps";
+import { AppBadge, useAdminApp } from "@/lib/apps";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -187,7 +187,7 @@ export function CreatorApplications({ track }: { track: Track }) {
                     {row.full_name.split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase() ?? "").join("")}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-bold text-brand-navy">{row.full_name}</span>
+                    <span className="block truncate text-sm font-bold text-brand-navy"><AppBadge appId={(row as { app_id?: string }).app_id} /> {row.full_name}</span>
                     <span className="block truncate text-xs text-brand-navySoft">
                       {row.email} · {row.country} · {formatDateTime(row.created_at)}
                     </span>

@@ -138,7 +138,7 @@ export function InfluencerApplications() {
                 const [platform, n] = largest(a);
                 return (
                   <tr key={a.id} className="cursor-pointer hover:bg-brand-navy/5" onClick={() => open(a)}>
-                    <td className="px-4 py-3 font-bold text-brand-navy">{a.full_name}<span className="block text-xs font-normal text-brand-navySoft">{a.city}, {a.country}</span></td>
+                    <td className="px-4 py-3 font-bold text-brand-navy"><AppBadge appId={a.app_id} /> {a.full_name}<span className="block text-xs font-normal text-brand-navySoft">{a.city}, {a.country}</span></td>
                     <td className="px-4 py-3 capitalize">{computeTier(n)}</td>
                     <td className="px-4 py-3">{platform}</td>
                     <td className="px-4 py-3">{fmt(n)}</td>
