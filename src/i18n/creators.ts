@@ -53,7 +53,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       metaDescription:
         "Two ways to create content for Sophia, the general-knowledge app: film yourself as a UGC creator, or publish ready-made slideshows without appearing on camera.",
       title: "Create for Sophia",
-      lead: "Two ways to work with us. Pick the one that fits you.",
+      lead: "Three ways to work with us. Pick the one that fits you.",
       ugc: {
         title: "UGC creator",
         lines: [
@@ -147,7 +147,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       metaDescription:
         "Deux façons de créer du contenu pour Sophia, l'appli de culture générale : vous filmer en tant que créateur UGC, ou publier des slideshows prêts à l'emploi sans apparaître à l'écran.",
       title: "Créer pour Sophia",
-      lead: "Deux façons de travailler avec nous. Choisissez celle qui vous correspond.",
+      lead: "Trois façons de travailler avec nous. Choisissez celle qui vous correspond.",
       ugc: {
         title: "Créateur UGC",
         lines: [
