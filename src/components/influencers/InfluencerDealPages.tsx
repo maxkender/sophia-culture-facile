@@ -384,7 +384,7 @@ function DeliverableCard({ dealId, item, draftRequired, onDone }: { dealId: stri
   return (
     <Card className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="font-bold capitalize text-brand-navy">{item.platform} {item.format}</p>
+        <p className="flex items-center gap-2 font-bold capitalize text-brand-navy"><PlatformBadge platform={item.platform} /> {item.format}</p>
         <span className="rounded-full bg-brand-navy/10 px-2 py-0.5 text-[11px] font-bold">{item.status.replace("_", " ")}</span>
       </div>
       {item.draft_feedback ? <p className={cn("rounded-xl p-3 text-sm", item.status === "changes_requested" ? "bg-portal-amber/10" : "bg-portal-green/10")}><span className="font-bold">Sophia: </span>{item.draft_feedback}</p> : null}
