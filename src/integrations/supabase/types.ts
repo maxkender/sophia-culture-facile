@@ -2477,6 +2477,76 @@ export type Database = {
           },
         ]
       }
+      influencer_payout_items: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          deal_id: string
+          id: string
+          influencer_id: string
+          invoice_id: string | null
+          method: string
+          paid_on: string | null
+          paid_reference: string | null
+          part: string
+          payee: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          deal_id: string
+          id?: string
+          influencer_id: string
+          invoice_id?: string | null
+          method?: string
+          paid_on?: string | null
+          paid_reference?: string | null
+          part?: string
+          payee?: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          deal_id?: string
+          id?: string
+          influencer_id?: string
+          invoice_id?: string | null
+          method?: string
+          paid_on?: string | null
+          paid_reference?: string | null
+          part?: string
+          payee?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_payout_items_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_payout_items_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_payout_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       influencer_settings: {
         Row: {
           disclosure: Json

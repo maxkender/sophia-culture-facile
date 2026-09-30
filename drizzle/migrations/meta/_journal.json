@@ -197,6 +197,13 @@
       "when": 1790759711259,
       "tag": "0027_influencer_deals_access",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1790760221953,
+      "tag": "0028_influencer_payouts",
+      "breakpoints": true
     }
   ]
 }

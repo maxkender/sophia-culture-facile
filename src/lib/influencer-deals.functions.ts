@@ -101,6 +101,20 @@ async function rollDealStatus(dealId: string) {
   await a.from("influencer_deals").update({ status: next }).eq("id", dealId);
 }
 
+/** One payout item per deal, or two halves when the offer was split. Idempotent via UNIQUE (deal_id, part). */
+async function createPayoutItems(deal: { id: string; influencer_id: string; agreed_price: number | string; split_payment: boolean }) {
+  const a = await db();
+  const { data: inf } = await a.from("influencers").select("payout_method, payee").eq("id", deal.influencer_id).single();
+  const total = Number(deal.agreed_price);
+  const base = { deal_id: deal.id, influencer_id: deal.influencer_id, currency: "EUR", method: inf?.payout_method ?? "stripe", payee: inf?.payee === "agency" ? "agency" : "influencer" };
+  const first = Math.round((total / 2) * 100) / 100;
+  const rows = deal.split_payment
+    ? [{ ...base, part: "acceptance", amount: first }, { ...base, part: "posting", amount: Math.round((total - first) * 100) / 100 }]
+    : [{ ...base, part: "full", amount: total }];
+  const { error } = await a.from("influencer_payout_items").upsert(rows, { onConflict: "deal_id,part", ignoreDuplicates: true });
+  if (error) throw new Error("The deal was completed but the payout item could not be created.");
+}
+
 /* ================= Admin ================= */
 
 export const sendInfluencerOffers = createServerFn({ method: "POST" })
@@ -235,6 +249,7 @@ export const adminDealAction = createServerFn({ method: "POST" })
       case "complete":
         if (deal.status === "cancelled") throw new Error("This deal is cancelled.");
         await a.from("influencer_deals").update({ status: "completed", completed_at: now }).eq("id", deal.id);
+        await createPayoutItems(deal);
         await notify(deal.influencer_id, `The deal for ${title} is completed. Thank you!`);
         return { ok: true };
       case "spark":
@@ -434,6 +449,67 @@ export const openDealFile = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { deal, a } = await myDeal(context as Ctx, data.dealId);
     if (!data.path.startsWith(`deals/${deal.id}/`)) throw new Error("Forbidden");
+    const { data: s } = await a.storage.from("influencer-files").createSignedUrl(data.path, 600);
+    return { url: s?.signedUrl ?? null };
+  });
+
+export const markPayoutPaid = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ itemIds: z.array(z.string().uuid()).min(1).max(100), paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), reference: z.string().trim().min(1).max(200) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await adminProfile(context as Ctx);
+    const a = await db();
+    const { data: items } = await a.from("influencer_payout_items").select("id, invoice_id, status").in("id", data.itemIds);
+    if ((items ?? []).some((i: { status: string }) => i.status === "paid")) throw new Error("One of these is already paid.");
+    await a.from("influencer_payout_items").update({ status: "paid", paid_on: data.paidOn, paid_reference: data.reference }).in("id", data.itemIds);
+    const invoices = [...new Set((items ?? []).map((i: { invoice_id: string | null }) => i.invoice_id).filter(Boolean))];
+    if (invoices.length) await a.from("influencer_invoices").update({ status: "paid", paid_on: data.paidOn, paid_reference: data.reference }).in("id", invoices);
+    return { ok: true };
+  });
+
+export const invoiceUploadSlot = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ name: z.string().max(200), size: z.number().int().positive() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const inf = await meInfluencer(context as Ctx);
+    if (!/\.pdf$/i.test(data.name)) return { ok: false as const, reason: "type" as const };
+    if (data.size > 10 * 1024 * 1024) return { ok: false as const, reason: "size" as const };
+    const a = await db();
+    const path = `${inf.id}/invoices/${Date.now()}.pdf`;
+    const { data: slot, error } = await a.storage.from("influencer-files").createSignedUploadUrl(path);
+    if (error || !slot) return { ok: false as const, reason: "server" as const };
+    return { ok: true as const, path, signedUrl: slot.signedUrl };
+  });
+
+/** Attaches an uploaded invoice PDF to one or more due payout items (same deal). */
+export const submitInvoice = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ itemIds: z.array(z.string().uuid()).min(1).max(20), path: z.string().max(300) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const inf = await meInfluencer(context as Ctx);
+    if (!data.path.startsWith(`${inf.id}/invoices/`)) throw new Error("Forbidden");
+    const a = await db();
+    const { data: items } = await a.from("influencer_payout_items").select("*").in("id", data.itemIds).eq("influencer_id", inf.id);
+    if (!items?.length || items.length !== data.itemIds.length) throw new Error("Payment not found.");
+    if (items.some((i: { status: string }) => i.status !== "due")) throw new Error("An invoice was already sent for this payment.");
+    const amount = items.reduce((s: number, i: { amount: number }) => s + Number(i.amount), 0);
+    const { data: inv, error } = await a.from("influencer_invoices").insert({
+      influencer_id: inf.id, deal_id: items[0].deal_id, amount, file_path: data.path, payee: items[0].payee, status: "submitted",
+    }).select("id").single();
+    if (error || !inv) throw new Error("The invoice could not be saved.");
+    await a.from("influencer_payout_items").update({ status: "invoiced", invoice_id: inv.id }).in("id", data.itemIds);
+    return { ok: true };
+  });
+
+export const openMyInvoice = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ path: z.string().max(300) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const inf = await meInfluencer(context as Ctx);
+    if (!data.path.startsWith(`${inf.id}/`)) throw new Error("Forbidden");
+    const a = await db();
     const { data: s } = await a.storage.from("influencer-files").createSignedUrl(data.path, 600);
     return { url: s?.signedUrl ?? null };
   });
