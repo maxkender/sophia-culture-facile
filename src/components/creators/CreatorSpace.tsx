@@ -85,7 +85,7 @@ function Workspace() {
   useEffect(() => {
     if (data !== null) return;
     resolveAccountRole().then((r) => {
-      if (r === "author" || r === "admin") window.location.replace(homeFor(r));
+      if (r === "author" || r === "admin" || r === "influencer") window.location.replace(homeFor(r));
       else setRole(r);
     });
   }, [data]);
