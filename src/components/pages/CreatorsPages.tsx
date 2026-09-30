@@ -29,6 +29,16 @@ function AppBand({ slug }: { slug?: string | undefined }) {
     </section>
   );
 }
+function useAppCopy<T>(copy: T, slug?: string): T {
+  const { data: apps = [] } = useApps();
+  const app = apps.find((a) => a.slug === slug);
+  if (!slug || slug === "sophia" || !app) return copy;
+  const swap = (v: unknown): unknown =>
+    typeof v === "string" ? v.replace(/Sophia/g, app.name) : Array.isArray(v) ? v.map(swap) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, swap(x)])) : v;
+  const out = swap(copy) as T & { heroSubtitle?: string };
+  if (app.short_description && "heroSubtitle" in (out as object)) out.heroSubtitle = app.short_description;
+  return out;
+}
 const withApp = (to: string, slug?: string) => (slug && slug !== "sophia" ? `${to}?app=${slug}` : to);
 
 function Shell({ children }: { children: React.ReactNode }) {
@@ -83,7 +93,7 @@ function CheckList({ items }: { items: string[] }) {
 
 export function CreatorsChooserPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
-  const c = CREATORS[lang].chooser;
+  const c = useAppCopy(CREATORS[lang].chooser, app);
   const ugcPath = useLocalePath("creatorsUgc");
   const slidePath = useLocalePath("creatorsSlideshow");
   const inflPath = useLocalePath("creatorsInfluencer");
@@ -125,7 +135,7 @@ export function CreatorsChooserPage({ app }: { app?: string | undefined } = {}) 
 
 export function UgcLandingPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
-  const u = CREATORS[lang].ugc;
+  const u = useAppCopy(CREATORS[lang].ugc, app);
   const applyPath = useLocalePath("creatorsUgcApply");
   return (
     <Shell>
@@ -161,7 +171,7 @@ export function UgcLandingPage({ app }: { app?: string | undefined } = {}) {
 
 export function SlideshowLandingPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
-  const s = CREATORS[lang].slideshow;
+  const s = useAppCopy(CREATORS[lang].slideshow, app);
   const applyPath = useLocalePath("creatorsSlideshowApply");
   return (
     <Shell>
@@ -199,7 +209,7 @@ export function SlideshowLandingPage({ app }: { app?: string | undefined } = {})
 
 export function InfluencerLandingPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
-  const s = INFLUENCER_COPY[lang];
+  const s = useAppCopy(INFLUENCER_COPY[lang], app);
   const applyPath = useLocalePath("creatorsInfluencerApply");
   return (
     <Shell>
