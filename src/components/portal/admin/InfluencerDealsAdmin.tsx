@@ -43,6 +43,7 @@ export function InfluencerDealsBoard() {
                     return (
                       <Link key={d.id} to="/auteurs/admin/creators/influencer-deals/$dealId" params={{ dealId: d.id }}
                         className="block rounded-2xl bg-card p-3 shadow-card transition hover:ring-2 hover:ring-brand-navy/20">
+                        <AppBadge appId={d.app_id} />
                         <p className="text-sm font-bold text-brand-navy">{d.influencers?.display_name}</p>
                         <p className="truncate text-xs text-brand-navySoft">{d.influencer_briefs?.title}</p>
                         <div className="mt-2 flex items-center justify-between text-xs">

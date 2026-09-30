@@ -153,6 +153,7 @@ function BriefForm({ open, onOpenChange, brief }: { open: boolean; onOpenChange:
         <DialogHeader><DialogTitle>{brief ? "Edit brief" : "New influencer brief"}</DialogTitle></DialogHeader>
         <div className="space-y-5">
           <div className="grid gap-3 md:grid-cols-2">
+            <div className="md:col-span-2"><AppField id="b-app" value={appPick} onChange={setAppPick} /></div>
             <div className="md:col-span-2"><Label htmlFor="b-title">Title</Label><Input id="b-title" value={f.title} onChange={set("title")} /></div>
             <div className="md:col-span-2"><Label htmlFor="b-angle">Angle</Label><Input id="b-angle" value={f.angle} onChange={set("angle")} placeholder="One line: the idea of the video" /></div>
           </div>
