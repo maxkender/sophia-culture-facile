@@ -1,3 +1,4 @@
+import { AppEnrolment } from "./AppEnrolment";
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -179,6 +180,7 @@ export function InfluencerAdminDetail({ influencerId }: { influencerId: string }
           </div>
         ) : <Button asChild variant="pillSecondary" size="pillSm"><Link to="/auteurs/admin/creators/influencer-briefs">Create a brief to send an offer</Link></Button>}
       </div>
+      <AppEnrolment kind="influencer" personId={influencerId} />
       <PortalCard className="space-y-4">
         <p className="font-bold text-brand-navy">Profile</p>
         <div className="grid gap-3 md:grid-cols-3">
