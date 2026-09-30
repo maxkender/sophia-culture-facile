@@ -69,6 +69,7 @@ import { Route as CreatorsAppPostsRouteImport } from './routes/creators.app.post
 import { Route as CreatorsAppProfileRouteImport } from './routes/creators.app.profile'
 import { Route as CreatorsAppRulesRouteImport } from './routes/creators.app.rules'
 import { Route as CreatorsInfluencerIndexRouteImport } from './routes/creators.influencer.index'
+import { Route as CreatorsInfluencerAppRouteImport } from './routes/creators.influencer.app'
 import { Route as CreatorsInfluencerApplyRouteImport } from './routes/creators.influencer.apply'
 import { Route as CreatorsSignTokenRouteImport } from './routes/creators.sign.$token'
 import { Route as CreatorsSlideshowIndexRouteImport } from './routes/creators.slideshow.index'
@@ -104,6 +105,12 @@ import { Route as AuthenticatedAuteursCoursesCourseIdRouteImport } from './route
 import { Route as ApiPublicAppCoursesRouteImport } from './routes/api/public/app/courses'
 import { Route as CreatorsAppBriefsIndexRouteImport } from './routes/creators.app.briefs.index'
 import { Route as CreatorsAppBriefsBriefIdRouteImport } from './routes/creators.app.briefs.$briefId'
+import { Route as CreatorsInfluencerAppIndexRouteImport } from './routes/creators.influencer.app.index'
+import { Route as CreatorsInfluencerAppAgreementRouteImport } from './routes/creators.influencer.app.agreement'
+import { Route as CreatorsInfluencerAppMessagesRouteImport } from './routes/creators.influencer.app.messages'
+import { Route as CreatorsInfluencerAppPayoutsRouteImport } from './routes/creators.influencer.app.payouts'
+import { Route as CreatorsInfluencerAppProfileRouteImport } from './routes/creators.influencer.app.profile'
+import { Route as CreatorsInfluencerAppRulesRouteImport } from './routes/creators.influencer.app.rules'
 import { Route as AuthenticatedAuteursAdminAuthorsIndexRouteImport } from './routes/_authenticated/auteurs/admin/authors.index'
 import { Route as AuthenticatedAuteursAdminAuthorsAuthorIdRouteImport } from './routes/_authenticated/auteurs/admin/authors.$authorId'
 import { Route as AuthenticatedAuteursAdminAuthorsNewRouteImport } from './routes/_authenticated/auteurs/admin/authors.new'
@@ -434,6 +441,11 @@ const CreatorsInfluencerIndexRoute = CreatorsInfluencerIndexRouteImport.update({
   path: '/creators/influencer/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CreatorsInfluencerAppRoute = CreatorsInfluencerAppRouteImport.update({
+  id: '/creators/influencer/app',
+  path: '/creators/influencer/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreatorsInfluencerApplyRoute = CreatorsInfluencerApplyRouteImport.update({
   id: '/creators/influencer/apply',
   path: '/creators/influencer/apply',
@@ -622,6 +634,42 @@ const CreatorsAppBriefsBriefIdRoute =
     path: '/briefs/$briefId',
     getParentRoute: () => CreatorsAppRoute,
   } as any)
+const CreatorsInfluencerAppIndexRoute =
+  CreatorsInfluencerAppIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CreatorsInfluencerAppRoute,
+  } as any)
+const CreatorsInfluencerAppAgreementRoute =
+  CreatorsInfluencerAppAgreementRouteImport.update({
+    id: '/agreement',
+    path: '/agreement',
+    getParentRoute: () => CreatorsInfluencerAppRoute,
+  } as any)
+const CreatorsInfluencerAppMessagesRoute =
+  CreatorsInfluencerAppMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => CreatorsInfluencerAppRoute,
+  } as any)
+const CreatorsInfluencerAppPayoutsRoute =
+  CreatorsInfluencerAppPayoutsRouteImport.update({
+    id: '/payouts',
+    path: '/payouts',
+    getParentRoute: () => CreatorsInfluencerAppRoute,
+  } as any)
+const CreatorsInfluencerAppProfileRoute =
+  CreatorsInfluencerAppProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => CreatorsInfluencerAppRoute,
+  } as any)
+const CreatorsInfluencerAppRulesRoute =
+  CreatorsInfluencerAppRulesRouteImport.update({
+    id: '/rules',
+    path: '/rules',
+    getParentRoute: () => CreatorsInfluencerAppRoute,
+  } as any)
 const AuthenticatedAuteursAdminAuthorsIndexRoute =
   AuthenticatedAuteursAdminAuthorsIndexRouteImport.update({
     id: '/auteurs/admin/authors/',
@@ -799,6 +847,7 @@ export interface FileRoutesByFullPath {
   '/creators/app/posts': typeof CreatorsAppPostsRoute
   '/creators/app/profile': typeof CreatorsAppProfileRoute
   '/creators/app/rules': typeof CreatorsAppRulesRoute
+  '/creators/influencer/app': typeof CreatorsInfluencerAppRouteWithChildren
   '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
@@ -834,9 +883,15 @@ export interface FileRoutesByFullPath {
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
+  '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
+  '/creators/influencer/app/messages': typeof CreatorsInfluencerAppMessagesRoute
+  '/creators/influencer/app/payouts': typeof CreatorsInfluencerAppPayoutsRoute
+  '/creators/influencer/app/profile': typeof CreatorsInfluencerAppProfileRoute
+  '/creators/influencer/app/rules': typeof CreatorsInfluencerAppRulesRoute
   '/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
   '/creators/app/briefs/': typeof CreatorsAppBriefsIndexRoute
+  '/creators/influencer/app/': typeof CreatorsInfluencerAppIndexRoute
   '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
   '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
@@ -949,9 +1004,15 @@ export interface FileRoutesByTo {
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
+  '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
+  '/creators/influencer/app/messages': typeof CreatorsInfluencerAppMessagesRoute
+  '/creators/influencer/app/payouts': typeof CreatorsInfluencerAppPayoutsRoute
+  '/creators/influencer/app/profile': typeof CreatorsInfluencerAppProfileRoute
+  '/creators/influencer/app/rules': typeof CreatorsInfluencerAppRulesRoute
   '/auteurs/admin': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses': typeof AuthenticatedAuteursCoursesIndexRoute
   '/creators/app/briefs': typeof CreatorsAppBriefsIndexRoute
+  '/creators/influencer/app': typeof CreatorsInfluencerAppIndexRoute
   '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
   '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
@@ -1032,6 +1093,7 @@ export interface FileRoutesById {
   '/creators/app/posts': typeof CreatorsAppPostsRoute
   '/creators/app/profile': typeof CreatorsAppProfileRoute
   '/creators/app/rules': typeof CreatorsAppRulesRoute
+  '/creators/influencer/app': typeof CreatorsInfluencerAppRouteWithChildren
   '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
@@ -1067,9 +1129,15 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
+  '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
+  '/creators/influencer/app/messages': typeof CreatorsInfluencerAppMessagesRoute
+  '/creators/influencer/app/payouts': typeof CreatorsInfluencerAppPayoutsRoute
+  '/creators/influencer/app/profile': typeof CreatorsInfluencerAppProfileRoute
+  '/creators/influencer/app/rules': typeof CreatorsInfluencerAppRulesRoute
   '/_authenticated/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/_authenticated/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
   '/creators/app/briefs/': typeof CreatorsAppBriefsIndexRoute
+  '/creators/influencer/app/': typeof CreatorsInfluencerAppIndexRoute
   '/_authenticated/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/_authenticated/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
   '/_authenticated/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
@@ -1150,6 +1218,7 @@ export interface FileRouteTypes {
     | '/creators/app/posts'
     | '/creators/app/profile'
     | '/creators/app/rules'
+    | '/creators/influencer/app'
     | '/creators/influencer/apply'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
@@ -1185,9 +1254,15 @@ export interface FileRouteTypes {
     | '/auteurs/courses/$courseId'
     | '/api/public/app/courses'
     | '/creators/app/briefs/$briefId'
+    | '/creators/influencer/app/agreement'
+    | '/creators/influencer/app/messages'
+    | '/creators/influencer/app/payouts'
+    | '/creators/influencer/app/profile'
+    | '/creators/influencer/app/rules'
     | '/auteurs/admin/'
     | '/auteurs/courses/'
     | '/creators/app/briefs/'
+    | '/creators/influencer/app/'
     | '/auteurs/admin/authors/$authorId'
     | '/auteurs/admin/authors/new'
     | '/auteurs/admin/courses/$courseId'
@@ -1300,9 +1375,15 @@ export interface FileRouteTypes {
     | '/auteurs/courses/$courseId'
     | '/api/public/app/courses'
     | '/creators/app/briefs/$briefId'
+    | '/creators/influencer/app/agreement'
+    | '/creators/influencer/app/messages'
+    | '/creators/influencer/app/payouts'
+    | '/creators/influencer/app/profile'
+    | '/creators/influencer/app/rules'
     | '/auteurs/admin'
     | '/auteurs/courses'
     | '/creators/app/briefs'
+    | '/creators/influencer/app'
     | '/auteurs/admin/authors/$authorId'
     | '/auteurs/admin/authors/new'
     | '/auteurs/admin/courses/$courseId'
@@ -1382,6 +1463,7 @@ export interface FileRouteTypes {
     | '/creators/app/posts'
     | '/creators/app/profile'
     | '/creators/app/rules'
+    | '/creators/influencer/app'
     | '/creators/influencer/apply'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
@@ -1417,9 +1499,15 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/courses/$courseId'
     | '/api/public/app/courses'
     | '/creators/app/briefs/$briefId'
+    | '/creators/influencer/app/agreement'
+    | '/creators/influencer/app/messages'
+    | '/creators/influencer/app/payouts'
+    | '/creators/influencer/app/profile'
+    | '/creators/influencer/app/rules'
     | '/_authenticated/auteurs/admin/'
     | '/_authenticated/auteurs/courses/'
     | '/creators/app/briefs/'
+    | '/creators/influencer/app/'
     | '/_authenticated/auteurs/admin/authors/$authorId'
     | '/_authenticated/auteurs/admin/authors/new'
     | '/_authenticated/auteurs/admin/courses/$courseId'
@@ -1485,6 +1573,7 @@ export interface RootRouteChildren {
   CreatorsIndexRoute: typeof CreatorsIndexRoute
   EnIndexRoute: typeof EnIndexRoute
   FrIndexRoute: typeof FrIndexRoute
+  CreatorsInfluencerAppRoute: typeof CreatorsInfluencerAppRouteWithChildren
   CreatorsInfluencerApplyRoute: typeof CreatorsInfluencerApplyRoute
   CreatorsSignTokenRoute: typeof CreatorsSignTokenRoute
   CreatorsSlideshowApplyRoute: typeof CreatorsSlideshowApplyRoute
@@ -1931,6 +2020,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreatorsInfluencerIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/creators/influencer/app': {
+      id: '/creators/influencer/app'
+      path: '/creators/influencer/app'
+      fullPath: '/creators/influencer/app'
+      preLoaderRoute: typeof CreatorsInfluencerAppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/creators/influencer/apply': {
       id: '/creators/influencer/apply'
       path: '/creators/influencer/apply'
@@ -2175,6 +2271,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/creators/app/briefs/$briefId'
       preLoaderRoute: typeof CreatorsAppBriefsBriefIdRouteImport
       parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/influencer/app/': {
+      id: '/creators/influencer/app/'
+      path: '/'
+      fullPath: '/creators/influencer/app/'
+      preLoaderRoute: typeof CreatorsInfluencerAppIndexRouteImport
+      parentRoute: typeof CreatorsInfluencerAppRoute
+    }
+    '/creators/influencer/app/agreement': {
+      id: '/creators/influencer/app/agreement'
+      path: '/agreement'
+      fullPath: '/creators/influencer/app/agreement'
+      preLoaderRoute: typeof CreatorsInfluencerAppAgreementRouteImport
+      parentRoute: typeof CreatorsInfluencerAppRoute
+    }
+    '/creators/influencer/app/messages': {
+      id: '/creators/influencer/app/messages'
+      path: '/messages'
+      fullPath: '/creators/influencer/app/messages'
+      preLoaderRoute: typeof CreatorsInfluencerAppMessagesRouteImport
+      parentRoute: typeof CreatorsInfluencerAppRoute
+    }
+    '/creators/influencer/app/payouts': {
+      id: '/creators/influencer/app/payouts'
+      path: '/payouts'
+      fullPath: '/creators/influencer/app/payouts'
+      preLoaderRoute: typeof CreatorsInfluencerAppPayoutsRouteImport
+      parentRoute: typeof CreatorsInfluencerAppRoute
+    }
+    '/creators/influencer/app/profile': {
+      id: '/creators/influencer/app/profile'
+      path: '/profile'
+      fullPath: '/creators/influencer/app/profile'
+      preLoaderRoute: typeof CreatorsInfluencerAppProfileRouteImport
+      parentRoute: typeof CreatorsInfluencerAppRoute
+    }
+    '/creators/influencer/app/rules': {
+      id: '/creators/influencer/app/rules'
+      path: '/rules'
+      fullPath: '/creators/influencer/app/rules'
+      preLoaderRoute: typeof CreatorsInfluencerAppRulesRouteImport
+      parentRoute: typeof CreatorsInfluencerAppRoute
     }
     '/_authenticated/auteurs/admin/authors/': {
       id: '/_authenticated/auteurs/admin/authors/'
@@ -2464,6 +2602,29 @@ const CreatorsAppRouteWithChildren = CreatorsAppRoute._addFileChildren(
   CreatorsAppRouteChildren,
 )
 
+interface CreatorsInfluencerAppRouteChildren {
+  CreatorsInfluencerAppAgreementRoute: typeof CreatorsInfluencerAppAgreementRoute
+  CreatorsInfluencerAppMessagesRoute: typeof CreatorsInfluencerAppMessagesRoute
+  CreatorsInfluencerAppPayoutsRoute: typeof CreatorsInfluencerAppPayoutsRoute
+  CreatorsInfluencerAppProfileRoute: typeof CreatorsInfluencerAppProfileRoute
+  CreatorsInfluencerAppRulesRoute: typeof CreatorsInfluencerAppRulesRoute
+  CreatorsInfluencerAppIndexRoute: typeof CreatorsInfluencerAppIndexRoute
+}
+
+const CreatorsInfluencerAppRouteChildren: CreatorsInfluencerAppRouteChildren = {
+  CreatorsInfluencerAppAgreementRoute: CreatorsInfluencerAppAgreementRoute,
+  CreatorsInfluencerAppMessagesRoute: CreatorsInfluencerAppMessagesRoute,
+  CreatorsInfluencerAppPayoutsRoute: CreatorsInfluencerAppPayoutsRoute,
+  CreatorsInfluencerAppProfileRoute: CreatorsInfluencerAppProfileRoute,
+  CreatorsInfluencerAppRulesRoute: CreatorsInfluencerAppRulesRoute,
+  CreatorsInfluencerAppIndexRoute: CreatorsInfluencerAppIndexRoute,
+}
+
+const CreatorsInfluencerAppRouteWithChildren =
+  CreatorsInfluencerAppRoute._addFileChildren(
+    CreatorsInfluencerAppRouteChildren,
+  )
+
 interface ApiPublicAppCoursesRouteChildren {
   ApiPublicAppCoursesSlugRoute: typeof ApiPublicAppCoursesSlugRoute
 }
@@ -2519,6 +2680,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsIndexRoute: CreatorsIndexRoute,
   EnIndexRoute: EnIndexRoute,
   FrIndexRoute: FrIndexRoute,
+  CreatorsInfluencerAppRoute: CreatorsInfluencerAppRouteWithChildren,
   CreatorsInfluencerApplyRoute: CreatorsInfluencerApplyRoute,
   CreatorsSignTokenRoute: CreatorsSignTokenRoute,
   CreatorsSlideshowApplyRoute: CreatorsSlideshowApplyRoute,

@@ -420,7 +420,7 @@ export function InfluencerProfile() {
         {field("display_name", "Display name")}
         {field("legal_name", "Legal name (used on contracts)")}
         {field("phone", "Phone", { type: "tel" })}
-        <div><Label>Country</Label><CountrySelect value={f.country} onChange={(v: string) => setF({ ...f, country: v })} /></div>
+        <div><Label htmlFor="pf-country">Country</Label><CountrySelect id="pf-country" value={f.country} onChange={(v: string) => setF({ ...f, country: v })} lang="en" labels={{ select: "Choose a country", search: "Search a country", empty: "No country found" }} /></div>
         {field("city", "City")}
       </Card>
       <Card className="grid gap-4 md:grid-cols-2">
