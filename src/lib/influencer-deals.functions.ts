@@ -1,3 +1,4 @@
+import { platformName, platformRightsNote } from "./platforms";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
@@ -64,7 +65,14 @@ async function createDeal(offerId: string, agreedPrice: number) {
     rights_package: rights,
     rights_text: `${RIGHTS_LABEL[rights].plain}${RIGHTS_LABEL[rights].days ? ` Duration: ${RIGHTS_LABEL[rights].days} days from publication.` : ""} Territory: worldwide.`,
     exclusivity: brief.exclusivity_days > 0 ? `${brief.exclusivity_days} days, in the general-knowledge and learning app category.` : null,
-    disclosure: disclosureMap[code] ?? disclosureMap["FR"] ?? "Disclose the partnership as the law of your country requires.",
+    disclosure: (() => {
+      const plats = [...new Set(deliverables.map((d) => platformName(d.platform)))];
+      const pick = (c: string, p: string) => disclosureMap[`${c}|${p}`] ?? disclosureMap[`${c}|All`] ?? disclosureMap[c];
+      const lines = plats.map((p) => { const t = pick(code, p) ?? pick("FR", p); return t ? `${p}: ${t}` : null; }).filter(Boolean);
+      return lines.length ? lines.join(" ") : "Disclose the partnership as the law of your country requires.";
+    })(),
+    platform_rights: [...new Set(deliverables.map((d) => platformRightsNote(d.platform)).filter(Boolean))].join(" "),
+    app_id: brief.app_id,
     master_agreement_version: String(master?.current_version ?? "1"),
     generated_at: new Date().toISOString(),
   };

@@ -5,6 +5,46 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime } from "@/lib/portal";
 import { Button } from "@/components/ui/button";
 import { EmptyState, PageTitle, PortalCard } from "../ui";
+import { AppBadge, useAdminApp, useApps } from "@/lib/apps";
+
+/** Side-by-side numbers per app, shown when the selector is on All apps. */
+function AppSplit() {
+  const { appId } = useAdminApp();
+  const { data: apps = [] } = useApps();
+  const { data } = useQuery({
+    queryKey: ["admin", "creators-app-split"],
+    queryFn: async () => {
+      const count = async (table: "creator_applications" | "slideshow_applications" | "influencer_applications" | "creator_apps" | "influencer_apps" | "creator_posts", id: string, extra?: [string, string]) => {
+        let q = supabase.from(table).select("*", { count: "exact", head: true }).eq("app_id", id);
+        if (extra) q = q.eq(extra[0], extra[1]);
+        return (await q).count ?? 0;
+      };
+      const ids = (await supabase.from("apps").select("id")).data ?? [];
+      const out: Record<string, number[]> = {};
+      for (const { id } of ids) {
+        out[id] = await Promise.all([
+          count("creator_applications", id), count("slideshow_applications", id), count("influencer_applications", id),
+          count("creator_apps", id, ["status", "active"]), count("influencer_apps", id, ["status", "active"]), count("creator_posts", id),
+        ]);
+      }
+      return out;
+    },
+  });
+  if (appId || !data) return null;
+  const labels = ["UGC applications", "Slideshow applications", "Influencer applications", "Active creators", "Active influencers", "Posts logged"];
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      {apps.map((a) => (
+        <PortalCard key={a.id}>
+          <AppBadge appId={a.id} className="text-sm" />
+          <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
+            {labels.map((l, i) => <div key={l}><dt className="text-brand-navySoft">{l}</dt><dd className="text-xl font-extrabold text-brand-navy">{data[a.id]?.[i] ?? 0}</dd></div>)}
+          </dl>
+        </PortalCard>
+      ))}
+    </div>
+  );
+}
 
 type RecentRow = {
   id: string;
@@ -59,6 +99,7 @@ export function CreatorsDashboard() {
 
   return (
     <div className="space-y-6">
+      <AppSplit />
       <PageTitle
         title="Creator programme"
         lead="UGC and slideshow creator applications, kept fully separate from the author side."

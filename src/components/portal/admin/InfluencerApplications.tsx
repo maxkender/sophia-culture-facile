@@ -1,3 +1,4 @@
+import { AppBadge, useAdminApp } from "@/lib/apps";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -44,11 +45,13 @@ export function InfluencerApplications() {
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const { appId } = useAdminApp();
   const { data } = useQuery({
-    queryKey: ["portal", "admin", "influencer-applications", status],
+    queryKey: ["portal", "admin", "influencer-applications", status, appId],
     queryFn: async () => {
       let q = supabase.from("influencer_applications").select("*").order("created_at", { ascending: false });
       if (status !== "all") q = q.eq("status", status);
+      if (appId) q = q.eq("app_id", appId);
       const { data: rows, error } = await q;
       if (error) throw error;
       return rows ?? [];
@@ -135,7 +138,7 @@ export function InfluencerApplications() {
                 const [platform, n] = largest(a);
                 return (
                   <tr key={a.id} className="cursor-pointer hover:bg-brand-navy/5" onClick={() => open(a)}>
-                    <td className="px-4 py-3 font-bold text-brand-navy">{a.full_name}<span className="block text-xs font-normal text-brand-navySoft">{a.city}, {a.country}</span></td>
+                    <td className="px-4 py-3 font-bold text-brand-navy"><AppBadge appId={a.app_id} /> {a.full_name}<span className="block text-xs font-normal text-brand-navySoft">{a.city}, {a.country}</span></td>
                     <td className="px-4 py-3 capitalize">{computeTier(n)}</td>
                     <td className="px-4 py-3">{platform}</td>
                     <td className="px-4 py-3">{fmt(n)}</td>

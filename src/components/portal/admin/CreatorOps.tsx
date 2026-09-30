@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { EmptyState, PageTitle, PortalCard } from "../ui";
 
+import { AppBadge, AppField, PlatformBadge, PLATFORM_FILTERS, SOPHIA_APP_ID, byApp, matchesPlatform, useAdminApp } from "@/lib/apps";
 import { WeeklyGuidesAdmin } from "./WeeklyGuidesAdmin";
 import { saveCreatorEmailSettings } from "@/lib/creator-onboarding.functions";
 import { fetchReferenceThumbnails, publishBrief } from "@/lib/creator-extras.functions";
@@ -23,6 +24,10 @@ export function CreatorOps() {
   const [a, setA] = useState("");
   const [b, setB] = useState("");
   const [c, setC] = useState("");
+  const { appId } = useAdminApp();
+  const [formApp, setFormApp] = useState(SOPHIA_APP_ID);
+  const createApp = appId ?? formApp;
+  const [platformFilter, setPlatformFilter] = useState("all");
   const [videoEdit, setVideoEdit] = useState<{ id: string; title: string; why_it_works: string; format_notes: string } | null>(null);
   const [refEdit, setRefEdit] = useState<{ id: string; ids: string[] } | null>(null);
   const { data: libraryVideos } = useQuery({
@@ -60,11 +65,11 @@ export function CreatorOps() {
       ({ error } = await supabase.from("creators").insert({ full_name: a.trim(), email: b.trim(), country: c.trim() || null }));
     } else if (tab === "briefs") {
       if (!a.trim()) return toast.error("Title required.");
-      ({ error } = await supabase.from("briefs").insert({ title: a.trim(), body: b, hook: c.trim() || null }));
+      ({ error } = await supabase.from("briefs").insert({ title: a.trim(), body: b, hook: c.trim() || null, app_id: createApp }));
     } else if (tab === "library") {
       const urls = a.split(/\s+/).filter((u) => /^https?:\/\//.test(u));
       if (!urls.length) return toast.error("Paste one or more video links.");
-      ({ error } = await supabase.from("reference_videos").insert(urls.map((url) => ({ url, platform: url.includes("instagram") ? "instagram" : "tiktok", category: b.trim() || "hook", note: c.trim() || null }))));
+      ({ error } = await supabase.from("reference_videos").insert(urls.map((url) => ({ url, platform: url.includes("instagram") ? "instagram" : "tiktok", category: b.trim() || "hook", note: c.trim() || null, app_id: createApp }))));
     } else if (tab === "calls") {
       if (!a.trim() || !b) return toast.error("Title and date required.");
       ({ error } = await supabase.from("creator_calls").insert({ title: a.trim(), starts_at: new Date(b).toISOString(), link: c.trim() || null }));
@@ -79,7 +84,8 @@ export function CreatorOps() {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const rows = (data ?? []) as any[];
+  const allRows = (data ?? []) as any[];
+  const rows = tab === "creators" || tab === "calls" ? allRows : byApp(allRows, appId).filter((r) => tab !== "posts" || matchesPlatform(r.platform, platformFilter));
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   return (
@@ -101,10 +107,17 @@ export function CreatorOps() {
             <Input type={tab === "calls" ? "datetime-local" : tab === "library" ? "text" : "email"} placeholder={tab === "library" ? "Category" : "Email"} value={b} onChange={(e) => setB(e.target.value)} />
           )}
           <Input placeholder={tab === "creators" ? "Country" : tab === "briefs" ? "Hook" : tab === "library" ? "Note" : "Meeting link"} value={c} onChange={(e) => setC(e.target.value)} />
+          {tab === "briefs" || tab === "library" ? <AppField value={formApp} onChange={setFormApp} id="ops-app" /> : null}
           <Button onClick={add}>Add</Button>
         </PortalCard>
       )}
 
+      {tab === "posts" && (
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Platform filter">
+          <span className="text-sm font-semibold text-brand-navy">Platform</span>
+          {PLATFORM_FILTERS.map((f) => <Button key={f} size="sm" variant={platformFilter === f ? "default" : "outline"} onClick={() => setPlatformFilter(f)}>{f === "all" ? "All" : f}</Button>)}
+        </div>
+      )}
       {tab === "library" && (
         <Button size="sm" variant="outline" onClick={async () => { const r = await thumbs({} as never); toast.success(`Thumbnails: ${r.found} found, ${r.missed} unavailable (Instagram needs a Meta token).`); refresh(); }}>Fetch thumbnails</Button>
       )}
@@ -164,7 +177,11 @@ export function CreatorOps() {
             {rows.map((r) => (
               <li key={r.id} className="flex flex-wrap items-center gap-3 py-3 text-sm">
                 <span className="min-w-0 flex-1">
-                  <span className="block font-semibold text-brand-navy">{r.full_name ?? r.title ?? r.url}</span>
+                  <span className="flex flex-wrap items-center gap-2 font-semibold text-brand-navy">
+                    {tab === "posts" || tab === "library" ? <PlatformBadge platform={r.platform} /> : null}
+                    {r.full_name ?? r.title ?? r.url}
+                    {r.app_id && tab !== "creators" && tab !== "calls" ? <AppBadge appId={r.app_id} /> : null}
+                  </span>
                   <span className="block text-xs text-brand-navySoft">
                     {tab === "creators" && `${r.email} · ${r.status} · Onboarding ${creatorProgress(r)}/4`}
                     {tab === "briefs" && `${r.status}${r.status === "published" ? ` · ${r.audience === "selected" ? "selected creators" : "all creators"}` : ""} · ${formatDateTime(r.created_at)}`}

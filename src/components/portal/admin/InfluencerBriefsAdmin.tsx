@@ -1,3 +1,4 @@
+import { AppBadge, AppField, PlatformBadge, byApp, useAdminApp, useCreateAppId } from "@/lib/apps";
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -32,7 +33,9 @@ function err(e: unknown) {
 /* ---------------- List + create ---------------- */
 export function InfluencerBriefsList() {
   const [open, setOpen] = useState(false);
-  const { data = [] } = useQuery({
+  const { appId } = useAdminApp();
+  const [platF, setPlatF] = useState("all");
+  const { data: rows = [] } = useQuery({
     queryKey: ["admin", "influencer-briefs"],
     queryFn: async () => {
       const [{ data: briefs }, { data: offers }] = await Promise.all([
@@ -45,8 +48,12 @@ export function InfluencerBriefsList() {
       });
     },
   });
+  const data = byApp(rows, appId).filter((b) => platF === "all" || parseDeliverables(b.deliverables).some((d) => d.platform === platF));
   return (
     <div className="space-y-6">
+      <select aria-label="Platform" value={platF} onChange={(e) => setPlatF(e.target.value)} className="min-h-11 rounded-xl border border-input bg-card px-3 text-sm">
+        <option value="all">All platforms</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option><option value="youtube">YouTube</option>
+      </select>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <PageTitle title="Briefs & offers" lead="Influencer briefs, and the offers sent for each." />
         <Button variant="pill" size="pill" onClick={() => setOpen(true)}><Plus className="size-4" /> New brief</Button>
@@ -55,14 +62,16 @@ export function InfluencerBriefsList() {
         {data.length ? (
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="text-xs uppercase tracking-wide text-brand-navySoft">
-              <tr>{["Brief", "Status", "Rights", "Offers sent", "Accepted", "Countered", "Declined"].map((h) => <th key={h} className="px-4 py-3">{h}</th>)}</tr>
+              <tr>{["App", "Brief", "Platforms", "Status", "Rights", "Offers sent", "Accepted", "Countered", "Declined"].map((h) => <th key={h} className="px-4 py-3">{h}</th>)}</tr>
             </thead>
             <tbody className="divide-y divide-brand-line">
               {data.map((b) => (
                 <tr key={b.id} className="hover:bg-brand-navy/5">
+                  <td className="px-4 py-3"><AppBadge appId={b.app_id} /></td>
                   <td className="px-4 py-3 font-bold text-brand-navy">
                     <Link to="/auteurs/admin/creators/influencer-briefs/$briefId" params={{ briefId: b.id }} className="underline-offset-2 hover:underline">{b.title}</Link>
                   </td>
+                  <td className="px-4 py-3"><div className="flex flex-wrap gap-1">{[...new Set(parseDeliverables(b.deliverables).map((d) => d.platform))].map((pl) => <PlatformBadge key={pl} platform={pl} />)}</div></td>
                   <td className="px-4 py-3 capitalize">{b.status}</td>
                   <td className="px-4 py-3">{RIGHTS_LABEL[b.rights_package as Rights]?.short}</td>
                   <td className="px-4 py-3">{b.sent}</td>
@@ -102,6 +111,8 @@ function BriefForm({ open, onOpenChange, brief }: { open: boolean; onOpenChange:
   }));
   const [deliverables, setDeliverables] = useState<Deliverable[]>(brief ? parseDeliverables(brief.deliverables) : [{ platform: "tiktok", format: "post", count: 1 }]);
   const [refIds, setRefIds] = useState<string[]>(brief?.reference_video_ids ?? []);
+  const [appPick, setAppPick] = useState<string>(brief?.app_id ?? "00000000-0000-4000-8000-000000000001");
+  const createAppId = useCreateAppId(appPick);
   const [tiers, setTiers] = useState<string[]>(brief?.target_tiers ?? []);
   const [niches, setNiches] = useState<string[]>(brief?.target_niches ?? []);
   const [langs, setLangs] = useState<string[]>(brief?.target_languages ?? ["fr"]);
@@ -122,7 +133,7 @@ function BriefForm({ open, onOpenChange, brief }: { open: boolean; onOpenChange:
       must_mention: f.must_mention.split(",").map((s) => s.trim()).filter(Boolean), reference_video_ids: refIds,
       budget_min: num(f.budget_min), budget_max: num(f.budget_max), target_tiers: tiers, target_niches: niches, target_languages: langs,
       earliest_post_date: f.earliest_post_date || null, latest_post_date: f.latest_post_date || null,
-      draft_approval_required: f.draft_approval_required, status,
+      draft_approval_required: f.draft_approval_required, status, app_id: brief ? appPick : createAppId,
     };
     setBusy(true);
     const res = brief
@@ -142,6 +153,7 @@ function BriefForm({ open, onOpenChange, brief }: { open: boolean; onOpenChange:
         <DialogHeader><DialogTitle>{brief ? "Edit brief" : "New influencer brief"}</DialogTitle></DialogHeader>
         <div className="space-y-5">
           <div className="grid gap-3 md:grid-cols-2">
+            <div className="md:col-span-2"><AppField id="b-app" value={appPick} onChange={setAppPick} /></div>
             <div className="md:col-span-2"><Label htmlFor="b-title">Title</Label><Input id="b-title" value={f.title} onChange={set("title")} /></div>
             <div className="md:col-span-2"><Label htmlFor="b-angle">Angle</Label><Input id="b-angle" value={f.angle} onChange={set("angle")} placeholder="One line: the idea of the video" /></div>
           </div>

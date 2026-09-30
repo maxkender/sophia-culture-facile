@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Banner, EmptyState, PageTitle, PortalCard } from "../ui";
 import { adminAssignCreatorCode, adminCreatorDetail, adminRevealCredentials } from "@/lib/creator-app.functions";
+import { AppEnrolment } from "./AppEnrolment";
 import { creatorSteps, SETUP_GUIDE, WARMUP_DAYS } from "@/lib/creator-steps";
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—");
@@ -35,6 +36,7 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
       <div className="mt-3"><PageTitle title={me.full_name} lead={`${me.email} · ${me.country ?? "no country"} · ${me.track} · status ${me.status}`} /></div>
 
       <div className="grid gap-4 md:grid-cols-2">
+        <AppEnrolment kind="creator" personId={creatorId} />
         <PortalCard>
           <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Onboarding</p>
           <p className="mt-1 text-2xl font-extrabold text-brand-navy">{steps.count}/4</p>

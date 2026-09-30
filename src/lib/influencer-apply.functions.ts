@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { resolveAppId } from "./resolve-app.server";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { isValidInternationalPhone } from "@/lib/creator-validation";
@@ -56,6 +57,7 @@ const schema = z
     agency_contact: z.string().trim().max(300).optional(),
     referral_source: z.string().trim().max(1000).optional(),
     consent: z.literal(true),
+  app: z.string().regex(/^[a-z0-9-]{2,40}$/).optional(),
   })
   .refine((d) => d.tiktok_url || d.instagram_url || d.youtube_url, "platform")
   .refine((d) => (!d.tiktok_url || d.tiktok_followers != null) && (!d.instagram_url || d.instagram_followers != null) && (!d.youtube_url || d.youtube_subscribers != null), "counts")
@@ -77,6 +79,7 @@ export const submitInfluencerApplication = createServerFn({ method: "POST" })
     ]);
     if ((byIp ?? 0) >= 5 || (byEmail ?? 0) >= 2) return { ok: false as const, reason: "rate" as const };
     const { error } = await supabaseAdmin.from("influencer_applications").insert({
+      app_id: await resolveAppId(data.app),
       full_name: data.full_name, email, phone: data.phone, country: data.country, city: data.city, age: data.age,
       tiktok_url: data.tiktok_url || null, tiktok_followers: data.tiktok_url ? data.tiktok_followers ?? null : null,
       instagram_url: data.instagram_url || null, instagram_followers: data.instagram_url ? data.instagram_followers ?? null : null,

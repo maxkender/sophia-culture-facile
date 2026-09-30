@@ -31,6 +31,7 @@ import { Route as CreatorsIndexRouteImport } from './routes/creators.index'
 import { Route as CreatorsAppRouteImport } from './routes/creators.app'
 import { Route as CreatorsInviteRouteImport } from './routes/creators.invite'
 import { Route as CreatorsLoginRouteImport } from './routes/creators.login'
+import { Route as CreatorsUnswipeRouteImport } from './routes/creators.unswipe'
 import { Route as EnIndexRouteImport } from './routes/en/index'
 import { Route as EnBecomeATeacherRouteImport } from './routes/en/become-a-teacher'
 import { Route as EnCareersRouteImport } from './routes/en/careers'
@@ -114,6 +115,14 @@ import { Route as CreatorsInfluencerAppOffersRouteImport } from './routes/creato
 import { Route as CreatorsInfluencerAppPayoutsRouteImport } from './routes/creators.influencer.app.payouts'
 import { Route as CreatorsInfluencerAppProfileRouteImport } from './routes/creators.influencer.app.profile'
 import { Route as CreatorsInfluencerAppRulesRouteImport } from './routes/creators.influencer.app.rules'
+import { Route as EnCreatorsUnswipeIndexRouteImport } from './routes/en/creators/unswipe/index'
+import { Route as EnCreatorsUnswipeInfluencerRouteImport } from './routes/en/creators/unswipe/influencer'
+import { Route as EnCreatorsUnswipeSlideshowRouteImport } from './routes/en/creators/unswipe/slideshow'
+import { Route as EnCreatorsUnswipeUgcRouteImport } from './routes/en/creators/unswipe/ugc'
+import { Route as FrCreateursUnswipeIndexRouteImport } from './routes/fr/createurs/unswipe/index'
+import { Route as FrCreateursUnswipeInfluenceurRouteImport } from './routes/fr/createurs/unswipe/influenceur'
+import { Route as FrCreateursUnswipeSlideshowRouteImport } from './routes/fr/createurs/unswipe/slideshow'
+import { Route as FrCreateursUnswipeUgcRouteImport } from './routes/fr/createurs/unswipe/ugc'
 import { Route as AuthenticatedAuteursAdminAuthorsIndexRouteImport } from './routes/_authenticated/auteurs/admin/authors.index'
 import { Route as AuthenticatedAuteursAdminAuthorsAuthorIdRouteImport } from './routes/_authenticated/auteurs/admin/authors.$authorId'
 import { Route as AuthenticatedAuteursAdminAuthorsNewRouteImport } from './routes/_authenticated/auteurs/admin/authors.new'
@@ -122,6 +131,7 @@ import { Route as AuthenticatedAuteursAdminCoursesCourseIdRouteImport } from './
 import { Route as AuthenticatedAuteursAdminCreatorsIndexRouteImport } from './routes/_authenticated/auteurs/admin/creators.index'
 import { Route as AuthenticatedAuteursAdminCreatorsCreatorIdRouteImport } from './routes/_authenticated/auteurs/admin/creators.$creatorId'
 import { Route as AuthenticatedAuteursAdminCreatorsApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.applications'
+import { Route as AuthenticatedAuteursAdminCreatorsAppsRouteImport } from './routes/_authenticated/auteurs/admin/creators.apps'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-applications'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerMessagesRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-messages'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-payouts'
@@ -255,6 +265,11 @@ const CreatorsInviteRoute = CreatorsInviteRouteImport.update({
 const CreatorsLoginRoute = CreatorsLoginRouteImport.update({
   id: '/creators/login',
   path: '/creators/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsUnswipeRoute = CreatorsUnswipeRouteImport.update({
+  id: '/creators/unswipe',
+  path: '/creators/unswipe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnIndexRoute = EnIndexRouteImport.update({
@@ -703,6 +718,50 @@ const CreatorsInfluencerAppRulesRoute =
     path: '/rules',
     getParentRoute: () => CreatorsInfluencerAppRoute,
   } as any)
+const EnCreatorsUnswipeIndexRoute = EnCreatorsUnswipeIndexRouteImport.update({
+  id: '/en/creators/unswipe/',
+  path: '/en/creators/unswipe/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnCreatorsUnswipeInfluencerRoute =
+  EnCreatorsUnswipeInfluencerRouteImport.update({
+    id: '/en/creators/unswipe/influencer',
+    path: '/en/creators/unswipe/influencer',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const EnCreatorsUnswipeSlideshowRoute =
+  EnCreatorsUnswipeSlideshowRouteImport.update({
+    id: '/en/creators/unswipe/slideshow',
+    path: '/en/creators/unswipe/slideshow',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const EnCreatorsUnswipeUgcRoute = EnCreatorsUnswipeUgcRouteImport.update({
+  id: '/en/creators/unswipe/ugc',
+  path: '/en/creators/unswipe/ugc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrCreateursUnswipeIndexRoute = FrCreateursUnswipeIndexRouteImport.update({
+  id: '/fr/createurs/unswipe/',
+  path: '/fr/createurs/unswipe/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrCreateursUnswipeInfluenceurRoute =
+  FrCreateursUnswipeInfluenceurRouteImport.update({
+    id: '/fr/createurs/unswipe/influenceur',
+    path: '/fr/createurs/unswipe/influenceur',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const FrCreateursUnswipeSlideshowRoute =
+  FrCreateursUnswipeSlideshowRouteImport.update({
+    id: '/fr/createurs/unswipe/slideshow',
+    path: '/fr/createurs/unswipe/slideshow',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const FrCreateursUnswipeUgcRoute = FrCreateursUnswipeUgcRouteImport.update({
+  id: '/fr/createurs/unswipe/ugc',
+  path: '/fr/createurs/unswipe/ugc',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAuteursAdminAuthorsIndexRoute =
   AuthenticatedAuteursAdminAuthorsIndexRouteImport.update({
     id: '/auteurs/admin/authors/',
@@ -749,6 +808,12 @@ const AuthenticatedAuteursAdminCreatorsApplicationsRoute =
   AuthenticatedAuteursAdminCreatorsApplicationsRouteImport.update({
     id: '/auteurs/admin/creators/applications',
     path: '/auteurs/admin/creators/applications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursAdminCreatorsAppsRoute =
+  AuthenticatedAuteursAdminCreatorsAppsRouteImport.update({
+    id: '/auteurs/admin/creators/apps',
+    path: '/auteurs/admin/creators/apps',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute =
@@ -915,6 +980,7 @@ export interface FileRoutesByFullPath {
   '/creators/app': typeof CreatorsAppRouteWithChildren
   '/creators/invite': typeof CreatorsInviteRoute
   '/creators/login': typeof CreatorsLoginRoute
+  '/creators/unswipe': typeof CreatorsUnswipeRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -996,15 +1062,24 @@ export interface FileRoutesByFullPath {
   '/creators/influencer/app/payouts': typeof CreatorsInfluencerAppPayoutsRoute
   '/creators/influencer/app/profile': typeof CreatorsInfluencerAppProfileRoute
   '/creators/influencer/app/rules': typeof CreatorsInfluencerAppRulesRoute
+  '/en/creators/unswipe/influencer': typeof EnCreatorsUnswipeInfluencerRoute
+  '/en/creators/unswipe/slideshow': typeof EnCreatorsUnswipeSlideshowRoute
+  '/en/creators/unswipe/ugc': typeof EnCreatorsUnswipeUgcRoute
+  '/fr/createurs/unswipe/influenceur': typeof FrCreateursUnswipeInfluenceurRoute
+  '/fr/createurs/unswipe/slideshow': typeof FrCreateursUnswipeSlideshowRoute
+  '/fr/createurs/unswipe/ugc': typeof FrCreateursUnswipeUgcRoute
   '/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
   '/creators/app/briefs/': typeof CreatorsAppBriefsIndexRoute
   '/creators/influencer/app/': typeof CreatorsInfluencerAppIndexRoute
+  '/en/creators/unswipe/': typeof EnCreatorsUnswipeIndexRoute
+  '/fr/createurs/unswipe/': typeof FrCreateursUnswipeIndexRoute
   '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
   '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   '/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   '/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
+  '/auteurs/admin/creators/apps': typeof AuthenticatedAuteursAdminCreatorsAppsRoute
   '/auteurs/admin/creators/influencer-applications': typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
   '/auteurs/admin/creators/influencer-messages': typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
   '/auteurs/admin/creators/influencer-payouts': typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
@@ -1052,6 +1127,7 @@ export interface FileRoutesByTo {
   '/cours/$slug': typeof CoursSlugRoute
   '/creators/invite': typeof CreatorsInviteRoute
   '/creators/login': typeof CreatorsLoginRoute
+  '/creators/unswipe': typeof CreatorsUnswipeRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -1132,15 +1208,24 @@ export interface FileRoutesByTo {
   '/creators/influencer/app/payouts': typeof CreatorsInfluencerAppPayoutsRoute
   '/creators/influencer/app/profile': typeof CreatorsInfluencerAppProfileRoute
   '/creators/influencer/app/rules': typeof CreatorsInfluencerAppRulesRoute
+  '/en/creators/unswipe/influencer': typeof EnCreatorsUnswipeInfluencerRoute
+  '/en/creators/unswipe/slideshow': typeof EnCreatorsUnswipeSlideshowRoute
+  '/en/creators/unswipe/ugc': typeof EnCreatorsUnswipeUgcRoute
+  '/fr/createurs/unswipe/influenceur': typeof FrCreateursUnswipeInfluenceurRoute
+  '/fr/createurs/unswipe/slideshow': typeof FrCreateursUnswipeSlideshowRoute
+  '/fr/createurs/unswipe/ugc': typeof FrCreateursUnswipeUgcRoute
   '/auteurs/admin': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses': typeof AuthenticatedAuteursCoursesIndexRoute
   '/creators/app/briefs': typeof CreatorsAppBriefsIndexRoute
   '/creators/influencer/app': typeof CreatorsInfluencerAppIndexRoute
+  '/en/creators/unswipe': typeof EnCreatorsUnswipeIndexRoute
+  '/fr/createurs/unswipe': typeof FrCreateursUnswipeIndexRoute
   '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
   '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   '/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   '/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
+  '/auteurs/admin/creators/apps': typeof AuthenticatedAuteursAdminCreatorsAppsRoute
   '/auteurs/admin/creators/influencer-applications': typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
   '/auteurs/admin/creators/influencer-messages': typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
   '/auteurs/admin/creators/influencer-payouts': typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
@@ -1191,6 +1276,7 @@ export interface FileRoutesById {
   '/creators/app': typeof CreatorsAppRouteWithChildren
   '/creators/invite': typeof CreatorsInviteRoute
   '/creators/login': typeof CreatorsLoginRoute
+  '/creators/unswipe': typeof CreatorsUnswipeRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -1272,15 +1358,24 @@ export interface FileRoutesById {
   '/creators/influencer/app/payouts': typeof CreatorsInfluencerAppPayoutsRoute
   '/creators/influencer/app/profile': typeof CreatorsInfluencerAppProfileRoute
   '/creators/influencer/app/rules': typeof CreatorsInfluencerAppRulesRoute
+  '/en/creators/unswipe/influencer': typeof EnCreatorsUnswipeInfluencerRoute
+  '/en/creators/unswipe/slideshow': typeof EnCreatorsUnswipeSlideshowRoute
+  '/en/creators/unswipe/ugc': typeof EnCreatorsUnswipeUgcRoute
+  '/fr/createurs/unswipe/influenceur': typeof FrCreateursUnswipeInfluenceurRoute
+  '/fr/createurs/unswipe/slideshow': typeof FrCreateursUnswipeSlideshowRoute
+  '/fr/createurs/unswipe/ugc': typeof FrCreateursUnswipeUgcRoute
   '/_authenticated/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/_authenticated/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
   '/creators/app/briefs/': typeof CreatorsAppBriefsIndexRoute
   '/creators/influencer/app/': typeof CreatorsInfluencerAppIndexRoute
+  '/en/creators/unswipe/': typeof EnCreatorsUnswipeIndexRoute
+  '/fr/createurs/unswipe/': typeof FrCreateursUnswipeIndexRoute
   '/_authenticated/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
   '/_authenticated/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
   '/_authenticated/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   '/_authenticated/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   '/_authenticated/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
+  '/_authenticated/auteurs/admin/creators/apps': typeof AuthenticatedAuteursAdminCreatorsAppsRoute
   '/_authenticated/auteurs/admin/creators/influencer-applications': typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
   '/_authenticated/auteurs/admin/creators/influencer-messages': typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
   '/_authenticated/auteurs/admin/creators/influencer-payouts': typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
@@ -1331,6 +1426,7 @@ export interface FileRouteTypes {
     | '/creators/app'
     | '/creators/invite'
     | '/creators/login'
+    | '/creators/unswipe'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -1412,15 +1508,24 @@ export interface FileRouteTypes {
     | '/creators/influencer/app/payouts'
     | '/creators/influencer/app/profile'
     | '/creators/influencer/app/rules'
+    | '/en/creators/unswipe/influencer'
+    | '/en/creators/unswipe/slideshow'
+    | '/en/creators/unswipe/ugc'
+    | '/fr/createurs/unswipe/influenceur'
+    | '/fr/createurs/unswipe/slideshow'
+    | '/fr/createurs/unswipe/ugc'
     | '/auteurs/admin/'
     | '/auteurs/courses/'
     | '/creators/app/briefs/'
     | '/creators/influencer/app/'
+    | '/en/creators/unswipe/'
+    | '/fr/createurs/unswipe/'
     | '/auteurs/admin/authors/$authorId'
     | '/auteurs/admin/authors/new'
     | '/auteurs/admin/courses/$courseId'
     | '/auteurs/admin/creators/$creatorId'
     | '/auteurs/admin/creators/applications'
+    | '/auteurs/admin/creators/apps'
     | '/auteurs/admin/creators/influencer-applications'
     | '/auteurs/admin/creators/influencer-messages'
     | '/auteurs/admin/creators/influencer-payouts'
@@ -1468,6 +1573,7 @@ export interface FileRouteTypes {
     | '/cours/$slug'
     | '/creators/invite'
     | '/creators/login'
+    | '/creators/unswipe'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -1548,15 +1654,24 @@ export interface FileRouteTypes {
     | '/creators/influencer/app/payouts'
     | '/creators/influencer/app/profile'
     | '/creators/influencer/app/rules'
+    | '/en/creators/unswipe/influencer'
+    | '/en/creators/unswipe/slideshow'
+    | '/en/creators/unswipe/ugc'
+    | '/fr/createurs/unswipe/influenceur'
+    | '/fr/createurs/unswipe/slideshow'
+    | '/fr/createurs/unswipe/ugc'
     | '/auteurs/admin'
     | '/auteurs/courses'
     | '/creators/app/briefs'
     | '/creators/influencer/app'
+    | '/en/creators/unswipe'
+    | '/fr/createurs/unswipe'
     | '/auteurs/admin/authors/$authorId'
     | '/auteurs/admin/authors/new'
     | '/auteurs/admin/courses/$courseId'
     | '/auteurs/admin/creators/$creatorId'
     | '/auteurs/admin/creators/applications'
+    | '/auteurs/admin/creators/apps'
     | '/auteurs/admin/creators/influencer-applications'
     | '/auteurs/admin/creators/influencer-messages'
     | '/auteurs/admin/creators/influencer-payouts'
@@ -1606,6 +1721,7 @@ export interface FileRouteTypes {
     | '/creators/app'
     | '/creators/invite'
     | '/creators/login'
+    | '/creators/unswipe'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -1687,15 +1803,24 @@ export interface FileRouteTypes {
     | '/creators/influencer/app/payouts'
     | '/creators/influencer/app/profile'
     | '/creators/influencer/app/rules'
+    | '/en/creators/unswipe/influencer'
+    | '/en/creators/unswipe/slideshow'
+    | '/en/creators/unswipe/ugc'
+    | '/fr/createurs/unswipe/influenceur'
+    | '/fr/createurs/unswipe/slideshow'
+    | '/fr/createurs/unswipe/ugc'
     | '/_authenticated/auteurs/admin/'
     | '/_authenticated/auteurs/courses/'
     | '/creators/app/briefs/'
     | '/creators/influencer/app/'
+    | '/en/creators/unswipe/'
+    | '/fr/createurs/unswipe/'
     | '/_authenticated/auteurs/admin/authors/$authorId'
     | '/_authenticated/auteurs/admin/authors/new'
     | '/_authenticated/auteurs/admin/courses/$courseId'
     | '/_authenticated/auteurs/admin/creators/$creatorId'
     | '/_authenticated/auteurs/admin/creators/applications'
+    | '/_authenticated/auteurs/admin/creators/apps'
     | '/_authenticated/auteurs/admin/creators/influencer-applications'
     | '/_authenticated/auteurs/admin/creators/influencer-messages'
     | '/_authenticated/auteurs/admin/creators/influencer-payouts'
@@ -1746,6 +1871,7 @@ export interface RootRouteChildren {
   CreatorsAppRoute: typeof CreatorsAppRouteWithChildren
   CreatorsInviteRoute: typeof CreatorsInviteRoute
   CreatorsLoginRoute: typeof CreatorsLoginRoute
+  CreatorsUnswipeRoute: typeof CreatorsUnswipeRoute
   EnBecomeATeacherRoute: typeof EnBecomeATeacherRoute
   EnCareersRoute: typeof EnCareersRoute
   EnDownloadRoute: typeof EnDownloadRoute
@@ -1791,6 +1917,14 @@ export interface RootRouteChildren {
   FrCoursIndexRoute: typeof FrCoursIndexRoute
   FrCreateursIndexRoute: typeof FrCreateursIndexRoute
   ApiPublicAppCoursesRoute: typeof ApiPublicAppCoursesRouteWithChildren
+  EnCreatorsUnswipeInfluencerRoute: typeof EnCreatorsUnswipeInfluencerRoute
+  EnCreatorsUnswipeSlideshowRoute: typeof EnCreatorsUnswipeSlideshowRoute
+  EnCreatorsUnswipeUgcRoute: typeof EnCreatorsUnswipeUgcRoute
+  FrCreateursUnswipeInfluenceurRoute: typeof FrCreateursUnswipeInfluenceurRoute
+  FrCreateursUnswipeSlideshowRoute: typeof FrCreateursUnswipeSlideshowRoute
+  FrCreateursUnswipeUgcRoute: typeof FrCreateursUnswipeUgcRoute
+  EnCreatorsUnswipeIndexRoute: typeof EnCreatorsUnswipeIndexRoute
+  FrCreateursUnswipeIndexRoute: typeof FrCreateursUnswipeIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1947,6 +2081,13 @@ declare module '@tanstack/react-router' {
       path: '/creators/login'
       fullPath: '/creators/login'
       preLoaderRoute: typeof CreatorsLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/unswipe': {
+      id: '/creators/unswipe'
+      path: '/creators/unswipe'
+      fullPath: '/creators/unswipe'
+      preLoaderRoute: typeof CreatorsUnswipeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/': {
@@ -2530,6 +2671,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreatorsInfluencerAppRulesRouteImport
       parentRoute: typeof CreatorsInfluencerAppRoute
     }
+    '/en/creators/unswipe/': {
+      id: '/en/creators/unswipe/'
+      path: '/en/creators/unswipe'
+      fullPath: '/en/creators/unswipe/'
+      preLoaderRoute: typeof EnCreatorsUnswipeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/creators/unswipe/influencer': {
+      id: '/en/creators/unswipe/influencer'
+      path: '/en/creators/unswipe/influencer'
+      fullPath: '/en/creators/unswipe/influencer'
+      preLoaderRoute: typeof EnCreatorsUnswipeInfluencerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/creators/unswipe/slideshow': {
+      id: '/en/creators/unswipe/slideshow'
+      path: '/en/creators/unswipe/slideshow'
+      fullPath: '/en/creators/unswipe/slideshow'
+      preLoaderRoute: typeof EnCreatorsUnswipeSlideshowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/creators/unswipe/ugc': {
+      id: '/en/creators/unswipe/ugc'
+      path: '/en/creators/unswipe/ugc'
+      fullPath: '/en/creators/unswipe/ugc'
+      preLoaderRoute: typeof EnCreatorsUnswipeUgcRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/createurs/unswipe/': {
+      id: '/fr/createurs/unswipe/'
+      path: '/fr/createurs/unswipe'
+      fullPath: '/fr/createurs/unswipe/'
+      preLoaderRoute: typeof FrCreateursUnswipeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/createurs/unswipe/influenceur': {
+      id: '/fr/createurs/unswipe/influenceur'
+      path: '/fr/createurs/unswipe/influenceur'
+      fullPath: '/fr/createurs/unswipe/influenceur'
+      preLoaderRoute: typeof FrCreateursUnswipeInfluenceurRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/createurs/unswipe/slideshow': {
+      id: '/fr/createurs/unswipe/slideshow'
+      path: '/fr/createurs/unswipe/slideshow'
+      fullPath: '/fr/createurs/unswipe/slideshow'
+      preLoaderRoute: typeof FrCreateursUnswipeSlideshowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/createurs/unswipe/ugc': {
+      id: '/fr/createurs/unswipe/ugc'
+      path: '/fr/createurs/unswipe/ugc'
+      fullPath: '/fr/createurs/unswipe/ugc'
+      preLoaderRoute: typeof FrCreateursUnswipeUgcRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/auteurs/admin/authors/': {
       id: '/_authenticated/auteurs/admin/authors/'
       path: '/auteurs/admin/authors'
@@ -2584,6 +2781,13 @@ declare module '@tanstack/react-router' {
       path: '/auteurs/admin/creators/applications'
       fullPath: '/auteurs/admin/creators/applications'
       preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsApplicationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/admin/creators/apps': {
+      id: '/_authenticated/auteurs/admin/creators/apps'
+      path: '/auteurs/admin/creators/apps'
+      fullPath: '/auteurs/admin/creators/apps'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsAppsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/auteurs/admin/creators/influencer-applications': {
@@ -2782,6 +2986,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuteursAdminCoursesCourseIdRoute: typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   AuthenticatedAuteursAdminCreatorsCreatorIdRoute: typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   AuthenticatedAuteursAdminCreatorsApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
+  AuthenticatedAuteursAdminCreatorsAppsRoute: typeof AuthenticatedAuteursAdminCreatorsAppsRoute
   AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
   AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
   AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
@@ -2845,6 +3050,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAuteursAdminCreatorsCreatorIdRoute,
   AuthenticatedAuteursAdminCreatorsApplicationsRoute:
     AuthenticatedAuteursAdminCreatorsApplicationsRoute,
+  AuthenticatedAuteursAdminCreatorsAppsRoute:
+    AuthenticatedAuteursAdminCreatorsAppsRoute,
   AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute:
     AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute,
   AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute:
@@ -2998,6 +3205,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsAppRoute: CreatorsAppRouteWithChildren,
   CreatorsInviteRoute: CreatorsInviteRoute,
   CreatorsLoginRoute: CreatorsLoginRoute,
+  CreatorsUnswipeRoute: CreatorsUnswipeRoute,
   EnBecomeATeacherRoute: EnBecomeATeacherRoute,
   EnCareersRoute: EnCareersRoute,
   EnDownloadRoute: EnDownloadRoute,
@@ -3043,6 +3251,14 @@ const rootRouteChildren: RootRouteChildren = {
   FrCoursIndexRoute: FrCoursIndexRoute,
   FrCreateursIndexRoute: FrCreateursIndexRoute,
   ApiPublicAppCoursesRoute: ApiPublicAppCoursesRouteWithChildren,
+  EnCreatorsUnswipeInfluencerRoute: EnCreatorsUnswipeInfluencerRoute,
+  EnCreatorsUnswipeSlideshowRoute: EnCreatorsUnswipeSlideshowRoute,
+  EnCreatorsUnswipeUgcRoute: EnCreatorsUnswipeUgcRoute,
+  FrCreateursUnswipeInfluenceurRoute: FrCreateursUnswipeInfluenceurRoute,
+  FrCreateursUnswipeSlideshowRoute: FrCreateursUnswipeSlideshowRoute,
+  FrCreateursUnswipeUgcRoute: FrCreateursUnswipeUgcRoute,
+  EnCreatorsUnswipeIndexRoute: EnCreatorsUnswipeIndexRoute,
+  FrCreateursUnswipeIndexRoute: FrCreateursUnswipeIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

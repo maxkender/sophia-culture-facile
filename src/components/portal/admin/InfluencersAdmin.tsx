@@ -1,3 +1,5 @@
+import { PLATFORM_FILTERS, matchesPlatform, useAdminApp, useApps } from "@/lib/apps";
+import { AppEnrolment } from "./AppEnrolment";
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -26,13 +28,13 @@ function err(e: unknown) {
 type MetricRow = { checkpoint: string; views: number | null };
 type DealLite = {
   id: string; influencer_id: string; brief_id: string; agreed_price: number; status: string; created_at: string; completed_at: string | null;
-  deal_sheet_snapshot: unknown; influencer_deliverables: { influencer_deliverable_metrics: MetricRow[] }[];
+  deal_sheet_snapshot: unknown; app_id: string; influencer_deliverables: { platform: string; influencer_deliverable_metrics: MetricRow[] }[];
 };
 const views7 = (d: DealLite) => d.influencer_deliverables.flatMap((v) => v.influencer_deliverable_metrics ?? []).filter((m) => m.checkpoint === "7d").reduce((s, m) => s + (m.views ?? 0), 0);
 const views48 = (d: DealLite) => d.influencer_deliverables.flatMap((v) => v.influencer_deliverable_metrics ?? []).filter((m) => m.checkpoint === "48h").reduce((s, m) => s + (m.views ?? 0), 0);
 /** 7-day views drive CPM; when only 48h is in, that is used and labelled. */
 const dealCpm = (d: DealLite) => cpm(Number(d.agreed_price), views7(d) || views48(d));
-const DEAL_SELECT = "id, influencer_id, brief_id, agreed_price, status, created_at, completed_at, deal_sheet_snapshot, influencer_deliverables(influencer_deliverable_metrics(checkpoint, views))";
+const DEAL_SELECT = "id, influencer_id, brief_id, agreed_price, status, created_at, completed_at, deal_sheet_snapshot, app_id, influencer_deliverables(platform, influencer_deliverable_metrics(checkpoint, views))";
 
 function useInfluencerData() {
   return useQuery({
@@ -179,6 +181,7 @@ export function InfluencerAdminDetail({ influencerId }: { influencerId: string }
           </div>
         ) : <Button asChild variant="pillSecondary" size="pillSm"><Link to="/auteurs/admin/creators/influencer-briefs">Create a brief to send an offer</Link></Button>}
       </div>
+      <AppEnrolment kind="influencer" personId={influencerId} />
       <PortalCard className="space-y-4">
         <p className="font-bold text-brand-navy">Profile</p>
         <div className="grid gap-3 md:grid-cols-3">
@@ -307,7 +310,11 @@ export function InfluencerPerformance() {
   const monthStart = new Date(); monthStart.setDate(1);
   const [from, setFrom] = useState(new Date(Date.now() - 90 * 86400e3).toISOString().slice(0, 10));
   const [to, setTo] = useState(new Date().toISOString().slice(0, 10));
-  const { data } = useInfluencerData();
+  const { data: raw } = useInfluencerData();
+  const { appId } = useAdminApp();
+  const { data: apps = [] } = useApps();
+  const [platform, setPlatform] = useState("all");
+  const data = useMemo(() => raw && ({ ...raw, deals: raw.deals.filter((d) => (!appId || d.app_id === appId) && (platform === "all" || d.influencer_deliverables.some((x) => matchesPlatform(x.platform, platform)))) }), [raw, appId, platform]);
   const { data: briefs = [] } = useQuery({ queryKey: ["admin", "influencer-briefs-lite"], queryFn: async () => (await supabase.from("influencer_briefs").select("id, title")).data ?? [] });
   const stats = useMemo(() => {
     if (!data) return null;
@@ -342,8 +349,9 @@ export function InfluencerPerformance() {
       const ds = done.filter((d) => d.brief_id === b.id);
       return { title: b.title, deals: ds.length, spend: ds.reduce((s, d) => s + Number(d.agreed_price), 0), reach: ds.reduce((s, d) => s + (views7(d) || views48(d)), 0) };
     }).filter((r) => r.deals);
-    return { spend, spendMonth, count: done.length, avgCpm, cpi, byTier, byNiche, byMonth, byCpm: board.filter((b) => b.cpm != null).sort((a, b) => a.cpm! - b.cpm!).slice(0, 10), byInstalls: board.filter((b) => b.installs).sort((a, b) => b.installs - a.installs).slice(0, 10), briefRows };
-  }, [data, briefs, from, to]); // eslint-disable-line react-hooks/exhaustive-deps
+    const byApp = apps.map((a) => { const ds = done.filter((d) => d.app_id === a.id); const c = ds.map(dealCpm).filter((x): x is number => x != null); return { name: a.name, spend: ds.reduce((s, d) => s + Number(d.agreed_price), 0), deals: ds.length, cpm: c.length ? c.reduce((x, y) => x + y, 0) / c.length : null }; });
+    return { byApp, spend, spendMonth, count: done.length, avgCpm, cpi, byTier, byNiche, byMonth, byCpm: board.filter((b) => b.cpm != null).sort((a, b) => a.cpm! - b.cpm!).slice(0, 10), byInstalls: board.filter((b) => b.installs).sort((a, b) => b.installs - a.installs).slice(0, 10), briefRows };
+  }, [data, briefs, from, to, apps]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!stats) return <p className="text-sm">Loading…</p>;
   const Kpi = ({ label, value, note }: { label: string; value: string; note?: string }) => (
     <PortalCard><p className="text-xs font-bold uppercase text-brand-navySoft">{label}</p><p className="mt-1 text-2xl font-extrabold text-brand-navy">{value}</p>{note ? <p className="text-xs text-brand-navySoft">{note}</p> : null}</PortalCard>
@@ -360,7 +368,7 @@ export function InfluencerPerformance() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <PageTitle title="Performance" lead="Completed deals in the chosen range. CPM uses 7-day views, or 48h views until the 7-day numbers are in." />
-        <div className="flex items-center gap-2"><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} aria-label="From" /><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} aria-label="To" /></div>
+        <div className="flex flex-wrap items-center gap-2"><select aria-label="Platform" value={platform} onChange={(e) => setPlatform(e.target.value)} className="min-h-10 rounded-xl border border-input bg-card px-3 text-sm">{PLATFORM_FILTERS.map((p) => <option key={p} value={p}>{p === "all" ? "All platforms" : p}</option>)}</select><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} aria-label="From" /><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} aria-label="To" /></div>
       </div>
       <div className="grid gap-4 md:grid-cols-5">
         <Kpi label="Spend this month" value={euros(stats.spendMonth)} />
@@ -369,6 +377,11 @@ export function InfluencerPerformance() {
         <Kpi label="Average CPM" value={stats.avgCpm != null ? euros(Math.round(stats.avgCpm * 100) / 100) : "—"} />
         <Kpi label="Average CPI" value={stats.cpi != null ? euros(Math.round(stats.cpi * 100) / 100) : "—"} note="Only where attribution is entered" />
       </div>
+      <PortalCard className="overflow-x-auto p-0">
+        <p className="px-4 pt-4 font-bold text-brand-navy">By app</p>
+        <table className="w-full text-left text-sm"><thead className="text-xs uppercase text-brand-navySoft"><tr>{["App", "Deals", "Spend", "Avg CPM"].map((h) => <th key={h} className="px-4 py-2">{h}</th>)}</tr></thead>
+          <tbody className="divide-y divide-brand-line">{stats.byApp.map((r) => <tr key={r.name}><td className="px-4 py-2 font-semibold">{r.name}</td><td className="px-4 py-2">{r.deals}</td><td className="px-4 py-2">{euros(r.spend)}</td><td className="px-4 py-2">{r.cpm != null ? euros(Math.round(r.cpm * 100) / 100) : "—"}</td></tr>)}</tbody></table>
+      </PortalCard>
       <div className="grid gap-4 lg:grid-cols-3">
         <Chart title="CPM by tier" rows={stats.byTier} k="cpm" />
         <Chart title="CPM by niche" rows={stats.byNiche} k="cpm" />
@@ -393,14 +406,14 @@ export function InfluencerPerformance() {
 export function InfluencerSettingsAdmin() {
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["admin", "influencer-settings"], queryFn: async () => (await supabase.from("influencer_settings").select("*").eq("id", 1).single()).data });
-  const [f, setF] = useState<null | { pct: Record<string, string>; split: string; expiry: string; bounds: Record<string, string>; niches: string; disclosure: { code: string; text: string }[] }>(null);
+  const [f, setF] = useState<null | { pct: Record<string, string>; split: string; expiry: string; bounds: Record<string, string>; niches: string; disclosure: { code: string; platform: string; text: string }[] }>(null);
   if (!data) return <p className="text-sm">Loading…</p>;
   const cur = f ?? {
     pct: Object.fromEntries(RIGHTS.map((r) => [r, String((data.rights_fee_pct as Record<string, number>)?.[r] ?? 0)])),
     split: String(data.split_threshold), expiry: String(data.offer_expiry_days),
     bounds: Object.fromEntries(["micro", "mid", "macro", "top"].map((k) => [k, String((data.tier_bounds as Record<string, number>)?.[k] ?? "")])),
     niches: data.niches.join(", "),
-    disclosure: Object.entries((data.disclosure ?? {}) as Record<string, string>).map(([code, text]) => ({ code, text })),
+    disclosure: Object.entries((data.disclosure ?? {}) as Record<string, string>).map(([k, text]) => { const [code = "", platform = "All"] = k.split("|"); return { code, platform, text }; }),
   };
   const set = (patch: Partial<typeof cur>) => setF({ ...cur, ...patch });
   async function save() {
@@ -408,7 +421,7 @@ export function InfluencerSettingsAdmin() {
     if (nums.some((x) => Number.isNaN(x) || x < 0)) return void toast.error("Every number must be zero or more.");
     const b = Object.fromEntries(Object.entries(cur.bounds).map(([k, v]) => [k, Number(v)]));
     if (!(b["micro"]! < b["mid"]! && b["mid"]! < b["macro"]! && b["macro"]! < b["top"]!)) return void toast.error("Tier boundaries must go up: micro < mid < macro < top.");
-    const disclosure = Object.fromEntries(cur.disclosure.filter((d) => d.code.trim() && d.text.trim()).map((d) => [d.code.trim().toUpperCase(), d.text.trim()]));
+    const disclosure = Object.fromEntries(cur.disclosure.filter((d) => d.code.trim() && d.text.trim()).map((d) => [`${d.code.trim().toUpperCase()}|${d.platform || "All"}`, d.text.trim()]));
     const { error } = await supabase.from("influencer_settings").update({
       rights_fee_pct: Object.fromEntries(Object.entries(cur.pct).map(([k, v]) => [k, Number(v)])), split_threshold: Number(cur.split), offer_expiry_days: Math.max(1, Math.round(Number(cur.expiry))),
       tier_bounds: b, niches: cur.niches.split(",").map((s) => s.trim()).filter(Boolean), disclosure, updated_at: new Date().toISOString(),
@@ -442,10 +455,11 @@ export function InfluencerSettingsAdmin() {
         {cur.disclosure.map((d, i) => (
           <div key={i} className="flex gap-2">
             <Input className="w-20" value={d.code} placeholder="FR" aria-label="Country code" onChange={(e) => set({ disclosure: cur.disclosure.map((x, j) => (j === i ? { ...x, code: e.target.value } : x)) })} />
+            <select aria-label="Platform" value={d.platform} onChange={(e) => set({ disclosure: cur.disclosure.map((x, j) => (j === i ? { ...x, platform: e.target.value } : x)) })} className="min-h-10 rounded-xl border border-input bg-card px-2 text-sm">{["All", "TikTok", "Instagram", "YouTube"].map((p) => <option key={p}>{p}</option>)}</select>
             <Input value={d.text} aria-label="Wording" onChange={(e) => set({ disclosure: cur.disclosure.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)) })} />
           </div>
         ))}
-        <Button variant="pillSecondary" size="pillSm" onClick={() => set({ disclosure: [...cur.disclosure, { code: "", text: "" }] })}>Add country</Button>
+        <Button variant="pillSecondary" size="pillSm" onClick={() => set({ disclosure: [...cur.disclosure, { code: "", platform: "TikTok", text: "" }] })}>Add country</Button>
       </PortalCard>
       <Button variant="pill" size="pill" onClick={save}>Save settings</Button>
     </div>

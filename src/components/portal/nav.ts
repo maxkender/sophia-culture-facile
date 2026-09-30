@@ -120,6 +120,7 @@ export const ADMIN_CREATOR_NAV: NavGroup[] = [
       { to: "/auteurs/admin/creators/influencer-performance", label: "Performance", icon: Activity },
       { to: "/auteurs/admin/creators/influencer-payouts", label: "Influencer payouts", icon: Banknote },
       { to: "/auteurs/admin/creators/influencer-settings", label: "Influencer settings", icon: Settings },
+      { to: "/auteurs/admin/creators/apps", label: "Apps", icon: Settings },
       { to: "/auteurs/admin/creators/influencer-messages", label: "Influencer messages", icon: MessageSquare },
     ],
   },

@@ -8,6 +8,38 @@ import { useI18n, useLocalePath } from "@/i18n";
 import { CREATORS } from "@/i18n/creators";
 import { useEffect } from "react";
 import { trackFunnel } from "@/lib/funnel-events";
+import { useApps } from "@/lib/apps";
+
+/** Brand band shown on app-specific creator pages (e.g. UnSwipe). */
+function AppBand({ slug }: { slug?: string | undefined }) {
+  const { lang } = useI18n();
+  const { data: apps = [] } = useApps();
+  const app = apps.find((a) => a.slug === slug);
+  if (!slug || slug === "sophia" || !app) return null;
+  return (
+    <section className="border-b border-brand-line bg-card">
+      <div className="mx-auto flex w-full max-w-3xl items-start gap-4 px-5 py-6">
+        {app.logo_path ? <img src={app.logo_path} alt="" className="size-12 rounded-xl object-cover" /> : null}
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">{lang === "fr" ? "Programme créateurs" : "Creator programme"} · Vik Studios</p>
+          <p className="text-2xl font-extrabold text-brand-navy">{app.name}{app.tagline ? <span className="font-semibold text-brand-navySoft"> · {app.tagline}</span> : null}</p>
+          {app.short_description ? <p className="mt-2 text-[15px] leading-relaxed text-brand-navySoft">{app.short_description}</p> : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+function useAppCopy<T>(copy: T, slug?: string): T {
+  const { data: apps = [] } = useApps();
+  const app = apps.find((a) => a.slug === slug);
+  if (!slug || slug === "sophia" || !app) return copy;
+  const swap = (v: unknown): unknown =>
+    typeof v === "string" ? v.replace(/Sophia/g, app.name) : Array.isArray(v) ? v.map(swap) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, swap(x)])) : v;
+  const out = swap(copy) as T & { heroSubtitle?: string };
+  if (app.short_description && "heroSubtitle" in (out as object)) out.heroSubtitle = app.short_description;
+  return out;
+}
+const withApp = (to: string, slug?: string) => (slug && slug !== "sophia" ? `${to}?app=${slug}` : to);
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
@@ -28,7 +60,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Hero({ title, subtitle, cta, to, note }: { title: string; subtitle: string; cta: string; to: "/fr/candidature-ugc" | "/en/ugc-application" | "/fr/candidature-slideshow" | "/en/slideshow-application" | "/fr/candidature-influenceur" | "/en/influencer-application"; note?: string }) {
+function Hero({ title, subtitle, cta, to, note, app }: { app?: string | undefined; title: string; subtitle: string; cta: string; to: "/fr/candidature-ugc" | "/en/ugc-application" | "/fr/candidature-slideshow" | "/en/slideshow-application" | "/fr/candidature-influenceur" | "/en/influencer-application"; note?: string }) {
   return (
     <section className="relative isolate overflow-hidden bg-brand-navy">
       <span aria-hidden="true" className="grid-texture absolute inset-0 -z-10" />
@@ -37,7 +69,7 @@ function Hero({ title, subtitle, cta, to, note }: { title: string; subtitle: str
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-brand-onNavy/75 md:text-lg">{subtitle}</p>
         <div className="mt-8 max-w-sm">
           <Button asChild variant="pillLight" size="pillLg" className="w-full">
-            <Link to={to}>{cta}</Link>
+            {app ? <a href={withApp(to, app)}>{cta}</a> : <Link to={to}>{cta}</Link>}
           </Button>
           {note ? <p className="mt-3 text-center text-xs text-brand-onNavy/60">{note}</p> : null}
         </div>
@@ -59,20 +91,22 @@ function CheckList({ items }: { items: string[] }) {
   );
 }
 
-export function CreatorsChooserPage() {
+export function CreatorsChooserPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
-  const c = CREATORS[lang].chooser;
+  const c = useAppCopy(CREATORS[lang].chooser, app);
+  const inflCard = useAppCopy(INFLUENCER_COPY[lang].card, app);
   const ugcPath = useLocalePath("creatorsUgc");
   const slidePath = useLocalePath("creatorsSlideshow");
   const inflPath = useLocalePath("creatorsInfluencer");
   const cards = [
-    { ...c.ugc, icon: Camera, to: ugcPath, track: "ugc" },
-    { ...c.slideshow, icon: Layers, to: slidePath, track: "slideshow" },
-    { ...INFLUENCER_COPY[lang].card, icon: Megaphone, to: inflPath, track: "influencer" },
+    { ...c.ugc, icon: Camera, to: ugcPath, track: "ugc", appTo: `${lang === "fr" ? "/fr/createurs" : "/en/creators"}/${app}/ugc` },
+    { ...c.slideshow, icon: Layers, to: slidePath, track: "slideshow", appTo: `${lang === "fr" ? "/fr/createurs" : "/en/creators"}/${app}/slideshow` },
+    { ...inflCard, icon: Megaphone, to: inflPath, track: "influencer", appTo: `${lang === "fr" ? "/fr/createurs" : "/en/creators"}/${app}/${lang === "fr" ? "influenceur" : "influencer"}` },
   ];
   useEffect(() => trackFunnel("creators_page_view", { lang }), [lang]);
   return (
     <Shell>
+      <AppBand slug={app} />
       <section className="mx-auto w-full max-w-6xl px-5 py-14 md:py-20">
         <h1 className="text-4xl font-extrabold tracking-tight text-brand-navy md:text-5xl">{c.title}</h1>
         <p className="mt-4 text-lg text-brand-navySoft">{c.lead}</p>
@@ -89,7 +123,7 @@ export function CreatorsChooserPage() {
                   ))}
                 </div>
                 <Button asChild variant="pill" size="pill" className="mt-6 w-full whitespace-normal text-center">
-                  <Link to={card.to} data-funnel="track_selected" data-track={card.track} onClick={() => trackFunnel("track_selected", { track: card.track })}>{card.cta}</Link>
+                  {app ? <a href={card.appTo} onClick={() => trackFunnel("track_selected", { track: card.track, app })}>{card.cta}</a> : <Link to={card.to} data-funnel="track_selected" data-track={card.track} onClick={() => trackFunnel("track_selected", { track: card.track })}>{card.cta}</Link>}
                 </Button>
               </article>
             );
@@ -100,13 +134,14 @@ export function CreatorsChooserPage() {
   );
 }
 
-export function UgcLandingPage() {
+export function UgcLandingPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
-  const u = CREATORS[lang].ugc;
+  const u = useAppCopy(CREATORS[lang].ugc, app);
   const applyPath = useLocalePath("creatorsUgcApply");
   return (
     <Shell>
-      <Hero title={u.heroTitle} subtitle={u.heroSubtitle} cta={u.cta} to={applyPath} note={u.replyLine} />
+      <AppBand slug={app} />
+      <Hero app={app} title={u.heroTitle} subtitle={u.heroSubtitle} cta={u.cta} to={applyPath} note={u.replyLine} />
       <Section title={u.aboutTitle}>
         <p>{u.about}</p>
       </Section>
@@ -127,7 +162,7 @@ export function UgcLandingPage() {
         <div className="rounded-3xl bg-card p-7 shadow-card">
           <p className="text-[17px] font-semibold text-brand-navy">{u.bottom}</p>
           <Button asChild variant="pill" size="pill" className="mt-5">
-            <Link to={applyPath}>{u.cta}</Link>
+            {app ? <a href={withApp(applyPath, app)}>{u.cta}</a> : <Link to={applyPath}>{u.cta}</Link>}
           </Button>
         </div>
       </section>
@@ -135,13 +170,14 @@ export function UgcLandingPage() {
   );
 }
 
-export function SlideshowLandingPage() {
+export function SlideshowLandingPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
-  const s = CREATORS[lang].slideshow;
+  const s = useAppCopy(CREATORS[lang].slideshow, app);
   const applyPath = useLocalePath("creatorsSlideshowApply");
   return (
     <Shell>
-      <Hero title={s.heroTitle} subtitle={s.heroSubtitle} cta={s.cta} to={applyPath} />
+      <AppBand slug={app} />
+      <Hero app={app} title={s.heroTitle} subtitle={s.heroSubtitle} cta={s.cta} to={applyPath} />
       <Section title={s.howTitle}>
         <ol className="space-y-3">
           {s.steps.map((step, i) => (
@@ -165,20 +201,21 @@ export function SlideshowLandingPage() {
       </Section>
       <section className="mx-auto w-full max-w-3xl px-5 pb-20 pt-2">
         <Button asChild variant="pill" size="pill">
-          <Link to={applyPath}>{s.cta}</Link>
+          {app ? <a href={withApp(applyPath, app)}>{s.cta}</a> : <Link to={applyPath}>{s.cta}</Link>}
         </Button>
       </section>
     </Shell>
   );
 }
 
-export function InfluencerLandingPage() {
+export function InfluencerLandingPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
-  const s = INFLUENCER_COPY[lang];
+  const s = useAppCopy(INFLUENCER_COPY[lang], app);
   const applyPath = useLocalePath("creatorsInfluencerApply");
   return (
     <Shell>
-      <Hero title={s.heroTitle} subtitle={s.heroSubtitle} cta={s.cta} to={applyPath} />
+      <AppBand slug={app} />
+      <Hero app={app} title={s.heroTitle} subtitle={s.heroSubtitle} cta={s.cta} to={applyPath} />
       <Section title={s.howTitle}>
         <ol className="space-y-3">
           {s.steps.map((step, i) => (
@@ -200,7 +237,7 @@ export function InfluencerLandingPage() {
       </Section>
       <section className="mx-auto w-full max-w-3xl px-5 pb-20 pt-2">
         <Button asChild variant="pill" size="pill">
-          <Link to={applyPath}>{s.cta}</Link>
+          {app ? <a href={withApp(applyPath, app)}>{s.cta}</a> : <Link to={applyPath}>{s.cta}</Link>}
         </Button>
       </section>
     </Shell>

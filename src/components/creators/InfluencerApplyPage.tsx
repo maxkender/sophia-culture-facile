@@ -111,7 +111,7 @@ export function InfluencerApplyPage() {
         media_kit_path = slot.path;
       }
       const res = await submitFn({
-        data: {
+        data: { app: new URLSearchParams(window.location.search).get("app") ?? undefined,
           website: honey, full_name: f.full_name, email: f.email, phone: f.phone, country: f.country, city: f.city, age: Number(f.age),
           tiktok_url: urls[0], tiktok_followers: num(f.tiktok_followers), instagram_url: urls[1], instagram_followers: num(f.instagram_followers),
           youtube_url: urls[2], youtube_subscribers: num(f.youtube_subscribers), niche_tags: niches as never, languages: langs,

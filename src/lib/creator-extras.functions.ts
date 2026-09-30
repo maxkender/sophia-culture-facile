@@ -34,7 +34,7 @@ export const publishBrief = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const audience = data.creatorIds.length ? "selected" : "all";
-    const { data: brief, error } = await supabaseAdmin.from("briefs").update({ status: "published", audience }).eq("id", data.briefId).select("title").single();
+    const { data: brief, error } = await supabaseAdmin.from("briefs").update({ status: "published", audience }).eq("id", data.briefId).select("title, app_id").single();
     if (error || !brief) throw new Error("Brief not found.");
     await supabaseAdmin.from("brief_assignments").delete().eq("brief_id", data.briefId);
     let targets = data.creatorIds;
@@ -44,6 +44,9 @@ export const publishBrief = createServerFn({ method: "POST" })
       const { data: all } = await supabaseAdmin.from("creators").select("id").not("user_id", "is", null);
       targets = (all ?? []).map((c) => c.id);
     }
+    const { data: enrolled } = await supabaseAdmin.from("creator_apps").select("creator_id").eq("app_id", brief.app_id).eq("status", "active");
+    const ok = new Set((enrolled ?? []).map((e) => e.creator_id));
+    targets = targets.filter((id) => ok.has(id));
     if (targets.length) await supabaseAdmin.from("creator_notifications").insert(targets.map((creator_id) => ({ creator_id, body: `New brief: ${brief.title}` })));
     return { assigned: audience === "selected" ? targets.length : 0, notified: targets.length };
   });
