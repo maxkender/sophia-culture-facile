@@ -1,3 +1,4 @@
+import { useAdminApp, SOPHIA_APP_ID } from "@/lib/apps";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   getCoreRowModel,
@@ -54,7 +55,11 @@ export function CreatorProspects() {
   const { data, isLoading } = useProspectsData();
   const mut = useProspectMutations();
   const hms = data?.hms ?? [];
-  const all = useMemo(() => enrich(data?.prospects ?? [], data?.touches ?? [], hms), [data, hms]);
+  const { appId: selectedApp } = useAdminApp();
+  const all = useMemo(() => {
+    const rows = enrich(data?.prospects ?? [], data?.touches ?? [], hms);
+    return selectedApp ? rows.filter((p) => ((p as { target_app_id?: string | null }).target_app_id ?? SOPHIA_APP_ID) === selectedApp) : rows;
+  }, [data, hms, selectedApp]);
 
   const [preset, setPreset] = useState<PresetView>("all");
   const [search, setSearch] = useState("");
