@@ -1,3 +1,4 @@
+import { useAdminApp, AppBadge } from "@/lib/apps";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -17,6 +18,7 @@ export function CreatorPayouts() {
   const [track, setTrack] = useState<"ugc" | "slideshow">("ugc");
   const [country, setCountry] = useState("");
   const [rate, setRate] = useState("");
+  const { appId } = useAdminApp();
   const gen = useServerFn(generatePayoutBatch);
   const pay = useServerFn(payPayoutBatch);
 
@@ -147,7 +149,10 @@ export function CreatorPayouts() {
             <EmptyState title="No batches" text="Pick a month and generate a batch from approved posts." />
           ) : (
             rows.map((b) => {
-              const total = (b.payout_items ?? []).reduce((s: number, i: any) => s + Number(i.amount_usd), 0);
+              const items = (b.payout_items ?? []).filter((i: any) => !appId || i.app_id === appId);
+              if (appId && items.length === 0) return null;
+              const byAppTotals = items.reduce((m: Record<string, number>, i: any) => ({ ...m, [i.app_id]: (m[i.app_id] ?? 0) + Number(i.amount_usd) }), {});
+              const total = items.reduce((s: number, i: any) => s + Number(i.amount_usd), 0);
               return (
                 <PortalCard key={b.id} className="space-y-2 p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -155,6 +160,9 @@ export function CreatorPayouts() {
                       <span className="font-semibold">{b.period}</span>
                       <span className="ml-2 rounded bg-muted px-2 py-0.5 text-xs">{b.status}</span>
                       <span className="ml-2 text-sm text-muted-foreground">${total.toFixed(2)} total</span>
+                      {Object.entries(byAppTotals).map(([a, v]) => (
+                        <span key={a} className="ml-2 inline-flex items-center gap-1 text-xs"><AppBadge appId={a} /> ${(v as number).toFixed(2)}</span>
+                      ))}
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" variant="ghost" onClick={() => exportCsv(b, "wise")}>Wise CSV</Button>
@@ -164,9 +172,9 @@ export function CreatorPayouts() {
                     </div>
                   </div>
                   <div className="divide-y text-sm">
-                    {(b.payout_items ?? []).map((i: any) => (
+                    {items.map((i: any) => (
                       <div key={i.id} className="flex items-center justify-between py-1.5">
-                        <span>{i.creators?.full_name} — {i.posts_count} post(s) × ${Number(i.rate_usd).toFixed(2)}</span>
+                        <span className="flex items-center gap-2"><AppBadge appId={i.app_id} />{i.creators?.full_name} — {i.posts_count} post(s) × ${Number(i.rate_usd).toFixed(2)}</span>
                         <span className="flex items-center gap-2">
                           <span className="font-medium">${Number(i.amount_usd).toFixed(2)}</span>
                           <span className="rounded bg-muted px-1.5 py-0.5 text-xs">{i.status}</span>
