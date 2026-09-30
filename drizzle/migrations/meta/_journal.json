@@ -204,6 +204,13 @@
       "when": 1790760221953,
       "tag": "0028_influencer_payouts",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1790765470773,
+      "tag": "0029_multi_app_layer",
+      "breakpoints": true
     }
   ]
 }

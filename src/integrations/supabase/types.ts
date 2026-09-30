@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       access_codes: {
         Row: {
+          app_id: string
           assigned_at: string | null
           assigned_creator_id: string | null
           assigned_to: string | null
@@ -27,6 +28,7 @@ export type Database = {
           state: Database["public"]["Enums"]["code_state"]
         }
         Insert: {
+          app_id?: string
           assigned_at?: string | null
           assigned_creator_id?: string | null
           assigned_to?: string | null
@@ -38,6 +40,7 @@ export type Database = {
           state?: Database["public"]["Enums"]["code_state"]
         }
         Update: {
+          app_id?: string
           assigned_at?: string | null
           assigned_creator_id?: string | null
           assigned_to?: string | null
@@ -49,6 +52,13 @@ export type Database = {
           state?: Database["public"]["Enums"]["code_state"]
         }
         Relationships: [
+          {
+            foreignKeyName: "access_codes_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "access_codes_assigned_creator_id_fkey"
             columns: ["assigned_creator_id"]
@@ -105,18 +115,21 @@ export type Database = {
       }
       admin_ui_prefs: {
         Row: {
+          creators_app: string
           key: string
           updated_at: string
           user_id: string
           value: Json
         }
         Insert: {
+          creators_app?: string
           key: string
           updated_at?: string
           user_id?: string
           value?: Json
         }
         Update: {
+          creators_app?: string
           key?: string
           updated_at?: string
           user_id?: string
@@ -327,6 +340,63 @@ export type Database = {
         }
         Relationships: []
       }
+      apps: {
+        Row: {
+          accent_color: string | null
+          active: boolean
+          app_store_url: string | null
+          created_at: string
+          creators_line: string | null
+          domain: string | null
+          id: string
+          logo_path: string | null
+          name: string
+          play_store_url: string | null
+          primary_color: string | null
+          short_description: string | null
+          slug: string
+          taap_url: string | null
+          tagline: string | null
+          users_line: string | null
+        }
+        Insert: {
+          accent_color?: string | null
+          active?: boolean
+          app_store_url?: string | null
+          created_at?: string
+          creators_line?: string | null
+          domain?: string | null
+          id?: string
+          logo_path?: string | null
+          name: string
+          play_store_url?: string | null
+          primary_color?: string | null
+          short_description?: string | null
+          slug: string
+          taap_url?: string | null
+          tagline?: string | null
+          users_line?: string | null
+        }
+        Update: {
+          accent_color?: string | null
+          active?: boolean
+          app_store_url?: string | null
+          created_at?: string
+          creators_line?: string | null
+          domain?: string | null
+          id?: string
+          logo_path?: string | null
+          name?: string
+          play_store_url?: string | null
+          primary_color?: string | null
+          short_description?: string | null
+          slug?: string
+          taap_url?: string | null
+          tagline?: string | null
+          users_line?: string | null
+        }
+        Relationships: []
+      }
       brief_assignments: {
         Row: {
           brief_id: string
@@ -408,6 +478,7 @@ export type Database = {
       briefs: {
         Row: {
           app: string
+          app_id: string
           audience: string
           body: string
           created_at: string
@@ -421,6 +492,7 @@ export type Database = {
         }
         Insert: {
           app?: string
+          app_id?: string
           audience?: string
           body?: string
           created_at?: string
@@ -434,6 +506,7 @@ export type Database = {
         }
         Update: {
           app?: string
+          app_id?: string
           audience?: string
           body?: string
           created_at?: string
@@ -446,6 +519,13 @@ export type Database = {
           title?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "briefs_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "briefs_created_by_fkey"
             columns: ["created_by"]
@@ -797,6 +877,7 @@ export type Database = {
       creator_announcements: {
         Row: {
           active: boolean
+          app_id: string
           body: string
           created_at: string
           id: string
@@ -805,6 +886,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          app_id?: string
           body: string
           created_at?: string
           id?: string
@@ -813,19 +895,29 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          app_id?: string
           body?: string
           created_at?: string
           id?: string
           title?: string
           track?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "creator_announcements_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       creator_applications: {
         Row: {
           acceptance_email_sent_at: string | null
           admin_notes: string | null
           age: number
+          app_id: string
           assigned_hm_id: string | null
           consent_at: string
           country: string
@@ -854,6 +946,7 @@ export type Database = {
           acceptance_email_sent_at?: string | null
           admin_notes?: string | null
           age: number
+          app_id?: string
           assigned_hm_id?: string | null
           consent_at?: string
           country: string
@@ -882,6 +975,7 @@ export type Database = {
           acceptance_email_sent_at?: string | null
           admin_notes?: string | null
           age?: number
+          app_id?: string
           assigned_hm_id?: string | null
           consent_at?: string
           country?: string
@@ -908,6 +1002,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "creator_applications_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "creator_applications_assigned_hm_id_fkey"
             columns: ["assigned_hm_id"]
             isOneToOne: false
@@ -926,6 +1027,42 @@ export type Database = {
             columns: ["decided_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_apps: {
+        Row: {
+          app_id: string
+          creator_id: string
+          enrolled_at: string
+          status: string
+        }
+        Insert: {
+          app_id: string
+          creator_id: string
+          enrolled_at?: string
+          status?: string
+        }
+        Update: {
+          app_id?: string
+          creator_id?: string
+          enrolled_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_apps_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_apps_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
             referencedColumns: ["id"]
           },
         ]
@@ -1205,6 +1342,7 @@ export type Database = {
       creator_posts: {
         Row: {
           amount_usd: number | null
+          app_id: string
           bonus_usd: number | null
           brief_id: string | null
           created_at: string
@@ -1226,6 +1364,7 @@ export type Database = {
         }
         Insert: {
           amount_usd?: number | null
+          app_id?: string
           bonus_usd?: number | null
           brief_id?: string | null
           created_at?: string
@@ -1247,6 +1386,7 @@ export type Database = {
         }
         Update: {
           amount_usd?: number | null
+          app_id?: string
           bonus_usd?: number | null
           brief_id?: string | null
           created_at?: string
@@ -1267,6 +1407,13 @@ export type Database = {
           views_screenshot_path?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "creator_posts_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "creator_posts_brief_id_fkey"
             columns: ["brief_id"]
@@ -1321,6 +1468,7 @@ export type Database = {
           status: string
           tags: string[]
           target_app: string | null
+          target_app_id: string | null
           tiktok_handle: string | null
           track: string | null
         }
@@ -1347,6 +1495,7 @@ export type Database = {
           status?: string
           tags?: string[]
           target_app?: string | null
+          target_app_id?: string | null
           tiktok_handle?: string | null
           track?: string | null
         }
@@ -1373,6 +1522,7 @@ export type Database = {
           status?: string
           tags?: string[]
           target_app?: string | null
+          target_app_id?: string | null
           tiktok_handle?: string | null
           track?: string | null
         }
@@ -1384,10 +1534,18 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "creator_prospects_target_app_id_fkey"
+            columns: ["target_app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
         ]
       }
       creator_rates: {
         Row: {
+          app_id: string
           country: string | null
           created_at: string
           effective_from: string
@@ -1396,6 +1554,7 @@ export type Database = {
           track: string
         }
         Insert: {
+          app_id?: string
           country?: string | null
           created_at?: string
           effective_from?: string
@@ -1404,6 +1563,7 @@ export type Database = {
           track: string
         }
         Update: {
+          app_id?: string
           country?: string | null
           created_at?: string
           effective_from?: string
@@ -1411,7 +1571,15 @@ export type Database = {
           rate_usd?: number
           track?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "creator_rates_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       creator_signatures: {
         Row: {
@@ -1467,6 +1635,7 @@ export type Database = {
       creator_social_accounts: {
         Row: {
           account_email: string
+          app_id: string
           creator_id: string
           device: string | null
           handle: string
@@ -1478,6 +1647,7 @@ export type Database = {
         }
         Insert: {
           account_email: string
+          app_id?: string
           creator_id: string
           device?: string | null
           handle: string
@@ -1489,6 +1659,7 @@ export type Database = {
         }
         Update: {
           account_email?: string
+          app_id?: string
           creator_id?: string
           device?: string | null
           handle?: string
@@ -1500,9 +1671,16 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "creator_social_accounts_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "creator_social_accounts_creator_id_fkey"
             columns: ["creator_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "creators"
             referencedColumns: ["id"]
           },
@@ -1510,6 +1688,7 @@ export type Database = {
       }
       creator_weekly_guides: {
         Row: {
+          app_id: string
           body: string
           created_at: string
           id: string
@@ -1519,6 +1698,7 @@ export type Database = {
           week_start: string
         }
         Insert: {
+          app_id?: string
           body?: string
           created_at?: string
           id?: string
@@ -1528,6 +1708,7 @@ export type Database = {
           week_start: string
         }
         Update: {
+          app_id?: string
           body?: string
           created_at?: string
           id?: string
@@ -1536,7 +1717,15 @@ export type Database = {
           track?: string | null
           week_start?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "creator_weekly_guides_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       creators: {
         Row: {
@@ -1791,6 +1980,7 @@ export type Database = {
           age: number
           agency_contact: string | null
           agency_name: string | null
+          app_id: string
           assigned_hm_id: string | null
           city: string
           consent_at: string
@@ -1829,6 +2019,7 @@ export type Database = {
           age: number
           agency_contact?: string | null
           agency_name?: string | null
+          app_id?: string
           assigned_hm_id?: string | null
           city: string
           consent_at?: string
@@ -1867,6 +2058,7 @@ export type Database = {
           age?: number
           agency_contact?: string | null
           agency_name?: string | null
+          app_id?: string
           assigned_hm_id?: string | null
           city?: string
           consent_at?: string
@@ -1901,6 +2093,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "influencer_applications_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "influencer_applications_assigned_hm_id_fkey"
             columns: ["assigned_hm_id"]
             isOneToOne: false
@@ -1919,6 +2118,42 @@ export type Database = {
             columns: ["decided_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_apps: {
+        Row: {
+          app_id: string
+          enrolled_at: string
+          influencer_id: string
+          status: string
+        }
+        Insert: {
+          app_id: string
+          enrolled_at?: string
+          influencer_id: string
+          status?: string
+        }
+        Update: {
+          app_id?: string
+          enrolled_at?: string
+          influencer_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_apps_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_apps_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
             referencedColumns: ["id"]
           },
         ]
@@ -2026,6 +2261,7 @@ export type Database = {
       influencer_briefs: {
         Row: {
           angle: string | null
+          app_id: string
           body: string
           brief_type: string
           budget_max: number | null
@@ -2049,6 +2285,7 @@ export type Database = {
         }
         Insert: {
           angle?: string | null
+          app_id?: string
           body?: string
           brief_type?: string
           budget_max?: number | null
@@ -2072,6 +2309,7 @@ export type Database = {
         }
         Update: {
           angle?: string | null
+          app_id?: string
           body?: string
           brief_type?: string
           budget_max?: number | null
@@ -2095,6 +2333,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "influencer_briefs_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "influencer_briefs_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
@@ -2106,6 +2351,7 @@ export type Database = {
       influencer_deals: {
         Row: {
           agreed_price: number
+          app_id: string
           brief_id: string
           cancelled_reason: string | null
           completed_at: string | null
@@ -2126,6 +2372,7 @@ export type Database = {
         }
         Insert: {
           agreed_price: number
+          app_id?: string
           brief_id: string
           cancelled_reason?: string | null
           completed_at?: string | null
@@ -2146,6 +2393,7 @@ export type Database = {
         }
         Update: {
           agreed_price?: number
+          app_id?: string
           brief_id?: string
           cancelled_reason?: string | null
           completed_at?: string | null
@@ -2165,6 +2413,13 @@ export type Database = {
           status?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "influencer_deals_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "influencer_deals_brief_id_fkey"
             columns: ["brief_id"]
@@ -2385,6 +2640,7 @@ export type Database = {
       }
       influencer_offers: {
         Row: {
+          app_id: string
           brief_id: string
           counter_message: string | null
           counter_price: number | null
@@ -2408,6 +2664,7 @@ export type Database = {
           viewed_at: string | null
         }
         Insert: {
+          app_id?: string
           brief_id: string
           counter_message?: string | null
           counter_price?: number | null
@@ -2431,6 +2688,7 @@ export type Database = {
           viewed_at?: string | null
         }
         Update: {
+          app_id?: string
           brief_id?: string
           counter_message?: string | null
           counter_price?: number | null
@@ -2454,6 +2712,13 @@ export type Database = {
           viewed_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "influencer_offers_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "influencer_offers_brief_id_fkey"
             columns: ["brief_id"]
@@ -2480,6 +2745,7 @@ export type Database = {
       influencer_payout_items: {
         Row: {
           amount: number
+          app_id: string
           created_at: string
           currency: string
           deal_id: string
@@ -2495,6 +2761,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          app_id?: string
           created_at?: string
           currency?: string
           deal_id: string
@@ -2510,6 +2777,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          app_id?: string
           created_at?: string
           currency?: string
           deal_id?: string
@@ -2524,6 +2792,13 @@ export type Database = {
           status?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "influencer_payout_items_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "influencer_payout_items_deal_id_fkey"
             columns: ["deal_id"]
@@ -2954,6 +3229,7 @@ export type Database = {
       payout_items: {
         Row: {
           amount_usd: number
+          app_id: string
           batch_id: string
           created_at: string
           creator_id: string
@@ -2966,6 +3242,7 @@ export type Database = {
         }
         Insert: {
           amount_usd?: number
+          app_id?: string
           batch_id: string
           created_at?: string
           creator_id: string
@@ -2978,6 +3255,7 @@ export type Database = {
         }
         Update: {
           amount_usd?: number
+          app_id?: string
           batch_id?: string
           created_at?: string
           creator_id?: string
@@ -2989,6 +3267,13 @@ export type Database = {
           stripe_transfer_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "payout_items_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payout_items_batch_id_fkey"
             columns: ["batch_id"]
@@ -3184,6 +3469,7 @@ export type Database = {
       reference_videos: {
         Row: {
           active: boolean
+          app_id: string
           category: string
           created_at: string
           format_notes: string | null
@@ -3198,6 +3484,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          app_id?: string
           category?: string
           created_at?: string
           format_notes?: string | null
@@ -3212,6 +3499,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          app_id?: string
           category?: string
           created_at?: string
           format_notes?: string | null
@@ -3224,7 +3512,15 @@ export type Database = {
           url?: string
           why_it_works?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reference_videos_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       screens: {
         Row: {
@@ -3268,6 +3564,7 @@ export type Database = {
         Row: {
           admin_notes: string | null
           agreement_signed_at: string | null
+          app_id: string
           assigned_hm_id: string | null
           consent_at: string
           country: string
@@ -3298,6 +3595,7 @@ export type Database = {
         Insert: {
           admin_notes?: string | null
           agreement_signed_at?: string | null
+          app_id?: string
           assigned_hm_id?: string | null
           consent_at?: string
           country: string
@@ -3328,6 +3626,7 @@ export type Database = {
         Update: {
           admin_notes?: string | null
           agreement_signed_at?: string | null
+          app_id?: string
           assigned_hm_id?: string | null
           consent_at?: string
           country?: string
@@ -3357,6 +3656,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "slideshow_applications_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "slideshow_applications_assigned_hm_id_fkey"
             columns: ["assigned_hm_id"]
             isOneToOne: false
@@ -3374,21 +3680,32 @@ export type Database = {
       }
       slideshow_country_rates: {
         Row: {
+          app_id: string
           country: string
           rate_usd: number
           updated_at: string
         }
         Insert: {
+          app_id?: string
           country: string
           rate_usd: number
           updated_at?: string
         }
         Update: {
+          app_id?: string
           country?: string
           rate_usd?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "slideshow_country_rates_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sources: {
         Row: {
@@ -3430,6 +3747,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      creator_enrolled: { Args: { _app: string }; Returns: boolean }
       influencer_can_see_brief: {
         Args: { _brief_id: string }
         Returns: boolean
