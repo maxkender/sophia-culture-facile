@@ -211,6 +211,13 @@
       "when": 1790765470773,
       "tag": "0029_multi_app_layer",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1790773189554,
+      "tag": "0030_restrict_influencer_settings_read",
+      "breakpoints": true
     }
   ]
 }

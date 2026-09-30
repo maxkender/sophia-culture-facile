@@ -1,0 +1,2 @@
+DROP POLICY IF EXISTS "Signed-in read influencer settings" ON public.influencer_settings;
+CREATE POLICY "Admins read influencer settings" ON public.influencer_settings FOR SELECT TO authenticated USING (private.is_admin());
