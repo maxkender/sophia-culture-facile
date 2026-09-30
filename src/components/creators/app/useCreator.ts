@@ -7,6 +7,11 @@ export const CREATOR_KEY = ["creator-space"] as const;
 export async function loadCreator() {
   const { data: me } = await supabase.from("creators").select("*").maybeSingle();
   if (!me) return null;
+  const [enrol, codes] = await Promise.all([
+    supabase.from("creator_apps").select("app_id, status").eq("creator_id", me.id),
+    supabase.from("access_codes").select("code, redeem_url, platform, app_id").eq("assigned_creator_id", me.id),
+  ]);
+  const apps = (enrol.data ?? []).filter((e) => e.status === "active").map((e) => e.app_id);
   const [briefs, reads, posts, calls, rsvps, refs, payoutProfile, payoutItems, signature, notes, messages, rulesDoc] = await Promise.all([
     supabase.from("briefs").select("*").eq("status", "published").order("created_at", { ascending: false }),
     supabase.from("brief_reads").select("*").eq("creator_id", me.id),
@@ -29,7 +34,9 @@ export async function loadCreator() {
     posts: posts.data ?? [],
     calls: calls.data ?? [],
     rsvps: rsvps.data ?? [],
-    refs: refs.data ?? [],
+    refs: (refs.data ?? []).filter((r) => apps.includes(r.app_id)),
+    enrolledApps: apps,
+    codes: codes.data ?? [],
     payoutProfile: payoutProfile.data ?? null,
     payoutItems: payoutItems.data ?? [],
     notes: notes.data ?? [],

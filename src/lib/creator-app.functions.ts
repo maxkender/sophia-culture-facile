@@ -221,6 +221,11 @@ export const logPostChecked = createServerFn({ method: "POST" })
       throw new Error("Finish onboarding steps 1 to 3 before logging posts.");
     const today = new Date().toISOString().slice(0, 10);
     if (data.postedOn > today) throw new Error("The date cannot be in the future.");
+    if (data.briefId) {
+      // RLS only returns briefs from apps the creator is actively enrolled in.
+      const { data: visible } = await context.supabase.from("briefs").select("id").eq("id", data.briefId).maybeSingle();
+      if (!visible) throw new Error("This brief is not available to you.");
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("creator_posts").insert({
       creator_id: me.id, url: data.url, platform: data.platform, brief_id: data.briefId,
