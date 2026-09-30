@@ -1,3 +1,4 @@
+import { useAdminApp } from "@/lib/apps";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -65,12 +66,14 @@ export function CreatorApplications({ track }: { track: Track }) {
   const genLink = useServerFn(generateSigningLink);
   const approveUgc = useServerFn(approveUgcApplication);
 
+  const { appId } = useAdminApp();
   const { data } = useQuery({
-    queryKey: ["portal", "admin", "creator-applications", track, status, signedFilter],
+    queryKey: ["portal", "admin", "creator-applications", track, status, signedFilter, appId],
     queryFn: async () => {
       const table = track === "ugc" ? "creator_applications" : "slideshow_applications";
       let query = supabase.from(table).select("*").order("created_at", { ascending: false });
       if (status !== "all") query = query.eq("status", status);
+      if (appId) query = query.eq("app_id", appId);
       if (track === "slideshow" && signedFilter === "signed") query = query.not("agreement_signed_at", "is", null);
       if (track === "slideshow" && signedFilter === "unsigned") query = query.is("agreement_signed_at", null);
       const { data: rows, error } = await query;

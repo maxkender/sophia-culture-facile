@@ -1,3 +1,4 @@
+import { AppBadge, useAdminApp } from "@/lib/apps";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -44,11 +45,13 @@ export function InfluencerApplications() {
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const { appId } = useAdminApp();
   const { data } = useQuery({
-    queryKey: ["portal", "admin", "influencer-applications", status],
+    queryKey: ["portal", "admin", "influencer-applications", status, appId],
     queryFn: async () => {
       let q = supabase.from("influencer_applications").select("*").order("created_at", { ascending: false });
       if (status !== "all") q = q.eq("status", status);
+      if (appId) q = q.eq("app_id", appId);
       const { data: rows, error } = await q;
       if (error) throw error;
       return rows ?? [];
