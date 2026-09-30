@@ -1,3 +1,4 @@
+import { AppBadge, SOPHIA_APP_ID, useApps, type AppRow } from "@/lib/apps";
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Check, Smartphone } from "lucide-react";
@@ -102,6 +103,43 @@ export function CreatorHomePage() {
 }
 
 export function AccessCodeCard() {
+  const { enrolledApps, codes } = useCreator();
+  const { data: apps = [] } = useApps();
+  const mine = apps.filter((a) => enrolledApps.includes(a.id));
+  return (
+    <>
+      {mine.map((a) => a.id === SOPHIA_APP_ID ? <SophiaAccessCard key={a.id} /> : <OtherAppAccessCard key={a.id} app={a} code={codes.find((c) => c.app_id === a.id) ?? null} />)}
+    </>
+  );
+}
+
+function OtherAppAccessCard({ app, code }: { app: AppRow; code: { code: string; redeem_url: string | null } | null }) {
+  const { me } = useCreator();
+  const store = me.platform === "android" ? "Play Store" : "App Store";
+  const link = app.taap_url || (me.platform === "android" ? app.play_store_url : app.app_store_url);
+  return (
+    <PortalCard>
+      <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-brand-navySoft"><Smartphone className="size-4" /> Your {app.name} app access <AppBadge appId={app.id} /></p>
+      {code ? (
+        <>
+          <p className="mt-2 text-base font-extrabold text-brand-navy">Your code goes into the {store}, not into the {app.name} app.</p>
+          <p className="mt-4 rounded-2xl bg-portal-bg px-4 py-3 font-mono text-xl font-bold tracking-[0.12em] text-brand-navy">{code.code}</p>
+          <div className="mt-3 flex flex-wrap gap-2"><CopyButton value={code.code} label="Copy code" />{code.redeem_url ? <Button asChild variant="pillSecondary" size="pillSm"><a href={code.redeem_url} target="_blank" rel="noreferrer noopener">Redeem</a></Button> : null}</div>
+          <ol className="mt-4 list-decimal space-y-1 pl-5 text-sm leading-relaxed text-brand-navySoft">
+            <li>Open the {store}, not {app.name}</li>
+            <li>Tap your profile picture, top right</li>
+            <li>{store === "App Store" ? "Choose Redeem Gift Card or Code" : "Choose Payments and subscriptions"}</li>
+            <li>{store === "App Store" ? "Choose Enter Code Manually" : "Choose Redeem code"}</li>
+            <li>Paste the code above</li>
+          </ol>
+        </>
+      ) : <p className="mt-3 text-base font-extrabold text-brand-navy">Code coming soon</p>}
+      {link ? <a href={link} target="_blank" rel="noopener noreferrer" className="mt-4 block font-bold text-portal-accent underline">Open {app.name} in the store</a> : null}
+    </PortalCard>
+  );
+}
+
+function SophiaAccessCard() {
   const { me } = useCreator();
   const store = me.platform === "android" ? "Play Store" : "App Store";
   return (
