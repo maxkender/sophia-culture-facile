@@ -12,7 +12,7 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
     refetchInterval: 60_000,
     queryFn: async () => {
       const count = async (
-        table: "courses" | "access_codes" | "applications" | "course_requests" | "course_proposals" | "creator_applications" | "slideshow_applications" | "influencer_applications",
+        table: "courses" | "access_codes" | "applications" | "course_requests" | "course_proposals" | "creator_applications" | "slideshow_applications" | "influencer_applications" | "influencer_offers",
         column: string,
         value: string,
       ) => {
@@ -22,7 +22,7 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
           .eq(column, value);
         return n ?? 0;
       };
-      const [review, codes, applications, requests, proposals, threads, ugcPending, slidePending, inflNew] = await Promise.all([
+      const [review, codes, applications, requests, proposals, threads, ugcPending, slidePending, inflNew, inflDeals, inflCounters] = await Promise.all([
         count("courses", "status", "submitted"),
         count("access_codes", "state", "available"),
         count("applications", "status", "pending"),
@@ -32,6 +32,8 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
         count("creator_applications", "status", "pending"),
         count("slideshow_applications", "status", "pending"),
         count("influencer_applications", "status", "new"),
+        supabase.from("influencer_deals").select("id", { count: "exact", head: true }).in("status", ["draft_submitted", "posted"]),
+        count("influencer_offers", "status", "countered"),
       ]);
       return {
         review,
@@ -43,6 +45,7 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
         ugcApps: ugcPending,
         slideApps: slidePending,
         inflApps: inflNew,
+        inflDeals: (inflDeals.count ?? 0) + inflCounters,
       } satisfies NavCounts;
     },
   });

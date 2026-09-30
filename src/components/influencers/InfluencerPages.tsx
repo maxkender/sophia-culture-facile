@@ -17,6 +17,8 @@ import {
   acceptInfluencerRules, confirmInfluencerMediaKit, influencerMediaKitSlot, openInfluencerMediaKit, saveInfluencerPayout,
   markInfluencerMessagesRead, signInfluencerAgreement, startInfluencerStripe, syncInfluencerStripe, updateInfluencerProfile,
 } from "@/lib/influencer-space.functions";
+import { euros } from "@/lib/influencer-deals";
+import { nextStep, useMyDeals, useMyOffers } from "./InfluencerDealPages";
 import { fillAgreement, INFLUENCER_KEY, influencerSteps, useInfluencerDoc, useInfluencerQuery, type Influencer } from "./useInfluencer";
 
 const LABELS = INFLUENCER_COPY.en;
@@ -89,16 +91,7 @@ export function InfluencerHome() {
           <p className="mt-2 text-sm text-brand-navySoft">When a brief fits you, your offer will appear here with the price, the deliverables and the deadline.</p>
         </Card>
       )}
-      <div className="grid gap-5 md:grid-cols-2">
-        <Card>
-          <p className="text-sm font-bold text-brand-navy">Pending offers</p>
-          <p className="mt-2 text-sm text-brand-navySoft">No offer yet.</p>
-        </Card>
-        <Card>
-          <p className="text-sm font-bold text-brand-navy">Earnings this month</p>
-          <p className="mt-2 text-2xl font-extrabold text-brand-navy">€0</p>
-        </Card>
-      </div>
+      <HomeWork />
       <Card>
         <p className="text-sm font-bold text-brand-navy">Your tracked link and promo code</p>
         {me.tracked_link || me.promo_code ? (
@@ -114,6 +107,37 @@ export function InfluencerHome() {
         ) : (
           <p className="mt-2 text-sm text-brand-navySoft">The Sophia team will add them here before your first collaboration.</p>
         )}
+      </Card>
+    </div>
+  );
+}
+
+function HomeWork() {
+  const { data: offers = [] } = useMyOffers();
+  const { data: deals = [] } = useMyDeals();
+  const open = offers.filter((o) => ["sent", "viewed"].includes(o.status) && (!o.expires_at || new Date(o.expires_at).getTime() > Date.now()));
+  const active = deals.filter((d) => !["completed", "cancelled"].includes(d.status));
+  const month = new Date().toISOString().slice(0, 7);
+  const earned = deals.filter((d) => d.status === "completed" && d.completed_at?.startsWith(month)).reduce((s, d) => s + Number(d.agreed_price), 0);
+  return (
+    <div className="grid gap-5 md:grid-cols-3">
+      <Card>
+        <p className="text-sm font-bold text-brand-navy">Pending offers</p>
+        {open.length ? (
+          <ul className="mt-2 space-y-1 text-sm">{open.slice(0, 3).map((o) => <li key={o.id}><Link to="/creators/influencer/app/offers" className="underline">{o.influencer_briefs?.title}</Link> · {euros(o.price)}</li>)}</ul>
+        ) : <p className="mt-2 text-sm text-brand-navySoft">No offer yet.</p>}
+      </Card>
+      <Card>
+        <p className="text-sm font-bold text-brand-navy">Active deals</p>
+        {active.length ? (
+          <ul className="mt-2 space-y-2 text-sm">{active.slice(0, 3).map((d) => { const n = nextStep(d); return (
+            <li key={d.id}><Link to="/creators/influencer/app/deals/$dealId" params={{ dealId: d.id }} className="font-semibold underline">{(d.deal_sheet_snapshot as { brief_title?: string })?.brief_title}</Link>{n ? <span className="block text-xs text-portal-amber">{n}</span> : null}</li>
+          ); })}</ul>
+        ) : <p className="mt-2 text-sm text-brand-navySoft">No active deal.</p>}
+      </Card>
+      <Card>
+        <p className="text-sm font-bold text-brand-navy">Earnings this month</p>
+        <p className="mt-2 text-2xl font-extrabold text-brand-navy">{euros(earned)}</p>
       </Card>
     </div>
   );

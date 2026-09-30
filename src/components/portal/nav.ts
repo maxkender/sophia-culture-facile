@@ -34,7 +34,8 @@ export type NavBadge =
   | "creatorApps"
   | "ugcApps"
   | "slideApps"
-  | "inflApps";
+  | "inflApps"
+  | "inflDeals";
 
 export type NavItem = {
   to: string;
@@ -113,6 +114,8 @@ export const ADMIN_CREATOR_NAV: NavGroup[] = [
       { to: "/auteurs/admin/creators/ugc-applications", label: "UGC applications", icon: Video, badge: "ugcApps" },
       { to: "/auteurs/admin/creators/slideshow-applications", label: "Slideshow applications", icon: Clapperboard, badge: "slideApps" },
       { to: "/auteurs/admin/creators/influencer-applications", label: "Influencer applications", icon: Megaphone, badge: "inflApps" },
+      { to: "/auteurs/admin/creators/influencer-briefs", label: "Briefs & offers", icon: FileText },
+      { to: "/auteurs/admin/creators/influencer-deals", label: "Deals", icon: Banknote, badge: "inflDeals" },
       { to: "/auteurs/admin/creators/influencer-messages", label: "Influencer messages", icon: MessageSquare },
     ],
   },
