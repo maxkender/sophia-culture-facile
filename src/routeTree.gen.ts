@@ -35,12 +35,14 @@ import { Route as EnIndexRouteImport } from './routes/en/index'
 import { Route as EnBecomeATeacherRouteImport } from './routes/en/become-a-teacher'
 import { Route as EnCareersRouteImport } from './routes/en/careers'
 import { Route as EnDownloadRouteImport } from './routes/en/download'
+import { Route as EnInfluencerApplicationRouteImport } from './routes/en/influencer-application'
 import { Route as EnLegalNoticeRouteImport } from './routes/en/legal-notice'
 import { Route as EnPrivacyRouteImport } from './routes/en/privacy'
 import { Route as EnSlideshowApplicationRouteImport } from './routes/en/slideshow-application'
 import { Route as EnSophiaGeneralKnowledgeRouteImport } from './routes/en/sophia-general-knowledge'
 import { Route as EnUgcApplicationRouteImport } from './routes/en/ugc-application'
 import { Route as FrIndexRouteImport } from './routes/fr/index'
+import { Route as FrCandidatureInfluenceurRouteImport } from './routes/fr/candidature-influenceur'
 import { Route as FrCandidatureSlideshowRouteImport } from './routes/fr/candidature-slideshow'
 import { Route as FrCandidatureUgcRouteImport } from './routes/fr/candidature-ugc'
 import { Route as FrCareersRouteImport } from './routes/fr/careers'
@@ -66,6 +68,8 @@ import { Route as CreatorsAppMessagesRouteImport } from './routes/creators.app.m
 import { Route as CreatorsAppPostsRouteImport } from './routes/creators.app.posts'
 import { Route as CreatorsAppProfileRouteImport } from './routes/creators.app.profile'
 import { Route as CreatorsAppRulesRouteImport } from './routes/creators.app.rules'
+import { Route as CreatorsInfluencerIndexRouteImport } from './routes/creators.influencer.index'
+import { Route as CreatorsInfluencerApplyRouteImport } from './routes/creators.influencer.apply'
 import { Route as CreatorsSignTokenRouteImport } from './routes/creators.sign.$token'
 import { Route as CreatorsSlideshowIndexRouteImport } from './routes/creators.slideshow.index'
 import { Route as CreatorsSlideshowApplyRouteImport } from './routes/creators.slideshow.apply'
@@ -73,6 +77,7 @@ import { Route as CreatorsUgcIndexRouteImport } from './routes/creators.ugc.inde
 import { Route as CreatorsUgcApplyRouteImport } from './routes/creators.ugc.apply'
 import { Route as EnAuthorsSlugRouteImport } from './routes/en/authors.$slug'
 import { Route as EnCreatorsIndexRouteImport } from './routes/en/creators/index'
+import { Route as EnCreatorsInfluencerRouteImport } from './routes/en/creators/influencer'
 import { Route as EnCreatorsSlideshowRouteImport } from './routes/en/creators/slideshow'
 import { Route as EnCreatorsUgcRouteImport } from './routes/en/creators/ugc'
 import { Route as EnLessonsIndexRouteImport } from './routes/en/lessons/index'
@@ -81,6 +86,7 @@ import { Route as FrAuteursSlugRouteImport } from './routes/fr/auteurs.$slug'
 import { Route as FrCoursIndexRouteImport } from './routes/fr/cours/index'
 import { Route as FrCoursSlugRouteImport } from './routes/fr/cours/$slug'
 import { Route as FrCreateursIndexRouteImport } from './routes/fr/createurs/index'
+import { Route as FrCreateursInfluenceurRouteImport } from './routes/fr/createurs/influenceur'
 import { Route as FrCreateursSlideshowRouteImport } from './routes/fr/createurs/slideshow'
 import { Route as FrCreateursUgcRouteImport } from './routes/fr/createurs/ugc'
 import { Route as AuthenticatedAuteursAdminIndexRouteImport } from './routes/_authenticated/auteurs/admin/index'
@@ -248,6 +254,11 @@ const EnDownloadRoute = EnDownloadRouteImport.update({
   path: '/en/download',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnInfluencerApplicationRoute = EnInfluencerApplicationRouteImport.update({
+  id: '/en/influencer-application',
+  path: '/en/influencer-application',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnLegalNoticeRoute = EnLegalNoticeRouteImport.update({
   id: '/en/legal-notice',
   path: '/en/legal-notice',
@@ -279,6 +290,12 @@ const FrIndexRoute = FrIndexRouteImport.update({
   path: '/fr/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FrCandidatureInfluenceurRoute =
+  FrCandidatureInfluenceurRouteImport.update({
+    id: '/fr/candidature-influenceur',
+    path: '/fr/candidature-influenceur',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const FrCandidatureSlideshowRoute = FrCandidatureSlideshowRouteImport.update({
   id: '/fr/candidature-slideshow',
   path: '/fr/candidature-slideshow',
@@ -411,6 +428,16 @@ const CreatorsAppRulesRoute = CreatorsAppRulesRouteImport.update({
   path: '/rules',
   getParentRoute: () => CreatorsAppRoute,
 } as any)
+const CreatorsInfluencerIndexRoute = CreatorsInfluencerIndexRouteImport.update({
+  id: '/creators/influencer/',
+  path: '/creators/influencer/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsInfluencerApplyRoute = CreatorsInfluencerApplyRouteImport.update({
+  id: '/creators/influencer/apply',
+  path: '/creators/influencer/apply',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreatorsSignTokenRoute = CreatorsSignTokenRouteImport.update({
   id: '/creators/sign/$token',
   path: '/creators/sign/$token',
@@ -444,6 +471,11 @@ const EnAuthorsSlugRoute = EnAuthorsSlugRouteImport.update({
 const EnCreatorsIndexRoute = EnCreatorsIndexRouteImport.update({
   id: '/en/creators/',
   path: '/en/creators/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnCreatorsInfluencerRoute = EnCreatorsInfluencerRouteImport.update({
+  id: '/en/creators/influencer',
+  path: '/en/creators/influencer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnCreatorsSlideshowRoute = EnCreatorsSlideshowRouteImport.update({
@@ -484,6 +516,11 @@ const FrCoursSlugRoute = FrCoursSlugRouteImport.update({
 const FrCreateursIndexRoute = FrCreateursIndexRouteImport.update({
   id: '/fr/createurs/',
   path: '/fr/createurs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrCreateursInfluenceurRoute = FrCreateursInfluenceurRouteImport.update({
+  id: '/fr/createurs/influenceur',
+  path: '/fr/createurs/influenceur',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FrCreateursSlideshowRoute = FrCreateursSlideshowRouteImport.update({
@@ -721,11 +758,13 @@ export interface FileRoutesByFullPath {
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
+  '/en/influencer-application': typeof EnInfluencerApplicationRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/slideshow-application': typeof EnSlideshowApplicationRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
   '/en/ugc-application': typeof EnUgcApplicationRoute
+  '/fr/candidature-influenceur': typeof FrCandidatureInfluenceurRoute
   '/fr/candidature-slideshow': typeof FrCandidatureSlideshowRoute
   '/fr/candidature-ugc': typeof FrCandidatureUgcRoute
   '/fr/careers': typeof FrCareersRoute
@@ -753,19 +792,23 @@ export interface FileRoutesByFullPath {
   '/creators/app/posts': typeof CreatorsAppPostsRoute
   '/creators/app/profile': typeof CreatorsAppProfileRoute
   '/creators/app/rules': typeof CreatorsAppRulesRoute
+  '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
   '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
+  '/en/creators/influencer': typeof EnCreatorsInfluencerRoute
   '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
   '/en/creators/ugc': typeof EnCreatorsUgcRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
   '/fr/cours/$slug': typeof FrCoursSlugRoute
+  '/fr/createurs/influenceur': typeof FrCreateursInfluenceurRoute
   '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
   '/fr/createurs/ugc': typeof FrCreateursUgcRoute
   '/auteurs/': typeof AuthenticatedAuteursIndexRoute
   '/creators/app/': typeof CreatorsAppIndexRoute
+  '/creators/influencer/': typeof CreatorsInfluencerIndexRoute
   '/creators/slideshow/': typeof CreatorsSlideshowIndexRoute
   '/creators/ugc/': typeof CreatorsUgcIndexRoute
   '/en/creators/': typeof EnCreatorsIndexRoute
@@ -829,11 +872,13 @@ export interface FileRoutesByTo {
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
+  '/en/influencer-application': typeof EnInfluencerApplicationRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/slideshow-application': typeof EnSlideshowApplicationRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
   '/en/ugc-application': typeof EnUgcApplicationRoute
+  '/fr/candidature-influenceur': typeof FrCandidatureInfluenceurRoute
   '/fr/candidature-slideshow': typeof FrCandidatureSlideshowRoute
   '/fr/candidature-ugc': typeof FrCandidatureUgcRoute
   '/fr/careers': typeof FrCareersRoute
@@ -861,19 +906,23 @@ export interface FileRoutesByTo {
   '/creators/app/posts': typeof CreatorsAppPostsRoute
   '/creators/app/profile': typeof CreatorsAppProfileRoute
   '/creators/app/rules': typeof CreatorsAppRulesRoute
+  '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
   '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
+  '/en/creators/influencer': typeof EnCreatorsInfluencerRoute
   '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
   '/en/creators/ugc': typeof EnCreatorsUgcRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
   '/fr/cours/$slug': typeof FrCoursSlugRoute
+  '/fr/createurs/influenceur': typeof FrCreateursInfluenceurRoute
   '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
   '/fr/createurs/ugc': typeof FrCreateursUgcRoute
   '/auteurs': typeof AuthenticatedAuteursIndexRoute
   '/creators/app': typeof CreatorsAppIndexRoute
+  '/creators/influencer': typeof CreatorsInfluencerIndexRoute
   '/creators/slideshow': typeof CreatorsSlideshowIndexRoute
   '/creators/ugc': typeof CreatorsUgcIndexRoute
   '/en/creators': typeof EnCreatorsIndexRoute
@@ -940,11 +989,13 @@ export interface FileRoutesById {
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
+  '/en/influencer-application': typeof EnInfluencerApplicationRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/slideshow-application': typeof EnSlideshowApplicationRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
   '/en/ugc-application': typeof EnUgcApplicationRoute
+  '/fr/candidature-influenceur': typeof FrCandidatureInfluenceurRoute
   '/fr/candidature-slideshow': typeof FrCandidatureSlideshowRoute
   '/fr/candidature-ugc': typeof FrCandidatureUgcRoute
   '/fr/careers': typeof FrCareersRoute
@@ -972,19 +1023,23 @@ export interface FileRoutesById {
   '/creators/app/posts': typeof CreatorsAppPostsRoute
   '/creators/app/profile': typeof CreatorsAppProfileRoute
   '/creators/app/rules': typeof CreatorsAppRulesRoute
+  '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
   '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
+  '/en/creators/influencer': typeof EnCreatorsInfluencerRoute
   '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
   '/en/creators/ugc': typeof EnCreatorsUgcRoute
   '/en/lessons/$slug': typeof EnLessonsSlugRoute
   '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
   '/fr/cours/$slug': typeof FrCoursSlugRoute
+  '/fr/createurs/influenceur': typeof FrCreateursInfluenceurRoute
   '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
   '/fr/createurs/ugc': typeof FrCreateursUgcRoute
   '/_authenticated/auteurs/': typeof AuthenticatedAuteursIndexRoute
   '/creators/app/': typeof CreatorsAppIndexRoute
+  '/creators/influencer/': typeof CreatorsInfluencerIndexRoute
   '/creators/slideshow/': typeof CreatorsSlideshowIndexRoute
   '/creators/ugc/': typeof CreatorsUgcIndexRoute
   '/en/creators/': typeof EnCreatorsIndexRoute
@@ -1051,11 +1106,13 @@ export interface FileRouteTypes {
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
+    | '/en/influencer-application'
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/slideshow-application'
     | '/en/sophia-general-knowledge'
     | '/en/ugc-application'
+    | '/fr/candidature-influenceur'
     | '/fr/candidature-slideshow'
     | '/fr/candidature-ugc'
     | '/fr/careers'
@@ -1083,19 +1140,23 @@ export interface FileRouteTypes {
     | '/creators/app/posts'
     | '/creators/app/profile'
     | '/creators/app/rules'
+    | '/creators/influencer/apply'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
     | '/creators/ugc/apply'
     | '/en/authors/$slug'
+    | '/en/creators/influencer'
     | '/en/creators/slideshow'
     | '/en/creators/ugc'
     | '/en/lessons/$slug'
     | '/fr/auteurs/$slug'
     | '/fr/cours/$slug'
+    | '/fr/createurs/influenceur'
     | '/fr/createurs/slideshow'
     | '/fr/createurs/ugc'
     | '/auteurs/'
     | '/creators/app/'
+    | '/creators/influencer/'
     | '/creators/slideshow/'
     | '/creators/ugc/'
     | '/en/creators/'
@@ -1159,11 +1220,13 @@ export interface FileRouteTypes {
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
+    | '/en/influencer-application'
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/slideshow-application'
     | '/en/sophia-general-knowledge'
     | '/en/ugc-application'
+    | '/fr/candidature-influenceur'
     | '/fr/candidature-slideshow'
     | '/fr/candidature-ugc'
     | '/fr/careers'
@@ -1191,19 +1254,23 @@ export interface FileRouteTypes {
     | '/creators/app/posts'
     | '/creators/app/profile'
     | '/creators/app/rules'
+    | '/creators/influencer/apply'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
     | '/creators/ugc/apply'
     | '/en/authors/$slug'
+    | '/en/creators/influencer'
     | '/en/creators/slideshow'
     | '/en/creators/ugc'
     | '/en/lessons/$slug'
     | '/fr/auteurs/$slug'
     | '/fr/cours/$slug'
+    | '/fr/createurs/influenceur'
     | '/fr/createurs/slideshow'
     | '/fr/createurs/ugc'
     | '/auteurs'
     | '/creators/app'
+    | '/creators/influencer'
     | '/creators/slideshow'
     | '/creators/ugc'
     | '/en/creators'
@@ -1269,11 +1336,13 @@ export interface FileRouteTypes {
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
+    | '/en/influencer-application'
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/slideshow-application'
     | '/en/sophia-general-knowledge'
     | '/en/ugc-application'
+    | '/fr/candidature-influenceur'
     | '/fr/candidature-slideshow'
     | '/fr/candidature-ugc'
     | '/fr/careers'
@@ -1301,19 +1370,23 @@ export interface FileRouteTypes {
     | '/creators/app/posts'
     | '/creators/app/profile'
     | '/creators/app/rules'
+    | '/creators/influencer/apply'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
     | '/creators/ugc/apply'
     | '/en/authors/$slug'
+    | '/en/creators/influencer'
     | '/en/creators/slideshow'
     | '/en/creators/ugc'
     | '/en/lessons/$slug'
     | '/fr/auteurs/$slug'
     | '/fr/cours/$slug'
+    | '/fr/createurs/influenceur'
     | '/fr/createurs/slideshow'
     | '/fr/createurs/ugc'
     | '/_authenticated/auteurs/'
     | '/creators/app/'
+    | '/creators/influencer/'
     | '/creators/slideshow/'
     | '/creators/ugc/'
     | '/en/creators/'
@@ -1380,11 +1453,13 @@ export interface RootRouteChildren {
   EnBecomeATeacherRoute: typeof EnBecomeATeacherRoute
   EnCareersRoute: typeof EnCareersRoute
   EnDownloadRoute: typeof EnDownloadRoute
+  EnInfluencerApplicationRoute: typeof EnInfluencerApplicationRoute
   EnLegalNoticeRoute: typeof EnLegalNoticeRoute
   EnPrivacyRoute: typeof EnPrivacyRoute
   EnSlideshowApplicationRoute: typeof EnSlideshowApplicationRoute
   EnSophiaGeneralKnowledgeRoute: typeof EnSophiaGeneralKnowledgeRoute
   EnUgcApplicationRoute: typeof EnUgcApplicationRoute
+  FrCandidatureInfluenceurRoute: typeof FrCandidatureInfluenceurRoute
   FrCandidatureSlideshowRoute: typeof FrCandidatureSlideshowRoute
   FrCandidatureUgcRoute: typeof FrCandidatureUgcRoute
   FrCareersRoute: typeof FrCareersRoute
@@ -1397,17 +1472,21 @@ export interface RootRouteChildren {
   CreatorsIndexRoute: typeof CreatorsIndexRoute
   EnIndexRoute: typeof EnIndexRoute
   FrIndexRoute: typeof FrIndexRoute
+  CreatorsInfluencerApplyRoute: typeof CreatorsInfluencerApplyRoute
   CreatorsSignTokenRoute: typeof CreatorsSignTokenRoute
   CreatorsSlideshowApplyRoute: typeof CreatorsSlideshowApplyRoute
   CreatorsUgcApplyRoute: typeof CreatorsUgcApplyRoute
   EnAuthorsSlugRoute: typeof EnAuthorsSlugRoute
+  EnCreatorsInfluencerRoute: typeof EnCreatorsInfluencerRoute
   EnCreatorsSlideshowRoute: typeof EnCreatorsSlideshowRoute
   EnCreatorsUgcRoute: typeof EnCreatorsUgcRoute
   EnLessonsSlugRoute: typeof EnLessonsSlugRoute
   FrAuteursSlugRoute: typeof FrAuteursSlugRoute
   FrCoursSlugRoute: typeof FrCoursSlugRoute
+  FrCreateursInfluenceurRoute: typeof FrCreateursInfluenceurRoute
   FrCreateursSlideshowRoute: typeof FrCreateursSlideshowRoute
   FrCreateursUgcRoute: typeof FrCreateursUgcRoute
+  CreatorsInfluencerIndexRoute: typeof CreatorsInfluencerIndexRoute
   CreatorsSlideshowIndexRoute: typeof CreatorsSlideshowIndexRoute
   CreatorsUgcIndexRoute: typeof CreatorsUgcIndexRoute
   EnCreatorsIndexRoute: typeof EnCreatorsIndexRoute
@@ -1601,6 +1680,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnDownloadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/en/influencer-application': {
+      id: '/en/influencer-application'
+      path: '/en/influencer-application'
+      fullPath: '/en/influencer-application'
+      preLoaderRoute: typeof EnInfluencerApplicationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/en/legal-notice': {
       id: '/en/legal-notice'
       path: '/en/legal-notice'
@@ -1641,6 +1727,13 @@ declare module '@tanstack/react-router' {
       path: '/fr'
       fullPath: '/fr/'
       preLoaderRoute: typeof FrIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/candidature-influenceur': {
+      id: '/fr/candidature-influenceur'
+      path: '/fr/candidature-influenceur'
+      fullPath: '/fr/candidature-influenceur'
+      preLoaderRoute: typeof FrCandidatureInfluenceurRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fr/candidature-slideshow': {
@@ -1818,6 +1911,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreatorsAppRulesRouteImport
       parentRoute: typeof CreatorsAppRoute
     }
+    '/creators/influencer/': {
+      id: '/creators/influencer/'
+      path: '/creators/influencer'
+      fullPath: '/creators/influencer/'
+      preLoaderRoute: typeof CreatorsInfluencerIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/influencer/apply': {
+      id: '/creators/influencer/apply'
+      path: '/creators/influencer/apply'
+      fullPath: '/creators/influencer/apply'
+      preLoaderRoute: typeof CreatorsInfluencerApplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/creators/sign/$token': {
       id: '/creators/sign/$token'
       path: '/creators/sign/$token'
@@ -1865,6 +1972,13 @@ declare module '@tanstack/react-router' {
       path: '/en/creators'
       fullPath: '/en/creators/'
       preLoaderRoute: typeof EnCreatorsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/creators/influencer': {
+      id: '/en/creators/influencer'
+      path: '/en/creators/influencer'
+      fullPath: '/en/creators/influencer'
+      preLoaderRoute: typeof EnCreatorsInfluencerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/creators/slideshow': {
@@ -1921,6 +2035,13 @@ declare module '@tanstack/react-router' {
       path: '/fr/createurs'
       fullPath: '/fr/createurs/'
       preLoaderRoute: typeof FrCreateursIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/createurs/influenceur': {
+      id: '/fr/createurs/influenceur'
+      path: '/fr/createurs/influenceur'
+      fullPath: '/fr/createurs/influenceur'
+      preLoaderRoute: typeof FrCreateursInfluenceurRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fr/createurs/slideshow': {
@@ -2356,11 +2477,13 @@ const rootRouteChildren: RootRouteChildren = {
   EnBecomeATeacherRoute: EnBecomeATeacherRoute,
   EnCareersRoute: EnCareersRoute,
   EnDownloadRoute: EnDownloadRoute,
+  EnInfluencerApplicationRoute: EnInfluencerApplicationRoute,
   EnLegalNoticeRoute: EnLegalNoticeRoute,
   EnPrivacyRoute: EnPrivacyRoute,
   EnSlideshowApplicationRoute: EnSlideshowApplicationRoute,
   EnSophiaGeneralKnowledgeRoute: EnSophiaGeneralKnowledgeRoute,
   EnUgcApplicationRoute: EnUgcApplicationRoute,
+  FrCandidatureInfluenceurRoute: FrCandidatureInfluenceurRoute,
   FrCandidatureSlideshowRoute: FrCandidatureSlideshowRoute,
   FrCandidatureUgcRoute: FrCandidatureUgcRoute,
   FrCareersRoute: FrCareersRoute,
@@ -2373,17 +2496,21 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsIndexRoute: CreatorsIndexRoute,
   EnIndexRoute: EnIndexRoute,
   FrIndexRoute: FrIndexRoute,
+  CreatorsInfluencerApplyRoute: CreatorsInfluencerApplyRoute,
   CreatorsSignTokenRoute: CreatorsSignTokenRoute,
   CreatorsSlideshowApplyRoute: CreatorsSlideshowApplyRoute,
   CreatorsUgcApplyRoute: CreatorsUgcApplyRoute,
   EnAuthorsSlugRoute: EnAuthorsSlugRoute,
+  EnCreatorsInfluencerRoute: EnCreatorsInfluencerRoute,
   EnCreatorsSlideshowRoute: EnCreatorsSlideshowRoute,
   EnCreatorsUgcRoute: EnCreatorsUgcRoute,
   EnLessonsSlugRoute: EnLessonsSlugRoute,
   FrAuteursSlugRoute: FrAuteursSlugRoute,
   FrCoursSlugRoute: FrCoursSlugRoute,
+  FrCreateursInfluenceurRoute: FrCreateursInfluenceurRoute,
   FrCreateursSlideshowRoute: FrCreateursSlideshowRoute,
   FrCreateursUgcRoute: FrCreateursUgcRoute,
+  CreatorsInfluencerIndexRoute: CreatorsInfluencerIndexRoute,
   CreatorsSlideshowIndexRoute: CreatorsSlideshowIndexRoute,
   CreatorsUgcIndexRoute: CreatorsUgcIndexRoute,
   EnCreatorsIndexRoute: EnCreatorsIndexRoute,
