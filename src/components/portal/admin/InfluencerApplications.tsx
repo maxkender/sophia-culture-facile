@@ -27,9 +27,9 @@ const STATUS_CLASS: Record<string, string> = {
   rejected: "bg-portal-red/10 text-portal-red",
 };
 const fmt = (n: number | null | undefined) => (n == null ? "—" : n.toLocaleString("en-GB"));
-function largest(a: App) {
+function largest(a: App): [string, number] {
   const list: [string, number][] = [["TikTok", a.tiktok_followers ?? 0], ["Instagram", a.instagram_followers ?? 0], ["YouTube", a.youtube_subscribers ?? 0]];
-  return list.sort((x, y) => y[1] - x[1])[0];
+  return list.sort((x, y) => y[1] - x[1])[0] ?? ["—", 0];
 }
 
 export function InfluencerApplications() {
@@ -104,7 +104,7 @@ export function InfluencerApplications() {
       <Select value={status} onValueChange={setStatus}>
         <SelectTrigger className="h-11 w-44" aria-label="Filter by status"><SelectValue /></SelectTrigger>
         <SelectContent>
-          {["new", "reviewing", "waitlist", "accepted", "rejected", "all"].map((s) => <SelectItem key={s} value={s}>{s[0].toUpperCase() + s.slice(1)}</SelectItem>)}
+          {["new", "reviewing", "waitlist", "accepted", "rejected", "all"].map((s) => <SelectItem key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</SelectItem>)}
         </SelectContent>
       </Select>
       <PortalCard className="overflow-x-auto p-0">
