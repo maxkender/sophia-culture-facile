@@ -1,3 +1,4 @@
+import { AppBadge, byApp, useAdminApp } from "@/lib/apps";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -18,10 +19,12 @@ function err(e: unknown) {
 }
 
 export function InfluencerDealsBoard() {
-  const { data = [] } = useQuery({
+  const { appId } = useAdminApp();
+  const { data: rows = [] } = useQuery({
     queryKey: ["admin", "influencer-deals"],
-    queryFn: async () => (await supabase.from("influencer_deals").select("id, status, agreed_price, deadline, deal_sheet_signed_at, influencers(display_name), influencer_briefs(title)").order("created_at", { ascending: false })).data ?? [],
+    queryFn: async () => (await supabase.from("influencer_deals").select("id, app_id, status, agreed_price, deadline, deal_sheet_signed_at, influencers(display_name), influencer_briefs(title)").order("created_at", { ascending: false })).data ?? [],
   });
+  const data = byApp(rows, appId);
   const colOf = (s: string) => (s === "changes_requested" ? "in_production" : s);
   const cancelled = data.filter((d) => d.status === "cancelled");
   return (
