@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
 import { createMediaKitUploadSlot, submitInfluencerApplication } from "@/lib/influencer-apply.functions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -107,8 +106,8 @@ export function InfluencerApplyPage() {
       if (kit) {
         const slot = await slotFn({ data: { name: kit.name, size: kit.size } });
         if (!slot.ok) { setError(t.errKit); return; }
-        const up = await supabase.storage.from("influencer-files").uploadToSignedUrl(slot.path, slot.signedUrl.split("token=")[1] ?? "", kit);
-        if (up.error) { setError(common.genericError); return; }
+        const up = await fetch(slot.signedUrl, { method: "PUT", body: kit, headers: { "content-type": kit.type || "application/octet-stream", "x-upsert": "false" } });
+        if (!up.ok) { setError(common.genericError); return; }
         media_kit_path = slot.path;
       }
       const res = await submitFn({
