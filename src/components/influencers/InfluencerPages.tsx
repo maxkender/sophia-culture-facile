@@ -15,7 +15,7 @@ import { INFLUENCER_COPY, NICHES, POST_LANGUAGES } from "@/i18n/influencers";
 import { cn } from "@/lib/utils";
 import {
   acceptInfluencerRules, confirmInfluencerMediaKit, influencerMediaKitSlot, openInfluencerMediaKit, saveInfluencerPayout,
-  signInfluencerAgreement, startInfluencerStripe, syncInfluencerStripe, updateInfluencerProfile,
+  markInfluencerMessagesRead, signInfluencerAgreement, startInfluencerStripe, syncInfluencerStripe, updateInfluencerProfile,
 } from "@/lib/influencer-space.functions";
 import { fillAgreement, INFLUENCER_KEY, influencerSteps, useInfluencerDoc, useInfluencerQuery, type Influencer } from "./useInfluencer";
 
@@ -503,11 +503,17 @@ export function InfluencerMessages() {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const key = ["influencer", "messages", me.id];
+  const markRead = useServerFn(markInfluencerMessagesRead);
   const { data = [] } = useQuery({
     queryKey: key,
     refetchInterval: 30_000,
     queryFn: async () => (await supabase.from("influencer_messages").select("*").eq("influencer_id", me.id).order("created_at")).data ?? [],
   });
+  const unreadCount = data.filter((m) => m.from_admin && !m.read_at).length;
+  useEffect(() => {
+    if (unreadCount) markRead({} as never).then(() => qc.invalidateQueries({ queryKey: ["influencer", "unread", me.id] })).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unreadCount]);
   const { data: announcements = [] } = useQuery({
     queryKey: ["influencer", "announcements"],
     queryFn: async () => (await supabase.from("creator_announcements").select("id, title, body, created_at").eq("active", true).eq("track", "influencer").order("created_at", { ascending: false })).data ?? [],

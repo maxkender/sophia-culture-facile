@@ -257,3 +257,12 @@ export const openInfluencerMediaKit = createServerFn({ method: "POST" })
     const { data } = await db.storage.from("influencer-files").createSignedUrl(inf.media_kit_path, 600);
     return { url: data?.signedUrl ?? null };
   });
+
+export const markInfluencerMessagesRead = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const inf = await me(context as Ctx);
+    const db = await admin();
+    await db.from("influencer_messages").update({ read_at: new Date().toISOString() }).eq("influencer_id", inf.id).eq("from_admin", true).is("read_at", null);
+    return { ok: true };
+  });
