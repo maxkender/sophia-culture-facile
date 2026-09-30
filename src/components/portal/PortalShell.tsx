@@ -1,3 +1,4 @@
+import { AdminAppSelector } from "@/lib/apps";
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -282,6 +283,7 @@ export function PortalShell({
           </Link>
         </div>
         {modeTabs}
+        {appSelector}
         <div className="flex-1 overflow-y-auto px-3 py-4">
           <SidebarNav groups={groups} counts={counts} collapsed={collapsed} />
         </div>
@@ -322,6 +324,7 @@ export function PortalShell({
                   <Logo />
                 </div>
                 {modeTabs}
+                {appSelector}
                 <div className="px-3 py-4">
                   <SidebarNav
                     groups={groups}
