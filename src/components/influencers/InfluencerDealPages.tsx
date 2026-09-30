@@ -15,13 +15,13 @@ import {
 import {
   dealUploadSlot, flagBriefInterest, markOfferViewed, markPosted, openDealFile, reportMetrics, respondToOffer, setSparkCode, signDealSheet, submitDraft,
 } from "@/lib/influencer-deals.functions";
-import { friendlyError } from "@/lib/creator-validation";
+import { friendlyCreatorError } from "@/lib/creator-validation";
 import { DealSheetView } from "./DealSheetView";
 import { useInfluencerQuery } from "./useInfluencer";
 
 function msg(e: unknown) {
   const m = e instanceof Error ? e.message : "";
-  if (!m || m.startsWith("[") || m.includes("{")) return friendlyError(e);
+  if (!m || m.startsWith("[") || m.includes("{")) return friendlyCreatorError(e);
   return m;
 }
 function Title({ title, lead }: { title: string; lead?: string }) {

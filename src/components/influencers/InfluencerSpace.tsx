@@ -3,7 +3,7 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { BookOpen, FileSignature, Home, Landmark, LogOut, Menu, MessageSquare, UserCircle, type LucideIcon } from "lucide-react";
+import { BookOpen, Briefcase, FileSignature, Handshake, Home, Inbox, Landmark, LogOut, Menu, MessageSquare, UserCircle, type LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/site/Logo";
 import { Button } from "@/components/ui/button";
@@ -13,14 +13,18 @@ import { NotSetUp } from "@/components/auth/NotSetUp";
 import { cn } from "@/lib/utils";
 import { homeFor, resolveAccountRole } from "@/lib/account-role";
 import { checkInfluencerInvite, claimInfluencerInvite, linkInfluencerByEmail } from "@/lib/influencer-space.functions";
+import { useInfluencerBadges } from "./InfluencerDealPages";
 import { INFLUENCER_KEY, influencerSteps, useInfluencerQuery, useInfluencerUnread } from "./useInfluencer";
 
-type Item = { to: string; label: string; icon: LucideIcon; exact?: boolean; badge?: "messages" };
+type Item = { to: string; label: string; icon: LucideIcon; exact?: boolean; badge?: "messages" | "offers" | "deals" };
 const NAV: { heading: string; items: Item[] }[] = [
   {
     heading: "Espace",
     items: [
       { to: "/creators/influencer/app", label: "Home", icon: Home, exact: true },
+      { to: "/creators/influencer/app/offers", label: "Offers", icon: Inbox, badge: "offers" },
+      { to: "/creators/influencer/app/deals", label: "Deals", icon: Handshake, badge: "deals" },
+      { to: "/creators/influencer/app/briefs", label: "Briefs", icon: Briefcase },
       { to: "/creators/influencer/app/messages", label: "Messages", icon: MessageSquare, badge: "messages" },
       { to: "/creators/influencer/app/profile", label: "Profile", icon: UserCircle },
     ],
@@ -103,6 +107,7 @@ function InfluencerSignIn({ invite, invitedEmail }: { invite: string | null; inv
 }
 
 function Nav({ onNavigate, unread, steps }: { onNavigate?: () => void; unread: number; steps: ReturnType<typeof influencerSteps> }) {
+  const badges = useInfluencerBadges();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const doneFor: Record<string, boolean> = {
     "/creators/influencer/app/rules": steps.rules,
@@ -118,7 +123,7 @@ function Nav({ onNavigate, unread, steps }: { onNavigate?: () => void; unread: n
             {g.items.map((item) => {
               const Icon = item.icon;
               const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
-              const count = item.badge === "messages" ? unread : 0;
+              const count = item.badge === "messages" ? unread : item.badge ? badges[item.badge] : 0;
               const done = doneFor[item.to];
               return (
                 <li key={item.to}>
