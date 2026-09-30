@@ -1,3 +1,4 @@
+import { AppBadge, PlatformBadge, platformRightsNote, useApps } from "@/lib/apps";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -60,6 +61,21 @@ export function useMyDeals() {
 type DealRow = NonNullable<ReturnType<typeof useMyDeals>["data"]>[number];
 
 const live = (o: { status: string; expires_at: string | null }) => ["sent", "viewed"].includes(o.status) && (!o.expires_at || new Date(o.expires_at).getTime() > Date.now());
+
+function AppFilter({ value, onChange, ids }: { value: string; onChange: (v: string) => void; ids: string[] }) {
+  const { data: apps = [] } = useApps();
+  const list = apps.filter((a) => ids.includes(a.id));
+  if (list.length < 2) return null;
+  return (
+    <select aria-label="App" value={value} onChange={(e) => onChange(e.target.value)} className="min-h-11 rounded-xl border border-input bg-card px-3 text-sm">
+      <option value="all">All apps</option>{list.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+    </select>
+  );
+}
+function PlatformRow({ deliverables }: { deliverables: unknown }) {
+  const plats = [...new Set(parseDeliverables(deliverables).map((d) => d.platform))];
+  return <div className="flex flex-wrap gap-2">{plats.map((p) => <PlatformBadge key={p} platform={p} />)}</div>;
+}
 
 /** What the influencer must do next on a deal; null when nothing is waiting on them. */
 export function nextStep(d: DealRow): string | null {
@@ -146,7 +162,8 @@ function OfferCard({ offer }: { offer: NonNullable<ReturnType<typeof useMyOffers
   return (
     <Card className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <div>
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-2"><AppBadge appId={offer.app_id} /><PlatformRow deliverables={offer.deliverables} /></div>
           <p className="text-xl font-extrabold text-brand-navy">{b?.title}</p>
           {b?.angle ? <p className="text-sm text-brand-navySoft">{b.angle}</p> : null}
         </div>
@@ -158,7 +175,7 @@ function OfferCard({ offer }: { offer: NonNullable<ReturnType<typeof useMyOffers
       <dl className="grid gap-3 text-sm sm:grid-cols-2">
         <div><dt className="font-bold text-brand-navy">Deliverables</dt><dd className="text-brand-navySoft">{parseDeliverables(offer.deliverables).map(deliverableLabel).join(", ")}</dd></div>
         <div><dt className="font-bold text-brand-navy">Deadline to post</dt><dd className="text-brand-navySoft">{offer.deadline ?? "To agree"}</dd></div>
-        <div className="sm:col-span-2"><dt className="font-bold text-brand-navy">What Sophia buys</dt><dd className="text-brand-navySoft">{rights?.plain}</dd></div>
+        <div className="sm:col-span-2"><dt className="font-bold text-brand-navy">What Sophia buys</dt><dd className="text-brand-navySoft">{rights?.plain}{rights?.ads ? ` ${[...new Set(parseDeliverables(offer.deliverables).map((x) => platformRightsNote(x.platform)).filter(Boolean))].join(" ")}` : ""}</dd></div>
         {offer.split_payment ? <div className="sm:col-span-2"><dt className="font-bold text-brand-navy">Payment</dt><dd className="text-brand-navySoft">50% when you accept, 50% when the post is live.</dd></div> : null}
         {b?.must_mention?.length ? <div className="sm:col-span-2"><dt className="font-bold text-brand-navy">Must mention</dt><dd className="text-brand-navySoft">{b.must_mention.join(", ")}</dd></div> : null}
         {b?.exclusivity_days ? <div className="sm:col-span-2"><dt className="font-bold text-brand-navy">Exclusivity</dt><dd className="text-brand-navySoft">{b.exclusivity_days} days without promoting a competing learning app.</dd></div> : null}
@@ -204,14 +221,18 @@ export function InfluencerBriefs() {
       return { briefs: briefs ?? [], interested: new Set((mine ?? []).map((m) => m.brief_id)) };
     },
   });
+  const [appF, setAppF] = useState("all");
   if (isLoading || !data) return <p className="text-sm">Loading…</p>;
+  const shown = data.briefs.filter((b) => appF === "all" || b.app_id === appF);
   return (
     <div className="space-y-5">
+      <AppFilter value={appF} onChange={setAppF} ids={data.briefs.map((b) => b.app_id)} />
       <Title title="Briefs" lead={`Open briefs that match your profile${me?.tier ? ` (${me.tier})` : ""}. Tap "I'd do this" to tell us; it is not a commitment, and we send an offer if it fits.`} />
-      {data.briefs.length ? data.briefs.map((b) => (
+      {shown.length ? shown.map((b) => (
         <Card key={b.id} className="space-y-3">
           <div className="flex flex-wrap items-start justify-between gap-2">
-            <div>
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2"><AppBadge appId={b.app_id} /><PlatformRow deliverables={b.deliverables} /></div>
               <p className="text-lg font-extrabold text-brand-navy">{b.title}</p>
               {b.angle ? <p className="text-sm text-brand-navySoft">{b.angle}</p> : null}
             </div>
@@ -232,18 +253,22 @@ export function InfluencerBriefs() {
 
 /* ---------------- Deals list ---------------- */
 export function InfluencerDeals() {
-  const { data: deals, isLoading } = useMyDeals();
+  const { data: all, isLoading } = useMyDeals();
+  const [appF, setAppF] = useState("all");
   if (isLoading) return <p className="text-sm">Loading…</p>;
+  const deals = (all ?? []).filter((d) => appF === "all" || d.app_id === appF);
   return (
     <div className="space-y-4">
       <Title title="Deals" lead="Your accepted collaborations and what to do next on each." />
-      {(deals ?? []).length ? (deals ?? []).map((d) => {
+      <AppFilter value={appF} onChange={setAppF} ids={(all ?? []).map((d) => d.app_id)} />
+      {deals.length ? deals.map((d) => {
         const next = nextStep(d);
         const left = daysLeft(d.deadline);
         return (
           <Link key={d.id} to="/creators/influencer/app/deals/$dealId" params={{ dealId: d.id }} className="block rounded-2xl bg-card p-5 shadow-card hover:ring-2 hover:ring-brand-navy/20">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="font-extrabold text-brand-navy">{(d.deal_sheet_snapshot as { brief_title?: string })?.brief_title}</p>
+              <div className="space-y-2"><div className="flex flex-wrap items-center gap-2"><AppBadge appId={d.app_id} /><PlatformRow deliverables={d.deliverables} /></div>
+              <p className="font-extrabold text-brand-navy">{(d.deal_sheet_snapshot as { brief_title?: string })?.brief_title}</p></div>
               <span className="text-sm font-bold">{euros(d.agreed_price)}</span>
             </div>
             <p className="mt-1 text-xs text-brand-navySoft">{DEAL_LABEL[d.status]}{d.deadline && !["completed", "cancelled"].includes(d.status) ? ` · deadline ${d.deadline}${left != null ? ` (${left < 0 ? `${-left}d late` : `${left}d left`})` : ""}` : ""}</p>
@@ -281,6 +306,7 @@ export function InfluencerDealPage({ dealId }: { dealId: string }) {
   const ads = RIGHTS_LABEL[d.rights_package as Rights]?.ads;
   return (
     <div className="space-y-5">
+      <div className="flex flex-wrap items-center gap-2"><AppBadge appId={d.app_id} className="text-sm" /><PlatformRow deliverables={d.deliverables} /></div>
       <Title title={snap.brief_title ?? "Deal"} lead={`${DEAL_LABEL[d.status]} · ${euros(d.agreed_price)}${d.deadline ? ` · post by ${d.deadline}` : ""}`} />
       {d.status === "cancelled" ? <Card><p className="text-sm">This deal was cancelled{d.cancelled_reason ? `: ${d.cancelled_reason}` : "."}</p></Card> : null}
       {d.status === "completed" ? <Card><p className="text-sm font-semibold text-portal-green">Completed. Thank you!{views7 ? ` ${views7.toLocaleString("en-GB")} views at 7 days (CPM ${euros(cpm(Number(d.agreed_price), views7))}).` : ""}</p></Card> : null}
@@ -444,6 +470,7 @@ export function InfluencerEarnings() {
   const submit = useServerFn(submitInvoice);
   const openInv = useServerFn(openMyInvoice);
   const [busy, setBusy] = useState<string | null>(null);
+  const { data: apps = [] } = useApps();
   const { data, isLoading } = useQuery({
     queryKey: ["influencer", "earnings"],
     queryFn: async () => {
@@ -481,10 +508,13 @@ export function InfluencerEarnings() {
         <Card><p className="text-xs font-bold uppercase text-brand-navySoft">Waiting to be paid</p><p className="mt-1 text-2xl font-extrabold">{euros(due)}</p></Card>
         <Card><p className="text-xs font-bold uppercase text-brand-navySoft">Deals in progress</p><p className="mt-1 text-2xl font-extrabold">{euros(inProgress)}</p></Card>
       </div>
-      <Card>
-        {data.items.length ? (
+      {data.items.length === 0 ? <Card><p className="text-sm text-brand-navySoft">No payment yet. Your first one appears when a deal is completed.</p></Card> : null}
+      {apps.filter((a) => data.items.some((i) => i.app_id === a.id)).map((app) => { const group = data.items.filter((i) => i.app_id === app.id); return (
+      <Card key={app.id}>
+        <div className="mb-2 flex items-center justify-between"><AppBadge appId={app.id} className="text-sm" /><span className="text-sm font-bold">Subtotal {euros(group.reduce((s, i) => s + Number(i.amount), 0))}</span></div>
+        {group.length ? (
           <ul className="divide-y divide-brand-line text-sm">
-            {data.items.map((i) => (
+            {group.map((i) => (
               <li key={i.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
                 <div>
                   <p className="font-semibold text-brand-navy">{title(i.deal_id)}</p>
@@ -506,8 +536,8 @@ export function InfluencerEarnings() {
               </li>
             ))}
           </ul>
-        ) : <p className="text-sm text-brand-navySoft">No payment yet. Your first one appears when a deal is completed.</p>}
-      </Card>
+        ) : null}
+      </Card>); })}
     </div>
   );
 }
