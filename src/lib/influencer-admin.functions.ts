@@ -44,3 +44,36 @@ export const acceptInfluencerApplication = createServerFn({ method: "POST" })
       .eq("id", app.id);
     return { ok: true as const, influencerId: inf.id };
   });
+
+/** Emails (or re-emails) the invite link to the influencer space. Returns the link so the admin can copy it. */
+export const sendInfluencerInvite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ influencerId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as any);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: inf } = await supabaseAdmin.from("influencers").select("id, email, display_name, invite_token, user_id").eq("id", data.influencerId).maybeSingle();
+    if (!inf) throw new Error("Influencer not found");
+    if (inf.user_id) return { url: null, sent: false, reason: "already_linked" };
+    let token = inf.invite_token;
+    if (!token) {
+      token = Array.from(crypto.getRandomValues(new Uint8Array(24)), (b) => b.toString(16).padStart(2, "0")).join("");
+      await supabaseAdmin.from("influencers").update({ invite_token: token }).eq("id", inf.id);
+    }
+    const origin = process.env["SITE_URL"] ?? "https://sophia-culture.com";
+    const url = `${origin}/creators/influencer/app?invite=${token}&email=${encodeURIComponent(inf.email)}`;
+    const { sendAppEmail, buildEmailHtml, buildEmailText } = await import("@/lib/email-send.server");
+    const paragraphs = [
+      `Hello ${inf.display_name},`,
+      "Your application to partner with Sophia has been accepted. You are now on our influencer roster.",
+      "Create your password with the button below. Your space is where you will read the rules, sign the master agreement, set up payouts, and receive our offers.",
+    ];
+    const res = await sendAppEmail({
+      to: inf.email, subject: "Welcome to the Sophia influencer roster",
+      html: buildEmailHtml({ paragraphs, buttonLabel: "Open my influencer space", buttonUrl: url }),
+      text: buildEmailText({ paragraphs, buttonLabel: "Open my influencer space", buttonUrl: url } as any),
+      idempotencyKey: `influencer-invite-${inf.id}-${new Date().toISOString().slice(0, 13)}`, label: "influencer-invite", purpose: "transactional",
+    });
+    if (res.sent) await supabaseAdmin.from("influencers").update({ invite_sent_at: new Date().toISOString() }).eq("id", inf.id);
+    return { url, sent: res.sent, reason: res.reason ?? null };
+  });
