@@ -27,7 +27,7 @@ export const STATUS_CLASS: Record<string, string> = {
   unreachable: "bg-status-unreachable text-brand-navy",
 };
 
-export const TRACKS = ["ugc", "slideshow", "both"] as const;
+export const TRACKS = ["ugc", "slideshow", "influencer", "both"] as const;
 export const SOURCES = ["app_form", "scrape", "manual", "referral"] as const;
 export const CHANNELS = ["email", "dm", "whatsapp", "call", "upwork", "other"] as const;
 export const FUNNEL = ["new", "contacted", "replied", "interested", "applied", "converted"] as const;
@@ -133,7 +133,7 @@ export function enrich(prospects: Prospect[], touches: Touch[], hms: Hm[]): Enri
   });
 }
 
-export type PresetView = "all" | "new" | "today" | "waiting" | "interested" | "applied" | "ugc" | "slideshow";
+export type PresetView = "all" | "new" | "today" | "waiting" | "interested" | "applied" | "ugc" | "slideshow" | "influencer";
 
 export const PRESETS: { id: PresetView; label: string }[] = [
   { id: "all", label: "All" },
@@ -144,6 +144,7 @@ export const PRESETS: { id: PresetView; label: string }[] = [
   { id: "applied", label: "Applied" },
   { id: "ugc", label: "UGC" },
   { id: "slideshow", label: "Slideshow" },
+  { id: "influencer", label: "Influencer" },
 ];
 
 export function matchPreset(p: Enriched, preset: PresetView): boolean {
@@ -167,6 +168,8 @@ export function matchPreset(p: Enriched, preset: PresetView): boolean {
       return p.track === "ugc" || p.track === "both";
     case "slideshow":
       return p.track === "slideshow" || p.track === "both";
+    case "influencer":
+      return p.track === "influencer";
     default:
       return true;
   }

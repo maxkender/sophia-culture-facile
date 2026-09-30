@@ -1784,6 +1784,895 @@ export type Database = {
           },
         ]
       }
+      influencer_applications: {
+        Row: {
+          accepts_recurring: string
+          admin_notes: string | null
+          age: number
+          agency_contact: string | null
+          agency_name: string | null
+          assigned_hm_id: string | null
+          city: string
+          consent_at: string
+          country: string
+          created_at: string
+          created_influencer_id: string | null
+          decided_at: string | null
+          decided_by: string | null
+          email: string
+          full_name: string
+          has_agency: boolean
+          id: string
+          instagram_followers: number | null
+          instagram_url: string | null
+          languages: string[]
+          media_kit_path: string | null
+          media_kit_url: string | null
+          niche_tags: string[]
+          phone: string
+          proud_links: string[]
+          rate_reel: number | null
+          rate_tiktok: number
+          referral_source: string | null
+          rejection_reason: string | null
+          status: string
+          submit_ip_hash: string | null
+          tiktok_avg_views: number | null
+          tiktok_followers: number | null
+          tiktok_url: string | null
+          youtube_subscribers: number | null
+          youtube_url: string | null
+        }
+        Insert: {
+          accepts_recurring?: string
+          admin_notes?: string | null
+          age: number
+          agency_contact?: string | null
+          agency_name?: string | null
+          assigned_hm_id?: string | null
+          city: string
+          consent_at?: string
+          country: string
+          created_at?: string
+          created_influencer_id?: string | null
+          decided_at?: string | null
+          decided_by?: string | null
+          email: string
+          full_name: string
+          has_agency?: boolean
+          id?: string
+          instagram_followers?: number | null
+          instagram_url?: string | null
+          languages?: string[]
+          media_kit_path?: string | null
+          media_kit_url?: string | null
+          niche_tags?: string[]
+          phone: string
+          proud_links?: string[]
+          rate_reel?: number | null
+          rate_tiktok: number
+          referral_source?: string | null
+          rejection_reason?: string | null
+          status?: string
+          submit_ip_hash?: string | null
+          tiktok_avg_views?: number | null
+          tiktok_followers?: number | null
+          tiktok_url?: string | null
+          youtube_subscribers?: number | null
+          youtube_url?: string | null
+        }
+        Update: {
+          accepts_recurring?: string
+          admin_notes?: string | null
+          age?: number
+          agency_contact?: string | null
+          agency_name?: string | null
+          assigned_hm_id?: string | null
+          city?: string
+          consent_at?: string
+          country?: string
+          created_at?: string
+          created_influencer_id?: string | null
+          decided_at?: string | null
+          decided_by?: string | null
+          email?: string
+          full_name?: string
+          has_agency?: boolean
+          id?: string
+          instagram_followers?: number | null
+          instagram_url?: string | null
+          languages?: string[]
+          media_kit_path?: string | null
+          media_kit_url?: string | null
+          niche_tags?: string[]
+          phone?: string
+          proud_links?: string[]
+          rate_reel?: number | null
+          rate_tiktok?: number
+          referral_source?: string | null
+          rejection_reason?: string | null
+          status?: string
+          submit_ip_hash?: string | null
+          tiktok_avg_views?: number | null
+          tiktok_followers?: number | null
+          tiktok_url?: string | null
+          youtube_subscribers?: number | null
+          youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_applications_assigned_hm_id_fkey"
+            columns: ["assigned_hm_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_applications_created_fk"
+            columns: ["created_influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_applications_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_attribution: {
+        Row: {
+          code_redemptions: number | null
+          deal_id: string | null
+          entered_at: string
+          entered_by: string | null
+          id: string
+          influencer_id: string
+          installs: number | null
+          link_clicks: number | null
+          period_end: string
+          period_start: string
+          subscriptions: number | null
+        }
+        Insert: {
+          code_redemptions?: number | null
+          deal_id?: string | null
+          entered_at?: string
+          entered_by?: string | null
+          id?: string
+          influencer_id: string
+          installs?: number | null
+          link_clicks?: number | null
+          period_end: string
+          period_start: string
+          subscriptions?: number | null
+        }
+        Update: {
+          code_redemptions?: number | null
+          deal_id?: string | null
+          entered_at?: string
+          entered_by?: string | null
+          id?: string
+          influencer_id?: string
+          installs?: number | null
+          link_clicks?: number | null
+          period_end?: string
+          period_start?: string
+          subscriptions?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_attribution_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_attribution_entered_by_fkey"
+            columns: ["entered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_attribution_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_brief_interest: {
+        Row: {
+          brief_id: string
+          created_at: string
+          id: string
+          influencer_id: string
+        }
+        Insert: {
+          brief_id: string
+          created_at?: string
+          id?: string
+          influencer_id: string
+        }
+        Update: {
+          brief_id?: string
+          created_at?: string
+          id?: string
+          influencer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_brief_interest_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_brief_interest_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_briefs: {
+        Row: {
+          angle: string | null
+          body: string
+          brief_type: string
+          budget_max: number | null
+          budget_min: number | null
+          created_at: string
+          created_by: string | null
+          deliverables: Json
+          draft_approval_required: boolean
+          earliest_post_date: string | null
+          exclusivity_days: number
+          id: string
+          latest_post_date: string | null
+          must_mention: string[]
+          reference_video_ids: string[]
+          rights_package: string
+          status: string
+          target_languages: string[]
+          target_niches: string[]
+          target_tiers: string[]
+          title: string
+        }
+        Insert: {
+          angle?: string | null
+          body?: string
+          brief_type?: string
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string
+          created_by?: string | null
+          deliverables?: Json
+          draft_approval_required?: boolean
+          earliest_post_date?: string | null
+          exclusivity_days?: number
+          id?: string
+          latest_post_date?: string | null
+          must_mention?: string[]
+          reference_video_ids?: string[]
+          rights_package?: string
+          status?: string
+          target_languages?: string[]
+          target_niches?: string[]
+          target_tiers?: string[]
+          title: string
+        }
+        Update: {
+          angle?: string | null
+          body?: string
+          brief_type?: string
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string
+          created_by?: string | null
+          deliverables?: Json
+          draft_approval_required?: boolean
+          earliest_post_date?: string | null
+          exclusivity_days?: number
+          id?: string
+          latest_post_date?: string | null
+          must_mention?: string[]
+          reference_video_ids?: string[]
+          rights_package?: string
+          status?: string
+          target_languages?: string[]
+          target_niches?: string[]
+          target_tiers?: string[]
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_briefs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_deals: {
+        Row: {
+          agreed_price: number
+          brief_id: string
+          cancelled_reason: string | null
+          completed_at: string | null
+          created_at: string
+          deadline: string | null
+          deal_sheet_signed_at: string | null
+          deal_sheet_signed_name: string | null
+          deal_sheet_snapshot: Json | null
+          deliverables: Json
+          id: string
+          influencer_id: string
+          offer_id: string
+          rights_package: string
+          spark_ads_code: string | null
+          split_payment: boolean
+          status: string
+        }
+        Insert: {
+          agreed_price: number
+          brief_id: string
+          cancelled_reason?: string | null
+          completed_at?: string | null
+          created_at?: string
+          deadline?: string | null
+          deal_sheet_signed_at?: string | null
+          deal_sheet_signed_name?: string | null
+          deal_sheet_snapshot?: Json | null
+          deliverables?: Json
+          id?: string
+          influencer_id: string
+          offer_id: string
+          rights_package: string
+          spark_ads_code?: string | null
+          split_payment?: boolean
+          status?: string
+        }
+        Update: {
+          agreed_price?: number
+          brief_id?: string
+          cancelled_reason?: string | null
+          completed_at?: string | null
+          created_at?: string
+          deadline?: string | null
+          deal_sheet_signed_at?: string | null
+          deal_sheet_signed_name?: string | null
+          deal_sheet_snapshot?: Json | null
+          deliverables?: Json
+          id?: string
+          influencer_id?: string
+          offer_id?: string
+          rights_package?: string
+          spark_ads_code?: string | null
+          split_payment?: boolean
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_deals_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_deals_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_deals_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_deliverable_metrics: {
+        Row: {
+          checkpoint: string
+          comments: number | null
+          deliverable_id: string
+          id: string
+          likes: number | null
+          reported_at: string
+          reported_by: string
+          saves: number | null
+          screenshot_path: string | null
+          shares: number | null
+          views: number | null
+        }
+        Insert: {
+          checkpoint: string
+          comments?: number | null
+          deliverable_id: string
+          id?: string
+          likes?: number | null
+          reported_at?: string
+          reported_by: string
+          saves?: number | null
+          screenshot_path?: string | null
+          shares?: number | null
+          views?: number | null
+        }
+        Update: {
+          checkpoint?: string
+          comments?: number | null
+          deliverable_id?: string
+          id?: string
+          likes?: number | null
+          reported_at?: string
+          reported_by?: string
+          saves?: number | null
+          screenshot_path?: string | null
+          shares?: number | null
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_deliverable_metrics_deliverable_id_fkey"
+            columns: ["deliverable_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_deliverables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_deliverables: {
+        Row: {
+          deal_id: string
+          draft_approved_at: string | null
+          draft_feedback: string | null
+          draft_file_path: string | null
+          draft_submitted_at: string | null
+          draft_url: string | null
+          format: string
+          id: string
+          platform: string
+          post_url: string | null
+          posted_at: string | null
+          status: string
+          verified_at: string | null
+        }
+        Insert: {
+          deal_id: string
+          draft_approved_at?: string | null
+          draft_feedback?: string | null
+          draft_file_path?: string | null
+          draft_submitted_at?: string | null
+          draft_url?: string | null
+          format: string
+          id?: string
+          platform: string
+          post_url?: string | null
+          posted_at?: string | null
+          status?: string
+          verified_at?: string | null
+        }
+        Update: {
+          deal_id?: string
+          draft_approved_at?: string | null
+          draft_feedback?: string | null
+          draft_file_path?: string | null
+          draft_submitted_at?: string | null
+          draft_url?: string | null
+          format?: string
+          id?: string
+          platform?: string
+          post_url?: string | null
+          posted_at?: string | null
+          status?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_deliverables_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_invoices: {
+        Row: {
+          amount: number
+          created_at: string
+          deal_id: string | null
+          file_path: string
+          id: string
+          influencer_id: string
+          paid_on: string | null
+          paid_reference: string | null
+          payee: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          deal_id?: string | null
+          file_path: string
+          id?: string
+          influencer_id: string
+          paid_on?: string | null
+          paid_reference?: string | null
+          payee?: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          deal_id?: string | null
+          file_path?: string
+          id?: string
+          influencer_id?: string
+          paid_on?: string | null
+          paid_reference?: string | null
+          payee?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_invoices_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_invoices_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_offers: {
+        Row: {
+          brief_id: string
+          counter_message: string | null
+          counter_price: number | null
+          counter_round: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          deadline: string | null
+          decline_reason: string | null
+          deliverables: Json
+          expires_at: string | null
+          id: string
+          influencer_id: string
+          message: string | null
+          price: number
+          price_breakdown: Json
+          responded_at: string | null
+          rights_package: string
+          split_payment: boolean
+          status: string
+          viewed_at: string | null
+        }
+        Insert: {
+          brief_id: string
+          counter_message?: string | null
+          counter_price?: number | null
+          counter_round?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          deadline?: string | null
+          decline_reason?: string | null
+          deliverables?: Json
+          expires_at?: string | null
+          id?: string
+          influencer_id: string
+          message?: string | null
+          price: number
+          price_breakdown?: Json
+          responded_at?: string | null
+          rights_package: string
+          split_payment?: boolean
+          status?: string
+          viewed_at?: string | null
+        }
+        Update: {
+          brief_id?: string
+          counter_message?: string | null
+          counter_price?: number | null
+          counter_round?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          deadline?: string | null
+          decline_reason?: string | null
+          deliverables?: Json
+          expires_at?: string | null
+          id?: string
+          influencer_id?: string
+          message?: string | null
+          price?: number
+          price_breakdown?: Json
+          responded_at?: string | null
+          rights_package?: string
+          split_payment?: boolean
+          status?: string
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_offers_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_offers_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_offers_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_settings: {
+        Row: {
+          disclosure: Json
+          id: number
+          niches: string[]
+          offer_expiry_days: number
+          rights_fee_pct: Json
+          split_threshold: number
+          tier_bounds: Json
+          updated_at: string
+        }
+        Insert: {
+          disclosure?: Json
+          id?: number
+          niches?: string[]
+          offer_expiry_days?: number
+          rights_fee_pct?: Json
+          split_threshold?: number
+          tier_bounds?: Json
+          updated_at?: string
+        }
+        Update: {
+          disclosure?: Json
+          id?: number
+          niches?: string[]
+          offer_expiry_days?: number
+          rights_fee_pct?: Json
+          split_threshold?: number
+          tier_bounds?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      influencer_signatures: {
+        Row: {
+          deal_id: string | null
+          document_version: string
+          id: string
+          influencer_id: string
+          kind: string
+          signature_ip: string | null
+          signed_at: string
+          signed_name: string
+          snapshot: Json | null
+          user_agent: string | null
+        }
+        Insert: {
+          deal_id?: string | null
+          document_version: string
+          id?: string
+          influencer_id: string
+          kind: string
+          signature_ip?: string | null
+          signed_at?: string
+          signed_name: string
+          snapshot?: Json | null
+          user_agent?: string | null
+        }
+        Update: {
+          deal_id?: string | null
+          document_version?: string
+          id?: string
+          influencer_id?: string
+          kind?: string
+          signature_ip?: string | null
+          signed_at?: string
+          signed_name?: string
+          snapshot?: Json | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_signatures_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_signatures_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencers: {
+        Row: {
+          accepts_recurring: string | null
+          admin_notes: string | null
+          agency_contact: string | null
+          agency_name: string | null
+          agreement_signed_at: string | null
+          application_id: string | null
+          assigned_hm_id: string | null
+          availability: string
+          booked_until: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          display_name: string
+          email: string
+          id: string
+          instagram_followers: number | null
+          instagram_url: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          languages: string[]
+          legal_name: string | null
+          media_kit_path: string | null
+          media_kit_url: string | null
+          niche_tags: string[]
+          payout_setup_at: string | null
+          phone: string | null
+          promo_code: string | null
+          rate_reel: number | null
+          rate_tiktok: number | null
+          rate_youtube: number | null
+          rules_accepted_at: string | null
+          status: string
+          tier: string
+          tier_override: boolean
+          tiktok_avg_views: number | null
+          tiktok_followers: number | null
+          tiktok_url: string | null
+          tracked_link: string | null
+          user_id: string | null
+          youtube_subscribers: number | null
+          youtube_url: string | null
+        }
+        Insert: {
+          accepts_recurring?: string | null
+          admin_notes?: string | null
+          agency_contact?: string | null
+          agency_name?: string | null
+          agreement_signed_at?: string | null
+          application_id?: string | null
+          assigned_hm_id?: string | null
+          availability?: string
+          booked_until?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          display_name: string
+          email: string
+          id?: string
+          instagram_followers?: number | null
+          instagram_url?: string | null
+          invite_sent_at?: string | null
+          invite_token?: string | null
+          languages?: string[]
+          legal_name?: string | null
+          media_kit_path?: string | null
+          media_kit_url?: string | null
+          niche_tags?: string[]
+          payout_setup_at?: string | null
+          phone?: string | null
+          promo_code?: string | null
+          rate_reel?: number | null
+          rate_tiktok?: number | null
+          rate_youtube?: number | null
+          rules_accepted_at?: string | null
+          status?: string
+          tier?: string
+          tier_override?: boolean
+          tiktok_avg_views?: number | null
+          tiktok_followers?: number | null
+          tiktok_url?: string | null
+          tracked_link?: string | null
+          user_id?: string | null
+          youtube_subscribers?: number | null
+          youtube_url?: string | null
+        }
+        Update: {
+          accepts_recurring?: string | null
+          admin_notes?: string | null
+          agency_contact?: string | null
+          agency_name?: string | null
+          agreement_signed_at?: string | null
+          application_id?: string | null
+          assigned_hm_id?: string | null
+          availability?: string
+          booked_until?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string
+          email?: string
+          id?: string
+          instagram_followers?: number | null
+          instagram_url?: string | null
+          invite_sent_at?: string | null
+          invite_token?: string | null
+          languages?: string[]
+          legal_name?: string | null
+          media_kit_path?: string | null
+          media_kit_url?: string | null
+          niche_tags?: string[]
+          payout_setup_at?: string | null
+          phone?: string | null
+          promo_code?: string | null
+          rate_reel?: number | null
+          rate_tiktok?: number | null
+          rate_youtube?: number | null
+          rules_accepted_at?: string | null
+          status?: string
+          tier?: string
+          tier_override?: boolean
+          tiktok_avg_views?: number | null
+          tiktok_followers?: number | null
+          tiktok_url?: string | null
+          tracked_link?: string | null
+          user_id?: string | null
+          youtube_subscribers?: number | null
+          youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencers_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencers_assigned_hm_id_fkey"
+            columns: ["assigned_hm_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           body: string

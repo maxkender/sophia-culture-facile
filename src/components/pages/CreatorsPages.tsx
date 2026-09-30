@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Camera, Check, Layers } from "lucide-react";
+import { Camera, Check, Layers, Megaphone } from "lucide-react";
+import { INFLUENCER_COPY } from "@/i18n/influencers";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Hero({ title, subtitle, cta, to, note }: { title: string; subtitle: string; cta: string; to: "/fr/candidature-ugc" | "/en/ugc-application" | "/fr/candidature-slideshow" | "/en/slideshow-application"; note?: string }) {
+function Hero({ title, subtitle, cta, to, note }: { title: string; subtitle: string; cta: string; to: "/fr/candidature-ugc" | "/en/ugc-application" | "/fr/candidature-slideshow" | "/en/slideshow-application" | "/fr/candidature-influenceur" | "/en/influencer-application"; note?: string }) {
   return (
     <section className="relative isolate overflow-hidden bg-brand-navy">
       <span aria-hidden="true" className="grid-texture absolute inset-0 -z-10" />
@@ -63,17 +64,19 @@ export function CreatorsChooserPage() {
   const c = CREATORS[lang].chooser;
   const ugcPath = useLocalePath("creatorsUgc");
   const slidePath = useLocalePath("creatorsSlideshow");
+  const inflPath = useLocalePath("creatorsInfluencer");
   const cards = [
     { ...c.ugc, icon: Camera, to: ugcPath, track: "ugc" },
     { ...c.slideshow, icon: Layers, to: slidePath, track: "slideshow" },
+    { ...INFLUENCER_COPY[lang].card, icon: Megaphone, to: inflPath, track: "influencer" },
   ];
   useEffect(() => trackFunnel("creators_page_view", { lang }), [lang]);
   return (
     <Shell>
-      <section className="mx-auto w-full max-w-5xl px-5 py-14 md:py-20">
+      <section className="mx-auto w-full max-w-6xl px-5 py-14 md:py-20">
         <h1 className="text-4xl font-extrabold tracking-tight text-brand-navy md:text-5xl">{c.title}</h1>
         <p className="mt-4 text-lg text-brand-navySoft">{c.lead}</p>
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
+        <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {cards.map((card) => {
             const Icon = card.icon;
             return (
@@ -156,6 +159,41 @@ export function SlideshowLandingPage() {
       </Section>
       <Section title={s.forTitle}>
         <p>{s.forText}</p>
+      </Section>
+      <Section title={s.reqTitle}>
+        <CheckList items={s.requirements} />
+      </Section>
+      <section className="mx-auto w-full max-w-3xl px-5 pb-20 pt-2">
+        <Button asChild variant="pill" size="pill">
+          <Link to={applyPath}>{s.cta}</Link>
+        </Button>
+      </section>
+    </Shell>
+  );
+}
+
+export function InfluencerLandingPage() {
+  const { lang } = useI18n();
+  const s = INFLUENCER_COPY[lang];
+  const applyPath = useLocalePath("creatorsInfluencerApply");
+  return (
+    <Shell>
+      <Hero title={s.heroTitle} subtitle={s.heroSubtitle} cta={s.cta} to={applyPath} />
+      <Section title={s.howTitle}>
+        <ol className="space-y-3">
+          {s.steps.map((step, i) => (
+            <li key={step} className="flex gap-4">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-navy text-sm font-bold text-brand-onNavy">{i + 1}</span>
+              <span className="pt-1">{step}</span>
+            </li>
+          ))}
+        </ol>
+      </Section>
+      <Section title={s.buyTitle}>
+        <CheckList items={s.buy} />
+      </Section>
+      <Section title={s.whoTitle}>
+        <p>{s.who}</p>
       </Section>
       <Section title={s.reqTitle}>
         <CheckList items={s.requirements} />

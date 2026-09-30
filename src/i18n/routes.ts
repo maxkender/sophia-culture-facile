@@ -14,6 +14,8 @@ export const ROUTES = {
   creatorsSlideshow: { fr: "/fr/createurs/slideshow", en: "/en/creators/slideshow" },
   creatorsUgcApply: { fr: "/fr/candidature-ugc", en: "/en/ugc-application" },
   creatorsSlideshowApply: { fr: "/fr/candidature-slideshow", en: "/en/slideshow-application" },
+  creatorsInfluencer: { fr: "/fr/createurs/influenceur", en: "/en/creators/influencer" },
+  creatorsInfluencerApply: { fr: "/fr/candidature-influenceur", en: "/en/influencer-application" },
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;

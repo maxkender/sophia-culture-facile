@@ -60,21 +60,23 @@ export default {
         },
       });
     }
-    const frEnglishPath = url.pathname.replace(/\/$/, "").match(/^\/fr\/creators(\/ugc|\/slideshow)?$/);
+    const frEnglishPath = url.pathname.replace(/\/$/, "").match(/^\/fr\/creators(\/ugc|\/slideshow|\/influencer)?$/);
     if (request.method === "GET" && frEnglishPath) {
+      const seg = frEnglishPath[1] === "/influencer" ? "/influenceur" : frEnglishPath[1] ?? "";
       return new Response(null, {
         status: 301,
-        headers: { location: `/fr/createurs${frEnglishPath[1] ?? ""}${url.search}` },
+        headers: { location: `/fr/createurs${seg}${url.search}` },
       });
     }
-    const creatorShort = url.pathname.replace(/\/$/, "").match(/^\/creators(\/ugc|\/slideshow)?$/);
+    const creatorShort = url.pathname.replace(/\/$/, "").match(/^\/creators(\/ugc|\/slideshow|\/influencer)?$/);
     if (request.method === "GET" && creatorShort) {
       const lang = detectLangFromHeaders(request.headers);
       const base = lang === "fr" ? "/fr/createurs" : "/en/creators";
+      const seg = lang === "fr" && creatorShort[1] === "/influencer" ? "/influenceur" : creatorShort[1] ?? "";
       return new Response(null, {
         status: 302,
         headers: {
-          location: `${base}${creatorShort[1] ?? ""}${url.search}`,
+          location: `${base}${seg}${url.search}`,
           vary: "Accept-Language, Cookie",
           "cache-control": "no-store",
         },

@@ -34,6 +34,7 @@ const STATIC_PAGES: { key: RouteKey; changefreq: string; priority: string }[] = 
   { key: "creators", changefreq: "monthly", priority: "0.6" },
   { key: "creatorsUgc", changefreq: "monthly", priority: "0.6" },
   { key: "creatorsSlideshow", changefreq: "monthly", priority: "0.6" },
+  { key: "creatorsInfluencer", changefreq: "monthly", priority: "0.6" },
   { key: "legal", changefreq: "yearly", priority: "0.3" },
   { key: "privacy", changefreq: "yearly", priority: "0.3" },
 ];

@@ -51,9 +51,9 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
     chooser: {
       metaTitle: "Create for Sophia: UGC and slideshow creators",
       metaDescription:
-        "Two ways to create content for Sophia, the general-knowledge app: film yourself as a UGC creator, or publish ready-made slideshows without appearing on camera.",
+        "Three ways to create content for Sophia, the general-knowledge app: film yourself as a UGC creator, publish ready-made slideshows, or partner as an influencer on your own account.",
       title: "Create for Sophia",
-      lead: "Two ways to work with us. Pick the one that fits you.",
+      lead: "Three ways to work with us. Pick the one that fits you.",
       ugc: {
         title: "UGC creator",
         lines: [
@@ -145,9 +145,9 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
     chooser: {
       metaTitle: "Créer pour Sophia : créateurs UGC et slideshows",
       metaDescription:
-        "Deux façons de créer du contenu pour Sophia, l'appli de culture générale : vous filmer en tant que créateur UGC, ou publier des slideshows prêts à l'emploi sans apparaître à l'écran.",
+        "Trois façons de créer du contenu pour Sophia, l'appli de culture générale : vous filmer en tant que créateur UGC, publier des slideshows prêts à l'emploi, ou devenir partenaire influenceur sur votre propre compte.",
       title: "Créer pour Sophia",
-      lead: "Deux façons de travailler avec nous. Choisissez celle qui vous correspond.",
+      lead: "Trois façons de travailler avec nous. Choisissez celle qui vous correspond.",
       ugc: {
         title: "Créateur UGC",
         lines: [
