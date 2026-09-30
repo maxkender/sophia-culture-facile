@@ -1,3 +1,4 @@
+import { AppBadge, useApps, type AppRow } from "@/lib/apps";
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -107,17 +108,11 @@ export function ContractPage() {
   );
 }
 
-export function AccountSetupPage() {
-  const { me, steps, reload } = useCreator();
+function ManagedAccountCard({ app, account }: { app: AppRow; account: { handle: string; account_email: string; phone: string | null; device: string | null; registered_at: string } | null }) {
+  const { reload } = useCreator();
   const qc = useQueryClient();
-  const toggle = useServerFn(toggleSetupGuideCheck);
   const register = useServerFn(registerSocialAccount);
-  const getAccount = useServerFn(getMySocialAccount);
   const reveal = useServerFn(revealMyPassword);
-  const tick = useServerFn(tickWarmupDay);
-  const { data: account } = useQuery({ queryKey: ["creator-social-account"], queryFn: () => getAccount() });
-  const checks = (me.setup_guide_checks ?? {}) as Record<string, string>;
-  const warm = (me.warmup ?? {}) as Record<string, string>;
   const [form, setForm] = useState({ handle: "", email: "", password: "", phone: "", device: "" });
   const [editing, setEditing] = useState(false);
   const [shown, setShown] = useState<string | null>(null);
@@ -125,7 +120,6 @@ export function AccountSetupPage() {
   useEffect(() => {
     if (account) setForm({ handle: account.handle, email: account.account_email, password: "", phone: account.phone ?? "", device: account.device ?? "" });
   }, [account]);
-
   async function save() {
     if (!form.handle.trim()) return void toast.error("Choose a TikTok username.");
     if (!isValidEmail(form.email)) return void toast.error("Enter a complete email address, for example name@example.com.");
@@ -133,19 +127,67 @@ export function AccountSetupPage() {
     if (!account && !form.password) return void toast.error("Enter the TikTok account password.");
     setBusy(true);
     try {
-      await register({ data: { handle: form.handle, email: form.email, password: form.password || undefined, phone: form.phone || null, device: form.device || null } });
-      toast.success("Account registered as Sophia's.");
+      await register({ data: { appId: app.id, handle: form.handle, email: form.email, password: form.password || undefined, phone: form.phone || null, device: form.device || null } });
+      toast.success(`${app.name} account registered.`);
       setEditing(false); setShown(null);
       await qc.invalidateQueries({ queryKey: ["creator-social-account"] });
       await reload();
     } catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
     setBusy(false);
   }
-
   const showForm = !account || editing;
   return (
     <div>
-      <PageTitle title="Account setup" lead="Create the Sophia TikTok account, register it, then complete the 24-hour warm-up before your first post." />
+      <div className="mb-2"><AppBadge appId={app.id} className="text-sm" /></div>
+      <PortalCard>
+        {showForm ? (
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div><Label>TikTok username *</Label><Input placeholder="@cultureminute" autoComplete="off" value={form.handle} onChange={(e) => setForm({ ...form, handle: e.target.value })} /><p className="mt-1 text-xs text-brand-navySoft">Choose any available name suitable for a general-knowledge account. There is no required format.</p></div>
+            <div><Label>Email used for the account *</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+            <div><Label>Password *{account ? " (leave empty to keep)" : ""}</Label><Input type="password" autoComplete="new-password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></div>
+            <div><Label>Phone number linked (if any)</Label><Input type="tel" placeholder="+44 7700 900123" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /><p className="mt-1 text-xs text-brand-navySoft">If entered, include the country code.</p></div>
+            <div className="sm:col-span-2"><Label>Device used</Label><Input placeholder="e.g. iPhone 12, second phone" value={form.device} onChange={(e) => setForm({ ...form, device: e.target.value })} /></div>
+            <p className="text-xs text-brand-navySoft sm:col-span-2">The password is stored encrypted. Only the team and you can reveal it. From the moment you save, the account is registered as Vik Studios'.</p>
+            <div className="flex gap-2 sm:col-span-2">
+              <Button disabled={busy || !form.handle.trim() || !form.email.trim() || (!account && !form.password)} onClick={() => void save()}>Save</Button>
+              {account && <Button variant="outline" onClick={() => setEditing(false)}>Cancel</Button>}
+            </div>
+          </div>
+        ) : (
+          <dl className="grid gap-3 text-sm sm:grid-cols-2">
+            <div><dt className="text-brand-navySoft">Handle</dt><dd className="font-bold text-brand-navy">{account!.handle}</dd></div>
+            <div><dt className="text-brand-navySoft">Email</dt><dd className="font-bold text-brand-navy">{account!.account_email}</dd></div>
+            <div><dt className="text-brand-navySoft">Password</dt><dd className="flex items-center gap-2 font-mono font-bold text-brand-navy">
+              {shown ?? "••••••••••"}
+               <Button size="sm" variant="ghost" onClick={async () => { if (shown) return setShown(null); try { setShown((await reveal({ data: { appId: app.id } })).password); } catch (e: unknown) { toast.error(friendlyCreatorError(e)); } }}>
+                {shown ? <EyeOff className="size-4" /> : <Eye className="size-4" />} {shown ? "Hide" : "Reveal"}
+              </Button>
+            </dd></div>
+            <div><dt className="text-brand-navySoft">Phone</dt><dd className="font-bold text-brand-navy">{account!.phone || "—"}</dd></div>
+            <div><dt className="text-brand-navySoft">Device</dt><dd className="font-bold text-brand-navy">{account!.device || "—"}</dd></div>
+            <div><dt className="text-brand-navySoft">Registered</dt><dd className="font-bold text-brand-navy">{fmt(account!.registered_at)}</dd></div>
+            <div className="sm:col-span-2"><Button size="sm" variant="outline" onClick={() => setEditing(true)}>Edit</Button></div>
+          </dl>
+        )}
+      </PortalCard>
+
+    </div>
+  );
+}
+
+export function AccountSetupPage() {
+  const { me, steps, reload, enrolledApps } = useCreator();
+  const toggle = useServerFn(toggleSetupGuideCheck);
+  const tick = useServerFn(tickWarmupDay);
+  const getAccount = useServerFn(getMySocialAccount);
+  const { data: accounts = [] } = useQuery({ queryKey: ["creator-social-account"], queryFn: () => getAccount() });
+  const { data: apps = [] } = useApps();
+  const mine = apps.filter((a) => enrolledApps.includes(a.id));
+  const checks = (me.setup_guide_checks ?? {}) as Record<string, string>;
+  const warm = (me.warmup ?? {}) as Record<string, string>;
+  return (
+    <div>
+      <PageTitle title="Account setup" lead="Create the TikTok account, register it, then complete the 24-hour warm-up before your first post." />
       {steps.account && <div className="mb-6"><Banner tone="success" title="Step 3 is done: the account is registered and warmed up." /></div>}
 
       <h2 className="mb-3 text-xl font-extrabold text-brand-navy">A. The guide</h2>
@@ -161,37 +203,10 @@ export function AccountSetupPage() {
       </PortalCard>
 
       <h2 className="mb-3 mt-10 text-xl font-extrabold text-brand-navy">B. Register the account</h2>
-      <PortalCard>
-        {showForm ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div><Label>TikTok username *</Label><Input placeholder="@cultureminute" autoComplete="off" value={form.handle} onChange={(e) => setForm({ ...form, handle: e.target.value })} /><p className="mt-1 text-xs text-brand-navySoft">Choose any available name suitable for a general-knowledge account. There is no required format.</p></div>
-            <div><Label>Email used for the account *</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-            <div><Label>Password *{account ? " (leave empty to keep)" : ""}</Label><Input type="password" autoComplete="new-password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></div>
-            <div><Label>Phone number linked (if any)</Label><Input type="tel" placeholder="+44 7700 900123" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /><p className="mt-1 text-xs text-brand-navySoft">If entered, include the country code.</p></div>
-            <div className="sm:col-span-2"><Label>Device used</Label><Input placeholder="e.g. iPhone 12, second phone" value={form.device} onChange={(e) => setForm({ ...form, device: e.target.value })} /></div>
-            <p className="text-xs text-brand-navySoft sm:col-span-2">The password is stored encrypted. Only the Sophia team and you can reveal it. From the moment you save, the account is registered as Sophia's.</p>
-            <div className="flex gap-2 sm:col-span-2">
-              <Button disabled={busy || !form.handle.trim() || !form.email.trim() || (!account && !form.password)} onClick={() => void save()}>Save</Button>
-              {account && <Button variant="outline" onClick={() => setEditing(false)}>Cancel</Button>}
-            </div>
-          </div>
-        ) : (
-          <dl className="grid gap-3 text-sm sm:grid-cols-2">
-            <div><dt className="text-brand-navySoft">Handle</dt><dd className="font-bold text-brand-navy">{account!.handle}</dd></div>
-            <div><dt className="text-brand-navySoft">Email</dt><dd className="font-bold text-brand-navy">{account!.account_email}</dd></div>
-            <div><dt className="text-brand-navySoft">Password</dt><dd className="flex items-center gap-2 font-mono font-bold text-brand-navy">
-              {shown ?? "••••••••••"}
-               <Button size="sm" variant="ghost" onClick={async () => { if (shown) return setShown(null); try { setShown((await reveal()).password); } catch (e: unknown) { toast.error(friendlyCreatorError(e)); } }}>
-                {shown ? <EyeOff className="size-4" /> : <Eye className="size-4" />} {shown ? "Hide" : "Reveal"}
-              </Button>
-            </dd></div>
-            <div><dt className="text-brand-navySoft">Phone</dt><dd className="font-bold text-brand-navy">{account!.phone || "—"}</dd></div>
-            <div><dt className="text-brand-navySoft">Device</dt><dd className="font-bold text-brand-navy">{account!.device || "—"}</dd></div>
-            <div><dt className="text-brand-navySoft">Registered</dt><dd className="font-bold text-brand-navy">{fmt(account!.registered_at)}</dd></div>
-            <div className="sm:col-span-2"><Button size="sm" variant="outline" onClick={() => setEditing(true)}>Edit</Button></div>
-          </dl>
-        )}
-      </PortalCard>
+      <p className="mb-3 text-sm font-semibold text-brand-navy">You may be asked to run one account per app. Each is registered separately below.</p>
+      <div className="space-y-4">
+        {mine.map((app) => <ManagedAccountCard key={app.id} app={app} account={accounts.find((x) => x.app_id === app.id) ?? null} />)}
+      </div>
 
       <h2 className="mb-3 mt-10 text-xl font-extrabold text-brand-navy">C. The warm-up</h2>
       {!me.social_account_created_at && <p className="mb-3 text-sm text-brand-navySoft">Register the account above to start the warm-up.</p>}
