@@ -2115,6 +2115,7 @@ export type Database = {
           deal_sheet_signed_name: string | null
           deal_sheet_snapshot: Json | null
           deliverables: Json
+          extended_count: number
           id: string
           influencer_id: string
           offer_id: string
@@ -2134,6 +2135,7 @@ export type Database = {
           deal_sheet_signed_name?: string | null
           deal_sheet_snapshot?: Json | null
           deliverables?: Json
+          extended_count?: number
           id?: string
           influencer_id: string
           offer_id: string
@@ -2153,6 +2155,7 @@ export type Database = {
           deal_sheet_signed_name?: string | null
           deal_sheet_snapshot?: Json | null
           deliverables?: Json
+          extended_count?: number
           id?: string
           influencer_id?: string
           offer_id?: string
@@ -3357,7 +3360,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      influencer_can_see_brief: {
+        Args: { _brief_id: string }
+        Returns: boolean
+      }
       lookup_country_zone: { Args: { _country: string }; Returns: string }
+      my_influencer_id: { Args: never; Returns: string }
       notify_author: {
         Args: {
           _body: string
