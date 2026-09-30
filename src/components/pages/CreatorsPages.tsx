@@ -171,3 +171,38 @@ export function SlideshowLandingPage() {
     </Shell>
   );
 }
+
+export function InfluencerLandingPage() {
+  const { lang } = useI18n();
+  const s = INFLUENCER_COPY[lang];
+  const applyPath = useLocalePath("creatorsInfluencerApply");
+  return (
+    <Shell>
+      <Hero title={s.heroTitle} subtitle={s.heroSubtitle} cta={s.cta} to={applyPath} />
+      <Section title={s.howTitle}>
+        <ol className="space-y-3">
+          {s.steps.map((step, i) => (
+            <li key={step} className="flex gap-4">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-navy text-sm font-bold text-brand-onNavy">{i + 1}</span>
+              <span className="pt-1">{step}</span>
+            </li>
+          ))}
+        </ol>
+      </Section>
+      <Section title={s.buyTitle}>
+        <CheckList items={s.buy} />
+      </Section>
+      <Section title={s.whoTitle}>
+        <p>{s.who}</p>
+      </Section>
+      <Section title={s.reqTitle}>
+        <CheckList items={s.requirements} />
+      </Section>
+      <section className="mx-auto w-full max-w-3xl px-5 pb-20 pt-2">
+        <Button asChild variant="pill" size="pill">
+          <Link to={applyPath}>{s.cta}</Link>
+        </Button>
+      </section>
+    </Shell>
+  );
+}
