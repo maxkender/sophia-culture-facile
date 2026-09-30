@@ -2345,6 +2345,41 @@ export type Database = {
           },
         ]
       }
+      influencer_messages: {
+        Row: {
+          body: string
+          created_at: string
+          from_admin: boolean
+          id: string
+          influencer_id: string
+          read_at: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          from_admin?: boolean
+          id?: string
+          influencer_id: string
+          read_at?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          from_admin?: boolean
+          id?: string
+          influencer_id?: string
+          read_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_messages_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       influencer_offers: {
         Row: {
           brief_id: string
@@ -2552,14 +2587,20 @@ export type Database = {
           media_kit_path: string | null
           media_kit_url: string | null
           niche_tags: string[]
+          payee: string
+          payout_details: Json
+          payout_method: string | null
           payout_setup_at: string | null
           phone: string | null
+          photo_path: string | null
           promo_code: string | null
           rate_reel: number | null
           rate_tiktok: number | null
           rate_youtube: number | null
           rules_accepted_at: string | null
           status: string
+          stripe_account_id: string | null
+          stripe_onboarded: boolean
           tier: string
           tier_override: boolean
           tiktok_avg_views: number | null
@@ -2595,14 +2636,20 @@ export type Database = {
           media_kit_path?: string | null
           media_kit_url?: string | null
           niche_tags?: string[]
+          payee?: string
+          payout_details?: Json
+          payout_method?: string | null
           payout_setup_at?: string | null
           phone?: string | null
+          photo_path?: string | null
           promo_code?: string | null
           rate_reel?: number | null
           rate_tiktok?: number | null
           rate_youtube?: number | null
           rules_accepted_at?: string | null
           status?: string
+          stripe_account_id?: string | null
+          stripe_onboarded?: boolean
           tier?: string
           tier_override?: boolean
           tiktok_avg_views?: number | null
@@ -2638,14 +2685,20 @@ export type Database = {
           media_kit_path?: string | null
           media_kit_url?: string | null
           niche_tags?: string[]
+          payee?: string
+          payout_details?: Json
+          payout_method?: string | null
           payout_setup_at?: string | null
           phone?: string | null
+          photo_path?: string | null
           promo_code?: string | null
           rate_reel?: number | null
           rate_tiktok?: number | null
           rate_youtube?: number | null
           rules_accepted_at?: string | null
           status?: string
+          stripe_account_id?: string | null
+          stripe_onboarded?: boolean
           tier?: string
           tier_override?: boolean
           tiktok_avg_views?: number | null

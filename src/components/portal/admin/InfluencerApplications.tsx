@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime } from "@/lib/portal";
-import { acceptInfluencerApplication } from "@/lib/influencer-admin.functions";
+import { acceptInfluencerApplication, sendInfluencerInvite } from "@/lib/influencer-admin.functions";
 import { computeTier } from "@/i18n/influencers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,8 @@ export function InfluencerApplications() {
   const qc = useQueryClient();
   const { data: me } = usePortalProfile();
   const accept = useServerFn(acceptInfluencerApplication);
+  const invite = useServerFn(sendInfluencerInvite);
+  const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [status, setStatus] = useState("new");
   const [selected, setSelected] = useState<App | null>(null);
   const [notes, setNotes] = useState("");
@@ -56,6 +58,7 @@ export function InfluencerApplications() {
 
   function open(a: App) {
     setSelected(a);
+    setInviteUrl(null);
     setNotes(a.admin_notes ?? "");
     setReason(a.rejection_reason ?? "");
   }
@@ -82,12 +85,26 @@ export function InfluencerApplications() {
     if (!selected) return;
     setBusy(true);
     try {
-      await accept({ data: { applicationId: selected.id, notes: notes.trim() || undefined } });
-      toast.success("Accepted. The influencer has been added to the roster.");
-      setSelected(null);
+      const r = await accept({ data: { applicationId: selected.id, notes: notes.trim() || undefined } });
+      setSelected({ ...selected, status: "accepted", created_influencer_id: r.influencerId });
       await refresh();
+      await onInvite(r.influencerId);
     } catch {
       toast.error("The application could not be accepted.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function onInvite(influencerId: string) {
+    setBusy(true);
+    try {
+      const r = await invite({ data: { influencerId } });
+      if (r.reason === "already_linked") toast.success("This influencer has already created their account.");
+      else if (r.sent) toast.success("Invite email sent.");
+      else toast.error("The email could not be sent. Copy the link below and send it yourself.");
+      setInviteUrl(r.url);
+    } catch {
+      toast.error("The invite could not be prepared.");
     } finally {
       setBusy(false);
     }
@@ -174,7 +191,18 @@ export function InfluencerApplications() {
                   <Button variant="outline" size="pillSm" disabled={busy} onClick={() => void setState("rejected")}>Reject</Button>
                 </div>
               ) : (
-                <p className="text-sm text-brand-navySoft">Accepted — on the roster. Their invitation to the influencer space will be sent once that space is live.</p>
+                <div className="space-y-3">
+                  <p className="text-sm text-brand-navySoft">Accepted — on the roster.</p>
+                  {selected.created_influencer_id ? (
+                    <Button variant="pillSecondary" size="pillSm" disabled={busy} onClick={() => void onInvite(selected.created_influencer_id!)}>Send invite email again</Button>
+                  ) : null}
+                  {inviteUrl ? (
+                    <div className="flex gap-2">
+                      <Input readOnly value={inviteUrl} aria-label="Invite link" />
+                      <Button variant="pillSecondary" size="pillSm" onClick={() => { void navigator.clipboard.writeText(inviteUrl); toast.success("Copied."); }}>Copy</Button>
+                    </div>
+                  ) : null}
+                </div>
               )}
             </>
           ) : null}

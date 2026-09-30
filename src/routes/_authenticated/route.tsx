@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthPage } from "@/components/auth/AuthPage";
 import { NotSetUp } from "@/components/auth/NotSetUp";
-import { resolveAccountRole } from "@/lib/account-role";
+import { homeFor, resolveAccountRole } from "@/lib/account-role";
 
 /**
  * /auteurs is the URL authors guess, so an unauthenticated visitor is shown the
@@ -20,8 +20,8 @@ function Gate() {
       const role = await resolveAccountRole();
       if (!active) return;
       if (role === null) return setStatus("out");
-      if (role === "creator") {
-        void navigate({ to: "/creators/app", replace: true });
+      if (role === "creator" || role === "influencer") {
+        window.location.replace(homeFor(role));
         return;
       }
       setStatus(role === "none" ? "none" : "in");
