@@ -179,6 +179,7 @@ export function PortalShell({
       ))}
     </div>
   ) : null;
+  const appSelector = isAdmin && mode === "creators" ? <AdminAppSelector collapsed={collapsed} /> : null;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
