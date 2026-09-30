@@ -1,3 +1,4 @@
+import { AppBadge, PlatformBadge, platformName, useApps } from "@/lib/apps";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -127,7 +128,7 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
   return (
     <div>
       <Link to="/creators/app/briefs" className="text-sm font-semibold text-portal-accent">← All briefs</Link>
-      <div className="mt-3"><PageTitle title={brief.title} lead={brief.due_date ? `Due ${fmtDate(brief.due_date)}` : undefined} action={<Pill s={status} />} /></div>
+      <div className="mt-3"><PageTitle title={brief.title} lead={brief.due_date ? `Due ${fmtDate(brief.due_date)}` : ""} action={<Pill s={status} />} /></div>
       <div className="mb-4"><AppBadge appId={brief.app_id} className="text-sm" /></div>
       <PortalCard>
         {brief.hook && (
