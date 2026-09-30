@@ -31,7 +31,6 @@ import { Route as CreatorsIndexRouteImport } from './routes/creators.index'
 import { Route as CreatorsAppRouteImport } from './routes/creators.app'
 import { Route as CreatorsInviteRouteImport } from './routes/creators.invite'
 import { Route as CreatorsLoginRouteImport } from './routes/creators.login'
-import { Route as CreatorsUnswipeRouteImport } from './routes/creators.unswipe'
 import { Route as EnIndexRouteImport } from './routes/en/index'
 import { Route as EnBecomeATeacherRouteImport } from './routes/en/become-a-teacher'
 import { Route as EnCareersRouteImport } from './routes/en/careers'
@@ -77,6 +76,10 @@ import { Route as CreatorsSlideshowIndexRouteImport } from './routes/creators.sl
 import { Route as CreatorsSlideshowApplyRouteImport } from './routes/creators.slideshow.apply'
 import { Route as CreatorsUgcIndexRouteImport } from './routes/creators.ugc.index'
 import { Route as CreatorsUgcApplyRouteImport } from './routes/creators.ugc.apply'
+import { Route as CreatorsUnswipeIndexRouteImport } from './routes/creators.unswipe.index'
+import { Route as CreatorsUnswipeInfluencerRouteImport } from './routes/creators.unswipe.influencer'
+import { Route as CreatorsUnswipeSlideshowRouteImport } from './routes/creators.unswipe.slideshow'
+import { Route as CreatorsUnswipeUgcRouteImport } from './routes/creators.unswipe.ugc'
 import { Route as EnAuthorsSlugRouteImport } from './routes/en/authors.$slug'
 import { Route as EnCreatorsIndexRouteImport } from './routes/en/creators/index'
 import { Route as EnCreatorsInfluencerRouteImport } from './routes/en/creators/influencer'
@@ -265,11 +268,6 @@ const CreatorsInviteRoute = CreatorsInviteRouteImport.update({
 const CreatorsLoginRoute = CreatorsLoginRouteImport.update({
   id: '/creators/login',
   path: '/creators/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreatorsUnswipeRoute = CreatorsUnswipeRouteImport.update({
-  id: '/creators/unswipe',
-  path: '/creators/unswipe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnIndexRoute = EnIndexRouteImport.update({
@@ -504,6 +502,28 @@ const CreatorsUgcIndexRoute = CreatorsUgcIndexRouteImport.update({
 const CreatorsUgcApplyRoute = CreatorsUgcApplyRouteImport.update({
   id: '/creators/ugc/apply',
   path: '/creators/ugc/apply',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsUnswipeIndexRoute = CreatorsUnswipeIndexRouteImport.update({
+  id: '/creators/unswipe/',
+  path: '/creators/unswipe/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsUnswipeInfluencerRoute =
+  CreatorsUnswipeInfluencerRouteImport.update({
+    id: '/creators/unswipe/influencer',
+    path: '/creators/unswipe/influencer',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CreatorsUnswipeSlideshowRoute =
+  CreatorsUnswipeSlideshowRouteImport.update({
+    id: '/creators/unswipe/slideshow',
+    path: '/creators/unswipe/slideshow',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CreatorsUnswipeUgcRoute = CreatorsUnswipeUgcRouteImport.update({
+  id: '/creators/unswipe/ugc',
+  path: '/creators/unswipe/ugc',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnAuthorsSlugRoute = EnAuthorsSlugRouteImport.update({
@@ -980,7 +1000,6 @@ export interface FileRoutesByFullPath {
   '/creators/app': typeof CreatorsAppRouteWithChildren
   '/creators/invite': typeof CreatorsInviteRoute
   '/creators/login': typeof CreatorsLoginRoute
-  '/creators/unswipe': typeof CreatorsUnswipeRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -1023,6 +1042,9 @@ export interface FileRoutesByFullPath {
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
   '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
+  '/creators/unswipe/influencer': typeof CreatorsUnswipeInfluencerRoute
+  '/creators/unswipe/slideshow': typeof CreatorsUnswipeSlideshowRoute
+  '/creators/unswipe/ugc': typeof CreatorsUnswipeUgcRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
   '/en/creators/influencer': typeof EnCreatorsInfluencerRoute
   '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
@@ -1038,6 +1060,7 @@ export interface FileRoutesByFullPath {
   '/creators/influencer/': typeof CreatorsInfluencerIndexRoute
   '/creators/slideshow/': typeof CreatorsSlideshowIndexRoute
   '/creators/ugc/': typeof CreatorsUgcIndexRoute
+  '/creators/unswipe/': typeof CreatorsUnswipeIndexRoute
   '/en/creators/': typeof EnCreatorsIndexRoute
   '/en/lessons/': typeof EnLessonsIndexRoute
   '/fr/cours/': typeof FrCoursIndexRoute
@@ -1127,7 +1150,6 @@ export interface FileRoutesByTo {
   '/cours/$slug': typeof CoursSlugRoute
   '/creators/invite': typeof CreatorsInviteRoute
   '/creators/login': typeof CreatorsLoginRoute
-  '/creators/unswipe': typeof CreatorsUnswipeRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -1169,6 +1191,9 @@ export interface FileRoutesByTo {
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
   '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
+  '/creators/unswipe/influencer': typeof CreatorsUnswipeInfluencerRoute
+  '/creators/unswipe/slideshow': typeof CreatorsUnswipeSlideshowRoute
+  '/creators/unswipe/ugc': typeof CreatorsUnswipeUgcRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
   '/en/creators/influencer': typeof EnCreatorsInfluencerRoute
   '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
@@ -1184,6 +1209,7 @@ export interface FileRoutesByTo {
   '/creators/influencer': typeof CreatorsInfluencerIndexRoute
   '/creators/slideshow': typeof CreatorsSlideshowIndexRoute
   '/creators/ugc': typeof CreatorsUgcIndexRoute
+  '/creators/unswipe': typeof CreatorsUnswipeIndexRoute
   '/en/creators': typeof EnCreatorsIndexRoute
   '/en/lessons': typeof EnLessonsIndexRoute
   '/fr/cours': typeof FrCoursIndexRoute
@@ -1276,7 +1302,6 @@ export interface FileRoutesById {
   '/creators/app': typeof CreatorsAppRouteWithChildren
   '/creators/invite': typeof CreatorsInviteRoute
   '/creators/login': typeof CreatorsLoginRoute
-  '/creators/unswipe': typeof CreatorsUnswipeRoute
   '/en/become-a-teacher': typeof EnBecomeATeacherRoute
   '/en/careers': typeof EnCareersRoute
   '/en/download': typeof EnDownloadRoute
@@ -1319,6 +1344,9 @@ export interface FileRoutesById {
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
   '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
+  '/creators/unswipe/influencer': typeof CreatorsUnswipeInfluencerRoute
+  '/creators/unswipe/slideshow': typeof CreatorsUnswipeSlideshowRoute
+  '/creators/unswipe/ugc': typeof CreatorsUnswipeUgcRoute
   '/en/authors/$slug': typeof EnAuthorsSlugRoute
   '/en/creators/influencer': typeof EnCreatorsInfluencerRoute
   '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
@@ -1334,6 +1362,7 @@ export interface FileRoutesById {
   '/creators/influencer/': typeof CreatorsInfluencerIndexRoute
   '/creators/slideshow/': typeof CreatorsSlideshowIndexRoute
   '/creators/ugc/': typeof CreatorsUgcIndexRoute
+  '/creators/unswipe/': typeof CreatorsUnswipeIndexRoute
   '/en/creators/': typeof EnCreatorsIndexRoute
   '/en/lessons/': typeof EnLessonsIndexRoute
   '/fr/cours/': typeof FrCoursIndexRoute
@@ -1426,7 +1455,6 @@ export interface FileRouteTypes {
     | '/creators/app'
     | '/creators/invite'
     | '/creators/login'
-    | '/creators/unswipe'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -1469,6 +1497,9 @@ export interface FileRouteTypes {
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
     | '/creators/ugc/apply'
+    | '/creators/unswipe/influencer'
+    | '/creators/unswipe/slideshow'
+    | '/creators/unswipe/ugc'
     | '/en/authors/$slug'
     | '/en/creators/influencer'
     | '/en/creators/slideshow'
@@ -1484,6 +1515,7 @@ export interface FileRouteTypes {
     | '/creators/influencer/'
     | '/creators/slideshow/'
     | '/creators/ugc/'
+    | '/creators/unswipe/'
     | '/en/creators/'
     | '/en/lessons/'
     | '/fr/cours/'
@@ -1573,7 +1605,6 @@ export interface FileRouteTypes {
     | '/cours/$slug'
     | '/creators/invite'
     | '/creators/login'
-    | '/creators/unswipe'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -1615,6 +1646,9 @@ export interface FileRouteTypes {
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
     | '/creators/ugc/apply'
+    | '/creators/unswipe/influencer'
+    | '/creators/unswipe/slideshow'
+    | '/creators/unswipe/ugc'
     | '/en/authors/$slug'
     | '/en/creators/influencer'
     | '/en/creators/slideshow'
@@ -1630,6 +1664,7 @@ export interface FileRouteTypes {
     | '/creators/influencer'
     | '/creators/slideshow'
     | '/creators/ugc'
+    | '/creators/unswipe'
     | '/en/creators'
     | '/en/lessons'
     | '/fr/cours'
@@ -1721,7 +1756,6 @@ export interface FileRouteTypes {
     | '/creators/app'
     | '/creators/invite'
     | '/creators/login'
-    | '/creators/unswipe'
     | '/en/become-a-teacher'
     | '/en/careers'
     | '/en/download'
@@ -1764,6 +1798,9 @@ export interface FileRouteTypes {
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
     | '/creators/ugc/apply'
+    | '/creators/unswipe/influencer'
+    | '/creators/unswipe/slideshow'
+    | '/creators/unswipe/ugc'
     | '/en/authors/$slug'
     | '/en/creators/influencer'
     | '/en/creators/slideshow'
@@ -1779,6 +1816,7 @@ export interface FileRouteTypes {
     | '/creators/influencer/'
     | '/creators/slideshow/'
     | '/creators/ugc/'
+    | '/creators/unswipe/'
     | '/en/creators/'
     | '/en/lessons/'
     | '/fr/cours/'
@@ -1871,7 +1909,6 @@ export interface RootRouteChildren {
   CreatorsAppRoute: typeof CreatorsAppRouteWithChildren
   CreatorsInviteRoute: typeof CreatorsInviteRoute
   CreatorsLoginRoute: typeof CreatorsLoginRoute
-  CreatorsUnswipeRoute: typeof CreatorsUnswipeRoute
   EnBecomeATeacherRoute: typeof EnBecomeATeacherRoute
   EnCareersRoute: typeof EnCareersRoute
   EnDownloadRoute: typeof EnDownloadRoute
@@ -1899,6 +1936,9 @@ export interface RootRouteChildren {
   CreatorsSignTokenRoute: typeof CreatorsSignTokenRoute
   CreatorsSlideshowApplyRoute: typeof CreatorsSlideshowApplyRoute
   CreatorsUgcApplyRoute: typeof CreatorsUgcApplyRoute
+  CreatorsUnswipeInfluencerRoute: typeof CreatorsUnswipeInfluencerRoute
+  CreatorsUnswipeSlideshowRoute: typeof CreatorsUnswipeSlideshowRoute
+  CreatorsUnswipeUgcRoute: typeof CreatorsUnswipeUgcRoute
   EnAuthorsSlugRoute: typeof EnAuthorsSlugRoute
   EnCreatorsInfluencerRoute: typeof EnCreatorsInfluencerRoute
   EnCreatorsSlideshowRoute: typeof EnCreatorsSlideshowRoute
@@ -1912,6 +1952,7 @@ export interface RootRouteChildren {
   CreatorsInfluencerIndexRoute: typeof CreatorsInfluencerIndexRoute
   CreatorsSlideshowIndexRoute: typeof CreatorsSlideshowIndexRoute
   CreatorsUgcIndexRoute: typeof CreatorsUgcIndexRoute
+  CreatorsUnswipeIndexRoute: typeof CreatorsUnswipeIndexRoute
   EnCreatorsIndexRoute: typeof EnCreatorsIndexRoute
   EnLessonsIndexRoute: typeof EnLessonsIndexRoute
   FrCoursIndexRoute: typeof FrCoursIndexRoute
@@ -2081,13 +2122,6 @@ declare module '@tanstack/react-router' {
       path: '/creators/login'
       fullPath: '/creators/login'
       preLoaderRoute: typeof CreatorsLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/unswipe': {
-      id: '/creators/unswipe'
-      path: '/creators/unswipe'
-      fullPath: '/creators/unswipe'
-      preLoaderRoute: typeof CreatorsUnswipeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/': {
@@ -2403,6 +2437,34 @@ declare module '@tanstack/react-router' {
       path: '/creators/ugc/apply'
       fullPath: '/creators/ugc/apply'
       preLoaderRoute: typeof CreatorsUgcApplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/unswipe/': {
+      id: '/creators/unswipe/'
+      path: '/creators/unswipe'
+      fullPath: '/creators/unswipe/'
+      preLoaderRoute: typeof CreatorsUnswipeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/unswipe/influencer': {
+      id: '/creators/unswipe/influencer'
+      path: '/creators/unswipe/influencer'
+      fullPath: '/creators/unswipe/influencer'
+      preLoaderRoute: typeof CreatorsUnswipeInfluencerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/unswipe/slideshow': {
+      id: '/creators/unswipe/slideshow'
+      path: '/creators/unswipe/slideshow'
+      fullPath: '/creators/unswipe/slideshow'
+      preLoaderRoute: typeof CreatorsUnswipeSlideshowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/unswipe/ugc': {
+      id: '/creators/unswipe/ugc'
+      path: '/creators/unswipe/ugc'
+      fullPath: '/creators/unswipe/ugc'
+      preLoaderRoute: typeof CreatorsUnswipeUgcRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/authors/$slug': {
@@ -3205,7 +3267,6 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsAppRoute: CreatorsAppRouteWithChildren,
   CreatorsInviteRoute: CreatorsInviteRoute,
   CreatorsLoginRoute: CreatorsLoginRoute,
-  CreatorsUnswipeRoute: CreatorsUnswipeRoute,
   EnBecomeATeacherRoute: EnBecomeATeacherRoute,
   EnCareersRoute: EnCareersRoute,
   EnDownloadRoute: EnDownloadRoute,
@@ -3233,6 +3294,9 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsSignTokenRoute: CreatorsSignTokenRoute,
   CreatorsSlideshowApplyRoute: CreatorsSlideshowApplyRoute,
   CreatorsUgcApplyRoute: CreatorsUgcApplyRoute,
+  CreatorsUnswipeInfluencerRoute: CreatorsUnswipeInfluencerRoute,
+  CreatorsUnswipeSlideshowRoute: CreatorsUnswipeSlideshowRoute,
+  CreatorsUnswipeUgcRoute: CreatorsUnswipeUgcRoute,
   EnAuthorsSlugRoute: EnAuthorsSlugRoute,
   EnCreatorsInfluencerRoute: EnCreatorsInfluencerRoute,
   EnCreatorsSlideshowRoute: EnCreatorsSlideshowRoute,
@@ -3246,6 +3310,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsInfluencerIndexRoute: CreatorsInfluencerIndexRoute,
   CreatorsSlideshowIndexRoute: CreatorsSlideshowIndexRoute,
   CreatorsUgcIndexRoute: CreatorsUgcIndexRoute,
+  CreatorsUnswipeIndexRoute: CreatorsUnswipeIndexRoute,
   EnCreatorsIndexRoute: EnCreatorsIndexRoute,
   EnLessonsIndexRoute: EnLessonsIndexRoute,
   FrCoursIndexRoute: FrCoursIndexRoute,
