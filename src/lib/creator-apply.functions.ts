@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { resolveAppId } from "./resolve-app.server";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { isValidInternationalPhone } from "@/lib/creator-validation";
@@ -66,6 +67,7 @@ const ugcSchema = z.object({
   video_file_path: z.string().max(300).regex(/^\d{4}-\d{2}-\d{2}\/[0-9a-f-]{36}\.(mp4|mov)$/).optional(),
   referral_source: z.string().trim().min(1).max(1000),
   consent: z.literal(true),
+  app: z.string().regex(/^[a-z0-9-]{2,40}$/).optional(),
 });
 
 export const submitUgcApplication = createServerFn({ method: "POST" })
@@ -78,6 +80,7 @@ export const submitUgcApplication = createServerFn({ method: "POST" })
     if (await rateLimited("creator_applications", hash, email)) return { ok: false as const, reason: "rate" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("creator_applications").insert({
+      app_id: await resolveAppId(data.app),
       full_name: data.full_name,
       email,
       phone: data.phone,
@@ -111,6 +114,7 @@ const slideSchema = z.object({
   upwork_profile_url: optUrl,
   referral_source: z.string().trim().max(1000).optional(),
   consent: z.literal(true),
+  app: z.string().regex(/^[a-z0-9-]{2,40}$/).optional(),
 });
 
 export const submitSlideshowApplication = createServerFn({ method: "POST" })
@@ -122,6 +126,7 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
     if (await rateLimited("slideshow_applications", hash, email)) return { ok: false as const, reason: "rate" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("slideshow_applications").insert({
+      app_id: await resolveAppId(data.app),
       full_name: data.full_name,
       email,
       phone: data.phone,
