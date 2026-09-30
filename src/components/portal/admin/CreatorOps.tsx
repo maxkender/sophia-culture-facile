@@ -52,9 +52,15 @@ export function CreatorOps() {
   const [briefTarget, setBriefTarget] = useState<string | null>(null);
   const [picked, setPicked] = useState<string[]>([]);
   const { data: activeCreators } = useQuery({
-    queryKey: ["portal", "admin", "creator-ops", "active-creators"],
-    enabled: tab === "briefs",
-    queryFn: async () => (await supabase.from("creators").select("id, full_name").not("user_id", "is", null).order("full_name")).data ?? [],
+    queryKey: ["portal", "admin", "creator-ops", "active-creators", briefTarget],
+    enabled: tab === "briefs" && Boolean(briefTarget),
+    queryFn: async () => {
+      const { data: br } = await supabase.from("briefs").select("app_id").eq("id", briefTarget!).maybeSingle();
+      const { data: en } = await supabase.from("creator_apps").select("creator_id").eq("app_id", br?.app_id ?? "").eq("status", "active");
+      const ids = (en ?? []).map((e) => e.creator_id);
+      if (!ids.length) return [];
+      return (await supabase.from("creators").select("id, full_name").in("id", ids).not("user_id", "is", null).order("full_name")).data ?? [];
+    },
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["portal", "admin", "creator-ops"] });
 
