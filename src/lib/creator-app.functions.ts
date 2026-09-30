@@ -69,19 +69,23 @@ export const registerSocialAccount = createServerFn({ method: "POST" })
       password: z.string().min(1).max(200).optional(),
        phone: z.string().trim().max(40).refine((value) => value === "" || isValidInternationalPhone(value), "Enter a valid phone number with the country code.").optional().nullable(),
       device: z.string().trim().max(80).optional().nullable(),
+      appId: z.string().uuid().optional(),
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
     const me = await myCreator(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const appId = data.appId ?? "00000000-0000-4000-8000-000000000001";
+    const { data: enrolled } = await context.supabase.from("creator_apps").select("status").eq("creator_id", me.id).eq("app_id", appId).maybeSingle();
+    if (enrolled?.status !== "active") throw new Error("You are not enrolled in this app.");
     const handle = data.handle.startsWith("@") ? data.handle : `@${data.handle}`;
-    const { data: existing } = await supabaseAdmin.from("creator_social_accounts").select("id").eq("creator_id", me.id).maybeSingle();
+    const { data: existing } = await supabaseAdmin.from("creator_social_accounts").select("id").eq("creator_id", me.id).eq("app_id", appId).maybeSingle();
     if (!existing && !data.password) throw new Error("Enter the account password.");
     const patch: any = { handle, account_email: data.email, phone: data.phone || null, device: data.device || null, updated_at: new Date().toISOString() };
     if (data.password) patch.password_encrypted = await encrypt(data.password);
     const { error } = existing
       ? await supabaseAdmin.from("creator_social_accounts").update(patch).eq("id", existing.id)
-      : await supabaseAdmin.from("creator_social_accounts").insert({ creator_id: me.id, ...patch } as never);
+      : await supabaseAdmin.from("creator_social_accounts").insert({ creator_id: me.id, app_id: appId, ...patch } as never);
     if (error) throw new Error("The account could not be saved.");
     await supabaseAdmin.from("creators").update({ social_handle: handle, social_account_created_at: me.social_account_created_at ?? new Date().toISOString() }).eq("id", me.id);
     return { ok: true as const };
@@ -92,16 +96,17 @@ export const getMySocialAccount = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const me = await myCreator(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await supabaseAdmin.from("creator_social_accounts").select("handle, account_email, phone, device, registered_at").eq("creator_id", me.id).maybeSingle();
-    return data ?? null;
+    const { data } = await supabaseAdmin.from("creator_social_accounts").select("app_id, handle, account_email, phone, device, registered_at").eq("creator_id", me.id);
+    return data ?? [];
   });
 
 export const revealMyPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((d) => z.object({ appId: z.string().uuid().optional() }).parse(d ?? {}))
+  .handler(async ({ data: input, context }) => {
     const me = await myCreator(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await supabaseAdmin.from("creator_social_accounts").select("password_encrypted").eq("creator_id", me.id).maybeSingle();
+    const { data } = await supabaseAdmin.from("creator_social_accounts").select("password_encrypted").eq("creator_id", me.id).eq("app_id", input.appId ?? "00000000-0000-4000-8000-000000000001").maybeSingle();
     if (!data) throw new Error("No account registered.");
     return { password: await decrypt(data.password_encrypted) };
   });
@@ -245,20 +250,20 @@ export const adminCreatorDetail = createServerFn({ method: "GET" })
     await adminProfile(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: account }, { data: sig }, { data: payout }] = await Promise.all([
-      supabaseAdmin.from("creator_social_accounts").select("handle, account_email, phone, device, registered_at").eq("creator_id", data.creatorId).maybeSingle(),
+      supabaseAdmin.from("creator_social_accounts").select("app_id, handle, account_email, phone, device, registered_at").eq("creator_id", data.creatorId),
       supabaseAdmin.from("creator_signatures").select("signed_at, variant, document_version, signed_name").eq("creator_id", data.creatorId).maybeSingle(),
       supabaseAdmin.from("creator_payout_profiles").select("method, stripe_onboarded, wise_email, paypal_email").eq("creator_id", data.creatorId).maybeSingle(),
     ]);
-    return { account: account ?? null, signature: sig ?? null, payout: payout ?? null };
+    return { account: account?.find((a) => a.app_id === "00000000-0000-4000-8000-000000000001") ?? account?.[0] ?? null, accounts: account ?? [], signature: sig ?? null, payout: payout ?? null };
   });
 
 export const adminRevealCredentials = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ creatorId: z.string().uuid() }).parse(d))
+  .inputValidator((d) => z.object({ creatorId: z.string().uuid(), appId: z.string().uuid().optional() }).parse(d))
   .handler(async ({ data, context }) => {
     const admin = await adminProfile(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row } = await supabaseAdmin.from("creator_social_accounts").select("handle, account_email, password_encrypted").eq("creator_id", data.creatorId).maybeSingle();
+    const { data: row } = await supabaseAdmin.from("creator_social_accounts").select("handle, account_email, password_encrypted").eq("creator_id", data.creatorId).eq("app_id", data.appId ?? "00000000-0000-4000-8000-000000000001").maybeSingle();
     if (!row) throw new Error("No account registered.");
     await supabaseAdmin.from("activity_log").insert({ actor_id: admin.id, entity: "creator", entity_id: data.creatorId, action: "credentials_revealed", comment: row.handle });
     return { handle: row.handle, email: row.account_email, password: await decrypt(row.password_encrypted) };
@@ -270,7 +275,7 @@ export const adminAssignCreatorCode = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const admin = await adminProfile(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: code } = await supabaseAdmin.from("access_codes").select("id, code, redeem_url").eq("state", "available").eq("platform", data.platform).is("assigned_to", null).is("assigned_creator_id", null).order("created_at").limit(1).maybeSingle();
+    const { data: code } = await supabaseAdmin.from("access_codes").select("id, code, redeem_url").eq("state", "available").eq("platform", data.platform).eq("app_id", "00000000-0000-4000-8000-000000000001").is("assigned_to", null).is("assigned_creator_id", null).order("created_at").limit(1).maybeSingle();
     if (!code) throw new Error(`No ${data.platform === "ios" ? "Apple" : "Google"} code left in the pool.`);
     await supabaseAdmin.from("access_codes").update({ state: "assigned", assigned_creator_id: data.creatorId, assigned_at: new Date().toISOString() }).eq("id", code.id);
     await supabaseAdmin.from("creators").update({ access_code: code.code, access_redeem_url: code.redeem_url, platform: data.platform }).eq("id", data.creatorId);
