@@ -184,7 +184,7 @@ export const syncInfluencerStripe = createServerFn({ method: "POST" })
   });
 
 const optUrl = z.union([z.string().trim().url().max(500), z.literal("")]).optional();
-const optNum = z.number().min(0).max(1_000_000_000).nullable().optional();
+const optNum = z.number().min(0).max(1_000_000_000).nullable().default(null);
 
 export const updateInfluencerProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
