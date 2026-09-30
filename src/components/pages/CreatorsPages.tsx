@@ -94,13 +94,14 @@ function CheckList({ items }: { items: string[] }) {
 export function CreatorsChooserPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
   const c = useAppCopy(CREATORS[lang].chooser, app);
+  const inflCard = useAppCopy(INFLUENCER_COPY[lang].card, app);
   const ugcPath = useLocalePath("creatorsUgc");
   const slidePath = useLocalePath("creatorsSlideshow");
   const inflPath = useLocalePath("creatorsInfluencer");
   const cards = [
     { ...c.ugc, icon: Camera, to: ugcPath, track: "ugc", appTo: `${lang === "fr" ? "/fr/createurs" : "/en/creators"}/${app}/ugc` },
     { ...c.slideshow, icon: Layers, to: slidePath, track: "slideshow", appTo: `${lang === "fr" ? "/fr/createurs" : "/en/creators"}/${app}/slideshow` },
-    { ...INFLUENCER_COPY[lang].card, icon: Megaphone, to: inflPath, track: "influencer", appTo: `${lang === "fr" ? "/fr/createurs" : "/en/creators"}/${app}/${lang === "fr" ? "influenceur" : "influencer"}` },
+    { ...inflCard, icon: Megaphone, to: inflPath, track: "influencer", appTo: `${lang === "fr" ? "/fr/createurs" : "/en/creators"}/${app}/${lang === "fr" ? "influenceur" : "influencer"}` },
   ];
   useEffect(() => trackFunnel("creators_page_view", { lang }), [lang]);
   return (
