@@ -56,7 +56,7 @@ export function SlideshowApplyPage() {
     setBusy(true);
     try {
       const res = await submitFn({
-        data: {
+        data: { app: new URLSearchParams(window.location.search).get("app") ?? undefined,
           website: honey,
           full_name: f.full_name,
           email: f.email,
