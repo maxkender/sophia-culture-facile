@@ -12,7 +12,7 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
     refetchInterval: 60_000,
     queryFn: async () => {
       const count = async (
-        table: "courses" | "access_codes" | "applications" | "course_requests" | "course_proposals" | "creator_applications" | "slideshow_applications",
+        table: "courses" | "access_codes" | "applications" | "course_requests" | "course_proposals" | "creator_applications" | "slideshow_applications" | "influencer_applications",
         column: string,
         value: string,
       ) => {
@@ -22,7 +22,7 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
           .eq(column, value);
         return n ?? 0;
       };
-      const [review, codes, applications, requests, proposals, threads, ugcPending, slidePending] = await Promise.all([
+      const [review, codes, applications, requests, proposals, threads, ugcPending, slidePending, inflNew] = await Promise.all([
         count("courses", "status", "submitted"),
         count("access_codes", "state", "available"),
         count("applications", "status", "pending"),
@@ -31,6 +31,7 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
         supabase.from("conversations").select("id", { count: "exact", head: true }).gt("admin_unread", 0),
         count("creator_applications", "status", "pending"),
         count("slideshow_applications", "status", "pending"),
+        count("influencer_applications", "status", "new"),
       ]);
       return {
         review,
@@ -41,6 +42,7 @@ export function useNavCounts(isAdmin: boolean, profileId: string | null | undefi
         creatorApps: ugcPending + slidePending,
         ugcApps: ugcPending,
         slideApps: slidePending,
+        inflApps: inflNew,
       } satisfies NavCounts;
     },
   });
