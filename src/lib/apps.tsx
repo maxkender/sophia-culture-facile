@@ -37,8 +37,8 @@ export function useApps() {
 }
 
 export function appLogoUrl(path: string | null) {
-  if (!path) return null;
-  return supabase.storage.from("app-logos").getPublicUrl(path).data.publicUrl;
+  // Logos are stored inline (small images) because public storage is disabled for this workspace.
+  return path && path.startsWith("data:image/") ? path : null;
 }
 
 /* ---------- admin selector (Sophia / UnSwipe / All), remembered per user ---------- */

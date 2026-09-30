@@ -122,6 +122,7 @@ import { Route as AuthenticatedAuteursAdminCoursesCourseIdRouteImport } from './
 import { Route as AuthenticatedAuteursAdminCreatorsIndexRouteImport } from './routes/_authenticated/auteurs/admin/creators.index'
 import { Route as AuthenticatedAuteursAdminCreatorsCreatorIdRouteImport } from './routes/_authenticated/auteurs/admin/creators.$creatorId'
 import { Route as AuthenticatedAuteursAdminCreatorsApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.applications'
+import { Route as AuthenticatedAuteursAdminCreatorsAppsRouteImport } from './routes/_authenticated/auteurs/admin/creators.apps'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-applications'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerMessagesRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-messages'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-payouts'
@@ -751,6 +752,12 @@ const AuthenticatedAuteursAdminCreatorsApplicationsRoute =
     path: '/auteurs/admin/creators/applications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAuteursAdminCreatorsAppsRoute =
+  AuthenticatedAuteursAdminCreatorsAppsRouteImport.update({
+    id: '/auteurs/admin/creators/apps',
+    path: '/auteurs/admin/creators/apps',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute =
   AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRouteImport.update({
     id: '/auteurs/admin/creators/influencer-applications',
@@ -1005,6 +1012,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   '/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   '/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
+  '/auteurs/admin/creators/apps': typeof AuthenticatedAuteursAdminCreatorsAppsRoute
   '/auteurs/admin/creators/influencer-applications': typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
   '/auteurs/admin/creators/influencer-messages': typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
   '/auteurs/admin/creators/influencer-payouts': typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
@@ -1141,6 +1149,7 @@ export interface FileRoutesByTo {
   '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   '/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   '/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
+  '/auteurs/admin/creators/apps': typeof AuthenticatedAuteursAdminCreatorsAppsRoute
   '/auteurs/admin/creators/influencer-applications': typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
   '/auteurs/admin/creators/influencer-messages': typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
   '/auteurs/admin/creators/influencer-payouts': typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
@@ -1281,6 +1290,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   '/_authenticated/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   '/_authenticated/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
+  '/_authenticated/auteurs/admin/creators/apps': typeof AuthenticatedAuteursAdminCreatorsAppsRoute
   '/_authenticated/auteurs/admin/creators/influencer-applications': typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
   '/_authenticated/auteurs/admin/creators/influencer-messages': typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
   '/_authenticated/auteurs/admin/creators/influencer-payouts': typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
@@ -1421,6 +1431,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/courses/$courseId'
     | '/auteurs/admin/creators/$creatorId'
     | '/auteurs/admin/creators/applications'
+    | '/auteurs/admin/creators/apps'
     | '/auteurs/admin/creators/influencer-applications'
     | '/auteurs/admin/creators/influencer-messages'
     | '/auteurs/admin/creators/influencer-payouts'
@@ -1557,6 +1568,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/courses/$courseId'
     | '/auteurs/admin/creators/$creatorId'
     | '/auteurs/admin/creators/applications'
+    | '/auteurs/admin/creators/apps'
     | '/auteurs/admin/creators/influencer-applications'
     | '/auteurs/admin/creators/influencer-messages'
     | '/auteurs/admin/creators/influencer-payouts'
@@ -1696,6 +1708,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/courses/$courseId'
     | '/_authenticated/auteurs/admin/creators/$creatorId'
     | '/_authenticated/auteurs/admin/creators/applications'
+    | '/_authenticated/auteurs/admin/creators/apps'
     | '/_authenticated/auteurs/admin/creators/influencer-applications'
     | '/_authenticated/auteurs/admin/creators/influencer-messages'
     | '/_authenticated/auteurs/admin/creators/influencer-payouts'
@@ -2586,6 +2599,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsApplicationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auteurs/admin/creators/apps': {
+      id: '/_authenticated/auteurs/admin/creators/apps'
+      path: '/auteurs/admin/creators/apps'
+      fullPath: '/auteurs/admin/creators/apps'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsAppsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/auteurs/admin/creators/influencer-applications': {
       id: '/_authenticated/auteurs/admin/creators/influencer-applications'
       path: '/auteurs/admin/creators/influencer-applications'
@@ -2782,6 +2802,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuteursAdminCoursesCourseIdRoute: typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
   AuthenticatedAuteursAdminCreatorsCreatorIdRoute: typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   AuthenticatedAuteursAdminCreatorsApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
+  AuthenticatedAuteursAdminCreatorsAppsRoute: typeof AuthenticatedAuteursAdminCreatorsAppsRoute
   AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
   AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
   AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
@@ -2845,6 +2866,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAuteursAdminCreatorsCreatorIdRoute,
   AuthenticatedAuteursAdminCreatorsApplicationsRoute:
     AuthenticatedAuteursAdminCreatorsApplicationsRoute,
+  AuthenticatedAuteursAdminCreatorsAppsRoute:
+    AuthenticatedAuteursAdminCreatorsAppsRoute,
   AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute:
     AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute,
   AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute:

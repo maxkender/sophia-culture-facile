@@ -70,11 +70,10 @@ function AppEditor({ app }: { app: AppRow }) {
     toast.success(`${f["name"]} saved.`); void qc.invalidateQueries({ queryKey: APPS_KEY });
   }
   async function upload(file: File) {
-    if (!/^image\//.test(file.type) || file.size > 2 * 1024 * 1024) return void toast.error("Use an image under 2 MB.");
-    const path = `${app.slug}/${Date.now()}-${file.name.replace(/[^a-z0-9.]+/gi, "-")}`;
-    const { error } = await supabase.storage.from("app-logos").upload(path, file, { upsert: true });
-    if (error) return void toast.error("Could not upload the logo.");
-    await supabase.from("apps").update({ logo_path: path }).eq("id", app.id);
+    if (!/^image\/(png|jpeg|webp|svg\+xml)$/.test(file.type) || file.size > 300 * 1024) return void toast.error("Use a PNG, JPG, WebP or SVG under 300 KB.");
+    const dataUrl = await new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(file); });
+    const { error } = await supabase.from("apps").update({ logo_path: dataUrl }).eq("id", app.id);
+    if (error) return void toast.error("Could not save the logo.");
     toast.success("Logo updated."); void qc.invalidateQueries({ queryKey: APPS_KEY });
   }
   const logo = appLogoUrl(app.logo_path);
