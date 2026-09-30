@@ -32,7 +32,7 @@ export const generatePayoutBatch = createServerFn({ method: "POST" })
     // Each approved post is priced at approval by the dated rate card; held posts (no card) are excluded.
     const { data: posts } = await supabase
       .from("creator_posts")
-      .select("creator_id, amount_usd, pay_status")
+      .select("creator_id, app_id, amount_usd, pay_status")
       .eq("status", "approved")
       .gte("posted_on", from)
       .lt("posted_on", to);
@@ -43,20 +43,22 @@ export const generatePayoutBatch = createServerFn({ method: "POST" })
     let held = 0;
     for (const p of posts ?? []) {
       if (p.pay_status !== "due" || p.amount_usd === null) { held++; continue; }
-      const s = sums.get(p.creator_id) ?? { count: 0, amount: 0 };
+      const key = `${p.creator_id}|${p.app_id}`;
+      const s = sums.get(key) ?? { count: 0, amount: 0 };
       s.count++; s.amount += Number(p.amount_usd);
-      sums.set(p.creator_id, s);
+      sums.set(key, s);
     }
 
     const items: any[] = [];
     const missing: string[] = [];
     const byMethod: Record<string, { creators: number; usd: number }> = {};
-    for (const [creatorId, s] of sums) {
+    for (const [key, s] of sums) {
+      const [creatorId = "", appId] = key.split("|");
       const creator = creators?.find((c: any) => c.id === creatorId);
       if (!creator) continue;
       const method = profiles?.find((p: any) => p.creator_id === creatorId)?.method ?? "none";
       byMethod[method] = { creators: (byMethod[method]?.creators ?? 0) + 1, usd: (byMethod[method]?.usd ?? 0) + s.amount };
-      items.push({ creator_id: creatorId, posts_count: s.count, rate_usd: s.count ? s.amount / s.count : 0, amount_usd: s.amount, note: `method:${method}` });
+      items.push({ creator_id: creatorId, app_id: appId, posts_count: s.count, rate_usd: s.count ? s.amount / s.count : 0, amount_usd: s.amount, note: `method:${method}` });
     }
     if (held) missing.push(`${held} approved post(s) held: no rate card in force`);
 
