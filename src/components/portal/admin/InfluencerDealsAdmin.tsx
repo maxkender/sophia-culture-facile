@@ -85,7 +85,7 @@ export function InfluencerDealDetail({ dealId }: { dealId: string }) {
       return { deal, items: items ?? [] };
     },
   });
-  async function run(action: Parameters<typeof act>[0]["data"]["action"], extra: Record<string, string | undefined> = {}) {
+  async function run(action: "approve_draft" | "request_changes" | "verify" | "cancel" | "extend" | "complete" | "spark", extra: Record<string, string | undefined> = {}) {
     try {
       await act({ data: { dealId, action, ...extra } });
       toast.success("Saved.");

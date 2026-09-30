@@ -6,7 +6,8 @@ import { deliverableLabel, parseDeliverables, RIGHTS, RIGHTS_LABEL, type Rights 
 
 type Ctx = { supabase: any; userId: string };
 async function db() {
-  return (await import("@/integrations/supabase/client.server")).supabaseAdmin;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (await import("@/integrations/supabase/client.server")).supabaseAdmin as any;
 }
 async function adminProfile(context: Ctx) {
   const { data } = await context.supabase.from("profiles").select("id, role").eq("user_id", context.userId).maybeSingle();
