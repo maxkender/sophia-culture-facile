@@ -11,7 +11,7 @@ import { trackFunnel } from "@/lib/funnel-events";
 import { useApps } from "@/lib/apps";
 
 /** Brand band shown on app-specific creator pages (e.g. UnSwipe). */
-function AppBand({ slug }: { slug?: string }) {
+function AppBand({ slug }: { slug?: string | undefined }) {
   const { lang } = useI18n();
   const { data: apps = [] } = useApps();
   const app = apps.find((a) => a.slug === slug);
@@ -81,7 +81,7 @@ function CheckList({ items }: { items: string[] }) {
   );
 }
 
-export function CreatorsChooserPage({ app }: { app?: string } = {}) {
+export function CreatorsChooserPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
   const c = CREATORS[lang].chooser;
   const ugcPath = useLocalePath("creatorsUgc");
@@ -123,7 +123,7 @@ export function CreatorsChooserPage({ app }: { app?: string } = {}) {
   );
 }
 
-export function UgcLandingPage({ app }: { app?: string } = {}) {
+export function UgcLandingPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
   const u = CREATORS[lang].ugc;
   const applyPath = useLocalePath("creatorsUgcApply");
@@ -159,7 +159,7 @@ export function UgcLandingPage({ app }: { app?: string } = {}) {
   );
 }
 
-export function SlideshowLandingPage({ app }: { app?: string } = {}) {
+export function SlideshowLandingPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
   const s = CREATORS[lang].slideshow;
   const applyPath = useLocalePath("creatorsSlideshowApply");
@@ -197,7 +197,7 @@ export function SlideshowLandingPage({ app }: { app?: string } = {}) {
   );
 }
 
-export function InfluencerLandingPage({ app }: { app?: string } = {}) {
+export function InfluencerLandingPage({ app }: { app?: string | undefined } = {}) {
   const { lang } = useI18n();
   const s = INFLUENCER_COPY[lang];
   const applyPath = useLocalePath("creatorsInfluencerApply");
