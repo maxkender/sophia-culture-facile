@@ -77,14 +77,15 @@ export function BriefsPage() {
   const d = useCreator();
   const [app, setApp] = useState("all");
   const [status, setStatus] = useState("all");
-  const apps = Array.from(new Set(d.briefs.map((b) => b.app)));
-  const list = d.briefs.filter((b) => (app === "all" || b.app === app) && (status === "all" || briefStatus(d, b.id) === status));
+  const { data: allApps = [] } = useApps();
+  const apps = allApps.filter((a) => d.briefs.some((b) => b.app_id === a.id));
+  const list = d.briefs.filter((b) => (app === "all" || b.app_id === app) && (status === "all" || briefStatus(d, b.id) === status));
   return (
     <div>
       <PageTitle title="Briefs" lead="Newest first. Open a brief to read it in full, then log your post or skip it with a reason." />
       <div className="mb-6 flex flex-wrap gap-2">
         <select aria-label="App" className="h-10 rounded-md border border-input bg-card px-3 text-sm" value={app} onChange={(e) => setApp(e.target.value)}>
-          <option value="all">All apps</option>{apps.map((a) => <option key={a} value={a}>{a}</option>)}
+          <option value="all">All apps</option>{apps.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
         </select>
         <select aria-label="Status" className="h-10 rounded-md border border-input bg-card px-3 text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>
           {["all", "new", "seen", "posted", "skipped"].map((s) => <option key={s} value={s}>{s === "all" ? "All statuses" : s}</option>)}
@@ -99,7 +100,7 @@ export function BriefsPage() {
                   <h3 className="text-lg font-extrabold text-brand-navy">{b.title}</h3>
                   <Pill s={briefStatus(d, b.id)} />
                 </div>
-                <p className="mt-2 text-sm text-brand-navySoft">{b.app}{b.due_date ? ` · due ${fmtDate(b.due_date)}` : " · no deadline"}</p>
+                <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-brand-navySoft"><AppBadge appId={b.app_id} />{b.due_date ? `Due ${fmtDate(b.due_date)}` : "No deadline"}</p>
               </PortalCard>
             </Link>
           ))}
@@ -126,7 +127,8 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
   return (
     <div>
       <Link to="/creators/app/briefs" className="text-sm font-semibold text-portal-accent">← All briefs</Link>
-      <div className="mt-3"><PageTitle title={brief.title} lead={`${brief.app}${brief.due_date ? ` · due ${fmtDate(brief.due_date)}` : ""}`} action={<Pill s={status} />} /></div>
+      <div className="mt-3"><PageTitle title={brief.title} lead={brief.due_date ? `Due ${fmtDate(brief.due_date)}` : undefined} action={<Pill s={status} />} /></div>
+      <div className="mb-4"><AppBadge appId={brief.app_id} className="text-sm" /></div>
       <PortalCard>
         {brief.hook && (
           <div className="mb-4 rounded-2xl bg-portal-accent/5 p-4">
@@ -172,6 +174,7 @@ function RefCard({ r, compact = false }: { r: Ref; compact?: boolean }) {
       ) : (
         <div className={cn("mb-3 flex aspect-[9/12] w-full items-center justify-center rounded-xl text-sm font-bold", r.platform === "instagram" ? "bg-portal-accent/10 text-portal-accent" : "bg-brand-navy/10 text-brand-navy")}>{r.platform === "instagram" ? "Instagram" : "TikTok"}</div>
       )}
+      <div className="mb-2 flex flex-wrap gap-1"><PlatformBadge platform={r.platform} /><AppBadge appId={r.app_id} /></div>
       {cat && <span className="mb-2 w-fit rounded-full bg-portal-bg px-2.5 py-0.5 text-[11px] font-bold text-brand-navy" title={cat.line}>{cat.label}</span>}
       <p className="font-extrabold text-brand-navy">{r.title || r.note || "Untitled video"}</p>
       {r.why_it_works && <p className="mt-1 text-sm text-brand-navySoft"><b>Why it works:</b> {r.why_it_works}</p>}
@@ -264,7 +267,7 @@ export function PostsPage({ refId }: { refId?: string | undefined }) {
             return (
               <PortalCard key={p.id} className={cn("p-5", p.status === "flagged" && "border-2 border-portal-amber")}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <a href={p.url} target="_blank" rel="noopener noreferrer" className="font-bold text-portal-accent hover:underline">{p.platform === "instagram" ? "Instagram" : "TikTok"} · {fmtDate(p.posted_on)}</a>
+                  <span className="flex flex-wrap items-center gap-2"><PlatformBadge platform={p.platform} /><AppBadge appId={p.app_id} /><a href={p.url} target="_blank" rel="noopener noreferrer" className="font-bold text-portal-accent hover:underline">{fmtDate(p.posted_on)}</a></span>
                   <Pill s={p.status === "flagged" ? "feedback" : p.status} />
                 </div>
                 <p className="mt-1 text-sm text-brand-navySoft">{brief ? `Brief: ${brief.title}` : "No brief"}{p.pay_status === "due" ? ` · ${money(p.amount_usd)}` : p.pay_status === "held" ? " · payment on hold (no rate set yet)" : ""}</p>
@@ -345,6 +348,8 @@ export function CallsPage() {
 /* ---------- Earnings ---------- */
 export function EarningsPage() {
   const { posts, payoutItems, me } = useCreator();
+  const { data: apps = [] } = useApps();
+  const appName = (id: string | null | undefined) => apps.find((a) => a.id === id)?.name ?? "—";
   const month = new Date().toISOString().slice(0, 7);
   const thisMonth = posts.filter((p) => p.posted_on.startsWith(month));
   const accrued = thisMonth.reduce((s, p) => s + (p.pay_status === "due" ? Number(p.amount_usd ?? 0) + Number(p.bonus_usd ?? 0) : 0), 0);
@@ -353,13 +358,13 @@ export function EarningsPage() {
   function download(item: CreatorData["payoutItems"][number]) {
     const period = item.payout_batches?.period ?? "";
     const lines = [
-      `Sophia creator statement`, `Creator: ${me.full_name}`, `Period: ${period}`, ``,
+      `Vik Studios creator statement`, `Creator: ${me.full_name}`, `Period: ${period}`, `App: ${appName(item.app_id)}`, ``,
       `Approved posts: ${item.posts_count}`, `Rate: ${money(item.rate_usd)}`, `Amount: ${money(item.amount_usd)}`, `Status: ${item.status}`,
       ...(item.payout_batches?.paid_at ? [`Paid on: ${fmtDate(item.payout_batches.paid_at)}`] : []),
-      ``, `Posts:`, ...posts.filter((p) => p.posted_on.startsWith(period) && p.pay_status === "due").map((p) => `${p.posted_on}  ${money(p.amount_usd)}  bonus ${money(p.bonus_usd)}  ${p.url}`),
+      ``, `Posts:`, ...posts.filter((p) => p.posted_on.startsWith(period) && p.pay_status === "due" && p.app_id === item.app_id).map((p) => `${p.posted_on}  ${appName(p.app_id)}  ${money(p.amount_usd)}  bonus ${money(p.bonus_usd)}  ${p.url}`),
     ];
     const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/plain" }));
-    const a = document.createElement("a"); a.href = url; a.download = `sophia-statement-${period}.txt`; a.click(); URL.revokeObjectURL(url);
+    const a = document.createElement("a"); a.href = url; a.download = `statement-${period}-${appName(item.app_id).toLowerCase()}.txt`; a.click(); URL.revokeObjectURL(url);
   }
   return (
     <div>
@@ -367,17 +372,21 @@ export function EarningsPage() {
       <PortalCard>
         <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Accrued this month</p>
         <p className="mt-1 text-3xl font-extrabold text-brand-navy">{money(accrued)}</p>
+        {apps.filter((a) => thisMonth.some((p) => p.app_id === a.id)).map((a) => (
+          <p key={a.id} className="mt-1 text-sm text-brand-navySoft">{a.name}: <b className="text-brand-navy">{money(thisMonth.filter((p) => p.app_id === a.id && p.pay_status === "due").reduce((s, p) => s + Number(p.amount_usd ?? 0) + Number(p.bonus_usd ?? 0), 0))}</b></p>
+        ))}
       </PortalCard>
       {held.length > 0 && <div className="mt-4"><Banner tone="warning" title={`${held.length} approved post${held.length > 1 ? "s are" : " is"} on hold`}>No rate has been set yet for your country. They will be paid at the right rate as soon as it is set; nothing is lost.</Banner></div>}
       {waitingViews.length > 0 && <div className="mt-4"><Banner tone="info" title={`${waitingViews.length} post${waitingViews.length > 1 ? "s are" : " is"} waiting for a view count`}>Report views with a screenshot on <Link to="/creators/app/posts" className="underline">My posts</Link>. Without it, the bonus for that post is zero.</Banner></div>}
       <h2 className="mb-3 mt-8 text-lg font-extrabold text-brand-navy">This month</h2>
       <PortalCard className="overflow-x-auto p-0">
         <table className="w-full text-sm">
-          <thead className="bg-portal-bg text-left text-xs uppercase tracking-wide text-brand-navySoft"><tr><th className="px-4 py-2">Post</th><th className="px-4 py-2">Date</th><th className="px-4 py-2">Fixed</th><th className="px-4 py-2">Bonus</th><th className="px-4 py-2">Status</th></tr></thead>
+          <thead className="bg-portal-bg text-left text-xs uppercase tracking-wide text-brand-navySoft"><tr><th className="px-4 py-2">Post</th><th className="px-4 py-2">App</th><th className="px-4 py-2">Date</th><th className="px-4 py-2">Fixed</th><th className="px-4 py-2">Bonus</th><th className="px-4 py-2">Status</th></tr></thead>
           <tbody className="divide-y divide-brand-line">
-            {thisMonth.length === 0 ? <tr><td colSpan={5} className="px-4 py-6 text-center text-brand-navySoft">No post this month yet.</td></tr> : thisMonth.map((p) => (
+            {thisMonth.length === 0 ? <tr><td colSpan={6} className="px-4 py-6 text-center text-brand-navySoft">No post this month yet.</td></tr> : thisMonth.map((p) => (
               <tr key={p.id}>
-                <td className="px-4 py-2"><a href={p.url} target="_blank" rel="noopener noreferrer" className="text-portal-accent underline">{p.platform}</a></td>
+                <td className="px-4 py-2"><a href={p.url} target="_blank" rel="noopener noreferrer" className="text-portal-accent underline">{platformName(p.platform)}</a></td>
+                <td className="px-4 py-2"><AppBadge appId={p.app_id} /></td>
                 <td className="px-4 py-2">{fmtDate(p.posted_on)}</td>
                 <td className="px-4 py-2">{p.pay_status === "due" ? money(p.amount_usd) : "—"}</td>
                 <td className="px-4 py-2">{money(p.bonus_usd)}</td>
@@ -392,7 +401,7 @@ export function EarningsPage() {
         <PortalCard className="divide-y divide-brand-line p-0">
           {payoutItems.map((i) => (
             <div key={i.id} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm">
-              <span><b className="text-brand-navy">{i.payout_batches?.period}</b> <span className="text-brand-navySoft">· {i.posts_count} post(s) · {money(i.amount_usd)} · {i.status}</span></span>
+              <span className="flex flex-wrap items-center gap-2"><b className="text-brand-navy">{i.payout_batches?.period}</b> <AppBadge appId={i.app_id} /> <span className="text-brand-navySoft"> {i.posts_count} post(s) · {money(i.amount_usd)} · {i.status}</span></span>
               <Button size="sm" variant="outline" onClick={() => download(i)}>Download statement</Button>
             </div>
           ))}
