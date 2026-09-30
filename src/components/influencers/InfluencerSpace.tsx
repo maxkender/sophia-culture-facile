@@ -25,6 +25,7 @@ const NAV: { heading: string; items: Item[] }[] = [
       { to: "/creators/influencer/app/offers", label: "Offers", icon: Inbox, badge: "offers" },
       { to: "/creators/influencer/app/deals", label: "Deals", icon: Handshake, badge: "deals" },
       { to: "/creators/influencer/app/briefs", label: "Briefs", icon: Briefcase },
+      { to: "/creators/influencer/app/earnings", label: "Earnings", icon: Landmark },
       { to: "/creators/influencer/app/messages", label: "Messages", icon: MessageSquare, badge: "messages" },
       { to: "/creators/influencer/app/profile", label: "Profile", icon: UserCircle },
     ],
@@ -56,6 +57,7 @@ function InfluencerSignIn({ invite, invitedEmail }: { invite: string | null; inv
   const [adult, setAdult] = useState(false);
   const [busy, setBusy] = useState(false);
   const [state, setState] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
   const check = useServerFn(checkInfluencerInvite);
   useEffect(() => {
     if (invite) check({ data: { token: invite } }).then((r) => { setState(r.state); if (r.state !== "fresh") setMode("in"); }).catch(() => setState("fresh"));
@@ -71,12 +73,13 @@ function InfluencerSignIn({ invite, invitedEmail }: { invite: string | null; inv
       : await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
     if (res.error) toast.error(res.error.message.includes("Invalid login") ? "The email or password is not right." : res.error.message);
-    else if (mode === "up" && !res.data.session) toast.success("Check your inbox to confirm your email, then come back to this link.");
+    else if (mode === "up" && !res.data.session) { setSent(true); toast.success("Check your inbox to confirm your email, then come back to this link."); }
   }
   return (
     <div className="min-h-screen bg-portal-bg">
       <div className="mx-auto max-w-sm space-y-3 p-6 pt-12 [&_input:not([type=checkbox])]:min-h-11 [&_button]:min-h-11">
         <Logo />
+        {sent ? <p role="status" className="rounded-xl bg-portal-green/10 p-3 text-sm font-semibold text-brand-navy">Account created. We sent a confirmation email to {email}: open it, then come back to this link to sign in.</p> : null}
         <h1 className="text-2xl font-extrabold text-brand-navy">Sophia influencer space</h1>
         {state === "used" && <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy">You have already set up your account. Sign in below.</p>}
         {state === "expired" && <p className="rounded-xl bg-portal-amber/10 p-3 text-sm text-brand-navy">This invite is more than 30 days old. Ask the Sophia team for a new one, or sign in if you already created your account.</p>}

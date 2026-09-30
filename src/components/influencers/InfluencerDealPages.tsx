@@ -13,7 +13,7 @@ import {
   checkpointOpen, CHECKPOINTS, cpm, daysLeft, DEAL_LABEL, deliverableLabel, euros, parseDeliverables, RIGHTS_LABEL, timeLeft, type Rights,
 } from "@/lib/influencer-deals";
 import {
-  dealUploadSlot, flagBriefInterest, markOfferViewed, markPosted, openDealFile, reportMetrics, respondToOffer, setSparkCode, signDealSheet, submitDraft,
+  dealUploadSlot, flagBriefInterest, invoiceUploadSlot, openMyInvoice, submitInvoice, markOfferViewed, markPosted, openDealFile, reportMetrics, respondToOffer, setSparkCode, signDealSheet, submitDraft,
 } from "@/lib/influencer-deals.functions";
 import { friendlyCreatorError } from "@/lib/creator-validation";
 import { DealSheetView } from "./DealSheetView";
@@ -432,6 +432,82 @@ function MetricsForm({ checkpoint, existing, open, opensAt, onSubmit }: {
         try { await onSubmit({ views, likes: n(v.likes), comments: n(v.comments), shares: n(v.shares), saves: n(v.saves) }, file); }
         catch (e) { toast.error(msg(e)); } finally { setBusy(false); }
       }}>Send</Button>
+    </div>
+  );
+}
+
+/* ---------------- Earnings ---------------- */
+export function InfluencerEarnings() {
+  const qc = useQueryClient();
+  const { data: me } = useInfluencerQuery();
+  const slot = useServerFn(invoiceUploadSlot);
+  const submit = useServerFn(submitInvoice);
+  const openInv = useServerFn(openMyInvoice);
+  const [busy, setBusy] = useState<string | null>(null);
+  const { data, isLoading } = useQuery({
+    queryKey: ["influencer", "earnings"],
+    queryFn: async () => {
+      const [{ data: items }, { data: deals }] = await Promise.all([
+        supabase.from("influencer_payout_items").select("*, influencer_invoices(file_path, status)").order("created_at", { ascending: false }),
+        supabase.from("influencer_deals").select("id, agreed_price, status, deal_sheet_snapshot"),
+      ]);
+      return { items: items ?? [], deals: deals ?? [] };
+    },
+  });
+  if (isLoading || !data) return <p className="text-sm">Loading…</p>;
+  const title = (id: string) => (data.deals.find((d) => d.id === id)?.deal_sheet_snapshot as { brief_title?: string } | null)?.brief_title ?? "Deal";
+  const month = new Date().toISOString().slice(0, 7);
+  const paid = data.items.filter((i) => i.status === "paid");
+  const due = data.items.filter((i) => ["due", "invoiced"].includes(i.status)).reduce((s, i) => s + Number(i.amount), 0);
+  const inProgress = data.deals.filter((d) => !["completed", "cancelled"].includes(d.status)).reduce((s, d) => s + Number(d.agreed_price), 0);
+  const needsInvoice = me?.payout_method === "invoice" || me?.payout_method === "agency";
+  async function upload(itemId: string, file: File) {
+    setBusy(itemId);
+    try {
+      const s = await slot({ data: { name: file.name, size: file.size } });
+      if (!s.ok) throw new Error(s.reason === "type" ? "The invoice must be a PDF." : s.reason === "size" ? "The PDF is over 10 MB." : "The upload could not start.");
+      const r = await fetch(s.signedUrl, { method: "PUT", body: file, headers: { "Content-Type": "application/pdf", "x-upsert": "true" } });
+      if (!r.ok) throw new Error("The upload did not go through. Try again.");
+      await submit({ data: { itemIds: [itemId], path: s.path } });
+      toast.success("Invoice sent. You will be paid by bank transfer.");
+      await qc.invalidateQueries({ queryKey: ["influencer", "earnings"] });
+    } catch (e) { toast.error(msg(e)); } finally { setBusy(null); }
+  }
+  return (
+    <div className="space-y-5">
+      <Title title="Earnings" lead={`Payments are created when a deal is completed.${needsInvoice ? ` Upload an invoice (PDF) for each payment${me?.payee === "agency" ? ", or have your agency send it" : ""}.` : " Paid through Stripe."}`} />
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card><p className="text-xs font-bold uppercase text-brand-navySoft">Paid this month</p><p className="mt-1 text-2xl font-extrabold">{euros(paid.filter((i) => i.paid_on?.startsWith(month)).reduce((s, i) => s + Number(i.amount), 0))}</p></Card>
+        <Card><p className="text-xs font-bold uppercase text-brand-navySoft">Waiting to be paid</p><p className="mt-1 text-2xl font-extrabold">{euros(due)}</p></Card>
+        <Card><p className="text-xs font-bold uppercase text-brand-navySoft">Deals in progress</p><p className="mt-1 text-2xl font-extrabold">{euros(inProgress)}</p></Card>
+      </div>
+      <Card>
+        {data.items.length ? (
+          <ul className="divide-y divide-brand-line text-sm">
+            {data.items.map((i) => (
+              <li key={i.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
+                <div>
+                  <p className="font-semibold text-brand-navy">{title(i.deal_id)}</p>
+                  <p className="text-xs text-brand-navySoft">{i.part === "full" ? "Full amount" : i.part === "acceptance" ? "50% on acceptance" : "50% on posting"}{i.payee === "agency" ? " · paid to your agency" : ""}</p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-bold">{euros(i.amount)}</span>
+                  <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold", i.status === "paid" ? "bg-portal-green/10 text-portal-green" : "bg-portal-amber/10 text-portal-amber")}>
+                    {i.status === "paid" ? `Paid ${i.paid_on ?? ""}` : i.status === "invoiced" ? "Invoice received" : "Due"}
+                  </span>
+                  {i.influencer_invoices?.file_path ? <button className="text-xs underline" onClick={async () => { const r = await openInv({ data: { path: i.influencer_invoices!.file_path } }); if (r.url) window.open(r.url, "_blank", "noopener"); }}>Statement (invoice)</button> : null}
+                  {i.status === "due" && i.method !== "stripe" ? (
+                    <label className="cursor-pointer rounded-full border border-brand-navy px-3 py-2 text-xs font-bold">
+                      {busy === i.id ? "Uploading…" : "Upload invoice (PDF)"}
+                      <input type="file" accept="application/pdf" className="sr-only" disabled={busy !== null} onChange={(e) => { const f = e.target.files?.[0]; if (f) void upload(i.id, f); }} />
+                    </label>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : <p className="text-sm text-brand-navySoft">No payment yet. Your first one appears when a deal is completed.</p>}
+      </Card>
     </div>
   );
 }
