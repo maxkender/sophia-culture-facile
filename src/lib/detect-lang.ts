@@ -22,11 +22,8 @@ export function langFromAcceptLanguage(header: string | null | undefined): Lang 
     })
     .filter((item) => item.tag && !Number.isNaN(item.q))
     .sort((a, b) => b.q - a.q);
-  for (const { tag } of tags) {
-    if (tag.startsWith("fr")) return "fr";
-    if (tag.startsWith("en")) return "en";
-  }
-  return null;
+  // Téléphone réglé en français (langue principale) → français ; sinon on laisse décider le pays.
+  return tags[0]?.tag.startsWith("fr") ? "fr" : null;
 }
 
 export function langFromCountry(country: string | null | undefined): Lang | null {
@@ -54,12 +51,7 @@ export function detectLangInBrowser(): Lang {
   const stored = langFromCookieHeader(document.cookie);
   if (stored) return stored;
   const languages = navigator.languages?.length ? navigator.languages : [navigator.language];
-  for (const tag of languages) {
-    const lower = (tag ?? "").toLowerCase();
-    if (lower.startsWith("fr")) return "fr";
-    if (lower.startsWith("en")) return "en";
-  }
-  return "en";
+  return (languages[0] ?? "").toLowerCase().startsWith("fr") ? "fr" : "en";
 }
 
 /** Écrit le choix du visiteur pour un an. */

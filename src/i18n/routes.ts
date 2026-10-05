@@ -71,9 +71,7 @@ export function langFromPath(pathname: string): Lang {
   return pathname === "/en" || pathname.startsWith("/en/") ? "en" : "fr";
 }
 
-/** Pays dont les visiteurs reçoivent le site en français par défaut. */
+/** Territoire français (métropole et outre-mer) : site en français par défaut. */
 export const FRANCOPHONE_COUNTRIES = new Set([
-  "FR", "BE", "CH", "LU", "MC", "CA",
-  "SN", "CI", "CM", "MA", "TN", "DZ", "ML", "BF", "NE", "GN",
-  "BJ", "TG", "MG", "CD", "CG", "GA", "TD", "RW", "BI", "HT",
+  "FR", "GP", "MQ", "GF", "RE", "YT", "PM", "BL", "MF", "WF", "PF", "NC", "TF",
 ]);

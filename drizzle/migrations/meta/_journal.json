@@ -218,6 +218,13 @@
       "when": 1790773189554,
       "tag": "0030_restrict_influencer_settings_read",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1791232190277,
+      "tag": "0031_slideshow_phone_optional",
+      "breakpoints": true
     }
   ]
 }

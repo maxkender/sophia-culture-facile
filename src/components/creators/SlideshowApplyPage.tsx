@@ -33,7 +33,7 @@ export function SlideshowApplyPage() {
     e.preventDefault();
     setError(null);
     if (adult === "no") return;
-    if (!f.full_name.trim() || !f.email.trim() || !f.phone.trim() || !f.country || !adult || !upwork) {
+    if (!f.full_name.trim() || !f.email.trim() || !f.country || !adult || !upwork) {
       setError(common.requiredError);
       return;
     }
@@ -41,7 +41,7 @@ export function SlideshowApplyPage() {
       setError(common.emailError);
       return;
     }
-    if (!isValidInternationalPhone(f.phone)) {
+    if (f.phone.trim() && !isValidInternationalPhone(f.phone)) {
       setError(common.phoneError);
       return;
     }
@@ -110,7 +110,7 @@ export function SlideshowApplyPage() {
             <p id="email-help" className="text-xs text-brand-navySoft">{lang === "fr" ? "Exemple : nom@exemple.com" : "Example: name@example.com"}</p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">{common.phone}</Label>
+            <Label htmlFor="phone">{common.phone} <span className="font-normal text-brand-navySoft">{lang === "fr" ? "(facultatif)" : "(optional)"}</span></Label>
             <Input id="phone" type="tel" className="h-11" placeholder="+33 6 12 34 56 78" autoComplete="tel" aria-describedby="phone-help" value={f.phone} onChange={(e) => set("phone", e.target.value)} />
             <p id="phone-help" className="text-xs text-brand-navySoft">{lang === "fr" ? "Incluez l’indicatif du pays, par exemple +33." : "Include the country code, for example +44."}</p>
           </div>

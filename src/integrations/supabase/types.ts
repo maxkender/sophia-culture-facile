@@ -3580,7 +3580,7 @@ export type Database = {
           has_upwork: boolean
           id: string
           is_adult: boolean
-          phone: string
+          phone: string | null
           referral_source: string | null
           rejection_reason: string | null
           signing_token: string | null
@@ -3611,7 +3611,7 @@ export type Database = {
           has_upwork?: boolean
           id?: string
           is_adult: boolean
-          phone: string
+          phone?: string | null
           referral_source?: string | null
           rejection_reason?: string | null
           signing_token?: string | null
@@ -3642,7 +3642,7 @@ export type Database = {
           has_upwork?: boolean
           id?: string
           is_adult?: boolean
-          phone?: string
+          phone?: string | null
           referral_source?: string | null
           rejection_reason?: string | null
           signing_token?: string | null
