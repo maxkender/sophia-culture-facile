@@ -1,0 +1,1 @@
+ALTER TABLE public.slideshow_applications ALTER COLUMN phone DROP NOT NULL;
