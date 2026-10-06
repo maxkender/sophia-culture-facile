@@ -16,6 +16,7 @@ import { usePortalProfile } from "../usePortal";
 import { useServerFn } from "@tanstack/react-start";
 import { generateSigningLink } from "@/lib/creator-agreement.functions";
 import { approveUgcApplication } from "@/lib/creator-onboarding.functions";
+import { rejectUgcApplication, resendWelcomeEmail } from "@/lib/ugc-admin.functions";
 import { getGuideForApplication, setApplicationZone } from "@/lib/slideshow-zones.functions";
 import { GUIDE_PDF_NAME, ZONE_BADGE } from "@/lib/slideshow-guide";
 import { SocialLinks, TalkingVideo, VideoStatusIcon } from "./ApplicationVideo";
@@ -65,11 +66,22 @@ export function CreatorApplications({ track }: { track: Track }) {
   const [signedFilter, setSignedFilter] = useState<"any" | "signed" | "unsigned">("any");
   const genLink = useServerFn(generateSigningLink);
   const approveUgc = useServerFn(approveUgcApplication);
+  const rejectUgc = useServerFn(rejectUgcApplication);
+  const resendWelcome = useServerFn(resendWelcomeEmail);
+  const [notifyReject, setNotifyReject] = useState(false);
 
   const { appId } = useAdminApp();
   const { data } = useQuery({
     queryKey: ["portal", "admin", "creator-applications", track, status, signedFilter, appId],
     queryFn: async () => {
+      if (track === "ugc" && next === "rejected") {
+        const r = await rejectUgc({ data: { applicationId: id, reason: reason.trim(), notify: notifyReject } });
+        if (notifyReject) r.sent ? toast.success(r.note ? `Rejected. ${r.note}.` : "Rejected. The decline email was sent.") : toast.warning(`Rejected. ${r.note ?? "Email not sent"}.`);
+        else toast.success("Application rejected.");
+        setSelected(null);
+        await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-applications"] });
+        return;
+      }
       const table = track === "ugc" ? "creator_applications" : "slideshow_applications";
       let query = supabase.from(table).select("*").order("created_at", { ascending: false });
       if (status !== "all") query = query.eq("status", status);
@@ -98,10 +110,11 @@ export function CreatorApplications({ track }: { track: Track }) {
       if (track === "ugc" && next === "approved") {
         const result = await approveUgc({ data: { applicationId: id, origin: window.location.origin, notes: notes.trim() || undefined } });
         if (result.emailSent) {
-          toast.success("Application approved. The invite email has been sent to the creator.");
+          if (result.emailReason) toast.warning(`Approved. ${result.emailReason}.`);
+          else toast.success("Application approved. The welcome email went out through Brevo.");
         } else {
           await navigator.clipboard.writeText(result.inviteUrl).catch(() => {});
-          toast.error("Application approved, but the email could not be sent. The invite link was copied — send it to the creator yourself.");
+          toast.warning(`Application approved. ${result.emailReason ?? "Email not sent"}. The invite link was copied — send it yourself or use Resend welcome email.`);
         }
         setSelected(null);
         await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-applications"] });
@@ -233,9 +246,15 @@ export function CreatorApplications({ track }: { track: Track }) {
                     <div className="sm:col-span-2">
                       <SocialLinks tiktok={selected.tiktok_url} instagram={selected.instagram_url} other={selected.other_links} />
                     </div>
+                    <div><dt className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Source</dt><dd className="text-brand-navy">{(selected as any).source ?? "direct"}</dd></div>
                     {selected.status === "approved" && selected.created_creator_id ? (
                       <div className="sm:col-span-2 rounded-lg border border-brand-line bg-brand-surface p-3 text-xs text-brand-navySoft">
-                        The creator account and secure invitation have been prepared. Automatic email delivery starts once Sophia’s sender domain is configured.
+                        <p>Welcome email: {(selected as any).acceptance_email_sent_at ? `sent ${formatDateTime((selected as any).acceptance_email_sent_at)} via ${(selected as any).welcome_email_provider ?? "?"}${(selected as any).welcome_email_message_id ? ` · Brevo id ${(selected as any).welcome_email_message_id}` : ""}` : "not sent"}</p>
+                        {(selected as any).welcome_email_error ? <p className="mt-1 font-semibold text-portal-amber">{(selected as any).welcome_email_error}</p> : null}
+                        <Button type="button" size="sm" variant="outline" className="mt-2" onClick={async () => {
+                          try { const r = await resendWelcome({ data: { applicationId: selected.id, origin: window.location.origin } }); r.sent ? toast.success(r.note ?? "Welcome email resent through Brevo.") : toast.warning(r.note ?? "Email not sent."); await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-applications"] }); }
+                          catch (e) { toast.error(e instanceof Error ? e.message : "Could not resend."); }
+                        }}>Resend welcome email</Button>
                       </div>
                     ) : null}
                   </>
@@ -267,6 +286,7 @@ export function CreatorApplications({ track }: { track: Track }) {
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wide text-brand-navySoft" htmlFor="creator-reason">Rejection reason (required to reject)</label>
                     <Input id="creator-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Not enough video examples" />
+                    {track === "ugc" && <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={notifyReject} onChange={(e) => setNotifyReject(e.target.checked)} /> Notify the applicant (kind decline email)</label>}
                   </div>
                   {track === "slideshow" && !(selected as SlideshowApplication).zone ? (
                     <p className="text-sm font-semibold text-portal-red">This country has no pay zone. Ask Adrien or Max before accepting.</p>
