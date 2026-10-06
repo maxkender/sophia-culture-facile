@@ -22,7 +22,7 @@ import {
 import { startStripeOnboarding, syncStripeStatus } from "@/lib/creator-payouts.functions";
 import { savePayoutFallback } from "@/lib/creator-extras.functions";
 import { joinCreatorSlack, SLACK_INVITE_URL } from "@/lib/creator-onboarding.functions";
-import { ACCOUNT_SUBSTEPS, SLACK_INVITE, WARMUP_DAYS } from "@/lib/creator-steps";
+import { ACCOUNT_SUBSTEPS, SLACK_INVITE, UGC_HANDLE_GUIDANCE, UGC_PROFILE_GUIDANCE, WARMUP_DAYS } from "@/lib/creator-steps";
 import { saveUgcAccountStep, setWhatsappOptIn } from "@/lib/ugc-creator.functions";
 import { friendlyCreatorError, isValidEmail, isValidInternationalPhone } from "@/lib/creator-validation";
 import { CountrySelect } from "../CountrySelect";
@@ -145,7 +145,7 @@ function ManagedAccountCard({ app, account }: { app: AppRow; account: { handle: 
       <PortalCard>
         {showForm ? (
           <div className="grid gap-4 sm:grid-cols-2">
-            <div><Label>TikTok username *</Label><Input placeholder="@cultureminute" autoComplete="off" value={form.handle} onChange={(e) => setForm({ ...form, handle: e.target.value })} /><p className="mt-1 text-xs text-brand-navySoft">Choose any available name suitable for a general-knowledge account. There is no required format.</p></div>
+            <div><Label>TikTok username *</Label><Input placeholder="@lea" autoComplete="off" value={form.handle} onChange={(e) => setForm({ ...form, handle: e.target.value })} /><p className="mt-1 text-xs text-brand-navySoft">{UGC_HANDLE_GUIDANCE}</p></div>
             <div><Label>Email used for the account *</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             <div><Label>Password *{account ? " (leave empty to keep)" : ""}</Label><Input type="password" autoComplete="new-password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></div>
             <div><Label>Phone number linked (if any)</Label><Input type="tel" placeholder="+44 7700 900123" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /><p className="mt-1 text-xs text-brand-navySoft">If entered, include the country code.</p></div>
@@ -204,7 +204,8 @@ export function AccountSetupPage() {
   };
   const req = (me as any).required_platforms ?? "both";
   const Sub = ({ k, children }: { k: string; children: React.ReactNode }) => {
-    const sub = ACCOUNT_SUBSTEPS.find((x) => x.key === k)!;
+    const sub = ACCOUNT_SUBSTEPS.find((x) => x.key === k);
+    if (!sub) return null;
     return (
       <PortalCard>
         <div className="flex items-start gap-3">
@@ -212,6 +213,12 @@ export function AccountSetupPage() {
           <div className="min-w-0 flex-1">
             <p className="font-extrabold text-brand-navy">{sub.title}</p>
             <p className="mt-1 text-sm text-brand-navySoft">{sub.text}</p>
+            {(k === "acc_tiktok" || k === "acc_instagram") && (
+              <div className="mt-3 space-y-2 text-sm text-brand-navySoft">
+                <p>Use the new email registered above.{k === "acc_instagram" ? " Switch it to a Creator account (Settings → Account type and tools)." : ""}</p>
+                {UGC_PROFILE_GUIDANCE.map((item) => <p key={item.label}><span className="font-semibold">{item.label}: </span>{item.text}</p>)}
+              </div>
+            )}
             <div className="mt-4">{children}</div>
           </div>
         </div>
@@ -227,7 +234,7 @@ export function AccountSetupPage() {
       <div className="space-y-4">
         <Sub k="acc_email">
           <div className="grid gap-3 sm:grid-cols-2">
-            <div><Label htmlFor="acc-email">Sophia email address</Label><Input id="acc-email" type="email" placeholder="sophia.lea@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+            <div><Label htmlFor="acc-email">Sophia email address</Label><Input id="acc-email" type="email" placeholder="lea.creator@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
             <div><Label htmlFor="acc-pw">Password{account ? " (enter again to change)" : ""}</Label><Input id="acc-pw" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
           </div>
           <p className="mt-2 text-xs text-brand-navySoft">Stored encrypted. Only the Sophia team can reveal it, and every reveal is logged.</p>
@@ -235,14 +242,14 @@ export function AccountSetupPage() {
         </Sub>
         {req !== "instagram" && (
           <Sub k="acc_tiktok">
-            <div className="max-w-sm"><Label htmlFor="acc-tt">TikTok handle</Label><Input id="acc-tt" placeholder="@sophia.lea" value={tt} onChange={(e) => setTt(e.target.value)} /></div>
+            <div className="max-w-sm"><Label htmlFor="acc-tt">TikTok handle</Label><Input id="acc-tt" placeholder="@lea" value={tt} onChange={(e) => setTt(e.target.value)} /></div>
             <Button className="mt-3" disabled={busy || !tt || !checks["acc_email"]} onClick={() => run(() => saveStep({ data: { step: "tiktok", handle: tt } }), "TikTok handle registered.")}>Register TikTok</Button>
             {!checks["acc_email"] && <p className="mt-2 text-xs text-brand-navySoft">Register the email first.</p>}
           </Sub>
         )}
         {req !== "tiktok" && (
           <Sub k="acc_instagram">
-            <div className="max-w-sm"><Label htmlFor="acc-ig">Instagram handle</Label><Input id="acc-ig" placeholder="@sophia.lea" value={ig} onChange={(e) => setIg(e.target.value)} /></div>
+            <div className="max-w-sm"><Label htmlFor="acc-ig">Instagram handle</Label><Input id="acc-ig" placeholder="@lea" value={ig} onChange={(e) => setIg(e.target.value)} /></div>
             <label className="mt-3 flex items-center gap-2 text-sm"><Checkbox checked={igCreator} onCheckedChange={(v) => setIgCreator(v === true)} /> The account is set to Creator account type</label>
             <Button className="mt-3" disabled={busy || !ig || !igCreator || !checks["acc_email"]} onClick={() => run(() => saveStep({ data: { step: "instagram", handle: ig, creatorType: true } }), "Instagram handle registered.")}>Register Instagram</Button>
           </Sub>

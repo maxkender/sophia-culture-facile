@@ -28,7 +28,7 @@ const handle = z.string().trim().min(2).max(60).regex(/^@?[a-zA-Z0-9._]+$/, "Use
 export const saveUgcAccountStep = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.discriminatedUnion("step", [
-    z.object({ step: z.literal("email"), email: z.string().trim().email("Enter a complete email address, for example sophia.lea@gmail.com.").max(200).refine((e) => /@(gmail|googlemail|outlook|hotmail|live)\./i.test(e), "Use a Gmail or Outlook address so it can be handed over."), password: z.string().min(6, "The password must have at least 6 characters.").max(200) }),
+    z.object({ step: z.literal("email"), email: z.string().trim().email("Enter a complete email address, for example lea.creator@gmail.com.").max(200).refine((e) => /@(gmail|googlemail|outlook|hotmail|live)\./i.test(e), "Use a Gmail or Outlook address so it can be handed over."), password: z.string().min(6, "The password must have at least 6 characters.").max(200) }),
     z.object({ step: z.literal("tiktok"), handle }),
     z.object({ step: z.literal("instagram"), handle, creatorType: z.literal(true) }),
     z.object({ step: z.literal("confirm"), publicConfirmed: z.literal(true) }),

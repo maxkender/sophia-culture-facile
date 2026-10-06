@@ -7,11 +7,19 @@ export const WARMUP_DAYS: { day: number; text: string }[] = [
 
 export const SLACK_INVITE = "https://join.slack.com/t/ugc-vikstudios/shared_invite/zt-4b6fwnseu-KrYV8Y0~IZ9C~7uo9HipbQ";
 
+export const UGC_HANDLE_GUIDANCE = "Choose a handle that sounds like you, the way you would name your own account. A first name, a nickname, a word you like. Do NOT put 'Sophia' or the app name in it: the account has to feel like a person, not a brand. Use the same handle on TikTok and Instagram if it is free on both; if not, keep them as close as possible.";
+export const UGC_PROFILE_GUIDANCE = [
+  { label: "Display name", text: "Your first name, or whatever you would use for your own account." },
+  { label: "Bio", text: "Write a one-line bio in your own words, about you. Do not mention Sophia or any app in it." },
+  { label: "Profile photo", text: "A clear photo of your face." },
+  { label: "Link in bio", text: "Do not add a link during onboarding. Add a link later only when a brief asks for it." },
+];
+
 /** Step 3 sub-steps (keys stored in creators.setup_guide_checks). */
 export const ACCOUNT_SUBSTEPS: { key: string; title: string; text: string }[] = [
   { key: "acc_email", title: "a. Create a new email address for Sophia", text: "Use a provider that allows handover: Gmail or Outlook. Do not use your personal email. Register the address and its password here." },
-  { key: "acc_tiktok", title: "b. Create the TikTok account", text: "Use the Sophia email. Handle: sophia.[firstname] or the one your hiring manager assigned. Bio: \"Learning something new every day with Sophia 📚 Get the app 👇\" · Link: taap.it/sophia.culture" },
-  { key: "acc_instagram", title: "c. Create the Instagram account", text: "Same email. Same handle if available, otherwise sophia.[firstname].fr. Switch it to a Creator account (Settings → Account type and tools)." },
+  { key: "acc_tiktok", title: "b. Create the TikTok account", text: UGC_HANDLE_GUIDANCE },
+  { key: "acc_instagram", title: "c. Create the Instagram account", text: UGC_HANDLE_GUIDANCE },
   { key: "acc_confirm", title: "d. Confirm both accounts are public and registered", text: "Both profiles public, both handles registered above." },
 ];
 
