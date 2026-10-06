@@ -74,7 +74,8 @@ export function RulesPage() {
 }
 
 export function ContractPage() {
-  const { me, signature, reload } = useCreator();
+  const { me, signature: sig, steps, reload } = useCreator();
+  const signature = steps.resignPending ? null : sig;
   const { data: doc } = useDoc("creator-agreement");
   const sign = useServerFn(signCreatorAgreement);
   if (!doc) return <p className="text-sm text-brand-navySoft">Loading…</p>;
@@ -82,7 +83,8 @@ export function ContractPage() {
   const merge = { legal_name: me.full_name, country: me.country, email: me.email, track: TRACK_LABEL.ugc };
   return (
     <div>
-      <PageTitle title="Creator Account Agreement" lead="The account you set up belongs to Sophia. Read the agreement in full, then sign." />
+      <PageTitle title="Creator Account Agreement" lead="The accounts you set up belong to Sophia. Read the agreement in full, then sign." />
+      {steps.resignPending && <div className="mb-6"><Banner tone="warning" title={`You signed version ${sig?.document_version}. Please sign version ${doc.current_version}.`}>Clauses 2 and 4 changed.</Banner></div>}
       {signature ? (
         <>
           <div className="mb-6"><Banner tone="success" title={`Signed on ${fmt(signature.signed_at)} · version ${signature.document_version} · ${signature.variant} variant`} /></div>
