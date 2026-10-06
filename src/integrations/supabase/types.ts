@@ -20,6 +20,7 @@ export type Database = {
           assigned_at: string | null
           assigned_creator_id: string | null
           assigned_to: string | null
+          batch_label: string | null
           code: string
           created_at: string
           id: string
@@ -32,6 +33,7 @@ export type Database = {
           assigned_at?: string | null
           assigned_creator_id?: string | null
           assigned_to?: string | null
+          batch_label?: string | null
           code: string
           created_at?: string
           id?: string
@@ -44,6 +46,7 @@ export type Database = {
           assigned_at?: string | null
           assigned_creator_id?: string | null
           assigned_to?: string | null
+          batch_label?: string | null
           code?: string
           created_at?: string
           id?: string
@@ -402,19 +405,40 @@ export type Database = {
           brief_id: string
           created_at: string
           creator_id: string
+          decline_reason: string | null
+          declined_at: string | null
           id: string
+          published_at: string | null
+          replacement_brief_id: string | null
+          replaces_assignment_id: string | null
+          target_date: string | null
+          week_start: string | null
         }
         Insert: {
           brief_id: string
           created_at?: string
           creator_id: string
+          decline_reason?: string | null
+          declined_at?: string | null
           id?: string
+          published_at?: string | null
+          replacement_brief_id?: string | null
+          replaces_assignment_id?: string | null
+          target_date?: string | null
+          week_start?: string | null
         }
         Update: {
           brief_id?: string
           created_at?: string
           creator_id?: string
+          decline_reason?: string | null
+          declined_at?: string | null
           id?: string
+          published_at?: string | null
+          replacement_brief_id?: string | null
+          replaces_assignment_id?: string | null
+          target_date?: string | null
+          week_start?: string | null
         }
         Relationships: [
           {
@@ -429,6 +453,20 @@ export type Database = {
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brief_assignments_replacement_brief_id_fkey"
+            columns: ["replacement_brief_id"]
+            isOneToOne: false
+            referencedRelation: "briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brief_assignments_replaces_assignment_id_fkey"
+            columns: ["replaces_assignment_id"]
+            isOneToOne: false
+            referencedRelation: "brief_assignments"
             referencedColumns: ["id"]
           },
         ]
@@ -477,45 +515,72 @@ export type Database = {
       }
       briefs: {
         Row: {
+          angle: string | null
           app: string
           app_id: string
           audience: string
           body: string
+          brief_type: string
           created_at: string
           created_by: string | null
+          difficulty: number
           due_date: string | null
+          duration_target: string | null
+          format: string | null
           hook: string | null
           id: string
+          must_mention: string | null
+          platform: string
           reference_video_ids: string[]
+          script: string | null
           status: string
+          tags: string[]
           title: string
         }
         Insert: {
+          angle?: string | null
           app?: string
           app_id?: string
           audience?: string
           body?: string
+          brief_type?: string
           created_at?: string
           created_by?: string | null
+          difficulty?: number
           due_date?: string | null
+          duration_target?: string | null
+          format?: string | null
           hook?: string | null
           id?: string
+          must_mention?: string | null
+          platform?: string
           reference_video_ids?: string[]
+          script?: string | null
           status?: string
+          tags?: string[]
           title: string
         }
         Update: {
+          angle?: string | null
           app?: string
           app_id?: string
           audience?: string
           body?: string
+          brief_type?: string
           created_at?: string
           created_by?: string | null
+          difficulty?: number
           due_date?: string | null
+          duration_target?: string | null
+          format?: string | null
           hook?: string | null
           id?: string
+          must_mention?: string | null
+          platform?: string
           reference_video_ids?: string[]
+          script?: string | null
           status?: string
+          tags?: string[]
           title?: string
         }
         Relationships: [
@@ -925,6 +990,8 @@ export type Database = {
           created_creator_id: string | null
           decided_at: string | null
           decided_by: string | null
+          decline_email_message_id: string | null
+          decline_email_sent_at: string | null
           email: string
           full_name: string
           id: string
@@ -936,11 +1003,15 @@ export type Database = {
           phone: string
           referral_source: string
           rejection_reason: string | null
+          source: string | null
           status: string
           submit_ip_hash: string | null
           tiktok_url: string | null
           video_file_path: string | null
           video_url: string | null
+          welcome_email_error: string | null
+          welcome_email_message_id: string | null
+          welcome_email_provider: string | null
         }
         Insert: {
           acceptance_email_sent_at?: string | null
@@ -954,6 +1025,8 @@ export type Database = {
           created_creator_id?: string | null
           decided_at?: string | null
           decided_by?: string | null
+          decline_email_message_id?: string | null
+          decline_email_sent_at?: string | null
           email: string
           full_name: string
           id?: string
@@ -965,11 +1038,15 @@ export type Database = {
           phone: string
           referral_source: string
           rejection_reason?: string | null
+          source?: string | null
           status?: string
           submit_ip_hash?: string | null
           tiktok_url?: string | null
           video_file_path?: string | null
           video_url?: string | null
+          welcome_email_error?: string | null
+          welcome_email_message_id?: string | null
+          welcome_email_provider?: string | null
         }
         Update: {
           acceptance_email_sent_at?: string | null
@@ -983,6 +1060,8 @@ export type Database = {
           created_creator_id?: string | null
           decided_at?: string | null
           decided_by?: string | null
+          decline_email_message_id?: string | null
+          decline_email_sent_at?: string | null
           email?: string
           full_name?: string
           id?: string
@@ -994,11 +1073,15 @@ export type Database = {
           phone?: string
           referral_source?: string
           rejection_reason?: string | null
+          source?: string | null
           status?: string
           submit_ip_hash?: string | null
           tiktok_url?: string | null
           video_file_path?: string | null
           video_url?: string | null
+          welcome_email_error?: string | null
+          welcome_email_message_id?: string | null
+          welcome_email_provider?: string | null
         }
         Relationships: [
           {
@@ -1731,24 +1814,33 @@ export type Database = {
         Row: {
           access_code: string | null
           access_redeem_url: string | null
+          accounts_confirmed_at: string | null
           admin_notes: string | null
           application_id: string | null
           assigned_hm_id: string | null
+          cap_override: number | null
           country: string | null
           created_at: string
           email: string
           examples_read_at: string | null
+          fixed_monthly_override: number | null
           full_name: string
           guide_read_at: string | null
           id: string
+          instagram_handle: string | null
           invite_sent_at: string | null
           invite_token: string | null
+          last_seen_at: string | null
           motivation_confirmed_at: string | null
           onboarding_completed_at: string | null
           phone: string | null
           photo_path: string | null
           platform: string | null
+          posts_per_month: number | null
           profile_picture_confirmed: boolean
+          required_platforms: string
+          resign_required_at: string | null
+          rpm_override: number | null
           rules_accepted_at: string | null
           rules_version: number | null
           setup_guide_checks: Json
@@ -1757,32 +1849,47 @@ export type Database = {
           social_bio: string | null
           social_handle: string | null
           status: string
+          sync_checked_at: string | null
+          sync_error: string | null
+          sync_status: string | null
+          tiktok_handle: string | null
           track: string
+          ugc_status: string
           user_id: string | null
           warmup: Json
           weekly_target: number
+          whatsapp_opt_in: boolean | null
         }
         Insert: {
           access_code?: string | null
           access_redeem_url?: string | null
+          accounts_confirmed_at?: string | null
           admin_notes?: string | null
           application_id?: string | null
           assigned_hm_id?: string | null
+          cap_override?: number | null
           country?: string | null
           created_at?: string
           email: string
           examples_read_at?: string | null
+          fixed_monthly_override?: number | null
           full_name: string
           guide_read_at?: string | null
           id?: string
+          instagram_handle?: string | null
           invite_sent_at?: string | null
           invite_token?: string | null
+          last_seen_at?: string | null
           motivation_confirmed_at?: string | null
           onboarding_completed_at?: string | null
           phone?: string | null
           photo_path?: string | null
           platform?: string | null
+          posts_per_month?: number | null
           profile_picture_confirmed?: boolean
+          required_platforms?: string
+          resign_required_at?: string | null
+          rpm_override?: number | null
           rules_accepted_at?: string | null
           rules_version?: number | null
           setup_guide_checks?: Json
@@ -1791,32 +1898,47 @@ export type Database = {
           social_bio?: string | null
           social_handle?: string | null
           status?: string
+          sync_checked_at?: string | null
+          sync_error?: string | null
+          sync_status?: string | null
+          tiktok_handle?: string | null
           track?: string
+          ugc_status?: string
           user_id?: string | null
           warmup?: Json
           weekly_target?: number
+          whatsapp_opt_in?: boolean | null
         }
         Update: {
           access_code?: string | null
           access_redeem_url?: string | null
+          accounts_confirmed_at?: string | null
           admin_notes?: string | null
           application_id?: string | null
           assigned_hm_id?: string | null
+          cap_override?: number | null
           country?: string | null
           created_at?: string
           email?: string
           examples_read_at?: string | null
+          fixed_monthly_override?: number | null
           full_name?: string
           guide_read_at?: string | null
           id?: string
+          instagram_handle?: string | null
           invite_sent_at?: string | null
           invite_token?: string | null
+          last_seen_at?: string | null
           motivation_confirmed_at?: string | null
           onboarding_completed_at?: string | null
           phone?: string | null
           photo_path?: string | null
           platform?: string | null
+          posts_per_month?: number | null
           profile_picture_confirmed?: boolean
+          required_platforms?: string
+          resign_required_at?: string | null
+          rpm_override?: number | null
           rules_accepted_at?: string | null
           rules_version?: number | null
           setup_guide_checks?: Json
@@ -1825,10 +1947,16 @@ export type Database = {
           social_bio?: string | null
           social_handle?: string | null
           status?: string
+          sync_checked_at?: string | null
+          sync_error?: string | null
+          sync_status?: string | null
+          tiktok_handle?: string | null
           track?: string
+          ugc_status?: string
           user_id?: string | null
           warmup?: Json
           weekly_target?: number
+          whatsapp_opt_in?: boolean | null
         }
         Relationships: [
           {
@@ -1969,6 +2097,130 @@ export type Database = {
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      external_posts: {
+        Row: {
+          brief_id: string | null
+          caption: string | null
+          comments: number | null
+          comments_7d: number | null
+          cover_url: string | null
+          creator_id: string
+          duration: number | null
+          exclude_reason: string | null
+          excluded: boolean
+          external_id: string
+          first_seen_at: string
+          id: string
+          last_synced_at: string
+          likes: number | null
+          likes_7d: number | null
+          logged_post_id: string | null
+          manual_accepted_at: string | null
+          manual_screenshot_path: string | null
+          manual_submitted_at: string | null
+          manual_views_7d: number | null
+          platform: string
+          posted_at: string | null
+          shares: number | null
+          shares_7d: number | null
+          url: string | null
+          views: number | null
+          views_30d: number | null
+          views_30d_at: string | null
+          views_7d: number | null
+          views_7d_at: string | null
+          views_7d_source: string | null
+        }
+        Insert: {
+          brief_id?: string | null
+          caption?: string | null
+          comments?: number | null
+          comments_7d?: number | null
+          cover_url?: string | null
+          creator_id: string
+          duration?: number | null
+          exclude_reason?: string | null
+          excluded?: boolean
+          external_id: string
+          first_seen_at?: string
+          id?: string
+          last_synced_at?: string
+          likes?: number | null
+          likes_7d?: number | null
+          logged_post_id?: string | null
+          manual_accepted_at?: string | null
+          manual_screenshot_path?: string | null
+          manual_submitted_at?: string | null
+          manual_views_7d?: number | null
+          platform: string
+          posted_at?: string | null
+          shares?: number | null
+          shares_7d?: number | null
+          url?: string | null
+          views?: number | null
+          views_30d?: number | null
+          views_30d_at?: string | null
+          views_7d?: number | null
+          views_7d_at?: string | null
+          views_7d_source?: string | null
+        }
+        Update: {
+          brief_id?: string | null
+          caption?: string | null
+          comments?: number | null
+          comments_7d?: number | null
+          cover_url?: string | null
+          creator_id?: string
+          duration?: number | null
+          exclude_reason?: string | null
+          excluded?: boolean
+          external_id?: string
+          first_seen_at?: string
+          id?: string
+          last_synced_at?: string
+          likes?: number | null
+          likes_7d?: number | null
+          logged_post_id?: string | null
+          manual_accepted_at?: string | null
+          manual_screenshot_path?: string | null
+          manual_submitted_at?: string | null
+          manual_views_7d?: number | null
+          platform?: string
+          posted_at?: string | null
+          shares?: number | null
+          shares_7d?: number | null
+          url?: string | null
+          views?: number | null
+          views_30d?: number | null
+          views_30d_at?: string | null
+          views_7d?: number | null
+          views_7d_at?: string | null
+          views_7d_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_posts_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_posts_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_posts_logged_post_id_fkey"
+            columns: ["logged_post_id"]
+            isOneToOne: false
+            referencedRelation: "creator_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -3191,6 +3443,44 @@ export type Database = {
         }
         Relationships: []
       }
+      payout_adjustments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          creator_id: string
+          id: string
+          period: string
+          reason: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          creator_id: string
+          id?: string
+          period: string
+          reason: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          creator_id?: string
+          id?: string
+          period?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_adjustments_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payout_batches: {
         Row: {
           created_at: string
@@ -3228,39 +3518,63 @@ export type Database = {
       }
       payout_items: {
         Row: {
+          adjustments_part: number | null
+          amount: number | null
           amount_usd: number
           app_id: string
           batch_id: string
+          bonus_part: number | null
+          breakdown: Json | null
           created_at: string
           creator_id: string
+          currency: string
+          fixed_part: number | null
+          hold_reason: string | null
           id: string
           note: string | null
+          period: string | null
           posts_count: number
           rate_usd: number
           status: string
           stripe_transfer_id: string | null
         }
         Insert: {
+          adjustments_part?: number | null
+          amount?: number | null
           amount_usd?: number
           app_id?: string
           batch_id: string
+          bonus_part?: number | null
+          breakdown?: Json | null
           created_at?: string
           creator_id: string
+          currency?: string
+          fixed_part?: number | null
+          hold_reason?: string | null
           id?: string
           note?: string | null
+          period?: string | null
           posts_count?: number
           rate_usd?: number
           status?: string
           stripe_transfer_id?: string | null
         }
         Update: {
+          adjustments_part?: number | null
+          amount?: number | null
           amount_usd?: number
           app_id?: string
           batch_id?: string
+          bonus_part?: number | null
+          breakdown?: Json | null
           created_at?: string
           creator_id?: string
+          currency?: string
+          fixed_part?: number | null
+          hold_reason?: string | null
           id?: string
           note?: string | null
+          period?: string | null
           posts_count?: number
           rate_usd?: number
           status?: string
@@ -3741,6 +4055,119 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sync_runs: {
+        Row: {
+          cost_usd: number
+          creator_id: string | null
+          error: string | null
+          finished_at: string | null
+          id: string
+          items: number
+          job: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          cost_usd?: number
+          creator_id?: string | null
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          items?: number
+          job: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          cost_usd?: number
+          creator_id?: string | null
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          items?: number
+          job?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sync_runs_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ugc_rate_cards: {
+        Row: {
+          app_id: string
+          cap_per_video: number
+          created_at: string
+          currency: string
+          effective_from: string
+          fixed_monthly: number
+          id: string
+          prorate_fixed_by_quota: boolean
+          rpm_eur_per_1000: number
+        }
+        Insert: {
+          app_id?: string
+          cap_per_video?: number
+          created_at?: string
+          currency?: string
+          effective_from?: string
+          fixed_monthly?: number
+          id?: string
+          prorate_fixed_by_quota?: boolean
+          rpm_eur_per_1000?: number
+        }
+        Update: {
+          app_id?: string
+          cap_per_video?: number
+          created_at?: string
+          currency?: string
+          effective_from?: string
+          fixed_monthly?: number
+          id?: string
+          prorate_fixed_by_quota?: boolean
+          rpm_eur_per_1000?: number
+        }
+        Relationships: []
+      }
+      ugc_settings: {
+        Row: {
+          apify_instagram_actor: string
+          apify_price_per_result_usd: number
+          apify_tiktok_actor: string
+          default_posts_per_month: number
+          id: number
+          payday_day: number
+          posts_per_profile_call: number
+          updated_at: string
+        }
+        Insert: {
+          apify_instagram_actor?: string
+          apify_price_per_result_usd?: number
+          apify_tiktok_actor?: string
+          default_posts_per_month?: number
+          id?: number
+          payday_day?: number
+          posts_per_profile_call?: number
+          updated_at?: string
+        }
+        Update: {
+          apify_instagram_actor?: string
+          apify_price_per_result_usd?: number
+          apify_tiktok_actor?: string
+          default_posts_per_month?: number
+          id?: number
+          payday_day?: number
+          posts_per_profile_call?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
