@@ -52,6 +52,7 @@ export const createVideoUploadSlot = createServerFn({ method: "POST" })
   });
 
 const ugcSchema = z.object({
+  source: z.string().trim().regex(/^[a-z0-9_-]{1,40}$/i).optional(),
   website: z.string().max(200).optional(), // honeypot
   full_name: z.string().trim().min(2).max(120),
   email: z.string().trim().email("Enter a complete email address, for example name@example.com.").max(200),
@@ -80,6 +81,7 @@ export const submitUgcApplication = createServerFn({ method: "POST" })
     if (await rateLimited("creator_applications", hash, email)) return { ok: false as const, reason: "rate" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("creator_applications").insert({
+      source: data.source?.toLowerCase() ?? null,
       app_id: await resolveAppId(data.app),
       full_name: data.full_name,
       email,
