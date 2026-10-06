@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { buildEmailHtml, buildEmailText, replaceMergeFields, sendAppEmail } from "./email-send.server";
 
 /** Team Slack — included verbatim in the acceptance email and in the onboarding checklist. */
 export const SLACK_INVITE_URL = "https://join.slack.com/t/ugc-vikstudios/shared_invite/zt-4b6fwnseu-KrYV8Y0~IZ9C~7uo9HipbQ";
@@ -94,51 +93,23 @@ export const approveUgcApplication = createServerFn({ method: "POST" })
 
     const inviteUrl = `${data.origin.replace(/\/$/, "")}/creators/invite?token=${encodeURIComponent(inviteToken)}&email=${encodeURIComponent(application.email)}`;
 
-    const { data: settings } = await supabaseAdmin
-      .from("creator_email_settings")
-      .select("subject, intro, instructions, button_label")
-      .eq("template_key", "ugc-acceptance")
-      .maybeSingle();
-    const defaults = {
-      subject: "You're in — welcome to the Sophia creator team",
-      intro:
-        "Hi {full_name},\n\nGreat news: your application has been accepted. Welcome to the Sophia creator team.",
-      instructions:
-        "Open the button below to create your account with the email this message was sent to. Your onboarding checklist — examples, agreement, account setup, Slack and your first post — is waiting for you in your creator space.",
-      button_label: "Create my account",
-    };
-    const template = settings ?? defaults;
-    const fields = { full_name: application.full_name || "there", invite_url: inviteUrl };
-    const subject = replaceMergeFields(template.subject, fields).slice(0, 160);
-    const paragraphs = replaceMergeFields(template.intro, fields).split(/\n{2,}/).filter(Boolean);
-    const instructions = replaceMergeFields(template.instructions, fields).split(/\n{2,}/).filter(Boolean);
-    const buttonLabel = replaceMergeFields(template.button_label || defaults.button_label, fields).slice(0, 80);
+    const { sendTemplated } = await import("./ugc-email.server");
+    const send = await sendTemplated(supabaseAdmin, "ugc-welcome", application.email.toLowerCase(), application.full_name, inviteUrl);
+    await supabaseAdmin.from("creator_applications").update({
+      ...(send.sent ? { acceptance_email_sent_at: new Date().toISOString() } : {}),
+      welcome_email_provider: send.provider, welcome_email_message_id: send.messageId, welcome_email_error: send.note,
+    }).eq("id", application.id);
+    // J. hand out an App Store code from the pool if the creator has none
+    const { data: cr } = await supabaseAdmin.from("creators").select("access_code").eq("id", creatorId).maybeSingle();
+    if (cr && !cr.access_code) {
+      const { data: code } = await supabaseAdmin.from("access_codes").select("id, code, redeem_url").eq("state", "available").eq("platform", "ios").order("batch_label", { ascending: false, nullsFirst: false }).limit(1).maybeSingle();
+      if (code) {
+        await supabaseAdmin.from("access_codes").update({ state: "assigned", assigned_creator_id: creatorId, assigned_at: new Date().toISOString() }).eq("id", code.id);
+        await supabaseAdmin.from("creators").update({ access_code: code.code, access_redeem_url: code.redeem_url, platform: "ios" }).eq("id", creatorId);
+      }
+    }
 
-    const firstName = application.full_name.split(/\s+/)[0] || "there";
-    const html = buildEmailHtml({
-      paragraphs: paragraphs.flatMap((p) => p.split(/\n/)).filter(Boolean),
-      buttonLabel,
-      buttonUrl: inviteUrl,
-      linkSection: { text: SLACK_INVITE_TEXT, url: SLACK_INVITE_URL, linkLabel: SLACK_INVITE_LABEL },
-    });
-    const text = buildEmailText({
-      paragraphs: [`Hi ${firstName},`, ...instructions],
-      buttonLabel,
-      buttonUrl: inviteUrl,
-      linkSection: { text: SLACK_INVITE_TEXT, url: SLACK_INVITE_URL, linkLabel: SLACK_INVITE_LABEL },
-    });
-
-    const send = await sendAppEmail({
-      to: application.email.toLowerCase(),
-      subject,
-      html,
-      text,
-      idempotencyKey: `ugc-acceptance-${application.id}`,
-      label: "ugc-acceptance",
-      purpose: "transactional",
-    });
-
-    return { ok: true as const, creatorId, inviteUrl, emailSent: send.sent, emailReason: send.reason ?? null };
+    return { ok: true as const, creatorId, inviteUrl, emailSent: send.sent, emailReason: send.note ?? null, emailProvider: send.provider };
   });
 
 export const saveCreatorEmailSettings = createServerFn({ method: "POST" })
