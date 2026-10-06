@@ -26,6 +26,7 @@ export async function loadCreator() {
     supabase.from("creator_messages").select("id, from_admin, read_at, post_id").eq("creator_id", me.id),
     supabase.from("documents").select("current_version").eq("slug", "creator-rules").maybeSingle(),
   ]);
+  const { data: assignments } = await supabase.from("brief_assignments").select("*").eq("creator_id", me.id).order("target_date");
   return {
     me,
     signature: signature.data ?? null,
@@ -42,6 +43,7 @@ export async function loadCreator() {
     notes: notes.data ?? [],
     messages: messages.data ?? [],
     rulesVersion: rulesDoc.data?.current_version ?? 1,
+    assignments: assignments ?? [],
   };
 }
 
