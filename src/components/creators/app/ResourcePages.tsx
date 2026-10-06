@@ -21,8 +21,9 @@ import {
 } from "@/lib/creator-app.functions";
 import { startStripeOnboarding, syncStripeStatus } from "@/lib/creator-payouts.functions";
 import { savePayoutFallback } from "@/lib/creator-extras.functions";
-import { SLACK_INVITE_URL } from "@/lib/creator-onboarding.functions";
-import { SETUP_GUIDE, WARMUP_DAYS } from "@/lib/creator-steps";
+import { joinCreatorSlack, SLACK_INVITE_URL } from "@/lib/creator-onboarding.functions";
+import { ACCOUNT_SUBSTEPS, SLACK_INVITE, WARMUP_DAYS } from "@/lib/creator-steps";
+import { saveUgcAccountStep, setWhatsappOptIn } from "@/lib/ugc-creator.functions";
 import { friendlyCreatorError, isValidEmail, isValidInternationalPhone } from "@/lib/creator-validation";
 import { CountrySelect } from "../CountrySelect";
 import { CreatorAgreementForm } from "../CreatorAgreementForm";
@@ -176,50 +177,113 @@ function ManagedAccountCard({ app, account }: { app: AppRow; account: { handle: 
 }
 
 export function AccountSetupPage() {
-  const { me, steps, reload, enrolledApps } = useCreator();
-  const toggle = useServerFn(toggleSetupGuideCheck);
+  const { me, steps, reload } = useCreator();
   const tick = useServerFn(tickWarmupDay);
+  const saveStep = useServerFn(saveUgcAccountStep);
+  const joinSlack = useServerFn(joinCreatorSlack);
+  const setWa = useServerFn(setWhatsappOptIn);
   const getAccount = useServerFn(getMySocialAccount);
   const { data: accounts = [] } = useQuery({ queryKey: ["creator-social-account"], queryFn: () => getAccount() });
-  const { data: apps = [] } = useApps();
-  const mine = apps.filter((a) => enrolledApps.includes(a.id));
+  const account = accounts.find((x: any) => x.app_id === "00000000-0000-4000-8000-000000000001") as any;
   const checks = (me.setup_guide_checks ?? {}) as Record<string, string>;
   const warm = (me.warmup ?? {}) as Record<string, string>;
+  const [email, setEmail] = useState(account?.account_email ?? "");
+  const [password, setPassword] = useState("");
+  const [tt, setTt] = useState((me as any).tiktok_handle ?? "");
+  const [ig, setIg] = useState((me as any).instagram_handle ?? "");
+  const [igCreator, setIgCreator] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const qc = useQueryClient();
+  const run = async (fn: () => Promise<unknown>, ok: string) => {
+    setBusy(true);
+    try { await fn(); toast.success(ok); reload(); qc.invalidateQueries({ queryKey: ["creator-social-account"] }); }
+    catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
+    finally { setBusy(false); }
+  };
+  const req = (me as any).required_platforms ?? "both";
+  const Sub = ({ k, children }: { k: string; children: React.ReactNode }) => {
+    const sub = ACCOUNT_SUBSTEPS.find((x) => x.key === k)!;
+    return (
+      <PortalCard>
+        <div className="flex items-start gap-3">
+          <Checkbox className="mt-1" checked={Boolean(checks[k])} disabled aria-label={`${sub.title} done`} />
+          <div className="min-w-0 flex-1">
+            <p className="font-extrabold text-brand-navy">{sub.title}</p>
+            <p className="mt-1 text-sm text-brand-navySoft">{sub.text}</p>
+            <div className="mt-4">{children}</div>
+          </div>
+        </div>
+      </PortalCard>
+    );
+  };
   return (
     <div>
-      <PageTitle title="Account setup" lead="Create the TikTok account, register it, then complete the 24-hour warm-up before your first post." />
-      {steps.account && <div className="mb-6"><Banner tone="success" title="Step 3 is done: the account is registered and warmed up." /></div>}
+      <PageTitle title="Account setup" lead="Step 3 creates the Sophia email, TikTok and Instagram accounts. Steps 4 to 6 follow below: warm-up, payouts and Slack." />
+      {steps.accounts && <div className="mb-6"><Banner tone="success" title="Your accounts are registered." /></div>}
 
-      <h2 className="mb-3 text-xl font-extrabold text-brand-navy">A. The guide</h2>
-      <PortalCard>
-        <ol className="space-y-4">
-          {SETUP_GUIDE.map((g) => (
-            <li key={g.key} className="flex items-start gap-3">
-              <Checkbox className="mt-1" checked={Boolean(checks[g.key])} onCheckedChange={async (v) => { await toggle({ data: { key: g.key, checked: v === true } }); reload(); }} aria-label={`Step ${g.key} done`} />
-              <p className="text-sm leading-relaxed text-brand-navy"><b>{g.key}.</b> {g.text}</p>
-            </li>
-          ))}
-        </ol>
-      </PortalCard>
-
-      <h2 className="mb-3 mt-10 text-xl font-extrabold text-brand-navy">B. Register the account</h2>
-      <p className="mb-3 text-sm font-semibold text-brand-navy">You may be asked to run one account per app. Each is registered separately below.</p>
+      <h2 className="mb-3 text-xl font-extrabold text-brand-navy">3. Create your accounts</h2>
       <div className="space-y-4">
-        {mine.map((app) => <ManagedAccountCard key={app.id} app={app} account={accounts.find((x) => x.app_id === app.id) ?? null} />)}
+        <Sub k="acc_email">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div><Label htmlFor="acc-email">Sophia email address</Label><Input id="acc-email" type="email" placeholder="sophia.lea@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+            <div><Label htmlFor="acc-pw">Password{account ? " (enter again to change)" : ""}</Label><Input id="acc-pw" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+          </div>
+          <p className="mt-2 text-xs text-brand-navySoft">Stored encrypted. Only the Sophia team can reveal it, and every reveal is logged.</p>
+          <Button className="mt-3" disabled={busy || !email || !password} onClick={() => run(() => saveStep({ data: { step: "email", email, password } }), "Email registered.")}>Register the email</Button>
+        </Sub>
+        {req !== "instagram" && (
+          <Sub k="acc_tiktok">
+            <div className="max-w-sm"><Label htmlFor="acc-tt">TikTok handle</Label><Input id="acc-tt" placeholder="@sophia.lea" value={tt} onChange={(e) => setTt(e.target.value)} /></div>
+            <Button className="mt-3" disabled={busy || !tt || !checks["acc_email"]} onClick={() => run(() => saveStep({ data: { step: "tiktok", handle: tt } }), "TikTok handle registered.")}>Register TikTok</Button>
+            {!checks["acc_email"] && <p className="mt-2 text-xs text-brand-navySoft">Register the email first.</p>}
+          </Sub>
+        )}
+        {req !== "tiktok" && (
+          <Sub k="acc_instagram">
+            <div className="max-w-sm"><Label htmlFor="acc-ig">Instagram handle</Label><Input id="acc-ig" placeholder="@sophia.lea" value={ig} onChange={(e) => setIg(e.target.value)} /></div>
+            <label className="mt-3 flex items-center gap-2 text-sm"><Checkbox checked={igCreator} onCheckedChange={(v) => setIgCreator(v === true)} /> The account is set to Creator account type</label>
+            <Button className="mt-3" disabled={busy || !ig || !igCreator || !checks["acc_email"]} onClick={() => run(() => saveStep({ data: { step: "instagram", handle: ig, creatorType: true } }), "Instagram handle registered.")}>Register Instagram</Button>
+          </Sub>
+        )}
+        <Sub k="acc_confirm">
+          <Button disabled={busy || Boolean(checks["acc_confirm"])} onClick={() => run(() => saveStep({ data: { step: "confirm", publicConfirmed: true } }), "Accounts confirmed.")}>Both accounts are public and registered</Button>
+        </Sub>
       </div>
 
-      <h2 className="mb-3 mt-10 text-xl font-extrabold text-brand-navy">C. The warm-up</h2>
-      {!me.social_account_created_at && <p className="mb-3 text-sm text-brand-navySoft">Register the account above to start the warm-up.</p>}
+      <h2 className="mb-3 mt-10 text-xl font-extrabold text-brand-navy">4. Warm-up (24 hours)</h2>
+      {!steps.accounts && <p className="mb-3 text-sm text-brand-navySoft">Confirm your accounts above to start the warm-up.</p>}
       <PortalCard className="divide-y divide-brand-line p-0">
         {WARMUP_DAYS.map((d) => (
           <label key={d.day} className="flex items-start gap-3 px-6 py-4">
-            <Checkbox className="mt-1" disabled={!me.social_account_created_at} checked={Boolean(warm[String(d.day)])} onCheckedChange={async (v) => {
-               try { await tick({ data: { day: d.day, checked: v === true } }); reload(); } catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
+            <Checkbox className="mt-1" disabled={!steps.accounts} checked={Boolean(warm[String(d.day)])} onCheckedChange={async (v) => {
+              try { await tick({ data: { day: d.day, checked: v === true } }); reload(); } catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
             }} />
-            <span className="flex-1 text-sm text-brand-navy"><b>24-hour warm-up:</b> {d.text}</span>
+            <span className="flex-1 text-sm text-brand-navy">{d.text}</span>
             {warm[String(d.day)] && <span className="text-xs font-semibold text-portal-green">{fmt(warm[String(d.day)]!)}</span>}
           </label>
         ))}
+      </PortalCard>
+
+      <h2 className="mb-3 mt-10 text-xl font-extrabold text-brand-navy">5. Payouts</h2>
+      <PortalCard>
+        {steps.payouts ? <p className="text-sm font-semibold text-portal-green">Payout details saved.</p> : <><p className="text-sm text-brand-navySoft">Stripe by default; bank transfer with invoice if Stripe does not work for you.</p><Button asChild className="mt-3"><Link to="/creators/app/profile" hash="payouts">Set up payouts</Link></Button></>}
+      </PortalCard>
+
+      <h2 className="mb-3 mt-10 text-xl font-extrabold text-brand-navy">6. Join Slack</h2>
+      <PortalCard>
+        <Button asChild><a href={SLACK_INVITE} target="_blank" rel="noopener noreferrer">Open the Slack invite</a></Button>
+        <label className="mt-4 flex items-center gap-2 text-sm font-semibold text-brand-navy">
+          <Checkbox checked={Boolean(me.slack_joined_at)} disabled={Boolean(me.slack_joined_at)} onCheckedChange={(v) => { if (v === true) void run(() => joinSlack(), "Thanks — Slack step done."); }} /> I've joined
+        </label>
+        {me.phone && (
+          <div className="mt-6 border-t border-brand-line pt-4">
+            <p className="text-sm text-brand-navy">We may also add you to the WhatsApp group.</p>
+            <label className="mt-2 flex items-center gap-2 text-sm">
+              <Checkbox checked={(me as any).whatsapp_opt_in !== false} onCheckedChange={(v) => void run(() => setWa({ data: { optIn: v === true } }), v === true ? "You're in for WhatsApp." : "We won't add you to WhatsApp.")} />
+              Yes, add me to the WhatsApp group
+            </label>
+          </div>
+        )}
       </PortalCard>
     </div>
   );
