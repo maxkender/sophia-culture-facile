@@ -127,9 +127,13 @@ export const ADMIN_CREATOR_NAV: NavGroup[] = [
   {
     heading: "Opérations",
     items: [
+      { to: "/auteurs/admin/creators/compliance", label: "Creators dashboard", icon: Activity },
+      { to: "/auteurs/admin/creators/planner", label: "Week planner", icon: FileText },
+      { to: "/auteurs/admin/creators/ugc-briefs", label: "UGC briefs & scripts", icon: FileText },
       { to: "/auteurs/admin/creators/ops", label: "Briefs, posts & calls", icon: Megaphone },
       { to: "/auteurs/admin/creators/messages", label: "Creator messages", icon: MessageSquare },
       { to: "/auteurs/admin/creators/payouts", label: "Payouts", icon: Banknote },
+      { to: "/auteurs/admin/creators/integrations", label: "Integrations setup", icon: Settings },
     ],
   },
 ];
