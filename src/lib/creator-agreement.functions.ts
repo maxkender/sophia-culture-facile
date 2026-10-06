@@ -28,14 +28,22 @@ export const signCreatorAgreement = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => signInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as any;
-    const { data: creator } = await supabase.from("creators").select("id, track").eq("user_id", userId).maybeSingle();
+    const { data: creator } = await supabase.from("creators").select("id, track, resign_required_at").eq("user_id", userId).maybeSingle();
     if (!creator) throw new Error("Not a creator");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const version = await currentVersion(supabaseAdmin);
     if (version !== data.documentVersion) throw new Error("A new version was published. Reload the page.");
-    const { data: existing } = await supabaseAdmin.from("creator_signatures").select("signed_at").eq("creator_id", creator.id).maybeSingle();
-    if (existing) return { alreadySigned: true };
+    const { data: existing } = await supabaseAdmin.from("creator_signatures").select("id, signed_at, document_version, signed_name").eq("creator_id", creator.id).maybeSingle();
     const { ip, ua } = requestMeta(data.userAgent);
+    if (existing) {
+      if (!creator.resign_required_at || Number(existing.document_version) >= Number(version)) return { alreadySigned: true };
+      // Re-signature: keep the old signature on record, then replace it with the new version.
+      await supabaseAdmin.from("activity_log").insert({ actor_id: null, entity: "creator", entity_id: creator.id, action: "agreement_resigned", comment: `v${existing.document_version} signed ${existing.signed_at} by ${existing.signed_name} → v${version}` });
+      const { error } = await supabaseAdmin.from("creator_signatures").update({ document_version: version, signed_name: data.signedName, signature_ip: ip, user_agent: ua, signed_at: new Date().toISOString() }).eq("id", existing.id);
+      if (error) throw new Error("The signature could not be recorded.");
+      await supabaseAdmin.from("creators").update({ resign_required_at: null }).eq("id", creator.id);
+      return { alreadySigned: false };
+    }
     const { error } = await supabaseAdmin.from("creator_signatures").insert({
       creator_id: creator.id,
       variant: creator.track === "slideshow" ? "slideshow" : "ugc",

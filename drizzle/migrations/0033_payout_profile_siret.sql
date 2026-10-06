@@ -1,0 +1,1 @@
+ALTER TABLE public.creator_payout_profiles ADD COLUMN IF NOT EXISTS siret text, ADD COLUMN IF NOT EXISTS bank_iban text, ADD COLUMN IF NOT EXISTS bank_holder text;

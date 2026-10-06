@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { getMyPhotoUrl } from "@/lib/creator-app.functions";
+import { touchCreatorSeen } from "@/lib/ugc-creator.functions";
 import { useCreator } from "./useCreator";
 
 type Badge = "briefs" | "posts" | "calls" | "messages";
@@ -126,6 +127,8 @@ export function CreatorShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { me, briefs, counts } = useCreator();
+  const touch = useServerFn(touchCreatorSeen);
+  useEffect(() => { void touch().catch(() => undefined); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const pending = Object.values(counts ?? {}).reduce((a: number, b) => a + (Number(b) || 0), 0);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [drawer, setDrawer] = useState(false);

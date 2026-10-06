@@ -158,7 +158,7 @@ export const payPayoutBatch = createServerFn({ method: "POST" })
         const transfer = await s.transfers.create(
           {
             amount: Math.round(Number(item.amount_usd) * 100),
-            currency: "usd",
+            currency: String((item as any).currency ?? "USD").toLowerCase(),
             destination: profile.stripe_account_id,
             metadata: { batch_id: batch.id, payout_item_id: item.id },
           },

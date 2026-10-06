@@ -170,7 +170,7 @@ export function UgcApplyPage() {
         setUploadedPath(path);
       }
       const result = await submitFn({
-        data: { app: new URLSearchParams(window.location.search).get("app") ?? undefined,
+        data: { app: new URLSearchParams(window.location.search).get("app") ?? undefined, source: (new URLSearchParams(window.location.search).get("src") ?? sessionStorage.getItem("sophia_src") ?? "").replace(/[^a-z0-9_-]/gi, "").slice(0, 40) || undefined,
           website: honey,
           full_name: form.full_name,
           email: form.email,

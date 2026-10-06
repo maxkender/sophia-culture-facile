@@ -151,6 +151,7 @@ import { Route as AuthenticatedAuteursAdminDocumentsSlugRouteImport } from './ro
 import { Route as AuthenticatedAuteursAdminReviewIndexRouteImport } from './routes/_authenticated/auteurs/admin/review.index'
 import { Route as AuthenticatedAuteursAdminReviewCourseIdRouteImport } from './routes/_authenticated/auteurs/admin/review.$courseId'
 import { Route as ApiPublicAppCoursesSlugRouteImport } from './routes/api/public/app/courses.$slug'
+import { Route as ApiPublicCronUgcJobRouteImport } from './routes/api/public/cron/ugc.$job'
 import { Route as CreatorsInfluencerAppDealsIndexRouteImport } from './routes/creators.influencer.app.deals.index'
 import { Route as CreatorsInfluencerAppDealsDealIdRouteImport } from './routes/creators.influencer.app.deals.$dealId'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-briefs.index'
@@ -931,6 +932,11 @@ const ApiPublicAppCoursesSlugRoute = ApiPublicAppCoursesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ApiPublicAppCoursesRoute,
 } as any)
+const ApiPublicCronUgcJobRoute = ApiPublicCronUgcJobRouteImport.update({
+  id: '/api/public/cron/ugc/$job',
+  path: '/api/public/cron/ugc/$job',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreatorsInfluencerAppDealsIndexRoute =
   CreatorsInfluencerAppDealsIndexRouteImport.update({
     id: '/deals/',
@@ -1117,6 +1123,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
+  '/api/public/cron/ugc/$job': typeof ApiPublicCronUgcJobRoute
   '/creators/influencer/app/deals/$dealId': typeof CreatorsInfluencerAppDealsDealIdRoute
   '/auteurs/admin/authors/': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
   '/auteurs/admin/courses/': typeof AuthenticatedAuteursAdminCoursesIndexRoute
@@ -1266,6 +1273,7 @@ export interface FileRoutesByTo {
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
+  '/api/public/cron/ugc/$job': typeof ApiPublicCronUgcJobRoute
   '/creators/influencer/app/deals/$dealId': typeof CreatorsInfluencerAppDealsDealIdRoute
   '/auteurs/admin/authors': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
   '/auteurs/admin/courses': typeof AuthenticatedAuteursAdminCoursesIndexRoute
@@ -1419,6 +1427,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/_authenticated/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
+  '/api/public/cron/ugc/$job': typeof ApiPublicCronUgcJobRoute
   '/creators/influencer/app/deals/$dealId': typeof CreatorsInfluencerAppDealsDealIdRoute
   '/_authenticated/auteurs/admin/authors/': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
   '/_authenticated/auteurs/admin/courses/': typeof AuthenticatedAuteursAdminCoursesIndexRoute
@@ -1572,6 +1581,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/api/public/app/courses/$slug'
+    | '/api/public/cron/ugc/$job'
     | '/creators/influencer/app/deals/$dealId'
     | '/auteurs/admin/authors/'
     | '/auteurs/admin/courses/'
@@ -1721,6 +1731,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/api/public/app/courses/$slug'
+    | '/api/public/cron/ugc/$job'
     | '/creators/influencer/app/deals/$dealId'
     | '/auteurs/admin/authors'
     | '/auteurs/admin/courses'
@@ -1873,6 +1884,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/documents/$slug'
     | '/_authenticated/auteurs/admin/review/$courseId'
     | '/api/public/app/courses/$slug'
+    | '/api/public/cron/ugc/$job'
     | '/creators/influencer/app/deals/$dealId'
     | '/_authenticated/auteurs/admin/authors/'
     | '/_authenticated/auteurs/admin/courses/'
@@ -1966,6 +1978,7 @@ export interface RootRouteChildren {
   FrCreateursUnswipeUgcRoute: typeof FrCreateursUnswipeUgcRoute
   EnCreatorsUnswipeIndexRoute: typeof EnCreatorsUnswipeIndexRoute
   FrCreateursUnswipeIndexRoute: typeof FrCreateursUnswipeIndexRoute
+  ApiPublicCronUgcJobRoute: typeof ApiPublicCronUgcJobRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2964,6 +2977,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAppCoursesSlugRouteImport
       parentRoute: typeof ApiPublicAppCoursesRoute
     }
+    '/api/public/cron/ugc/$job': {
+      id: '/api/public/cron/ugc/$job'
+      path: '/api/public/cron/ugc/$job'
+      fullPath: '/api/public/cron/ugc/$job'
+      preLoaderRoute: typeof ApiPublicCronUgcJobRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/creators/influencer/app/deals/': {
       id: '/creators/influencer/app/deals/'
       path: '/deals'
@@ -3324,6 +3344,7 @@ const rootRouteChildren: RootRouteChildren = {
   FrCreateursUnswipeUgcRoute: FrCreateursUnswipeUgcRoute,
   EnCreatorsUnswipeIndexRoute: EnCreatorsUnswipeIndexRoute,
   FrCreateursUnswipeIndexRoute: FrCreateursUnswipeIndexRoute,
+  ApiPublicCronUgcJobRoute: ApiPublicCronUgcJobRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

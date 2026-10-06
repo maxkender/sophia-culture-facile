@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { LibraryPage } from "@/components/creators/app/WorkPages";
+import { BriefLibraryPage as LibraryPage } from "@/components/creators/app/UgcPages";
 import { Locked } from "@/components/creators/app/CreatorShell";
 
 export const Route = createFileRoute("/creators/app/library")({

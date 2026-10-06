@@ -26,6 +26,7 @@ export async function loadCreator() {
     supabase.from("creator_messages").select("id, from_admin, read_at, post_id").eq("creator_id", me.id),
     supabase.from("documents").select("current_version").eq("slug", "creator-rules").maybeSingle(),
   ]);
+  const { data: assignments } = await supabase.from("brief_assignments").select("*").eq("creator_id", me.id).order("target_date");
   return {
     me,
     signature: signature.data ?? null,
@@ -42,6 +43,7 @@ export async function loadCreator() {
     notes: notes.data ?? [],
     messages: messages.data ?? [],
     rulesVersion: rulesDoc.data?.current_version ?? 1,
+    assignments: assignments ?? [],
   };
 }
 
@@ -56,7 +58,7 @@ export function useCreator() {
   const { data } = useCreatorQuery();
   const qc = useQueryClient();
   const d = data as CreatorData;
-  const steps = creatorSteps(d.me, Boolean(d.signature), d.payoutProfile);
+  const steps = creatorSteps(d.me, Boolean(d.signature), d.payoutProfile, d.signature?.document_version);
   const now = Date.now();
   const counts = {
     briefs: d.briefs.filter((b) => !d.reads.some((r) => r.brief_id === b.id)).length,

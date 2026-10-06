@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { EarningsPage } from "@/components/creators/app/WorkPages";
+import { UgcEarningsPage as EarningsPage } from "@/components/creators/app/UgcPages";
 import { Locked } from "@/components/creators/app/CreatorShell";
 
 export const Route = createFileRoute("/creators/app/earnings")({
