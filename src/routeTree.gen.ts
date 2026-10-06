@@ -135,17 +135,21 @@ import { Route as AuthenticatedAuteursAdminCreatorsIndexRouteImport } from './ro
 import { Route as AuthenticatedAuteursAdminCreatorsCreatorIdRouteImport } from './routes/_authenticated/auteurs/admin/creators.$creatorId'
 import { Route as AuthenticatedAuteursAdminCreatorsApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.applications'
 import { Route as AuthenticatedAuteursAdminCreatorsAppsRouteImport } from './routes/_authenticated/auteurs/admin/creators.apps'
+import { Route as AuthenticatedAuteursAdminCreatorsComplianceRouteImport } from './routes/_authenticated/auteurs/admin/creators.compliance'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-applications'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerMessagesRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-messages'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-payouts'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-performance'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerSettingsRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-settings'
+import { Route as AuthenticatedAuteursAdminCreatorsIntegrationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.integrations'
 import { Route as AuthenticatedAuteursAdminCreatorsMessagesRouteImport } from './routes/_authenticated/auteurs/admin/creators.messages'
 import { Route as AuthenticatedAuteursAdminCreatorsOpsRouteImport } from './routes/_authenticated/auteurs/admin/creators.ops'
 import { Route as AuthenticatedAuteursAdminCreatorsPayoutsRouteImport } from './routes/_authenticated/auteurs/admin/creators.payouts'
+import { Route as AuthenticatedAuteursAdminCreatorsPlannerRouteImport } from './routes/_authenticated/auteurs/admin/creators.planner'
 import { Route as AuthenticatedAuteursAdminCreatorsProspectsRouteImport } from './routes/_authenticated/auteurs/admin/creators.prospects'
 import { Route as AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.slideshow-applications'
 import { Route as AuthenticatedAuteursAdminCreatorsUgcApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.ugc-applications'
+import { Route as AuthenticatedAuteursAdminCreatorsUgcBriefsRouteImport } from './routes/_authenticated/auteurs/admin/creators.ugc-briefs'
 import { Route as AuthenticatedAuteursAdminDocumentsIndexRouteImport } from './routes/_authenticated/auteurs/admin/documents.index'
 import { Route as AuthenticatedAuteursAdminDocumentsSlugRouteImport } from './routes/_authenticated/auteurs/admin/documents.$slug'
 import { Route as AuthenticatedAuteursAdminReviewIndexRouteImport } from './routes/_authenticated/auteurs/admin/review.index'
@@ -837,6 +841,12 @@ const AuthenticatedAuteursAdminCreatorsAppsRoute =
     path: '/auteurs/admin/creators/apps',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAuteursAdminCreatorsComplianceRoute =
+  AuthenticatedAuteursAdminCreatorsComplianceRouteImport.update({
+    id: '/auteurs/admin/creators/compliance',
+    path: '/auteurs/admin/creators/compliance',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute =
   AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRouteImport.update({
     id: '/auteurs/admin/creators/influencer-applications',
@@ -867,6 +877,12 @@ const AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute =
     path: '/auteurs/admin/creators/influencer-settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAuteursAdminCreatorsIntegrationsRoute =
+  AuthenticatedAuteursAdminCreatorsIntegrationsRouteImport.update({
+    id: '/auteurs/admin/creators/integrations',
+    path: '/auteurs/admin/creators/integrations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAuteursAdminCreatorsMessagesRoute =
   AuthenticatedAuteursAdminCreatorsMessagesRouteImport.update({
     id: '/auteurs/admin/creators/messages',
@@ -885,6 +901,12 @@ const AuthenticatedAuteursAdminCreatorsPayoutsRoute =
     path: '/auteurs/admin/creators/payouts',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAuteursAdminCreatorsPlannerRoute =
+  AuthenticatedAuteursAdminCreatorsPlannerRouteImport.update({
+    id: '/auteurs/admin/creators/planner',
+    path: '/auteurs/admin/creators/planner',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAuteursAdminCreatorsProspectsRoute =
   AuthenticatedAuteursAdminCreatorsProspectsRouteImport.update({
     id: '/auteurs/admin/creators/prospects',
@@ -901,6 +923,12 @@ const AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute =
   AuthenticatedAuteursAdminCreatorsUgcApplicationsRouteImport.update({
     id: '/auteurs/admin/creators/ugc-applications',
     path: '/auteurs/admin/creators/ugc-applications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuteursAdminCreatorsUgcBriefsRoute =
+  AuthenticatedAuteursAdminCreatorsUgcBriefsRouteImport.update({
+    id: '/auteurs/admin/creators/ugc-briefs',
+    path: '/auteurs/admin/creators/ugc-briefs',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAuteursAdminDocumentsIndexRoute =
@@ -1109,17 +1137,21 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   '/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
   '/auteurs/admin/creators/apps': typeof AuthenticatedAuteursAdminCreatorsAppsRoute
+  '/auteurs/admin/creators/compliance': typeof AuthenticatedAuteursAdminCreatorsComplianceRoute
   '/auteurs/admin/creators/influencer-applications': typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
   '/auteurs/admin/creators/influencer-messages': typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
   '/auteurs/admin/creators/influencer-payouts': typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
   '/auteurs/admin/creators/influencer-performance': typeof AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute
   '/auteurs/admin/creators/influencer-settings': typeof AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute
+  '/auteurs/admin/creators/integrations': typeof AuthenticatedAuteursAdminCreatorsIntegrationsRoute
   '/auteurs/admin/creators/messages': typeof AuthenticatedAuteursAdminCreatorsMessagesRoute
   '/auteurs/admin/creators/ops': typeof AuthenticatedAuteursAdminCreatorsOpsRoute
   '/auteurs/admin/creators/payouts': typeof AuthenticatedAuteursAdminCreatorsPayoutsRoute
+  '/auteurs/admin/creators/planner': typeof AuthenticatedAuteursAdminCreatorsPlannerRoute
   '/auteurs/admin/creators/prospects': typeof AuthenticatedAuteursAdminCreatorsProspectsRoute
   '/auteurs/admin/creators/slideshow-applications': typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute
   '/auteurs/admin/creators/ugc-applications': typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute
+  '/auteurs/admin/creators/ugc-briefs': typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRoute
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
@@ -1259,17 +1291,21 @@ export interface FileRoutesByTo {
   '/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   '/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
   '/auteurs/admin/creators/apps': typeof AuthenticatedAuteursAdminCreatorsAppsRoute
+  '/auteurs/admin/creators/compliance': typeof AuthenticatedAuteursAdminCreatorsComplianceRoute
   '/auteurs/admin/creators/influencer-applications': typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
   '/auteurs/admin/creators/influencer-messages': typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
   '/auteurs/admin/creators/influencer-payouts': typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
   '/auteurs/admin/creators/influencer-performance': typeof AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute
   '/auteurs/admin/creators/influencer-settings': typeof AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute
+  '/auteurs/admin/creators/integrations': typeof AuthenticatedAuteursAdminCreatorsIntegrationsRoute
   '/auteurs/admin/creators/messages': typeof AuthenticatedAuteursAdminCreatorsMessagesRoute
   '/auteurs/admin/creators/ops': typeof AuthenticatedAuteursAdminCreatorsOpsRoute
   '/auteurs/admin/creators/payouts': typeof AuthenticatedAuteursAdminCreatorsPayoutsRoute
+  '/auteurs/admin/creators/planner': typeof AuthenticatedAuteursAdminCreatorsPlannerRoute
   '/auteurs/admin/creators/prospects': typeof AuthenticatedAuteursAdminCreatorsProspectsRoute
   '/auteurs/admin/creators/slideshow-applications': typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute
   '/auteurs/admin/creators/ugc-applications': typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute
+  '/auteurs/admin/creators/ugc-briefs': typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRoute
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
@@ -1413,17 +1449,21 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   '/_authenticated/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
   '/_authenticated/auteurs/admin/creators/apps': typeof AuthenticatedAuteursAdminCreatorsAppsRoute
+  '/_authenticated/auteurs/admin/creators/compliance': typeof AuthenticatedAuteursAdminCreatorsComplianceRoute
   '/_authenticated/auteurs/admin/creators/influencer-applications': typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
   '/_authenticated/auteurs/admin/creators/influencer-messages': typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
   '/_authenticated/auteurs/admin/creators/influencer-payouts': typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
   '/_authenticated/auteurs/admin/creators/influencer-performance': typeof AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute
   '/_authenticated/auteurs/admin/creators/influencer-settings': typeof AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute
+  '/_authenticated/auteurs/admin/creators/integrations': typeof AuthenticatedAuteursAdminCreatorsIntegrationsRoute
   '/_authenticated/auteurs/admin/creators/messages': typeof AuthenticatedAuteursAdminCreatorsMessagesRoute
   '/_authenticated/auteurs/admin/creators/ops': typeof AuthenticatedAuteursAdminCreatorsOpsRoute
   '/_authenticated/auteurs/admin/creators/payouts': typeof AuthenticatedAuteursAdminCreatorsPayoutsRoute
+  '/_authenticated/auteurs/admin/creators/planner': typeof AuthenticatedAuteursAdminCreatorsPlannerRoute
   '/_authenticated/auteurs/admin/creators/prospects': typeof AuthenticatedAuteursAdminCreatorsProspectsRoute
   '/_authenticated/auteurs/admin/creators/slideshow-applications': typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute
   '/_authenticated/auteurs/admin/creators/ugc-applications': typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute
+  '/_authenticated/auteurs/admin/creators/ugc-briefs': typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRoute
   '/_authenticated/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/_authenticated/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
@@ -1567,17 +1607,21 @@ export interface FileRouteTypes {
     | '/auteurs/admin/creators/$creatorId'
     | '/auteurs/admin/creators/applications'
     | '/auteurs/admin/creators/apps'
+    | '/auteurs/admin/creators/compliance'
     | '/auteurs/admin/creators/influencer-applications'
     | '/auteurs/admin/creators/influencer-messages'
     | '/auteurs/admin/creators/influencer-payouts'
     | '/auteurs/admin/creators/influencer-performance'
     | '/auteurs/admin/creators/influencer-settings'
+    | '/auteurs/admin/creators/integrations'
     | '/auteurs/admin/creators/messages'
     | '/auteurs/admin/creators/ops'
     | '/auteurs/admin/creators/payouts'
+    | '/auteurs/admin/creators/planner'
     | '/auteurs/admin/creators/prospects'
     | '/auteurs/admin/creators/slideshow-applications'
     | '/auteurs/admin/creators/ugc-applications'
+    | '/auteurs/admin/creators/ugc-briefs'
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/api/public/app/courses/$slug'
@@ -1717,17 +1761,21 @@ export interface FileRouteTypes {
     | '/auteurs/admin/creators/$creatorId'
     | '/auteurs/admin/creators/applications'
     | '/auteurs/admin/creators/apps'
+    | '/auteurs/admin/creators/compliance'
     | '/auteurs/admin/creators/influencer-applications'
     | '/auteurs/admin/creators/influencer-messages'
     | '/auteurs/admin/creators/influencer-payouts'
     | '/auteurs/admin/creators/influencer-performance'
     | '/auteurs/admin/creators/influencer-settings'
+    | '/auteurs/admin/creators/integrations'
     | '/auteurs/admin/creators/messages'
     | '/auteurs/admin/creators/ops'
     | '/auteurs/admin/creators/payouts'
+    | '/auteurs/admin/creators/planner'
     | '/auteurs/admin/creators/prospects'
     | '/auteurs/admin/creators/slideshow-applications'
     | '/auteurs/admin/creators/ugc-applications'
+    | '/auteurs/admin/creators/ugc-briefs'
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/api/public/app/courses/$slug'
@@ -1870,17 +1918,21 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/creators/$creatorId'
     | '/_authenticated/auteurs/admin/creators/applications'
     | '/_authenticated/auteurs/admin/creators/apps'
+    | '/_authenticated/auteurs/admin/creators/compliance'
     | '/_authenticated/auteurs/admin/creators/influencer-applications'
     | '/_authenticated/auteurs/admin/creators/influencer-messages'
     | '/_authenticated/auteurs/admin/creators/influencer-payouts'
     | '/_authenticated/auteurs/admin/creators/influencer-performance'
     | '/_authenticated/auteurs/admin/creators/influencer-settings'
+    | '/_authenticated/auteurs/admin/creators/integrations'
     | '/_authenticated/auteurs/admin/creators/messages'
     | '/_authenticated/auteurs/admin/creators/ops'
     | '/_authenticated/auteurs/admin/creators/payouts'
+    | '/_authenticated/auteurs/admin/creators/planner'
     | '/_authenticated/auteurs/admin/creators/prospects'
     | '/_authenticated/auteurs/admin/creators/slideshow-applications'
     | '/_authenticated/auteurs/admin/creators/ugc-applications'
+    | '/_authenticated/auteurs/admin/creators/ugc-briefs'
     | '/_authenticated/auteurs/admin/documents/$slug'
     | '/_authenticated/auteurs/admin/review/$courseId'
     | '/api/public/app/courses/$slug'
@@ -2865,6 +2917,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsAppsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auteurs/admin/creators/compliance': {
+      id: '/_authenticated/auteurs/admin/creators/compliance'
+      path: '/auteurs/admin/creators/compliance'
+      fullPath: '/auteurs/admin/creators/compliance'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsComplianceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/auteurs/admin/creators/influencer-applications': {
       id: '/_authenticated/auteurs/admin/creators/influencer-applications'
       path: '/auteurs/admin/creators/influencer-applications'
@@ -2900,6 +2959,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auteurs/admin/creators/integrations': {
+      id: '/_authenticated/auteurs/admin/creators/integrations'
+      path: '/auteurs/admin/creators/integrations'
+      fullPath: '/auteurs/admin/creators/integrations'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/auteurs/admin/creators/messages': {
       id: '/_authenticated/auteurs/admin/creators/messages'
       path: '/auteurs/admin/creators/messages'
@@ -2921,6 +2987,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsPayoutsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auteurs/admin/creators/planner': {
+      id: '/_authenticated/auteurs/admin/creators/planner'
+      path: '/auteurs/admin/creators/planner'
+      fullPath: '/auteurs/admin/creators/planner'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsPlannerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/auteurs/admin/creators/prospects': {
       id: '/_authenticated/auteurs/admin/creators/prospects'
       path: '/auteurs/admin/creators/prospects'
@@ -2940,6 +3013,13 @@ declare module '@tanstack/react-router' {
       path: '/auteurs/admin/creators/ugc-applications'
       fullPath: '/auteurs/admin/creators/ugc-applications'
       preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auteurs/admin/creators/ugc-briefs': {
+      id: '/_authenticated/auteurs/admin/creators/ugc-briefs'
+      path: '/auteurs/admin/creators/ugc-briefs'
+      fullPath: '/auteurs/admin/creators/ugc-briefs'
+      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/auteurs/admin/documents/': {
@@ -3069,17 +3149,21 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuteursAdminCreatorsCreatorIdRoute: typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
   AuthenticatedAuteursAdminCreatorsApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
   AuthenticatedAuteursAdminCreatorsAppsRoute: typeof AuthenticatedAuteursAdminCreatorsAppsRoute
+  AuthenticatedAuteursAdminCreatorsComplianceRoute: typeof AuthenticatedAuteursAdminCreatorsComplianceRoute
   AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
   AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
   AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
   AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute
   AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute
+  AuthenticatedAuteursAdminCreatorsIntegrationsRoute: typeof AuthenticatedAuteursAdminCreatorsIntegrationsRoute
   AuthenticatedAuteursAdminCreatorsMessagesRoute: typeof AuthenticatedAuteursAdminCreatorsMessagesRoute
   AuthenticatedAuteursAdminCreatorsOpsRoute: typeof AuthenticatedAuteursAdminCreatorsOpsRoute
   AuthenticatedAuteursAdminCreatorsPayoutsRoute: typeof AuthenticatedAuteursAdminCreatorsPayoutsRoute
+  AuthenticatedAuteursAdminCreatorsPlannerRoute: typeof AuthenticatedAuteursAdminCreatorsPlannerRoute
   AuthenticatedAuteursAdminCreatorsProspectsRoute: typeof AuthenticatedAuteursAdminCreatorsProspectsRoute
   AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute
   AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute
+  AuthenticatedAuteursAdminCreatorsUgcBriefsRoute: typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRoute
   AuthenticatedAuteursAdminDocumentsSlugRoute: typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   AuthenticatedAuteursAdminReviewCourseIdRoute: typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   AuthenticatedAuteursAdminAuthorsIndexRoute: typeof AuthenticatedAuteursAdminAuthorsIndexRoute
@@ -3134,6 +3218,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAuteursAdminCreatorsApplicationsRoute,
   AuthenticatedAuteursAdminCreatorsAppsRoute:
     AuthenticatedAuteursAdminCreatorsAppsRoute,
+  AuthenticatedAuteursAdminCreatorsComplianceRoute:
+    AuthenticatedAuteursAdminCreatorsComplianceRoute,
   AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute:
     AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute,
   AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute:
@@ -3144,18 +3230,24 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute,
   AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute:
     AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute,
+  AuthenticatedAuteursAdminCreatorsIntegrationsRoute:
+    AuthenticatedAuteursAdminCreatorsIntegrationsRoute,
   AuthenticatedAuteursAdminCreatorsMessagesRoute:
     AuthenticatedAuteursAdminCreatorsMessagesRoute,
   AuthenticatedAuteursAdminCreatorsOpsRoute:
     AuthenticatedAuteursAdminCreatorsOpsRoute,
   AuthenticatedAuteursAdminCreatorsPayoutsRoute:
     AuthenticatedAuteursAdminCreatorsPayoutsRoute,
+  AuthenticatedAuteursAdminCreatorsPlannerRoute:
+    AuthenticatedAuteursAdminCreatorsPlannerRoute,
   AuthenticatedAuteursAdminCreatorsProspectsRoute:
     AuthenticatedAuteursAdminCreatorsProspectsRoute,
   AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute:
     AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute,
   AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute:
     AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute,
+  AuthenticatedAuteursAdminCreatorsUgcBriefsRoute:
+    AuthenticatedAuteursAdminCreatorsUgcBriefsRoute,
   AuthenticatedAuteursAdminDocumentsSlugRoute:
     AuthenticatedAuteursAdminDocumentsSlugRoute,
   AuthenticatedAuteursAdminReviewCourseIdRoute:
