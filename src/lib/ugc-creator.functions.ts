@@ -126,3 +126,27 @@ export const submitManualViews = createServerFn({ method: "POST" })
     await a.from("external_posts").update({ manual_views_7d: data.views, manual_screenshot_path: data.screenshotPath, manual_submitted_at: new Date().toISOString() }).eq("id", data.externalPostId);
     return { ok: true };
   });
+
+/** I. Network performance per brief for the creator library (no other creator's identity leaves the server). */
+export const briefLibraryStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const c = await me(context);
+    const a = await db();
+    const { data: rows } = await a.from("external_posts").select("creator_id, brief_id, views_7d").not("views_7d", "is", null);
+    const all = rows ?? [];
+    const byCreator = new Map<string, number[]>();
+    all.forEach((r: any) => byCreator.set(r.creator_id, [...(byCreator.get(r.creator_id) ?? []), Number(r.views_7d)]));
+    const avg = (xs: number[]) => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : 0);
+    const tier = (v: number) => (v < 5000 ? 1 : v < 50000 ? 2 : 3);
+    const myTier = tier(avg(byCreator.get(c.id) ?? []));
+    const stats: Record<string, { avg: number; posts: number; peerAvg: number; peerPosts: number }> = {};
+    for (const r of all as any[]) {
+      if (!r.brief_id) continue;
+      const s = (stats[r.brief_id] ??= { avg: 0, posts: 0, peerAvg: 0, peerPosts: 0 });
+      s.avg += Number(r.views_7d); s.posts++;
+      if (tier(avg(byCreator.get(r.creator_id) ?? [])) === myTier) { s.peerAvg += Number(r.views_7d); s.peerPosts++; }
+    }
+    Object.values(stats).forEach((s) => { s.avg = s.posts ? s.avg / s.posts : 0; s.peerAvg = s.peerPosts ? s.peerAvg / s.peerPosts : 0; });
+    return { stats, myTier };
+  });

@@ -74,6 +74,8 @@ export function LogPostForm({ briefId: initialBrief = "", refId = null, url: ini
 }
 
 /* ---------- Briefs ---------- */
+import { AssignedBriefs } from "./UgcPages";
+
 export function BriefsPage() {
   const d = useCreator();
   const [app, setApp] = useState("all");
@@ -83,7 +85,8 @@ export function BriefsPage() {
   const list = d.briefs.filter((b) => (app === "all" || b.app_id === app) && (status === "all" || briefStatus(d, b.id) === status));
   return (
     <div>
-      <PageTitle title="Briefs" lead="Newest first. Open a brief to read it in full, then log your post or skip it with a reason." />
+      <PageTitle title="Briefs" lead="Your briefs for the week, then everything else. If an assigned brief doesn't suit you, swap it for one from the library." />
+      <AssignedBriefs />
       <div className="mb-6 flex flex-wrap gap-2">
         <select aria-label="App" className="h-10 rounded-md border border-input bg-card px-3 text-sm" value={app} onChange={(e) => setApp(e.target.value)}>
           <option value="all">All apps</option>{apps.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
