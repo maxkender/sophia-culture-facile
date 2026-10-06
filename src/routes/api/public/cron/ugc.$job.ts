@@ -5,10 +5,18 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
   server: {
     handlers: {
       POST: async ({ request, params }) => {
-        const secret = process.env["LOVABLE_CRON_SECRET"];
-        if (!secret || request.headers.get("x-cron-secret") !== secret) return new Response("Unauthorized", { status: 401 });
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const a = supabaseAdmin as any;
+        const given = request.headers.get("x-cron-secret") ?? "";
+        const envSecret = process.env["LOVABLE_CRON_SECRET"];
+        const { data: cfg } = await a.from("ugc_settings").select("cron_token").eq("id", 1).maybeSingle();
+        if (!given || (given !== envSecret && given !== cfg?.cron_token)) return new Response("Unauthorized", { status: 401 });
+        // Schedules fire at two UTC hours to follow Paris daylight saving; only the one matching Paris time runs.
+        const wantHour = new URL(request.url).searchParams.get("parisHour");
+        if (wantHour) {
+          const parisHour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Paris", hour: "2-digit", hour12: false }).format(new Date()));
+          if (parisHour !== Number(wantHour)) return Response.json({ skipped: "not the Paris hour" });
+        }
         try {
           if (params.job === "compliance" || params.job === "d7") {
             if (!process.env["APIFY_TOKEN"]) return Response.json({ skipped: "APIFY_TOKEN missing" });
