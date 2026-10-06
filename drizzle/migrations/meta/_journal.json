@@ -239,6 +239,13 @@
       "when": 1791295799394,
       "tag": "0033_payout_profile_siret",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1791297762483,
+      "tag": "0034_ugc_cron_setup",
+      "breakpoints": true
     }
   ]
 }
