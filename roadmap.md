@@ -1,6 +1,6 @@
 # Roadmap — UGC pipeline rebuild (Oct 2026)
 
-- [ ] Urgent Oct 6 correction: personal UGC handles/display names/bios, no onboarding link; Rules point 1 and agreement v3 clause 2; verify admin handle checks and deploy.
+- [x] Urgent Oct 6 correction: personal UGC handles/display names/bios, no onboarding link; Rules point 1 and agreement v3 clause 2 updated and read back; no admin brand restrictions; clean build and guidance checks. Deployment requested. Creator-page visual check blocked by available admin session redirect.
 
 - [ ] A. ?src= source field on UGC application
 - [ ] B. Brevo welcome / decline emails, send log, resend, editable templates
