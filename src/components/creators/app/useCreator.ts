@@ -56,7 +56,7 @@ export function useCreator() {
   const { data } = useCreatorQuery();
   const qc = useQueryClient();
   const d = data as CreatorData;
-  const steps = creatorSteps(d.me, Boolean(d.signature), d.payoutProfile);
+  const steps = creatorSteps(d.me, Boolean(d.signature), d.payoutProfile, d.signature?.document_version);
   const now = Date.now();
   const counts = {
     briefs: d.briefs.filter((b) => !d.reads.some((r) => r.brief_id === b.id)).length,

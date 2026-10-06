@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CopyButton, PageTitle, PortalCard } from "@/components/portal/ui";
 import { WeeklyGuides } from "../WeeklyGuides";
-import { TAAP_LINK, useCreator, weekStart } from "./useCreator";
+import { TAAP_LINK, useCreator } from "./useCreator";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { myRunningMonth } from "@/lib/ugc-creator.functions";
 
 function Step({ n, title, done, current, children }: { n: number; title: string; done: boolean; current: boolean; children: ReactNode }) {
   return (
@@ -27,10 +30,12 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: 
 export function CreatorHomePage() {
   const { me, steps, signature, briefs, calls, posts, rsvps } = useCreator();
   const first = me.full_name.split(" ")[0];
-  const order = [steps.rules, steps.signed, steps.account, steps.payouts];
+  const order = [steps.rules, steps.signed, steps.accounts, steps.warmDone, steps.payouts, steps.slack];
   const currentIdx = order.findIndex((d) => !d);
-  const week = posts.filter((p) => p.posted_on >= weekStart() && p.status !== "flagged").length;
-  const target = me.weekly_target || 5;
+  const monthFn = useServerFn(myRunningMonth);
+  const { data: month } = useQuery({ queryKey: ["creator-month"], queryFn: () => monthFn() });
+  const found = month?.breakdown.postsCounted ?? 0;
+  const target = month?.breakdown.target ?? (me as any).posts_per_month ?? 20;
   const nextCall = [...calls].filter((c) => new Date(c.starts_at).getTime() > Date.now()).sort((a, b) => a.starts_at.localeCompare(b.starts_at))[0];
   const feedback = posts.filter((p) => p.status === "flagged");
   const warm = (me.warmup ?? {}) as Record<string, string>;
@@ -41,36 +46,51 @@ export function CreatorHomePage() {
       <PageTitle title={`Welcome, ${first}`} lead="Your creator space: briefs, the reference library, your posts, calls, earnings and messages with the Sophia team." />
       <p className="-mt-4 mb-6 text-xs text-brand-navySoft">Bookmark this page: sophia-culture.com/creators/login is where you sign in from now on.</p>
 
+      {steps.resignPending && (
+        <div className="mb-6"><PortalCard className="border-2 border-portal-amber bg-portal-amber/10">
+          <p className="font-extrabold text-brand-navy">Please re-sign the Creator Account Agreement (version 3)</p>
+          <p className="mt-1 text-sm text-brand-navySoft">Clauses 2 and 4 changed: the Instagram account and the Sophia email are now covered, and advertising codes are included.</p>
+          <Button asChild className="mt-3"><Link to="/creators/app/contract">Open the agreement</Link></Button>
+        </PortalCard></div>
+      )}
       <div className="mb-4 flex items-baseline justify-between gap-4">
         <h2 className="text-xl font-extrabold text-brand-navy">Before you post</h2>
-        <p className="text-sm font-bold text-brand-navySoft">{steps.count} of 4 done</p>
+        <p className="text-sm font-bold text-brand-navySoft">{steps.count} of 6 done</p>
       </div>
-      <div className="mb-2 h-2 rounded-full bg-brand-line"><div className="h-2 rounded-full bg-portal-green transition-all" style={{ width: `${(steps.count / 4) * 100}%` }} /></div>
+      <div className="mb-2 h-2 rounded-full bg-brand-line"><div className="h-2 rounded-full bg-portal-green transition-all" style={{ width: `${(steps.count / 6) * 100}%` }} /></div>
       <div className="mt-4 space-y-4">
         <Step n={1} title="Read the rules" done={steps.rules} current={currentIdx === 0}>
-          <p className="mt-2 text-sm text-brand-navySoft">Eight short rules about the account, posting, quality and pay. You accept them at the bottom of the page.</p>
+          <p className="mt-2 text-sm text-brand-navySoft">Eight short rules about the accounts, your target, quality and pay.</p>
           {steps.rules ? <p className="mt-3 text-sm font-semibold text-portal-green">Accepted on {fmt(me.rules_accepted_at!)}</p> : <Button asChild className="mt-4"><Link to="/creators/app/rules">Read the rules</Link></Button>}
         </Step>
         <Step n={2} title="Sign the Creator Account Agreement" done={steps.signed} current={currentIdx === 1}>
-          <p className="mt-2 text-sm text-brand-navySoft">The account you set up belongs to Sophia; this agreement says so. Read it in full, then sign with your typed name.</p>
+          <p className="mt-2 text-sm text-brand-navySoft">The TikTok, Instagram and email accounts belong to Sophia; this agreement says so.</p>
           {steps.signed ? <p className="mt-3 text-sm font-semibold text-portal-green">Signed on {fmt(signature!.signed_at)}</p> : <Button asChild className="mt-4" variant={steps.rules ? "default" : "outline"}><Link to="/creators/app/contract">Open the agreement</Link></Button>}
         </Step>
-        <Step n={3} title="Set up your Sophia account" done={steps.account} current={currentIdx === 2}>
-          <p className="mt-2 text-sm text-brand-navySoft">Create the TikTok account following the guide, register it here, then complete the 24-hour warm-up.</p>
-          {!steps.account && <p className="mt-2 text-xs font-semibold text-brand-navySoft">{me.social_account_created_at ? "Account registered" : "Account not registered yet"} · 24-hour warm-up {warmDone ? "done" : "not done"}</p>}
-          {steps.account ? <p className="mt-3 text-sm font-semibold text-portal-green">Account {me.social_handle} registered and warmed up</p> : <Button asChild className="mt-4" variant={steps.signed ? "default" : "outline"}><Link to="/creators/app/account">Open account setup</Link></Button>}
+        <Step n={3} title="Create your accounts" done={steps.accounts} current={currentIdx === 2}>
+          <p className="mt-2 text-sm text-brand-navySoft">A new Gmail or Outlook address, then TikTok and Instagram with it. Register all three here.</p>
+          {steps.accounts ? <p className="mt-3 text-sm font-semibold text-portal-green">{[(me as any).tiktok_handle, (me as any).instagram_handle].filter(Boolean).join(" · ")} registered</p> : <Button asChild className="mt-4" variant={steps.signed ? "default" : "outline"}><Link to="/creators/app/account">Open account setup</Link></Button>}
         </Step>
-        <Step n={4} title="Set up payouts" done={steps.payouts} current={currentIdx === 3}>
-          <p className="mt-2 text-sm text-brand-navySoft">Connect Stripe, or give a Wise or PayPal email if Stripe does not work in your country. This only unlocks Earnings; it does not block the rest.</p>
+        <Step n={4} title="Warm-up, 24 hours" done={steps.warmDone} current={currentIdx === 3}>
+          <p className="mt-2 text-sm text-brand-navySoft">Scroll 10 minutes, follow 10 accounts in the niche, like and repost. No posting yet.</p>
+          {!steps.warmDone && <Button asChild className="mt-4" variant="outline"><Link to="/creators/app/account">Open the warm-up</Link></Button>}
+        </Step>
+        <Step n={5} title="Set up payouts" done={steps.payouts} current={currentIdx === 4}>
+          <p className="mt-2 text-sm text-brand-navySoft">Stripe by default, bank transfer with invoice as a fallback.</p>
           {steps.payouts ? <p className="mt-3 text-sm font-semibold text-portal-green">Payout details saved</p> : <Button asChild className="mt-4" variant="outline"><Link to="/creators/app/profile" hash="payouts">Set up payouts</Link></Button>}
+        </Step>
+        <Step n={6} title="Join Slack" done={steps.slack} current={currentIdx === 5}>
+          <p className="mt-2 text-sm text-brand-navySoft">Where the team shares news and answers questions.</p>
+          {!steps.slack && <Button asChild className="mt-4" variant="outline"><Link to="/creators/app/account">Join Slack</Link></Button>}
         </Step>
       </div>
 
       {steps.unlocked && (
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           <PortalCard className="md:col-span-2">
-            <p className="text-sm font-bold text-brand-navy">This week: {week} / {target} posts</p>
-            <div className="mt-3 h-2 rounded-full bg-brand-line"><div className="h-2 rounded-full bg-portal-accent" style={{ width: `${Math.min(100, (week / target) * 100)}%` }} /></div>
+            <p className="text-sm font-bold text-brand-navy">This month: {found} / {target} posts found online</p>
+            <div className="mt-3 h-2 rounded-full bg-brand-line"><div className="h-2 rounded-full bg-portal-accent" style={{ width: `${Math.min(100, (found / Math.max(1, target)) * 100)}%` }} /></div>
+            <p className="mt-2 text-xs text-brand-navySoft">Your monthly target is {target} posts. We count what is actually online on your registered accounts.</p>
           </PortalCard>
           <PortalCard>
             <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Newest brief</p>
