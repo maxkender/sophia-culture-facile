@@ -228,7 +228,7 @@ export function WeekPlanner() {
     const { error } = await supabase.from("brief_assignments").insert(creators.map((c: any) => ({ brief_id: briefId, creator_id: c.id, target_date: date, week_start: week, published_at: null })));
     if (error) toast.error(error.message); else { toast.success(`Assigned to ${creators.length} creators.`); reload(); }
   }
-  const [allDay, setAllDay] = useState(days[0]);
+  const [allDay, setAllDay] = useState(days[0] ?? week);
   const unpublished = cells.filter((c: any) => !c.published_at).length;
   const deadline = addDays(week, -3);
   return (
@@ -301,7 +301,7 @@ export function UgcBriefsGrid() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [form, setForm] = useState<any>(null);
   const reload = () => qc.invalidateQueries({ queryKey: ["ugc-briefs-grid"] });
-  const median = (xs: number[]) => { if (!xs.length) return 0; const s = [...xs].sort((a, b) => a - b); const m = Math.floor(s.length / 2); return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  const median = (xs: number[]) => { if (!xs.length) return 0; const s = [...xs].sort((a, b) => a - b); const m = Math.floor(s.length / 2); return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2; };
   const perf = (id: string) => {
     const ps = (data?.posts ?? []).filter((p: any) => p.brief_id === id);
     const v = ps.filter((p: any) => p.views_7d != null).map((p: any) => Number(p.views_7d));
