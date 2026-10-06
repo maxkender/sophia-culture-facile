@@ -1380,33 +1380,42 @@ export type Database = {
       }
       creator_payout_profiles: {
         Row: {
+          bank_holder: string | null
+          bank_iban: string | null
           created_at: string
           creator_id: string
           id: string
           method: string
           paypal_email: string | null
+          siret: string | null
           stripe_account_id: string | null
           stripe_onboarded: boolean
           updated_at: string
           wise_email: string | null
         }
         Insert: {
+          bank_holder?: string | null
+          bank_iban?: string | null
           created_at?: string
           creator_id: string
           id?: string
           method?: string
           paypal_email?: string | null
+          siret?: string | null
           stripe_account_id?: string | null
           stripe_onboarded?: boolean
           updated_at?: string
           wise_email?: string | null
         }
         Update: {
+          bank_holder?: string | null
+          bank_iban?: string | null
           created_at?: string
           creator_id?: string
           id?: string
           method?: string
           paypal_email?: string | null
+          siret?: string | null
           stripe_account_id?: string | null
           stripe_onboarded?: boolean
           updated_at?: string

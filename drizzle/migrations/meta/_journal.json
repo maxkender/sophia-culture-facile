@@ -232,6 +232,13 @@
       "when": 1791295697771,
       "tag": "0032_ugc_pipeline_rebuild",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1791295799394,
+      "tag": "0033_payout_profile_siret",
+      "breakpoints": true
     }
   ]
 }
