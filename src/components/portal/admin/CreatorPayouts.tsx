@@ -1,3 +1,4 @@
+import { UgcMonthPanel } from "./UgcAdmin";
 import { useAdminApp, AppBadge } from "@/lib/apps";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -105,7 +106,8 @@ export function CreatorPayouts() {
 
   return (
     <div className="space-y-6">
-      <PageTitle title="Creator payouts" lead="Monthly batches from approved posts, paid by Stripe Connect." />
+      <PageTitle title="Creator payouts" lead="Monthly batches, paid by Stripe Connect or exported for Wise, PayPal and bank transfer." />
+      {tab === "batches" && <UgcMonthPanel />}
       <div className="flex flex-wrap gap-2">
         {(["batches", "rates", "creators"] as Tab[]).map((t) => (
           <Button key={t} size="sm" variant={tab === t ? "default" : "outline"} onClick={() => setTab(t)}>{t}</Button>
@@ -176,7 +178,7 @@ export function CreatorPayouts() {
                       <div key={i.id} className="flex items-center justify-between py-1.5">
                         <span className="flex items-center gap-2"><AppBadge appId={i.app_id} />{i.creators?.full_name} — {i.posts_count} post(s) × ${Number(i.rate_usd).toFixed(2)}</span>
                         <span className="flex items-center gap-2">
-                          <span className="font-medium">${Number(i.amount_usd).toFixed(2)}</span>
+                          <span className="font-medium">{i.currency === "EUR" ? "€" : "$"}{Number(i.amount ?? i.amount_usd).toFixed(2)}</span>{i.hold_reason ? <span className="text-xs text-portal-amber">{i.hold_reason}</span> : null}
                           <span className="rounded bg-muted px-1.5 py-0.5 text-xs">{i.status}</span>
                         </span>
                       </div>

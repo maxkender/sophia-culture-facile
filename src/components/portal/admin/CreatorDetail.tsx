@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Banner, EmptyState, PageTitle, PortalCard } from "../ui";
 import { adminAssignCreatorCode, adminCreatorDetail, adminRevealCredentials } from "@/lib/creator-app.functions";
 import { AppEnrolment } from "./AppEnrolment";
+import { UgcCreatorPanel } from "./UgcAdmin";
 import { creatorSteps, SETUP_GUIDE, WARMUP_DAYS } from "@/lib/creator-steps";
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—");
@@ -25,8 +26,8 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
   const { data: detail } = useQuery({ queryKey: ["admin-creator-detail", creatorId], queryFn: () => detailFn({ data: { creatorId } }) });
   if (me === undefined || !detail) return <p className="text-sm text-brand-navySoft">Loading…</p>;
   if (!me) return <EmptyState title="Creator not found" />;
-  const steps = creatorSteps(me, Boolean(detail.signature), detail.payout);
-  const current = !steps.rules ? "Step 1: read the rules" : !steps.signed ? "Step 2: sign the agreement" : !steps.account ? (me.social_account_created_at ? "Step 3: warm-up in progress" : "Step 3: register the account") : !steps.payouts ? "Step 4: payouts" : "Onboarding complete";
+  const steps = creatorSteps(me, Boolean(detail.signature), detail.payout, detail.signature?.document_version);
+  const current = !steps.rules ? "Step 1: read the rules" : !steps.signed ? (steps.resignPending ? "Step 2: re-sign agreement v3" : "Step 2: sign the agreement") : !steps.accounts ? "Step 3: create accounts" : !steps.warmDone ? "Step 4: warm-up" : !steps.payouts ? "Step 5: payouts" : !steps.slack ? "Step 6: Slack" : "Onboarding complete";
   const warm = (me.warmup ?? {}) as Record<string, string>;
   const checks = (me.setup_guide_checks ?? {}) as Record<string, string>;
 
@@ -39,7 +40,7 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
         <AppEnrolment kind="creator" personId={creatorId} />
         <PortalCard>
           <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Onboarding</p>
-          <p className="mt-1 text-2xl font-extrabold text-brand-navy">{steps.count}/4</p>
+          <p className="mt-1 text-2xl font-extrabold text-brand-navy">{steps.count}/6</p>
           <p className="text-sm text-brand-navySoft">{current}</p>
           <dl className="mt-4 space-y-1 text-sm">
             <div><dt className="inline text-brand-navySoft">Rules accepted: </dt><dd className="inline font-semibold">{fmt(me.rules_accepted_at)}{me.rules_version ? ` (v${me.rules_version})` : ""}</dd></div>
@@ -50,7 +51,7 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
         </PortalCard>
 
         <PortalCard>
-          <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Registered TikTok account</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Sophia email & credentials</p>
           {detail.account ? (
             <div className="mt-2 space-y-1 text-sm">
               <p className="text-lg font-extrabold text-brand-navy">{detail.account.handle}</p>
@@ -70,7 +71,7 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
         </PortalCard>
 
         <PortalCard>
-          <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Account setup guide</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Account sub-steps</p>
           <ul className="mt-2 space-y-1 text-sm">
             {SETUP_GUIDE.map((g) => <li key={g.key}>{checks[g.key] ? "✓" : "○"} Step {g.key} {checks[g.key] ? <span className="text-brand-navySoft">· {fmt(checks[g.key])}</span> : null}</li>)}
           </ul>
@@ -100,6 +101,7 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
           )}
         </PortalCard>
       </div>
+      {me.track === "ugc" && <UgcCreatorPanel creator={me} />}
       {!me.user_id && <div className="mt-6"><Banner tone="info" title="This creator has not created their account yet" /></div>}
     </div>
   );

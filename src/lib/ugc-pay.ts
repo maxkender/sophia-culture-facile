@@ -46,7 +46,7 @@ export type MonthBreakdown = {
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
 export function periodBounds(period: string) {
-  const [y, m] = period.split("-").map(Number);
+  const [y = 1970, m = 1] = period.split("-").map(Number);
   const start = new Date(Date.UTC(y, m - 1, 1));
   const end = new Date(Date.UTC(y, m, 1));
   return { start, end };

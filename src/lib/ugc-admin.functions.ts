@@ -212,8 +212,8 @@ export const updateExternalPost = createServerFn({ method: "POST" })
     const me = await adminId(context);
     const a = await db();
     const patch: Record<string, unknown> = {};
-    if (data.excluded !== undefined) { patch.excluded = data.excluded; patch.exclude_reason = data.exclude_reason ?? null; }
-    if (data.views_7d !== undefined) { patch.views_7d = data.views_7d; patch.views_7d_at = new Date().toISOString(); patch.views_7d_source = "admin"; }
+    if (data.excluded !== undefined) { patch["excluded"] = data.excluded; patch["exclude_reason"] = data.exclude_reason ?? null; }
+    if (data.views_7d !== undefined) { patch["views_7d"] = data.views_7d; patch["views_7d_at"] = new Date().toISOString(); patch["views_7d_source"] = "admin"; }
     if (data.acceptManual) {
       const { data: row } = await a.from("external_posts").select("manual_views_7d").eq("id", data.id).maybeSingle();
       if (row?.manual_views_7d == null) throw new Error("No manual figure to accept.");

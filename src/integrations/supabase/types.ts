@@ -4150,6 +4150,7 @@ export type Database = {
           apify_instagram_actor: string
           apify_price_per_result_usd: number
           apify_tiktok_actor: string
+          cron_token: string
           default_posts_per_month: number
           id: number
           payday_day: number
@@ -4160,6 +4161,7 @@ export type Database = {
           apify_instagram_actor?: string
           apify_price_per_result_usd?: number
           apify_tiktok_actor?: string
+          cron_token?: string
           default_posts_per_month?: number
           id?: number
           payday_day?: number
@@ -4170,6 +4172,7 @@ export type Database = {
           apify_instagram_actor?: string
           apify_price_per_result_usd?: number
           apify_tiktok_actor?: string
+          cron_token?: string
           default_posts_per_month?: number
           id?: number
           payday_day?: number
