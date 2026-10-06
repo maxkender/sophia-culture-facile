@@ -124,6 +124,12 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  // Remember an outreach source (?src=va|formspree|dm…) so the UGC form can record it.
+  useEffect(() => {
+    const src = new URLSearchParams(window.location.search).get("src");
+    if (src) sessionStorage.setItem("sophia_src", src.replace(/[^a-z0-9_-]/gi, "").slice(0, 40));
+  }, []);
+
 
   return (
     <QueryClientProvider client={queryClient}>
