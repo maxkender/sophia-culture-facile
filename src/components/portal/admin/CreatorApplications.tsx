@@ -74,14 +74,6 @@ export function CreatorApplications({ track }: { track: Track }) {
   const { data } = useQuery({
     queryKey: ["portal", "admin", "creator-applications", track, status, signedFilter, appId],
     queryFn: async () => {
-      if (track === "ugc" && next === "rejected") {
-        const r = await rejectUgc({ data: { applicationId: id, reason: reason.trim(), notify: notifyReject } });
-        if (notifyReject) r.sent ? toast.success(r.note ? `Rejected. ${r.note}.` : "Rejected. The decline email was sent.") : toast.warning(`Rejected. ${r.note ?? "Email not sent"}.`);
-        else toast.success("Application rejected.");
-        setSelected(null);
-        await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-applications"] });
-        return;
-      }
       const table = track === "ugc" ? "creator_applications" : "slideshow_applications";
       let query = supabase.from(table).select("*").order("created_at", { ascending: false });
       if (status !== "all") query = query.eq("status", status);
@@ -119,6 +111,14 @@ export function CreatorApplications({ track }: { track: Track }) {
         setSelected(null);
         await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-applications"] });
         await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-ops"] });
+        return;
+      }
+      if (track === "ugc" && next === "rejected") {
+        const r = await rejectUgc({ data: { applicationId: id, reason: reason.trim(), notify: notifyReject } });
+        if (notifyReject) r.sent ? toast.success(r.note ? `Rejected. ${r.note}.` : "Rejected. The decline email was sent.") : toast.warning(`Rejected. ${r.note ?? "Email not sent"}.`);
+        else toast.success("Application rejected.");
+        setSelected(null);
+        await queryClient.invalidateQueries({ queryKey: ["portal", "admin", "creator-applications"] });
         return;
       }
       const table = track === "ugc" ? "creator_applications" : "slideshow_applications";
