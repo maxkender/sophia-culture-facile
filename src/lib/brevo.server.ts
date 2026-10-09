@@ -6,6 +6,7 @@ export type BrevoResult = { sent: boolean; messageId?: string; reason?: string }
 export async function sendBrevoEmail(opts: { to: string; toName?: string; subject: string; html: string; text: string }): Promise<BrevoResult> {
   const key = process.env["BREVO_API_KEY"];
   if (!key) return { sent: false, reason: "brevo_key_missing" };
+  if (/@fastlane\.sophia-culture\.com$/i.test(opts.to.trim())) return { sent: false, reason: "email_pending" };
   try {
     const res = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",

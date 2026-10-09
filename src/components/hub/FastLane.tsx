@@ -20,7 +20,9 @@ function useTiers(appId: string) {
   return useQuery({ queryKey: ["hub", "tiers", appId], queryFn: async () => (await supabase.from("ugc_tiers").select("tier, per_post, cpm, cap_per_post").eq("app_id", appId)).data ?? [] });
 }
 export function payPreview(p: Pay) {
-  return `Elle verra : ${fr(p.perPost)} par post · ${fr(p.rpm)} / 1 000 vues · jusqu'à ${fr(p.cap)} par post · objectif ${p.postsPerMonth ?? 20} posts/mois${p.fixedMonthly ? ` · ${fr(p.fixedMonthly)} fixe/mois` : ""}${p.welcomeBonus ? ` · bonus ${fr(p.welcomeBonus)}` : ""}`;
+  const n = p.postsPerMonth ?? 20;
+  if (p.fixedMonthly) return `Elle verra : ${fr(p.fixedMonthly)} pour ${n} vidéos par mois (au prorata) · ${fr(p.rpm)} / 1 000 vues${p.cap ? ` · jusqu'à ${fr(p.cap)} par post` : ""}${p.perPost ? ` · + ${fr(p.perPost)} par post` : ""}${p.welcomeBonus ? ` · bonus ${fr(p.welcomeBonus)}` : ""}`;
+  return `Elle verra : ${fr(p.perPost)} par post · ${fr(p.rpm)} / 1 000 vues · jusqu'à ${fr(p.cap)} par post · objectif ${n} posts/mois${p.welcomeBonus ? ` · bonus ${fr(p.welcomeBonus)}` : ""}`;
 }
 
 export function PayEditor({ pay, setPay, appId }: { pay: Pay; setPay: (p: Pay) => void; appId: string }) {
@@ -77,15 +79,16 @@ export function AddValidatedCreator({ open, onOpenChange, preset }: { open: bool
   async function save() {
     let people: Record<string, unknown>[] = [];
     if (tab === "one") {
-      if (!p.firstName.trim() || !/^\S+@\S+\.\S+$/.test(p.email.trim())) return void toast.error("First name and a valid email are needed.");
-      people = [{ ...p, lastName: p.lastName || null, tiktok: p.tiktok || null, instagram: p.instagram || null, notes: p.notes || null, ref: preset ? { kind: preset.kind, id: preset.id } : null }];
+      if (!p.firstName.trim()) return void toast.error("A first name is needed.");
+      if (p.email.trim() && !/^\S+@\S+\.\S+$/.test(p.email.trim())) return void toast.error("This email doesn't look valid. Leave it empty if you don't have it.");
+      people = [{ ...p, email: p.email.trim() || null, lastName: p.lastName || null, tiktok: p.tiktok || null, instagram: p.instagram || null, notes: p.notes || null, ref: preset ? { kind: preset.kind, id: preset.id } : null }];
     } else {
       const lines = bulk.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
       const bad: number[] = [];
       people = lines.map((l, i) => {
         const [firstName = "", email = "", country = "", handle = "", source = ""] = l.split(/[,;\t]/).map((v) => v.trim());
-        if (!firstName || !/^\S+@\S+\.\S+$/.test(email)) bad.push(i + 1);
-        return { firstName, email, country: country || null, language: defaultLang(country), tiktok: handle || null, source: (SOURCES as readonly string[]).includes(source.toLowerCase()) ? source.toLowerCase() : "other" };
+        if (!firstName || (email && !/^\S+@\S+\.\S+$/.test(email))) bad.push(i + 1);
+        return { firstName, email: email || null, country: country || null, language: defaultLang(country), tiktok: handle || null, source: (SOURCES as readonly string[]).includes(source.toLowerCase()) ? source.toLowerCase() : "other" };
       });
       if (!people.length) return void toast.error("Paste at least one line.");
       if (bad.length) return void toast.error(`Line ${bad.join(", ")}: a first name and a valid email are needed.`);
@@ -118,7 +121,7 @@ export function AddValidatedCreator({ open, onOpenChange, preset }: { open: bool
               <Button size="sm" variant="ghost" onClick={() => setResults(null)}>Add more</Button>
             </div>
             <table className="w-full text-left text-sm"><thead><tr className="text-xs text-brand-navySoft"><th className="py-1">Name</th><th>Email</th><th>Link</th></tr></thead>
-              <tbody>{results.map((r) => <tr key={r.email} className="border-t"><td className="py-2 font-semibold">{r.name}</td><td className="break-all">{r.email}</td>
+              <tbody>{results.map((r) => <tr key={r.email} className="border-t"><td className="py-2 font-semibold">{r.name}</td><td className="break-all">{r.email || "email à saisir"}</td>
                 <td>{r.link ? <div className="flex items-center gap-2"><code className="max-w-[14rem] truncate text-xs" data-testid="fast-link">{r.link}</code><Button size="sm" variant="outline" onClick={() => void navigator.clipboard.writeText(r.link!).then(() => toast.success("Copied"))}>Copy</Button></div> : <span className="text-xs text-destructive">{r.error}</span>}</td></tr>)}</tbody>
             </table>
           </div>
@@ -133,7 +136,7 @@ export function AddValidatedCreator({ open, onOpenChange, preset }: { open: bool
               </div>
               {tab === "one" ? (
                 <div className="grid grid-cols-2 gap-3">
-                  {txt("firstName", "First name")}{txt("lastName", "Last name (optional)")}{txt("email", "Email", "email")}{txt("country", "Country")}
+                  {txt("firstName", "First name")}{txt("lastName", "Last name (optional)")}<div>{txt("email", "Email (optional)", "email")}<p className="mt-1 text-[11px] text-brand-navySoft">Si tu ne l'as pas, elle le saisira sur son lien.</p></div>{txt("country", "Country")}
                   <label className="text-xs font-semibold text-brand-navySoft">Language<select aria-label="Language" className={field} value={p.language} onChange={(e) => setP({ ...p, language: e.target.value as "fr" | "en" })}><option value="fr">Français</option><option value="en">English</option></select></label>
                   <label className="text-xs font-semibold text-brand-navySoft">Phone<select aria-label="Phone" className={field} value={p.platform} onChange={(e) => setP({ ...p, platform: e.target.value as "ios" | "android" })}><option value="ios">iPhone</option><option value="android">Android</option></select></label>
                   {txt("tiktok", "Personal TikTok handle (optional)")}{txt("instagram", "Instagram handle (optional)")}
