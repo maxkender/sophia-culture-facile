@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { SOPHIA_APP_ID, useAdminApp } from "@/lib/apps";
-import { COUNTRIES } from "@/config/countries";
 import { eur } from "./hub-data";
 
+const COUNTRY_CODES = ["FR", "BE", "CH", "CA", "LU", "MA", "SN", "CI", "GB", "US", "DE", "ES", "IT", "PT", "NL", "IE"];
 export const POSITIONS = ["UGC creator", "Clipper", "Influencer", "Video editor", "Slideshow poster"] as const;
 export const PLATFORMS = ["tiktok", "instagram", "youtube", "twitter", "facebook", "snapchat"] as const;
 export const CONTENT_TYPES = ["Face-cam talking", "Screen/POV", "Reaction", "Slideshow", "Faceless"];
@@ -149,7 +149,7 @@ export function JobFields({ j, set, tab }: { j: JobDraft; set: (p: Partial<JobDr
       <label className="flex items-start gap-3 rounded-xl border border-brand-line p-3"><Globe className="mt-0.5 size-5 text-portal-accent" /><span className="flex-1"><b className="text-sm text-brand-navy">Require a verified country</b><span className="block text-xs text-brand-navySoft">Choose where creators must live to apply or accept an invitation</span></span><input type="checkbox" checked={j.verified_country} onChange={(e) => set({ verified_country: e.target.checked })} /></label>
       {j.verified_country ? (
         <label className={label}>Countries<select multiple className={cn(input, "h-32")} value={j.countries} onChange={(e) => set({ countries: [...e.target.selectedOptions].map((o) => o.value) })}>
-          {COUNTRIES.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
+          {COUNTRY_CODES.map((c) => <option key={c} value={c}>{c}</option>)}
         </select></label>
       ) : null}
       <label className={label}>Age Range<select className={input} value={j.age} onChange={(e) => set({ age: e.target.value })}>{Object.keys(AGES).map((a) => <option key={a}>{a}</option>)}</select></label>
