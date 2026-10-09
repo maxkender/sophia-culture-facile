@@ -24,7 +24,7 @@ export function useHubExtras() {
       const [awards, tasks, tiers, jobs, apps] = await Promise.all([
         supabase.from("awards").select("kind, period, awarded_at").eq("creator_id", me.id),
         supabase.from("creator_tasks").select("*").eq("creator_id", me.id).order("created_at", { ascending: false }),
-        supabase.from("ugc_tiers").select("tier, label, per_post, cpm, monthly_cap, app_id"),
+        supabase.from("ugc_tiers").select("tier, label, per_post, cpm, cap_per_post, app_id"),
         supabase.from("jobs").select("*").eq("status", "active").eq("access", "job_feed").order("created_at", { ascending: false }),
         supabase.from("job_applications").select("job_id, status").eq("creator_id", me.id),
       ]);

@@ -113,7 +113,7 @@ export function UgcCreatorPanel({ creator }: { creator: any }) {
   const addPost = useServerFn(addManualExternalPost);
   const [s, setS] = useState({
     posts_per_month: creator.posts_per_month ?? "", required_platforms: creator.required_platforms ?? "both", ugc_status: creator.ugc_status ?? "trial",
-    fixed_monthly_override: creator.fixed_monthly_override ?? "", rpm_override: creator.rpm_override ?? "", cap_override: creator.cap_override ?? "",
+    fixed_monthly_override: creator.fixed_monthly_override ?? "", per_post_override: creator.per_post_override ?? "", rpm_override: creator.rpm_override ?? "", cap_override: creator.cap_override ?? "",
     assigned_hm_id: creator.assigned_hm_id ?? "", admin_notes: creator.admin_notes ?? "",
   });
   const [adj, setAdj] = useState({ amount: "", reason: "" });
@@ -143,14 +143,15 @@ export function UgcCreatorPanel({ creator }: { creator: any }) {
           <div><Label>Required platforms</Label><select className={cn(sel, "w-full")} value={s.required_platforms} onChange={(e) => setS({ ...s, required_platforms: e.target.value })}><option value="both">Both</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option></select></div>
           <div><Label>Status</Label><select className={cn(sel, "w-full")} value={s.ugc_status} onChange={(e) => setS({ ...s, ugc_status: e.target.value })}>{["trial", "active", "paused", "ended"].map((x) => <option key={x}>{x}</option>)}</select></div>
           <div><Label>Fixed monthly € (blank = rate card)</Label><Input type="number" value={s.fixed_monthly_override} onChange={(e) => setS({ ...s, fixed_monthly_override: e.target.value })} /></div>
+          <div><Label>€ per post (blank = tier)</Label><Input type="number" step="0.5" value={s.per_post_override} onChange={(e) => setS({ ...s, per_post_override: e.target.value })} /></div>
           <div><Label>€ per 1,000 views (blank = rate card)</Label><Input type="number" step="0.01" value={s.rpm_override} onChange={(e) => setS({ ...s, rpm_override: e.target.value })} /></div>
-          <div><Label>Cap per video € (blank = rate card)</Label><Input type="number" value={s.cap_override} onChange={(e) => setS({ ...s, cap_override: e.target.value })} /></div>
+          <div><Label>Cap per post € (blank = tier)</Label><Input type="number" value={s.cap_override} onChange={(e) => setS({ ...s, cap_override: e.target.value })} /></div>
           <div><Label>Hiring manager</Label><select className={cn(sel, "w-full")} value={s.assigned_hm_id} onChange={(e) => setS({ ...s, assigned_hm_id: e.target.value })}><option value="">—</option>{hms.map((h: any) => <option key={h.id} value={h.id}>{h.full_name}</option>)}</select></div>
           <div className="sm:col-span-2"><Label>Notes</Label><Textarea rows={2} value={s.admin_notes} onChange={(e) => setS({ ...s, admin_notes: e.target.value })} /></div>
         </div>
         <Button className="mt-3" onClick={async () => {
           try {
-            await save({ data: { creatorId: creator.id, posts_per_month: num(s.posts_per_month), required_platforms: s.required_platforms as any, ugc_status: s.ugc_status as any, fixed_monthly_override: num(s.fixed_monthly_override), rpm_override: num(s.rpm_override), cap_override: num(s.cap_override), assigned_hm_id: s.assigned_hm_id || null, admin_notes: s.admin_notes || null } });
+            await save({ data: { creatorId: creator.id, posts_per_month: num(s.posts_per_month), required_platforms: s.required_platforms as any, ugc_status: s.ugc_status as any, fixed_monthly_override: num(s.fixed_monthly_override), per_post_override: num(s.per_post_override), rpm_override: num(s.rpm_override), cap_override: num(s.cap_override), assigned_hm_id: s.assigned_hm_id || null, admin_notes: s.admin_notes || null } });
             toast.success("Settings saved."); refresh();
           } catch (e) { toast.error(errMsg(e)); }
         }}>Save settings</Button>

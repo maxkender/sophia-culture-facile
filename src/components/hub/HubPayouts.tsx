@@ -49,7 +49,7 @@ function Tiers() {
   const qc = useQueryClient();
   const run = useServerFn(runTiersNow);
   const { data = [] } = useQuery({ queryKey: ["hub", "tiers", appId], queryFn: async () => { let q = supabase.from("ugc_tiers").select("*").order("per_post"); if (appId) q = q.eq("app_id", appId); return (await q).data ?? []; } });
-  async function update(id: string, k: "per_post" | "cpm" | "monthly_cap", val: string) {
+  async function update(id: string, k: "per_post" | "cpm" | "cap_per_post", val: string) {
     const { error } = await supabase.from("ugc_tiers").update({ [k]: Number(val) } as never).eq("id", id);
     if (error) toast.error("Could not save."); else void qc.invalidateQueries({ queryKey: ["hub", "tiers"] });
   }
@@ -57,14 +57,14 @@ function Tiers() {
     <section className={card}>
       <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-extrabold text-brand-navy">Tiers</h2>
         <Button size="sm" variant="outline" onClick={async () => { const r = await run(); toast.success(`Checked: ${r.awarded} awards, ${r.bonuses} bonuses${r.promote ? `, ${r.changed} tier changes` : " (tier changes only run on the 1st)"}`); }}>Run awards & bonuses now</Button></div>
-      <p className="mt-1 text-xs text-brand-navySoft">Tiers replace the single rate card. Instagram posts pay the per-post rate only (no views pay). Per-creator overrides on the creator page still apply. Tier changes run on the 1st of each month.</p>
+      <p className="mt-1 text-xs text-brand-navySoft">Tiers replace the single rate card. Each post earns the per-post rate plus views pay up to the cap per post; there is no monthly ceiling per tier (only the global monthly budget cap). Instagram posts pay the per-post rate only. Per-creator overrides on the creator page still apply. Tier changes run on the 1st of each month.</p>
       <div className="mt-3 overflow-x-auto">
         <table className="w-full min-w-[560px] text-sm">
-          <thead className="text-left text-xs text-brand-navySoft"><tr><th className="py-2">App</th><th>Tier</th><th>Rule</th><th>€/post</th><th>€/1000 views</th><th>Monthly cap €</th></tr></thead>
+          <thead className="text-left text-xs text-brand-navySoft"><tr><th className="py-2">App</th><th>Tier</th><th>Rule</th><th>Per post €</th><th>Per 1,000 views €</th><th>Cap per post €</th></tr></thead>
           <tbody className="divide-y divide-brand-line">{data.map((t) => (
             <tr key={t.id}>
               <td className="py-2">{apps.find((a) => a.id === t.app_id)?.name}</td><td className="font-bold">{t.label}</td><td className="text-xs text-brand-navySoft">{t.rule}</td>
-              {(["per_post", "cpm", "monthly_cap"] as const).map((k) => <td key={k}><input aria-label={`${t.label} ${k}`} type="number" step="0.5" min={0} defaultValue={String(t[k])} onBlur={(e) => e.target.value !== String(t[k]) && void update(t.id, k, e.target.value)} className="h-9 w-20 rounded-lg border px-2" /></td>)}
+              {(["per_post", "cpm", "cap_per_post"] as const).map((k) => <td key={k}><input aria-label={`${t.label} ${k}`} type="number" step="0.5" min={0} defaultValue={String(t[k])} onBlur={(e) => e.target.value !== String(t[k]) && void update(t.id, k, e.target.value)} className="h-9 w-20 rounded-lg border px-2" /></td>)}
             </tr>
           ))}</tbody>
         </table>
