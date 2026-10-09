@@ -78,6 +78,60 @@ export type Database = {
           },
         ]
       }
+      account_pool: {
+        Row: {
+          app_id: string | null
+          assigned_creator_id: string | null
+          created_at: string
+          from_creator_id: string | null
+          handle: string
+          id: string
+          note: string | null
+          password_rotated_at: string | null
+          platform: string
+          status: string
+        }
+        Insert: {
+          app_id?: string | null
+          assigned_creator_id?: string | null
+          created_at?: string
+          from_creator_id?: string | null
+          handle: string
+          id?: string
+          note?: string | null
+          password_rotated_at?: string | null
+          platform: string
+          status?: string
+        }
+        Update: {
+          app_id?: string | null
+          assigned_creator_id?: string | null
+          created_at?: string
+          from_creator_id?: string | null
+          handle?: string
+          id?: string
+          note?: string | null
+          password_rotated_at?: string | null
+          platform?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_pool_assigned_creator_id_fkey"
+            columns: ["assigned_creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "account_pool_from_creator_id_fkey"
+            columns: ["from_creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       activity_log: {
         Row: {
           action: string
@@ -727,15 +781,18 @@ export type Database = {
           created_at: string
           created_by: string | null
           difficulty: number
+          drop_at: string | null
           due_date: string | null
           duration_target: string | null
           format: string | null
           hook: string | null
+          hooks: string[]
           id: string
           must_mention: string | null
           platform: string
           reference_video_ids: string[]
           script: string | null
+          source_course_id: string | null
           status: string
           tags: string[]
           title: string
@@ -750,15 +807,18 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           difficulty?: number
+          drop_at?: string | null
           due_date?: string | null
           duration_target?: string | null
           format?: string | null
           hook?: string | null
+          hooks?: string[]
           id?: string
           must_mention?: string | null
           platform?: string
           reference_video_ids?: string[]
           script?: string | null
+          source_course_id?: string | null
           status?: string
           tags?: string[]
           title: string
@@ -773,15 +833,18 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           difficulty?: number
+          drop_at?: string | null
           due_date?: string | null
           duration_target?: string | null
           format?: string | null
           hook?: string | null
+          hooks?: string[]
           id?: string
           must_mention?: string | null
           platform?: string
           reference_video_ids?: string[]
           script?: string | null
+          source_course_id?: string | null
           status?: string
           tags?: string[]
           title?: string
@@ -1269,6 +1332,7 @@ export type Database = {
           occupation: string
           other_links: string | null
           phone: string
+          ref_handle: string | null
           referral_source: string
           rejection_reason: string | null
           source: string | null
@@ -1304,6 +1368,7 @@ export type Database = {
           occupation: string
           other_links?: string | null
           phone: string
+          ref_handle?: string | null
           referral_source: string
           rejection_reason?: string | null
           source?: string | null
@@ -1339,6 +1404,7 @@ export type Database = {
           occupation?: string
           other_links?: string | null
           phone?: string
+          ref_handle?: string | null
           referral_source?: string
           rejection_reason?: string | null
           source?: string | null
@@ -1703,18 +1769,27 @@ export type Database = {
         Row: {
           amount_usd: number | null
           app_id: string
+          auto_detected: boolean
           bonus_usd: number | null
           brief_id: string | null
+          caption: string | null
+          comments: number | null
           created_at: string
           creator_id: string
+          external_id: string | null
           feedback: string | null
+          format: string | null
+          fraud_flags: string[]
+          hold_reason: string | null
           id: string
           likes: number | null
           pay_status: string | null
           platform: string
           posted_on: string
+          queued_period: string | null
           rate_id: string | null
           reference_video_id: string | null
+          shares: number | null
           skip_reason: string | null
           status: string
           url: string
@@ -1725,18 +1800,27 @@ export type Database = {
         Insert: {
           amount_usd?: number | null
           app_id?: string
+          auto_detected?: boolean
           bonus_usd?: number | null
           brief_id?: string | null
+          caption?: string | null
+          comments?: number | null
           created_at?: string
           creator_id: string
+          external_id?: string | null
           feedback?: string | null
+          format?: string | null
+          fraud_flags?: string[]
+          hold_reason?: string | null
           id?: string
           likes?: number | null
           pay_status?: string | null
           platform?: string
           posted_on?: string
+          queued_period?: string | null
           rate_id?: string | null
           reference_video_id?: string | null
+          shares?: number | null
           skip_reason?: string | null
           status?: string
           url: string
@@ -1747,18 +1831,27 @@ export type Database = {
         Update: {
           amount_usd?: number | null
           app_id?: string
+          auto_detected?: boolean
           bonus_usd?: number | null
           brief_id?: string | null
+          caption?: string | null
+          comments?: number | null
           created_at?: string
           creator_id?: string
+          external_id?: string | null
           feedback?: string | null
+          format?: string | null
+          fraud_flags?: string[]
+          hold_reason?: string | null
           id?: string
           likes?: number | null
           pay_status?: string | null
           platform?: string
           posted_on?: string
+          queued_period?: string | null
           rate_id?: string | null
           reference_video_id?: string | null
+          shares?: number | null
           skip_reason?: string | null
           status?: string
           url?: string
@@ -2220,6 +2313,8 @@ export type Database = {
           cap_override: number | null
           country: string | null
           created_at: string
+          dormancy_reminders: Json
+          dormant_at: string | null
           email: string
           examples_read_at: string | null
           fixed_monthly_override: number | null
@@ -2229,6 +2324,7 @@ export type Database = {
           instagram_handle: string | null
           invite_sent_at: string | null
           invite_token: string | null
+          last_post_at: string | null
           last_seen_at: string | null
           motivation_confirmed_at: string | null
           onboarding_completed_at: string | null
@@ -2272,6 +2368,8 @@ export type Database = {
           cap_override?: number | null
           country?: string | null
           created_at?: string
+          dormancy_reminders?: Json
+          dormant_at?: string | null
           email: string
           examples_read_at?: string | null
           fixed_monthly_override?: number | null
@@ -2281,6 +2379,7 @@ export type Database = {
           instagram_handle?: string | null
           invite_sent_at?: string | null
           invite_token?: string | null
+          last_post_at?: string | null
           last_seen_at?: string | null
           motivation_confirmed_at?: string | null
           onboarding_completed_at?: string | null
@@ -2324,6 +2423,8 @@ export type Database = {
           cap_override?: number | null
           country?: string | null
           created_at?: string
+          dormancy_reminders?: Json
+          dormant_at?: string | null
           email?: string
           examples_read_at?: string | null
           fixed_monthly_override?: number | null
@@ -2333,6 +2434,7 @@ export type Database = {
           instagram_handle?: string | null
           invite_sent_at?: string | null
           invite_token?: string | null
+          last_post_at?: string | null
           last_seen_at?: string | null
           motivation_confirmed_at?: string | null
           onboarding_completed_at?: string | null
@@ -2629,6 +2731,47 @@ export type Database = {
             columns: ["logged_post_id"]
             isOneToOne: false
             referencedRelation: "creator_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      go_clicks: {
+        Row: {
+          app_id: string | null
+          country: string | null
+          created_at: string
+          creator_id: string | null
+          device: string
+          handle: string
+          id: string
+          user_agent: string | null
+        }
+        Insert: {
+          app_id?: string | null
+          country?: string | null
+          created_at?: string
+          creator_id?: string | null
+          device: string
+          handle: string
+          id?: string
+          user_agent?: string | null
+        }
+        Update: {
+          app_id?: string | null
+          country?: string | null
+          created_at?: string
+          creator_id?: string | null
+          device?: string
+          handle?: string
+          id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "go_clicks_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
             referencedColumns: ["id"]
           },
         ]
@@ -3841,6 +3984,21 @@ export type Database = {
           },
         ]
       }
+      job_locks: {
+        Row: {
+          locked_until: string
+          name: string
+        }
+        Insert: {
+          locked_until: string
+          name: string
+        }
+        Update: {
+          locked_until?: string
+          name?: string
+        }
+        Relationships: []
+      }
       jobs: {
         Row: {
           access: string
@@ -3853,6 +4011,7 @@ export type Database = {
           base_mode: string
           bonus_goals: Json
           campaign_id: string | null
+          closed_by_budget: boolean
           content_type: string | null
           countries: string[]
           cover_image_path: string | null
@@ -3888,6 +4047,7 @@ export type Database = {
           base_mode?: string
           bonus_goals?: Json
           campaign_id?: string | null
+          closed_by_budget?: boolean
           content_type?: string | null
           countries?: string[]
           cover_image_path?: string | null
@@ -3923,6 +4083,7 @@ export type Database = {
           base_mode?: string
           bonus_goals?: Json
           campaign_id?: string | null
+          closed_by_budget?: boolean
           content_type?: string | null
           countries?: string[]
           cover_image_path?: string | null
@@ -4470,9 +4631,11 @@ export type Database = {
           created_at: string
           format_notes: string | null
           id: string
+          is_winner: boolean
           note: string | null
           pinned: boolean
           platform: string
+          tags: string[]
           thumbnail_url: string | null
           title: string | null
           url: string
@@ -4485,9 +4648,11 @@ export type Database = {
           created_at?: string
           format_notes?: string | null
           id?: string
+          is_winner?: boolean
           note?: string | null
           pinned?: boolean
           platform?: string
+          tags?: string[]
           thumbnail_url?: string | null
           title?: string | null
           url: string
@@ -4500,9 +4665,11 @@ export type Database = {
           created_at?: string
           format_notes?: string | null
           id?: string
+          is_winner?: boolean
           note?: string | null
           pinned?: boolean
           platform?: string
+          tags?: string[]
           thumbnail_url?: string | null
           title?: string | null
           url?: string
@@ -4517,6 +4684,90 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          earned: number
+          ends_at: string
+          id: string
+          rate: number
+          ref_handle: string
+          referee_creator_id: string
+          referrer_creator_id: string
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          earned?: number
+          ends_at?: string
+          id?: string
+          rate?: number
+          ref_handle: string
+          referee_creator_id: string
+          referrer_creator_id: string
+          starts_at?: string
+        }
+        Update: {
+          created_at?: string
+          earned?: number
+          ends_at?: string
+          id?: string
+          rate?: number
+          ref_handle?: string
+          referee_creator_id?: string
+          referrer_creator_id?: string
+          starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referee_creator_id_fkey"
+            columns: ["referee_creator_id"]
+            isOneToOne: true
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_creator_id_fkey"
+            columns: ["referrer_creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_templates: {
+        Row: {
+          app_id: string | null
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          name: string
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          app_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          name: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          app_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          name?: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       screens: {
         Row: {
@@ -4918,6 +5169,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      weekly_installs: {
+        Row: {
+          app_id: string | null
+          created_at: string
+          handle: string
+          id: string
+          installs: number
+          spend: number
+          week_start: string
+        }
+        Insert: {
+          app_id?: string | null
+          created_at?: string
+          handle: string
+          id?: string
+          installs?: number
+          spend?: number
+          week_start: string
+        }
+        Update: {
+          app_id?: string | null
+          created_at?: string
+          handle?: string
+          id?: string
+          installs?: number
+          spend?: number
+          week_start?: string
+        }
+        Relationships: []
       }
     }
     Views: {
