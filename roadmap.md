@@ -27,3 +27,11 @@
 - [x] D. Brevo nurture sequence J0/J+2/J+7, daily 09:00, editable in Templates
 - [x] E. 20-course brief generation, Briefs list refresh, reference_library (81 rows), DM templates
 - [x] F. Sidebar headings language, delete test applicant, Get started steps 4/5, security scan, republish
+
+# Fast lane (Oct 9, 19:31)
+- [x] Admin "Add validated creator" (single + bulk) with pay block, Discover + "+" menu
+- [x] /j/<token> page, Entrer → sign-in, steps 1-2 done, expired page
+- [x] Email-link login on /creators/login, optional password on Profile
+- [x] Fiche Fast lane block, Générer un lien for creators/applicants/prospects, editable pay, "Tes conditions"
+- [x] Sidekick create_fast_lane
+- [x] Test end-to-end, clean test records, republish

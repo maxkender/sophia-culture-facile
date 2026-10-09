@@ -198,6 +198,7 @@ export function HubShell({ children }: { children: ReactNode }) {
                 <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/campaigns", search: { tab: "jobs", newJob: 1 } as never })}>Job</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/tools/$", params: { _splat: "ugc-briefs" } })}>Brief</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/discover" })}>Invite creator</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/discover", search: { add: 1 } as never })}>Add validated creator</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <Button size="icon" variant="outline" aria-label="Open Sidekick" onClick={() => setSidekick(true)}><Bot className="size-4" /></Button>

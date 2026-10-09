@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { claimCreatorInvite, linkCreatorByEmail } from "@/lib/creator-space.functions";
 import { checkCreatorInvite } from "@/lib/creator-extras.functions";
+import { requestLoginLink } from "@/lib/fast-lane.functions";
 import { Outlet } from "@tanstack/react-router";
 import { CreatorShell } from "./app/CreatorShell";
 import { CREATOR_KEY, useCreatorQuery } from "./app/useCreator";
@@ -31,6 +32,8 @@ export function SignIn({ invite, invitedEmail, standalone = false }: { invite: s
   const [adult, setAdult] = useState(false);
   const [state, setState] = useState<string | null>(null);
   const check = useServerFn(checkCreatorInvite);
+  const sendLink = useServerFn(requestLoginLink);
+  const [linkSent, setLinkSent] = useState(false);
   useEffect(() => {
     if (invite) check({ data: { token: invite } }).then((r) => { setState(r.state); if (r.state !== "fresh") setMode("in"); }).catch(() => setState("fresh"));
   }, [invite, check]);
@@ -70,6 +73,15 @@ export function SignIn({ invite, invitedEmail, standalone = false }: { invite: s
         }}>Forgot password?</button>
       )}
       <Button className="w-full" disabled={busy} onClick={go}>{mode === "up" ? "Create account" : "Sign in"}</Button>
+      {mode === "in" && (linkSent
+        ? <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy">Lien envoyé : regarde ta boîte mail (et les spams). / Link sent: check your inbox.</p>
+        : <Button variant="outline" className="w-full" disabled={busy} onClick={async () => {
+            if (!/^\S+@\S+\.\S+$/.test(email.trim())) { toast.error("Entre ton email d'abord. / Enter your email first."); return; }
+            setBusy(true);
+            try { await sendLink({ data: { email: email.trim(), origin: window.location.origin, lang: navigator.language.toLowerCase().startsWith("fr") ? "fr" : "en" } }); setLinkSent(true); }
+            catch { toast.error("Le lien n'a pas pu être envoyé. Réessaie. / The link could not be sent."); }
+            setBusy(false);
+          }}>Recevoir un lien de connexion par email</Button>)}
       <button className="text-xs text-brand-navySoft underline" onClick={() => setMode(mode === "up" ? "in" : "up")}>
         {mode === "up" ? "I already have an account" : "I have an invite, create my account"}
       </button>

@@ -12,6 +12,8 @@ import { fmtMoney } from "@/lib/ugc-pay";
 import { friendlyCreatorError } from "@/lib/creator-validation";
 import { useCreator } from "./useCreator";
 import { LibraryPage as ReferenceLibrary } from "./WorkPages";
+import { MyTerms } from "./HubPages";
+import { supabase } from "@/integrations/supabase/client";
 
 const n = (v: number) => new Intl.NumberFormat("en-GB").format(Math.round(v));
 const day = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }) : "Any day");
@@ -127,6 +129,7 @@ export function UgcEarningsPage() {
   return (
     <div>
       <PageTitle title="Earnings" lead={`Live for ${b.period}. Our system reads views directly from your accounts.`} />
+      <EarningsTerms />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {[
           ["Posts found", `${b.postsCounted} / ${b.target}`],
@@ -184,4 +187,9 @@ export function Breakdown({ b }: { b: any }) {
       <p className="mt-4 border-t border-brand-line pt-3 text-base font-extrabold text-brand-navy">Total: {fmtMoney(b.total, b.currency)}</p>
     </PortalCard>
   );
+}
+
+function EarningsTerms() {
+  const { data: tiers = [] } = useQuery({ queryKey: ["creator-tiers"], queryFn: async () => (await supabase.from("ugc_tiers").select("tier, per_post, cpm, cap_per_post, app_id")).data ?? [] });
+  return <PortalCard className="mb-6 p-4"><MyTerms tiers={tiers} /></PortalCard>;
 }

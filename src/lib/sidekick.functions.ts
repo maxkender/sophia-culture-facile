@@ -34,6 +34,7 @@ const TOOLS = [
   fn("funnel", "Creator funnel: signed up, account created, first post, 10 posts, active tier.", { type: "object", additionalProperties: false, required: [], properties: {} }),
   fn("find_briefs", "Search existing briefs by words in title, hook or script.", { type: "object", additionalProperties: false, required: ["query"], properties: { query: { type: "string" } } }),
   fn("draft_brief", "Return a draft brief for a topic. Not saved. Call this when asked to draft a brief, then write the brief yourself in the answer as JSON in a ```brief block with keys title, hooks (3), angle, script, must_mention, format, duration_target.", { type: "object", additionalProperties: false, required: ["topic"], properties: { topic: { type: "string" } } }),
+  fn("create_fast_lane", "Create a pre-validated creator record and return their personal one-time fast-lane link. Only call when the admin explicitly asks to create a fast-lane link. Pay fields are optional overrides; null keeps the tier value. Never invent an email: ask for it if missing.", { type: "object", additionalProperties: false, required: ["first_name", "email", "handle", "country", "source", "tier", "per_post", "rpm", "cap", "posts_per_month"], properties: { first_name: { type: "string" }, email: { type: "string" }, handle: { type: ["string", "null"] }, country: { type: ["string", "null"] }, source: { type: ["string", "null"], enum: ["va", "dm", "sideshift", "upwork", "referral", "other", null] }, tier: { type: ["string", "null"], enum: ["trial", "active", "pro", null] }, per_post: { type: ["number", "null"] }, rpm: { type: ["number", "null"] }, cap: { type: ["number", "null"] }, posts_per_month: { type: ["integer", "null"] } } }),
   fn("draft_message", "Get the saved DM/email/reply templates to base a message on. Then write the message yourself.", { type: "object", additionalProperties: false, required: ["kind", "name", "context"], properties: { kind: { type: "string", enum: ["dm", "email", "reply"] }, name: { type: "string" }, context: { type: "string" } } }),
 ];
 
@@ -74,6 +75,20 @@ async function people(a: Admin, app: string, f: F, limit: number) {
 async function runTool(a: Admin, app: string, name: string, args: any, cited: Cited[]) {
   const since = (days: number) => new Date(Date.now() - Math.max(1, Math.min(365, days)) * 86400_000).toISOString().slice(0, 10);
   switch (name) {
+    case "create_fast_lane": {
+      const email = String(args.email ?? "").trim().toLowerCase();
+      if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "A valid email is needed." };
+      const tierName = ["trial", "active", "pro"].includes(args.tier) ? args.tier : "trial";
+      const { data: t } = await a.from("ugc_tiers").select("per_post, cpm, cap_per_post").eq("app_id", app).eq("tier", tierName).maybeSingle();
+      const { data: job } = await a.from("jobs").select("id").eq("app_id", app).eq("status", "active").order("open", { ascending: false }).limit(1).maybeSingle();
+      const h = (await import("@tanstack/react-start/server")).getRequest()?.headers;
+      const origin = h?.get("origin") ?? "https://sophia-culture.com";
+      const { createFastLaneOne, defaultLanguage } = await import("./fast-lane.server");
+      const r = await createFastLaneOne(a, { firstName: String(args.first_name ?? "").slice(0, 80) || "Creator", email, tiktok: args.handle ?? null, country: args.country ?? null, language: defaultLanguage(args.country), source: args.source ?? "other" },
+        { tier: tierName, perPost: args.per_post ?? (t ? Number(t.per_post) : null), rpm: args.rpm ?? (t ? Number(t.cpm) : null), cap: args.cap ?? (t ? Number(t.cap_per_post) : null), postsPerMonth: args.posts_per_month ?? 20, platforms: "both", fixedMonthly: null, welcomeBonus: null }, app, job?.id ?? null, origin);
+      cited.push({ name: r.name, kind: "creator" });
+      return { created: true, name: r.name, email: r.email, link: r.link, note: "No email was sent." };
+    }
     case "count_people": return { count: (await people(a, app, args, 1)).count };
     case "list_people": {
       const r = await people(a, app, args, Math.max(1, Math.min(20, args.limit ?? 10)));
@@ -158,7 +173,7 @@ export const askSidekick = createServerFn({ method: "POST" })
     const a = supabaseAdmin as Admin;
     const { data: appRow } = await a.from("apps").select("name").eq("id", app).maybeSingle();
     const style = data.mode === "precise" ? "Be terse and exact." : data.mode === "creative" ? "For drafts, be bold and playful; numbers stay exact." : "Be short and clear.";
-    const instructions = `You are Sidekick, the assistant inside the creator Hub admin for the app "${appRow?.name ?? "Sophia"}". Answer in the admin's language. ${style} Every number must come from a tool result in this conversation — never estimate or invent figures, names or handles. If a tool returns nothing, say so. Keep answers under 120 words unless drafting. Today is ${new Date().toISOString().slice(0, 10)}.`;
+    const instructions = `You are Sidekick, the assistant inside the creator Hub admin for the app "${appRow?.name ?? "Sophia"}". Answer in the admin's language. ${style} Every number must come from a tool result in this conversation — never estimate or invent figures, names, emails or handles. The only action you may take is create_fast_lane, and only when explicitly asked. If a tool returns nothing, say so. Keep answers under 120 words unless drafting. Today is ${new Date().toISOString().slice(0, 10)}.`;
     const input: any[] = [...(hist ?? []).map((m: any) => ({ role: m.role, content: m.content })), { role: "user", content: data.message }];
     const cited: Cited[] = [];
     let answer = "";

@@ -2412,6 +2412,14 @@ export type Database = {
           dormant_at: string | null
           email: string
           examples_read_at: string | null
+          fast_lane: boolean
+          fast_lane_app_id: string | null
+          fast_lane_entered_at: string | null
+          fast_lane_expires_at: string | null
+          fast_lane_job_id: string | null
+          fast_lane_opened_at: string | null
+          fast_lane_sent_at: string | null
+          fast_lane_token: string | null
           fixed_monthly_override: number | null
           full_name: string
           guide_read_at: string | null
@@ -2419,6 +2427,7 @@ export type Database = {
           instagram_handle: string | null
           invite_sent_at: string | null
           invite_token: string | null
+          language: string | null
           last_post_at: string | null
           last_seen_at: string | null
           motivation_confirmed_at: string | null
@@ -2439,6 +2448,8 @@ export type Database = {
           social_account_created_at: string | null
           social_bio: string | null
           social_handle: string | null
+          source: string | null
+          starting_tier: string | null
           status: string
           sync_checked_at: string | null
           sync_error: string | null
@@ -2452,6 +2463,7 @@ export type Database = {
           user_id: string | null
           warmup: Json
           weekly_target: number
+          welcome_bonus: number | null
           whatsapp_opt_in: boolean | null
         }
         Insert: {
@@ -2468,6 +2480,14 @@ export type Database = {
           dormant_at?: string | null
           email: string
           examples_read_at?: string | null
+          fast_lane?: boolean
+          fast_lane_app_id?: string | null
+          fast_lane_entered_at?: string | null
+          fast_lane_expires_at?: string | null
+          fast_lane_job_id?: string | null
+          fast_lane_opened_at?: string | null
+          fast_lane_sent_at?: string | null
+          fast_lane_token?: string | null
           fixed_monthly_override?: number | null
           full_name: string
           guide_read_at?: string | null
@@ -2475,6 +2495,7 @@ export type Database = {
           instagram_handle?: string | null
           invite_sent_at?: string | null
           invite_token?: string | null
+          language?: string | null
           last_post_at?: string | null
           last_seen_at?: string | null
           motivation_confirmed_at?: string | null
@@ -2495,6 +2516,8 @@ export type Database = {
           social_account_created_at?: string | null
           social_bio?: string | null
           social_handle?: string | null
+          source?: string | null
+          starting_tier?: string | null
           status?: string
           sync_checked_at?: string | null
           sync_error?: string | null
@@ -2508,6 +2531,7 @@ export type Database = {
           user_id?: string | null
           warmup?: Json
           weekly_target?: number
+          welcome_bonus?: number | null
           whatsapp_opt_in?: boolean | null
         }
         Update: {
@@ -2524,6 +2548,14 @@ export type Database = {
           dormant_at?: string | null
           email?: string
           examples_read_at?: string | null
+          fast_lane?: boolean
+          fast_lane_app_id?: string | null
+          fast_lane_entered_at?: string | null
+          fast_lane_expires_at?: string | null
+          fast_lane_job_id?: string | null
+          fast_lane_opened_at?: string | null
+          fast_lane_sent_at?: string | null
+          fast_lane_token?: string | null
           fixed_monthly_override?: number | null
           full_name?: string
           guide_read_at?: string | null
@@ -2531,6 +2563,7 @@ export type Database = {
           instagram_handle?: string | null
           invite_sent_at?: string | null
           invite_token?: string | null
+          language?: string | null
           last_post_at?: string | null
           last_seen_at?: string | null
           motivation_confirmed_at?: string | null
@@ -2551,6 +2584,8 @@ export type Database = {
           social_account_created_at?: string | null
           social_bio?: string | null
           social_handle?: string | null
+          source?: string | null
+          starting_tier?: string | null
           status?: string
           sync_checked_at?: string | null
           sync_error?: string | null
@@ -2564,6 +2599,7 @@ export type Database = {
           user_id?: string | null
           warmup?: Json
           weekly_target?: number
+          welcome_bonus?: number | null
           whatsapp_opt_in?: boolean | null
         }
         Relationships: [

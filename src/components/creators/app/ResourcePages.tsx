@@ -310,6 +310,7 @@ export function ProfilePage() {
   return (
     <div>
       <PageTitle title="Profile" lead="Your details, your Sophia app access, the creators Slack and your payout details." />
+      <SetPasswordCard />
       <PortalCard>
         <div className="grid gap-4 sm:grid-cols-2">
           <div><Label>Name</Label><Input value={me.full_name} readOnly /></div>
@@ -397,5 +398,26 @@ function PayoutDetails() {
         </div>
       </PortalCard>
     </>
+  );
+}
+
+function SetPasswordCard() {
+  const [pw, setPw] = useState("");
+  const [busy, setBusy] = useState(false);
+  return (
+    <PortalCard className="mb-6">
+      <h2 className="text-lg font-extrabold text-brand-navy">Définir un mot de passe</h2>
+      <p className="mt-1 text-sm text-brand-navySoft">Optional. You can always sign in with an email link instead.</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Input type="password" aria-label="New password" placeholder="New password (8+ characters)" className="max-w-xs" value={pw} onChange={(e) => setPw(e.target.value)} />
+        <Button disabled={busy} onClick={async () => {
+          if (pw.length < 8) return void toast.error("Use at least 8 characters.");
+          setBusy(true);
+          const { error } = await supabase.auth.updateUser({ password: pw });
+          setBusy(false);
+          if (error) toast.error("The password could not be saved. Try a longer one, or sign in again with an email link first."); else { toast.success("Password saved."); setPw(""); }
+        }}>Save password</Button>
+      </div>
+    </PortalCard>
   );
 }

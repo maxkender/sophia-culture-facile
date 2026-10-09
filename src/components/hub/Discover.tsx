@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useAdminApp } from "@/lib/apps";
 import { compact, eur, flag } from "./hub-data";
+import { AddValidatedCreator, FastLaneBlock, type Preset } from "./FastLane";
 
 type Kind = "creator" | "applicant" | "prospect";
 type Person = {
@@ -74,7 +75,7 @@ function usePeople() {
           status: "applied", lastSeen: null, views: 0, earned: 0, posts: 0, streak: 0, notes: null, postDays: [], platforms: [r.tiktok_url && "tiktok", r.instagram_url && "instagram"].filter(Boolean) as string[] });
       }
       for (const r of p.data ?? []) {
-        if (appId && r.target_app_id && r.target_app_id !== appId) continue;
+        if (r.status === "converted" || (appId && r.target_app_id && r.target_app_id !== appId)) continue;
         out.push({ key: `p-${r.id}`, id: r.id, kind: "prospect", name: r.name ?? r.handle ?? "Prospect", country: r.country, age: r.age, gender: r.gender, city: r.city, school: r.school_or_job, email: r.email, tiktok: r.tiktok_handle, instagram: r.instagram_handle, followers: r.followers, niche: r.niche, source: r.source,
           status: r.status === "invited" ? "invited" : "prospect", lastSeen: r.last_seen_at, views: 0, earned: 0, posts: 0, streak: 0, notes: r.notes, postDays: [], platforms: [r.platform, r.tiktok_handle && "tiktok", r.instagram_handle && "instagram"].filter(Boolean) as string[] });
       }
@@ -151,7 +152,7 @@ function ImportCsv() {
   );
 }
 
-function Drawer({ list, index, setIndex, maxViews }: { list: Person[]; index: number | null; setIndex: (i: number | null) => void; maxViews: Map<string, number> }) {
+function Drawer({ list, index, setIndex, maxViews, onFastLane }: { list: Person[]; index: number | null; setIndex: (i: number | null) => void; maxViews: Map<string, number>; onFastLane: (p: Preset) => void }) {
   const p = index === null ? null : list[index];
   const qc = useQueryClient();
   const [notes, setNotes] = useState("");
@@ -187,6 +188,7 @@ function Drawer({ list, index, setIndex, maxViews }: { list: Person[]; index: nu
           </div>
           <StatStrip p={p} />
           <div className="flex gap-2"><InviteButton p={p} className="flex-1" />{p.kind === "creator" ? <Button asChild variant="outline" size="sm"><Link to="/hub/creators/$creatorId" params={{ creatorId: p.id }}>Full profile</Link></Button> : null}</div>
+          {p.kind === "creator" ? <FastLaneBlock creatorId={p.id} firstName={p.name.split(/\s+/)[0] ?? ""} /> : <Button size="sm" variant="outline" className="w-full" onClick={() => onFastLane({ kind: p.kind, id: p.id, name: p.name, email: p.email, country: p.country, tiktok: p.tiktok, instagram: p.instagram })}>Générer un lien (fast lane)</Button>}
           <div className="grid gap-3 sm:grid-cols-2">
             {([["Instagram", p.instagram, "https://instagram.com/"], ["TikTok", p.tiktok, "https://tiktok.com/@"]] as const).map(([n, h, base]) => (
               <div key={n} className="rounded-xl border border-brand-line p-3">
@@ -211,7 +213,9 @@ function Drawer({ list, index, setIndex, maxViews }: { list: Person[]; index: nu
   );
 }
 
-export function Discover({ initialQ }: { initialQ?: string | undefined } = {}) {
+export function Discover({ initialQ, initialAdd }: { initialQ?: string | undefined; initialAdd?: boolean } = {}) {
+  const [adding, setAdding] = useState<boolean>(Boolean(initialAdd));
+  const [preset, setPreset] = useState<Preset | null>(null);
   const { data, isLoading } = usePeople();
   const [tab, setTab] = useState("all");
   const [q, setQ] = useState(initialQ ?? "");
@@ -248,6 +252,7 @@ export function Discover({ initialQ }: { initialQ?: string | undefined } = {}) {
         <select aria-label="Followers" className={sel} value={f.followers} onChange={(e) => setF({ ...f, followers: e.target.value })}><option value="">Followers</option><option value="0-1000">&lt; 1K</option><option value="1000-10000">1K–10K</option><option value="10000-100000">10K–100K</option><option value="100000-0">100K+</option></select>
         <select aria-label="Status" className={sel} value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })}><option value="">Status</option>{opts("status").map((o) => <option key={o}>{o}</option>)}</select>
         <label className="flex items-center gap-1 text-sm"><input type="checkbox" checked={f.online} onChange={(e) => setF({ ...f, online: e.target.checked })} />Online</label>
+        <Button size="sm" className="min-h-9 bg-brand-navy" onClick={() => { setPreset(null); setAdding(true); }}>Add validated creator</Button>
         <ImportCsv />
       </div>
       {isLoading ? <p className="text-sm text-brand-navySoft">Loading…</p> : list.length === 0 ? <p className="rounded-2xl bg-card p-6 text-sm text-brand-navySoft shadow-portal">{tab === "agencies" || tab === "clipping" ? "Nobody here yet." : "No one matches these filters."}</p> : (
@@ -268,7 +273,8 @@ export function Discover({ initialQ }: { initialQ?: string | undefined } = {}) {
           })}
         </div>
       )}
-      <Drawer list={list} index={open} setIndex={setOpen} maxViews={data?.maxViews ?? new Map()} />
+      <Drawer list={list} index={open} setIndex={setOpen} maxViews={data?.maxViews ?? new Map()} onFastLane={(pr) => { setOpen(null); setPreset(pr); setAdding(true); }} />
+      <AddValidatedCreator open={adding} onOpenChange={setAdding} preset={preset} />
     </div>
   );
 }

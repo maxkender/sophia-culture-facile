@@ -12,7 +12,7 @@ import { SOPHIA_APP_ID, useAdminApp } from "@/lib/apps";
 import { askSidekick, type Cited } from "@/lib/sidekick.functions";
 
 type Msg = { role: "user" | "assistant"; content: string; cited?: Cited[] };
-const CHIPS = ["How many French creators do we have?", "Who posted the most this week?", "What do we owe this month?", "Draft a brief about ", "Write a DM for @"];
+const CHIPS = ["How many French creators do we have?", "Who posted the most this week?", "What do we owe this month?", "Draft a brief about ", "Write a DM for @", "Create a fast-lane link for @"];
 
 function briefFrom(text: string) {
   const m = text.match(/```brief\s*([\s\S]*?)```/) ?? text.match(/```json\s*([\s\S]*?)```/);
