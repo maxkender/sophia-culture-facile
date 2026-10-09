@@ -182,7 +182,7 @@ export const requestLoginLink = createServerFn({ method: "POST" })
     const a = await adminClient();
     const email = data.email.toLowerCase();
     const [{ data: c }, { data: p }] = await Promise.all([
-      a.from("creators").select("id, full_name, user_id, last_login_link_at:fast_lane_sent_at").ilike("email", email).limit(1).maybeSingle(),
+      a.from("creators").select("id, full_name, user_id").ilike("email", email).limit(1).maybeSingle(),
       a.from("profiles").select("id").ilike("email", email).limit(1).maybeSingle(),
     ]);
     if (!c && !p) return { ok: true }; // same answer either way: no account enumeration
