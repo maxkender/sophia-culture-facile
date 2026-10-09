@@ -57,6 +57,7 @@ export function CreatorStatsStrip() {
           <span className="rounded-full bg-portal-accent/10 px-3 py-1 text-xs font-bold text-portal-accent">{TIER_LABEL[tier]} tier</span>
           {nextPayout ? <span className="text-xs text-brand-navySoft">Next payout: <b>{fmtMoney(Number(nextPayout.amount ?? 0))}</b> ({nextPayout.period})</span> : null}
         </div>
+        {(() => { const t = data?.tiers.find((x) => x.tier === tier); return t ? <p className="mt-3 text-sm text-brand-navy"><b>{fmtMoney(Number(t.per_post))}</b> per post · <b>{fmtMoney(Number(t.cpm))}</b> per 1,000 views · up to <b>{fmtMoney(Number(t.cap_per_post))}</b> per post</p> : null; })()}
         {tier !== "pro" ? <>
           <div className="mt-3 h-2 rounded-full bg-brand-line"><div className="h-2 rounded-full bg-portal-accent" style={{ width: `${Math.min(100, (last30 / ACTIVE_POSTS) * 100)}%` }} /></div>
           <p className="mt-1 text-xs text-brand-navySoft">{tier === "trial" ? `${Math.min(last30, ACTIVE_POSTS)}/${ACTIVE_POSTS} approved posts in 30 days to reach Active` : "Stay in the top 10% of views this month to reach Pro"}</p>

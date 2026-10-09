@@ -288,6 +288,13 @@
       "when": 1791547257033,
       "tag": "0040_tier_cap_per_post",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1791547314109,
+      "tag": "0041_ugc_tiers_public_read",
+      "breakpoints": true
     }
   ]
 }
