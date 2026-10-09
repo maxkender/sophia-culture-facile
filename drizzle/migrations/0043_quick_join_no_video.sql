@@ -1,0 +1,2 @@
+ALTER TABLE public.creator_applications DROP CONSTRAINT IF EXISTS creator_applications_check;
+ALTER TABLE public.creator_applications ADD CONSTRAINT creator_applications_check CHECK (video_url IS NOT NULL OR video_file_path IS NOT NULL OR source = 'quick');
