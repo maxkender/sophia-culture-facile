@@ -86,8 +86,8 @@ export function CreatorPayouts() {
       const p = profs?.find((x) => x.creator_id === i.creator_id);
       const amt = Number(i.amount_usd).toFixed(2);
       return kind === "wise"
-        ? [i.creators?.full_name, p?.wise_email, amt, "USD", `Sophia ${b.period}`]
-        : [p?.paypal_email, amt, "USD", `Sophia ${b.period}`];
+        ? [i.creators?.full_name, p?.wise_email, amt, i.currency ?? "EUR", `Sophia ${b.period}`]
+        : [p?.paypal_email, amt, i.currency ?? "EUR", `Sophia ${b.period}`];
     });
     const csv = [header, ...lines].map((r) => r.map(esc).join(",")).join("\n");
     const a = document.createElement("a");
