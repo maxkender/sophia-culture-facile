@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Campaigns, type CampaignTab } from "@/components/hub/Campaigns";
 
-const TABS: CampaignTab[] = ["campaigns", "applicants", "requests", "jobs", "reviews"];
+const TABS: CampaignTab[] = ["campaigns", "applicants", "requests", "jobs", "reviews", "challenges"];
 
 export const Route = createFileRoute("/_authenticated/hub/campaigns/")({
   validateSearch: (s: Record<string, unknown>): { tab: CampaignTab; newJob?: number | undefined } => ({
