@@ -121,7 +121,8 @@ function SetupBanner() {
 }
 
 export function HubShell({ children }: { children: ReactNode }) {
-  const { data: profile, isLoading } = usePortalProfile();
+  const { data: me, isLoading } = usePortalProfile();
+  const profile = me?.profile;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -140,7 +141,7 @@ export function HubShell({ children }: { children: ReactNode }) {
 
   const key = Object.keys(HUB_TITLES).sort((a, b) => b.length - a.length).find((k) => pathname === k || pathname.startsWith(`${k}/`)) ?? "/hub";
   const [title, lead] = HUB_TITLES[key];
-  const name = profile.full_name ?? "Admin";
+  const name = (profile as { full_name?: string | null }).full_name ?? "Admin";
 
   async function signOut() {
     qc.clear();
