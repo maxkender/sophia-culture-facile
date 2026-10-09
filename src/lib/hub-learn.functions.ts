@@ -75,8 +75,8 @@ export const generateBriefsFromCourses = createServerFn({ method: "POST" })
       for (const b of parsed.briefs) {
         const { error } = await a.from("briefs").insert({
           title: b.title, hook: b.hooks[0], hooks: b.hooks, angle: b.angle, script: b.script, body: b.script, must_mention: b.must_mention,
-          format: b.format, duration_target: b.duration_target, difficulty: b.difficulty, status: "draft", app_id: data.appId,
-          source_course_id: c.id, created_by: me.id, brief_type: "ugc", platform: "tiktok",
+          format: b.format, duration_target: `${b.duration_target}s`, difficulty: b.difficulty === "hard" ? 3 : b.difficulty === "medium" ? 2 : 1, status: "draft", app_id: data.appId,
+          source_course_id: c.id, created_by: me.id, brief_type: "precise", platform: "both",
         });
         if (error) errors.push(`${c.title}: ${error.message}`); else created++;
       }
