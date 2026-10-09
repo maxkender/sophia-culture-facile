@@ -35,18 +35,27 @@ export const emptyJob = (): JobDraft => ({
   application_items: [{ type: "video", label: "Short talking video", required: true }],
 });
 
-export function exampleEarnings(j: Pick<JobDraft, "payment_type" | "base_mode" | "base_amount" | "cpm_rate" | "retainer_frequency">) {
+export type TierRow = { tier: string; label: string; per_post: number; cpm: number; cap_per_post: number };
+
+export function exampleEarnings(j: Pick<JobDraft, "payment_type" | "base_mode" | "base_amount" | "cpm_rate" | "retainer_frequency">, capPerPost?: number | null) {
   const posts = 20, views = 30000;
   const usesBase = j.payment_type !== "cpm";
   const usesCpm = j.payment_type === "cpm" || j.payment_type === "hybrid";
   const parts: string[] = []; let total = 0;
   if (usesBase && (j.payment_type === "per_post" || (j.payment_type === "hybrid" && j.base_mode === "per_post"))) { parts.push(`${posts} posts × ${eur(j.base_amount)}`); total += posts * j.base_amount; }
   if (usesBase && (j.payment_type === "retainer" || (j.payment_type === "hybrid" && j.base_mode === "retainer"))) { parts.push(`${eur(j.base_amount)} ${j.retainer_frequency} retainer`); total += j.base_amount; }
-  if (usesCpm) { parts.push(`${views.toLocaleString("en")} views × ${eur(j.cpm_rate)}/1000`); total += (views / 1000) * j.cpm_rate; }
-  return `${parts.join(" + ")} = ${eur(total)}`;
+  if (usesCpm) {
+    // views pay is capped per post, never per month
+    const perPostViews = views / posts, raw = (perPostViews / 1000) * j.cpm_rate;
+    const each = capPerPost ? Math.min(raw, capPerPost) : raw;
+    parts.push(`${views.toLocaleString("en")} views × ${eur(j.cpm_rate)}/1000`); total += each * posts;
+  }
+  return `${parts.join(" + ")} = ${eur(total)}${capPerPost && usesCpm ? ` (views pay capped at ${eur(capPerPost)} per post)` : ""}`;
 }
 
-export function JobPublicCard({ job, appName }: { job: Partial<JobDraft> & { title: string }; appName?: string }) {
+export function JobPublicCard({ job, appName, tiers }: { job: Partial<JobDraft> & { title: string }; appName?: string; tiers?: TierRow[] }) {
+  const matched = tiers?.find((t) => Number(t.per_post) === Number(job.base_amount ?? -1)) ?? tiers?.find((t) => t.tier === "active");
+  const sorted = [...(tiers ?? [])].sort((a, b) => Number(a.per_post) - Number(b.per_post));
   return (
     <div className="overflow-hidden rounded-2xl bg-card shadow-portal">
       {job.cover_image_path ? <img src={job.cover_image_path} alt="" className="aspect-square w-full max-h-64 object-cover" /> : <div className="h-24 bg-gradient-to-r from-brand-navy to-portal-accent" />}
@@ -56,7 +65,16 @@ export function JobPublicCard({ job, appName }: { job: Partial<JobDraft> & { tit
         <div className="flex flex-wrap gap-4">
           {job.payment_type !== "cpm" ? <div><p className="text-3xl font-extrabold text-brand-navy">{eur(job.base_amount ?? 0)}</p><p className="text-xs text-brand-navySoft">{job.base_mode === "retainer" || job.payment_type === "retainer" ? `per ${job.retainer_frequency === "weekly" ? "week" : "month"}` : "per post"}</p></div> : null}
           {job.payment_type === "cpm" || job.payment_type === "hybrid" ? <div><p className="text-3xl font-extrabold text-brand-navy">{eur(job.cpm_rate ?? 0)}</p><p className="text-xs text-brand-navySoft">per 1,000 views</p></div> : null}
+          {matched && job.payment_type !== "per_post" && job.payment_type !== "retainer" ? <div><p className="text-3xl font-extrabold text-brand-navy">up to {eur(Number(matched.cap_per_post))}</p><p className="text-xs text-brand-navySoft">per post</p></div> : null}
         </div>
+        {sorted.length ? (
+          <table className="w-full text-sm">
+            <thead className="text-left text-xs text-brand-navySoft"><tr><th className="py-1">Tier</th><th>Per post</th><th>Per 1,000 views</th><th>Cap per post</th></tr></thead>
+            <tbody className="divide-y divide-brand-line">{sorted.map((t) => (
+              <tr key={t.tier} className={t === matched ? "font-bold text-brand-navy" : "text-brand-navy"}><td className="py-1.5">{t.label}</td><td>{eur(Number(t.per_post))}</td><td>{eur(Number(t.cpm))}</td><td>{eur(Number(t.cap_per_post))}</td></tr>
+            ))}</tbody>
+          </table>
+        ) : null}
         {job.details_md ? <p className="whitespace-pre-line text-sm text-brand-navy">{job.details_md}</p> : null}
         <ul className="flex flex-wrap gap-2 text-xs">
           {(job.platforms ?? []).map((p) => <li key={p} className="rounded-full bg-portal-bg px-2.5 py-1 font-bold capitalize text-brand-navy">{p}</li>)}
@@ -83,6 +101,8 @@ function Seg<T extends string>({ value, options, onChange }: { value: T; options
 export function JobFields({ j, set, tab }: { j: JobDraft; set: (p: Partial<JobDraft>) => void; tab: "details" | "payment" | "content" }) {
   const { data: campaigns = [] } = useQuery({ queryKey: ["hub", "campaign-options"], queryFn: async () => (await supabase.from("campaigns").select("id, name").order("created_at", { ascending: false })).data ?? [] });
   const [aiBusy, setAiBusy] = useState(false);
+  const { data: tierRows = [] } = useQuery({ queryKey: ["hub", "tier-rows"], queryFn: async () => (await supabase.from("ugc_tiers").select("tier, label, per_post, cpm, cap_per_post")).data ?? [] });
+  const capPerPost = Number((tierRows.find((t) => Number(t.per_post) === Number(j.base_amount)) ?? tierRows.find((t) => t.tier === "active"))?.cap_per_post ?? 0) || null;
   if (tab === "details") return (
     <div className="space-y-4">
       <label className={label}>Title<input className={input} value={j.title} onChange={(e) => set({ title: e.target.value })} placeholder="Ex. UGC Creator for skincare launch" /></label>
@@ -106,7 +126,7 @@ export function JobFields({ j, set, tab }: { j: JobDraft; set: (p: Partial<JobDr
       <button type="button" disabled={aiBusy} className="text-sm font-bold text-portal-accent" onClick={async () => {
         setAiBusy(true);
         const c = j.campaign_id ? (await supabase.from("campaigns").select("brief_md, name").eq("id", j.campaign_id).maybeSingle()).data : null;
-        const draft = `${c?.name ? `${c.name}: ` : ""}${c?.brief_md || "Short, natural videos about the app"}\n\nWhat you do: film ${j.posting_frequency_n ?? 5} ${j.content_type?.toLowerCase() ?? "short"} videos per ${j.posting_frequency_unit}, about ${j.video_length_s ?? 30}s each, on ${j.platforms.join(" and ")}.\nPay: ${exampleEarnings(j)} (example).`;
+        const draft = `${c?.name ? `${c.name}: ` : ""}${c?.brief_md || "Short, natural videos about the app"}\n\nWhat you do: film ${j.posting_frequency_n ?? 5} ${j.content_type?.toLowerCase() ?? "short"} videos per ${j.posting_frequency_unit}, about ${j.video_length_s ?? 30}s each, on ${j.platforms.join(" and ")}.\nPay: ${exampleEarnings(j, capPerPost)} (example).`;
         set({ details_md: draft.slice(0, 1000) }); setAiBusy(false);
       }}>Write with AI</button>
       <label className={label}>Who has access<Seg value={j.access} onChange={(v) => set({ access: v })} options={[["job_feed", "Anyone on the job feed"], ["invite_only", "Invite only"], ["link", "Anyone with the link"]]} /></label>
@@ -141,7 +161,7 @@ export function JobFields({ j, set, tab }: { j: JobDraft; set: (p: Partial<JobDr
         ))}
         <button type="button" className="mt-2 text-sm font-bold text-portal-accent" onClick={() => set({ bonus_goals: [...j.bonus_goals, { metric: "posts", threshold: 10, amount: 20, period: "month" }] })}>Add Goal</button>
       </div>
-      <p className="rounded-xl bg-portal-bg p-3 text-sm text-brand-navy"><b>Example earnings:</b> {exampleEarnings(j)}</p>
+      <p className="rounded-xl bg-portal-bg p-3 text-sm text-brand-navy"><b>Example earnings:</b> {exampleEarnings(j, capPerPost)}</p>
     </div>
   );
   return (

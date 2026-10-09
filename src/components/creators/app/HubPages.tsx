@@ -24,7 +24,7 @@ export function useHubExtras() {
       const [awards, tasks, tiers, jobs, apps] = await Promise.all([
         supabase.from("awards").select("kind, period, awarded_at").eq("creator_id", me.id),
         supabase.from("creator_tasks").select("*").eq("creator_id", me.id).order("created_at", { ascending: false }),
-        supabase.from("ugc_tiers").select("tier, label, per_post, cpm, monthly_cap, app_id"),
+        supabase.from("ugc_tiers").select("tier, label, per_post, cpm, cap_per_post, app_id"),
         supabase.from("jobs").select("*").eq("status", "active").eq("access", "job_feed").order("created_at", { ascending: false }),
         supabase.from("job_applications").select("job_id, status").eq("creator_id", me.id),
       ]);
@@ -57,6 +57,7 @@ export function CreatorStatsStrip() {
           <span className="rounded-full bg-portal-accent/10 px-3 py-1 text-xs font-bold text-portal-accent">{TIER_LABEL[tier]} tier</span>
           {nextPayout ? <span className="text-xs text-brand-navySoft">Next payout: <b>{fmtMoney(Number(nextPayout.amount ?? 0))}</b> ({nextPayout.period})</span> : null}
         </div>
+        {(() => { const t = data?.tiers.find((x) => x.tier === tier); return t ? <p className="mt-3 text-sm text-brand-navy"><b>{fmtMoney(Number(t.per_post))}</b> per post · <b>{fmtMoney(Number(t.cpm))}</b> per 1,000 views · up to <b>{fmtMoney(Number(t.cap_per_post))}</b> per post</p> : null; })()}
         {tier !== "pro" ? <>
           <div className="mt-3 h-2 rounded-full bg-brand-line"><div className="h-2 rounded-full bg-portal-accent" style={{ width: `${Math.min(100, (last30 / ACTIVE_POSTS) * 100)}%` }} /></div>
           <p className="mt-1 text-xs text-brand-navySoft">{tier === "trial" ? `${Math.min(last30, ACTIVE_POSTS)}/${ACTIVE_POSTS} approved posts in 30 days to reach Active` : "Stay in the top 10% of views this month to reach Pro"}</p>
@@ -85,7 +86,7 @@ export function JobsPage() {
             const items = (j.application_items ?? []) as { type: string; label: string; required: boolean }[];
             return (
               <div key={j.id} className="space-y-2">
-                <JobPublicCard job={j as unknown as JobDraft} />
+                <JobPublicCard job={j as unknown as JobDraft} tiers={(data?.tiers ?? []).filter((t) => t.app_id === j.app_id) as never} />
                 {mine ? <p className="rounded-xl bg-portal-bg p-3 text-sm font-bold text-brand-navy">Your application: {mine.status}</p>
                   : openId === j.id ? (
                     <PortalCard className="space-y-2 p-4">

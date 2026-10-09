@@ -281,6 +281,20 @@
       "when": 1791545846304,
       "tag": "0039_creator_hub_phase3",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1791547257033,
+      "tag": "0040_tier_cap_per_post",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1791547314109,
+      "tag": "0041_ugc_tiers_public_read",
+      "breakpoints": true
     }
   ]
 }

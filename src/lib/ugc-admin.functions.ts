@@ -20,7 +20,7 @@ export const adminUgcDashboard = createServerFn({ method: "GET" })
     const { start, end } = periodBounds(period);
     const { activeRateCard } = await import("./ugc-month.server");
     const [{ data: creators }, rate, { data: s }] = await Promise.all([
-      a.from("creators").select("id, full_name, email, country, ugc_status, posts_per_month, required_platforms, fixed_monthly_override, rpm_override, cap_override, tiktok_handle, instagram_handle, last_seen_at, sync_status, sync_error, sync_checked_at, assigned_hm_id, user_id").eq("track", "ugc").order("full_name"),
+      a.from("creators").select("id, full_name, email, country, ugc_status, posts_per_month, required_platforms, fixed_monthly_override, per_post_override, rpm_override, cap_override, tiktok_handle, instagram_handle, last_seen_at, sync_status, sync_error, sync_checked_at, assigned_hm_id, user_id").eq("track", "ugc").order("full_name"),
       activeRateCard(a, period),
       a.from("ugc_settings").select("*").eq("id", 1).maybeSingle(),
     ]);
@@ -58,6 +58,7 @@ export const saveCreatorUgcSettings = createServerFn({ method: "POST" })
     required_platforms: z.enum(["tiktok", "instagram", "both"]),
     ugc_status: z.enum(["trial", "active", "paused", "ended"]),
     fixed_monthly_override: z.number().min(0).max(100000).nullable(),
+    per_post_override: z.number().min(0).max(10000).nullable().optional(),
     rpm_override: z.number().min(0).max(1000).nullable(),
     cap_override: z.number().min(0).max(100000).nullable(),
     assigned_hm_id: z.string().uuid().nullable(),
