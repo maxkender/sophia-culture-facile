@@ -57,7 +57,7 @@ export function CreatorStatsStrip() {
           <span className="rounded-full bg-portal-accent/10 px-3 py-1 text-xs font-bold text-portal-accent">{TIER_LABEL[tier]} tier</span>
           {nextPayout ? <span className="text-xs text-brand-navySoft">Next payout: <b>{fmtMoney(Number(nextPayout.amount ?? 0))}</b> ({nextPayout.period})</span> : null}
         </div>
-        {(() => { const t = data?.tiers.find((x) => x.tier === tier); return t ? <p className="mt-3 text-sm text-brand-navy"><b>{fmtMoney(Number(t.per_post))}</b> per post · <b>{fmtMoney(Number(t.cpm))}</b> per 1,000 views · up to <b>{fmtMoney(Number(t.cap_per_post))}</b> per post</p> : null; })()}
+        <MyTerms tiers={data?.tiers ?? []} />
         {tier !== "pro" ? <>
           <div className="mt-3 h-2 rounded-full bg-brand-line"><div className="h-2 rounded-full bg-portal-accent" style={{ width: `${Math.min(100, (last30 / ACTIVE_POSTS) * 100)}%` }} /></div>
           <p className="mt-1 text-xs text-brand-navySoft">{tier === "trial" ? `${Math.min(last30, ACTIVE_POSTS)}/${ACTIVE_POSTS} approved posts in 30 days to reach Active` : "Stay in the top 10% of views this month to reach Pro"}</p>
@@ -227,5 +227,34 @@ function ChallengeCard() {
         <p className="mt-2 text-xs text-brand-navySoft">Ends {new Date(c.ends_at).toLocaleDateString()}. Every approved video posted before then counts.</p>
       </> : <p className="mt-2 text-sm text-brand-navySoft">No challenge running right now. The next one drops soon.</p>}
     </PortalCard>
+  );
+}
+
+/** The creator's own pay: per-creator overrides when set ("Tes conditions"), otherwise the tier. */
+export function MyTerms({ tiers }: { tiers: { tier: string; per_post: number | string; cpm: number | string; cap_per_post: number | string; app_id?: string | null }[] }) {
+  const { me } = useCreator();
+  const m = me as Record<string, unknown>;
+  const tier = String(m["tier"] ?? "trial");
+  const appId = (m["fast_lane_app_id"] as string | null) ?? null;
+  const t = tiers.find((x) => x.tier === tier && (!appId || x.app_id === appId)) ?? tiers.find((x) => x.tier === tier);
+  const num = (k: string) => (m[k] == null ? null : Number(m[k]));
+  const own = ["per_post_override", "rpm_override", "cap_override", "fixed_monthly_override", "welcome_bonus"].some((k) => m[k] != null) || Boolean(m["fast_lane"]);
+  const perPost = num("per_post_override") ?? (t ? Number(t.per_post) : null);
+  const rpm = num("rpm_override") ?? (t ? Number(t.cpm) : null);
+  const cap = num("cap_override") ?? (t ? Number(t.cap_per_post) : null);
+  if (perPost == null) return null;
+  const fr = m["language"] !== "en";
+  const eur = (n: number) => `${new Intl.NumberFormat(fr ? "fr-FR" : "en-GB", { maximumFractionDigits: 2 }).format(n)} €`;
+  const target = num("posts_per_month") ?? 20;
+  return (
+    <div className="mt-3" data-testid="my-terms">
+      {own ? <p className="text-xs font-bold uppercase tracking-wide text-portal-accent">{fr ? "Tes conditions" : "Your terms"}</p> : null}
+      <p className="mt-1 text-sm text-brand-navy">
+        <b>{eur(perPost)}</b> {fr ? "par post" : "per post"} · <b>{eur(rpm ?? 0)}</b> {fr ? "/ 1 000 vues" : "per 1,000 views"} · {fr ? "jusqu'à" : "up to"} <b>{eur(cap ?? 0)}</b> {fr ? "par post" : "per post"}
+        {own ? <> · {fr ? "objectif" : "target"} <b>{target}</b> {fr ? "posts/mois" : "posts/month"}</> : null}
+        {num("fixed_monthly_override") ? <> · <b>{eur(num("fixed_monthly_override")!)}</b> {fr ? "fixe/mois" : "fixed/month"}</> : null}
+        {num("welcome_bonus") ? <> · {fr ? "bonus de bienvenue" : "welcome bonus"} <b>{eur(num("welcome_bonus")!)}</b></> : null}
+      </p>
+    </div>
   );
 }
