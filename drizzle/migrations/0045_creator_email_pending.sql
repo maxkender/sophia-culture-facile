@@ -1,0 +1,1 @@
+ALTER TABLE public.creators ADD COLUMN IF NOT EXISTS email_pending boolean NOT NULL DEFAULT false;

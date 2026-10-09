@@ -2411,6 +2411,7 @@ export type Database = {
           dormancy_reminders: Json
           dormant_at: string | null
           email: string
+          email_pending: boolean
           examples_read_at: string | null
           fast_lane: boolean
           fast_lane_app_id: string | null
@@ -2479,6 +2480,7 @@ export type Database = {
           dormancy_reminders?: Json
           dormant_at?: string | null
           email: string
+          email_pending?: boolean
           examples_read_at?: string | null
           fast_lane?: boolean
           fast_lane_app_id?: string | null
@@ -2547,6 +2549,7 @@ export type Database = {
           dormancy_reminders?: Json
           dormant_at?: string | null
           email?: string
+          email_pending?: boolean
           examples_read_at?: string | null
           fast_lane?: boolean
           fast_lane_app_id?: string | null
