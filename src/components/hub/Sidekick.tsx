@@ -76,7 +76,7 @@ export function SidekickDrawer({ open, onOpenChange }: { open: boolean; onOpenCh
             const b = m.role === "assistant" ? briefFrom(m.content) : null;
             return (
               <div key={i} className={cn("max-w-[90%] rounded-2xl px-3 py-2 text-sm", m.role === "user" ? "ml-auto bg-brand-navy text-card" : "bg-portal-bg text-brand-navy")}>
-                <p className="whitespace-pre-wrap">{m.content}</p>
+                <p className="whitespace-pre-wrap">{m.content.replace(/```brief[\s\S]*?```/g, "").split("**").map((part, k) => (k % 2 ? <b key={k}>{part}</b> : part))}</p>
                 {m.cited?.length ? <div className="mt-2 flex flex-wrap gap-1">{m.cited.map((c) => <Link key={c.name} to="/hub/discover" search={{ q: c.name }} onClick={() => onOpenChange(false)} className="rounded-full bg-card px-2 py-0.5 text-xs font-bold text-portal-accent">{c.name}</Link>)}</div> : null}
                 {b ? <Button size="sm" className="mt-2" onClick={() => void saveBrief(b)}>Save as draft</Button> : null}
               </div>
