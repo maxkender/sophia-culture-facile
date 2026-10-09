@@ -50,7 +50,7 @@ function Tiers() {
   const run = useServerFn(runTiersNow);
   const { data = [] } = useQuery({ queryKey: ["hub", "tiers", appId], queryFn: async () => { let q = supabase.from("ugc_tiers").select("*").order("per_post"); if (appId) q = q.eq("app_id", appId); return (await q).data ?? []; } });
   async function update(id: string, k: "per_post" | "cpm" | "monthly_cap", val: string) {
-    const { error } = await supabase.from("ugc_tiers").update({ [k]: Number(val) }).eq("id", id);
+    const { error } = await supabase.from("ugc_tiers").update({ [k]: Number(val) } as never).eq("id", id);
     if (error) toast.error("Could not save."); else void qc.invalidateQueries({ queryKey: ["hub", "tiers"] });
   }
   return (
