@@ -37,6 +37,23 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             const { syncAdMetrics } = await import("@/lib/ads.server");
             return Response.json(await syncAdMetrics(a));
           }
+          if (params.job === "daily-detect") {
+            if (!process.env["APIFY_TOKEN"]) return Response.json({ skipped: "APIFY_TOKEN missing" });
+            const { runDailyDetect } = await import("@/lib/hub-automation.server");
+            return Response.json(await runDailyDetect(a));
+          }
+          if (params.job === "dormancy") {
+            const { runDormancy } = await import("@/lib/hub-automation.server");
+            return Response.json(await runDormancy(a));
+          }
+          if (params.job === "brief-drop") {
+            const { runBriefDrop } = await import("@/lib/hub-automation.server");
+            return Response.json(await runBriefDrop(a));
+          }
+          if (params.job === "budget") {
+            const { applyBudgetCap } = await import("@/lib/hub-automation.server");
+            return Response.json(await applyBudgetCap(a));
+          }
           if (params.job === "planner-reminder") {
             const { data: admins } = await a.from("profiles").select("id").eq("role", "admin");
             await a.from("notifications").insert((admins ?? []).map((p: any) => ({ profile_id: p.id, type: "message", body: "Reminder: publish next week's UGC briefs in the Week planner by Friday." })));
