@@ -22,7 +22,7 @@ type Item = { to: string; label: string; icon: LucideIcon; exact?: boolean; badg
 
 export const CREATOR_NAV: { heading: string; items: Item[] }[] = [
   {
-    heading: "Espace",
+    heading: "Workspace",
     items: [
       { to: "/creators/app", label: "Home", icon: Home, exact: true },
       { to: "/creators/app/jobs", label: "Jobs", icon: Briefcase, gate: "steps" },
@@ -36,7 +36,7 @@ export const CREATOR_NAV: { heading: string; items: Item[] }[] = [
     ],
   },
   {
-    heading: "Ressources",
+    heading: "Resources",
     items: [
       { to: "/creators/app/rules", label: "Rules", icon: BookOpen },
       { to: "/creators/app/account", label: "Account setup", icon: Smartphone },

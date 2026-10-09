@@ -13,7 +13,7 @@ import { PostThumb } from "./PostThumb";
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const input = "mt-1 block min-h-10 w-full rounded-xl border border-input bg-card px-3 text-sm";
 const TABS = ["Briefs", "Reference videos", "Guides & rules", "Templates"] as const;
-const FORMATS = ["talking_head", "voiceover", "pov", "skit", "green_screen", "list"];
+const FORMATS = ["talking_head", "pov", "reaction", "voiceover", "skit", "green_screen", "list"];
 
 /** Next Monday 09:00 Paris (07:00 or 08:00 UTC depending on DST; stored as 07:00 UTC so the 09:00 Paris run always picks it up). */
 function nextMonday() {
@@ -93,10 +93,10 @@ function Briefs() {
     <div className="space-y-4">
       <div className={cn(card, "flex flex-wrap items-end gap-3")}>
         <Button onClick={() => setEdit(blank)}>New brief</Button>
-        <label className="text-xs font-semibold text-brand-navySoft">Courses<input type="number" min={1} max={10} value={n} onChange={(e) => setN(Math.min(10, Math.max(1, Number(e.target.value))))} className="mt-1 block h-10 w-20 rounded-xl border px-2" /></label>
+        <label className="text-xs font-semibold text-brand-navySoft">Courses<input type="number" min={1} max={20} value={n} onChange={(e) => setN(Math.min(20, Math.max(1, Number(e.target.value))))} className="mt-1 block h-10 w-20 rounded-xl border px-2" /></label>
         <Button variant="outline" disabled={busy} onClick={async () => {
           setBusy(true);
-          try { const r = await gen({ data: { count: n, appId: app, language: "fr" } }); toast[r.errors.length ? "warning" : "success"](`${r.created} draft briefs from ${r.courses} courses${r.errors.length ? ` — ${r.errors[0]}` : ""}`); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); }
+          try { const r = await gen({ data: { count: n, appId: app, language: "fr" } }); toast[r.errors.length ? "warning" : "success"](`${r.created} draft briefs from ${r.courses} courses${r.errors.length ? ` — ${r.errors[0]}` : ""}`); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); void qc.refetchQueries({ queryKey: ["hub", "learn", "briefs"] }); setStatus("all"); }
           catch (e) { toast.error((e as Error).message); } finally { setBusy(false); }
         }}><Sparkles className="size-4" />{busy ? "Writing…" : "Generate from courses"}</Button>
         <Button variant="outline" disabled={!sel.length} onClick={() => void schedule()}>Drop selected on Monday 09:00 ({sel.length})</Button>

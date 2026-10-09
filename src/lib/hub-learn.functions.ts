@@ -19,7 +19,7 @@ const briefSchema = {
           angle: { type: "string" },
           script: { type: "string" },
           must_mention: { type: "string" },
-          format: { type: "string", enum: ["talking_head", "voiceover", "pov", "skit", "green_screen", "list"] },
+          format: { type: "string", enum: ["talking_head", "pov", "reaction"] },
           duration_target: { type: "integer" },
           difficulty: { type: "string", enum: ["easy", "medium", "hard"] },
         },
@@ -31,7 +31,7 @@ const briefSchema = {
 /** "Generate from courses": drafts 3 briefs per course (status draft). Admin only, bounded to 10 courses per click. */
 export const generateBriefsFromCourses = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ count: z.number().int().min(1).max(10), appId: z.string().uuid(), language: z.enum(["fr", "en"]).default("fr") }).parse(d))
+  .inputValidator((d: unknown) => z.object({ count: z.number().int().min(1).max(20), appId: z.string().uuid(), language: z.enum(["fr", "en"]).default("fr") }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as { supabase: Admin; userId: string };
     const { data: me } = await ctx.supabase.from("profiles").select("id, role").eq("user_id", ctx.userId).maybeSingle();
@@ -55,7 +55,7 @@ export const generateBriefsFromCourses = createServerFn({ method: "POST" })
         body: JSON.stringify({
           model: MODEL,
           reasoning: { effort: "low" },
-          instructions: `You write short-form video briefs (TikTok/Instagram Reels) for UGC creators promoting Sophia, a culture-in-5-minutes-a-day app that helps people learn instead of doom-scrolling. Write in ${data.language === "fr" ? "French" : "English"}. Each brief turns one surprising fact from the course into a 20-45 second video. Hooks must stop the scroll in under 2 seconds. The script is spoken, casual, first person, and ends by mentioning Sophia naturally. Never invent facts that are not in the course.`,
+          instructions: `You write short-form video briefs (TikTok/Instagram Reels) for UGC creators promoting Sophia, a culture-in-5-minutes-a-day app that helps people learn instead of doom-scrolling. Write in ${data.language === "fr" ? "French" : "English"}. Each brief turns one surprising fact from the course into a 20-45 second video. Hooks must stop the scroll in under 2 seconds. The script is spoken, casual, first person, 25-40 seconds (70-110 words), and ends by mentioning Sophia naturally. Formats: talking_head (face-cam), pov (POV screen), reaction. Never invent facts that are not in the course.`,
           input: `Course: ${c.title}${c.subtitle ? ` — ${c.subtitle}` : ""}\nSubject: ${c.subject_area ?? ""}\n\n${text}\n\nWrite exactly 3 different briefs.`,
           text: { format: { type: "json_schema", name: "briefs", strict: true, schema: briefSchema } },
         }),
@@ -74,7 +74,7 @@ export const generateBriefsFromCourses = createServerFn({ method: "POST" })
       try { parsed = JSON.parse(raw); } catch { errors.push(`${c.title}: the AI reply could not be read`); continue; }
       for (const b of parsed.briefs) {
         const { error } = await a.from("briefs").insert({
-          title: b.title, hook: b.hooks[0], hooks: b.hooks, angle: b.angle, script: b.script, body: b.script, must_mention: b.must_mention,
+          title: b.title, hook: b.hooks[0], hooks: b.hooks, angle: b.angle, script: b.script, body: b.script, must_mention: data.language === "fr" ? "Montre l'app à 5 s, dis le nom Sophia" : b.must_mention,
           format: b.format, duration_target: `${b.duration_target}s`, difficulty: b.difficulty === "hard" ? 3 : b.difficulty === "medium" ? 2 : 1, status: "draft", app_id: data.appId,
           source_course_id: c.id, created_by: me.id, brief_type: "precise", platform: "both",
         });
