@@ -34,4 +34,4 @@
 - [x] Email-link login on /creators/login, optional password on Profile
 - [x] Fiche Fast lane block, Générer un lien for creators/applicants/prospects, editable pay, "Tes conditions"
 - [x] Sidekick create_fast_lane
-- [ ] Test end-to-end, clean test records, republish
+- [x] Test end-to-end, clean test records, republish
