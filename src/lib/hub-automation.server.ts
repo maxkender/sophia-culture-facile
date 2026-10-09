@@ -217,8 +217,8 @@ export async function runNurture(admin: Admin, origin = "https://sophia-culture.
       const fill = (s: string) => s.replaceAll("{prenom}", first).replaceAll("{first_name}", first).replaceAll("{lien}", link);
       const paragraphs = fill(t.body).split(/\n+/).filter(Boolean);
       const r = await sendBrevoEmail({ to: c.email, toName: c.full_name, subject: fill(t.subject ?? ""), html: buildEmailHtml({ paragraphs, buttonLabel: lang === "fr" ? "Ouvrir mon espace" : "Open my space", buttonUrl: link }), text: buildEmailText({ paragraphs, buttonLabel: lang === "fr" ? "Ouvrir mon espace" : "Open my space", buttonUrl: link } as never) });
-      await admin.from("creator_email_sequence").update(r.ok ? { sent_at: new Date().toISOString(), error: null } : { error: String((r as any).error ?? "send failed").slice(0, 300) }).eq("id", row.id);
-      if (r.ok) sent++; else failed++;
+      await admin.from("creator_email_sequence").update(r.sent ? { sent_at: new Date().toISOString(), error: null } : { error: String(r.reason ?? "send failed").slice(0, 300) }).eq("id", row.id);
+      if (r.sent) sent++; else failed++;
     }
     return { due: due?.length ?? 0, sent, stopped, failed };
   });
