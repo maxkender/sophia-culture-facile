@@ -52,6 +52,7 @@ import { Route as FrDevenirProfesseurRouteImport } from './routes/fr/devenir-pro
 import { Route as FrMentionsLegalesRouteImport } from './routes/fr/mentions-legales'
 import { Route as FrSophiaCultureGeneraleRouteImport } from './routes/fr/sophia-culture-generale'
 import { Route as FrTelechargerRouteImport } from './routes/fr/telecharger'
+import { Route as JobsSlugRouteImport } from './routes/jobs.$slug'
 import { Route as AuthenticatedAuteursIndexRouteImport } from './routes/_authenticated/auteurs/index'
 import { Route as AuthenticatedAuteursContractRouteImport } from './routes/_authenticated/auteurs/contract'
 import { Route as AuthenticatedAuteursExamplesRouteImport } from './routes/_authenticated/auteurs/examples'
@@ -393,6 +394,11 @@ const FrSophiaCultureGeneraleRoute = FrSophiaCultureGeneraleRouteImport.update({
 const FrTelechargerRoute = FrTelechargerRouteImport.update({
   id: '/fr/telecharger',
   path: '/fr/telecharger',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsSlugRoute = JobsSlugRouteImport.update({
+  id: '/jobs/$slug',
+  path: '/jobs/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAuteursIndexRoute =
@@ -1139,6 +1145,7 @@ export interface FileRoutesByFullPath {
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
   '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
   '/fr/telecharger': typeof FrTelechargerRoute
+  '/jobs/$slug': typeof JobsSlugRoute
   '/cours/': typeof CoursIndexRoute
   '/creators/': typeof CreatorsIndexRoute
   '/en/': typeof EnIndexRoute
@@ -1306,6 +1313,7 @@ export interface FileRoutesByTo {
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
   '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
   '/fr/telecharger': typeof FrTelechargerRoute
+  '/jobs/$slug': typeof JobsSlugRoute
   '/cours': typeof CoursIndexRoute
   '/creators': typeof CreatorsIndexRoute
   '/en': typeof EnIndexRoute
@@ -1476,6 +1484,7 @@ export interface FileRoutesById {
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
   '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
   '/fr/telecharger': typeof FrTelechargerRoute
+  '/jobs/$slug': typeof JobsSlugRoute
   '/cours/': typeof CoursIndexRoute
   '/creators/': typeof CreatorsIndexRoute
   '/en/': typeof EnIndexRoute
@@ -1647,6 +1656,7 @@ export interface FileRouteTypes {
     | '/fr/mentions-legales'
     | '/fr/sophia-culture-generale'
     | '/fr/telecharger'
+    | '/jobs/$slug'
     | '/cours/'
     | '/creators/'
     | '/en/'
@@ -1814,6 +1824,7 @@ export interface FileRouteTypes {
     | '/fr/mentions-legales'
     | '/fr/sophia-culture-generale'
     | '/fr/telecharger'
+    | '/jobs/$slug'
     | '/cours'
     | '/creators'
     | '/en'
@@ -1983,6 +1994,7 @@ export interface FileRouteTypes {
     | '/fr/mentions-legales'
     | '/fr/sophia-culture-generale'
     | '/fr/telecharger'
+    | '/jobs/$slug'
     | '/cours/'
     | '/creators/'
     | '/en/'
@@ -2153,6 +2165,7 @@ export interface RootRouteChildren {
   FrMentionsLegalesRoute: typeof FrMentionsLegalesRoute
   FrSophiaCultureGeneraleRoute: typeof FrSophiaCultureGeneraleRoute
   FrTelechargerRoute: typeof FrTelechargerRoute
+  JobsSlugRoute: typeof JobsSlugRoute
   CoursIndexRoute: typeof CoursIndexRoute
   CreatorsIndexRoute: typeof CreatorsIndexRoute
   EnIndexRoute: typeof EnIndexRoute
@@ -2496,6 +2509,13 @@ declare module '@tanstack/react-router' {
       path: '/fr/telecharger'
       fullPath: '/fr/telecharger'
       preLoaderRoute: typeof FrTelechargerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs/$slug': {
+      id: '/jobs/$slug'
+      path: '/jobs/$slug'
+      fullPath: '/jobs/$slug'
+      preLoaderRoute: typeof JobsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/auteurs/': {
@@ -3688,6 +3708,7 @@ const rootRouteChildren: RootRouteChildren = {
   FrMentionsLegalesRoute: FrMentionsLegalesRoute,
   FrSophiaCultureGeneraleRoute: FrSophiaCultureGeneraleRoute,
   FrTelechargerRoute: FrTelechargerRoute,
+  JobsSlugRoute: JobsSlugRoute,
   CoursIndexRoute: CoursIndexRoute,
   CreatorsIndexRoute: CreatorsIndexRoute,
   EnIndexRoute: EnIndexRoute,
