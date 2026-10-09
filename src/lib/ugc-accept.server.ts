@@ -9,7 +9,7 @@ function randomToken() {
 export async function acceptApplication(supabaseAdmin: Admin, applicationId: string, origin: string, decidedBy: string | null, notes?: string | null) {
     const { data: application } = await supabaseAdmin
       .from("creator_applications")
-      .select("id, full_name, email, country, status, created_creator_id")
+      .select("id, full_name, email, country, status, created_creator_id, ref_handle")
       .eq("id", applicationId)
       .maybeSingle();
     if (!application) throw new Error("Application not found.");
@@ -61,6 +61,14 @@ export async function acceptApplication(supabaseAdmin: Admin, applicationId: str
         created_creator_id: creatorId,
       })
       .eq("id", application.id);
+
+    // Affiliates: link the referrer named in ?ref=<handle> (never self-referral).
+    const ref = String((application as { ref_handle?: string | null }).ref_handle ?? "").trim().replace(/^@/, "").toLowerCase();
+    if (ref) {
+      const { data: referrer } = await supabaseAdmin.from("creators").select("id")
+        .or(`tiktok_handle.ilike.${ref},instagram_handle.ilike.${ref},tiktok_handle.ilike.@${ref},instagram_handle.ilike.@${ref}`).limit(1).maybeSingle();
+      if (referrer && referrer.id !== creatorId) await supabaseAdmin.from("referrals").upsert({ referrer_creator_id: referrer.id, referee_creator_id: creatorId, ref_handle: ref }, { onConflict: "referee_creator_id", ignoreDuplicates: true });
+    }
 
     const inviteUrl = `${origin.replace(/\/$/, "")}/creators/invite?token=${encodeURIComponent(inviteToken)}&email=${encodeURIComponent(application.email)}`;
 

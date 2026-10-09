@@ -67,6 +67,7 @@ const ugcSchema = z.object({
   video_url: optUrl,
   video_file_path: z.string().max(300).regex(/^\d{4}-\d{2}-\d{2}\/[0-9a-f-]{36}\.(mp4|mov)$/).optional(),
   referral_source: z.string().trim().min(1).max(1000),
+  ref_handle: z.string().trim().regex(/^@?[A-Za-z0-9._]{1,40}$/).optional().or(z.literal("")),
   consent: z.literal(true),
   app: z.string().regex(/^[a-z0-9-]{2,40}$/).optional(),
 });
@@ -96,6 +97,7 @@ export const submitUgcApplication = createServerFn({ method: "POST" })
       video_url: data.video_url || null,
       video_file_path: data.video_file_path || null,
       referral_source: data.referral_source,
+      ref_handle: data.ref_handle ? data.ref_handle.replace(/^@/, "").toLowerCase() : null,
       submit_ip_hash: hash,
     });
     if (error) {
