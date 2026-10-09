@@ -157,7 +157,7 @@ export function UgcEarnPage() {
 
       <section className="mx-auto w-full max-w-3xl px-5 pb-20">
         <h2 className="mb-4 text-2xl font-extrabold text-brand-navy">{t.faqTitle}</h2>
-        <Faq items={t.faq.map(([q, a]) => ({ q, a }))} />
+        <Faq items={t.faq.map(([question, answer]) => ({ question, answer }))} />
       </section>
     </Shell>
   );
