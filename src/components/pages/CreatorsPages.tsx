@@ -41,7 +41,7 @@ function useAppCopy<T>(copy: T, slug?: string): T {
 }
 const withApp = (to: string, slug?: string) => (slug && slug !== "sophia" ? `${to}?app=${slug}` : to);
 
-function Shell({ children }: { children: React.ReactNode }) {
+export function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-brand-surface">
       <SiteHeader />
