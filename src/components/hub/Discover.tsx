@@ -73,7 +73,7 @@ function usePeople() {
       }
       for (const r of p.data ?? []) {
         if (appId && r.target_app_id && r.target_app_id !== appId) continue;
-        out.push({ key: `p-${r.id}`, id: r.id, kind: "prospect", name: r.name, country: r.country, age: r.age, gender: r.gender, city: r.city, school: r.school_or_job, email: r.email, tiktok: r.tiktok_handle, instagram: r.instagram_handle, followers: r.followers, niche: r.niche, source: r.source,
+        out.push({ key: `p-${r.id}`, id: r.id, kind: "prospect", name: r.name ?? r.handle ?? "Prospect", country: r.country, age: r.age, gender: r.gender, city: r.city, school: r.school_or_job, email: r.email, tiktok: r.tiktok_handle, instagram: r.instagram_handle, followers: r.followers, niche: r.niche, source: r.source,
           status: r.status === "invited" ? "invited" : "prospect", lastSeen: r.last_seen_at, views: 0, earned: 0, posts: 0, streak: 0, notes: r.notes, postDays: [], platforms: [r.platform, r.tiktok_handle && "tiktok", r.instagram_handle && "instagram"].filter(Boolean) as string[] });
       }
       return { people: out, maxViews };
