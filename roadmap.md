@@ -21,9 +21,9 @@
 - [ ] Phase 3: Analytics, Affiliates, Learn, automation (daily scrape, /go links, fraud flags, dormancy), then publish
 
 # Completion pass (Oct 9, 12:34)
-- [ ] A. Sidekick drawer + server fn with whitelisted tools, threads
-- [ ] B. Public UGC page rebuilt (earnings, leaderboard, tiers, 60s form → open job, FAQ), FR/EN
-- [ ] C. Leaderboard/challenge/streak cards on creator Home; Challenges tab + winner payout/award
-- [ ] D. Brevo nurture sequence J0/J+2/J+7, daily 09:00, editable in Templates
-- [ ] E. 20-course brief generation, Briefs list refresh, reference_library (81 rows), DM templates
-- [ ] F. Sidebar headings language, delete test applicant, Get started steps 4/5, security scan, republish
+- [x] A. Sidekick drawer + server fn with whitelisted tools, threads
+- [x] B. Public UGC page rebuilt (earnings, leaderboard, tiers, 60s form → open job, FAQ), FR/EN
+- [x] C. Leaderboard/challenge/streak cards on creator Home; Challenges tab + winner payout/award
+- [x] D. Brevo nurture sequence J0/J+2/J+7, daily 09:00, editable in Templates
+- [x] E. 20-course brief generation, Briefs list refresh, reference_library (81 rows), DM templates
+- [x] F. Sidebar headings language, delete test applicant, Get started steps 4/5, security scan, republish
