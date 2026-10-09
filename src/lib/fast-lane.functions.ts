@@ -14,7 +14,7 @@ export const paySchema = z.object({
 });
 const personSchema = z.object({
   firstName: z.string().trim().min(1).max(80), lastName: z.string().trim().max(80).nullable().optional(),
-  email: z.string().trim().email().max(200), country: z.string().trim().max(80).nullable().optional(),
+  email: z.string().trim().email().max(200).nullable().optional().or(z.literal("")), country: z.string().trim().max(80).nullable().optional(),
   language: z.enum(["fr", "en"]).nullable().optional(), platform: z.enum(["ios", "android"]).nullable().optional(),
   tiktok: z.string().trim().max(200).nullable().optional(), instagram: z.string().trim().max(200).nullable().optional(),
   source: z.enum(["va", "dm", "sideshift", "upwork", "referral", "other"]).nullable().optional(), notes: z.string().max(2000).nullable().optional(),
@@ -43,7 +43,7 @@ export const createFastLane = createServerFn({ method: "POST" })
     const results: { name: string; email: string; link: string | null; creatorId: string | null; error: string | null }[] = [];
     for (const p of data.people) {
       try { const r = await createFastLaneOne(a, p as never, data.pay, data.appId, data.jobId, data.origin); results.push({ ...r, error: null }); }
-      catch (e) { results.push({ name: p.firstName, email: p.email, link: null, creatorId: null, error: (e as Error).message }); }
+      catch (e) { results.push({ name: p.firstName, email: p.email || "", link: null, creatorId: null, error: (e as Error).message }); }
     }
     return { results };
   });
@@ -119,7 +119,7 @@ export const resolveFastLane = createServerFn({ method: "GET" })
     ]);
     const n = (x: unknown) => (x == null ? null : Number(x));
     return {
-      state, language: (c.language as string | null) ?? "fr", firstName: String(c.full_name).split(/\s+/)[0] ?? "", fullName: c.full_name as string, appName: (app?.name as string) ?? "Sophia",
+      state, emailPending: Boolean(c.email_pending), language: (c.language as string | null) ?? "fr", firstName: String(c.full_name).split(/\s+/)[0] ?? "", fullName: c.full_name as string, appName: (app?.name as string) ?? "Sophia",
       pay: {
         tier, perPost: n(c.per_post_override) ?? n(t?.per_post) ?? 0, rpm: n(c.rpm_override) ?? n(t?.cpm) ?? 0, cap: n(c.cap_override) ?? n(t?.cap_per_post) ?? 0,
         postsPerMonth: n(c.posts_per_month) ?? 20, platforms: c.required_platforms as string, fixedMonthly: n(c.fixed_monthly_override), welcomeBonus: n(c.welcome_bonus),
@@ -130,12 +130,27 @@ export const resolveFastLane = createServerFn({ method: "GET" })
   });
 
 export const enterFastLane = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ token, signedName: z.string().trim().min(2).max(160), accepted: z.literal(true), documentVersion: z.string().max(10), userAgent: z.string().max(400).optional() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ token, signedName: z.string().trim().min(2).max(160), accepted: z.literal(true), email: z.string().trim().email().max(200).optional(), documentVersion: z.string().max(10), userAgent: z.string().max(400).optional() }).parse(d))
   .handler(async ({ data }) => {
     const a = await adminClient();
-    const c = await loadByToken(a, data.token);
+    let c = await loadByToken(a, data.token);
     const state = stateOf(c);
     if (state !== "ok") return { ok: false as const, state };
+    if (c.email_pending) {
+      if (!data.email) return { ok: false as const, state: "email" as const };
+      const typed = data.email.toLowerCase();
+      const { data: other } = await a.from("creators").select("*").ilike("email", typed).neq("id", c.id).limit(1).maybeSingle();
+      if (other) {
+        // Already a creator with this email: consume this link and sign that creator in instead.
+        await a.from("creators").update({ fast_lane_entered_at: new Date().toISOString(), fast_lane_expires_at: new Date().toISOString() }).eq("id", c.id);
+        const { sessionTokenFor } = await import("./fast-lane.server");
+        const s = await sessionTokenFor(a, typed);
+        if (!other.user_id) await a.from("creators").update({ user_id: s.userId }).eq("id", other.id);
+        return { ok: true as const, tokenHash: s.tokenHash, type: s.type };
+      }
+      await a.from("creators").update({ email: typed, email_pending: false }).eq("id", c.id);
+      c = { ...c, email: typed, email_pending: false };
+    }
     const [{ data: doc }, { data: rules }] = await Promise.all([
       a.from("documents").select("current_version, published").eq("slug", "creator-agreement").maybeSingle(),
       a.from("documents").select("current_version").eq("slug", "creator-rules").maybeSingle(),

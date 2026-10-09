@@ -46,7 +46,7 @@ function usePeople() {
     queryKey: ["hub", "discover", appId],
     queryFn: async () => {
       const [c, a, p, posts, pay] = await Promise.all([
-        supabase.from("creators").select("id, full_name, email, country, status, ugc_status, tiktok_handle, instagram_handle, last_seen_at, admin_notes, application_id"),
+        supabase.from("creators").select("id, full_name, email, email_pending, country, status, ugc_status, tiktok_handle, instagram_handle, last_seen_at, admin_notes, application_id"),
         supabase.from("creator_applications").select("id, full_name, email, country, age, occupation, tiktok_url, instagram_url, status, source, created_creator_id, app_id"),
         supabase.from("creator_prospects").select("*"),
         supabase.from("creator_posts").select("creator_id, views, posted_on, created_at, status, platform"),
@@ -66,7 +66,7 @@ function usePeople() {
       for (const r of c.data ?? []) {
         const s = byCreator.get(r.id);
         maxViews.set(`c-${r.id}`, s?.max ?? 0);
-        out.push({ key: `c-${r.id}`, id: r.id, kind: "creator", name: r.full_name, country: r.country, age: null, gender: null, city: null, school: null, email: r.email, tiktok: r.tiktok_handle, instagram: r.instagram_handle, followers: null, niche: null, source: null,
+        out.push({ key: `c-${r.id}`, id: r.id, kind: "creator", name: r.full_name, country: r.country, age: null, gender: null, city: null, school: r.email_pending ? "email à saisir" : null, email: r.email_pending ? null : r.email, tiktok: r.tiktok_handle, instagram: r.instagram_handle, followers: null, niche: null, source: null,
           status: r.ugc_status ?? r.status ?? "active", lastSeen: r.last_seen_at, views: s?.views ?? 0, earned: earned.get(r.id) ?? 0, posts: s?.posts ?? 0, streak: streakOf(s?.days ?? []), notes: r.admin_notes, postDays: s?.days ?? [], platforms: [...(s?.platforms ?? [])] });
       }
       for (const r of a.data ?? []) {

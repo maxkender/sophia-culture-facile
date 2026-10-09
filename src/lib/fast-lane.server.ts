@@ -8,7 +8,7 @@ export type FastPay = {
   fixedMonthly: number | null; welcomeBonus: number | null;
 };
 export type FastPerson = {
-  firstName: string; lastName?: string | null; email: string; country?: string | null; language?: "fr" | "en" | null;
+  firstName: string; lastName?: string | null; email?: string | null; country?: string | null; language?: "fr" | "en" | null;
   platform?: "ios" | "android" | null; tiktok?: string | null; instagram?: string | null; source?: string | null; notes?: string | null;
   ref?: { kind: "creator" | "applicant" | "prospect"; id: string } | null;
 };
@@ -32,7 +32,10 @@ export function payColumns(p: FastPay) {
 
 /** Create or update one creator record for the fast lane and return the personal link. Sends nothing. */
 export async function createFastLaneOne(a: Admin, person: FastPerson, pay: FastPay, appId: string, jobId: string | null, origin: string) {
-  const email = person.email.trim().toLowerCase();
+  const token = newToken();
+  const typed = (person.email ?? "").trim().toLowerCase();
+  const pending = !typed;
+  const email = pending ? `pending+${token}@fastlane.sophia-culture.com` : typed;
   const fullName = [person.firstName.trim(), (person.lastName ?? "").trim()].filter(Boolean).join(" ");
   let creatorId: string | null = null;
   let applicationId: string | null = null;
@@ -43,13 +46,12 @@ export async function createFastLaneOne(a: Admin, person: FastPerson, pay: FastP
     if (!app) throw new Error("Application not found");
     applicationId = app.id; creatorId = app.created_creator_id ?? null;
   }
-  if (!creatorId) {
+  if (!creatorId && !pending) {
     const { data: dup } = await a.from("creators").select("id").ilike("email", email).limit(1).maybeSingle();
     creatorId = dup?.id ?? null;
   }
-  const token = newToken();
   const base = {
-    full_name: fullName, email, country: person.country || null, language: person.language ?? defaultLanguage(person.country),
+    full_name: fullName, email, email_pending: pending, country: person.country || null, language: person.language ?? defaultLanguage(person.country),
     ...(person.platform ? { platform: person.platform } : {}),
     ...(cleanHandle(person.tiktok) ? { tiktok_handle: cleanHandle(person.tiktok) } : {}),
     ...(cleanHandle(person.instagram) ? { instagram_handle: cleanHandle(person.instagram) } : {}),
@@ -73,13 +75,14 @@ export async function createFastLaneOne(a: Admin, person: FastPerson, pay: FastP
   if (applicationId) await a.from("creator_applications").update({ status: "approved", decided_at: new Date().toISOString(), created_creator_id: creatorId, admin_notes: "Fast lane" }).eq("id", applicationId);
   if (person.ref?.kind === "prospect") await a.from("creator_prospects").update({ status: "converted" }).eq("id", person.ref.id);
   await a.from("creator_apps").upsert({ creator_id: creatorId, app_id: appId, status: "active" }, { onConflict: "creator_id,app_id" });
-  if (jobId) await a.from("job_invites").insert({ job_id: jobId, creator_id: creatorId, email });
+  if (jobId) await a.from("job_invites").insert({ job_id: jobId, creator_id: creatorId, email: pending ? null : email });
   return { creatorId: creatorId as string, name: fullName, email, link: fastLink(origin, token) };
 }
 
 export async function sendFastLaneEmail(a: Admin, creatorId: string, origin: string) {
-  const { data: c } = await a.from("creators").select("full_name, email, fast_lane_token, language").eq("id", creatorId).maybeSingle();
+  const { data: c } = await a.from("creators").select("full_name, email, email_pending, fast_lane_token, language").eq("id", creatorId).maybeSingle();
   if (!c?.fast_lane_token) throw new Error("No link yet");
+  if (c.email_pending) return { sent: false, reason: "No email yet: she will type it on her link", link: fastLink(origin, c.fast_lane_token) };
   const link = fastLink(origin, c.fast_lane_token);
   const first = String(c.full_name).split(/\s+/)[0] || "";
   const en = c.language === "en";

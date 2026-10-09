@@ -249,10 +249,14 @@ export function MyTerms({ tiers }: { tiers: { tier: string; per_post: number | s
   return (
     <div className="mt-3" data-testid="my-terms">
       {own ? <p className="text-xs font-bold uppercase tracking-wide text-portal-accent">{fr ? "Tes conditions" : "Your terms"}</p> : null}
-      <p className="mt-1 text-sm text-brand-navy">
+      {num("fixed_monthly_override") ? <><p className="mt-1 text-sm text-brand-navy">
+        <b>{eur(num("fixed_monthly_override")!)}</b> {fr ? `pour ${target} vidéos par mois` : `for ${target} videos a month`} · <b>{eur(rpm ?? 0)}</b> {fr ? "/ 1 000 vues" : "per 1,000 views"}
+        {cap ? <> · {fr ? "jusqu'à" : "up to"} <b>{eur(cap)}</b> {fr ? "par post" : "per post"}</> : null}
+        {perPost ? <> · + <b>{eur(perPost)}</b> {fr ? "par post" : "per post"}</> : null}
+        {num("welcome_bonus") ? <> · {fr ? "bonus de bienvenue" : "welcome bonus"} <b>{eur(num("welcome_bonus")!)}</b></> : null}
+      </p><p className="text-xs text-brand-navySoft">{fr ? `Au prorata si moins de ${target} vidéos.` : `Prorated if fewer than ${target} videos.`}</p></> : <p className="mt-1 text-sm text-brand-navy">
         <b>{eur(perPost)}</b> {fr ? "par post" : "per post"} · <b>{eur(rpm ?? 0)}</b> {fr ? "/ 1 000 vues" : "per 1,000 views"} · {fr ? "jusqu'à" : "up to"} <b>{eur(cap ?? 0)}</b> {fr ? "par post" : "per post"}
         {own ? <> · {fr ? "objectif" : "target"} <b>{target}</b> {fr ? "posts/mois" : "posts/month"}</> : null}
-        {num("fixed_monthly_override") ? <> · <b>{eur(num("fixed_monthly_override")!)}</b> {fr ? "fixe/mois" : "fixed/month"}</> : null}
         {num("welcome_bonus") ? <> · {fr ? "bonus de bienvenue" : "welcome bonus"} <b>{eur(num("welcome_bonus")!)}</b></> : null}
       </p>
     </div>

@@ -55,6 +55,7 @@ function FastLanePage() {
   const [ticked, setTicked] = useState(false);
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [email, setEmail] = useState("");
   useEffect(() => { if (data && "fullName" in data && data.fullName) setName(data.fullName); }, [data]);
   const lang = data?.language === "en" ? "en" : "fr";
   const t = T[lang];
@@ -74,10 +75,14 @@ function FastLanePage() {
     );
   }
   const p = data.pay;
-  const figures: [string, string][] = [
+  const figures: [string, string][] = p.fixedMonthly ? [
+    [eur(p.fixedMonthly), lang === "en" ? `for ${p.postsPerMonth} videos a month` : `pour ${p.postsPerMonth} vidéos par mois`],
+    [eur(p.rpm), t.rpm], ...(p.cap ? [[eur(p.cap), t.cap] as [string, string]] : []),
+    ...(p.perPost ? [[eur(p.perPost), t.perPost] as [string, string]] : []),
+    [t.platforms[p.platforms] ?? p.platforms, t.platformsLabel],
+  ] : [
     [eur(p.perPost), t.perPost], [eur(p.rpm), t.rpm], [eur(p.cap), t.cap], [String(p.postsPerMonth), t.target],
     [t.platforms[p.platforms] ?? p.platforms, t.platformsLabel],
-    ...(p.fixedMonthly ? [[eur(p.fixedMonthly), t.fixed] as [string, string]] : []),
     ...(p.welcomeBonus ? [[eur(p.welcomeBonus), t.bonus] as [string, string]] : []),
   ];
   const ruleTitles = parseBlocks(data.rules).filter((b) => b.type === "heading").map((b) => (b as { text: string }).text);
@@ -86,9 +91,11 @@ function FastLanePage() {
     if (!data || !("agreement" in data) || !data.agreement) return;
     if (!ticked) return void toast.error(t.needTick);
     if (name.trim().length < 2) return void toast.error(t.needName);
+    const needEmail = "emailPending" in data && data.emailPending;
+    if (needEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) return void toast.error(lang === "en" ? "Type a valid email, for example lea@gmail.com." : "Écris un email valide, par exemple lea@gmail.com.");
     setBusy(true);
     try {
-      const r = await enter({ data: { token, signedName: name.trim(), accepted: true, documentVersion: data.agreement.version, userAgent: navigator.userAgent } });
+      const r = await enter({ data: { token, signedName: name.trim(), accepted: true, ...(needEmail ? { email: email.trim().toLowerCase() } : {}), documentVersion: data.agreement.version, userAgent: navigator.userAgent } });
       if (!r.ok) { toast.error(r.state === "reload" ? t.reload : r.state === "mismatch" ? t.mismatch : t.expired); setBusy(false); return; }
       const { error } = await supabase.auth.verifyOtp({ token_hash: r.tokenHash, type: r.type as "magiclink" });
       if (error) { toast.error(t.fail); setBusy(false); return; }
@@ -106,6 +113,7 @@ function FastLanePage() {
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
           {figures.map(([v, k]) => <div key={k}><p className="text-3xl font-extrabold">{v}</p><p className="text-sm opacity-80">{k}</p></div>)}
         </div>
+        {p.fixedMonthly ? <p className="mt-4 text-xs opacity-80">{lang === "en" ? `Prorated if fewer than ${p.postsPerMonth} videos.` : `Au prorata si moins de ${p.postsPerMonth} vidéos.`}</p> : null}
       </section>
 
       <section className="mt-8">
@@ -123,6 +131,9 @@ function FastLanePage() {
           <summary className="cursor-pointer text-lg font-extrabold text-brand-navy">{t.contract} · {data.agreement.title} (v{data.agreement.version})</summary>
           <div className="mt-4 max-h-[60vh] overflow-y-auto"><DocumentBody blocks={creatorAgreementBlocks(parseBlocks(data.agreement.body), "ugc")} merge={{ name } as never} /></div>
         </details>
+        {data.emailPending ? <label className="mt-5 block text-sm font-semibold text-brand-navy">{lang === "en" ? "Your email" : "Ton email"}
+          <Input type="email" required className="mt-1 min-h-11" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" inputMode="email" />
+        </label> : null}
         <label className="mt-5 flex items-start gap-3 text-sm font-semibold text-brand-navy">
           <Checkbox checked={ticked} onCheckedChange={(v) => setTicked(v === true)} className="mt-0.5" aria-label={t.accept} />{t.accept}
         </label>
