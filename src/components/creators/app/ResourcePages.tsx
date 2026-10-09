@@ -358,6 +358,8 @@ function PayoutDetails() {
   const sync = useServerFn(syncStripeStatus);
   const fallback = useServerFn(savePayoutFallback);
   const [busy, setBusy] = useState(false);
+  const modeFn = useServerFn(stripeModeInfo);
+  const { data: stripeMode } = useQuery({ queryKey: ["creator", "stripe-mode"], queryFn: () => modeFn() });
   const [alt, setAlt] = useState<"wise" | "paypal">(profile?.method === "paypal" ? "paypal" : "wise");
   const [altEmail, setAltEmail] = useState(profile?.wise_email ?? profile?.paypal_email ?? "");
   useEffect(() => {
@@ -372,6 +374,7 @@ function PayoutDetails() {
           <Banner tone="success" title="Your Stripe account is connected">Monthly payouts are sent automatically.</Banner>
         ) : (
           <div>
+            {stripeMode?.mode === "test" && <p className="mb-2 text-xs text-muted-foreground">Mode test — ne saisis pas de vraies coordonnées</p>}
             <p className="text-brand-navySoft">Connect a Stripe account to receive your monthly payouts. Stripe asks for your identity and bank details directly; Sophia never sees them.</p>
             <Button className="mt-3" disabled={busy} onClick={async () => {
               setBusy(true);

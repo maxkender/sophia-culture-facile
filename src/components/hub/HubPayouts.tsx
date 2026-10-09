@@ -97,10 +97,32 @@ function StripeStatus() {
   );
 }
 
+function StripeModeBanner() {
+  const get = useServerFn(stripeModeInfo);
+  const { data } = useQuery({ queryKey: ["hub", "stripe-mode"], queryFn: () => get() });
+  const url = typeof window !== "undefined" ? `${window.location.origin.includes("localhost") || window.location.hostname.includes("preview") ? "https://sophia-culture.com" : window.location.origin}/api/public/stripe/webhook` : "";
+  if (!data) return null;
+  return (
+    <section className={card}>
+      <p className={`rounded-xl px-4 py-2 text-sm font-bold ${data.mode === "live" ? "bg-destructive text-destructive-foreground" : "bg-muted text-brand-navy"}`}>
+        {data.mode === "live" ? "Stripe: LIVE" : data.mode === "test" ? "Stripe: TEST mode (STRIPE_ALLOW_LIVE is off)" : "Stripe: not configured"}
+      </p>
+      <div className="mt-3 space-y-1 text-sm text-brand-navySoft">
+        <p className="font-bold text-brand-navy">Stripe webhook</p>
+        <p>Endpoint URL to paste in Stripe → Developers → Webhooks (choose “Connected and v2 accounts” + “Your account”):</p>
+        <p className="flex flex-wrap items-center gap-2"><code className="rounded bg-muted px-2 py-1 text-xs">{url}</code><button className="text-xs font-semibold underline" onClick={() => { navigator.clipboard.writeText(url); toast.success("Copied"); }}>Copy</button></p>
+        <p>Events: <code className="text-xs">account.updated</code>, <code className="text-xs">transfer.failed</code>, <code className="text-xs">transfer.reversed</code></p>
+        <p>Signing secret saved: <b>{data.webhookSecretSet ? "yes" : "no — add STRIPE_WEBHOOK_SECRET (whsec_…) in project secrets"}</b></p>
+      </div>
+    </section>
+  );
+}
+
 export function HubPayouts() {
   const { data: w } = useWallet();
   return (
     <div className="space-y-5">
+      <StripeModeBanner />
       <div className="grid gap-3 sm:grid-cols-4">
         {[["Available balance", w?.available], ["Currently owed", w?.currentlyOwed], ["Pending balance", w?.pending], ["Live budgets", w?.budget]].map(([k, v]) => (
           <div key={k as string} className="rounded-2xl bg-gradient-to-br from-brand-navy to-portal-accent p-4 text-card shadow-portal"><p className="text-xs opacity-80">{k}</p><p className="text-2xl font-extrabold">{eur(Number(v ?? 0))}</p></div>
@@ -109,7 +131,7 @@ export function HubPayouts() {
       <Settings />
       <Tiers />
       <StripeStatus />
-      <section className={card}><h2 className="mb-3 font-extrabold text-brand-navy">Months, statements & batches</h2><CreatorPayouts /></section>
+      <section className={card}><h2 className="mb-3 font-extrabold text-brand-navy">Months, statements & batches</h2><CreatorPayouts inHub /></section>
     </div>
   );
 }
