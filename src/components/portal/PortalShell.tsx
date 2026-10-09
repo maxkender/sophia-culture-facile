@@ -157,7 +157,8 @@ export function PortalShell({
   function switchMode(next: AdminMode) {
     setMode(next);
     window.localStorage.setItem(MODE_KEY, next);
-    void navigate({ to: next === "creators" ? "/auteurs/admin/creators" : "/auteurs/admin" });
+    if (next === "creators") { window.localStorage.setItem(MODE_KEY, "authors"); void navigate({ to: "/hub" }); return; }
+    void navigate({ to: "/auteurs/admin" });
   }
   const groups = isAdmin ? (mode === "creators" ? ADMIN_CREATOR_NAV : ADMIN_AUTHOR_NAV) : AUTHOR_NAV;
   const modeTabs = isAdmin ? (

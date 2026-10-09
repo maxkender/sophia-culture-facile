@@ -1,12 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PortalShell } from "@/components/portal/PortalShell";
-import { UgcComplianceDashboard } from "@/components/portal/admin/UgcAdmin";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Moved to the Creator Hub; kept so old links keep working. */
 export const Route = createFileRoute("/_authenticated/auteurs/admin/creators/compliance")({
-  head: () => ({ meta: [{ title: "Creators dashboard | Sophia" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: () => (
-    <PortalShell adminOnly>
-      <UgcComplianceDashboard />
-    </PortalShell>
-  ),
+  beforeLoad: ({ params }) => {
+    throw redirect({ ...{ to: "/hub/tools/$", params: { _splat: "compliance" } }, replace: true, statusCode: 301 } as never);
+  },
 });

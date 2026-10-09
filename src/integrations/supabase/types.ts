@@ -600,6 +600,71 @@ export type Database = {
           },
         ]
       }
+      campaigns: {
+        Row: {
+          app_id: string
+          brief_md: string
+          created_at: string
+          created_by: string | null
+          distribution: Json
+          ends_at: string | null
+          id: string
+          monthly_budget: number | null
+          name: string
+          ongoing: boolean
+          requirements: Json
+          settings: Json
+          starts_at: string
+          status: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          app_id: string
+          brief_md?: string
+          created_at?: string
+          created_by?: string | null
+          distribution?: Json
+          ends_at?: string | null
+          id?: string
+          monthly_budget?: number | null
+          name: string
+          ongoing?: boolean
+          requirements?: Json
+          settings?: Json
+          starts_at?: string
+          status?: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          app_id?: string
+          brief_md?: string
+          created_at?: string
+          created_by?: string | null
+          distribution?: Json
+          ends_at?: string | null
+          id?: string
+          monthly_budget?: number | null
+          name?: string
+          ongoing?: boolean
+          requirements?: Json
+          settings?: Json
+          starts_at?: string
+          status?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contracts: {
         Row: {
           author_id: string
@@ -1541,21 +1606,27 @@ export type Database = {
           age: number | null
           applied_at: string | null
           assigned_hm_id: string | null
+          city: string | null
           country: string | null
           created_at: string
           device: string | null
           email: string | null
+          face_cam: boolean | null
           followers: number | null
+          gender: string | null
           handle: string | null
           id: string
           instagram_handle: string | null
           language: string | null
+          last_seen_at: string | null
           name: string | null
           next_action_on: string | null
+          niche: string | null
           notes: string | null
           phone: string | null
           platform: string
           presentation: string | null
+          school_or_job: string | null
           source: string
           status: string
           tags: string[]
@@ -1568,21 +1639,27 @@ export type Database = {
           age?: number | null
           applied_at?: string | null
           assigned_hm_id?: string | null
+          city?: string | null
           country?: string | null
           created_at?: string
           device?: string | null
           email?: string | null
+          face_cam?: boolean | null
           followers?: number | null
+          gender?: string | null
           handle?: string | null
           id?: string
           instagram_handle?: string | null
           language?: string | null
+          last_seen_at?: string | null
           name?: string | null
           next_action_on?: string | null
+          niche?: string | null
           notes?: string | null
           phone?: string | null
           platform?: string
           presentation?: string | null
+          school_or_job?: string | null
           source?: string
           status?: string
           tags?: string[]
@@ -1595,21 +1672,27 @@ export type Database = {
           age?: number | null
           applied_at?: string | null
           assigned_hm_id?: string | null
+          city?: string | null
           country?: string | null
           created_at?: string
           device?: string | null
           email?: string | null
+          face_cam?: boolean | null
           followers?: number | null
+          gender?: string | null
           handle?: string | null
           id?: string
           instagram_handle?: string | null
           language?: string | null
+          last_seen_at?: string | null
           name?: string | null
           next_action_on?: string | null
+          niche?: string | null
           notes?: string | null
           phone?: string | null
           platform?: string
           presentation?: string | null
+          school_or_job?: string | null
           source?: string
           status?: string
           tags?: string[]
@@ -1669,6 +1752,50 @@ export type Database = {
             columns: ["app_id"]
             isOneToOne: false
             referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_requests: {
+        Row: {
+          body: string
+          created_at: string
+          creator_id: string
+          id: string
+          reply: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          type: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          creator_id: string
+          id?: string
+          reply?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          type?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          creator_id?: string
+          id?: string
+          reply?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_requests_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
             referencedColumns: ["id"]
           },
         ]
@@ -3335,6 +3462,236 @@ export type Database = {
           },
         ]
       }
+      job_applications: {
+        Row: {
+          answers: Json
+          application_id: string | null
+          contract_signed_at: string | null
+          created_at: string
+          creator_id: string | null
+          decided_at: string | null
+          decided_by: string | null
+          decline_reason: string | null
+          id: string
+          job_id: string
+          shortlisted: boolean
+          status: string
+        }
+        Insert: {
+          answers?: Json
+          application_id?: string | null
+          contract_signed_at?: string | null
+          created_at?: string
+          creator_id?: string | null
+          decided_at?: string | null
+          decided_by?: string | null
+          decline_reason?: string | null
+          id?: string
+          job_id: string
+          shortlisted?: boolean
+          status?: string
+        }
+        Update: {
+          answers?: Json
+          application_id?: string | null
+          contract_signed_at?: string | null
+          created_at?: string
+          creator_id?: string | null
+          decided_at?: string | null
+          decided_by?: string | null
+          decline_reason?: string | null
+          id?: string
+          job_id?: string
+          shortlisted?: boolean
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_applications_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_invites: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          creator_id: string | null
+          email: string | null
+          id: string
+          job_id: string
+          opened_at: string | null
+          prospect_id: string | null
+          sent_at: string | null
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          creator_id?: string | null
+          email?: string | null
+          id?: string
+          job_id: string
+          opened_at?: string | null
+          prospect_id?: string | null
+          sent_at?: string | null
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          creator_id?: string | null
+          email?: string | null
+          id?: string
+          job_id?: string
+          opened_at?: string | null
+          prospect_id?: string | null
+          sent_at?: string | null
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_invites_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          access: string
+          account_type: string
+          age_max: number | null
+          age_min: number | null
+          app_id: string
+          application_items: Json
+          base_amount: number
+          base_mode: string
+          bonus_goals: Json
+          campaign_id: string | null
+          content_type: string | null
+          countries: string[]
+          cover_image_path: string | null
+          cpm_rate: number
+          created_at: string
+          details_md: string
+          id: string
+          open: boolean
+          payment_type: string
+          platforms: string[]
+          position: string
+          posting_frequency_n: number | null
+          posting_frequency_unit: string | null
+          product_type: string | null
+          retainer_frequency: string | null
+          slots: number | null
+          slug: string
+          status: string
+          title: string
+          updated_at: string
+          verified_country: boolean
+          video_length_s: number | null
+          weekly_hours: string | null
+        }
+        Insert: {
+          access?: string
+          account_type?: string
+          age_max?: number | null
+          age_min?: number | null
+          app_id: string
+          application_items?: Json
+          base_amount?: number
+          base_mode?: string
+          bonus_goals?: Json
+          campaign_id?: string | null
+          content_type?: string | null
+          countries?: string[]
+          cover_image_path?: string | null
+          cpm_rate?: number
+          created_at?: string
+          details_md?: string
+          id?: string
+          open?: boolean
+          payment_type?: string
+          platforms?: string[]
+          position?: string
+          posting_frequency_n?: number | null
+          posting_frequency_unit?: string | null
+          product_type?: string | null
+          retainer_frequency?: string | null
+          slots?: number | null
+          slug?: string
+          status?: string
+          title: string
+          updated_at?: string
+          verified_country?: boolean
+          video_length_s?: number | null
+          weekly_hours?: string | null
+        }
+        Update: {
+          access?: string
+          account_type?: string
+          age_max?: number | null
+          age_min?: number | null
+          app_id?: string
+          application_items?: Json
+          base_amount?: number
+          base_mode?: string
+          bonus_goals?: Json
+          campaign_id?: string | null
+          content_type?: string | null
+          countries?: string[]
+          cover_image_path?: string | null
+          cpm_rate?: number
+          created_at?: string
+          details_md?: string
+          id?: string
+          open?: boolean
+          payment_type?: string
+          platforms?: string[]
+          position?: string
+          posting_frequency_n?: number | null
+          posting_frequency_unit?: string | null
+          product_type?: string | null
+          retainer_frequency?: string | null
+          slots?: number | null
+          slug?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          verified_country?: boolean
+          video_length_s?: number | null
+          weekly_hours?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           body: string
@@ -3609,6 +3966,50 @@ export type Database = {
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_metrics_daily: {
+        Row: {
+          app_id: string | null
+          comments: number
+          created_at: string
+          day: string
+          id: string
+          likes: number
+          post_id: string
+          shares: number
+          views: number
+        }
+        Insert: {
+          app_id?: string | null
+          comments?: number
+          created_at?: string
+          day?: string
+          id?: string
+          likes?: number
+          post_id: string
+          shares?: number
+          views?: number
+        }
+        Update: {
+          app_id?: string | null
+          comments?: number
+          created_at?: string
+          day?: string
+          id?: string
+          likes?: number
+          post_id?: string
+          shares?: number
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_metrics_daily_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "creator_posts"
             referencedColumns: ["id"]
           },
         ]
