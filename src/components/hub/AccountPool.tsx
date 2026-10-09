@@ -32,7 +32,7 @@ export function AccountPool() {
             <select aria-label="Reassign to" className="ml-auto h-9 rounded-lg border px-2 text-sm" defaultValue="" onChange={async (e) => {
               const id = e.target.value; if (!id) return;
               const col = a.platform === "tiktok" ? "tiktok_handle" : "instagram_handle";
-              const { error } = await supabase.from("creators").update({ [col]: a.handle }).eq("id", id);
+              const { error } = await supabase.from("creators").update({ [col]: a.handle } as never).eq("id", id);
               if (error) { toast.error("Could not reassign."); return; }
               await supabase.from("account_pool").update({ status: "assigned", assigned_creator_id: id }).eq("id", a.id);
               toast.success("Reassigned — share the new password through the creator's credentials page."); reload();

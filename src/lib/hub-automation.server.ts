@@ -9,7 +9,7 @@ const DAY = 86400_000;
 const MAX_CREATORS_PER_RUN = 40;
 
 const period = (d = new Date()) => d.toISOString().slice(0, 7);
-const nextPeriod = (p: string) => { const [y, m] = p.split("-").map(Number); return m === 12 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, "0")}`; };
+const nextPeriod = (p: string) => { const [y = 0, m = 1] = p.split("-").map(Number); return m === 12 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, "0")}`; };
 
 /** Single-flight lease so overlapping cron calls never run the same job twice. */
 export async function withLock<T>(admin: Admin, name: string, minutes: number, fn: () => Promise<T>): Promise<T | { skipped: string }> {
@@ -135,12 +135,12 @@ export async function runDormancy(admin: Admin) {
       const { data: last } = await admin.from("creator_posts").select("posted_on, created_at").eq("creator_id", c.id).order("posted_on", { ascending: false }).limit(1).maybeSingle();
       const lastAt = last ? new Date(last.posted_on ?? last.created_at).getTime() : new Date(c.onboarding_completed_at).getTime();
       const idle = now - lastAt;
-      const rem = (c.dormancy_reminders ?? {}) as Record<string, string>;
+      const rem = (c.dormancy_reminders ?? {}) as { d3?: string; d7?: string; pooled?: string };
       if (idle < 3 * DAY) {
         if (c.dormant_at) await admin.from("creators").update({ dormant_at: null, dormancy_reminders: {}, last_post_at: new Date(lastAt).toISOString() }).eq("id", c.id);
         continue;
       }
-      const patch: Record<string, unknown> = { last_post_at: new Date(lastAt).toISOString() };
+      const patch: any = { last_post_at: new Date(lastAt).toISOString() };
       if (!c.dormant_at) { patch.dormant_at = new Date().toISOString(); dormant++; }
       if (!rem.d3 && await remind(admin, c, "d3")) { rem.d3 = new Date().toISOString(); reminders++; }
       if (idle >= 7 * DAY && !rem.d7 && await remind(admin, c, "d7")) { rem.d7 = new Date().toISOString(); reminders++; }

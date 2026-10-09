@@ -12,7 +12,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
 
 function csv(name: string, rows: Record<string, unknown>[]) {
   if (!rows.length) { toast.error("Nothing to export"); return; }
-  const keys = Object.keys(rows[0]);
+  const keys = Object.keys(rows[0] ?? {});
   const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   const blob = new Blob([[keys.join(","), ...rows.map((r) => keys.map((k) => esc(r[k])).join(","))].join("\n")], { type: "text/csv" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click();
@@ -84,9 +84,10 @@ export function Analytics() {
     for (const p of data.posts) postsByDay.set(p.posted_on, (postsByDay.get(p.posted_on) ?? 0) + 1);
     const series = days.map((d) => ({ day: d.slice(5), views: viewsByDay.get(d) ?? 0, posts: postsByDay.get(d) ?? 0 }));
     const totalViews = data.posts.reduce((a, p) => a + Number(p.views ?? 0), 0);
-    const group = (key: (p: (typeof data.posts)[number]) => string) => {
+    const posts = data.posts;
+    const group = (key: (p: (typeof posts)[number]) => string) => {
       const m = new Map<string, { k: string; posts: number; views: number }>();
-      for (const p of data.posts) { const k = key(p) || "—"; const r = m.get(k) ?? { k, posts: 0, views: 0 }; r.posts++; r.views += Number(p.views ?? 0); m.set(k, r); }
+      for (const p of posts) { const k = key(p) || "—"; const r = m.get(k) ?? { k, posts: 0, views: 0 }; r.posts++; r.views += Number(p.views ?? 0); m.set(k, r); }
       return [...m.values()].sort((a, b) => b.views - a.views);
     };
     const postCount = new Map<string, number>();
