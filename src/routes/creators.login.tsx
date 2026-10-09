@@ -1,11 +1,27 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { homeFor, resolveAccountRole } from "@/lib/account-role";
 import { createFileRoute } from "@tanstack/react-router";
 import { SignIn } from "@/components/creators/CreatorSpace";
 import { useRedirectIfSignedIn } from "@/components/auth/LoginRedirect";
 
 function CreatorLogin() {
   useRedirectIfSignedIn();
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    const u = new URL(window.location.href);
+    const th = u.searchParams.get("th");
+    if (!th) return;
+    const ty = (u.searchParams.get("ty") ?? "magiclink") as "magiclink";
+    void supabase.auth.verifyOtp({ token_hash: th, type: ty }).then(async ({ error }) => {
+      if (error) { setFailed(true); window.history.replaceState(null, "", "/creators/login"); return; }
+      const role = await resolveAccountRole();
+      window.location.assign(role ? homeFor(role) : "/creators/app");
+    });
+  }, []);
   return (
     <div className="min-h-screen bg-portal-bg pb-[env(safe-area-inset-bottom)]">
+      {failed ? <p className="mx-auto max-w-sm px-6 pt-6 text-sm text-brand-navy">Ce lien a déjà servi ou a expiré. Demande-en un nouveau ci-dessous. / This link was used or expired.</p> : null}
       <SignIn invite={null} invitedEmail="" standalone />
     </div>
   );
