@@ -295,6 +295,13 @@
       "when": 1791547314109,
       "tag": "0041_ugc_tiers_public_read",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1791549371072,
+      "tag": "0042_hub_completion_pass",
+      "breakpoints": true
     }
   ]
 }
