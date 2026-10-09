@@ -313,6 +313,7 @@ function VideoReviews() {
               <div><dt className="text-brand-navySoft">Posted</dt><dd className="font-semibold">{post.posted_on ?? "—"}</dd></div>
               <div><dt className="text-brand-navySoft">Views so far</dt><dd className="font-semibold">{compact(Number(post.views ?? 0))}</dd></div>
             </dl>
+            {(post.fraud_flags ?? []).length || post.hold_reason ? <p className="mt-3 rounded-xl bg-portal-amber/15 p-3 text-sm text-brand-navy">On hold: {[...(post.fraud_flags ?? []), post.hold_reason].filter(Boolean).join(" · ")}</p> : null}
             {post.skip_reason ? <p className="mt-3 rounded-xl bg-portal-red/10 p-3 text-sm text-portal-red">Flag: {post.skip_reason}</p> : null}
             <fieldset className="mt-4 space-y-2"><legend className="text-sm font-bold text-brand-navy">Compliance</legend>
               {CHECKS.map((c) => <label key={c} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={checks.includes(c)} onChange={(e) => setChecks((x) => (e.target.checked ? [...x, c] : x.filter((y) => y !== c)))} />{c}</label>)}
