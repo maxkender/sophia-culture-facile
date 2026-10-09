@@ -115,7 +115,7 @@ async function runTool(a: Admin, app: string, name: string, args: any, cited: Ci
       const real = (cs ?? []).filter((c: any) => !/test/i.test(c.email ?? ""));
       const { data: posts } = await a.from("creator_posts").select("creator_id").eq("app_id", app).eq("status", "approved");
       const n: Record<string, number> = {}; for (const p of posts ?? []) n[p.creator_id] = (n[p.creator_id] ?? 0) + 1;
-      return { signed_up: real.length, account_created: real.filter((c: any) => c.social_account_created_at).length, first_post: real.filter((c: any) => n[c.id] >= 1).length, ten_posts: real.filter((c: any) => n[c.id] >= 10).length, active_or_pro: real.filter((c: any) => ["active", "pro"].includes(c.tier)).length };
+      return { signed_up: real.length, account_created: real.filter((c: any) => c.social_account_created_at).length, first_post: real.filter((c: any) => (n[c.id] ?? 0) >= 1).length, ten_posts: real.filter((c: any) => (n[c.id] ?? 0) >= 10).length, active_or_pro: real.filter((c: any) => ["active", "pro"].includes(c.tier)).length };
     }
     case "find_briefs": {
       const qq = String(args.query ?? "").replace(/[%,()]/g, " ").trim().slice(0, 60);
