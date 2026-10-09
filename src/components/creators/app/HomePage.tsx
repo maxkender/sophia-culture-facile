@@ -10,6 +10,7 @@ import { TAAP_LINK, useCreator } from "./useCreator";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { myRunningMonth } from "@/lib/ugc-creator.functions";
+import { CreatorStatsStrip } from "./HubPages";
 
 function Step({ n, title, done, current, children }: { n: number; title: string; done: boolean; current: boolean; children: ReactNode }) {
   return (
@@ -44,6 +45,7 @@ export function CreatorHomePage() {
   return (
     <div>
       <PageTitle title={`Welcome, ${first}`} lead="Your creator space: briefs, the reference library, your posts, calls, earnings and messages with the Sophia team." />
+      <CreatorStatsStrip />
       <p className="-mt-4 mb-6 text-xs text-brand-navySoft">Bookmark this page: sophia-culture.com/creators/login is where you sign in from now on.</p>
 
       {steps.resignPending && (

@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Banknote, Bell, BookOpen, Clapperboard, Home, Library, Lock, LogOut, Menu, MessageSquare, Search,
-  Smartphone, UserCircle, Video, CalendarDays, type LucideIcon,
+  Smartphone, UserCircle, Video, CalendarDays, Briefcase, ListChecks, type LucideIcon,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/site/Logo";
@@ -25,11 +25,13 @@ export const CREATOR_NAV: { heading: string; items: Item[] }[] = [
     heading: "Espace",
     items: [
       { to: "/creators/app", label: "Home", icon: Home, exact: true },
+      { to: "/creators/app/jobs", label: "Jobs", icon: Briefcase, gate: "steps" },
       { to: "/creators/app/briefs", label: "Briefs", icon: Clapperboard, badge: "briefs", gate: "steps" },
-      { to: "/creators/app/library", label: "Library", icon: Library, gate: "steps" },
+      { to: "/creators/app/library", label: "Learn", icon: Library, gate: "steps" },
       { to: "/creators/app/posts", label: "My posts", icon: Video, badge: "posts", gate: "steps" },
+      { to: "/creators/app/tasks", label: "Tasks", icon: ListChecks, gate: "steps" },
       { to: "/creators/app/calls", label: "Calls", icon: CalendarDays, badge: "calls", gate: "steps" },
-      { to: "/creators/app/earnings", label: "Earnings", icon: Banknote, gate: "payouts" },
+      { to: "/creators/app/earnings", label: "Payouts", icon: Banknote, gate: "payouts" },
       { to: "/creators/app/messages", label: "Messages", icon: MessageSquare, badge: "messages" },
     ],
   },
@@ -217,8 +219,14 @@ export function CreatorShell({ children }: { children: ReactNode }) {
             <CreatorBell />
           </div>
         </header>
-        <main className="safe-bottom mx-auto w-full min-w-0 max-w-5xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
+        <main className="safe-bottom mx-auto w-full min-w-0 max-w-5xl px-4 pb-24 pt-8 sm:px-6 sm:py-10 lg:pb-10">{children}</main>
       </div>
+      <nav aria-label="Creator mobile" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-brand-line bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
+        {([["/creators/app", "Home", Home], ["/creators/app/jobs", "Jobs", Briefcase], ["/creators/app/posts", "Posts", Video], ["/creators/app/tasks", "Tasks", ListChecks], ["/creators/app/messages", "Messages", MessageSquare]] as const).map(([to, l, Icon]) => {
+          const on = to === "/creators/app" ? pathname === to : pathname.startsWith(to);
+          return <Link key={to} to={to} className={cn("flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold", on ? "text-portal-accent" : "text-brand-navySoft")}><Icon className="size-5" />{l}</Link>;
+        })}
+      </nav>
     </div>
   );
 }
