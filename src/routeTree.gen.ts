@@ -74,11 +74,13 @@ import { Route as CreatorsAppAccountRouteImport } from './routes/creators.app.ac
 import { Route as CreatorsAppCallsRouteImport } from './routes/creators.app.calls'
 import { Route as CreatorsAppContractRouteImport } from './routes/creators.app.contract'
 import { Route as CreatorsAppEarningsRouteImport } from './routes/creators.app.earnings'
+import { Route as CreatorsAppJobsRouteImport } from './routes/creators.app.jobs'
 import { Route as CreatorsAppLibraryRouteImport } from './routes/creators.app.library'
 import { Route as CreatorsAppMessagesRouteImport } from './routes/creators.app.messages'
 import { Route as CreatorsAppPostsRouteImport } from './routes/creators.app.posts'
 import { Route as CreatorsAppProfileRouteImport } from './routes/creators.app.profile'
 import { Route as CreatorsAppRulesRouteImport } from './routes/creators.app.rules'
+import { Route as CreatorsAppTasksRouteImport } from './routes/creators.app.tasks'
 import { Route as CreatorsInfluencerIndexRouteImport } from './routes/creators.influencer.index'
 import { Route as CreatorsInfluencerAppRouteImport } from './routes/creators.influencer.app'
 import { Route as CreatorsInfluencerApplyRouteImport } from './routes/creators.influencer.apply'
@@ -518,6 +520,11 @@ const CreatorsAppEarningsRoute = CreatorsAppEarningsRouteImport.update({
   path: '/earnings',
   getParentRoute: () => CreatorsAppRoute,
 } as any)
+const CreatorsAppJobsRoute = CreatorsAppJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
 const CreatorsAppLibraryRoute = CreatorsAppLibraryRouteImport.update({
   id: '/library',
   path: '/library',
@@ -541,6 +548,11 @@ const CreatorsAppProfileRoute = CreatorsAppProfileRouteImport.update({
 const CreatorsAppRulesRoute = CreatorsAppRulesRouteImport.update({
   id: '/rules',
   path: '/rules',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppTasksRoute = CreatorsAppTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
   getParentRoute: () => CreatorsAppRoute,
 } as any)
 const CreatorsInfluencerIndexRoute = CreatorsInfluencerIndexRouteImport.update({
@@ -1174,11 +1186,13 @@ export interface FileRoutesByFullPath {
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
   '/creators/app/earnings': typeof CreatorsAppEarningsRoute
+  '/creators/app/jobs': typeof CreatorsAppJobsRoute
   '/creators/app/library': typeof CreatorsAppLibraryRoute
   '/creators/app/messages': typeof CreatorsAppMessagesRoute
   '/creators/app/posts': typeof CreatorsAppPostsRoute
   '/creators/app/profile': typeof CreatorsAppProfileRoute
   '/creators/app/rules': typeof CreatorsAppRulesRoute
+  '/creators/app/tasks': typeof CreatorsAppTasksRoute
   '/creators/influencer/app': typeof CreatorsInfluencerAppRouteWithChildren
   '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
@@ -1343,11 +1357,13 @@ export interface FileRoutesByTo {
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
   '/creators/app/earnings': typeof CreatorsAppEarningsRoute
+  '/creators/app/jobs': typeof CreatorsAppJobsRoute
   '/creators/app/library': typeof CreatorsAppLibraryRoute
   '/creators/app/messages': typeof CreatorsAppMessagesRoute
   '/creators/app/posts': typeof CreatorsAppPostsRoute
   '/creators/app/profile': typeof CreatorsAppProfileRoute
   '/creators/app/rules': typeof CreatorsAppRulesRoute
+  '/creators/app/tasks': typeof CreatorsAppTasksRoute
   '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
@@ -1515,11 +1531,13 @@ export interface FileRoutesById {
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
   '/creators/app/earnings': typeof CreatorsAppEarningsRoute
+  '/creators/app/jobs': typeof CreatorsAppJobsRoute
   '/creators/app/library': typeof CreatorsAppLibraryRoute
   '/creators/app/messages': typeof CreatorsAppMessagesRoute
   '/creators/app/posts': typeof CreatorsAppPostsRoute
   '/creators/app/profile': typeof CreatorsAppProfileRoute
   '/creators/app/rules': typeof CreatorsAppRulesRoute
+  '/creators/app/tasks': typeof CreatorsAppTasksRoute
   '/creators/influencer/app': typeof CreatorsInfluencerAppRouteWithChildren
   '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
@@ -1688,11 +1706,13 @@ export interface FileRouteTypes {
     | '/creators/app/calls'
     | '/creators/app/contract'
     | '/creators/app/earnings'
+    | '/creators/app/jobs'
     | '/creators/app/library'
     | '/creators/app/messages'
     | '/creators/app/posts'
     | '/creators/app/profile'
     | '/creators/app/rules'
+    | '/creators/app/tasks'
     | '/creators/influencer/app'
     | '/creators/influencer/apply'
     | '/creators/sign/$token'
@@ -1857,11 +1877,13 @@ export interface FileRouteTypes {
     | '/creators/app/calls'
     | '/creators/app/contract'
     | '/creators/app/earnings'
+    | '/creators/app/jobs'
     | '/creators/app/library'
     | '/creators/app/messages'
     | '/creators/app/posts'
     | '/creators/app/profile'
     | '/creators/app/rules'
+    | '/creators/app/tasks'
     | '/creators/influencer/apply'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
@@ -2028,11 +2050,13 @@ export interface FileRouteTypes {
     | '/creators/app/calls'
     | '/creators/app/contract'
     | '/creators/app/earnings'
+    | '/creators/app/jobs'
     | '/creators/app/library'
     | '/creators/app/messages'
     | '/creators/app/posts'
     | '/creators/app/profile'
     | '/creators/app/rules'
+    | '/creators/app/tasks'
     | '/creators/influencer/app'
     | '/creators/influencer/apply'
     | '/creators/sign/$token'
@@ -2678,6 +2702,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreatorsAppEarningsRouteImport
       parentRoute: typeof CreatorsAppRoute
     }
+    '/creators/app/jobs': {
+      id: '/creators/app/jobs'
+      path: '/jobs'
+      fullPath: '/creators/app/jobs'
+      preLoaderRoute: typeof CreatorsAppJobsRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
     '/creators/app/library': {
       id: '/creators/app/library'
       path: '/library'
@@ -2711,6 +2742,13 @@ declare module '@tanstack/react-router' {
       path: '/rules'
       fullPath: '/creators/app/rules'
       preLoaderRoute: typeof CreatorsAppRulesRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/tasks': {
+      id: '/creators/app/tasks'
+      path: '/tasks'
+      fullPath: '/creators/app/tasks'
+      preLoaderRoute: typeof CreatorsAppTasksRouteImport
       parentRoute: typeof CreatorsAppRoute
     }
     '/creators/influencer/': {
@@ -3615,11 +3653,13 @@ interface CreatorsAppRouteChildren {
   CreatorsAppCallsRoute: typeof CreatorsAppCallsRoute
   CreatorsAppContractRoute: typeof CreatorsAppContractRoute
   CreatorsAppEarningsRoute: typeof CreatorsAppEarningsRoute
+  CreatorsAppJobsRoute: typeof CreatorsAppJobsRoute
   CreatorsAppLibraryRoute: typeof CreatorsAppLibraryRoute
   CreatorsAppMessagesRoute: typeof CreatorsAppMessagesRoute
   CreatorsAppPostsRoute: typeof CreatorsAppPostsRoute
   CreatorsAppProfileRoute: typeof CreatorsAppProfileRoute
   CreatorsAppRulesRoute: typeof CreatorsAppRulesRoute
+  CreatorsAppTasksRoute: typeof CreatorsAppTasksRoute
   CreatorsAppIndexRoute: typeof CreatorsAppIndexRoute
   CreatorsAppBriefsBriefIdRoute: typeof CreatorsAppBriefsBriefIdRoute
   CreatorsAppBriefsIndexRoute: typeof CreatorsAppBriefsIndexRoute
@@ -3630,11 +3670,13 @@ const CreatorsAppRouteChildren: CreatorsAppRouteChildren = {
   CreatorsAppCallsRoute: CreatorsAppCallsRoute,
   CreatorsAppContractRoute: CreatorsAppContractRoute,
   CreatorsAppEarningsRoute: CreatorsAppEarningsRoute,
+  CreatorsAppJobsRoute: CreatorsAppJobsRoute,
   CreatorsAppLibraryRoute: CreatorsAppLibraryRoute,
   CreatorsAppMessagesRoute: CreatorsAppMessagesRoute,
   CreatorsAppPostsRoute: CreatorsAppPostsRoute,
   CreatorsAppProfileRoute: CreatorsAppProfileRoute,
   CreatorsAppRulesRoute: CreatorsAppRulesRoute,
+  CreatorsAppTasksRoute: CreatorsAppTasksRoute,
   CreatorsAppIndexRoute: CreatorsAppIndexRoute,
   CreatorsAppBriefsBriefIdRoute: CreatorsAppBriefsBriefIdRoute,
   CreatorsAppBriefsIndexRoute: CreatorsAppBriefsIndexRoute,
