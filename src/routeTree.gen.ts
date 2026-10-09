@@ -52,6 +52,7 @@ import { Route as FrDevenirProfesseurRouteImport } from './routes/fr/devenir-pro
 import { Route as FrMentionsLegalesRouteImport } from './routes/fr/mentions-legales'
 import { Route as FrSophiaCultureGeneraleRouteImport } from './routes/fr/sophia-culture-generale'
 import { Route as FrTelechargerRouteImport } from './routes/fr/telecharger'
+import { Route as GoHandleRouteImport } from './routes/go.$handle'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as JobsSlugRouteImport } from './routes/jobs.$slug'
 import { Route as AuthenticatedAuteursIndexRouteImport } from './routes/_authenticated/auteurs/index'
@@ -397,6 +398,11 @@ const FrSophiaCultureGeneraleRoute = FrSophiaCultureGeneraleRouteImport.update({
 const FrTelechargerRoute = FrTelechargerRouteImport.update({
   id: '/fr/telecharger',
   path: '/fr/telecharger',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GoHandleRoute = GoHandleRouteImport.update({
+  id: '/go/$handle',
+  path: '/go/$handle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
@@ -1163,6 +1169,7 @@ export interface FileRoutesByFullPath {
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
   '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
   '/fr/telecharger': typeof FrTelechargerRoute
+  '/go/$handle': typeof GoHandleRoute
   '/invite/$token': typeof InviteTokenRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/cours/': typeof CoursIndexRoute
@@ -1334,6 +1341,7 @@ export interface FileRoutesByTo {
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
   '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
   '/fr/telecharger': typeof FrTelechargerRoute
+  '/go/$handle': typeof GoHandleRoute
   '/invite/$token': typeof InviteTokenRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/cours': typeof CoursIndexRoute
@@ -1508,6 +1516,7 @@ export interface FileRoutesById {
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
   '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
   '/fr/telecharger': typeof FrTelechargerRoute
+  '/go/$handle': typeof GoHandleRoute
   '/invite/$token': typeof InviteTokenRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/cours/': typeof CoursIndexRoute
@@ -1683,6 +1692,7 @@ export interface FileRouteTypes {
     | '/fr/mentions-legales'
     | '/fr/sophia-culture-generale'
     | '/fr/telecharger'
+    | '/go/$handle'
     | '/invite/$token'
     | '/jobs/$slug'
     | '/cours/'
@@ -1854,6 +1864,7 @@ export interface FileRouteTypes {
     | '/fr/mentions-legales'
     | '/fr/sophia-culture-generale'
     | '/fr/telecharger'
+    | '/go/$handle'
     | '/invite/$token'
     | '/jobs/$slug'
     | '/cours'
@@ -2027,6 +2038,7 @@ export interface FileRouteTypes {
     | '/fr/mentions-legales'
     | '/fr/sophia-culture-generale'
     | '/fr/telecharger'
+    | '/go/$handle'
     | '/invite/$token'
     | '/jobs/$slug'
     | '/cours/'
@@ -2201,6 +2213,7 @@ export interface RootRouteChildren {
   FrMentionsLegalesRoute: typeof FrMentionsLegalesRoute
   FrSophiaCultureGeneraleRoute: typeof FrSophiaCultureGeneraleRoute
   FrTelechargerRoute: typeof FrTelechargerRoute
+  GoHandleRoute: typeof GoHandleRoute
   InviteTokenRoute: typeof InviteTokenRoute
   JobsSlugRoute: typeof JobsSlugRoute
   CoursIndexRoute: typeof CoursIndexRoute
@@ -2546,6 +2559,13 @@ declare module '@tanstack/react-router' {
       path: '/fr/telecharger'
       fullPath: '/fr/telecharger'
       preLoaderRoute: typeof FrTelechargerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/go/$handle': {
+      id: '/go/$handle'
+      path: '/go/$handle'
+      fullPath: '/go/$handle'
+      preLoaderRoute: typeof GoHandleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite/$token': {
@@ -3770,6 +3790,7 @@ const rootRouteChildren: RootRouteChildren = {
   FrMentionsLegalesRoute: FrMentionsLegalesRoute,
   FrSophiaCultureGeneraleRoute: FrSophiaCultureGeneraleRoute,
   FrTelechargerRoute: FrTelechargerRoute,
+  GoHandleRoute: GoHandleRoute,
   InviteTokenRoute: InviteTokenRoute,
   JobsSlugRoute: JobsSlugRoute,
   CoursIndexRoute: CoursIndexRoute,
