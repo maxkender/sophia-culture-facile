@@ -2328,6 +2328,7 @@ export type Database = {
           last_seen_at: string | null
           motivation_confirmed_at: string | null
           onboarding_completed_at: string | null
+          per_post_override: number | null
           phone: string | null
           photo_path: string | null
           platform: string | null
@@ -2383,6 +2384,7 @@ export type Database = {
           last_seen_at?: string | null
           motivation_confirmed_at?: string | null
           onboarding_completed_at?: string | null
+          per_post_override?: number | null
           phone?: string | null
           photo_path?: string | null
           platform?: string | null
@@ -2438,6 +2440,7 @@ export type Database = {
           last_seen_at?: string | null
           motivation_confirmed_at?: string | null
           onboarding_completed_at?: string | null
+          per_post_override?: number | null
           phone?: string | null
           photo_path?: string | null
           platform?: string | null
@@ -5132,6 +5135,7 @@ export type Database = {
       ugc_tiers: {
         Row: {
           app_id: string
+          cap_per_post: number
           cpm: number
           id: string
           label: string
@@ -5142,6 +5146,7 @@ export type Database = {
         }
         Insert: {
           app_id: string
+          cap_per_post?: number
           cpm?: number
           id?: string
           label: string
@@ -5152,6 +5157,7 @@ export type Database = {
         }
         Update: {
           app_id?: string
+          cap_per_post?: number
           cpm?: number
           id?: string
           label?: string
