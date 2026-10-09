@@ -309,6 +309,13 @@
       "when": 1791549710150,
       "tag": "0043_quick_join_no_video",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1791574352111,
+      "tag": "0044_creator_fast_lane",
+      "breakpoints": true
     }
   ]
 }
