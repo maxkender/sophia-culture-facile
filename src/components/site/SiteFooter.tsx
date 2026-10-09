@@ -10,7 +10,7 @@ export function SiteFooter() {
   const privacyPath = useLocalePath("privacy");
   const coursesPath = useLocalePath("courses");
   const applyPath = useLocalePath("apply");
-  const creatorsPath = useLocalePath("creators");
+  const creatorsPath = useLocalePath("creatorsUgc");
 
   return (
     <footer className="border-t border-brand-line bg-brand-surface">
