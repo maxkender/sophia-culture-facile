@@ -1,0 +1,1 @@
+CREATE POLICY "Admins upload creator videos" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'creator-videos' AND private.is_admin());

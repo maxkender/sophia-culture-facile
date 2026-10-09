@@ -388,3 +388,46 @@ export const postThumbnail = createServerFn({ method: "GET" })
       return { thumb: null, title: null };
     }
   });
+
+/* ---------------- creator side ---------------- */
+
+async function meCreator(context: unknown) {
+  const { supabase, userId } = context as { supabase: Admin; userId: string };
+  const { data } = await supabase.from("creators").select("id, full_name, email").eq("user_id", userId).maybeSingle();
+  if (!data) throw new Error("Not a creator");
+  return data as { id: string; full_name: string; email: string };
+}
+
+/** A signed-in creator applies to a feed job. Open jobs accept at once (the agreement is already signed in onboarding). */
+export const applyAsCreator = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ jobId: z.string().uuid(), answers: z.record(z.string(), z.string().max(2000)).default({}) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const me = await meCreator(context);
+    const a = await adminClient();
+    const { data: job } = await a.from("jobs").select("id, app_id, open, status, access, title, application_items").eq("id", data.jobId).maybeSingle();
+    if (!job || job.status !== "active" || job.access === "invite_only") return { ok: false as const, reason: "This job is not open for applications." };
+    const missing = ((job.application_items ?? []) as { label: string; required: boolean }[]).filter((i) => i.required && !data.answers[i.label]?.trim());
+    if (missing.length) return { ok: false as const, reason: `Please fill in: ${missing.map((m) => m.label).join(", ")}.` };
+    const { data: dup } = await a.from("job_applications").select("id").eq("job_id", job.id).eq("creator_id", me.id).maybeSingle();
+    if (dup) return { ok: false as const, reason: "You already applied to this job." };
+    const { data: sig } = await a.from("creator_signatures").select("id").eq("creator_id", me.id).maybeSingle();
+    const accept = job.open && Boolean(sig);
+    await a.from("job_applications").insert({ job_id: job.id, creator_id: me.id, answers: data.answers, status: accept ? "accepted" : "pending", ...(accept ? { contract_signed_at: new Date().toISOString(), decided_at: new Date().toISOString() } : {}) });
+    if (accept) await a.from("creator_apps").upsert({ creator_id: me.id, app_id: job.app_id, status: "active" }, { onConflict: "creator_id,app_id" });
+    return { ok: true as const, accepted: accept, needsSignature: job.open && !sig };
+  });
+
+export const taskUploadSlot = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ taskId: z.string().uuid(), contentType: z.enum(["video/mp4", "video/quicktime"]) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const me = await meCreator(context);
+    const a = await adminClient();
+    const { data: t } = await a.from("creator_tasks").select("id").eq("id", data.taskId).eq("creator_id", me.id).eq("status", "open").maybeSingle();
+    if (!t) throw new Error("This task is closed.");
+    const path = `${me.id}/ads/${data.taskId}-${Date.now()}.${data.contentType === "video/mp4" ? "mp4" : "mov"}`;
+    const { data: slot, error } = await a.storage.from("creator-videos").createSignedUploadUrl(path);
+    if (error || !slot) throw new Error("Upload could not start.");
+    return { path, token: slot.token };
+  });
