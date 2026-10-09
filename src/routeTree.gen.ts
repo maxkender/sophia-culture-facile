@@ -22,6 +22,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SophiaCultureGeneraleRouteImport } from './routes/sophia-culture-generale'
 import { Route as TelechargerRouteImport } from './routes/telecharger'
 import { Route as DotwellKnownAppleAppSiteAssociationRouteImport } from './routes/[.]well-known.apple-app-site-association'
+import { Route as AuthenticatedHubRouteRouteImport } from './routes/_authenticated/hub/route'
 import { Route as AuteursSlugRouteImport } from './routes/auteurs.$slug'
 import { Route as AuteursInviteRouteImport } from './routes/auteurs.invite'
 import { Route as AuteursLoginRouteImport } from './routes/auteurs.login'
@@ -58,6 +59,14 @@ import { Route as AuthenticatedAuteursGuideRouteImport } from './routes/_authent
 import { Route as AuthenticatedAuteursMessagesRouteImport } from './routes/_authenticated/auteurs/messages'
 import { Route as AuthenticatedAuteursOpenRouteImport } from './routes/_authenticated/auteurs/open'
 import { Route as AuthenticatedAuteursProfileRouteImport } from './routes/_authenticated/auteurs/profile'
+import { Route as AuthenticatedHubIndexRouteImport } from './routes/_authenticated/hub/index'
+import { Route as AuthenticatedHubAdsRouteImport } from './routes/_authenticated/hub/ads'
+import { Route as AuthenticatedHubAffiliatesRouteImport } from './routes/_authenticated/hub/affiliates'
+import { Route as AuthenticatedHubAnalyticsRouteImport } from './routes/_authenticated/hub/analytics'
+import { Route as AuthenticatedHubDiscoverRouteImport } from './routes/_authenticated/hub/discover'
+import { Route as AuthenticatedHubLearnRouteImport } from './routes/_authenticated/hub/learn'
+import { Route as AuthenticatedHubMessagesRouteImport } from './routes/_authenticated/hub/messages'
+import { Route as AuthenticatedHubPayoutsRouteImport } from './routes/_authenticated/hub/payouts'
 import { Route as CreatorsAppIndexRouteImport } from './routes/creators.app.index'
 import { Route as CreatorsAppAccountRouteImport } from './routes/creators.app.account'
 import { Route as CreatorsAppCallsRouteImport } from './routes/creators.app.calls'
@@ -106,6 +115,9 @@ import { Route as AuthenticatedAuteursAdminPoolRouteImport } from './routes/_aut
 import { Route as AuthenticatedAuteursAdminSettingsRouteImport } from './routes/_authenticated/auteurs/admin/settings'
 import { Route as AuthenticatedAuteursCoursesIndexRouteImport } from './routes/_authenticated/auteurs/courses.index'
 import { Route as AuthenticatedAuteursCoursesCourseIdRouteImport } from './routes/_authenticated/auteurs/courses.$courseId'
+import { Route as AuthenticatedHubCampaignsIndexRouteImport } from './routes/_authenticated/hub/campaigns.index'
+import { Route as AuthenticatedHubCampaignsCreateRouteImport } from './routes/_authenticated/hub/campaigns.create'
+import { Route as AuthenticatedHubCreatorsCreatorIdRouteImport } from './routes/_authenticated/hub/creators.$creatorId'
 import { Route as ApiPublicAppCoursesRouteImport } from './routes/api/public/app/courses'
 import { Route as CreatorsAppBriefsIndexRouteImport } from './routes/creators.app.briefs.index'
 import { Route as CreatorsAppBriefsBriefIdRouteImport } from './routes/creators.app.briefs.$briefId'
@@ -230,6 +242,11 @@ const DotwellKnownAppleAppSiteAssociationRoute =
     path: '/.well-known/apple-app-site-association',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedHubRouteRoute = AuthenticatedHubRouteRouteImport.update({
+  id: '/hub',
+  path: '/hub',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuteursSlugRoute = AuteursSlugRouteImport.update({
   id: '/auteurs/$slug',
   path: '/auteurs/$slug',
@@ -419,6 +436,50 @@ const AuthenticatedAuteursProfileRoute =
     path: '/auteurs/profile',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedHubIndexRoute = AuthenticatedHubIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedHubRouteRoute,
+} as any)
+const AuthenticatedHubAdsRoute = AuthenticatedHubAdsRouteImport.update({
+  id: '/ads',
+  path: '/ads',
+  getParentRoute: () => AuthenticatedHubRouteRoute,
+} as any)
+const AuthenticatedHubAffiliatesRoute =
+  AuthenticatedHubAffiliatesRouteImport.update({
+    id: '/affiliates',
+    path: '/affiliates',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubAnalyticsRoute =
+  AuthenticatedHubAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubDiscoverRoute =
+  AuthenticatedHubDiscoverRouteImport.update({
+    id: '/discover',
+    path: '/discover',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubLearnRoute = AuthenticatedHubLearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
+  getParentRoute: () => AuthenticatedHubRouteRoute,
+} as any)
+const AuthenticatedHubMessagesRoute =
+  AuthenticatedHubMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubPayoutsRoute = AuthenticatedHubPayoutsRouteImport.update({
+  id: '/payouts',
+  path: '/payouts',
+  getParentRoute: () => AuthenticatedHubRouteRoute,
+} as any)
 const CreatorsAppIndexRoute = CreatorsAppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -672,6 +733,24 @@ const AuthenticatedAuteursCoursesCourseIdRoute =
     id: '/auteurs/courses/$courseId',
     path: '/auteurs/courses/$courseId',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedHubCampaignsIndexRoute =
+  AuthenticatedHubCampaignsIndexRouteImport.update({
+    id: '/campaigns/',
+    path: '/campaigns/',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubCampaignsCreateRoute =
+  AuthenticatedHubCampaignsCreateRouteImport.update({
+    id: '/campaigns/create',
+    path: '/campaigns/create',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubCreatorsCreatorIdRoute =
+  AuthenticatedHubCreatorsCreatorIdRouteImport.update({
+    id: '/creators/$creatorId',
+    path: '/creators/$creatorId',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
 const ApiPublicAppCoursesRoute = ApiPublicAppCoursesRouteImport.update({
   id: '/api/public/app/courses',
@@ -1026,6 +1105,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
+  '/hub': typeof AuthenticatedHubRouteRouteWithChildren
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
@@ -1062,6 +1142,13 @@ export interface FileRoutesByFullPath {
   '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/hub/ads': typeof AuthenticatedHubAdsRoute
+  '/hub/affiliates': typeof AuthenticatedHubAffiliatesRoute
+  '/hub/analytics': typeof AuthenticatedHubAnalyticsRoute
+  '/hub/discover': typeof AuthenticatedHubDiscoverRoute
+  '/hub/learn': typeof AuthenticatedHubLearnRoute
+  '/hub/messages': typeof AuthenticatedHubMessagesRoute
+  '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
@@ -1090,6 +1177,7 @@ export interface FileRoutesByFullPath {
   '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
   '/fr/createurs/ugc': typeof FrCreateursUgcRoute
   '/auteurs/': typeof AuthenticatedAuteursIndexRoute
+  '/hub/': typeof AuthenticatedHubIndexRoute
   '/creators/app/': typeof CreatorsAppIndexRoute
   '/creators/influencer/': typeof CreatorsInfluencerIndexRoute
   '/creators/slideshow/': typeof CreatorsSlideshowIndexRoute
@@ -1109,6 +1197,8 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/pool': typeof AuthenticatedAuteursAdminPoolRoute
   '/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
+  '/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
+  '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
   '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
@@ -1127,6 +1217,7 @@ export interface FileRoutesByFullPath {
   '/fr/createurs/unswipe/ugc': typeof FrCreateursUnswipeUgcRoute
   '/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
+  '/hub/campaigns/': typeof AuthenticatedHubCampaignsIndexRoute
   '/creators/app/briefs/': typeof CreatorsAppBriefsIndexRoute
   '/creators/influencer/app/': typeof CreatorsInfluencerAppIndexRoute
   '/en/creators/unswipe/': typeof EnCreatorsUnswipeIndexRoute
@@ -1217,6 +1308,13 @@ export interface FileRoutesByTo {
   '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/hub/ads': typeof AuthenticatedHubAdsRoute
+  '/hub/affiliates': typeof AuthenticatedHubAffiliatesRoute
+  '/hub/analytics': typeof AuthenticatedHubAnalyticsRoute
+  '/hub/discover': typeof AuthenticatedHubDiscoverRoute
+  '/hub/learn': typeof AuthenticatedHubLearnRoute
+  '/hub/messages': typeof AuthenticatedHubMessagesRoute
+  '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
@@ -1244,6 +1342,7 @@ export interface FileRoutesByTo {
   '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
   '/fr/createurs/ugc': typeof FrCreateursUgcRoute
   '/auteurs': typeof AuthenticatedAuteursIndexRoute
+  '/hub': typeof AuthenticatedHubIndexRoute
   '/creators/app': typeof CreatorsAppIndexRoute
   '/creators/influencer': typeof CreatorsInfluencerIndexRoute
   '/creators/slideshow': typeof CreatorsSlideshowIndexRoute
@@ -1263,6 +1362,8 @@ export interface FileRoutesByTo {
   '/auteurs/admin/pool': typeof AuthenticatedAuteursAdminPoolRoute
   '/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
+  '/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
+  '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
   '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
@@ -1281,6 +1382,7 @@ export interface FileRoutesByTo {
   '/fr/createurs/unswipe/ugc': typeof FrCreateursUnswipeUgcRoute
   '/auteurs/admin': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses': typeof AuthenticatedAuteursCoursesIndexRoute
+  '/hub/campaigns': typeof AuthenticatedHubCampaignsIndexRoute
   '/creators/app/briefs': typeof CreatorsAppBriefsIndexRoute
   '/creators/influencer/app': typeof CreatorsInfluencerAppIndexRoute
   '/en/creators/unswipe': typeof EnCreatorsUnswipeIndexRoute
@@ -1338,6 +1440,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
   '/telecharger': typeof TelechargerRoute
+  '/_authenticated/hub': typeof AuthenticatedHubRouteRouteWithChildren
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
@@ -1374,6 +1477,13 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
   '/_authenticated/auteurs/open': typeof AuthenticatedAuteursOpenRoute
   '/_authenticated/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
+  '/_authenticated/hub/ads': typeof AuthenticatedHubAdsRoute
+  '/_authenticated/hub/affiliates': typeof AuthenticatedHubAffiliatesRoute
+  '/_authenticated/hub/analytics': typeof AuthenticatedHubAnalyticsRoute
+  '/_authenticated/hub/discover': typeof AuthenticatedHubDiscoverRoute
+  '/_authenticated/hub/learn': typeof AuthenticatedHubLearnRoute
+  '/_authenticated/hub/messages': typeof AuthenticatedHubMessagesRoute
+  '/_authenticated/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
@@ -1402,6 +1512,7 @@ export interface FileRoutesById {
   '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
   '/fr/createurs/ugc': typeof FrCreateursUgcRoute
   '/_authenticated/auteurs/': typeof AuthenticatedAuteursIndexRoute
+  '/_authenticated/hub/': typeof AuthenticatedHubIndexRoute
   '/creators/app/': typeof CreatorsAppIndexRoute
   '/creators/influencer/': typeof CreatorsInfluencerIndexRoute
   '/creators/slideshow/': typeof CreatorsSlideshowIndexRoute
@@ -1421,6 +1532,8 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/pool': typeof AuthenticatedAuteursAdminPoolRoute
   '/_authenticated/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/_authenticated/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
+  '/_authenticated/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
+  '/_authenticated/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
   '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
@@ -1439,6 +1552,7 @@ export interface FileRoutesById {
   '/fr/createurs/unswipe/ugc': typeof FrCreateursUnswipeUgcRoute
   '/_authenticated/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/_authenticated/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
+  '/_authenticated/hub/campaigns/': typeof AuthenticatedHubCampaignsIndexRoute
   '/creators/app/briefs/': typeof CreatorsAppBriefsIndexRoute
   '/creators/influencer/app/': typeof CreatorsInfluencerAppIndexRoute
   '/en/creators/unswipe/': typeof EnCreatorsUnswipeIndexRoute
@@ -1496,6 +1610,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sophia-culture-generale'
     | '/telecharger'
+    | '/hub'
     | '/.well-known/apple-app-site-association'
     | '/auteurs/$slug'
     | '/auteurs/invite'
@@ -1532,6 +1647,13 @@ export interface FileRouteTypes {
     | '/auteurs/messages'
     | '/auteurs/open'
     | '/auteurs/profile'
+    | '/hub/ads'
+    | '/hub/affiliates'
+    | '/hub/analytics'
+    | '/hub/discover'
+    | '/hub/learn'
+    | '/hub/messages'
+    | '/hub/payouts'
     | '/creators/app/account'
     | '/creators/app/calls'
     | '/creators/app/contract'
@@ -1560,6 +1682,7 @@ export interface FileRouteTypes {
     | '/fr/createurs/slideshow'
     | '/fr/createurs/ugc'
     | '/auteurs/'
+    | '/hub/'
     | '/creators/app/'
     | '/creators/influencer/'
     | '/creators/slideshow/'
@@ -1579,6 +1702,8 @@ export interface FileRouteTypes {
     | '/auteurs/admin/pool'
     | '/auteurs/admin/settings'
     | '/auteurs/courses/$courseId'
+    | '/hub/campaigns/create'
+    | '/hub/creators/$creatorId'
     | '/api/public/app/courses'
     | '/creators/app/briefs/$briefId'
     | '/creators/influencer/app/agreement'
@@ -1597,6 +1722,7 @@ export interface FileRouteTypes {
     | '/fr/createurs/unswipe/ugc'
     | '/auteurs/admin/'
     | '/auteurs/courses/'
+    | '/hub/campaigns/'
     | '/creators/app/briefs/'
     | '/creators/influencer/app/'
     | '/en/creators/unswipe/'
@@ -1687,6 +1813,13 @@ export interface FileRouteTypes {
     | '/auteurs/messages'
     | '/auteurs/open'
     | '/auteurs/profile'
+    | '/hub/ads'
+    | '/hub/affiliates'
+    | '/hub/analytics'
+    | '/hub/discover'
+    | '/hub/learn'
+    | '/hub/messages'
+    | '/hub/payouts'
     | '/creators/app/account'
     | '/creators/app/calls'
     | '/creators/app/contract'
@@ -1714,6 +1847,7 @@ export interface FileRouteTypes {
     | '/fr/createurs/slideshow'
     | '/fr/createurs/ugc'
     | '/auteurs'
+    | '/hub'
     | '/creators/app'
     | '/creators/influencer'
     | '/creators/slideshow'
@@ -1733,6 +1867,8 @@ export interface FileRouteTypes {
     | '/auteurs/admin/pool'
     | '/auteurs/admin/settings'
     | '/auteurs/courses/$courseId'
+    | '/hub/campaigns/create'
+    | '/hub/creators/$creatorId'
     | '/api/public/app/courses'
     | '/creators/app/briefs/$briefId'
     | '/creators/influencer/app/agreement'
@@ -1751,6 +1887,7 @@ export interface FileRouteTypes {
     | '/fr/createurs/unswipe/ugc'
     | '/auteurs/admin'
     | '/auteurs/courses'
+    | '/hub/campaigns'
     | '/creators/app/briefs'
     | '/creators/influencer/app'
     | '/en/creators/unswipe'
@@ -1807,6 +1944,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sophia-culture-generale'
     | '/telecharger'
+    | '/_authenticated/hub'
     | '/.well-known/apple-app-site-association'
     | '/auteurs/$slug'
     | '/auteurs/invite'
@@ -1843,6 +1981,13 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/messages'
     | '/_authenticated/auteurs/open'
     | '/_authenticated/auteurs/profile'
+    | '/_authenticated/hub/ads'
+    | '/_authenticated/hub/affiliates'
+    | '/_authenticated/hub/analytics'
+    | '/_authenticated/hub/discover'
+    | '/_authenticated/hub/learn'
+    | '/_authenticated/hub/messages'
+    | '/_authenticated/hub/payouts'
     | '/creators/app/account'
     | '/creators/app/calls'
     | '/creators/app/contract'
@@ -1871,6 +2016,7 @@ export interface FileRouteTypes {
     | '/fr/createurs/slideshow'
     | '/fr/createurs/ugc'
     | '/_authenticated/auteurs/'
+    | '/_authenticated/hub/'
     | '/creators/app/'
     | '/creators/influencer/'
     | '/creators/slideshow/'
@@ -1890,6 +2036,8 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/pool'
     | '/_authenticated/auteurs/admin/settings'
     | '/_authenticated/auteurs/courses/$courseId'
+    | '/_authenticated/hub/campaigns/create'
+    | '/_authenticated/hub/creators/$creatorId'
     | '/api/public/app/courses'
     | '/creators/app/briefs/$briefId'
     | '/creators/influencer/app/agreement'
@@ -1908,6 +2056,7 @@ export interface FileRouteTypes {
     | '/fr/createurs/unswipe/ugc'
     | '/_authenticated/auteurs/admin/'
     | '/_authenticated/auteurs/courses/'
+    | '/_authenticated/hub/campaigns/'
     | '/creators/app/briefs/'
     | '/creators/influencer/app/'
     | '/en/creators/unswipe/'
@@ -2125,6 +2274,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/.well-known/apple-app-site-association'
       preLoaderRoute: typeof DotwellKnownAppleAppSiteAssociationRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/hub': {
+      id: '/_authenticated/hub'
+      path: '/hub'
+      fullPath: '/hub'
+      preLoaderRoute: typeof AuthenticatedHubRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/auteurs/$slug': {
       id: '/auteurs/$slug'
@@ -2377,6 +2533,62 @@ declare module '@tanstack/react-router' {
       fullPath: '/auteurs/profile'
       preLoaderRoute: typeof AuthenticatedAuteursProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/hub/': {
+      id: '/_authenticated/hub/'
+      path: '/'
+      fullPath: '/hub/'
+      preLoaderRoute: typeof AuthenticatedHubIndexRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/ads': {
+      id: '/_authenticated/hub/ads'
+      path: '/ads'
+      fullPath: '/hub/ads'
+      preLoaderRoute: typeof AuthenticatedHubAdsRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/affiliates': {
+      id: '/_authenticated/hub/affiliates'
+      path: '/affiliates'
+      fullPath: '/hub/affiliates'
+      preLoaderRoute: typeof AuthenticatedHubAffiliatesRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/analytics': {
+      id: '/_authenticated/hub/analytics'
+      path: '/analytics'
+      fullPath: '/hub/analytics'
+      preLoaderRoute: typeof AuthenticatedHubAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/discover': {
+      id: '/_authenticated/hub/discover'
+      path: '/discover'
+      fullPath: '/hub/discover'
+      preLoaderRoute: typeof AuthenticatedHubDiscoverRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/learn': {
+      id: '/_authenticated/hub/learn'
+      path: '/learn'
+      fullPath: '/hub/learn'
+      preLoaderRoute: typeof AuthenticatedHubLearnRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/messages': {
+      id: '/_authenticated/hub/messages'
+      path: '/messages'
+      fullPath: '/hub/messages'
+      preLoaderRoute: typeof AuthenticatedHubMessagesRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/payouts': {
+      id: '/_authenticated/hub/payouts'
+      path: '/payouts'
+      fullPath: '/hub/payouts'
+      preLoaderRoute: typeof AuthenticatedHubPayoutsRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
     }
     '/creators/app/': {
       id: '/creators/app/'
@@ -2713,6 +2925,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/auteurs/courses/$courseId'
       preLoaderRoute: typeof AuthenticatedAuteursCoursesCourseIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/hub/campaigns/': {
+      id: '/_authenticated/hub/campaigns/'
+      path: '/campaigns'
+      fullPath: '/hub/campaigns/'
+      preLoaderRoute: typeof AuthenticatedHubCampaignsIndexRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/campaigns/create': {
+      id: '/_authenticated/hub/campaigns/create'
+      path: '/campaigns/create'
+      fullPath: '/hub/campaigns/create'
+      preLoaderRoute: typeof AuthenticatedHubCampaignsCreateRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/creators/$creatorId': {
+      id: '/_authenticated/hub/creators/$creatorId'
+      path: '/creators/$creatorId'
+      fullPath: '/hub/creators/$creatorId'
+      preLoaderRoute: typeof AuthenticatedHubCreatorsCreatorIdRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
     }
     '/api/public/app/courses': {
       id: '/api/public/app/courses'
@@ -3123,7 +3356,42 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedHubRouteRouteChildren {
+  AuthenticatedHubAdsRoute: typeof AuthenticatedHubAdsRoute
+  AuthenticatedHubAffiliatesRoute: typeof AuthenticatedHubAffiliatesRoute
+  AuthenticatedHubAnalyticsRoute: typeof AuthenticatedHubAnalyticsRoute
+  AuthenticatedHubDiscoverRoute: typeof AuthenticatedHubDiscoverRoute
+  AuthenticatedHubLearnRoute: typeof AuthenticatedHubLearnRoute
+  AuthenticatedHubMessagesRoute: typeof AuthenticatedHubMessagesRoute
+  AuthenticatedHubPayoutsRoute: typeof AuthenticatedHubPayoutsRoute
+  AuthenticatedHubIndexRoute: typeof AuthenticatedHubIndexRoute
+  AuthenticatedHubCampaignsCreateRoute: typeof AuthenticatedHubCampaignsCreateRoute
+  AuthenticatedHubCreatorsCreatorIdRoute: typeof AuthenticatedHubCreatorsCreatorIdRoute
+  AuthenticatedHubCampaignsIndexRoute: typeof AuthenticatedHubCampaignsIndexRoute
+}
+
+const AuthenticatedHubRouteRouteChildren: AuthenticatedHubRouteRouteChildren = {
+  AuthenticatedHubAdsRoute: AuthenticatedHubAdsRoute,
+  AuthenticatedHubAffiliatesRoute: AuthenticatedHubAffiliatesRoute,
+  AuthenticatedHubAnalyticsRoute: AuthenticatedHubAnalyticsRoute,
+  AuthenticatedHubDiscoverRoute: AuthenticatedHubDiscoverRoute,
+  AuthenticatedHubLearnRoute: AuthenticatedHubLearnRoute,
+  AuthenticatedHubMessagesRoute: AuthenticatedHubMessagesRoute,
+  AuthenticatedHubPayoutsRoute: AuthenticatedHubPayoutsRoute,
+  AuthenticatedHubIndexRoute: AuthenticatedHubIndexRoute,
+  AuthenticatedHubCampaignsCreateRoute: AuthenticatedHubCampaignsCreateRoute,
+  AuthenticatedHubCreatorsCreatorIdRoute:
+    AuthenticatedHubCreatorsCreatorIdRoute,
+  AuthenticatedHubCampaignsIndexRoute: AuthenticatedHubCampaignsIndexRoute,
+}
+
+const AuthenticatedHubRouteRouteWithChildren =
+  AuthenticatedHubRouteRoute._addFileChildren(
+    AuthenticatedHubRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedHubRouteRoute: typeof AuthenticatedHubRouteRouteWithChildren
   AuthenticatedAuteursContractRoute: typeof AuthenticatedAuteursContractRoute
   AuthenticatedAuteursExamplesRoute: typeof AuthenticatedAuteursExamplesRoute
   AuthenticatedAuteursGuideRoute: typeof AuthenticatedAuteursGuideRoute
@@ -3180,6 +3448,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedHubRouteRoute: AuthenticatedHubRouteRouteWithChildren,
   AuthenticatedAuteursContractRoute: AuthenticatedAuteursContractRoute,
   AuthenticatedAuteursExamplesRoute: AuthenticatedAuteursExamplesRoute,
   AuthenticatedAuteursGuideRoute: AuthenticatedAuteursGuideRoute,
