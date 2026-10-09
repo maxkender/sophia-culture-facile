@@ -86,7 +86,7 @@ async function runTool(a: Admin, app: string, name: string, args: any, cited: Ci
       const { createFastLaneOne, defaultLanguage } = await import("./fast-lane.server");
       const r = await createFastLaneOne(a, { firstName: String(args.first_name ?? "").slice(0, 80) || "Creator", email, tiktok: args.handle ?? null, country: args.country ?? null, language: defaultLanguage(args.country), source: args.source ?? "other" },
         { tier: tierName, perPost: args.per_post ?? (t ? Number(t.per_post) : null), rpm: args.rpm ?? (t ? Number(t.cpm) : null), cap: args.cap ?? (t ? Number(t.cap_per_post) : null), postsPerMonth: args.posts_per_month ?? 20, platforms: "both", fixedMonthly: null, welcomeBonus: null }, app, job?.id ?? null, origin);
-      cited.push({ name: r.name, kind: "creator", id: r.creatorId } as never);
+      cited.push({ name: r.name, kind: "creator" });
       return { created: true, name: r.name, email: r.email, link: r.link, note: "No email was sent." };
     }
     case "count_people": return { count: (await people(a, app, args, 1)).count };
