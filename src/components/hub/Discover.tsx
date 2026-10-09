@@ -211,10 +211,10 @@ function Drawer({ list, index, setIndex, maxViews }: { list: Person[]; index: nu
   );
 }
 
-export function Discover() {
+export function Discover({ initialQ }: { initialQ?: string | undefined } = {}) {
   const { data, isLoading } = usePeople();
   const [tab, setTab] = useState("all");
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(initialQ ?? "");
   const [f, setF] = useState({ source: "", country: "", platform: "", niche: "", followers: "", status: "", online: false });
   const [open, setOpen] = useState<number | null>(null);
   const people = data?.people ?? [];
