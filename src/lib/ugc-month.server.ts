@@ -1,4 +1,5 @@
 // Server-only monthly UGC computation shared by admin functions and the scheduled route.
+import { computeTierMonth, type Tier } from "./ugc-tiers";
 import { computeMonth, periodBounds, type MonthBreakdown, type RateCard } from "./ugc-pay";
 
 type Admin = any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -11,7 +12,7 @@ export async function activeRateCard(admin: Admin, period: string): Promise<Rate
 
 export async function computeCreatorMonth(admin: Admin, creatorId: string, period: string) {
   const [{ data: c }, rate, { data: s }] = await Promise.all([
-    admin.from("creators").select("id, full_name, country, posts_per_month, required_platforms, fixed_monthly_override, rpm_override, cap_override, resign_required_at").eq("id", creatorId).maybeSingle(),
+    admin.from("creators").select("id, full_name, country, posts_per_month, required_platforms, fixed_monthly_override, rpm_override, cap_override, resign_required_at, tier").eq("id", creatorId).maybeSingle(),
     activeRateCard(admin, period),
     admin.from("ugc_settings").select("default_posts_per_month").eq("id", 1).maybeSingle(),
   ]);
@@ -22,7 +23,13 @@ export async function computeCreatorMonth(admin: Admin, creatorId: string, perio
       .or(`and(posted_at.gte.${start.toISOString()},posted_at.lt.${end.toISOString()}),and(views_7d_at.gte.${start.toISOString()},views_7d_at.lt.${end.toISOString()})`),
     admin.from("payout_adjustments").select("amount, reason").eq("creator_id", creatorId).eq("period", period),
   ]);
-  const breakdown = computeMonth(period, c, rate, s?.default_posts_per_month ?? 20, posts ?? [], (adj ?? []).map((a: any) => ({ amount: Number(a.amount), reason: a.reason })));
+  const adjustments = (adj ?? []).map((a: any) => ({ amount: Number(a.amount), reason: a.reason }));
+  const { data: enrol } = await admin.from("creator_apps").select("app_id").eq("creator_id", creatorId).eq("status", "active").limit(1).maybeSingle();
+  const { data: tier } = await admin.from("ugc_tiers").select("tier, per_post, cpm, monthly_cap").eq("tier", c.tier ?? "trial").eq("app_id", enrol?.app_id ?? "00000000-0000-4000-8000-000000000001").maybeSingle();
+  // Tiers replace the single rate card; the rate card stays as fallback when no tier row exists.
+  const breakdown = tier
+    ? computeTierMonth(period, c, { tier: tier.tier as Tier, per_post: Number(tier.per_post), cpm: Number(tier.cpm), monthly_cap: Number(tier.monthly_cap) }, posts ?? [], adjustments)
+    : computeMonth(period, c, rate, s?.default_posts_per_month ?? 20, posts ?? [], adjustments);
   return { creator: c, breakdown };
 }
 

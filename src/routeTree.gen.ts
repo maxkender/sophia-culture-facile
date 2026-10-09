@@ -52,6 +52,7 @@ import { Route as FrDevenirProfesseurRouteImport } from './routes/fr/devenir-pro
 import { Route as FrMentionsLegalesRouteImport } from './routes/fr/mentions-legales'
 import { Route as FrSophiaCultureGeneraleRouteImport } from './routes/fr/sophia-culture-generale'
 import { Route as FrTelechargerRouteImport } from './routes/fr/telecharger'
+import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as JobsSlugRouteImport } from './routes/jobs.$slug'
 import { Route as AuthenticatedAuteursIndexRouteImport } from './routes/_authenticated/auteurs/index'
 import { Route as AuthenticatedAuteursContractRouteImport } from './routes/_authenticated/auteurs/contract'
@@ -73,11 +74,13 @@ import { Route as CreatorsAppAccountRouteImport } from './routes/creators.app.ac
 import { Route as CreatorsAppCallsRouteImport } from './routes/creators.app.calls'
 import { Route as CreatorsAppContractRouteImport } from './routes/creators.app.contract'
 import { Route as CreatorsAppEarningsRouteImport } from './routes/creators.app.earnings'
+import { Route as CreatorsAppJobsRouteImport } from './routes/creators.app.jobs'
 import { Route as CreatorsAppLibraryRouteImport } from './routes/creators.app.library'
 import { Route as CreatorsAppMessagesRouteImport } from './routes/creators.app.messages'
 import { Route as CreatorsAppPostsRouteImport } from './routes/creators.app.posts'
 import { Route as CreatorsAppProfileRouteImport } from './routes/creators.app.profile'
 import { Route as CreatorsAppRulesRouteImport } from './routes/creators.app.rules'
+import { Route as CreatorsAppTasksRouteImport } from './routes/creators.app.tasks'
 import { Route as CreatorsInfluencerIndexRouteImport } from './routes/creators.influencer.index'
 import { Route as CreatorsInfluencerAppRouteImport } from './routes/creators.influencer.app'
 import { Route as CreatorsInfluencerApplyRouteImport } from './routes/creators.influencer.apply'
@@ -396,6 +399,11 @@ const FrTelechargerRoute = FrTelechargerRouteImport.update({
   path: '/fr/telecharger',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JobsSlugRoute = JobsSlugRouteImport.update({
   id: '/jobs/$slug',
   path: '/jobs/$slug',
@@ -512,6 +520,11 @@ const CreatorsAppEarningsRoute = CreatorsAppEarningsRouteImport.update({
   path: '/earnings',
   getParentRoute: () => CreatorsAppRoute,
 } as any)
+const CreatorsAppJobsRoute = CreatorsAppJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
 const CreatorsAppLibraryRoute = CreatorsAppLibraryRouteImport.update({
   id: '/library',
   path: '/library',
@@ -535,6 +548,11 @@ const CreatorsAppProfileRoute = CreatorsAppProfileRouteImport.update({
 const CreatorsAppRulesRoute = CreatorsAppRulesRouteImport.update({
   id: '/rules',
   path: '/rules',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppTasksRoute = CreatorsAppTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
   getParentRoute: () => CreatorsAppRoute,
 } as any)
 const CreatorsInfluencerIndexRoute = CreatorsInfluencerIndexRouteImport.update({
@@ -1145,6 +1163,7 @@ export interface FileRoutesByFullPath {
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
   '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
   '/fr/telecharger': typeof FrTelechargerRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/cours/': typeof CoursIndexRoute
   '/creators/': typeof CreatorsIndexRoute
@@ -1167,11 +1186,13 @@ export interface FileRoutesByFullPath {
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
   '/creators/app/earnings': typeof CreatorsAppEarningsRoute
+  '/creators/app/jobs': typeof CreatorsAppJobsRoute
   '/creators/app/library': typeof CreatorsAppLibraryRoute
   '/creators/app/messages': typeof CreatorsAppMessagesRoute
   '/creators/app/posts': typeof CreatorsAppPostsRoute
   '/creators/app/profile': typeof CreatorsAppProfileRoute
   '/creators/app/rules': typeof CreatorsAppRulesRoute
+  '/creators/app/tasks': typeof CreatorsAppTasksRoute
   '/creators/influencer/app': typeof CreatorsInfluencerAppRouteWithChildren
   '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
@@ -1313,6 +1334,7 @@ export interface FileRoutesByTo {
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
   '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
   '/fr/telecharger': typeof FrTelechargerRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/cours': typeof CoursIndexRoute
   '/creators': typeof CreatorsIndexRoute
@@ -1335,11 +1357,13 @@ export interface FileRoutesByTo {
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
   '/creators/app/earnings': typeof CreatorsAppEarningsRoute
+  '/creators/app/jobs': typeof CreatorsAppJobsRoute
   '/creators/app/library': typeof CreatorsAppLibraryRoute
   '/creators/app/messages': typeof CreatorsAppMessagesRoute
   '/creators/app/posts': typeof CreatorsAppPostsRoute
   '/creators/app/profile': typeof CreatorsAppProfileRoute
   '/creators/app/rules': typeof CreatorsAppRulesRoute
+  '/creators/app/tasks': typeof CreatorsAppTasksRoute
   '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
@@ -1484,6 +1508,7 @@ export interface FileRoutesById {
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
   '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
   '/fr/telecharger': typeof FrTelechargerRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/cours/': typeof CoursIndexRoute
   '/creators/': typeof CreatorsIndexRoute
@@ -1506,11 +1531,13 @@ export interface FileRoutesById {
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
   '/creators/app/earnings': typeof CreatorsAppEarningsRoute
+  '/creators/app/jobs': typeof CreatorsAppJobsRoute
   '/creators/app/library': typeof CreatorsAppLibraryRoute
   '/creators/app/messages': typeof CreatorsAppMessagesRoute
   '/creators/app/posts': typeof CreatorsAppPostsRoute
   '/creators/app/profile': typeof CreatorsAppProfileRoute
   '/creators/app/rules': typeof CreatorsAppRulesRoute
+  '/creators/app/tasks': typeof CreatorsAppTasksRoute
   '/creators/influencer/app': typeof CreatorsInfluencerAppRouteWithChildren
   '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
@@ -1656,6 +1683,7 @@ export interface FileRouteTypes {
     | '/fr/mentions-legales'
     | '/fr/sophia-culture-generale'
     | '/fr/telecharger'
+    | '/invite/$token'
     | '/jobs/$slug'
     | '/cours/'
     | '/creators/'
@@ -1678,11 +1706,13 @@ export interface FileRouteTypes {
     | '/creators/app/calls'
     | '/creators/app/contract'
     | '/creators/app/earnings'
+    | '/creators/app/jobs'
     | '/creators/app/library'
     | '/creators/app/messages'
     | '/creators/app/posts'
     | '/creators/app/profile'
     | '/creators/app/rules'
+    | '/creators/app/tasks'
     | '/creators/influencer/app'
     | '/creators/influencer/apply'
     | '/creators/sign/$token'
@@ -1824,6 +1854,7 @@ export interface FileRouteTypes {
     | '/fr/mentions-legales'
     | '/fr/sophia-culture-generale'
     | '/fr/telecharger'
+    | '/invite/$token'
     | '/jobs/$slug'
     | '/cours'
     | '/creators'
@@ -1846,11 +1877,13 @@ export interface FileRouteTypes {
     | '/creators/app/calls'
     | '/creators/app/contract'
     | '/creators/app/earnings'
+    | '/creators/app/jobs'
     | '/creators/app/library'
     | '/creators/app/messages'
     | '/creators/app/posts'
     | '/creators/app/profile'
     | '/creators/app/rules'
+    | '/creators/app/tasks'
     | '/creators/influencer/apply'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
@@ -1994,6 +2027,7 @@ export interface FileRouteTypes {
     | '/fr/mentions-legales'
     | '/fr/sophia-culture-generale'
     | '/fr/telecharger'
+    | '/invite/$token'
     | '/jobs/$slug'
     | '/cours/'
     | '/creators/'
@@ -2016,11 +2050,13 @@ export interface FileRouteTypes {
     | '/creators/app/calls'
     | '/creators/app/contract'
     | '/creators/app/earnings'
+    | '/creators/app/jobs'
     | '/creators/app/library'
     | '/creators/app/messages'
     | '/creators/app/posts'
     | '/creators/app/profile'
     | '/creators/app/rules'
+    | '/creators/app/tasks'
     | '/creators/influencer/app'
     | '/creators/influencer/apply'
     | '/creators/sign/$token'
@@ -2165,6 +2201,7 @@ export interface RootRouteChildren {
   FrMentionsLegalesRoute: typeof FrMentionsLegalesRoute
   FrSophiaCultureGeneraleRoute: typeof FrSophiaCultureGeneraleRoute
   FrTelechargerRoute: typeof FrTelechargerRoute
+  InviteTokenRoute: typeof InviteTokenRoute
   JobsSlugRoute: typeof JobsSlugRoute
   CoursIndexRoute: typeof CoursIndexRoute
   CreatorsIndexRoute: typeof CreatorsIndexRoute
@@ -2511,6 +2548,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FrTelechargerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/jobs/$slug': {
       id: '/jobs/$slug'
       path: '/jobs/$slug'
@@ -2658,6 +2702,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreatorsAppEarningsRouteImport
       parentRoute: typeof CreatorsAppRoute
     }
+    '/creators/app/jobs': {
+      id: '/creators/app/jobs'
+      path: '/jobs'
+      fullPath: '/creators/app/jobs'
+      preLoaderRoute: typeof CreatorsAppJobsRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
     '/creators/app/library': {
       id: '/creators/app/library'
       path: '/library'
@@ -2691,6 +2742,13 @@ declare module '@tanstack/react-router' {
       path: '/rules'
       fullPath: '/creators/app/rules'
       preLoaderRoute: typeof CreatorsAppRulesRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/tasks': {
+      id: '/creators/app/tasks'
+      path: '/tasks'
+      fullPath: '/creators/app/tasks'
+      preLoaderRoute: typeof CreatorsAppTasksRouteImport
       parentRoute: typeof CreatorsAppRoute
     }
     '/creators/influencer/': {
@@ -3595,11 +3653,13 @@ interface CreatorsAppRouteChildren {
   CreatorsAppCallsRoute: typeof CreatorsAppCallsRoute
   CreatorsAppContractRoute: typeof CreatorsAppContractRoute
   CreatorsAppEarningsRoute: typeof CreatorsAppEarningsRoute
+  CreatorsAppJobsRoute: typeof CreatorsAppJobsRoute
   CreatorsAppLibraryRoute: typeof CreatorsAppLibraryRoute
   CreatorsAppMessagesRoute: typeof CreatorsAppMessagesRoute
   CreatorsAppPostsRoute: typeof CreatorsAppPostsRoute
   CreatorsAppProfileRoute: typeof CreatorsAppProfileRoute
   CreatorsAppRulesRoute: typeof CreatorsAppRulesRoute
+  CreatorsAppTasksRoute: typeof CreatorsAppTasksRoute
   CreatorsAppIndexRoute: typeof CreatorsAppIndexRoute
   CreatorsAppBriefsBriefIdRoute: typeof CreatorsAppBriefsBriefIdRoute
   CreatorsAppBriefsIndexRoute: typeof CreatorsAppBriefsIndexRoute
@@ -3610,11 +3670,13 @@ const CreatorsAppRouteChildren: CreatorsAppRouteChildren = {
   CreatorsAppCallsRoute: CreatorsAppCallsRoute,
   CreatorsAppContractRoute: CreatorsAppContractRoute,
   CreatorsAppEarningsRoute: CreatorsAppEarningsRoute,
+  CreatorsAppJobsRoute: CreatorsAppJobsRoute,
   CreatorsAppLibraryRoute: CreatorsAppLibraryRoute,
   CreatorsAppMessagesRoute: CreatorsAppMessagesRoute,
   CreatorsAppPostsRoute: CreatorsAppPostsRoute,
   CreatorsAppProfileRoute: CreatorsAppProfileRoute,
   CreatorsAppRulesRoute: CreatorsAppRulesRoute,
+  CreatorsAppTasksRoute: CreatorsAppTasksRoute,
   CreatorsAppIndexRoute: CreatorsAppIndexRoute,
   CreatorsAppBriefsBriefIdRoute: CreatorsAppBriefsBriefIdRoute,
   CreatorsAppBriefsIndexRoute: CreatorsAppBriefsIndexRoute,
@@ -3708,6 +3770,7 @@ const rootRouteChildren: RootRouteChildren = {
   FrMentionsLegalesRoute: FrMentionsLegalesRoute,
   FrSophiaCultureGeneraleRoute: FrSophiaCultureGeneraleRoute,
   FrTelechargerRoute: FrTelechargerRoute,
+  InviteTokenRoute: InviteTokenRoute,
   JobsSlugRoute: JobsSlugRoute,
   CoursIndexRoute: CoursIndexRoute,
   CreatorsIndexRoute: CreatorsIndexRoute,

@@ -3,6 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, ExternalLink, Tag, Upload, X } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { sendJobInvite } from "@/lib/hub.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -99,15 +101,14 @@ function InviteButton({ p, className }: { p: Person; className?: string }) {
   const { appId } = useAdminApp();
   const { data: jobs = [] } = useQuery({ queryKey: ["hub", "job-options", appId], enabled: open, queryFn: async () => { let q = supabase.from("jobs").select("id, title").eq("status", "active"); if (appId) q = q.eq("app_id", appId); return (await q).data ?? []; } });
   const qc = useQueryClient();
+  const inviteFn = useServerFn(sendJobInvite);
   async function invite(jobId: string) {
-    const row = { job_id: jobId, creator_id: p.kind === "creator" ? p.id : null, prospect_id: p.kind === "prospect" ? p.id : null, email: p.email };
-    const { data, error } = await supabase.from("job_invites").insert(row).select("token").single();
-    if (error) { toast.error("The invite could not be created. Please try again."); return; }
-    if (p.kind === "creator") await supabase.from("creator_notifications").insert({ creator_id: p.id, body: "You were invited to a new job. Open Jobs to see it." });
-    if (p.kind === "prospect") await supabase.from("creator_prospects").update({ status: "invited" }).eq("id", p.id);
-    const link = `${window.location.origin}/jobs/invite/${data.token}`;
-    void navigator.clipboard?.writeText(link);
-    toast.success("Invite created — link copied", { description: link });
+    try {
+      const r = await inviteFn({ data: { jobId, creatorId: p.kind === "creator" ? p.id : null, prospectId: p.kind === "prospect" ? p.id : null, email: p.email, name: p.name, origin: window.location.origin } });
+      void navigator.clipboard?.writeText(r.link).catch(() => undefined);
+      if (r.emailSent) toast.success(`Invite emailed to ${p.email}`, { description: r.link });
+      else toast(`Invite created — link copied (${r.emailReason ?? "no email sent"})`, { description: r.link });
+    } catch { toast.error("The invite could not be created. Please try again."); }
     setOpen(false); void qc.invalidateQueries({ queryKey: ["hub", "discover"] });
   }
   return (

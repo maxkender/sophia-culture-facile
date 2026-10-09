@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ProfilePage } from "@/components/creators/app/ResourcePages";
+import { ReferralCard } from "@/components/creators/app/HubPages";
 
 export const Route = createFileRoute("/creators/app/profile")({
   head: () => ({ meta: [
@@ -11,5 +12,5 @@ export const Route = createFileRoute("/creators/app/profile")({
     { name: "twitter:card", content: "summary" },
     { name: "robots", content: "noindex, nofollow" },
   ] }),
-  component: () => <ProfilePage />,
+  component: () => <div className="space-y-6"><ProfilePage /><ReferralCard /></div>,
 });
