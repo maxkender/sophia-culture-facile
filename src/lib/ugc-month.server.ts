@@ -64,8 +64,10 @@ export async function generateMonth(admin: Admin, period: string, createdBy: str
     batch = ins.data;
   }
   await admin.from("payout_items").delete().eq("batch_id", batch.id).in("status", ["accrued", "held", "pending"]);
+  const { referralAdjustments } = await import("./hub-automation.server");
+  const lines = await referralAdjustments(admin, period, await previewMonth(admin, period));
   const rows = await previewMonth(admin, period);
-  let created = 0;
+  let created = lines;
   for (const r of rows) {
     if (r.breakdown.total <= 0) continue;
     const { data: c } = await admin.from("creators").select("id, country, resign_required_at").eq("id", r.creatorId).maybeSingle();

@@ -190,7 +190,6 @@ export async function referralAdjustments(admin: Admin, p: string, rows: { creat
     const amount = Math.round(total * Number(r.rate) * 100) / 100;
     if (amount <= 0) continue;
     await admin.from("payout_adjustments").insert({ creator_id: r.referrer_creator_id, period: p, amount, reason: `Referral: 10% of ${r.referee?.full_name ?? "a referred creator"}'s ${p} earnings` });
-    await admin.from("referrals").update({ earned: Number(r.earned ?? 0) + amount }).eq("id", r.id);
     lines++;
   }
   return lines;
