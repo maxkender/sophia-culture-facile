@@ -19,7 +19,7 @@ export function useSetupChecklist(): SetupStep[] {
         scope("campaigns"),
         f(supabase.from("creator_messages").select("id", { count: "exact", head: true }).eq("from_admin", true)),
         f(supabase.from("creators").select("id", { count: "exact", head: true }).not("onboarding_completed_at", "is", null)),
-        (appId ? supabase.from("creator_posts").select("id", { count: "exact", head: true }).eq("app_id", appId) : supabase.from("creator_posts").select("id", { count: "exact", head: true })).eq("status", "approved"),
+        appId ? supabase.from("creator_posts").select("id", { count: "exact", head: true }).eq("app_id", appId) : supabase.from("creator_posts").select("id", { count: "exact", head: true }),
         scope("post_metrics_daily"),
       ]);
       return [c.count ?? 0, m.count ?? 0, s.count ?? 0, p.count ?? 0, t.count ?? 0];

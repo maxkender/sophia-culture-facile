@@ -19,3 +19,11 @@
 - [ ] Phase 1 gaps: job apply flow with inline contract (Open jobs), Brevo email on decline/invite, Apify follower scrape on apply, oEmbed thumbnails, invite landing /jobs/invite/<token>
 - [ ] Phase 2: Ads module, Payouts rebuild (budget cap, statements), creator dashboard mirror, tiers & awards
 - [ ] Phase 3: Analytics, Affiliates, Learn, automation (daily scrape, /go links, fraud flags, dormancy), then publish
+
+# Completion pass (Oct 9, 12:34)
+- [x] A. Sidekick drawer + server fn with whitelisted tools, threads
+- [x] B. Public UGC page rebuilt (earnings, leaderboard, tiers, 60s form → open job, FAQ), FR/EN
+- [x] C. Leaderboard/challenge/streak cards on creator Home; Challenges tab + winner payout/award
+- [x] D. Brevo nurture sequence J0/J+2/J+7, daily 09:00, editable in Templates
+- [x] E. 20-course brief generation, Briefs list refresh, reference_library (81 rows), DM templates
+- [x] F. Sidebar headings language, delete test applicant, Get started steps 4/5, security scan, republish

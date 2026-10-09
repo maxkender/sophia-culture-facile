@@ -13,7 +13,7 @@ import { fmtMoney } from "@/lib/ugc-pay";
 import { JobPublicCard, type JobDraft } from "@/components/hub/JobModal";
 import { useCreator } from "./useCreator";
 
-const AWARD_LABEL: Record<string, string> = { first_step: "First Step", ten_posts: "10 posts", streak_7: "7-day streak", streak_30: "30-day streak", views_10k: "10K views post", views_100k: "100K views post", top10_month: "Top 10 of the month" };
+const AWARD_LABEL: Record<string, string> = { first_step: "First Step", ten_posts: "10 posts", streak_7: "7-day streak", streak_30: "30-day streak", views_10k: "10K views post", views_100k: "100K views post", top10_month: "Top 10 of the month", challenge_winner: "Challenge winner" };
 const compact = (n: number) => new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(n);
 
 export function useHubExtras() {
@@ -65,6 +65,10 @@ export function CreatorStatsStrip() {
         {data?.awards.length ? <div className="mt-3 flex flex-wrap gap-2">{data.awards.map((a) => <span key={a.kind + a.period} className="inline-flex items-center gap-1 rounded-full bg-portal-amber/15 px-2.5 py-1 text-xs font-bold text-brand-navy"><Award className="size-3" />{AWARD_LABEL[a.kind] ?? a.kind}</span>)}</div> : null}
         {streak >= 3 ? <p className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-portal-amber"><Flame className="size-3.5" />{streak}-day streak</p> : null}
       </PortalCard>
+      <div className="grid gap-4 md:grid-cols-2">
+        <LeaderboardCard />
+        <ChallengeCard />
+      </div>
     </div>
   );
 }
@@ -171,6 +175,57 @@ export function ReferralCard() {
       <p className="font-extrabold text-brand-navy">Invite friends</p>
       <p className="mt-1 text-sm text-brand-navySoft">Share your link. When someone you invite joins, you earn a share of their earnings for their first 60 days.</p>
       <div className="mt-3 flex gap-2"><input readOnly aria-label="Referral link" value={link} className="min-h-10 flex-1 rounded-xl border bg-portal-bg px-3 text-sm" /><Button onClick={() => { void navigator.clipboard.writeText(link); toast.success("Link copied"); }}>Copy</Button></div>
+    </PortalCard>
+  );
+}
+
+function useBoard() {
+  const { me, enrolledApps } = useCreator();
+  const app = enrolledApps[0] ?? "00000000-0000-4000-8000-000000000001";
+  return useQuery({
+    queryKey: ["creator-board", me.id, app],
+    queryFn: async () => {
+      const [b, c] = await Promise.all([
+        supabase.rpc("leaderboard_month", { _app: app }),
+        supabase.from("challenges").select("id, title, description, reward_eur, ends_at, status").eq("app_id", app).eq("status", "live").order("ends_at").limit(1),
+      ]);
+      return { board: (b.data ?? []) as { rank: number; creator_id: string; pseudonym: string; earnings: number; views: number; posts: number }[], challenge: c.data?.[0] ?? null };
+    },
+  });
+}
+
+function LeaderboardCard() {
+  const { me } = useCreator();
+  const { data } = useBoard();
+  const board = data?.board ?? [];
+  const mine = board.find((r) => r.creator_id === me.id);
+  return (
+    <PortalCard className="p-4">
+      <div className="flex items-center justify-between"><p className="font-extrabold text-brand-navy">This month's leaderboard</p>{mine ? <span className="rounded-full bg-portal-accent/10 px-2.5 py-1 text-xs font-bold text-portal-accent">You're #{mine.rank}</span> : null}</div>
+      {board.length === 0 ? <p className="mt-2 text-sm text-brand-navySoft">The first creators start this week. Post to take the top spot.</p> : (
+        <ol className="mt-3 space-y-1.5">{board.slice(0, 10).map((r) => (
+          <li key={r.rank} className={cn("flex items-center gap-2 rounded-lg px-2 py-1 text-sm", r.creator_id === me.id && "bg-portal-accent/10")}>
+            <span className="w-6 font-extrabold text-brand-navy">{r.rank}</span><span className="flex-1 truncate">{r.pseudonym}</span>
+            <span className="text-xs text-brand-navySoft">{compact(Number(r.views))} views</span><b className="w-16 text-right">{fmtMoney(Number(r.earnings))}</b>
+          </li>
+        ))}</ol>
+      )}
+      {!mine && board.length > 0 ? <p className="mt-2 text-xs text-brand-navySoft">You're not ranked yet this month — your first approved post puts you on the board.</p> : null}
+    </PortalCard>
+  );
+}
+
+function ChallengeCard() {
+  const { data } = useBoard();
+  const c = data?.challenge;
+  return (
+    <PortalCard className="p-4">
+      <p className="flex items-center gap-2 font-extrabold text-brand-navy"><Award className="size-4 text-portal-amber" />Challenge of the week</p>
+      {c ? <>
+        <p className="mt-2 font-bold text-brand-navy">{c.title}{Number(c.reward_eur) > 0 ? ` — ${Number(c.reward_eur)} €` : ""}</p>
+        {c.description ? <p className="mt-1 text-sm text-brand-navySoft">{c.description}</p> : null}
+        <p className="mt-2 text-xs text-brand-navySoft">Ends {new Date(c.ends_at).toLocaleDateString()}. Every approved video posted before then counts.</p>
+      </> : <p className="mt-2 text-sm text-brand-navySoft">No challenge running right now. The next one drops soon.</p>}
     </PortalCard>
   );
 }

@@ -194,3 +194,32 @@ export async function referralAdjustments(admin: Admin, p: string, rows: { creat
   }
   return lines;
 }
+
+/** Daily 09:00 Paris: nurture emails (J0/J+2/J+7) for sign-ups who have not created their account yet. Texts come from saved_templates (nurture-<step>-<lang>). */
+export async function runNurture(admin: Admin, origin = "https://sophia-culture.com") {
+  return withLock(admin, "nurture", 15, async () => {
+    const { data: due } = await admin.from("creator_email_sequence").select("id, step, creator_id, creators(id, full_name, email, country, user_id, invite_token, social_account_created_at, status)")
+      .is("sent_at", null).lte("scheduled_at", new Date().toISOString()).limit(200);
+    const { data: tpls } = await admin.from("saved_templates").select("name, subject, body").eq("kind", "email").like("name", "nurture-%");
+    const tpl = new Map((tpls ?? []).map((t: any) => [t.name, t]));
+    let sent = 0, stopped = 0, failed = 0;
+    for (const row of due ?? []) {
+      const c = row.creators;
+      if (!c || c.social_account_created_at || c.status === "inactive") {
+        await admin.from("creator_email_sequence").update({ sent_at: new Date().toISOString(), error: "stopped: account created" }).eq("creator_id", row.creator_id).is("sent_at", null);
+        stopped++; continue;
+      }
+      const lang = ["FR", "BE", "CH", "LU", "MC", "CA", "SN", "CI", "MA", "TN"].includes(String(c.country ?? "").toUpperCase()) || /^fr/i.test(String(c.country ?? "")) ? "fr" : "en";
+      const t: any = tpl.get(`nurture-${row.step}-${lang}`) ?? tpl.get(`nurture-${row.step}-fr`);
+      if (!t) { failed++; continue; }
+      const link = c.user_id || !c.invite_token ? `${origin}/creators/app` : `${origin}/creators/invite?token=${encodeURIComponent(c.invite_token)}&email=${encodeURIComponent(c.email)}`;
+      const first = String(c.full_name ?? "").trim().split(/\s+/)[0] || (lang === "fr" ? "toi" : "there");
+      const fill = (s: string) => s.replaceAll("{prenom}", first).replaceAll("{first_name}", first).replaceAll("{lien}", link);
+      const paragraphs = fill(t.body).split(/\n+/).filter(Boolean);
+      const r = await sendBrevoEmail({ to: c.email, toName: c.full_name, subject: fill(t.subject ?? ""), html: buildEmailHtml({ paragraphs, buttonLabel: lang === "fr" ? "Ouvrir mon espace" : "Open my space", buttonUrl: link }), text: buildEmailText({ paragraphs, buttonLabel: lang === "fr" ? "Ouvrir mon espace" : "Open my space", buttonUrl: link } as never) });
+      await admin.from("creator_email_sequence").update(r.sent ? { sent_at: new Date().toISOString(), error: null } : { error: String(r.reason ?? "send failed").slice(0, 300) }).eq("id", row.id);
+      if (r.sent) sent++; else failed++;
+    }
+    return { due: due?.length ?? 0, sent, stopped, failed };
+  });
+}

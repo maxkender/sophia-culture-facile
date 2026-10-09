@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { UgcLandingPage } from "@/components/pages/CreatorsPages";
+import { UgcEarnPage } from "@/components/pages/UgcEarnPage";
 import { CREATORS } from "@/i18n/creators";
 import { langLinks, meta } from "@/lib/seo";
 
@@ -13,5 +13,5 @@ export const Route = createFileRoute("/en/creators/ugc")({
     }),
     links: langLinks("creatorsUgc", "en"),
   }),
-  component: UgcLandingPage,
+  component: UgcEarnPage,
 });

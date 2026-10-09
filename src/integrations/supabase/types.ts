@@ -931,6 +931,63 @@ export type Database = {
           },
         ]
       }
+      challenges: {
+        Row: {
+          app_id: string
+          created_at: string
+          description: string
+          ends_at: string
+          id: string
+          reward_eur: number
+          starts_at: string
+          status: string
+          title: string
+          winner_creator_id: string | null
+          winner_post_id: string | null
+        }
+        Insert: {
+          app_id?: string
+          created_at?: string
+          description?: string
+          ends_at?: string
+          id?: string
+          reward_eur?: number
+          starts_at?: string
+          status?: string
+          title: string
+          winner_creator_id?: string | null
+          winner_post_id?: string | null
+        }
+        Update: {
+          app_id?: string
+          created_at?: string
+          description?: string
+          ends_at?: string
+          id?: string
+          reward_eur?: number
+          starts_at?: string
+          status?: string
+          title?: string
+          winner_creator_id?: string | null
+          winner_post_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenges_winner_creator_id_fkey"
+            columns: ["winner_creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenges_winner_post_id_fkey"
+            columns: ["winner_post_id"]
+            isOneToOne: false
+            referencedRelation: "creator_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contracts: {
         Row: {
           author_id: string
@@ -1555,6 +1612,44 @@ export type Database = {
           title?: string
         }
         Relationships: []
+      }
+      creator_email_sequence: {
+        Row: {
+          created_at: string
+          creator_id: string
+          error: string | null
+          id: string
+          scheduled_at: string
+          sent_at: string | null
+          step: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          error?: string | null
+          id?: string
+          scheduled_at: string
+          sent_at?: string | null
+          step: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          error?: string | null
+          id?: string
+          scheduled_at?: string
+          sent_at?: string | null
+          step?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_email_sequence_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       creator_email_settings: {
         Row: {
@@ -4626,6 +4721,45 @@ export type Database = {
           },
         ]
       }
+      reference_library: {
+        Row: {
+          app_id: string
+          category: string | null
+          created_at: string
+          id: string
+          kind: string
+          note: string
+          platform: string
+          tags: string[]
+          title: string
+          url: string | null
+        }
+        Insert: {
+          app_id?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          note?: string
+          platform: string
+          tags?: string[]
+          title: string
+          url?: string | null
+        }
+        Update: {
+          app_id?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          note?: string
+          platform?: string
+          tags?: string[]
+          title?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       reference_videos: {
         Row: {
           active: boolean
@@ -4806,6 +4940,76 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sidekick_messages: {
+        Row: {
+          content: string
+          created_at: string
+          data: Json
+          id: string
+          role: string
+          thread_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          role: string
+          thread_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          role?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sidekick_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "sidekick_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sidekick_threads: {
+        Row: {
+          app_id: string | null
+          created_at: string
+          id: string
+          profile_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          app_id?: string | null
+          created_at?: string
+          id?: string
+          profile_id: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          app_id?: string | null
+          created_at?: string
+          id?: string
+          profile_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sidekick_threads_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -5208,13 +5412,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard_month_public: {
+        Row: {
+          earnings: number | null
+          posts: number | null
+          pseudonym: string | null
+          rank: number | null
+          views: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       creator_enrolled: { Args: { _app: string }; Returns: boolean }
       influencer_can_see_brief: {
         Args: { _brief_id: string }
         Returns: boolean
+      }
+      leaderboard_month: {
+        Args: { _app?: string }
+        Returns: {
+          creator_id: string
+          earnings: number
+          posts: number
+          pseudonym: string
+          rank: number
+          views: number
+        }[]
       }
       lookup_country_zone: { Args: { _country: string }; Returns: string }
       my_influencer_id: { Args: never; Returns: string }

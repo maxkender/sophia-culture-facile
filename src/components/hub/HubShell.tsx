@@ -15,11 +15,12 @@ import { useAdminApp, useApps } from "@/lib/apps";
 import { usePortalProfile } from "@/components/portal/usePortal";
 import { NotificationBell } from "@/components/portal/NotificationBell";
 import { useSetupChecklist } from "./hub-data";
+import { SidekickDrawer } from "./Sidekick";
 
 type Item = { to: string; label: string; icon: LucideIcon; exact?: boolean; disabled?: boolean; pill?: string; mobile?: boolean };
 export const HUB_NAV: Item[] = [
   { to: "/hub", label: "Home", icon: Home, exact: true, mobile: true },
-  { to: "/hub", label: "Sidekick", icon: Bot, disabled: true },
+  { to: "#sidekick", label: "Sidekick", icon: Bot },
   { to: "/hub/campaigns", label: "Campaigns", icon: Target, mobile: true },
   { to: "/hub/discover", label: "Discover", icon: Compass, mobile: true },
   { to: "/hub/messages", label: "Messages", icon: MessageSquare, mobile: true },
@@ -92,7 +93,7 @@ function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
       <CommandInput placeholder="Search creators, posts, briefs, jobs…" />
       <CommandList>
         <CommandEmpty>No result.</CommandEmpty>
-        <CommandGroup heading="Pages">{HUB_NAV.filter((i) => !i.disabled).map((i) => <CommandItem key={i.label} onSelect={() => go(i.to)}>{i.label}</CommandItem>)}</CommandGroup>
+        <CommandGroup heading="Pages">{HUB_NAV.filter((i) => !i.disabled && i.to.startsWith("/")).map((i) => <CommandItem key={i.label} onSelect={() => go(i.to)}>{i.label}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="Creators">{data?.creators.map((c) => <CommandItem key={c.id} value={`creator ${c.full_name}`} onSelect={() => go("/hub/creators/$creatorId", { creatorId: c.id })}>{c.full_name}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="Jobs">{data?.jobs.map((j) => <CommandItem key={j.id} value={`job ${j.title}`} onSelect={() => go("/hub/campaigns")}>{j.title}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="Briefs">{data?.briefs.map((b) => <CommandItem key={b.id} value={`brief ${b.title}`} onSelect={() => go("/hub/learn")}>{b.title}</CommandItem>)}</CommandGroup>
@@ -127,6 +128,7 @@ export function HubShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [search, setSearch] = useState(false);
+  const [sidekick, setSidekick] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setSearch((o) => !o); } };
@@ -152,6 +154,7 @@ export function HubShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-portal-bg">
       <GlobalSearch open={search} onOpenChange={setSearch} />
+      <SidekickDrawer open={sidekick} onOpenChange={setSidekick} />
       <aside className="fixed inset-y-0 left-0 z-50 hidden w-60 flex-col border-r border-brand-line bg-card lg:flex">
         <div className="flex h-16 items-center gap-2 px-5"><Logo /><span className="rounded-full bg-portal-bg px-2 py-0.5 text-[10px] font-bold uppercase text-brand-navySoft">Hub</span></div>
         <nav aria-label="Creator hub" className="flex-1 space-y-1 overflow-y-auto px-3 py-3">
@@ -159,7 +162,7 @@ export function HubShell({ children }: { children: ReactNode }) {
             const Icon = i.icon;
             const cls = cn("flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition", i.disabled ? "cursor-not-allowed text-brand-navySoft/50" : isActive(pathname, i) ? "bg-brand-navy text-card" : "text-brand-navy hover:bg-brand-navy/10");
             const inner = <><Icon className="size-4" aria-hidden="true" /><span className="flex-1">{i.label}</span>{i.pill ? <span className="rounded-full bg-portal-accent px-2 py-0.5 text-[10px] font-bold text-card">{i.pill}</span> : null}{i.disabled ? <span className="text-[10px]">Soon</span> : null}</>;
-            return i.disabled ? <span key={i.label} className={cls} aria-disabled="true">{inner}</span> : <Link key={i.label} to={i.to} className={cls}>{inner}</Link>;
+            return i.to === "#sidekick" ? <button key={i.label} type="button" onClick={() => setSidekick(true)} className={cn(cls, "w-full text-left")}>{inner}</button> : i.disabled ? <span key={i.label} className={cls} aria-disabled="true">{inner}</span> : <Link key={i.label} to={i.to} className={cls}>{inner}</Link>;
           })}
           <div className="mt-4 border-t border-brand-line pt-3">
             <Link to="/hub/tools/$" params={{ _splat: "" }} className="flex min-h-10 items-center rounded-xl px-3 text-xs font-semibold text-brand-navySoft hover:bg-brand-navy/10">All existing tools →</Link>
@@ -197,6 +200,7 @@ export function HubShell({ children }: { children: ReactNode }) {
                 <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/discover" })}>Invite creator</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <Button size="icon" variant="outline" aria-label="Open Sidekick" onClick={() => setSidekick(true)}><Bot className="size-4" /></Button>
             <NotificationBell profileId={profile.id} />
           </div>
         </header>

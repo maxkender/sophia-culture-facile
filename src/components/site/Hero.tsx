@@ -13,7 +13,7 @@ import shotQuiz from "@/assets/shot-quiz.png.asset.json";
  */
 export function Hero({ compact = false }: { compact?: boolean }) {
   const { t } = useI18n();
-  const creatorsPath = useLocalePath("creators");
+  const creatorsPath = useLocalePath("creatorsUgc");
 
   return (
     <section
