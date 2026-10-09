@@ -129,6 +129,8 @@ function RootComponent() {
   useEffect(() => {
     const src = new URLSearchParams(window.location.search).get("src");
     if (src) sessionStorage.setItem("sophia_src", src.replace(/[^a-z0-9_-]/gi, "").slice(0, 40));
+    const ref = new URLSearchParams(window.location.search).get("ref");
+    if (ref) localStorage.setItem("sophia_ref", ref.replace(/[^a-z0-9._]/gi, "").slice(0, 40));
   }, []);
 
 

@@ -185,6 +185,7 @@ export function UgcApplyPage() {
           video_url: form.video_mode === "link" ? form.video_url : "",
           video_file_path: form.video_mode === "file" ? path ?? undefined : undefined,
           referral_source: form.referral_source,
+          ref_handle: (typeof window !== "undefined" && localStorage.getItem("sophia_ref")) || "",
           consent: true,
         },
       });
