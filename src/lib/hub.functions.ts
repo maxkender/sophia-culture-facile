@@ -123,8 +123,12 @@ export const applyToJob = createServerFn({ method: "POST" })
     if ((dup ?? []).some((d: any) => d.creator_applications?.email?.toLowerCase() === email)) return { ok: false as const, reason: "You already applied to this job with this email." };
 
     const followers = await followerCounts(data.tiktok, data.instagram);
+    // The job form takes free text; the table only accepts a fixed set, so the text is kept in the answers.
+    const occ = (data.occupation ?? "").trim();
+    const occupation = ["studying", "working", "both", "other"].includes(occ.toLowerCase()) ? occ.toLowerCase() : "other";
+    if (occ) data.answers = { ...data.answers, "School or job": occ };
     const { data: app, error } = await a.from("creator_applications").insert({
-      full_name: data.fullName, email, phone: data.phone || "", country: data.country, age: data.age, occupation: data.occupation || "",
+      full_name: data.fullName, email, phone: data.phone || "", country: data.country, age: data.age, occupation,
       tiktok_url: data.tiktok || null, instagram_url: data.instagram || null, video_url: data.videoUrl || null, video_file_path: data.videoPath || null,
       referral_source: `job:${job.slug}`, source: "job", consent_at: new Date().toISOString(), meets_criteria: true, status: "pending", submit_ip_hash: hash, app_id: job.app_id,
     }).select("id").single();
