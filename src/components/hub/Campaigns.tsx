@@ -3,6 +3,9 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Archive, Copy, Filter, LayoutGrid, List, Pencil, Search, Star } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { acceptJobApplication, declineJobApplication } from "@/lib/hub.functions";
+import { PostThumb } from "./PostThumb";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -146,10 +149,18 @@ function Applicants() {
       return (data ?? []).filter((r) => !appId || (r.jobs as { app_id: string }).app_id === appId);
     },
   });
+  const acceptFn = useServerFn(acceptJobApplication);
+  const declineFn = useServerFn(declineJobApplication);
   async function decide(ids: string[], status: "accepted" | "declined", reason?: string) {
-    const { data: u } = await supabase.auth.getUser();
-    const { error } = await supabase.from("job_applications").update({ status, decline_reason: reason ?? null, decided_at: new Date().toISOString(), decided_by: u.user?.id ?? null }).in("id", ids);
-    if (error) toast.error("That could not be saved. Please try again."); else toast.success(status === "accepted" ? "Accepted" : "Declined");
+    let ok = 0; const notes: string[] = [];
+    for (const id of ids) {
+      try {
+        const r = status === "accepted" ? await acceptFn({ data: { id, origin: window.location.origin } }) : await declineFn({ data: { id, reason: reason ?? "" } });
+        ok++; if (!r.emailSent) notes.push(r.emailReason ?? "email not sent");
+      } catch { notes.push("one decision could not be saved"); }
+    }
+    if (ok) toast.success(`${ok} ${status === "accepted" ? "accepted" : "declined"}${notes.length ? "" : " — email sent"}`);
+    if (notes.length) toast.error(`Check: ${[...new Set(notes)].join("; ")}`);
     setSel([]); void qc.invalidateQueries({ queryKey: ["hub"] });
   }
   async function shortlist(id: string, v: boolean) { await supabase.from("job_applications").update({ shortlisted: v }).eq("id", id); void qc.invalidateQueries({ queryKey: ["hub"] }); }
@@ -178,7 +189,7 @@ function Applicants() {
                           <td className="font-bold text-brand-navy">{flag(c?.country)} {c?.full_name ?? "Applicant"}</td>
                           <td className="text-xs">{[c?.tiktok_handle && `TT @${c.tiktok_handle}`, c?.instagram_handle && `IG @${c.instagram_handle}`].filter(Boolean).join(" · ") || "—"}</td>
                           <td>{(a.jobs as { title: string }).title}</td>
-                          <td className="max-w-48 truncate text-xs">{Object.values((a.answers ?? {}) as Record<string, string>).join(" · ") || "—"}</td>
+                          <td className="max-w-48 truncate text-xs">{Object.entries((a.answers ?? {}) as Record<string, string>).filter(([, v]) => v).map(([k, v]) => (k.startsWith("followers_") ? `${k.slice(10)}: ${compact(Number(v))} followers` : v)).join(" · ") || "—"}</td>
                           <td><span className="rounded-full bg-portal-bg px-2 py-0.5 text-xs font-bold">{a.status}</span></td>
                           <td className="whitespace-nowrap p-2">
                             <Button size="icon" variant="ghost" aria-label="Shortlist" onClick={() => void shortlist(a.id, !a.shortlisted)}><Star className={cn("size-4", a.shortlisted && "fill-portal-amber text-portal-amber")} /></Button>
@@ -290,7 +301,7 @@ function VideoReviews() {
       {!post ? <p className={cn(card, "text-sm text-brand-navySoft")}>No posts waiting for review.</p> : (
         <div className="grid gap-4 lg:grid-cols-[360px_1fr]">
           <div className="flex aspect-[9/16] max-h-[640px] flex-col items-center justify-center gap-3 rounded-2xl bg-brand-navy p-4 text-center text-card">
-            <p className="text-sm">{post.platform} video</p>
+            <PostThumb url={post.url} className="w-full flex-1 rounded-xl" />
             <Button asChild variant="secondary"><a href={post.url} target="_blank" rel="noreferrer">Open video ↗</a></Button>
           </div>
           <div className={card}>

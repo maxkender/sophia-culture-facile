@@ -116,6 +116,177 @@ export type Database = {
           },
         ]
       }
+      ad_candidates: {
+        Row: {
+          app_id: string
+          bonus_paid_at: string | null
+          caption: string | null
+          channel: string
+          country: string
+          created_at: string
+          created_by: string | null
+          creator_id: string | null
+          cta: string
+          daily_budget: number | null
+          duration_days: number | null
+          ended_at: string | null
+          external_ids: Json
+          hook: string | null
+          id: string
+          landing_url: string | null
+          notes: string | null
+          objective: string
+          post_id: string
+          raw_file_path: string | null
+          spark_code: string | null
+          spark_valid_until: string | null
+          started_at: string | null
+          status: string
+          updated_at: string
+          winner: boolean
+        }
+        Insert: {
+          app_id: string
+          bonus_paid_at?: string | null
+          caption?: string | null
+          channel?: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          creator_id?: string | null
+          cta?: string
+          daily_budget?: number | null
+          duration_days?: number | null
+          ended_at?: string | null
+          external_ids?: Json
+          hook?: string | null
+          id?: string
+          landing_url?: string | null
+          notes?: string | null
+          objective?: string
+          post_id: string
+          raw_file_path?: string | null
+          spark_code?: string | null
+          spark_valid_until?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          winner?: boolean
+        }
+        Update: {
+          app_id?: string
+          bonus_paid_at?: string | null
+          caption?: string | null
+          channel?: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          creator_id?: string | null
+          cta?: string
+          daily_budget?: number | null
+          duration_days?: number | null
+          ended_at?: string | null
+          external_ids?: Json
+          hook?: string | null
+          id?: string
+          landing_url?: string | null
+          notes?: string | null
+          objective?: string
+          post_id?: string
+          raw_file_path?: string | null
+          spark_code?: string | null
+          spark_valid_until?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          winner?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_candidates_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "creator_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_connections: {
+        Row: {
+          account_id: string | null
+          app_id: string
+          channel: string
+          config: Json
+          connected_at: string | null
+          id: string
+        }
+        Insert: {
+          account_id?: string | null
+          app_id: string
+          channel: string
+          config?: Json
+          connected_at?: string | null
+          id?: string
+        }
+        Update: {
+          account_id?: string | null
+          app_id?: string
+          channel?: string
+          config?: Json
+          connected_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_connections_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_metrics_daily: {
+        Row: {
+          ad_id: string
+          clicks: number
+          day: string
+          id: string
+          impressions: number
+          installs: number
+          source: string
+          spend: number
+        }
+        Insert: {
+          ad_id: string
+          clicks?: number
+          day: string
+          id?: string
+          impressions?: number
+          installs?: number
+          source?: string
+          spend?: number
+        }
+        Update: {
+          ad_id?: string
+          clicks?: number
+          day?: string
+          id?: string
+          impressions?: number
+          installs?: number
+          source?: string
+          spend?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_metrics_daily_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "ad_candidates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_ui_prefs: {
         Row: {
           creators_app: string
@@ -399,6 +570,38 @@ export type Database = {
           users_line?: string | null
         }
         Relationships: []
+      }
+      awards: {
+        Row: {
+          awarded_at: string
+          creator_id: string
+          id: string
+          kind: string
+          period: string
+        }
+        Insert: {
+          awarded_at?: string
+          creator_id: string
+          id?: string
+          kind: string
+          period?: string
+        }
+        Update: {
+          awarded_at?: string
+          creator_id?: string
+          id?: string
+          kind?: string
+          period?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "awards_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       brief_assignments: {
         Row: {
@@ -1905,6 +2108,66 @@ export type Database = {
           },
         ]
       }
+      creator_tasks: {
+        Row: {
+          ad_candidate_id: string | null
+          created_at: string
+          creator_id: string
+          done_at: string | null
+          file_path: string | null
+          id: string
+          instructions: string
+          response: string | null
+          status: string
+          title: string
+          type: string
+          valid_until: string | null
+        }
+        Insert: {
+          ad_candidate_id?: string | null
+          created_at?: string
+          creator_id: string
+          done_at?: string | null
+          file_path?: string | null
+          id?: string
+          instructions?: string
+          response?: string | null
+          status?: string
+          title: string
+          type: string
+          valid_until?: string | null
+        }
+        Update: {
+          ad_candidate_id?: string | null
+          created_at?: string
+          creator_id?: string
+          done_at?: string | null
+          file_path?: string | null
+          id?: string
+          instructions?: string
+          response?: string | null
+          status?: string
+          title?: string
+          type?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_tasks_ad_candidate_id_fkey"
+            columns: ["ad_candidate_id"]
+            isOneToOne: false
+            referencedRelation: "ad_candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_tasks_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_weekly_guides: {
         Row: {
           app_id: string
@@ -1988,6 +2251,9 @@ export type Database = {
           sync_checked_at: string | null
           sync_error: string | null
           sync_status: string | null
+          tier: string
+          tier_locked: boolean
+          tier_since: string
           tiktok_handle: string | null
           track: string
           ugc_status: string
@@ -2037,6 +2303,9 @@ export type Database = {
           sync_checked_at?: string | null
           sync_error?: string | null
           sync_status?: string | null
+          tier?: string
+          tier_locked?: boolean
+          tier_since?: string
           tiktok_handle?: string | null
           track?: string
           ugc_status?: string
@@ -2086,6 +2355,9 @@ export type Database = {
           sync_checked_at?: string | null
           sync_error?: string | null
           sync_status?: string | null
+          tier?: string
+          tier_locked?: boolean
+          tier_since?: string
           tiktok_handle?: string | null
           track?: string
           ugc_status?: string
@@ -4548,39 +4820,104 @@ export type Database = {
       }
       ugc_settings: {
         Row: {
+          ad_selection_bonus: number
           apify_instagram_actor: string
           apify_price_per_result_usd: number
           apify_tiktok_actor: string
+          cpi_target: number
           cron_token: string
           default_posts_per_month: number
+          hold_days: number
           id: number
+          min_payout: number
+          monthly_budget_cap: number | null
           payday_day: number
           posts_per_profile_call: number
+          streak30_bonus: number
+          streak7_bonus: number
+          ten_post_bonus: number
           updated_at: string
         }
         Insert: {
+          ad_selection_bonus?: number
           apify_instagram_actor?: string
           apify_price_per_result_usd?: number
           apify_tiktok_actor?: string
+          cpi_target?: number
           cron_token?: string
           default_posts_per_month?: number
+          hold_days?: number
           id?: number
+          min_payout?: number
+          monthly_budget_cap?: number | null
           payday_day?: number
           posts_per_profile_call?: number
+          streak30_bonus?: number
+          streak7_bonus?: number
+          ten_post_bonus?: number
           updated_at?: string
         }
         Update: {
+          ad_selection_bonus?: number
           apify_instagram_actor?: string
           apify_price_per_result_usd?: number
           apify_tiktok_actor?: string
+          cpi_target?: number
           cron_token?: string
           default_posts_per_month?: number
+          hold_days?: number
           id?: number
+          min_payout?: number
+          monthly_budget_cap?: number | null
           payday_day?: number
           posts_per_profile_call?: number
+          streak30_bonus?: number
+          streak7_bonus?: number
+          ten_post_bonus?: number
           updated_at?: string
         }
         Relationships: []
+      }
+      ugc_tiers: {
+        Row: {
+          app_id: string
+          cpm: number
+          id: string
+          label: string
+          monthly_cap: number
+          per_post: number
+          rule: string
+          tier: string
+        }
+        Insert: {
+          app_id: string
+          cpm?: number
+          id?: string
+          label: string
+          monthly_cap?: number
+          per_post?: number
+          rule?: string
+          tier: string
+        }
+        Update: {
+          app_id?: string
+          cpm?: number
+          id?: string
+          label?: string
+          monthly_cap?: number
+          per_post?: number
+          rule?: string
+          tier?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ugc_tiers_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

@@ -39,3 +39,24 @@ describe("computeMonth", () => {
     expect(m.total).toBe(95);
   });
 });
+
+import { computeTierMonth, tierFor, streakDays } from "./ugc-tiers";
+describe("tier pay", () => {
+  const c = { posts_per_month: null, required_platforms: "both", fixed_monthly_override: null, rpm_override: null, cap_override: null };
+  const post = (id: string, platform: string, views: number) => ({ id, platform, url: null, posted_at: "2026-10-03T10:00:00Z", views_7d: views, views_7d_at: "2026-10-10T10:00:00Z", excluded: false });
+  it("active: 1 €/post + 2 €/1000, Instagram base only", () => {
+    const r = computeTierMonth("2026-10", c, { tier: "active", per_post: 1, cpm: 2, monthly_cap: 150 }, [post("a", "tiktok", 30000), post("b", "instagram", 50000)]);
+    expect(r.fixedPart).toBe(2); expect(r.bonusPart).toBe(60); expect(r.total).toBe(62);
+  });
+  it("caps the month", () => {
+    const r = computeTierMonth("2026-10", c, { tier: "trial", per_post: 0, cpm: 2, monthly_cap: 100 }, [post("a", "tiktok", 200000)]);
+    expect(r.total).toBe(100);
+  });
+  it("tier rules and streak", () => {
+    expect(tierFor({ daysSinceStart: 3, approvedLast30: 2, topTenPrevMonth: false })).toBe("trial");
+    expect(tierFor({ daysSinceStart: 40, approvedLast30: 25, topTenPrevMonth: false })).toBe("active");
+    expect(tierFor({ daysSinceStart: 40, approvedLast30: 25, topTenPrevMonth: true })).toBe("pro");
+    const now = new Date("2026-10-09T12:00:00Z");
+    expect(streakDays(["2026-10-09", "2026-10-08", "2026-10-07", "2026-10-05"], now)).toBe(3);
+  });
+});

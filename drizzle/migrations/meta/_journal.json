@@ -253,6 +253,20 @@
       "when": 1791543476561,
       "tag": "0035_creator_hub_phase1",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1791544641487,
+      "tag": "0036_creator_hub_phase2",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1791544961773,
+      "tag": "0037_ad_connections_config",
+      "breakpoints": true
     }
   ]
 }

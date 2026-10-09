@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAdminApp, useApps } from "@/lib/apps";
+import { PostThumb } from "./PostThumb";
 import { compact, eur, useSetupChecklist, usePerformance, useWallet } from "./hub-data";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -187,9 +188,10 @@ function TopContent() {
       {data.length === 0 ? <p className="mt-3 text-sm text-brand-navySoft">Approved posts will show here.</p> : (
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {data.map((p) => (
-            <a key={p.id} href={p.url} target="_blank" rel="noreferrer" className="flex aspect-[9/12] flex-col justify-end rounded-xl bg-gradient-to-b from-brand-navy/20 to-brand-navy p-3 text-card">
-              <span className="text-lg font-extrabold">{compact(Number(p.views ?? 0))} views</span>
-              <span className="truncate text-xs">{(p.creators as { full_name?: string } | null)?.full_name} · {p.platform}</span>
+            <a key={p.id} href={p.url} target="_blank" rel="noreferrer" className="relative flex aspect-[9/12] flex-col justify-end overflow-hidden rounded-xl bg-brand-navy p-3 text-card">
+              <PostThumb url={p.url} className="absolute inset-0 size-full opacity-80" />
+              <span className="relative text-lg font-extrabold">{compact(Number(p.views ?? 0))} views</span>
+              <span className="relative truncate text-xs">{(p.creators as { full_name?: string } | null)?.full_name} · {p.platform}</span>
             </a>
           ))}
         </div>

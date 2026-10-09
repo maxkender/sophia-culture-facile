@@ -29,6 +29,14 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             const { previousPeriod } = await import("@/lib/ugc-pay");
             return Response.json(await generateMonth(a, previousPeriod(), null));
           }
+          if (params.job === "tiers") {
+            const { runTierJob } = await import("@/lib/ugc-tiers.server");
+            return Response.json(await runTierJob(a));
+          }
+          if (params.job === "ads-metrics") {
+            const { syncAdMetrics } = await import("@/lib/ads.server");
+            return Response.json(await syncAdMetrics(a));
+          }
           if (params.job === "planner-reminder") {
             const { data: admins } = await a.from("profiles").select("id").eq("role", "admin");
             await a.from("notifications").insert((admins ?? []).map((p: any) => ({ profile_id: p.id, type: "message", body: "Reminder: publish next week's UGC briefs in the Week planner by Friday." })));
