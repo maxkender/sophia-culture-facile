@@ -19,7 +19,7 @@ import {
   acceptCreatorRules, getMySocialAccount, registerSocialAccount, revealMyPassword, saveCreatorProfile,
   tickWarmupDay, toggleSetupGuideCheck,
 } from "@/lib/creator-app.functions";
-import { startStripeOnboarding, syncStripeStatus } from "@/lib/creator-payouts.functions";
+import { startStripeOnboarding, syncStripeStatus, stripeModeInfo } from "@/lib/creator-payouts.functions";
 import { savePayoutFallback } from "@/lib/creator-extras.functions";
 import { joinCreatorSlack, SLACK_INVITE_URL } from "@/lib/creator-onboarding.functions";
 import { ACCOUNT_SUBSTEPS, SLACK_INVITE, UGC_HANDLE_GUIDANCE, UGC_PROFILE_GUIDANCE, WARMUP_DAYS } from "@/lib/creator-steps";
