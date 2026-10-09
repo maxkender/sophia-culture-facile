@@ -1,7 +1,7 @@
 // Server-only Apify sync for UGC compliance (weekly) and D+7 views (daily).
 type Admin = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-type Found = {
+export type Found = {
   platform: "tiktok" | "instagram";
   external_id: string;
   url: string | null;
@@ -15,7 +15,7 @@ type Found = {
   shares: number | null;
 };
 
-const clean = (h: string | null | undefined) => (h ?? "").trim().replace(/^@/, "").replace(/^https?:\/\/[^/]+\/@?/, "").replace(/\/.*$/, "");
+export const clean = (h: string | null | undefined) => (h ?? "").trim().replace(/^@/, "").replace(/^https?:\/\/[^/]+\/@?/, "").replace(/\/.*$/, "");
 const num = (v: unknown) => (v == null || v === "" || Number.isNaN(Number(v)) ? null : Number(v));
 
 async function runActor(actor: string, input: unknown): Promise<any[]> {
@@ -31,7 +31,7 @@ async function runActor(actor: string, input: unknown): Promise<any[]> {
   return Array.isArray(data) ? data : [];
 }
 
-async function scrapeTikTok(actor: string, handle: string, perProfile: number): Promise<Found[]> {
+export async function scrapeTikTok(actor: string, handle: string, perProfile: number): Promise<Found[]> {
   const items = await runActor(actor, { profiles: [handle], resultsPerPage: perProfile, shouldDownloadVideos: false, shouldDownloadCovers: false });
   return items
     .filter((i) => i && i.id && !i.error)
@@ -47,7 +47,7 @@ async function scrapeTikTok(actor: string, handle: string, perProfile: number): 
     }));
 }
 
-async function scrapeInstagram(actor: string, handle: string): Promise<Found[]> {
+export async function scrapeInstagram(actor: string, handle: string): Promise<Found[]> {
   const items = await runActor(actor, { usernames: [handle], resultsLimit: 30 });
   const posts = items.flatMap((p) => (Array.isArray(p?.latestPosts) ? p.latestPosts : p?.shortCode ? [p] : []));
   return posts
@@ -66,7 +66,7 @@ async function scrapeInstagram(actor: string, handle: string): Promise<Found[]> 
 
 const normUrl = (u: string | null | undefined) => (u ?? "").toLowerCase().replace(/[?#].*$/, "").replace(/\/$/, "");
 
-async function upsertFound(admin: Admin, creatorId: string, found: Found[]) {
+export async function upsertFound(admin: Admin, creatorId: string, found: Found[]) {
   if (!found.length) return;
   const now = new Date().toISOString();
   const { data: logged } = await admin.from("creator_posts").select("id, url, brief_id").eq("creator_id", creatorId);
@@ -79,7 +79,7 @@ async function upsertFound(admin: Admin, creatorId: string, found: Found[]) {
   if (error) throw new Error(`store: ${error.message}`);
 }
 
-async function settings(admin: Admin) {
+export async function settings(admin: Admin) {
   const { data } = await admin.from("ugc_settings").select("*").eq("id", 1).maybeSingle();
   return data ?? { apify_tiktok_actor: "clockworks~tiktok-profile-scraper", apify_instagram_actor: "apify~instagram-profile-scraper", apify_price_per_result_usd: 0.0003, posts_per_profile_call: 30 };
 }

@@ -269,7 +269,7 @@ function VideoReviews() {
       return (await x).data ?? [];
     },
   });
-  const rows = useMemo(() => data.filter((p) => !flagged || p.skip_reason), [data, flagged]);
+  const rows = useMemo(() => data.filter((p) => !flagged || p.skip_reason || (p.fraud_flags ?? []).length || p.hold_reason), [data, flagged]);
   const post = rows[Math.min(i, rows.length - 1)];
   async function decide(status: "approved" | "rejected") {
     if (!post) return;
@@ -295,7 +295,7 @@ function VideoReviews() {
     <div>
       <div className="mb-4 flex gap-2">
         <button type="button" aria-pressed={!flagged} onClick={() => setFlagged(false)} className={cn("min-h-9 rounded-full px-4 text-sm font-bold", !flagged ? "bg-brand-navy text-card" : "bg-card")}>Pending {data.length}</button>
-        <button type="button" aria-pressed={flagged} onClick={() => setFlagged(true)} className={cn("min-h-9 rounded-full px-4 text-sm font-bold", flagged ? "bg-brand-navy text-card" : "bg-card")}>Flagged {data.filter((p) => p.skip_reason).length}</button>
+        <button type="button" aria-pressed={flagged} onClick={() => setFlagged(true)} className={cn("min-h-9 rounded-full px-4 text-sm font-bold", flagged ? "bg-brand-navy text-card" : "bg-card")}>Flagged {data.filter((p) => p.skip_reason || (p.fraud_flags ?? []).length || p.hold_reason).length}</button>
         <span className="hidden flex-1 text-right text-xs text-brand-navySoft sm:block">Shortcuts: A approve · R reject · → next</span>
       </div>
       {!post ? <p className={cn(card, "text-sm text-brand-navySoft")}>No posts waiting for review.</p> : (
