@@ -50,6 +50,10 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             const { runBriefDrop } = await import("@/lib/hub-automation.server");
             return Response.json(await runBriefDrop(a));
           }
+          if (params.job === "nurture") {
+            const { runNurture } = await import("@/lib/hub-automation.server");
+            return Response.json(await runNurture(a, new URL(request.url).origin));
+          }
           if (params.job === "budget") {
             const { applyBudgetCap } = await import("@/lib/hub-automation.server");
             return Response.json(await applyBudgetCap(a));
