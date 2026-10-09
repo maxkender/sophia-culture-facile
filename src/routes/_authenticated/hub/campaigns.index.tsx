@@ -4,9 +4,9 @@ import { Campaigns, type CampaignTab } from "@/components/hub/Campaigns";
 const TABS: CampaignTab[] = ["campaigns", "applicants", "requests", "jobs", "reviews"];
 
 export const Route = createFileRoute("/_authenticated/hub/campaigns/")({
-  validateSearch: (s: Record<string, unknown>): { tab: CampaignTab; newJob?: number } => ({
-    tab: TABS.includes(s.tab as CampaignTab) ? (s.tab as CampaignTab) : "campaigns",
-    newJob: s.newJob ? 1 : undefined,
+  validateSearch: (s: Record<string, unknown>): { tab: CampaignTab; newJob?: number | undefined } => ({
+    tab: TABS.includes(s["tab"] as CampaignTab) ? (s["tab"] as CampaignTab) : "campaigns",
+    newJob: s["newJob"] ? 1 : undefined,
   }),
   head: () => ({ meta: [{ title: "Campaigns | Creator Hub" }, { name: "robots", content: "noindex, nofollow" }] }),
   component: function CampaignsRoute() {

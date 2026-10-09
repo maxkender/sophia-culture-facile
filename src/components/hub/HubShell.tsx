@@ -140,7 +140,7 @@ export function HubShell({ children }: { children: ReactNode }) {
   }
 
   const key = Object.keys(HUB_TITLES).sort((a, b) => b.length - a.length).find((k) => pathname === k || pathname.startsWith(`${k}/`)) ?? "/hub";
-  const [title, lead] = HUB_TITLES[key];
+  const [title, lead] = HUB_TITLES[key] ?? ["Hub", ""];
   const name = (profile as { full_name?: string | null }).full_name ?? "Admin";
 
   async function signOut() {

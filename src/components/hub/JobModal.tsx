@@ -195,7 +195,7 @@ export function jobToRow(j: JobDraft, appId: string) {
   return { ...rest, age_min, age_max, app_id: appId, slots: null };
 }
 
-export function JobModal({ open, onOpenChange, initial, jobId }: { open: boolean; onOpenChange: (o: boolean) => void; initial?: Partial<JobDraft>; jobId?: string }) {
+export function JobModal({ open, onOpenChange, initial, jobId }: { open: boolean; onOpenChange: (o: boolean) => void; initial?: Partial<JobDraft> | undefined; jobId?: string | undefined }) {
   const [j, setJ] = useState<JobDraft>(() => ({ ...emptyJob(), ...initial }));
   const [tab, setTab] = useState<"details" | "payment" | "content">("details");
   const [preview, setPreview] = useState(false);

@@ -128,7 +128,7 @@ function ImportCsv() {
   const { appId } = useAdminApp();
   async function onFile(f: File) {
     const text = await f.text();
-    const [head, ...lines] = text.split(/\r?\n/).filter(Boolean);
+    const [head = "", ...lines] = text.split(/\r?\n/).filter(Boolean);
     const cols = head.split(/[,;]/).map((c) => c.trim().toLowerCase());
     const idx = (n: string) => cols.indexOf(n);
     if (idx("handle") < 0) { toast.error("The file needs a 'handle' column (also: followers, niche, face_cam, email, country)."); return; }
@@ -227,7 +227,7 @@ export function Discover() {
     if (f.niche && p.niche !== f.niche) return false;
     if (f.status && p.status !== f.status) return false;
     if (f.online && !online(p)) return false;
-    if (f.followers) { const [lo, hi] = f.followers.split("-").map(Number); const n = p.followers ?? 0; if (n < lo || (hi && n > hi)) return false; }
+    if (f.followers) { const [lo = 0, hi = 0] = f.followers.split("-").map(Number); const n = p.followers ?? 0; if (n < lo || (hi && n > hi)) return false; }
     return true;
   }), [people, tab, q, f]);
   const sel = "min-h-9 rounded-lg border border-brand-line bg-card px-2 text-sm";

@@ -68,9 +68,9 @@ export function CampaignWizard() {
     const { data: u } = await supabase.auth.getUser();
     const { data, error } = await supabase.from("campaigns").insert({
       app_id: appId ?? SOPHIA_APP_ID, name: d.name, type: d.type, starts_at: d.starts_at, ends_at: d.ongoing ? null : d.ends_at, ongoing: d.ongoing,
-      status: "live", monthly_budget: d.monthly_budget, brief_md: d.brief_md, created_by: u.user?.id,
-      requirements: { platforms: d.job.platforms, countries: d.job.countries, age: d.job.age, account_type: d.job.account_type, content_type: d.job.content_type, video_length_s: d.job.video_length_s, posting_frequency_n: d.job.posting_frequency_n, posting_frequency_unit: d.job.posting_frequency_unit },
-      settings: { payment_type: d.job.payment_type, base_mode: d.job.base_mode, base_amount: d.job.base_amount, cpm_rate: d.job.cpm_rate, bonus_goals: d.job.bonus_goals, hold_days: d.hold_days, min_payout: d.min_payout, language: d.language, rules: d.rules, auto_reject: d.auto_reject, brief_ids: d.brief_ids },
+      status: "live", monthly_budget: d.monthly_budget, brief_md: d.brief_md, created_by: u.user?.id ?? null,
+      requirements: JSON.parse(JSON.stringify({ platforms: d.job.platforms, countries: d.job.countries, age: d.job.age, account_type: d.job.account_type, content_type: d.job.content_type, video_length_s: d.job.video_length_s, posting_frequency_n: d.job.posting_frequency_n, posting_frequency_unit: d.job.posting_frequency_unit })),
+      settings: JSON.parse(JSON.stringify({ payment_type: d.job.payment_type, base_mode: d.job.base_mode, base_amount: d.job.base_amount, cpm_rate: d.job.cpm_rate, bonus_goals: d.job.bonus_goals, hold_days: d.hold_days, min_payout: d.min_payout, language: d.language, rules: d.rules, auto_reject: d.auto_reject, brief_ids: d.brief_ids })),
       distribution: d.dist,
     }).select("id").single();
     setBusy(false);

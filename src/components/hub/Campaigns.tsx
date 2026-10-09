@@ -81,11 +81,11 @@ function CampaignsList() {
 
 type JobRow = JobDraft & { id: string; slug: string; status: string; app_id: string; slots: number | null; age_min: number | null; age_max: number | null; campaigns: { name: string } | null; job_applications: { status: string }[] };
 
-function JobsList({ autoNew }: { autoNew?: boolean }) {
+function JobsList({ autoNew }: { autoNew?: boolean | undefined }) {
   const { appId } = useAdminApp();
   const [active, setActive] = useState(true);
   const [q, setQ] = useState("");
-  const [modal, setModal] = useState<{ open: boolean; initial?: Partial<JobDraft>; id?: string }>({ open: Boolean(autoNew) });
+  const [modal, setModal] = useState<{ open: boolean; initial?: Partial<JobDraft> | undefined; id?: string | undefined }>({ open: Boolean(autoNew) });
   const qc = useQueryClient();
   const { data = [] } = useQuery({
     queryKey: ["hub", "jobs", appId],
@@ -148,7 +148,7 @@ function Applicants() {
   });
   async function decide(ids: string[], status: "accepted" | "declined", reason?: string) {
     const { data: u } = await supabase.auth.getUser();
-    const { error } = await supabase.from("job_applications").update({ status, decline_reason: reason ?? null, decided_at: new Date().toISOString(), decided_by: u.user?.id }).in("id", ids);
+    const { error } = await supabase.from("job_applications").update({ status, decline_reason: reason ?? null, decided_at: new Date().toISOString(), decided_by: u.user?.id ?? null }).in("id", ids);
     if (error) toast.error("That could not be saved. Please try again."); else toast.success(status === "accepted" ? "Accepted" : "Declined");
     setSel([]); void qc.invalidateQueries({ queryKey: ["hub"] });
   }
@@ -220,7 +220,7 @@ function Requests() {
     if (!text) { toast.error("Write a short reply first — it goes to the creator's messages."); return; }
     const { data: u } = await supabase.auth.getUser();
     await supabase.from("creator_messages").insert({ creator_id: r.creator_id, from_admin: true, body: text });
-    await supabase.from("creator_requests").update({ status: "resolved", reply: text, resolved_by: u.user?.id, resolved_at: new Date().toISOString() }).eq("id", r.id);
+    await supabase.from("creator_requests").update({ status: "resolved", reply: text, resolved_by: u.user?.id ?? null, resolved_at: new Date().toISOString() }).eq("id", r.id);
     toast.success("Resolved and replied"); void qc.invalidateQueries({ queryKey: ["hub"] });
   }
   return (

@@ -140,7 +140,7 @@ function NeedsAttention() {
       <h2 className="font-extrabold text-brand-navy">Needs attention</h2>
       {data.length === 0 ? <p className="mt-3 text-sm text-brand-navySoft">Nothing needs attention right now</p> : (
         <ul className="mt-3 space-y-2">{data.map((x) => (
-          <li key={x.label}><Link to={x.to} search={x.label.includes("review") ? ({ tab: "reviews" } as never) : x.label.includes("applications") ? ({ tab: "applicants" } as never) : undefined} className="flex items-center gap-3 rounded-xl bg-portal-bg px-3 py-2.5 text-sm"><b className="text-lg text-brand-navy">{x.n}</b><span className="flex-1 text-brand-navy">{x.label}</span><ArrowRight className="size-4" /></Link></li>
+          <li key={x.label}><Link to={x.to} search={(x.label.includes("review") ? { tab: "reviews" } : x.label.includes("applications") ? { tab: "applicants" } : {}) as never} className="flex items-center gap-3 rounded-xl bg-portal-bg px-3 py-2.5 text-sm"><b className="text-lg text-brand-navy">{x.n}</b><span className="flex-1 text-brand-navy">{x.label}</span><ArrowRight className="size-4" /></Link></li>
         ))}</ul>
       )}
     </section>

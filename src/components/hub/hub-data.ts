@@ -11,21 +11,22 @@ export function useSetupChecklist(): SetupStep[] {
     queryKey: ["hub", "setup", appId],
     queryFn: async () => {
       const f = <T,>(q: T) => q;
-      const scope = (table: "campaigns" | "creators" | "creator_posts" | "creator_messages" | "post_metrics_daily") => {
-        const q = supabase.from(table).select("id", { count: "exact", head: true });
-        return appId && table !== "creators" && table !== "creator_messages" ? q.eq("app_id", appId) : q;
+      const scope = (table: "campaigns" | "creator_posts" | "post_metrics_daily") => {
+        const q = supabase.from(table as "campaigns").select("id", { count: "exact", head: true });
+        return appId ? q.eq("app_id", appId) : q;
       };
       const [c, m, s, p, t] = await Promise.all([
         scope("campaigns"),
         f(supabase.from("creator_messages").select("id", { count: "exact", head: true }).eq("from_admin", true)),
         f(supabase.from("creators").select("id", { count: "exact", head: true }).not("onboarding_completed_at", "is", null)),
-        scope("creator_posts").eq("status", "approved"),
+        (appId ? supabase.from("creator_posts").select("id", { count: "exact", head: true }).eq("app_id", appId) : supabase.from("creator_posts").select("id", { count: "exact", head: true })).eq("status", "approved"),
         scope("post_metrics_daily"),
       ]);
       return [c.count ?? 0, m.count ?? 0, s.count ?? 0, p.count ?? 0, t.count ?? 0];
     },
   });
-  const n = data ?? [0, 0, 0, 0, 0];
+  const [n0 = 0, n1 = 0, n2 = 0, n3 = 0, n4 = 0] = data ?? [];
+  const n = [n0, n1, n2, n3, n4] as const;
   return [
     { title: "Create your first campaign", subtitle: "Set the brief, the payout and who can join", done: n[0] > 0, to: "/hub/campaigns/create" },
     { title: "Message your applicants", subtitle: "Say hello and answer their questions", done: n[1] > 0, to: "/hub/messages" },
