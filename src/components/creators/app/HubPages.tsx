@@ -258,7 +258,7 @@ export function MyTerms({ tiers }: { tiers: { tier: string; per_post: number | s
         <b>{eur(perPost)}</b> {fr ? "par post" : "per post"} · <b>{eur(rpm ?? 0)}</b> {fr ? "/ 1 000 vues" : "per 1,000 views"} · {fr ? "jusqu'à" : "up to"} <b>{eur(cap ?? 0)}</b> {fr ? "par post" : "per post"}
         {own ? <> · {fr ? "objectif" : "target"} <b>{target}</b> {fr ? "posts/mois" : "posts/month"}</> : null}
         {num("welcome_bonus") ? <> · {fr ? "bonus de bienvenue" : "welcome bonus"} <b>{eur(num("welcome_bonus")!)}</b></> : null}
-      </p>
+      </p>}
     </div>
   );
 }
