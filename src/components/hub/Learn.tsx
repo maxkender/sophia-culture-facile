@@ -144,8 +144,47 @@ function References() {
           </div>
         </div>
       ))}</div>
+      <ReferenceLibrary />
     </div>
   );
+}
+
+const KINDS = ["all", "account", "search", "hashtag", "format"] as const;
+function ReferenceLibrary() {
+  const { appId } = useAdminApp();
+  const app = appId ?? SOPHIA_APP_ID;
+  const [kind, setKind] = useState<(typeof KINDS)[number]>("all");
+  const { data = [] } = useQuery({ queryKey: ["hub", "learn", "library", app], queryFn: async () => (await supabase.from("reference_library").select("*").eq("app_id", app).order("kind").order("created_at")).data ?? [] });
+  const rows = data.filter((r) => kind === "all" || r.kind === kind);
+  return (
+    <div className="space-y-3 pt-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-lg font-extrabold text-brand-navy">Accounts, searches & formats</h3>
+        <div className="flex gap-1 overflow-x-auto">{KINDS.map((k) => <button key={k} type="button" onClick={() => setKind(k)} className={cn("min-h-9 shrink-0 rounded-full px-3 text-xs font-bold capitalize", kind === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{k} {k === "all" ? data.length : data.filter((r) => r.kind === k).length}</button>)}</div>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{rows.map((r) => (
+        <div key={r.id} className={cn(card, "space-y-2 p-4")}>
+          <div className="flex items-center gap-2">
+            {r.kind === "account" && r.url ? <AccountAvatar url={r.url} /> : null}
+            <span className="rounded-full bg-portal-bg px-2 py-0.5 text-[10px] font-bold uppercase text-brand-navySoft">{r.kind}</span>
+            <span className="text-[10px] text-brand-navySoft">{r.category?.replace(/_/g, " ")}</span>
+          </div>
+          {r.url ? <a href={r.url} target="_blank" rel="noreferrer" className="block font-extrabold text-brand-navy underline-offset-2 hover:underline">{r.title}</a> : <p className="font-extrabold text-brand-navy">{r.title}</p>}
+          <p className="whitespace-pre-line text-sm text-brand-navySoft">{r.note}</p>
+          {r.tags.length ? <p className="flex flex-wrap gap-1">{r.tags.map((t: string) => <span key={t} className="rounded-full bg-portal-accent/10 px-2 py-0.5 text-[10px] font-bold text-portal-accent">#{t}</span>)}</p> : null}
+        </div>
+      ))}</div>
+    </div>
+  );
+}
+
+/** TikTok oEmbed gives the account avatar for profile URLs when available; otherwise nothing is shown. */
+function AccountAvatar({ url }: { url: string }) {
+  const { data } = useQuery({ queryKey: ["oembed-avatar", url], staleTime: 86400_000, retry: false, queryFn: async () => {
+    const r = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(url)}`); if (!r.ok) return null;
+    const j = (await r.json()) as { thumbnail_url?: string }; return j.thumbnail_url ?? null;
+  } });
+  return data ? <img src={data} alt="" loading="lazy" className="size-8 rounded-full object-cover" /> : <span className="flex size-8 items-center justify-center rounded-full bg-portal-bg text-xs font-bold text-brand-navy">@</span>;
 }
 
 function Guides() {
@@ -196,12 +235,13 @@ function Templates() {
   return (
     <div className="space-y-4">
       <div className={card}>
-        <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-extrabold text-brand-navy">DM templates & saved replies</h3>
+        <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-extrabold text-brand-navy">DM templates, saved replies & nurture emails</h3>
           <div className="flex gap-2">{(["dm", "reply"] as const).map((k) => <Button key={k} size="sm" variant="outline" onClick={async () => { await supabase.from("saved_templates").insert({ kind: k, name: k === "dm" ? "New DM" : "New reply", body: "", app_id: appId }); reload(); }}>Add {k === "dm" ? "DM" : "reply"}</Button>)}</div></div>
         <div className="mt-3 space-y-3">{(data?.saved ?? []).map((t) => (
           <div key={t.id} className="rounded-xl border p-3">
             <div className="flex gap-2"><span className="rounded-full bg-portal-bg px-2 py-1 text-xs font-bold uppercase">{t.kind}</span><input aria-label="Name" defaultValue={t.name} onBlur={(e) => void supabase.from("saved_templates").update({ name: e.target.value }).eq("id", t.id)} className="h-8 flex-1 rounded-lg border px-2 text-sm font-semibold" />
               <Button size="sm" variant="ghost" aria-label="Delete" onClick={async () => { if (window.confirm("Delete this template?")) { await supabase.from("saved_templates").delete().eq("id", t.id); reload(); } }}><Trash2 className="size-4" /></Button></div>
+            {t.kind === "email" ? <input aria-label="Subject" defaultValue={t.subject ?? ""} placeholder="Subject" onBlur={(e) => void supabase.from("saved_templates").update({ subject: e.target.value }).eq("id", t.id)} className="mt-2 h-8 w-full rounded-lg border px-2 text-sm" /> : null}
             <textarea aria-label="Text" rows={3} defaultValue={t.body} onBlur={(e) => void supabase.from("saved_templates").update({ body: e.target.value, updated_at: new Date().toISOString() }).eq("id", t.id)} className="mt-2 w-full rounded-lg border p-2 text-sm" />
           </div>
         ))}{!data?.saved.length ? <p className="text-sm text-brand-navySoft">No saved templates yet.</p> : null}</div>
