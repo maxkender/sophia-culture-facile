@@ -101,6 +101,8 @@ function Seg<T extends string>({ value, options, onChange }: { value: T; options
 export function JobFields({ j, set, tab }: { j: JobDraft; set: (p: Partial<JobDraft>) => void; tab: "details" | "payment" | "content" }) {
   const { data: campaigns = [] } = useQuery({ queryKey: ["hub", "campaign-options"], queryFn: async () => (await supabase.from("campaigns").select("id, name").order("created_at", { ascending: false })).data ?? [] });
   const [aiBusy, setAiBusy] = useState(false);
+  const { data: tierRows = [] } = useQuery({ queryKey: ["hub", "tier-rows"], queryFn: async () => (await supabase.from("ugc_tiers").select("tier, label, per_post, cpm, cap_per_post")).data ?? [] });
+  const capPerPost = Number((tierRows.find((t) => Number(t.per_post) === Number(j.base_amount)) ?? tierRows.find((t) => t.tier === "active"))?.cap_per_post ?? 0) || null;
   if (tab === "details") return (
     <div className="space-y-4">
       <label className={label}>Title<input className={input} value={j.title} onChange={(e) => set({ title: e.target.value })} placeholder="Ex. UGC Creator for skincare launch" /></label>
@@ -124,7 +126,7 @@ export function JobFields({ j, set, tab }: { j: JobDraft; set: (p: Partial<JobDr
       <button type="button" disabled={aiBusy} className="text-sm font-bold text-portal-accent" onClick={async () => {
         setAiBusy(true);
         const c = j.campaign_id ? (await supabase.from("campaigns").select("brief_md, name").eq("id", j.campaign_id).maybeSingle()).data : null;
-        const draft = `${c?.name ? `${c.name}: ` : ""}${c?.brief_md || "Short, natural videos about the app"}\n\nWhat you do: film ${j.posting_frequency_n ?? 5} ${j.content_type?.toLowerCase() ?? "short"} videos per ${j.posting_frequency_unit}, about ${j.video_length_s ?? 30}s each, on ${j.platforms.join(" and ")}.\nPay: ${exampleEarnings(j)} (example).`;
+        const draft = `${c?.name ? `${c.name}: ` : ""}${c?.brief_md || "Short, natural videos about the app"}\n\nWhat you do: film ${j.posting_frequency_n ?? 5} ${j.content_type?.toLowerCase() ?? "short"} videos per ${j.posting_frequency_unit}, about ${j.video_length_s ?? 30}s each, on ${j.platforms.join(" and ")}.\nPay: ${exampleEarnings(j, capPerPost)} (example).`;
         set({ details_md: draft.slice(0, 1000) }); setAiBusy(false);
       }}>Write with AI</button>
       <label className={label}>Who has access<Seg value={j.access} onChange={(v) => set({ access: v })} options={[["job_feed", "Anyone on the job feed"], ["invite_only", "Invite only"], ["link", "Anyone with the link"]]} /></label>
@@ -159,7 +161,7 @@ export function JobFields({ j, set, tab }: { j: JobDraft; set: (p: Partial<JobDr
         ))}
         <button type="button" className="mt-2 text-sm font-bold text-portal-accent" onClick={() => set({ bonus_goals: [...j.bonus_goals, { metric: "posts", threshold: 10, amount: 20, period: "month" }] })}>Add Goal</button>
       </div>
-      <p className="rounded-xl bg-portal-bg p-3 text-sm text-brand-navy"><b>Example earnings:</b> {exampleEarnings(j)}</p>
+      <p className="rounded-xl bg-portal-bg p-3 text-sm text-brand-navy"><b>Example earnings:</b> {exampleEarnings(j, capPerPost)}</p>
     </div>
   );
   return (
