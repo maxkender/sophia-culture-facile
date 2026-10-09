@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, ExternalLink, Tag, Upload, X } from "lucide-react";
@@ -231,6 +231,7 @@ export function Discover({ initialQ }: { initialQ?: string | undefined } = {}) {
     if (f.followers) { const [lo = 0, hi = 0] = f.followers.split("-").map(Number); const n = p.followers ?? 0; if (n < lo || (hi && n > hi)) return false; }
     return true;
   }), [people, tab, q, f]);
+  useEffect(() => { if (initialQ && list.length > 0) setOpen(0); }, [initialQ, list.length > 0]); // eslint-disable-line react-hooks/exhaustive-deps
   const sel = "min-h-9 rounded-lg border border-brand-line bg-card px-2 text-sm";
   const count = (k: string) => (k === "all" ? people.length : people.filter((p) => p.kind === k).length);
   return (
