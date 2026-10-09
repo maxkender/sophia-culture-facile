@@ -126,6 +126,7 @@ import { Route as AuthenticatedHubCampaignsCreateRouteImport } from './routes/_a
 import { Route as AuthenticatedHubCreatorsCreatorIdRouteImport } from './routes/_authenticated/hub/creators.$creatorId'
 import { Route as AuthenticatedHubToolsSplatRouteImport } from './routes/_authenticated/hub/tools.$'
 import { Route as ApiPublicAppCoursesRouteImport } from './routes/api/public/app/courses'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 import { Route as CreatorsAppBriefsIndexRouteImport } from './routes/creators.app.briefs.index'
 import { Route as CreatorsAppBriefsBriefIdRouteImport } from './routes/creators.app.briefs.$briefId'
 import { Route as CreatorsInfluencerAppIndexRouteImport } from './routes/creators.influencer.app.index'
@@ -800,6 +801,11 @@ const ApiPublicAppCoursesRoute = ApiPublicAppCoursesRouteImport.update({
   path: '/api/public/app/courses',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe/webhook',
+  path: '/api/public/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreatorsAppBriefsIndexRoute = CreatorsAppBriefsIndexRouteImport.update({
   id: '/briefs/',
   path: '/briefs/',
@@ -1250,6 +1256,7 @@ export interface FileRoutesByFullPath {
   '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
   '/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
+  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
   '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
   '/creators/influencer/app/briefs': typeof CreatorsInfluencerAppBriefsRoute
@@ -1422,6 +1429,7 @@ export interface FileRoutesByTo {
   '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
   '/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
+  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
   '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
   '/creators/influencer/app/briefs': typeof CreatorsInfluencerAppBriefsRoute
@@ -1599,6 +1607,7 @@ export interface FileRoutesById {
   '/_authenticated/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
   '/_authenticated/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
+  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
   '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
   '/creators/influencer/app/briefs': typeof CreatorsInfluencerAppBriefsRoute
@@ -1776,6 +1785,7 @@ export interface FileRouteTypes {
     | '/hub/creators/$creatorId'
     | '/hub/tools/$'
     | '/api/public/app/courses'
+    | '/api/public/stripe/webhook'
     | '/creators/app/briefs/$briefId'
     | '/creators/influencer/app/agreement'
     | '/creators/influencer/app/briefs'
@@ -1948,6 +1958,7 @@ export interface FileRouteTypes {
     | '/hub/creators/$creatorId'
     | '/hub/tools/$'
     | '/api/public/app/courses'
+    | '/api/public/stripe/webhook'
     | '/creators/app/briefs/$briefId'
     | '/creators/influencer/app/agreement'
     | '/creators/influencer/app/briefs'
@@ -2124,6 +2135,7 @@ export interface FileRouteTypes {
     | '/_authenticated/hub/creators/$creatorId'
     | '/_authenticated/hub/tools/$'
     | '/api/public/app/courses'
+    | '/api/public/stripe/webhook'
     | '/creators/app/briefs/$briefId'
     | '/creators/influencer/app/agreement'
     | '/creators/influencer/app/briefs'
@@ -2260,6 +2272,7 @@ export interface RootRouteChildren {
   FrCoursIndexRoute: typeof FrCoursIndexRoute
   FrCreateursIndexRoute: typeof FrCreateursIndexRoute
   ApiPublicAppCoursesRoute: typeof ApiPublicAppCoursesRouteWithChildren
+  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   EnCreatorsUnswipeInfluencerRoute: typeof EnCreatorsUnswipeInfluencerRoute
   EnCreatorsUnswipeSlideshowRoute: typeof EnCreatorsUnswipeSlideshowRoute
   EnCreatorsUnswipeUgcRoute: typeof EnCreatorsUnswipeUgcRoute
@@ -3092,6 +3105,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAppCoursesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/stripe/webhook': {
+      id: '/api/public/stripe/webhook'
+      path: '/api/public/stripe/webhook'
+      fullPath: '/api/public/stripe/webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/creators/app/briefs/': {
       id: '/creators/app/briefs/'
       path: '/briefs'
@@ -3845,6 +3865,7 @@ const rootRouteChildren: RootRouteChildren = {
   FrCoursIndexRoute: FrCoursIndexRoute,
   FrCreateursIndexRoute: FrCreateursIndexRoute,
   ApiPublicAppCoursesRoute: ApiPublicAppCoursesRouteWithChildren,
+  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   EnCreatorsUnswipeInfluencerRoute: EnCreatorsUnswipeInfluencerRoute,
   EnCreatorsUnswipeSlideshowRoute: EnCreatorsUnswipeSlideshowRoute,
   EnCreatorsUnswipeUgcRoute: EnCreatorsUnswipeUgcRoute,

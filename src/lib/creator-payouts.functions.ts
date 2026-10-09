@@ -7,6 +7,24 @@ async function requireAdmin(supabase: any, userId: string) {
   if (data?.role !== "admin") throw new Error("Forbidden");
 }
 
+/** Which Stripe mode the server is in; never returns key material. */
+export function stripeModeOf(): "live" | "test" | "none" {
+  const live = process.env["STRIPE_SECRET_KEY"];
+  if (live?.startsWith("sk_live_") && process.env["STRIPE_ALLOW_LIVE"] === "true") return "live";
+  if (live?.startsWith("sk_test_") || process.env["STRIPE_TEST_API_KEY"]) return "test";
+  return "none";
+}
+
+export const stripeModeInfo = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context as any;
+    const { data } = await supabase.from("profiles").select("role").eq("user_id", userId).maybeSingle();
+    const mode = stripeModeOf();
+    if (data?.role !== "admin") return { mode, webhookSecretSet: null as boolean | null };
+    return { mode, webhookSecretSet: Boolean(process.env["STRIPE_WEBHOOK_SECRET"]) };
+  });
+
 // Safety: live keys are refused unless STRIPE_ALLOW_LIVE=true is explicitly set.
 async function stripe() {
   let key = process.env["STRIPE_SECRET_KEY"];

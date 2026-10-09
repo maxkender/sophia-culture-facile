@@ -12,7 +12,7 @@ import { PageTitle, PortalCard, EmptyState } from "../ui";
 
 type Tab = "batches" | "rates" | "creators";
 
-export function CreatorPayouts() {
+export function CreatorPayouts({ inHub = false }: { inHub?: boolean } = {}) {
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("batches");
   const [period, setPeriod] = useState(new Date().toISOString().slice(0, 7));
@@ -77,14 +77,15 @@ export function CreatorPayouts() {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async function exportCsv(b: any, kind: "wise" | "paypal") {
+  async function exportCsv(b: any, kind: "wise" | "paypal" | "bank") {
     const ids = (b.payout_items ?? []).map((i: any) => i.creator_id);
-    const { data: profs } = await supabase.from("creator_payout_profiles").select("creator_id, paypal_email, wise_email").in("creator_id", ids);
+    const { data: profs } = await supabase.from("creator_payout_profiles").select("creator_id, method, paypal_email, wise_email, bank_iban, bank_holder").in("creator_id", ids);
     const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-    const header = kind === "wise" ? ["name", "recipientEmail", "amount", "currency", "reference"] : ["email", "amount", "currency", "note"];
-    const lines = (b.payout_items ?? []).map((i: any) => {
+    const header = kind === "bank" ? ["iban", "holder", "amount", "currency", "reference"] : kind === "wise" ? ["name", "recipientEmail", "amount", "currency", "reference"] : ["email", "amount", "currency", "note"];
+    const lines = (b.payout_items ?? []).filter((i: any) => kind !== "bank" || profs?.some((x) => x.creator_id === i.creator_id && x.bank_iban)).map((i: any) => {
       const p = profs?.find((x) => x.creator_id === i.creator_id);
-      const amt = Number(i.amount_usd).toFixed(2);
+      const amt = Number(i.amount ?? i.amount_usd).toFixed(2);
+      if (kind === "bank") return [p?.bank_iban, p?.bank_holder ?? i.creators?.full_name, amt, i.currency ?? "EUR", `Sophia ${b.period}`];
       return kind === "wise"
         ? [i.creators?.full_name, p?.wise_email, amt, i.currency ?? "EUR", `Sophia ${b.period}`]
         : [p?.paypal_email, amt, i.currency ?? "EUR", `Sophia ${b.period}`];
@@ -107,6 +108,7 @@ export function CreatorPayouts() {
   return (
     <div className="space-y-6">
       <PageTitle title="Creator payouts" lead="Monthly batches, paid by Stripe Connect or exported for Wise, PayPal and bank transfer." />
+      {!inHub && <p className="rounded-xl bg-muted px-4 py-2 text-sm">Payouts now live in the Creator Hub: <a className="font-semibold underline" href="/hub/payouts">open Hub → Payouts</a>.</p>}
       {tab === "batches" && <UgcMonthPanel />}
       <div className="flex flex-wrap gap-2">
         {(["batches", "rates", "creators"] as Tab[]).map((t) => (
@@ -167,8 +169,9 @@ export function CreatorPayouts() {
                       ))}
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="ghost" onClick={() => exportCsv(b, "wise")}>Wise CSV</Button>
-                      <Button size="sm" variant="ghost" onClick={() => exportCsv(b, "paypal")}>PayPal CSV</Button>
+                      <Button size="sm" variant="ghost" onClick={() => exportCsv(b, "wise")}>Export Wise CSV</Button>
+                      <Button size="sm" variant="ghost" onClick={() => exportCsv(b, "paypal")}>Export PayPal CSV</Button>
+                      <Button size="sm" variant="ghost" onClick={() => exportCsv(b, "bank")}>Export bank CSV</Button>
                       {b.status === "draft" && <Button size="sm" variant="outline" onClick={() => setBatchStatus(b.id, "approved")}>Approve</Button>}
                       {b.status === "approved" && <Button size="sm" onClick={() => payBatch(b.id)}>Pay via Stripe</Button>}
                     </div>
@@ -179,6 +182,8 @@ export function CreatorPayouts() {
                         <span className="flex items-center gap-2"><AppBadge appId={i.app_id} />{i.creators?.full_name} — {i.posts_count} post(s) × ${Number(i.rate_usd).toFixed(2)}</span>
                         <span className="flex items-center gap-2">
                           <span className="font-medium">{i.currency === "EUR" ? "€" : "$"}{Number(i.amount ?? i.amount_usd).toFixed(2)}</span>{i.hold_reason ? <span className="text-xs text-portal-amber">{i.hold_reason}</span> : null}
+                          {i.status === "paid" && i.stripe_transfer_id ? <span className="font-mono text-xs text-muted-foreground">{i.stripe_transfer_id}</span> : null}
+                          {(i.status === "failed" || i.status === "skipped") && i.note ? <span className="text-xs text-destructive">{i.note}</span> : null}
                           <span className="rounded bg-muted px-1.5 py-0.5 text-xs">{i.status}</span>
                         </span>
                       </div>
