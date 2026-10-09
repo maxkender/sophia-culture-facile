@@ -200,6 +200,7 @@ export function HubShell({ children }: { children: ReactNode }) {
                 <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/discover" })}>Invite creator</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <Button size="icon" variant="outline" aria-label="Open Sidekick" onClick={() => setSidekick(true)}><Bot className="size-4" /></Button>
             <NotificationBell profileId={profile.id} />
           </div>
         </header>
