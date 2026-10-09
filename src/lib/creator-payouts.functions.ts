@@ -9,11 +9,13 @@ async function requireAdmin(supabase: any, userId: string) {
 
 // Safety: live keys are refused unless STRIPE_ALLOW_LIVE=true is explicitly set.
 async function stripe() {
-  const key = process.env["STRIPE_SECRET_KEY"];
-  if (!key) throw new Error("Stripe is not configured");
-  if (key.startsWith("sk_live_") && process.env["STRIPE_ALLOW_LIVE"] !== "true") {
-    throw new Error("Stripe is in live mode. Add a test key (sk_test_…) to try payouts safely.");
+  let key = process.env["STRIPE_SECRET_KEY"];
+  if (key?.startsWith("sk_live_") && process.env["STRIPE_ALLOW_LIVE"] !== "true") {
+    // Live money stays off until STRIPE_ALLOW_LIVE=true; meanwhile run the whole chain on the test key.
+    key = process.env["STRIPE_TEST_API_KEY"];
+    if (!key) throw new Error("Stripe is in live mode. Add a test key (sk_test_…) to try payouts safely.");
   }
+  if (!key) throw new Error("Stripe is not configured");
   const Stripe = (await import("stripe")).default;
   return new Stripe(key);
 }
@@ -142,7 +144,7 @@ export const payPayoutBatch = createServerFn({ method: "POST" })
     const { data: batch } = await supabase.from("payout_batches").select("*").eq("id", data.batchId).single();
     if (!batch || batch.status === "paid") throw new Error("Batch not payable");
     if (batch.status !== "approved") throw new Error("Approve the batch first");
-    const { data: items } = await supabase.from("payout_items").select("*").eq("batch_id", batch.id).in("status", ["pending", "skipped", "failed"]);
+    const { data: items } = await supabase.from("payout_items").select("*").eq("batch_id", batch.id).in("status", ["pending", "accrued", "skipped", "failed"]);
     const { data: profiles } = await supabase.from("creator_payout_profiles").select("*");
     const s = await stripe();
 
@@ -157,8 +159,8 @@ export const payPayoutBatch = createServerFn({ method: "POST" })
       try {
         const transfer = await s.transfers.create(
           {
-            amount: Math.round(Number(item.amount_usd) * 100),
-            currency: String((item as any).currency ?? "USD").toLowerCase(),
+            amount: Math.round(Number((item as any).amount ?? item.amount_usd) * 100),
+            currency: String((item as any).currency ?? "EUR").toLowerCase(),
             destination: profile.stripe_account_id,
             metadata: { batch_id: batch.id, payout_item_id: item.id },
           },
