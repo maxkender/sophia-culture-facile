@@ -42,7 +42,7 @@ export const createFastLane = createServerFn({ method: "POST" })
     const { createFastLaneOne } = await import("./fast-lane.server");
     const results: { name: string; email: string; link: string | null; creatorId: string | null; error: string | null }[] = [];
     for (const p of data.people) {
-      try { const r = await createFastLaneOne(a, p, data.pay, data.appId, data.jobId, data.origin); results.push({ ...r, error: null }); }
+      try { const r = await createFastLaneOne(a, p as never, data.pay, data.appId, data.jobId, data.origin); results.push({ ...r, error: null }); }
       catch (e) { results.push({ name: p.firstName, email: p.email, link: null, creatorId: null, error: (e as Error).message }); }
     }
     return { results };
