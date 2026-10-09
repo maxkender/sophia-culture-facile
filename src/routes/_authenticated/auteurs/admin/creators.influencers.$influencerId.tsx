@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PortalShell } from "@/components/portal/PortalShell";
-import { InfluencerAdminDetail } from "@/components/portal/admin/InfluencersAdmin";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Moved to the Creator Hub; kept so old links keep working. */
 export const Route = createFileRoute("/_authenticated/auteurs/admin/creators/influencers/$influencerId")({
-  head: () => ({ meta: [{ title: "Influencer | Sophia" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: function Page() { const { influencerId } = Route.useParams(); return <PortalShell adminOnly><InfluencerAdminDetail influencerId={influencerId} /></PortalShell>; },
+  beforeLoad: ({ params }) => {
+    throw redirect({ ...{ to: "/hub/tools/$", params: { _splat: `influencers/${params.influencerId}` } }, replace: true, statusCode: 301 } as never);
+  },
 });

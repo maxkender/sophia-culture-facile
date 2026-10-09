@@ -118,6 +118,7 @@ import { Route as AuthenticatedAuteursCoursesCourseIdRouteImport } from './route
 import { Route as AuthenticatedHubCampaignsIndexRouteImport } from './routes/_authenticated/hub/campaigns.index'
 import { Route as AuthenticatedHubCampaignsCreateRouteImport } from './routes/_authenticated/hub/campaigns.create'
 import { Route as AuthenticatedHubCreatorsCreatorIdRouteImport } from './routes/_authenticated/hub/creators.$creatorId'
+import { Route as AuthenticatedHubToolsSplatRouteImport } from './routes/_authenticated/hub/tools.$'
 import { Route as ApiPublicAppCoursesRouteImport } from './routes/api/public/app/courses'
 import { Route as CreatorsAppBriefsIndexRouteImport } from './routes/creators.app.briefs.index'
 import { Route as CreatorsAppBriefsBriefIdRouteImport } from './routes/creators.app.briefs.$briefId'
@@ -752,6 +753,12 @@ const AuthenticatedHubCreatorsCreatorIdRoute =
     path: '/creators/$creatorId',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
+const AuthenticatedHubToolsSplatRoute =
+  AuthenticatedHubToolsSplatRouteImport.update({
+    id: '/tools/$',
+    path: '/tools/$',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
 const ApiPublicAppCoursesRoute = ApiPublicAppCoursesRouteImport.update({
   id: '/api/public/app/courses',
   path: '/api/public/app/courses',
@@ -1199,6 +1206,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
   '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
+  '/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
   '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
@@ -1364,6 +1372,7 @@ export interface FileRoutesByTo {
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
   '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
+  '/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
   '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
@@ -1534,6 +1543,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/_authenticated/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
   '/_authenticated/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
+  '/_authenticated/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
   '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
@@ -1704,6 +1714,7 @@ export interface FileRouteTypes {
     | '/auteurs/courses/$courseId'
     | '/hub/campaigns/create'
     | '/hub/creators/$creatorId'
+    | '/hub/tools/$'
     | '/api/public/app/courses'
     | '/creators/app/briefs/$briefId'
     | '/creators/influencer/app/agreement'
@@ -1869,6 +1880,7 @@ export interface FileRouteTypes {
     | '/auteurs/courses/$courseId'
     | '/hub/campaigns/create'
     | '/hub/creators/$creatorId'
+    | '/hub/tools/$'
     | '/api/public/app/courses'
     | '/creators/app/briefs/$briefId'
     | '/creators/influencer/app/agreement'
@@ -2038,6 +2050,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/courses/$courseId'
     | '/_authenticated/hub/campaigns/create'
     | '/_authenticated/hub/creators/$creatorId'
+    | '/_authenticated/hub/tools/$'
     | '/api/public/app/courses'
     | '/creators/app/briefs/$briefId'
     | '/creators/influencer/app/agreement'
@@ -2947,6 +2960,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHubCreatorsCreatorIdRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
+    '/_authenticated/hub/tools/$': {
+      id: '/_authenticated/hub/tools/$'
+      path: '/tools/$'
+      fullPath: '/hub/tools/$'
+      preLoaderRoute: typeof AuthenticatedHubToolsSplatRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
     '/api/public/app/courses': {
       id: '/api/public/app/courses'
       path: '/api/public/app/courses'
@@ -3367,6 +3387,7 @@ interface AuthenticatedHubRouteRouteChildren {
   AuthenticatedHubIndexRoute: typeof AuthenticatedHubIndexRoute
   AuthenticatedHubCampaignsCreateRoute: typeof AuthenticatedHubCampaignsCreateRoute
   AuthenticatedHubCreatorsCreatorIdRoute: typeof AuthenticatedHubCreatorsCreatorIdRoute
+  AuthenticatedHubToolsSplatRoute: typeof AuthenticatedHubToolsSplatRoute
   AuthenticatedHubCampaignsIndexRoute: typeof AuthenticatedHubCampaignsIndexRoute
 }
 
@@ -3382,6 +3403,7 @@ const AuthenticatedHubRouteRouteChildren: AuthenticatedHubRouteRouteChildren = {
   AuthenticatedHubCampaignsCreateRoute: AuthenticatedHubCampaignsCreateRoute,
   AuthenticatedHubCreatorsCreatorIdRoute:
     AuthenticatedHubCreatorsCreatorIdRoute,
+  AuthenticatedHubToolsSplatRoute: AuthenticatedHubToolsSplatRoute,
   AuthenticatedHubCampaignsIndexRoute: AuthenticatedHubCampaignsIndexRoute,
 }
 

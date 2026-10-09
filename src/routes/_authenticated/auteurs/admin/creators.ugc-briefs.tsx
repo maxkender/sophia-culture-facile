@@ -1,12 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PortalShell } from "@/components/portal/PortalShell";
-import { UgcBriefsGrid } from "@/components/portal/admin/UgcAdmin";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Moved to the Creator Hub; kept so old links keep working. */
 export const Route = createFileRoute("/_authenticated/auteurs/admin/creators/ugc-briefs")({
-  head: () => ({ meta: [{ title: "UGC briefs | Sophia" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: () => (
-    <PortalShell adminOnly>
-      <UgcBriefsGrid />
-    </PortalShell>
-  ),
+  beforeLoad: ({ params }) => {
+    throw redirect({ ...{ to: "/hub/tools/$", params: { _splat: "ugc-briefs" } }, replace: true, statusCode: 301 } as never);
+  },
 });

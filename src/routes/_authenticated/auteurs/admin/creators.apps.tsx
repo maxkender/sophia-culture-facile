@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PortalShell } from "@/components/portal/PortalShell";
-import { AppsSettings } from "@/components/portal/admin/AppsSettings";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Moved to the Creator Hub; kept so old links keep working. */
 export const Route = createFileRoute("/_authenticated/auteurs/admin/creators/apps")({
-  head: () => ({ meta: [{ title: "Apps | Sophia" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: () => <PortalShell adminOnly><AppsSettings /></PortalShell>,
+  beforeLoad: ({ params }) => {
+    throw redirect({ ...{ to: "/hub/tools/$", params: { _splat: "apps" } }, replace: true, statusCode: 301 } as never);
+  },
 });

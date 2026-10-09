@@ -1,12 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PortalShell } from "@/components/portal/PortalShell";
-import { WeekPlanner } from "@/components/portal/admin/UgcAdmin";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Moved to the Creator Hub; kept so old links keep working. */
 export const Route = createFileRoute("/_authenticated/auteurs/admin/creators/planner")({
-  head: () => ({ meta: [{ title: "Week planner | Sophia" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: () => (
-    <PortalShell adminOnly>
-      <WeekPlanner />
-    </PortalShell>
-  ),
+  beforeLoad: ({ params }) => {
+    throw redirect({ ...{ to: "/hub/tools/$", params: { _splat: "planner" } }, replace: true, statusCode: 301 } as never);
+  },
 });
