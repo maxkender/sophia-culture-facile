@@ -231,7 +231,33 @@ export const adsConnectionStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context as never);
-    return { meta: Boolean(process.env["META_ADS_TOKEN"]), tiktok: Boolean(process.env["TIKTOK_ADS_TOKEN"]) };
+    const a = await adminClient();
+    const { data: t } = await a.from("ad_tokens").select("app_id, advertiser_ids, updated_at").eq("channel", "tiktok");
+    return { meta: Boolean(process.env["META_ADS_TOKEN"]), tiktok: Boolean((t ?? []).length || process.env["TIKTOK_ADS_TOKEN"]), tiktokApps: t ?? [], tiktokAppSet: Boolean(process.env["TIKTOK_APP_ID"] && process.env["TIKTOK_APP_SECRET"]), redirectUri: "https://sophia-culture.com/api/public/tiktok/oauth" };
+  });
+
+export const verifyAdConnection = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ appId: z.string().uuid(), channel: z.enum(["meta", "tiktok"]) }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    const a = await adminClient();
+    const { data: conn } = await a.from("ad_connections").select("account_id, config").eq("app_id", data.appId).eq("channel", data.channel).maybeSingle();
+    const { verifyMeta, verifyTikTok } = await import("./ads.server");
+    return data.channel === "meta" ? verifyMeta(conn) : verifyTikTok(a, conn?.account_id ?? null, data.appId);
+  });
+
+/** TikTok OAuth start: state is HMAC-signed with the app secret and expires after 15 minutes. */
+export const tiktokConnectUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ appId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    const id = process.env["TIKTOK_APP_ID"]; const secret = process.env["TIKTOK_APP_SECRET"];
+    if (!id || !secret) throw new Error("Add the TIKTOK_APP_ID and TIKTOK_APP_SECRET secrets first.");
+    const { signTikTokState } = await import("./tiktok-oauth.server");
+    const state = await signTikTokState(data.appId, secret);
+    return { url: `https://business-api.tiktok.com/portal/auth?app_id=${encodeURIComponent(id)}&state=${encodeURIComponent(state)}&redirect_uri=${encodeURIComponent("https://sophia-culture.com/api/public/tiktok/oauth")}` };
   });
 
 /** Creates the ad on the ad platform, always PAUSED. Needs the token secret and the account id saved in Connections. */
@@ -245,7 +271,7 @@ export const pushAd = createServerFn({ method: "POST" })
     if (!ad) throw new Error("Ad not found");
     const { data: conn } = await a.from("ad_connections").select("account_id, config").eq("app_id", ad.app_id).eq("channel", ad.channel).maybeSingle();
     const { pushMetaAd, pushTikTokAd } = await import("./ads.server");
-    const result = ad.channel === "meta" ? await pushMetaAd(a, ad, conn) : await pushTikTokAd(ad, conn);
+    const result = ad.channel === "meta" ? await pushMetaAd(a, ad, conn) : await pushTikTokAd(a, ad, conn);
     if (!result.ok) return result;
     await a.from("ad_candidates").update({ status: "paused", external_ids: result.ids, started_at: new Date().toISOString().slice(0, 10) }).eq("id", ad.id);
     return result;

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { SOPHIA_APP_ID, useAdminApp, useApps } from "@/lib/apps";
-import { adFileUrl, adsConnectionStatus, markAdWinner, pushAd, requestCreatorTask, saveAdCandidate, setAdStatus, syncAdMetricsNow } from "@/lib/hub.functions";
+import { adFileUrl, adsConnectionStatus, markAdWinner, pushAd, requestCreatorTask, saveAdCandidate, setAdStatus, syncAdMetricsNow, tiktokConnectUrl, verifyAdConnection } from "@/lib/hub.functions";
 import { PostThumb } from "./PostThumb";
 import { compact, eur } from "./hub-data";
 
@@ -262,33 +262,60 @@ function Results() {
   );
 }
 
+function VerifyBox({ appId, channel }: { appId: string; channel: "meta" | "tiktok" }) {
+  const verify = useServerFn(verifyAdConnection);
+  const [res, setRes] = useState<{ check: string; ok: boolean; detail: string }[] | null>(null);
+  const [busy, setBusy] = useState(false);
+  return (
+    <div className="mt-3">
+      <Button type="button" size="sm" variant="outline" disabled={busy} onClick={async () => { setBusy(true); try { setRes(await verify({ data: { appId, channel } })); } catch { toast.error("Verification failed."); } setBusy(false); }}>{busy ? "Checking…" : channel === "meta" ? "Verify" : "Verify TikTok"}</Button>
+      {res && <ul className="mt-2 space-y-1 text-xs">{res.map((r) => <li key={r.check} className={r.ok ? "text-portal-green" : "text-destructive"}>{r.ok ? "●" : "○"} <b>{r.check}</b>: {r.detail}</li>)}</ul>}
+    </div>
+  );
+}
+
 function Connections() {
   const { data: apps = [] } = useApps();
   const qc = useQueryClient();
   const status = useServerFn(adsConnectionStatus);
+  const connectTT = useServerFn(tiktokConnectUrl);
   const { data: tokens } = useQuery({ queryKey: ["hub", "ads-tokens"], queryFn: () => status() });
   const { data: conns = [] } = useQuery({ queryKey: ["hub", "ad-conns"], queryFn: async () => (await supabase.from("ad_connections").select("*")).data ?? [] });
+  const ttFlag = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tiktok") : null;
   async function save(appId: string, channel: "meta" | "tiktok", account_id: string, config: Record<string, string>) {
     const { error } = await supabase.from("ad_connections").upsert({ app_id: appId, channel, account_id: account_id || null, config, connected_at: new Date().toISOString() }, { onConflict: "app_id,channel" });
     if (error) toast.error("Could not save."); else { toast.success("Saved"); void qc.invalidateQueries({ queryKey: ["hub", "ad-conns"] }); }
   }
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      {apps.filter((a) => a.active).flatMap((app) => (["tiktok", "meta"] as const).map((ch) => {
+      {ttFlag && <p className="md:col-span-2 rounded-xl bg-muted px-4 py-2 text-sm">TikTok: {ttFlag === "connected" ? "connected." : ttFlag === "token_error" ? "token error — TikTok refused the code, try Connect again." : ttFlag === "bad_state" ? "link expired or invalid, try Connect again." : "app id / secret missing."}</p>}
+      {apps.filter((a) => a.active).flatMap((app) => (["meta", "tiktok"] as const).map((ch) => {
         const c = conns.find((x) => x.app_id === app.id && x.channel === ch);
         const cfg = (c?.config ?? {}) as Record<string, string>;
-        const hasToken = ch === "meta" ? tokens?.meta : tokens?.tiktok;
+        const ttConnected = (tokens?.tiktokApps ?? []).some((t: { app_id: string }) => t.app_id === app.id);
+        const hasToken = ch === "meta" ? tokens?.meta : ttConnected;
         return (
-          <form key={`${app.id}-${ch}`} className={card} onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); const rest = Object.fromEntries([...fd.entries()].filter(([k]) => k !== "account_id").map(([k, v]) => [k, String(v)])); void save(app.id, ch, String(fd.get("account_id") ?? ""), rest); }}>
-            <div className="flex items-center justify-between"><p className="font-extrabold text-brand-navy">{ch === "meta" ? "Meta Marketing API" : "TikTok Marketing API"} · {app.name}</p><span className={cn("rounded-full px-2 py-0.5 text-xs font-bold", hasToken && c?.account_id ? "bg-portal-green/15 text-portal-green" : "bg-portal-bg text-brand-navySoft")}>{hasToken && c?.account_id ? "Connected" : "Manual mode"}</span></div>
-            <p className="mt-1 text-xs text-brand-navySoft">Access token: {hasToken ? "saved" : `not saved yet — add the ${ch === "meta" ? "META_ADS_TOKEN" : "TIKTOK_ADS_TOKEN"} secret`}. Without it, use the ad pack and the ads manager by hand.</p>
-            <label className="mt-3 block text-sm font-semibold">{ch === "meta" ? "Ad account id" : "Advertiser id"}<input name="account_id" defaultValue={c?.account_id ?? ""} className={input} /></label>
+          <form key={`${app.id}-${ch}`} className={card} onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); const rest = Object.fromEntries([...fd.entries()].filter(([k]) => k !== "account_id").map(([k, v]) => [k, String(v)])); void save(app.id, ch, String(fd.get("account_id") ?? ""), { ...cfg, ...rest }); }}>
+            <div className="flex items-center justify-between"><p className="font-extrabold text-brand-navy">{ch === "meta" ? "Meta Marketing API" : "TikTok Marketing API"} · {app.name}</p><span className={cn("rounded-full px-2 py-0.5 text-xs font-bold", hasToken && c?.account_id ? "bg-portal-green/15 text-portal-green" : "bg-portal-bg text-brand-navySoft")}>{hasToken && c?.account_id ? "Connected" : "Not connected"}</span></div>
             {ch === "meta" ? <>
+              <p className="mt-1 text-xs text-brand-navySoft">Access token: {hasToken ? "saved (META_ADS_TOKEN)" : "add the META_ADS_TOKEN secret"}.</p>
+              <label className="mt-3 block text-sm font-semibold">Ad account id<input name="account_id" defaultValue={c?.account_id ?? ""} className={input} /></label>
               <label className="mt-2 block text-sm font-semibold">Facebook page id<input name="page_id" defaultValue={cfg["page_id"] ?? ""} className={input} /></label>
-              <label className="mt-2 block text-sm font-semibold">Meta app id<input name="app_id" defaultValue={cfg["app_id"] ?? ""} className={input} /></label>
-              <label className="mt-2 block text-sm font-semibold">Store link<input name="store_url" defaultValue={cfg["store_url"] ?? app.app_store_url ?? ""} className={input} /></label>
-            </> : <label className="mt-2 block text-sm font-semibold">TikTok app id<input name="app_id" defaultValue={cfg["app_id"] ?? ""} className={input} /></label>}
-            <Button type="submit" size="sm" className="mt-3">Save</Button>
+              <label className="mt-2 block text-sm font-semibold">Business id<input name="business_id" defaultValue={cfg["business_id"] ?? ""} className={input} /></label>
+              <label className="mt-2 block text-sm font-semibold">Instagram actor id<input name="instagram_actor_id" defaultValue={cfg["instagram_actor_id"] ?? ""} placeholder="Not linked yet" className={input} /></label>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <label className="block text-sm font-semibold">EU beneficiary<input name="dsa_beneficiary" defaultValue={cfg["dsa_beneficiary"] ?? "Sophia"} className={input} /></label>
+                <label className="block text-sm font-semibold">EU payer<input name="dsa_payor" defaultValue={cfg["dsa_payor"] ?? "Vik Studios"} className={input} /></label>
+              </div>
+            </> : <>
+              <p className="mt-1 text-xs text-brand-navySoft">Status: <b>{ttConnected ? "connected" : ttFlag === "token_error" ? "token error" : "not connected"}</b>{tokens && !tokens.tiktokAppSet ? " · add TIKTOK_APP_ID and TIKTOK_APP_SECRET secrets" : ""}</p>
+              <p className="mt-2 text-xs text-brand-navySoft">Redirect URI to paste in the TikTok developer app:</p>
+              <p className="flex flex-wrap items-center gap-2"><code className="rounded bg-muted px-2 py-1 text-xs">{tokens?.redirectUri}</code><button type="button" className="text-xs font-semibold underline" onClick={() => { void navigator.clipboard.writeText(tokens?.redirectUri ?? ""); toast.success("Copied"); }}>Copy</button></p>
+              <Button type="button" size="sm" className="mt-2" onClick={async () => { try { const { url } = await connectTT({ data: { appId: app.id } }); window.location.href = url; } catch (e) { toast.error((e as Error).message); } }}>{ttConnected ? "Reconnect TikTok" : "Connect TikTok"}</Button>
+              <label className="mt-3 block text-sm font-semibold">Active advertiser id<input name="account_id" defaultValue={c?.account_id ?? ""} className={input} /></label>
+            </>}
+            <div className="flex flex-wrap items-end gap-2"><Button type="submit" size="sm" className="mt-3">Save</Button></div>
+            <VerifyBox appId={app.id} channel={ch} />
           </form>
         );
       }))}
@@ -297,7 +324,7 @@ function Connections() {
 }
 
 export function Ads() {
-  const [tab, setTab] = useState<Tab>("candidates");
+  const [tab, setTab] = useState<Tab>(() => (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("tab") === "connections" ? "connections" : "candidates"));
   const [panel, setPanel] = useState<string | null>(null);
   return (
     <div>
