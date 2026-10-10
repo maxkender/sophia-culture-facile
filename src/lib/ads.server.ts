@@ -19,13 +19,15 @@ async function ttCall(path: string, body: Record<string, unknown>, token: string
 }
 
 /** Campaign + ad set, both PAUSED. OUTCOME_TRAFFIC, iOS, link clicks, website destination (no Meta SDK in the app yet). */
-export async function createMetaCampaignAdset(token: string, accountId: string, o: { name: string; country: string; dailyBudget: number; durationDays?: number | null }) {
+export async function createMetaCampaignAdset(token: string, accountId: string, o: { name: string; country: string; dailyBudget: number; durationDays?: number | null; beneficiary?: string; payor?: string }) {
   const acct = accountId.startsWith("act_") ? accountId : `act_${accountId}`;
   const campaign = await metaCall(`${acct}/campaigns`, { name: o.name, objective: "OUTCOME_TRAFFIC", status: "PAUSED", special_ad_categories: [], is_adset_budget_sharing_enabled: false }, token);
   const adset = await metaCall(`${acct}/adsets`, {
     name: `${o.name} · ${o.country} iOS`, campaign_id: campaign.id, status: "PAUSED",
     daily_budget: Math.round(o.dailyBudget * 100), billing_event: "IMPRESSIONS", optimization_goal: "LINK_CLICKS", destination_type: "WEBSITE",
     bid_strategy: "LOWEST_COST_WITHOUT_CAP",
+    // EU (DSA) requires who the ad promotes and who pays for it.
+    dsa_beneficiary: o.beneficiary || "Sophia", dsa_payor: o.payor || "Vik Studios",
     targeting: { geo_locations: { countries: [o.country] }, device_platforms: ["mobile"], user_os: ["iOS"], publisher_platforms: ["facebook", "instagram"], targeting_automation: { advantage_audience: 0 } },
     ...(o.durationDays ? { end_time: new Date(Date.now() + o.durationDays * 86400_000).toISOString() } : {}),
   }, token);
@@ -44,7 +46,7 @@ export async function pushMetaAd(a: Admin, ad: any, conn: { account_id?: string 
     const { data: cr } = ad.creator_id ? await a.from("creators").select("tiktok_handle, instagram_handle").eq("id", ad.creator_id).maybeSingle() : { data: null };
     const handle = String(cr?.tiktok_handle ?? cr?.instagram_handle ?? "hub").replace(/^@/, "");
     const link = ad.landing_url || `https://sophia-culture.com/go/${encodeURIComponent(handle)}`;
-    const { acct, campaign_id, adset_id } = await createMetaCampaignAdset(token, conn.account_id, { name: `Sophia Hub – ${ad.id.slice(0, 8)}`, country: ad.country ?? "FR", dailyBudget: Number(ad.daily_budget), durationDays: ad.duration_days });
+    const { acct, campaign_id, adset_id } = await createMetaCampaignAdset(token, conn.account_id, { name: `Sophia Hub – ${ad.id.slice(0, 8)}`, country: ad.country ?? "FR", dailyBudget: Number(ad.daily_budget), durationDays: ad.duration_days, beneficiary: conn.config.dsa_beneficiary, payor: conn.config.dsa_payor });
     const { data: signed } = await a.storage.from("creator-videos").createSignedUrl(ad.raw_file_path, 3600);
     const video = await metaCall(`${acct}/advideos`, { file_url: signed?.signedUrl, name: `ad-${ad.id}` }, token);
     const story: Record<string, unknown> = { page_id: conn.config.page_id, video_data: { video_id: video.id, message: ad.caption ?? "", title: ad.hook ?? "", call_to_action: { type: "DOWNLOAD", value: { link } } } };
