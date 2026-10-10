@@ -341,6 +341,33 @@ export type Database = {
           },
         ]
       }
+      ad_tokens: {
+        Row: {
+          access_token: string
+          advertiser_ids: string[]
+          app_id: string
+          channel: string
+          scope: Json | null
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          advertiser_ids?: string[]
+          app_id: string
+          channel: string
+          scope?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          advertiser_ids?: string[]
+          app_id?: string
+          channel?: string
+          scope?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_ui_prefs: {
         Row: {
           creators_app: string
