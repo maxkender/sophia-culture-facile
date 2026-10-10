@@ -292,7 +292,7 @@ function Connections() {
       {apps.filter((a) => a.active).flatMap((app) => (["meta", "tiktok"] as const).map((ch) => {
         const c = conns.find((x) => x.app_id === app.id && x.channel === ch);
         const cfg = (c?.config ?? {}) as Record<string, string>;
-        const ttConnected = (tokens?.tiktokApps ?? []).some((t) => t.app_id === app.id);
+        const ttConnected = (tokens?.tiktokApps ?? []).some((t: { app_id: string }) => t.app_id === app.id);
         const hasToken = ch === "meta" ? tokens?.meta : ttConnected;
         return (
           <form key={`${app.id}-${ch}`} className={card} onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); const rest = Object.fromEntries([...fd.entries()].filter(([k]) => k !== "account_id").map(([k, v]) => [k, String(v)])); void save(app.id, ch, String(fd.get("account_id") ?? ""), { ...cfg, ...rest }); }}>
