@@ -8,7 +8,7 @@ const TT = "https://business-api.tiktok.com/open_api/v1.3";
 async function metaCall(path: string, body: Record<string, unknown>, token: string) {
   const res = await fetch(`${META}/${path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...body, access_token: token }) });
   const json = (await res.json().catch(() => ({}))) as any;
-  if (!res.ok || json.error) throw new Error(`Meta ${res.status}: ${json.error?.message ?? "request failed"}`);
+  if (!res.ok || json.error) throw new Error(`Meta ${res.status}: ${[json.error?.message, json.error?.error_user_title, json.error?.error_user_msg].filter(Boolean).join(" — ") || "request failed"}`);
   return json;
 }
 async function ttCall(path: string, body: Record<string, unknown>, token: string) {
