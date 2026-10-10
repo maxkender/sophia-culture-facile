@@ -18,7 +18,21 @@ async function ttCall(path: string, body: Record<string, unknown>, token: string
   return json.data;
 }
 
-/** config: { page_id, app_id (Meta app), store_url } saved in Connections. */
+/** Campaign + ad set, both PAUSED. OUTCOME_TRAFFIC, iOS, link clicks, website destination (no Meta SDK in the app yet). */
+export async function createMetaCampaignAdset(token: string, accountId: string, o: { name: string; country: string; dailyBudget: number; durationDays?: number | null }) {
+  const acct = accountId.startsWith("act_") ? accountId : `act_${accountId}`;
+  const campaign = await metaCall(`${acct}/campaigns`, { name: o.name, objective: "OUTCOME_TRAFFIC", status: "PAUSED", special_ad_categories: [], is_adset_budget_sharing_enabled: false }, token);
+  const adset = await metaCall(`${acct}/adsets`, {
+    name: `${o.name} · ${o.country} iOS`, campaign_id: campaign.id, status: "PAUSED",
+    daily_budget: Math.round(o.dailyBudget * 100), billing_event: "IMPRESSIONS", optimization_goal: "LINK_CLICKS", destination_type: "WEBSITE",
+    bid_strategy: "LOWEST_COST_WITHOUT_CAP",
+    targeting: { geo_locations: { countries: [o.country] }, device_platforms: ["mobile"], user_os: ["iOS"], publisher_platforms: ["facebook", "instagram"], targeting_automation: { advantage_audience: 0 } },
+    ...(o.durationDays ? { end_time: new Date(Date.now() + o.durationDays * 86400_000).toISOString() } : {}),
+  }, token);
+  return { acct, campaign_id: campaign.id as string, adset_id: adset.id as string };
+}
+
+/** config: { page_id, instagram_actor_id, business_id } saved in Connections. Path: campaign → ad set → video → creative → ad, all PAUSED. */
 export async function pushMetaAd(a: Admin, ad: any, conn: { account_id?: string | null; config?: any } | null): Promise<Result> {
   const token = process.env["META_ADS_TOKEN"];
   if (!token) return { ok: false, reason: "Meta is not connected: add the META_ADS_TOKEN secret first." };
@@ -26,26 +40,35 @@ export async function pushMetaAd(a: Admin, ad: any, conn: { account_id?: string 
   if (!ad.raw_file_path) return { ok: false, reason: "Meta needs the original video file. Request it from the creator or upload it." };
   if (!ad.daily_budget) return { ok: false, reason: "Set a daily budget first." };
   try {
-    const acct = conn.account_id.startsWith("act_") ? conn.account_id : `act_${conn.account_id}`;
+    const { data: app } = await a.from("apps").select("app_store_url").eq("id", ad.app_id).maybeSingle();
+    const { data: cr } = ad.creator_id ? await a.from("creators").select("tiktok_handle, instagram_handle").eq("id", ad.creator_id).maybeSingle() : { data: null };
+    const handle = String(cr?.tiktok_handle ?? cr?.instagram_handle ?? "hub").replace(/^@/, "");
+    const link = ad.landing_url || `https://sophia-culture.com/go/${encodeURIComponent(handle)}`;
+    const { acct, campaign_id, adset_id } = await createMetaCampaignAdset(token, conn.account_id, { name: `Sophia Hub – ${ad.id.slice(0, 8)}`, country: ad.country ?? "FR", dailyBudget: Number(ad.daily_budget), durationDays: ad.duration_days });
     const { data: signed } = await a.storage.from("creator-videos").createSignedUrl(ad.raw_file_path, 3600);
     const video = await metaCall(`${acct}/advideos`, { file_url: signed?.signedUrl, name: `ad-${ad.id}` }, token);
-    const campaign = await metaCall(`${acct}/campaigns`, { name: `Hub ${ad.id.slice(0, 8)}`, objective: "OUTCOME_APP_PROMOTION", status: "PAUSED", special_ad_categories: [] }, token);
-    const adset = await metaCall(`${acct}/adsets`, {
-      name: `Hub ${ad.id.slice(0, 8)} ${ad.country}`, campaign_id: campaign.id, status: "PAUSED",
-      daily_budget: Math.round(Number(ad.daily_budget) * 100), billing_event: "IMPRESSIONS", optimization_goal: "APP_INSTALLS",
-      bid_strategy: "LOWEST_COST_WITHOUT_CAP", targeting: { geo_locations: { countries: [ad.country] } },
-      promoted_object: { application_id: conn.config.app_id, object_store_url: conn.config.store_url },
-      ...(ad.duration_days ? { end_time: new Date(Date.now() + ad.duration_days * 86400_000).toISOString() } : {}),
-    }, token);
-    const creative = await metaCall(`${acct}/adcreatives`, {
-      name: `Hub ${ad.id.slice(0, 8)}`,
-      object_story_spec: { page_id: conn.config.page_id, video_data: { video_id: video.id, message: ad.caption ?? "", title: ad.hook ?? "", call_to_action: { type: "INSTALL_MOBILE_APP", value: { link: ad.landing_url } } } },
-    }, token);
-    const adRow = await metaCall(`${acct}/ads`, { name: `Hub ${ad.id.slice(0, 8)}`, adset_id: adset.id, creative: { creative_id: creative.id }, status: "PAUSED" }, token);
-    return { ok: true, ids: { channel: "meta", campaign_id: campaign.id, adset_id: adset.id, ad_id: adRow.id, video_id: video.id } };
+    const story: Record<string, unknown> = { page_id: conn.config.page_id, video_data: { video_id: video.id, message: ad.caption ?? "", title: ad.hook ?? "", call_to_action: { type: "DOWNLOAD", value: { link } } } };
+    if (conn.config.instagram_actor_id) story["instagram_user_id"] = conn.config.instagram_actor_id;
+    const creative = await metaCall(`${acct}/adcreatives`, { name: `Hub ${ad.id.slice(0, 8)}`, object_story_spec: story }, token);
+    const adRow = await metaCall(`${acct}/ads`, { name: `Hub ${ad.id.slice(0, 8)}`, adset_id, creative: { creative_id: creative.id }, status: "PAUSED" }, token);
+    void app;
+    return { ok: true, ids: { channel: "meta", campaign_id, adset_id, ad_id: adRow.id, video_id: video.id } };
   } catch (e) {
     return { ok: false, reason: (e as Error).message };
   }
+}
+
+/** Live checks for the Connections card; never returns the token. */
+export async function verifyMeta(conn: { account_id?: string | null; config?: any } | null) {
+  const token = process.env["META_ADS_TOKEN"];
+  if (!token) return [{ check: "Token", ok: false, detail: "META_ADS_TOKEN not set" }];
+  const get = async (p: string) => { const r = await fetch(`${META}/${p}`, { headers: { Authorization: `Bearer ${token}` } }); const j = (await r.json().catch(() => ({}))) as any; return r.ok && !j.error ? { ok: true, j } : { ok: false, j }; };
+  const out: { check: string; ok: boolean; detail: string }[] = [];
+  const me = await get("me"); out.push({ check: "Token (/me)", ok: me.ok, detail: me.ok ? me.j.name : me.j.error?.message ?? "error" });
+  const acct = conn?.account_id ? (conn.account_id.startsWith("act_") ? conn.account_id : `act_${conn.account_id}`) : null;
+  if (acct) { const r = await get(`${acct}?fields=name,account_status,currency`); out.push({ check: "Ad account", ok: r.ok && r.j.account_status === 1, detail: r.ok ? `${r.j.name} · status ${r.j.account_status} · ${r.j.currency}` : r.j.error?.message ?? "error" }); }
+  if (conn?.config?.page_id) { const r = await get(`${conn.config.page_id}?fields=name,instagram_business_account`); out.push({ check: "Page", ok: r.ok, detail: r.ok ? r.j.name : r.j.error?.message ?? "error" }); out.push({ check: "Instagram account", ok: Boolean(conn.config.instagram_actor_id || r.j?.instagram_business_account?.id), detail: conn.config.instagram_actor_id || r.j?.instagram_business_account?.id || "No Instagram account linked to this page for the system user" }); }
+  return out;
 }
 
 /** config: { app_id (TikTok app id) } saved in Connections. Uses the Spark authorization code. */
