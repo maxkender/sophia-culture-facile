@@ -73,35 +73,71 @@ export async function verifyMeta(conn: { account_id?: string | null; config?: an
   return out;
 }
 
-/** config: { app_id (TikTok app id) } saved in Connections. Uses the Spark authorization code. */
-export async function pushTikTokAd(ad: any, conn: { account_id?: string | null; config?: any } | null): Promise<Result> {
-  const token = process.env["TIKTOK_ADS_TOKEN"];
-  if (!token) return { ok: false, reason: "TikTok is not connected: add the TIKTOK_ADS_TOKEN secret first." };
+export const TIKTOK_REDIRECT_URI = "https://sophia-culture.com/api/public/tiktok/oauth";
+
+/** OAuth token saved by /api/public/tiktok/oauth; server-only table, never sent to the browser. */
+export async function tiktokToken(a: Admin, appId?: string | null): Promise<string | null> {
+  let q = a.from("ad_tokens").select("access_token").eq("channel", "tiktok");
+  if (appId) q = q.eq("app_id", appId);
+  const { data } = await q.limit(1).maybeSingle();
+  return data?.access_token ?? process.env["TIKTOK_ADS_TOKEN"] ?? null;
+}
+
+async function ttGet(path: string, q: Record<string, unknown>, token: string) {
+  const qs = new URLSearchParams(Object.fromEntries(Object.entries(q).map(([k, v]) => [k, typeof v === "string" ? v : JSON.stringify(v)])));
+  const res = await fetch(`${TT}/${path}?${qs}`, { headers: { "Access-Token": token } });
+  const json = (await res.json().catch(() => ({}))) as any;
+  if (!res.ok || json.code !== 0) throw new Error(`TikTok ${res.status}: ${json.message ?? "request failed"}`);
+  return json.data;
+}
+
+/** Campaign (TRAFFIC) → ad group PAUSED (FR, iOS, daily budget) → Spark identity from the auth code → ad PAUSED. */
+export async function pushTikTokAd(a: Admin, ad: any, conn: { account_id?: string | null; config?: any } | null): Promise<Result> {
+  const token = await tiktokToken(a, ad.app_id);
+  if (!token) return { ok: false, reason: "TikTok is not connected: use Connect TikTok in Connections first." };
   if (!conn?.account_id) return { ok: false, reason: "Save the TikTok advertiser id in Connections first." };
   if (!ad.spark_code) return { ok: false, reason: "TikTok Spark Ads need the authorization code from the posting account." };
   if (!ad.daily_budget) return { ok: false, reason: "Set a daily budget first." };
   try {
     const advertiser_id = conn.account_id;
+    const { data: cr } = ad.creator_id ? await a.from("creators").select("tiktok_handle").eq("id", ad.creator_id).maybeSingle() : { data: null };
+    const link = ad.landing_url || `https://sophia-culture.com/go/${encodeURIComponent(String(cr?.tiktok_handle ?? "hub").replace(/^@/, ""))}`;
     await ttCall("tt_video/authorize/", { advertiser_id, auth_code: ad.spark_code }, token);
-    const info = await ttCall("tt_video/info/", { advertiser_id, auth_code: ad.spark_code }, token);
-    const itemId = info?.item_info?.item_id; const identityId = info?.user_info?.identity_id;
-    const campaign = await ttCall("campaign/create/", { advertiser_id, campaign_name: `Hub ${ad.id.slice(0, 8)}`, objective_type: "APP_PROMOTION", app_promotion_type: "APP_INSTALL", budget_mode: "BUDGET_MODE_INFINITE", operation_status: "DISABLE" }, token);
+    const ids = await ttGet("identity/get/", { advertiser_id, identity_type: "AUTH_CODE" }, token);
+    const identity = (ids?.identity_list ?? [])[0];
+    const info = await ttGet("tt_video/info/", { advertiser_id, auth_code: ad.spark_code }, token);
+    const itemId = info?.item_info?.item_id;
+    const identityId = identity?.identity_id ?? info?.user_info?.identity_id;
+    const name = `Sophia Hub – ${ad.id.slice(0, 8)}`;
+    const campaign = await ttCall("campaign/create/", { advertiser_id, campaign_name: name, objective_type: "TRAFFIC", budget_mode: "BUDGET_MODE_INFINITE", operation_status: "DISABLE" }, token);
     const group = await ttCall("adgroup/create/", {
-      advertiser_id, campaign_id: campaign.campaign_id, adgroup_name: `Hub ${ad.id.slice(0, 8)} ${ad.country}`, operation_status: "DISABLE",
-      placement_type: "PLACEMENT_TYPE_NORMAL", placements: ["PLACEMENT_TIKTOK"], location_ids: conn.config?.location_ids ?? [], app_id: conn.config?.app_id,
+      advertiser_id, campaign_id: campaign.campaign_id, adgroup_name: `${name} · ${ad.country ?? "FR"} iOS`, operation_status: "DISABLE",
+      promotion_type: "WEBSITE", placement_type: "PLACEMENT_TYPE_NORMAL", placements: ["PLACEMENT_TIKTOK"],
+      location_ids: conn.config?.location_ids ?? ["3017382"], operating_systems: ["IOS"],
       budget_mode: "BUDGET_MODE_DAY", budget: Number(ad.daily_budget), schedule_type: ad.duration_days ? "SCHEDULE_START_END" : "SCHEDULE_FROM_NOW",
       schedule_start_time: new Date().toISOString().slice(0, 19).replace("T", " "),
       ...(ad.duration_days ? { schedule_end_time: new Date(Date.now() + ad.duration_days * 86400_000).toISOString().slice(0, 19).replace("T", " ") } : {}),
-      optimization_goal: "INSTALL", billing_event: "OCPM", bid_type: "BID_TYPE_NO_BID",
+      optimization_goal: "CLICK", billing_event: "CPC", bid_type: "BID_TYPE_NO_BID",
     }, token);
     const created = await ttCall("ad/create/", {
       advertiser_id, adgroup_id: group.adgroup_id,
-      creatives: [{ ad_name: `Hub ${ad.id.slice(0, 8)}`, identity_type: "AUTH_CODE", identity_id: identityId, tiktok_item_id: itemId, call_to_action: "DOWNLOAD_NOW", landing_page_url: ad.landing_url, ad_format: "SINGLE_VIDEO", operation_status: "DISABLE" }],
+      creatives: [{ ad_name: name, identity_type: "AUTH_CODE", identity_id: identityId, tiktok_item_id: itemId, call_to_action: "DOWNLOAD_NOW", landing_page_url: link, ad_format: "SINGLE_VIDEO", operation_status: "DISABLE" }],
     }, token);
     return { ok: true, ids: { channel: "tiktok", advertiser_id, campaign_id: campaign.campaign_id, adgroup_id: group.adgroup_id, ad_id: String(created?.ad_ids?.[0] ?? "") } };
   } catch (e) {
     return { ok: false, reason: (e as Error).message };
   }
+}
+
+export async function verifyTikTok(a: Admin, advertiserId: string | null, appId: string) {
+  const token = await tiktokToken(a, appId);
+  if (!token) return [{ check: "TikTok token", ok: false, detail: "Not connected" }];
+  if (!advertiserId) return [{ check: "Advertiser", ok: false, detail: "No advertiser id saved" }];
+  try {
+    const d = await ttGet("advertiser/info/", { advertiser_ids: [advertiserId], fields: ["name", "status", "currency"] }, token);
+    const x = d?.list?.[0];
+    return [{ check: "Advertiser", ok: x?.status === "STATUS_ENABLE", detail: x ? `${x.name} · ${x.status} · ${x.currency ?? ""}` : "Not found" }];
+  } catch (e) { return [{ check: "Token / advertiser", ok: false, detail: (e as Error).message }]; }
 }
 
 export async function setRemoteStatus(ad: any, status: "ACTIVE" | "PAUSED"): Promise<string | null> {
@@ -112,7 +148,8 @@ export async function setRemoteStatus(ad: any, status: "ACTIVE" | "PAUSED"): Pro
       await metaCall(ad.external_ids.adset_id, { status }, token);
       await metaCall(ad.external_ids.campaign_id, { status }, token);
     } else {
-      const token = process.env["TIKTOK_ADS_TOKEN"]; if (!token) return "TikTok not connected — change it in Ads Manager";
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const token = await tiktokToken(supabaseAdmin, ad.app_id); if (!token) return "TikTok not connected — change it in Ads Manager";
       const op = status === "ACTIVE" ? "ENABLE" : "DISABLE";
       const advertiser_id = ad.external_ids.advertiser_id;
       await ttCall("campaign/status/update/", { advertiser_id, campaign_ids: [ad.external_ids.campaign_id], operation_status: op }, token);
@@ -127,7 +164,7 @@ export async function setRemoteStatus(ad: any, status: "ACTIVE" | "PAUSED"): Pro
 
 /** Pulls yesterday's spend / impressions / clicks / installs for pushed ads. Manual entries are kept. */
 export async function syncAdMetrics(a: Admin) {
-  const { data: ads } = await a.from("ad_candidates").select("id, channel, external_ids").in("status", ["live", "paused", "pushed"]);
+  const { data: ads } = await a.from("ad_candidates").select("id, app_id, channel, external_ids").in("status", ["live", "paused", "pushed"]);
   const day = new Date(Date.now() - 86400_000).toISOString().slice(0, 10);
   let synced = 0; const errors: string[] = [];
   for (const ad of ads ?? []) {
@@ -141,7 +178,7 @@ export async function syncAdMetrics(a: Admin) {
         const installs = Number(r.actions?.find((x: any) => x.action_type === "mobile_app_install")?.value ?? 0);
         await a.from("ad_metrics_daily").upsert({ ad_id: ad.id, day, spend: Number(r.spend ?? 0), impressions: Number(r.impressions ?? 0), clicks: Number(r.clicks ?? 0), installs, source: "meta" }, { onConflict: "ad_id,day" });
       } else {
-        const token = process.env["TIKTOK_ADS_TOKEN"]; if (!token) continue;
+        const token = await tiktokToken(a, ad.app_id); if (!token) continue;
         const q = new URLSearchParams({ advertiser_id: ad.external_ids.advertiser_id, report_type: "BASIC", data_level: "AUCTION_AD", dimensions: JSON.stringify(["ad_id", "stat_time_day"]), metrics: JSON.stringify(["spend", "impressions", "clicks", "app_install"]), start_date: day, end_date: day, filtering: JSON.stringify([{ field_name: "ad_ids", filter_type: "IN", filter_value: JSON.stringify([ad.external_ids.ad_id]) }]) });
         const res = await fetch(`${TT}/report/integrated/get/?${q}`, { headers: { "Access-Token": token } });
         const j = (await res.json()) as any; const m = j.data?.list?.[0]?.metrics;
