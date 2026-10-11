@@ -22,6 +22,7 @@ import { Posters } from "./slides/Posters";
 import { SlidesPayouts } from "./slides/SlidesPayouts";
 import { OsConnectionCard } from "./slides/OsConnectionCard";
 import { OS_UI_ENABLED } from "./slides/useOs";
+import { GuidelinesEditor } from "@/components/creators/Guidelines";
 import { HubAccessCodes } from "./HubAccessCodes";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -151,7 +152,7 @@ export function InfluencerSection({ section, id }: { section: string; id?: strin
 }
 
 /* ---------------- Settings ---------------- */
-export const SETTINGS_TABS: [string, string][] = [["apps", "Apps & store links"], ["codes", "Access codes"], ["email", "Email"], ["connections", "Connections"], ["team", "Team & hiring managers"], ["security", "Security"]];
+export const SETTINGS_TABS: [string, string][] = [["apps", "Apps & store links"], ["codes", "Access codes"], ["email", "Email"], ["ugc-guidelines", "UGC guidelines"], ["connections", "Connections"], ["team", "Team & hiring managers"], ["security", "Security"]];
 
 const TRACKS = [["ugc", "UGC"], ["slideshow", "Slideshows"], ["influencer", "Influencers"]] as const;
 function Team({ track }: { track?: string } = {}) {
@@ -209,7 +210,7 @@ function EmailSettings() {
 export function HubSettings({ tab }: { tab?: string | undefined }) {
   const t = pick(SETTINGS_TABS, tab);
   const body: Record<string, ReactNode> = {
-    apps: <AppsSettings />, codes: <div className="space-y-6"><HubAccessCodes /><details className="rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold">Author codes and assignment history</summary><div className="mt-4"><CodesPool /></div></details></div>, email: <EmailSettings />, connections: <div className="space-y-4">{OS_UI_ENABLED ? <OsConnectionCard /> : null}<IntegrationsSetup /></div>, team: <Team />, security: <AdminSettings />,
+    apps: <AppsSettings />, codes: <div className="space-y-6"><HubAccessCodes /><details className="rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold">Author codes and assignment history</summary><div className="mt-4"><CodesPool /></div></details></div>, email: <EmailSettings />, "ugc-guidelines": <GuidelinesEditor />, connections: <div className="space-y-4">{OS_UI_ENABLED ? <OsConnectionCard /> : null}<IntegrationsSetup /></div>, team: <Team />, security: <AdminSettings />,
   };
   return <div><SectionTabs base="/hub/settings" tabs={SETTINGS_TABS} current={t} />{body[t]}</div>;
 }

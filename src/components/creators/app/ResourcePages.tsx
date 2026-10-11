@@ -28,6 +28,7 @@ import { friendlyCreatorError, isValidEmail, isValidInternationalPhone } from "@
 import { CountrySelect } from "../CountrySelect";
 import { CreatorAgreementForm } from "../CreatorAgreementForm";
 import { AccessCodeCard } from "./HomePage";
+import { GuidelinesList } from "../Guidelines";
 import { CREATOR_KEY, fileToBase64, useCreator } from "./useCreator";
 
 const fmt = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
@@ -53,6 +54,7 @@ export function RulesPage() {
       <PortalCard>
         <h2 className="mb-4 text-2xl font-extrabold text-brand-navy">{doc.title}</h2>
         <DocumentBody blocks={parseBlocks(doc.content)} />
+        <div className="mt-8 border-t border-brand-line pt-6"><h3 className="mb-3 text-xl font-extrabold text-brand-navy">Consignes de tournage</h3><GuidelinesList /></div>
         <p className="mt-4 text-sm"><a href={SLACK_INVITE_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-portal-accent underline">Join the creators Slack (optional)</a></p>
         {!me.rules_accepted_at && (
           <div className="mt-8 border-t border-brand-line pt-6">

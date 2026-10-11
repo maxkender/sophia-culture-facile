@@ -1,3 +1,4 @@
+import { GuidelinesEditor } from "@/components/creators/Guidelines";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -179,6 +180,8 @@ function Guides() {
     toast.success(`Version ${version} saved`); setNote(""); void qc.invalidateQueries({ queryKey: ["hub", "learn", "docs"] });
   }
   return (
+    <div className="space-y-4">
+    <div className={cn(card)}><GuidelinesEditor /></div>
     <div className={cn(card, "space-y-3")}>
       <div className="flex flex-wrap items-center gap-3">
         <select aria-label="Document" className="h-10 rounded-xl border px-2 text-sm" value={slug} onChange={(e) => setSlug(e.target.value)}>{data.filter((d) => !["contract", "guide"].includes(d.slug)).map((d) => <option key={d.slug} value={d.slug}>{d.title} ({d.slug})</option>)}</select>
@@ -190,6 +193,7 @@ function Guides() {
       <p className="text-xs text-brand-navySoft">Author contracts and the author writing guide are managed in the authors portal and are not listed here.</p>
       <textarea aria-label="Content" rows={18} className="w-full rounded-xl border p-3 font-mono text-xs" value={text} onChange={(e) => setText(e.target.value)} />
       <div className="flex gap-2"><input aria-label="Change note" className="min-h-10 flex-1 rounded-xl border px-3 text-sm" placeholder="What changed (optional)" value={note} onChange={(e) => setNote(e.target.value)} /><Button onClick={() => void newVersion()}>Save as new version</Button></div>
+    </div>
     </div>
   );
 }
