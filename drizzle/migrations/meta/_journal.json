@@ -344,6 +344,13 @@
       "when": 1791710223604,
       "tag": "0048_brief_studio_assets",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1791711556772,
+      "tag": "0049_hub_team_settings",
+      "breakpoints": true
     }
   ]
 }
