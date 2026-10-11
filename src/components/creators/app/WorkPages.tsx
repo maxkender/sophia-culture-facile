@@ -16,7 +16,10 @@ import { cn } from "@/lib/utils";
 import { BriefView, toStudio, type BriefAsset } from "@/components/hub/BriefPreview";
 import { friendlyCreatorError, isHttpUrl } from "@/lib/creator-validation";
 import { Banner, EmptyState, PageTitle, PortalCard } from "@/components/portal/ui";
-import { logPostChecked, markBriefSkipped, markMyMessagesRead, reportPostViews } from "@/lib/creator-app.functions";
+import { markBriefSkipped, markMyMessagesRead, reportPostViews } from "@/lib/creator-app.functions";
+import { submitPostLinks } from "@/lib/ugc-loop.functions";
+import { GuidelinesBlock, GuidelinesChecklist, useGuidelines } from "../Guidelines";
+import { parisWeekStart } from "@/lib/ugc-pay";
 import { CATEGORY_LEGEND, briefStatus, fileToBase64, useCreator, type CreatorData } from "./useCreator";
 
 type Post = CreatorData["posts"][number];
@@ -33,44 +36,43 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString(undefined, { day: 
 const money = (n: unknown) => (n == null ? "—" : `$${Number(n).toFixed(2)}`);
 const today = () => new Date().toISOString().slice(0, 10);
 
-/* ---------- Log a post ---------- */
-export function LogPostForm({ briefId: initialBrief = "", refId = null, url: initialUrl = "", onDone }: { briefId?: string; refId?: string | null; url?: string; onDone?: () => void }) {
-  const { briefs, refs, reload } = useCreator();
-  const submit = useServerFn(logPostChecked);
-  const [url, setUrl] = useState(initialUrl);
-  const [platform, setPlatform] = useState<"tiktok" | "instagram">("tiktok");
+/* ---------- Add links (the only place to enter post links) ---------- */
+export function LogPostForm({ briefId: initialBrief = "", onDone }: { briefId?: string; refId?: string | null; url?: string; onDone?: () => void }) {
+  const { briefs, reload } = useCreator();
+  const submit = useServerFn(submitPostLinks);
+  const [text, setText] = useState("");
   const [briefId, setBriefId] = useState(initialBrief);
-  const [date, setDate] = useState(today());
+  const [checked, setChecked] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
+  const [out, setOut] = useState<{ url: string; ok: boolean; reason?: string | undefined }[]>([]);
   useEffect(() => setBriefId(initialBrief), [initialBrief]);
-  const ref = refs.find((r) => r.id === refId);
+  const appId = briefs.find((b) => b.id === briefId)?.app_id ?? null;
+  const { data: guidelines = [] } = useGuidelines(appId);
+  const urls = text.split(/[\s,]+/).map((u) => u.trim()).filter(Boolean);
+  const allTicked = guidelines.every((g) => checked.includes(g.id));
   return (
-    <div className="space-y-3">
-      {ref && <p className="rounded-xl bg-portal-accent/10 px-3 py-2 text-sm font-semibold text-portal-accent">Linked to reference: {ref.title || ref.url}</p>}
-      <div className="grid gap-3 sm:grid-cols-[1fr_140px]">
-        <div><Label>Post link</Label><Input placeholder="https://www.tiktok.com/@…/video/…" value={url} onChange={(e) => setUrl(e.target.value)} /></div>
-        <div><Label>Platform</Label>
-          <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={platform} onChange={(e) => setPlatform(e.target.value as "tiktok")}>
-            <option value="tiktok">TikTok</option><option value="instagram">Instagram</option>
-          </select>
-        </div>
-        <div><Label>Brief</Label>
-          <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={briefId} onChange={(e) => setBriefId(e.target.value)}>
-            <option value="">No brief</option>
-            {briefs.map((b) => <option key={b.id} value={b.id}>{b.title}</option>)}
-          </select>
-        </div>
-        <div><Label>Date posted</Label><Input type="date" max={today()} value={date} onChange={(e) => setDate(e.target.value)} /></div>
-      </div>
-      <Button disabled={busy} onClick={async () => {
-        if (!isHttpUrl(url) || !url.trim().startsWith("https://")) return void toast.error("Paste the complete secure link to your post, beginning with https://.");
+    <div className="space-y-4">
+      <div><Label htmlFor="links" className="text-base font-extrabold">Ajouter un lien</Label>
+        <Textarea id="links" rows={3} className="mt-1 text-base" placeholder={"https://www.tiktok.com/@…/video/…\nhttps://www.instagram.com/reel/…"} value={text} onChange={(e) => setText(e.target.value)} />
+        <p className="mt-1 text-xs text-brand-navySoft">TikTok ou Instagram, un ou plusieurs liens (un par ligne).</p></div>
+      <div><Label htmlFor="link-brief">Brief (optionnel)</Label>
+        <select id="link-brief" className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={briefId} onChange={(e) => setBriefId(e.target.value)}>
+          <option value="">Sans brief</option>{briefs.map((b) => <option key={b.id} value={b.id}>{b.title}</option>)}
+        </select></div>
+      <GuidelinesChecklist appId={appId} value={checked} onChange={setChecked} />
+      <Button size="lg" disabled={busy || !urls.length || !allTicked} title={!allTicked ? "Coche chaque consigne avant d’envoyer" : undefined} onClick={async () => {
+        const bad = urls.find((u) => !isHttpUrl(u) || !u.startsWith("https://"));
+        if (bad) return void toast.error("Colle le lien complet, qui commence par https://.");
         setBusy(true);
         try {
-          await submit({ data: { url: url.trim(), platform, briefId: briefId || null, referenceVideoId: refId, postedOn: date } });
-          toast.success("Post logged."); setUrl(""); await reload(); onDone?.();
+          const r = await submit({ data: { urls, briefId: briefId || null, guidelines: checked } });
+          setOut(r.results); const ok = r.results.filter((x) => x.ok).length;
+          if (ok) { toast.success(`${ok} lien${ok > 1 ? "s" : ""} envoyé${ok > 1 ? "s" : ""}.`); setText(r.results.filter((x) => !x.ok).map((x) => x.url).join("\n")); setChecked([]); await reload(); onDone?.(); }
+          else toast.error("Aucun lien n’a été envoyé.");
         } catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
         setBusy(false);
-      }}>Log post</Button>
+      }}>Envoyer</Button>
+      {out.some((x) => !x.ok) ? <ul className="space-y-1 text-sm" data-testid="link-errors">{out.filter((x) => !x.ok).map((x) => <li key={x.url} className="text-portal-red">{x.url} — {x.reason === "Already submitted." ? "déjà envoyé" : x.reason === "Not a TikTok or Instagram video link." ? "ce n’est pas un lien de vidéo TikTok ou Instagram" : "n’a pas pu être enregistré"}</li>)}</ul> : null}
     </div>
   );
 }
@@ -199,8 +201,9 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
       <div className="mt-3"><PageTitle title={brief.title} lead={brief.due_date ? `Due ${fmtDate(brief.due_date)}` : ""} action={<Pill s={status} />} /></div>
       <div className="mb-4"><AppBadge appId={brief.app_id} className="text-sm" /></div>
       <PortalCard><BriefView b={toStudio(brief as Record<string, unknown>)} assets={files} refs={refs} pay={pay} /></PortalCard>
+      <div className="mt-4"><GuidelinesBlock appId={brief.app_id} /></div>
       <div className="mt-8 flex flex-wrap gap-2">
-        <Button onClick={() => setMode(mode === "post" ? "none" : "post")}>I posted this</Button>
+        <Button onClick={() => setMode(mode === "post" ? "none" : "post")}>J’ai posté : coller mon lien</Button>
         {status !== "posted" && status !== "skipped" && <Button variant="outline" onClick={() => setMode(mode === "skip" ? "none" : "skip")}>Skip</Button>}
       </div>
       {mode === "post" && <PortalCard className="mt-4"><LogPostForm briefId={brief.id} onDone={() => setMode("none")} /></PortalCard>}
@@ -308,34 +311,57 @@ function FeedbackReply({ post }: { post: Post }) {
   );
 }
 
+const eurFr = (n: unknown) => `${Number(n ?? 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+type LoopPost = Post & { pay_status?: string | null; views_frozen?: number | null; pay_amount?: number | null; validated_at?: string | null; submitted_at?: string | null; payout_item_id?: string | null };
+/** Envoyé → Validé (or Refusé) → Vues à J+7 → Prêt pour paiement → Payé le … */
+export function postStage(p: Post, paidAt?: string | null): { label: string; tone: string; detail?: string | undefined } {
+  const x = p as LoopPost;
+  const v = (n: number | null | undefined) => Number(n ?? 0).toLocaleString("fr-FR");
+  if (p.status === "rejected") return { label: "Refusé", tone: "bg-portal-red/10 text-portal-red", detail: p.feedback ? `Raison : ${p.feedback}` : undefined };
+  if (p.status === "pending" || p.status === "flagged") return { label: "Envoyé", tone: "bg-brand-surfaceStrong text-brand-navySoft", detail: "en attente de validation" };
+  if (x.pay_status === "paid") return { label: paidAt ? `Payé le ${fmtDate(paidAt)}` : "Payé", tone: "bg-portal-green/15 text-portal-green", detail: `${eurFr(x.pay_amount)} · vues à J+7 : ${v(x.views_frozen)}` };
+  if (x.pay_status === "approved") return { label: `Paiement en cours : ${eurFr(x.pay_amount)}`, tone: "bg-portal-green/10 text-portal-green", detail: `vues à J+7 : ${v(x.views_frozen)}` };
+  if (x.pay_status === "ready") return { label: `Prêt pour paiement : ${eurFr(x.pay_amount)}`, tone: "bg-portal-green/10 text-portal-green", detail: `vues à J+7 : ${v(x.views_frozen)}` };
+  if (x.pay_status === "no_data") return { label: "Validé · vues introuvables", tone: "bg-portal-amber/15 text-portal-amber", detail: "l’équipe vérifie le lien avant de payer" };
+  const j7 = x.validated_at ? new Date(new Date(x.validated_at).getTime() + 7 * 86400000).toISOString() : null;
+  return { label: "Validé", tone: "bg-portal-accent/10 text-portal-accent", detail: `${p.views != null ? `${v(p.views)} vues pour l’instant · ` : ""}vues comptées le ${j7 ? fmtDate(j7) : "—"} (J+7)` };
+}
+
+export function WeeklyBar() {
+  const { me, posts } = useCreator();
+  const start = parisWeekStart();
+  const target = Number((me as { weekly_target?: number }).weekly_target ?? 5) || 5;
+  const done = posts.filter((p) => p.status !== "rejected" && ((p as LoopPost).submitted_at ?? p.created_at) >= start).length;
+  return (
+    <PortalCard className="p-4">
+      <div data-testid="weekly-bar" className="flex items-baseline justify-between"><p className="text-lg font-extrabold text-brand-navy">{done} / {target} cette semaine</p><p className="text-xs text-brand-navySoft">du lundi au dimanche</p></div>
+      <div className="mt-2 h-3 rounded-full bg-brand-line"><div className="h-3 rounded-full bg-portal-accent transition-all" style={{ width: `${Math.min(100, (done / target) * 100)}%` }} /></div>
+    </PortalCard>
+  );
+}
+
 export function PostsPage({ refId }: { refId?: string | undefined }) {
-  const { posts, briefs } = useCreator();
+  const { posts, briefs, payoutItems } = useCreator();
+  void refId;
+  const paidAt = (p: Post) => (payoutItems as { id: string; paid_at?: string | null }[]).find((i) => i.id === (p as LoopPost).payout_item_id)?.paid_at ?? null;
   return (
     <div>
-      <PageTitle title="My posts" lead="Log every post the day you publish it. A post that is not logged is not paid." />
-      <PortalCard className="mb-8"><h2 className="mb-3 text-lg font-extrabold text-brand-navy">Log a post</h2><LogPostForm refId={refId ?? null} /></PortalCard>
-      {posts.length === 0 ? <EmptyState title="No post logged yet" /> : (
+      <PageTitle title="Mes posts" lead="Colle ici le lien de chaque vidéo publiée. C’est le seul endroit pour envoyer tes liens." />
+      <div className="mb-6"><WeeklyBar /></div>
+      <PortalCard className="mb-8"><LogPostForm /></PortalCard>
+      {posts.length === 0 ? <EmptyState title="Aucun lien envoyé pour l’instant" /> : (
         <div className="space-y-3">
           {posts.map((p) => {
-            const day7 = Date.now() - new Date(p.posted_on).getTime() >= 7 * 86400000;
             const brief = briefs.find((b) => b.id === p.brief_id);
+            const st = postStage(p, paidAt(p));
             return (
-              <PortalCard key={p.id} className={cn("p-5", p.status === "flagged" && "border-2 border-portal-amber")}>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="flex flex-wrap items-center gap-2"><PlatformBadge platform={p.platform} /><AppBadge appId={p.app_id} /><a href={p.url} target="_blank" rel="noopener noreferrer" className="font-bold text-portal-accent hover:underline">{fmtDate(p.posted_on)}</a></span>
-                  <Pill s={p.status === "flagged" ? "feedback" : p.status} />
+              <PortalCard key={p.id} className="p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2" data-testid="post-row">
+                  <span className="flex min-w-0 flex-wrap items-center gap-2"><PlatformBadge platform={p.platform} /><a href={p.url} target="_blank" rel="noopener noreferrer" className="truncate font-bold text-portal-accent hover:underline">{p.url.replace(/^https:\/\/(www\.)?/, "").slice(0, 48)}</a></span>
+                  <span className={cn("rounded-full px-3 py-1 text-xs font-bold", st.tone)}>{st.label}</span>
                 </div>
-                <p className="mt-1 text-sm text-brand-navySoft">{brief ? `Brief: ${brief.title}` : "No brief"}{p.pay_status === "due" ? ` · ${money(p.amount_usd)}` : p.pay_status === "held" ? " · payment on hold (no rate set yet)" : ""}</p>
-                {p.feedback && (
-                  <div className="mt-3 rounded-xl bg-portal-amber/10 p-3 text-sm text-brand-navy">
-                    <p className="text-xs font-bold uppercase tracking-wide text-portal-amber">Feedback</p>
-                    <p className="mt-1">{p.feedback}</p>
-                    <FeedbackReply post={p} />
-                  </div>
-                )}
-                {p.views != null ? <p className="mt-2 text-sm font-semibold text-brand-navy">{p.views.toLocaleString()} views reported</p> : day7 ? <ReportViews post={p} /> : (
-                  <p className="mt-2 text-xs text-brand-navySoft">Report views from {fmtDate(new Date(new Date(p.posted_on).getTime() + 7 * 86400000).toISOString())}</p>
-                )}
+                <p className="mt-1 text-sm text-brand-navySoft">{brief ? `Brief : ${brief.title}` : "Sans brief"} · envoyé le {fmtDate((p as LoopPost).submitted_at ?? p.created_at)}{st.detail ? ` · ${st.detail}` : ""}</p>
+                {p.status === "flagged" && p.feedback ? <div className="mt-3 rounded-xl bg-portal-amber/10 p-3 text-sm"><p>{p.feedback}</p><FeedbackReply post={p} /></div> : null}
               </PortalCard>
             );
           })}
