@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,10 @@ function FastLanePage() {
   const [email, setEmail] = useState("");
   useEffect(() => { if (data && "fullName" in data && data.fullName) setName(data.fullName); }, [data]);
   const lang = data?.language === "en" ? "en" : "fr";
+  // Parsing the agreement is heavy: do it once, and let the signed name update it lazily so typing never lags.
+  const agreementBody = data && "agreement" in data && data.agreement ? data.agreement.body : null;
+  const blocks = useMemo(() => (agreementBody ? creatorAgreementBlocks(parseBlocks(agreementBody), "ugc") : []), [agreementBody]);
+  const lazyName = useDeferredValue(name);
   const t = T[lang];
 
   if (valid && (isLoading || !data)) return <Shell><p className="text-sm text-brand-navySoft">…</p></Shell>;
@@ -129,7 +133,7 @@ function FastLanePage() {
       {data.agreement ? <section className="mt-6 rounded-2xl bg-card p-5 shadow-portal">
         <details>
           <summary className="cursor-pointer text-lg font-extrabold text-brand-navy">{t.contract} · {data.agreement.title} (v{data.agreement.version})</summary>
-          <div className="mt-4 max-h-[60vh] overflow-y-auto"><DocumentBody blocks={creatorAgreementBlocks(parseBlocks(data.agreement.body), "ugc")} merge={{ name } as never} /></div>
+          <div className="mt-4 max-h-[60vh] overflow-y-auto"><DocumentBody blocks={blocks} merge={{ name: lazyName } as never} /></div>
         </details>
         {data.emailPending ? <label className="mt-5 block text-sm font-semibold text-brand-navy">{lang === "en" ? "Your email" : "Ton email"}
           <Input type="email" required className="mt-1 min-h-11" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" inputMode="email" />

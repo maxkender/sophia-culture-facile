@@ -116,6 +116,15 @@ export async function runDailyDetect(admin: Admin) {
 async function remind(admin: Admin, c: any, kind: "d3" | "d7") {
   if (!c.email) return false;
   const first = String(c.full_name ?? "").split(/\s+/)[0] || "there";
+  const { emailLang } = await import("./ugc-email.server");
+  if (emailLang(c.language, c.country) === "fr") {
+    const p = kind === "d3"
+      ? [`Salut ${first},`, "On n’a pas vu de nouveau post de ta part depuis 3 jours. Ta prochaine vidéo t’attend : ouvre ton espace créateur pour les briefs de la semaine.", "Poster régulièrement fait grandir ton compte et tes gains."]
+      : [`Salut ${first},`, "Ça fait une semaine sans post. Si quelque chose te bloque, réponds à cet email et on t’aide.", "S’il n’y a toujours pas de post après 14 jours, le compte revient à l’équipe pour qu’un autre créateur puisse l’utiliser."];
+    const o = { paragraphs: p, buttonLabel: "Ouvrir mon espace créateur", buttonUrl: "https://sophia-culture.com/creators/app/briefs" };
+    const rf = await sendBrevoEmail({ to: c.email, toName: c.full_name, subject: kind === "d3" ? "Ta prochaine vidéo t’attend" : "Tes vidéos nous manquent", html: buildEmailHtml(o), text: buildEmailText(o) });
+    return rf.sent;
+  }
   const paragraphs = kind === "d3"
     ? [`Hi ${first},`, "We haven't seen a new post from you for 3 days. Your next video is waiting: open your creator space for this week's briefs.", "Posting regularly keeps your account growing and your earnings coming."]
     : [`Hi ${first},`, "It's been a week without a post. If something is blocking you, reply to this email and we'll help.", "If there is still no post after 14 days, the account goes back to the team so another creator can use it."];
@@ -127,7 +136,7 @@ async function remind(admin: Admin, c: any, kind: "d3" | "d7") {
 /** Daily: 72h without a post → dormant + reminders at day 3 and day 7; 14 days → accounts back to the pool with a password-rotation task. */
 export async function runDormancy(admin: Admin) {
   return withLock(admin, "dormancy", 15, async () => {
-    const { data: creators } = await admin.from("creators").select("id, full_name, email, tiktok_handle, instagram_handle, onboarding_completed_at, dormant_at, dormancy_reminders, ugc_status")
+    const { data: creators } = await admin.from("creators").select("id, full_name, email, language, country, tiktok_handle, instagram_handle, onboarding_completed_at, dormant_at, dormancy_reminders, ugc_status")
       .eq("track", "ugc").not("onboarding_completed_at", "is", null).limit(500);
     const now = Date.now();
     let dormant = 0, reminders = 0, pooled = 0;

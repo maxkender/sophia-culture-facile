@@ -3,9 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { homeFor, resolveAccountRole } from "@/lib/account-role";
 import { createFileRoute } from "@tanstack/react-router";
 import { SignIn } from "@/components/creators/CreatorSpace";
+import { CreatorLangSwitch, initCreatorLang, useCreatorLang } from "@/i18n/creator-app";
 import { useRedirectIfSignedIn } from "@/components/auth/LoginRedirect";
 
 function CreatorLogin() {
+  initCreatorLang(null, null);
+  useCreatorLang();
   useRedirectIfSignedIn();
   const [failed, setFailed] = useState(false);
   useEffect(() => {
@@ -22,6 +25,7 @@ function CreatorLogin() {
   return (
     <div className="min-h-screen bg-portal-bg pb-[env(safe-area-inset-bottom)]">
       {failed ? <p className="mx-auto max-w-sm px-6 pt-6 text-sm text-brand-navy">Ce lien a déjà servi ou a expiré. Demande-en un nouveau ci-dessous. / This link was used or expired.</p> : null}
+      <div className="flex justify-end px-4 pt-4"><CreatorLangSwitch /></div>
       <SignIn invite={null} invitedEmail="" standalone />
     </div>
   );

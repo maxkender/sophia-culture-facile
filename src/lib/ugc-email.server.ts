@@ -21,6 +21,31 @@ export const EMAIL_DEFAULTS = {
   },
 } as const;
 
+/** French versions used for French-speaking creators (language fr, or a French-speaking country). */
+export const EMAIL_DEFAULTS_FR = {
+  "ugc-welcome": {
+    subject: "C’est validé — ton espace créateur Sophia",
+    intro: "Salut {first_name},\n\nBienvenue dans l’équipe créateurs Sophia. Ton espace créateur privé est prêt : clique sur le bouton ci-dessous et crée ton mot de passe avec cette adresse email.",
+    instructions: "Commence par ces trois choses :\n1. Lis les règles et signe le contrat de compte créateur.\n2. Crée l’email Sophia et les comptes TikTok et Instagram, puis enregistre-les dans ton espace.\n3. Fais l’échauffement de 24 heures et configure tes paiements.\n\nRejoins aussi le Slack de l’équipe — le lien est juste en dessous.\n\nRéponds à cet email si quelque chose n’est pas clair.",
+    button_label: "Ouvrir mon espace créateur",
+  },
+  "ugc-decline": {
+    subject: "Ta candidature créateur Sophia",
+    intro: "Salut {first_name},\n\nMerci d’avoir candidaté pour créer pour Sophia et pour le temps passé sur ta vidéo.",
+    instructions: "On ne retient pas ta candidature cette fois-ci. Ce n’est pas un jugement sur toi : on cherche un style très précis et on reçoit beaucoup plus de candidatures que de places.\n\nOn te souhaite le meilleur, et tu peux candidater à nouveau dans quelques mois.",
+    button_label: "",
+  },
+} as const;
+
+const FR_COUNTRIES = new Set(["FR", "BE", "CH", "LU", "MC", "CA", "SN", "CI", "MA", "TN", "DZ", "CM", "RE", "GP", "MQ", "GF", "YT", "PF", "NC"]);
+/** French creators get French emails: explicit language first, then country. */
+export function emailLang(language?: string | null, country?: string | null): "fr" | "en" {
+  const l = (language ?? "").toLowerCase();
+  if (l.startsWith("fr")) return "fr";
+  if (l.startsWith("en")) return "en";
+  return country && FR_COUNTRIES.has(country.toUpperCase()) ? "fr" : "en";
+}
+
 export type EmailKey = keyof typeof EMAIL_DEFAULTS;
 
 export async function loadTemplate(admin: Admin, key: EmailKey) {
@@ -30,15 +55,16 @@ export async function loadTemplate(admin: Admin, key: EmailKey) {
 
 export type EmailOutcome = { sent: boolean; provider: "brevo" | "lovable" | null; messageId: string | null; note: string | null };
 
-export async function sendTemplated(admin: Admin, key: EmailKey, to: string, fullName: string, buttonUrl?: string): Promise<EmailOutcome> {
-  const t = await loadTemplate(admin, key);
-  const fields = { first_name: fullName.split(/\s+/)[0] || "there", full_name: fullName, invite_url: buttonUrl ?? "" };
+export async function sendTemplated(admin: Admin, key: EmailKey, to: string, fullName: string, buttonUrl?: string, lang: "fr" | "en" = "en"): Promise<EmailOutcome> {
+  // The admin-edited template is the English one; French creators get the French version.
+  const t = lang === "fr" ? EMAIL_DEFAULTS_FR[key] : await loadTemplate(admin, key);
+  const fields = { first_name: fullName.split(/\s+/)[0] || (lang === "fr" ? "" : "there"), full_name: fullName, invite_url: buttonUrl ?? "" };
   const split = (s: string) => replaceMergeFields(s, fields).split(/\n/).map((l) => l.trim()).filter(Boolean);
   const paragraphs = [...split(t.intro), ...split(t.instructions)];
   const opts = {
     paragraphs,
     ...(buttonUrl && t.button_label ? { buttonLabel: t.button_label, buttonUrl } : {}),
-    ...(key === "ugc-welcome" ? { linkSection: { text: "Join the team Slack:", url: SLACK_URL, linkLabel: "Join our Slack" } } : {}),
+    ...(key === "ugc-welcome" ? { linkSection: (lang === "fr" ? { text: "Rejoins le Slack de l’équipe :", url: SLACK_URL, linkLabel: "Rejoindre le Slack" } : { text: "Join the team Slack:", url: SLACK_URL, linkLabel: "Join our Slack" }) } : {}),
   };
   const subject = replaceMergeFields(t.subject, fields).slice(0, 160);
   const html = buildEmailHtml(opts);
