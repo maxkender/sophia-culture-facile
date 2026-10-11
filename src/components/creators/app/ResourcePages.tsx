@@ -180,6 +180,30 @@ function ManagedAccountCard({ app, account }: { app: AppRow; account: { handle: 
   );
 }
 
+/** Module-level so inputs inside keep focus (a component defined in render remounts on every keystroke). */
+function SetupSub({ k, done, children }: { k: string; done: boolean; children: React.ReactNode }) {
+    const sub = ACCOUNT_SUBSTEPS.find((x) => x.key === k);
+    if (!sub) return null;
+    return (
+      <PortalCard>
+        <div className="flex items-start gap-3">
+          <Checkbox className="mt-1" checked={done} disabled aria-label={`${sub.title} done`} />
+          <div className="min-w-0 flex-1">
+            <p className="font-extrabold text-brand-navy">{sub.title}</p>
+            <p className="mt-1 text-sm text-brand-navySoft">{sub.text}</p>
+            {(k === "acc_tiktok" || k === "acc_instagram") && (
+              <div className="mt-3 space-y-2 text-sm text-brand-navySoft">
+                <p>Use the new email registered above.{k === "acc_instagram" ? " Switch it to a Creator account (Settings → Account type and tools)." : ""}</p>
+                {UGC_PROFILE_GUIDANCE.map((item) => <p key={item.label}><span className="font-semibold">{item.label}: </span>{item.text}</p>)}
+              </div>
+            )}
+            <div className="mt-4">{children}</div>
+          </div>
+        </div>
+      </PortalCard>
+    );
+  }
+
 export function AccountSetupPage() {
   const { me, steps, reload } = useCreator();
   const tick = useServerFn(tickWarmupDay);
@@ -205,28 +229,7 @@ export function AccountSetupPage() {
     finally { setBusy(false); }
   };
   const req = (me as any).required_platforms ?? "both";
-  const Sub = ({ k, children }: { k: string; children: React.ReactNode }) => {
-    const sub = ACCOUNT_SUBSTEPS.find((x) => x.key === k);
-    if (!sub) return null;
-    return (
-      <PortalCard>
-        <div className="flex items-start gap-3">
-          <Checkbox className="mt-1" checked={Boolean(checks[k])} disabled aria-label={`${sub.title} done`} />
-          <div className="min-w-0 flex-1">
-            <p className="font-extrabold text-brand-navy">{sub.title}</p>
-            <p className="mt-1 text-sm text-brand-navySoft">{sub.text}</p>
-            {(k === "acc_tiktok" || k === "acc_instagram") && (
-              <div className="mt-3 space-y-2 text-sm text-brand-navySoft">
-                <p>Use the new email registered above.{k === "acc_instagram" ? " Switch it to a Creator account (Settings → Account type and tools)." : ""}</p>
-                {UGC_PROFILE_GUIDANCE.map((item) => <p key={item.label}><span className="font-semibold">{item.label}: </span>{item.text}</p>)}
-              </div>
-            )}
-            <div className="mt-4">{children}</div>
-          </div>
-        </div>
-      </PortalCard>
-    );
-  };
+  const Sub = ({ k, children }: { k: string; children: React.ReactNode }) => <SetupSub k={k} done={Boolean(checks[k])}>{children}</SetupSub>;
   return (
     <div>
       <PageTitle title="Account setup" lead="Step 3 creates the Sophia email, TikTok and Instagram accounts. Steps 4 to 6 follow below: warm-up, payouts and Slack." />
