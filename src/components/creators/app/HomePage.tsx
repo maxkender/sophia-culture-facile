@@ -14,7 +14,7 @@ import { myRunningMonth } from "@/lib/ugc-creator.functions";
 import { CreatorStatsStrip } from "./HubPages";
 import { supabase } from "@/integrations/supabase/client";
 import { FilesSection, type BriefAsset } from "@/components/hub/BriefPreview";
-import { t as ct, L } from "@/i18n/creator-app";
+import { creatorLocale, t as ct, L } from "@/i18n/creator-app";
 
 /** "Kit de démarrage": the app's screen recordings, logos and bio/CTA texts, plus the creator's personal files. */
 function StarterKit() {
@@ -48,7 +48,7 @@ function Step({ n, title, done, current, children }: { n: number; title: string;
   );
 }
 
-const fmt = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+const fmt = (iso: string) => new Date(iso).toLocaleDateString(creatorLocale(), { day: "numeric", month: "short", year: "numeric" });
 
 export function CreatorHomePage() {
   const { me, steps, signature, briefs, calls, posts, rsvps } = useCreator();

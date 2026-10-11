@@ -12,7 +12,7 @@ import { ACTIVE_POSTS, TIER_LABEL, streakDays, type Tier } from "@/lib/ugc-tiers
 import { fmtMoney } from "@/lib/ugc-pay";
 import { JobPublicCard, type JobDraft } from "@/components/hub/JobModal";
 import { useCreator } from "./useCreator";
-import { t as ct, L } from "@/i18n/creator-app";
+import { creatorLocale, t as ct, L } from "@/i18n/creator-app";
 
 const AWARD_LABEL: Record<string, string> = { first_step: ct("First Step"), ten_posts: "10 posts", streak_7: "7-day streak", streak_30: "30-day streak", views_10k: "10K views post", views_100k: "100K views post", top10_month: ct("Top 10 of the month"), challenge_winner: ct("Challenge winner") };
 const compact = (n: number) => new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(n);
@@ -225,7 +225,7 @@ function ChallengeCard() {
       {c ? <>
         <p className="mt-2 font-bold text-brand-navy">{ct(c.title)}{Number(c.reward_eur) > 0 ? ` — ${Number(c.reward_eur)} €` : ""}</p>
         {c.description ? <p className="mt-1 text-sm text-brand-navySoft">{ct(c.description)}</p> : null}
-        <p className="mt-2 text-xs text-brand-navySoft">Ends {new Date(c.ends_at).toLocaleDateString()}. Every approved video posted before then counts.</p>
+        <p className="mt-2 text-xs text-brand-navySoft">Ends {new Date(c.ends_at).toLocaleDateString(creatorLocale())}. Every approved video posted before then counts.</p>
       </> : <p className="mt-2 text-sm text-brand-navySoft">{ct("No challenge running right now. The next one drops soon.")}</p>}
     </PortalCard>
   );

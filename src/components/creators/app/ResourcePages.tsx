@@ -30,9 +30,9 @@ import { CreatorAgreementForm } from "../CreatorAgreementForm";
 import { AccessCodeCard } from "./HomePage";
 import { GuidelinesList } from "../Guidelines";
 import { CREATOR_KEY, fileToBase64, useCreator } from "./useCreator";
-import { t as ct, L, CreatorLangSwitch } from "@/i18n/creator-app";
+import { creatorLocale, t as ct, L, CreatorLangSwitch } from "@/i18n/creator-app";
 
-const fmt = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+const fmt = (iso: string) => new Date(iso).toLocaleDateString(creatorLocale(), { day: "numeric", month: "short", year: "numeric" });
 
 function useDoc(slug: string) {
   return useQuery({

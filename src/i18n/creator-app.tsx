@@ -69,3 +69,4 @@ export function CreatorLangSwitch() {
 
 /** Inline pair for strings with variables: L(`Due ${d}`, `À rendre le ${d}`). */
 export const L = (en: string, fr: string) => (current === "fr" ? fr : en);
+export const creatorLocale = () => (current === "fr" ? "fr-FR" : "en-GB");

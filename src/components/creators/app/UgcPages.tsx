@@ -15,10 +15,10 @@ import { postStage } from "./WorkPages";
 import { LibraryPage as ReferenceLibrary } from "./WorkPages";
 import { MyTerms } from "./HubPages";
 import { supabase } from "@/integrations/supabase/client";
-import { t as ct, L } from "@/i18n/creator-app";
+import { creatorLocale, t as ct, L } from "@/i18n/creator-app";
 
 const n = (v: number) => new Intl.NumberFormat("en-GB").format(Math.round(v));
-const day = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }) : ct("Any day"));
+const day = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString(creatorLocale(), { weekday: "short", day: "numeric", month: "short" }) : ct("Any day"));
 
 /* ---------- Assigned briefs with decline → replacement ---------- */
 export function AssignedBriefs() {
@@ -182,7 +182,7 @@ export function Breakdown({ b }: { b: any }) {
             <tbody>
               {b.posts.map((p: any) => (
                 <tr key={p.id} className="border-t border-brand-line">
-                  <td className="py-1 pr-3">{p.url ? <a className="text-portal-accent underline" href={p.url} target="_blank" rel="noopener noreferrer">{p.posted_at ? new Date(p.posted_at).toLocaleDateString() : "open"}</a> : "—"}</td>
+                  <td className="py-1 pr-3">{p.url ? <a className="text-portal-accent underline" href={p.url} target="_blank" rel="noopener noreferrer">{p.posted_at ? new Date(p.posted_at).toLocaleDateString(creatorLocale()) : "open"}</a> : "—"}</td>
                   <td className="pr-3">{p.platform}</td>
                   <td className="pr-3 text-right">{n(p.views_7d)}</td>
                   <td className="pr-3 text-right font-semibold">{fmtMoney(p.bonus, b.currency)}</td>

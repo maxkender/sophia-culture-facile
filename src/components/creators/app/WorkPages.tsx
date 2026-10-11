@@ -21,7 +21,7 @@ import { submitPostLinks } from "@/lib/ugc-loop.functions";
 import { GuidelinesBlock, GuidelinesChecklist, useGuidelines } from "../Guidelines";
 import { parisWeekStart } from "@/lib/ugc-pay";
 import { CATEGORY_LEGEND, briefStatus, fileToBase64, useCreator, type CreatorData } from "./useCreator";
-import { t as ct, L } from "@/i18n/creator-app";
+import { creatorLocale, t as ct, L } from "@/i18n/creator-app";
 
 type Post = CreatorData["posts"][number];
 type Ref = CreatorData["refs"][number];
@@ -33,7 +33,7 @@ const STATUS_CLASS: Record<string, string> = {
   skipped: "bg-portal-amber/15 text-portal-amber",
 };
 const Pill = ({ s }: { s: string }) => <span className={cn("inline-flex rounded-full px-3 py-1 text-xs font-bold capitalize", STATUS_CLASS[s] ?? "bg-brand-surfaceStrong text-brand-navySoft")}>{s}</span>;
-const fmtDate = (d: string) => new Date(d).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+const fmtDate = (d: string) => new Date(d).toLocaleDateString(creatorLocale(), { day: "numeric", month: "short", year: "numeric" });
 const money = (n: unknown) => (n == null ? "—" : `$${Number(n).toFixed(2)}`);
 const today = () => new Date().toISOString().slice(0, 10);
 
