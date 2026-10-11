@@ -119,9 +119,8 @@ function NeedsAttention() {
     queryFn: async () => {
       const c = (q: PromiseLike<{ count: number | null }>) => q.then((r) => r.count ?? 0);
       const since = new Date(Date.now() - 72 * 3600_000).toISOString();
-      const [ugc, , jobs, posts, active, recent] = await Promise.all([
+      const [ugc, jobs, posts, active, recent] = await Promise.all([
         c(supabase.from("creator_applications").select("id", { count: "exact", head: true }).eq("status", "pending")),
-        c(supabase.from("slideshow_applications").select("id", { count: "exact", head: true }).eq("status", "pending")),
         c(supabase.from("job_applications").select("id", { count: "exact", head: true }).eq("status", "pending")),
         c(supabase.from("creator_posts").select("id", { count: "exact", head: true }).eq("status", "pending")),
         supabase.from("creators").select("id").not("onboarding_completed_at", "is", null).eq("status", "active"),

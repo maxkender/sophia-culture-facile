@@ -104,7 +104,7 @@ export async function refreshSnapshots(admin: Admin) {
 
 export const MIN_PAYOUT = 20;
 
-/** Monday 07:00 Paris: build the week just ended for every started poster. Posters without OS data are skipped and say so. */
+/** Explicit admin action: prepare editable weekly rows, using cached counts when available; never call the OS. */
 export async function buildWeek(admin: Admin, lundi = addDays(mondayOf(), -7)) {
   const [{ data: posters }, { data: zones }] = await Promise.all([
     admin.from("slideshow_applications").select("id, zone, start_monday, os_profile_id").eq("status", "started"),
@@ -114,24 +114,20 @@ export async function buildWeek(admin: Admin, lundi = addDays(mondayOf(), -7)) {
   let built = 0, skipped = 0;
   for (const p of posters ?? []) {
     const { data: existing } = await admin.from("slideshow_payouts").select("id, status").eq("application_id", p.id).eq("week_start", lundi).maybeSingle();
-    if (existing && existing.status !== "draft" && existing.status !== "skipped") continue;
+    if (p.start_monday && p.start_monday > lundi) continue;
+    if (existing) continue;
     const { data: snap } = p.os_profile_id ? await admin.from("os_snapshots").select("*").eq("os_profile_id", p.os_profile_id).eq("lundi", lundi).maybeSingle() : { data: null };
     const { data: carried } = await admin.from("slideshow_payouts").select("id, amount, carried_in").eq("application_id", p.id).eq("status", "carried").lt("week_start", lundi);
     const carriedIn = (carried ?? []).reduce((s: number, c: any) => s + Number(c.amount ?? 0) + Number(c.carried_in ?? 0), 0);
     const first = p.start_monday === lundi;
     const base = rate[p.zone] ?? 0;
     const row: Record<string, unknown> = { application_id: p.id, week_start: lundi, zone: p.zone, rate: base, first_week: first };
-    if (!snap) {
-      Object.assign(row, { status: "skipped", skip_reason: "No OS data for this week (not connected or no snapshot)", suggested: null, amount: null, carried_in: 0 });
-      skipped++;
-    } else {
-      const missed = Number(snap.manques ?? 0);
-      const suggested = Math.max(0, base + (first ? 1 : 0) - Math.max(0, missed - 1));
-      Object.assign(row, { status: "draft", skip_reason: null, prevus: snap.prevus, publies: snap.publies, manques: missed, suggested, amount: suggested, carried_in: carriedIn });
-      built++;
-    }
+    const missed = Number(snap?.manques ?? 0);
+    const suggested = Math.max(0, base + (first ? 1 : 0) - Math.max(0, missed - 1));
+    Object.assign(row, { status: "draft", skip_reason: null, prevus: snap?.prevus ?? null, publies: snap?.publies ?? null, manques: snap ? missed : null, suggested, amount: suggested, carried_in: carriedIn, ...(!snap ? { note: "Manual week — confirm attendance and adjust amount before approval" } : {}) });
+    built++;
     await admin.from("slideshow_payouts").upsert(row, { onConflict: "application_id,week_start" });
-    if (snap && carried?.length) await admin.from("slideshow_payouts").update({ status: "rolled" }).in("id", carried.map((c: any) => c.id));
+    if (carried?.length) await admin.from("slideshow_payouts").update({ status: "rolled" }).in("id", carried.map((c: any) => c.id));
   }
   return { ok: true, lundi, built, skipped };
 }

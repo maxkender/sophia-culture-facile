@@ -23,12 +23,13 @@ export function Posters() {
   const { data } = useQuery({
     queryKey: ["hub", "slides", "posters", lundi],
     queryFn: async () => {
-      const [a, s, z] = await Promise.all([
-        supabase.from("slideshow_applications").select("id, full_name, email, country, zone, status, manager_name, deux_telephones, unswipe_code_id, applications, os_profile_id, start_monday, payout_method, stripe_onboarded").in("status", POSTER_STATUSES).order("full_name"),
+      const [a, s, z, h] = await Promise.all([
+        supabase.from("slideshow_applications").select("id, full_name, email, country, zone, status, manager_name, deux_telephones, unswipe_code_id, applications, os_profile_id, start_monday, payout_method, stripe_onboarded, timeline, os_created_at, contract_signed_at, assigned_hm_id").in("status", POSTER_STATUSES).order("full_name"),
         supabase.from("os_snapshots").select("*").eq("lundi", lundi),
         supabase.from("pay_zones").select("zone, weekly_amount"),
+        supabase.from("profiles").select("id, full_name").eq("role", "admin"),
       ]);
-      return { posters: a.data ?? [], snaps: new Map((s.data ?? []).map((x) => [x.application_id, x])), rates: Object.fromEntries((z.data ?? []).map((x) => [x.zone, x.weekly_amount])) };
+      return { managers: new Map((h.data ?? []).map((m) => [m.id, m.full_name])), posters: a.data ?? [], snaps: new Map((s.data ?? []).map((x) => [x.application_id, x])), rates: Object.fromEntries((z.data ?? []).map((x) => [x.zone, x.weekly_amount])) };
     },
   });
   const connected = os.data?.connected;
@@ -38,29 +39,31 @@ export function Posters() {
         {OS_UI_ENABLED ? <><p className="text-sm text-brand-navySoft">Week of {lundi} · last OS sync {os.data?.lastSync ? new Date(os.data.lastSync).toLocaleString("en-GB") : "never"} · refreshed automatically every morning at 06:30 Paris</p>
         <Button size="sm" variant="outline" className="ml-auto" disabled={!connected} onClick={async () => {
           const r = await refresh(); if (r.ok) { toast.success("Refreshed from the OS"); void qc.invalidateQueries({ queryKey: ["hub", "slides"] }); } else toast.error((r as { error?: string }).error ?? "Failed");
-        }}><RefreshCw className="size-4" />Refresh from OS</Button></> : <p className="text-sm text-brand-navySoft">Week of {lundi} · posters are managed by hand (OS accounts, logins and Slack are ticked on each card).</p>}
+        }}><RefreshCw className="size-4" />Refresh from OS</Button></> : <p className="text-sm text-brand-navySoft">Week of {lundi} · signed posters · account creation, logins and Slack are managed by hand.</p>}
       </div>
       {!connected ? <OsNotConnected what="Weekly post counts" /> : null}
       <div className="overflow-x-auto rounded-2xl bg-card shadow-portal">
         <table className="w-full min-w-[900px] text-sm" data-testid="posters-table">
           <thead className="text-left text-xs uppercase text-brand-navySoft"><tr>
-            <th className="p-3">Poster</th><th className="p-3">Status</th><th className="p-3">Zone · rate</th><th className="p-3">Planned</th><th className="p-3">Published</th><th className="p-3">Missed</th><th className="p-3">Last post</th><th className="p-3">Manager</th><th className="p-3">2nd phone</th><th className="p-3">UnSwipe code</th><th className="p-3">Payout</th>
+            <th className="p-3">Poster</th><th className="p-3">Status</th><th className="p-3">Zone · rate</th><th className="p-3">Start Monday</th><th className="p-3">Manual checklist</th><th className="p-3">Planned</th><th className="p-3">Published</th><th className="p-3">Missed</th><th className="p-3">Last post</th><th className="p-3">Manager</th><th className="p-3">2nd phone</th><th className="p-3">UnSwipe code</th><th className="p-3">Payout</th>
           </tr></thead>
           <tbody>{(data?.posters ?? []).map((p) => { const s = data?.snaps.get(p.id); return (
             <tr key={p.id} className="border-t border-brand-line">
               <td className="p-3 font-bold text-brand-navy">{p.full_name}<span className="block text-xs font-normal text-brand-navySoft">{p.country} · {(p.applications ?? []).join(", ")}</span></td>
               <td className="p-3">{STATUS_LABEL[p.status] ?? p.status}</td>
-              <td className="p-3">{p.zone ?? "—"} · {data?.rates[p.zone ?? ""] != null ? `$${Number(data.rates[p.zone!])}/wk` : "—"}</td>
-              <td className="p-3">{s?.prevus ?? "—"}</td><td className="p-3">{s?.publies ?? "—"}</td>
+              <td className="p-3">{p.zone ?? "—"} · {data?.rates[p.zone ?? ""] != null ? `$${Number(data.rates[p.zone ?? ""])}/wk` : "—"}</td>
+              <td className="p-3">{p.start_monday ?? "—"}</td>
+               <td className="p-3"><div className="space-y-1 text-xs">{([["os_created", "OS account created"], ["logins_sent", "Logins sent"], ["slack_added", "Added to Slack"]] as const).map(([key, label]) => <p key={key}>{(key === "os_created" ? p.os_created_at : (p.timeline as Record<string, unknown> | null)?.[key]) ? "✓" : "○"} {label}</p>)}</div></td>
+               <td className="p-3">{s?.prevus ?? "—"}</td><td className="p-3">{s?.publies ?? "—"}</td>
               <td className={cn("p-3", (s?.manques ?? 0) > 1 && "font-bold text-portal-red")}>{s?.manques ?? "—"}</td>
               <td className="p-3">{s?.dernier_post_at ? new Date(s.dernier_post_at).toLocaleDateString("en-GB") : "—"}</td>
-              <td className="p-3">{p.manager_name ?? "—"}</td>
+              <td className="p-3">{p.manager_name ?? data?.managers.get(p.assigned_hm_id ?? "") ?? "—"}</td>
               <td className="p-3">{p.deux_telephones == null ? "—" : p.deux_telephones ? "Yes" : "No"}</td>
               <td className="p-3">{(p.applications ?? []).includes("unswipe") ? (p.unswipe_code_id ? "Assigned" : "Not yet") : "n/a"}</td>
               <td className="p-3">{p.payout_method ? p.payout_method : <span className="text-portal-amber">Payout method missing</span>}</td>
             </tr>); })}</tbody>
         </table>
-        {!data?.posters.length ? <p className="p-5 text-sm text-brand-navySoft">No posters yet. Posters appear here once "Create the OS account" is ticked on their card.</p> : null}
+        {!data?.posters.length ? <p className="p-5 text-sm text-brand-navySoft">No posters yet. Posters appear here once their contract is signed.</p> : null}
       </div>
     </div>
   );

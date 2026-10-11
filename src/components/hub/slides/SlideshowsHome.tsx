@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useSlideshowApps } from "./SlideshowApplications";
 import { STATUS_LABEL, useOsStatus , OS_UI_ENABLED } from "./useOs";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { OsNotConnected } from "./Posters";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -11,11 +13,20 @@ export function SlideshowsHome() {
   const os = useOsStatus();
   const apps = data?.apps ?? [];
   const n = (s: string) => apps.filter((a) => a.status === s).length;
+  const now = new Date();
+  const parisDay = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+  const day = new Date(`${parisDay}T12:00:00Z`);
+  const week = new Date(day); week.setUTCDate(week.getUTCDate() - ((week.getUTCDay() + 6) % 7));
+  const next = new Date(week); next.setUTCDate(next.getUTCDate() + 7);
+  const nextMonday = next.toISOString().slice(0, 10);
+  const { data: payouts = 0 } = useQuery({ queryKey: ["hub", "slides", "payouts-to-approve"], queryFn: async () => (await supabase.from("slideshow_payouts").select("id", { count: "exact", head: true }).eq("status", "draft")).count ?? 0 });
   const notOpen = apps.filter((a) => a.status === "pending" && !a.zone).length;
   const tiles: [string, number, string][] = [
-    ["Pending applications", n("pending"), "/hub/slideshows/applications"], ["Kept warm", n("pool"), "/hub/slideshows/applications"],
-    ["Waiting for contract", n("accepted"), "/hub/slideshows/applications"], ["OS account created", n("os_created"), "/hub/slideshows/posters"],
-    ["Posters started", n("started"), "/hub/slideshows/posters"], 
+    ["Pending applications", n("pending"), "/hub/slideshows/applications"],
+    ["Accepted this week", apps.filter((a) => a.accepted_at && a.accepted_at >= week.toISOString()).length, "/hub/slideshows/applications"],
+    ["Starting next Monday", apps.filter((a) => a.start_monday === nextMonday && ["accepted", "contract_signed", "os_created"].includes(a.status)).length, "/hub/slideshows/posters"],
+    ["Posters started", n("started"), "/hub/slideshows/posters"],
+    ["Payouts to approve", payouts, "/hub/slideshows/payouts"],
   ];
   const byZone = ["A", "B", "C"].map((z) => [z, apps.filter((a) => a.zone === z && a.status === "pending").length] as const);
   return (

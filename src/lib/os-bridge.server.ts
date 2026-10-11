@@ -11,11 +11,12 @@ export async function osBaseUrl(admin: Admin): Promise<string> {
 }
 
 export function osConfigured(): boolean {
-  return Boolean(process.env["OS_HUB_SECRET"]);
+  return false;
 }
 
 /** POST {base}/functions/v1/hub-posteurs with 3 tries and backoff; every call is logged in os_calls. */
 export async function callOs<T = Record<string, unknown>>(admin: Admin, action: string, params: Record<string, unknown> = {}): Promise<OsResult<T>> {
+  if (!osConfigured()) return { ok: false, error: "OS integration is dormant", notConnected: true };
   const secret = process.env["OS_HUB_SECRET"];
   if (!secret) return { ok: false, error: OS_NOT_CONNECTED, notConnected: true };
   const url = `${await osBaseUrl(admin)}/functions/v1/hub-posteurs`;

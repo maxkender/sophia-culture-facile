@@ -121,7 +121,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       cta: "Apply now (1 minute)",
       howTitle: "How it works",
       steps: [
-        "You apply below. We reply within five days.",
+        "You apply below. We'll get back to you if a place opens in your country.",
         "If accepted, you get an account in our system and you set up a fresh TikTok account for Sophia, following our instructions. The account belongs to Sophia; you run it.",
         "You warm the account up for a few days, exactly as we tell you. Then the posts start.",
         "Every day, two posts are waiting for you in your space: the slides, the caption, the music. You assemble and publish. Nothing to invent.",
@@ -215,7 +215,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       cta: "Postuler (1 minute)",
       howTitle: "Comment ça marche",
       steps: [
-        "Vous postulez ci-dessous. Nous répondons sous cinq jours.",
+        "Vous postulez ci-dessous. Nous vous recontactons si une place s'ouvre dans votre pays.",
         "Si vous êtes retenu, vous recevez un accès à notre espace et vous créez un nouveau compte TikTok pour Sophia, en suivant nos consignes. Le compte appartient à Sophia ; c'est vous qui l'animez.",
         "Vous « chauffez » le compte pendant quelques jours, exactement comme indiqué. Ensuite, les posts commencent.",
         "Chaque jour, deux posts vous attendent dans votre espace : les slides, la légende, la musique. Vous assemblez et publiez. Rien à inventer.",

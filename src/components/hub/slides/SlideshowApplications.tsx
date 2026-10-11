@@ -15,7 +15,8 @@ import { STATUS_LABEL, useOsStatus , OS_UI_ENABLED } from "./useOs";
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const sel = "h-9 rounded-lg border border-brand-line bg-card px-2 text-sm";
 type App = Database["public"]["Tables"]["slideshow_applications"]["Row"];
-const LANG_OF: Record<string, ApplicantLang> = {};
+export const APPLICATION_TABS = [["pending", "Pending"], ["accepted", "Accepted"], ["contract_signed", "Contract signed"], ["started", "Started"], ["pool", "Pool"], ["rejected", "Rejected"], ["expired", "Expired"]] as const;
+export const statusInTab = (status: string, tab: string) => tab === "contract_signed" ? ["contract_signed", "os_created"].includes(status) : tab === "accepted" ? ["accepted", "approved"].includes(status) : tab === "started" ? ["started", "dropped"].includes(status) : status === tab;
 
 export function useSlideshowApps() {
   return useQuery({
@@ -50,26 +51,26 @@ const fmt = (d?: string | null) => (d ? new Date(d).toLocaleDateString("en-GB", 
 export function SlideshowApplications({ focusId }: { focusId?: string | undefined }) {
   const { data } = useSlideshowApps();
   const os = useOsStatus();
-  const [f, setF] = useState({ country: "all", zone: "all", upwork: "all", phone: "all", status: "pending" });
+  const [f, setF] = useState({ country: "all", zone: "all", upwork: "all", phone: "all", status: focusId ? "all" : "pending" });
   const [open, setOpen] = useState<string | null>(focusId ?? null);
   const apps = data?.apps ?? [];
   const countries = useMemo(() => [...new Set(apps.map((a) => a.country))].sort(), [apps]);
   const rows = apps.filter((a) =>
     (f.country === "all" || a.country === f.country) && (f.zone === "all" || (f.zone === "none" ? !a.zone : a.zone === f.zone))
     && (f.upwork === "all" || String(Boolean(a.has_upwork)) === f.upwork) && (f.phone === "all" || String(a.deux_telephones === true) === f.phone)
-    && (f.status === "all" || a.status === f.status));
+    && (f.status === "all" || statusInTab(a.status, f.status)));
   const groups = useMemo(() => {
     const m = new Map<string, App[]>();
     for (const a of rows) m.set(a.country, [...(m.get(a.country) ?? []), a]);
     return [...m.entries()].sort((x, y) => y[1].length - x[1].length);
   }, [rows]);
-  const activeByLang = new Map((os.data?.byLangue ?? []).map((r) => [r.langue, r.actifs]));
-  const activeFor = (country: string) => { if (!os.data?.connected || !activeByLang.size) return "—"; const l = LANG_OF[country] ?? langOfCountry(country); return String(activeByLang.get(l) ?? 0); };
   const counts = (list: App[]) => Object.entries(list.reduce<Record<string, number>>((m, a) => ({ ...m, [a.status]: (m[a.status] ?? 0) + 1 }), {}));
 
   return (
     <div className="space-y-4">
-      <div className={cn(card, "flex flex-wrap items-center gap-2 py-3")}>
+      <p className="text-sm font-semibold text-brand-navy">Candidatures posteurs slideshow — tu choisis qui tu acceptes, rien ne part tout seul</p>
+      <div role="tablist" aria-label="Application status" className="flex flex-wrap gap-1 border-b border-brand-line pb-2">{APPLICATION_TABS.map(([key, label]) => <Button key={key} role="tab" aria-selected={f.status === key} variant={f.status === key ? "default" : "ghost"} size="sm" onClick={() => setF({ ...f, status: key })}>{label} · {apps.filter((a) => statusInTab(a.status, key)).length}</Button>)}</div>
+      <div className="flex flex-wrap items-center gap-2 py-3">
         <select aria-label="Status" className={sel} value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })}>
           <option value="all">All statuses</option>{Object.entries(STATUS_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
         </select>
@@ -86,17 +87,17 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
             <h3 className="font-extrabold text-brand-navy">{country}</h3>
             {list[0]?.zone ? <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold", ZONE_BADGE[list[0].zone])}>Zone {list[0].zone}</span> : <span className="rounded-full bg-portal-red/10 px-2 py-0.5 text-[11px] font-bold text-portal-red">Country not open</span>}
             {counts(list).map(([s, n]) => <span key={s} className="rounded-full bg-portal-bg px-2 py-0.5 text-[11px] font-semibold">{STATUS_LABEL[s] ?? s} {n}</span>)}
-            <span className="ml-auto text-xs text-brand-navySoft">Active posters in this country: <b>{activeFor(country)}</b></span>
+            
           </header>
-          <ul>{list.map((a) => { const s = scoreOf(a, data!.hmCountries); const isOpen = open === a.id; return (
+          <ul>{list.map((a) => { const s = scoreOf(a, data?.hmCountries ?? new Set<string>()); const isOpen = open === a.id; return (
             <li key={a.id} className="border-t border-brand-line first:border-t-0">
-              <button type="button" onClick={() => setOpen(isOpen ? null : a.id)} className="flex w-full flex-wrap items-center gap-3 px-4 py-3 text-left text-sm hover:bg-portal-bg">
+              <Button variant="ghost" onClick={() => setOpen(isOpen ? null : a.id)} aria-expanded={isOpen} className="h-auto min-h-14 w-full flex-wrap justify-start gap-3 rounded-none px-4 py-3 text-left text-sm hover:bg-portal-bg">
                 {isOpen ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
-                <span className="min-w-0 flex-1 font-bold text-brand-navy">{a.full_name}<span className="block truncate text-xs font-normal text-brand-navySoft">{a.email} · applied {fmt(a.created_at)}</span></span>
+                <span className="min-w-0 flex-1 font-bold text-brand-navy">{a.full_name}<span className="block break-all whitespace-normal text-xs font-normal text-brand-navySoft">{a.email} · applied {fmt(a.created_at)}</span></span>
                 <span className="rounded-full bg-space-slides/10 px-2 py-0.5 text-xs font-bold text-space-slides">Score {s.score}/{s.max}</span>
                 <span className="text-xs">{STATUS_LABEL[a.status] ?? a.status}</span>
-              </button>
-              {isOpen ? <PosterCard a={a} score={s} zones={data!.zones} /> : null}
+              </Button>
+              {isOpen ? <PosterCard a={a} score={s} zones={data?.zones ?? []} /> : null}
             </li>); })}</ul>
         </section>
       ))}
@@ -106,8 +107,8 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
 }
 
 const STEPS: [string, string, string | null][] = [
-  ["accepted", "Accepted", "accepted_at"], ["contract_signed", "Contract signed", "contract_signed_at"], ["os_created", "Create the OS account", "os_created_at"],
-  ["logins_sent", "Send the logins", null], ["slack_added", "Add to Slack (zone channel)", null], ["hm_notified", "Hiring manager notified", "hm_notified_at"], ["warmup", "Warm-up done", null], ["started", "Started Monday", "started_at"], ["dropped", "Dropped", "dropped_at"],
+  ["accepted", "Accepted", "accepted_at"], ["contract_signed", "Contract signed", "contract_signed_at"], ["os_created", "OS account created · by hand", "os_created_at"],
+  ["logins_sent", "Logins sent · by hand", null], ["slack_added", "Added to Slack · by hand", null], ["hm_notified", "Hiring manager notified", "hm_notified_at"], ["warmup", "Warm-up done", null], ["started", "Started Monday", "started_at"], ["dropped", "Dropped", "dropped_at"],
 ];
 
 export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<typeof scoreOf>; zones: { zone: string; weekly_amount: number | null; first_week_amount: number | null }[] }) {
@@ -130,26 +131,27 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
   const tl = (a.timeline ?? {}) as unknown as Record<string, { at: string; by: string }>;
   const decided = !["pending", "pool"].includes(a.status);
   return (
-    <div className="grid gap-4 bg-portal-bg/50 px-4 pb-4 pt-2 md:grid-cols-2" data-testid="poster-card">
+    <div className="space-y-4 bg-portal-bg/50 px-4 pb-4 pt-2" data-testid="poster-card">
       <div className="space-y-2 text-sm">
-        <p><b>Phone</b> {a.phone ?? "—"} · <b>Language</b> {a.langue ?? "—"} · <b>Second phone</b> {a.deux_telephones == null ? "—" : a.deux_telephones ? "yes" : "no"}</p>
+        <p><b>Country</b> {a.country} · <b>Age 18+</b> {a.is_adult ? "OK" : "Not confirmed"}</p>
+        <p><b>Phone</b> {a.phone ?? "—"} · <b>Language</b> {a.langue ? a.langue.toUpperCase() : `${langOfCountry(a.country).toUpperCase()} (country default)`} · <b>Second phone</b> {a.deux_telephones == null ? "—" : a.deux_telephones ? "yes" : "no"}</p>
         <p><b>Upwork</b> {a.has_upwork ? (a.upwork_profile_url ? <a className="text-space-slides underline" href={a.upwork_profile_url} target="_blank" rel="noreferrer">profile</a> : "yes") : "no"} · <b>Zone</b> {a.zone ?? "country not open"}</p>
-        <div className="rounded-xl bg-card p-3 text-xs">
+        <div className="border-t border-brand-line py-3 text-xs">
           <p><b>Country now:</b> {a.q_country_now ?? "—"}</p><p><b>Hours/day:</b> {a.q_hours_per_day ?? "—"}</p><p><b>TikTok daily:</b> {a.q_tiktok_daily ?? "—"}</p><p><b>Previous content:</b> {a.q_previous_content ?? "—"}</p>
           {a.referral_source ? <p><b>Heard via:</b> {a.referral_source}</p> : null}
         </div>
-        <p className="text-xs text-brand-navySoft">{score.checks.map(([l, ok]) => `${ok ? "✓" : "✗"} ${l}`).join(" · ")}</p>
+        <p className="text-xs text-brand-navySoft"><b>Score {score.score}/5</b> · {score.checks.map(([l, ok]) => `${ok ? "✓" : "✗"} ${l}`).join(" · ")}</p>
         {a.start_monday ? <p><b>Start Monday</b> {fmt(a.start_monday)} · <b>Apps</b> {(a.applications ?? []).join(", ") || "—"}</p> : null}
         {a.manager_name ? <p><b>Hiring manager</b> {a.manager_name} {a.manager_email ? `· ${a.manager_email}` : ""}</p> : null}
         {a.os_email ? <p><b>OS login</b> {a.os_email}</p> : null}
         {a.rejected_reason ? <p><b>Reason</b> {a.rejected_reason}</p> : null}
       </div>
       <div className="space-y-3">
-        <ul className="space-y-1 rounded-xl bg-card p-3 text-sm">
+        <ul className="space-y-1 border-t border-brand-line py-3 text-sm">
           {STEPS.map(([k, l, col]) => { const at = (col && ((a as unknown as Record<string, string | null>)[col])) || tl[k]?.at; return (
             <li key={k} className="flex items-center gap-2">
-              <input type="checkbox" aria-label={l} checked={Boolean(at)} disabled={busy} onChange={(e) => void run(() => tick({ data: { applicationId: a.id, step: k as never, done: e.target.checked } }), "Updated")} />
-              <span className="flex-1">{l}</span><span className="text-xs text-brand-navySoft">{at ? `${fmt(at)}${tl[k]?.by ? ` · ${tl[k]!.by}` : ""}` : ""}</span>
+              <input type="checkbox" aria-label={l} checked={Boolean(at)} disabled={busy || ["accepted", "contract_signed"].includes(k) || (["os_created", "logins_sent", "slack_added", "hm_notified", "warmup", "started"].includes(k) && !["contract_signed", "os_created", "started", "dropped"].includes(a.status))} onChange={(e) => void run(() => tick({ data: { applicationId: a.id, step: k as never, done: e.target.checked } }), "Updated")} />
+              <span className="flex-1">{l}{k === "started" && a.start_monday ? ` · ${fmt(a.start_monday)}` : ""}</span><span className="text-xs text-brand-navySoft">{at ? `${fmt(at)}${tl[k]?.by ? ` · ${tl[k]?.by}` : ""}` : ""}</span>
             </li>); })}
         </ul>
         {OS_UI_ENABLED && a.os_error && a.status === "contract_signed" ? (
@@ -172,7 +174,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
           </div>
         ) : null}
         {mode === "accept" ? (
-          <div className="space-y-2 rounded-xl bg-card p-3 text-sm">
+          <div className="space-y-2 border-t border-brand-line py-3 text-sm">
             <p className="font-bold">App(s) this poster will promote</p>
             {["sophia", "unswipe"].map((x) => <label key={x} className="mr-4 inline-flex items-center gap-1"><input type="checkbox" checked={apps.includes(x)} onChange={(e) => setApps(e.target.checked ? [...apps, x] : apps.filter((y) => y !== x))} />{x === "sophia" ? "Sophia" : "UnSwipe"}</label>)}
             <div className="flex flex-wrap items-center gap-2">
@@ -181,12 +183,12 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
               {z ? <span className="text-xs">${Number(z.weekly_amount)}/week · first week ${Number(z.first_week_amount)}</span> : null}
             </div>
             {!a.zone ? <p className="text-xs text-portal-amber">This country is not open: picking a zone sets it by hand.</p> : null}
-            <p className="text-xs text-brand-navySoft">Emails the applicant: accepted + contract link + next steps (sign → logins → warm-up before Sunday → first posts Monday).</p>
+            <p className="text-xs text-brand-navySoft">Only Confirm acceptance sends the contract email. After signing, account creation, logins, Slack and the start are handled by hand.</p>
             <Button size="sm" disabled={busy || !zone || !apps.length} onClick={() => void run(() => accept({ data: { applicationId: a.id, apps: apps as ("sophia" | "unswipe")[], zone: zone as "A", langue } }), "Accepted, email sent")}>Confirm acceptance</Button>
           </div>
         ) : null}
         {mode === "reject" ? (
-          <div className="space-y-2 rounded-xl bg-card p-3 text-sm">
+          <div className="space-y-2 border-t border-brand-line py-3 text-sm">
             <textarea aria-label="Reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (sent to the applicant in their language)" className="w-full rounded-lg border p-2" />
             <Button size="sm" variant="destructive" disabled={busy} onClick={() => void run(() => reject({ data: { applicationId: a.id, reason } }), "Rejected, email sent")}>Reject and email</Button>
           </div>
