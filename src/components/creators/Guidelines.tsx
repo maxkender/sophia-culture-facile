@@ -90,7 +90,7 @@ export function GuidelinesEditor() {
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div><h3 className="font-extrabold text-brand-navy">{ct("Consignes de tournage")}</h3><p className="text-xs text-brand-navySoft">Shown on the creator Rules page, on every brief (collapsible) and as the checklist when a creator submits a link.</p></div>
-        <Button size="sm" onClick={async () => { await supabase.from("ugc_guidelines").insert({ title_fr: "Nouvelle consigne", title_en: "New guideline", sort_order: (data.at(-1)?.sort_order ?? 0) + 1 }); reload(); }}><Plus className="size-4" />{ct("Add")}</Button>
+        <Button size="sm" onClick={async () => { await supabase.from("ugc_guidelines").insert({ title_fr: ct("Nouvelle consigne"), title_en: ct("New guideline"), sort_order: (data.at(-1)?.sort_order ?? 0) + 1 }); reload(); }}><Plus className="size-4" />{ct("Add")}</Button>
       </div>
       {data.map((g, i) => (
         <div key={g.id} className={cn("grid gap-2 rounded-2xl bg-card p-4 shadow-portal md:grid-cols-[1fr_1fr_auto]", !g.active && "opacity-60")} data-testid="guideline-row">

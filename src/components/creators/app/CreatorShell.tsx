@@ -29,7 +29,7 @@ export const CREATOR_NAV: { heading: string; items: Item[] }[] = [
       { to: "/creators/app/jobs", label: "Jobs", icon: Briefcase, gate: "steps" },
       { to: "/creators/app/briefs", label: "Briefs", icon: Clapperboard, badge: "briefs", gate: "steps" },
       { to: "/creators/app/library", label: "Library", icon: Library, gate: "steps" },
-      { to: "/creators/app/posts", label: "My posts", icon: Video, badge: "posts", gate: "steps" },
+      { to: "/creators/app/posts", label: ct("My posts"), icon: Video, badge: "posts", gate: "steps" },
       { to: "/creators/app/tasks", label: "Tasks", icon: ListChecks, gate: "steps" },
       { to: "/creators/app/calls", label: "Calls", icon: CalendarDays, badge: "calls", gate: "steps" },
       { to: "/creators/app/earnings", label: "Payouts", icon: Banknote, gate: "payouts" },
@@ -40,7 +40,7 @@ export const CREATOR_NAV: { heading: string; items: Item[] }[] = [
     heading: "Resources",
     items: [
       { to: "/creators/app/rules", label: "Rules", icon: BookOpen },
-      { to: "/creators/app/account", label: "Account setup", icon: Smartphone },
+      { to: "/creators/app/account", label: ct("Account setup"), icon: Smartphone },
       { to: "/creators/app/profile", label: "Profile", icon: UserCircle },
     ],
   },
@@ -236,13 +236,13 @@ export function CreatorShell({ children }: { children: ReactNode }) {
 export function Locked({ gate, children }: { gate: "steps" | "payouts"; children: ReactNode }) {
   const { steps } = useCreator();
   const missing = !steps.rules
-    ? { n: 1, label: "Read the rules", to: "/creators/app/rules" }
+    ? { n: 1, label: ct("Read the rules"), to: "/creators/app/rules" }
     : !steps.signed
-      ? { n: 2, label: "Sign the Creator Account Agreement", to: "/creators/app/contract" }
+      ? { n: 2, label: ct("Sign the Creator Account Agreement"), to: "/creators/app/contract" }
       : !steps.account
-        ? { n: 3, label: "Set up your Sophia account", to: "/creators/app/account" }
+        ? { n: 3, label: ct("Set up your Sophia account"), to: "/creators/app/account" }
         : gate === "payouts" && !steps.payouts
-          ? { n: 4, label: "Set up payouts", to: "/creators/app/profile" }
+          ? { n: 4, label: ct("Set up payouts"), to: "/creators/app/profile" }
           : null;
   if (!missing) return <>{children}</>;
   return (

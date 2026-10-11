@@ -14,7 +14,7 @@ import { JobPublicCard, type JobDraft } from "@/components/hub/JobModal";
 import { useCreator } from "./useCreator";
 import { t as ct } from "@/i18n/creator-app";
 
-const AWARD_LABEL: Record<string, string> = { first_step: "First Step", ten_posts: "10 posts", streak_7: "7-day streak", streak_30: "30-day streak", views_10k: "10K views post", views_100k: "100K views post", top10_month: "Top 10 of the month", challenge_winner: "Challenge winner" };
+const AWARD_LABEL: Record<string, string> = { first_step: ct("First Step"), ten_posts: "10 posts", streak_7: "7-day streak", streak_30: "30-day streak", views_10k: "10K views post", views_100k: "100K views post", top10_month: ct("Top 10 of the month"), challenge_winner: ct("Challenge winner") };
 const compact = (n: number) => new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(n);
 
 export function useHubExtras() {

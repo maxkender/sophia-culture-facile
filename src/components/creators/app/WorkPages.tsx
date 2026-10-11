@@ -88,7 +88,7 @@ function FormatsTab() {
     .sort((a, b) => Number((b as { pinned?: boolean }).pinned) - Number((a as { pinned?: boolean }).pinned) || Number((a as { sort_order?: number }).sort_order ?? 99) - Number((b as { sort_order?: number }).sort_order ?? 99));
   const fr = (d.me as { language?: string }).language !== "en";
   const eur = (n: number) => `${new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2, minimumFractionDigits: n % 1 ? 2 : 0 }).format(n)} €`;
-  const label = { pov: "POV", reaction: fr ? "Réaction" : "Reaction", talking_head: "Face cam" } as Record<string, string>;
+  const label = { pov: "POV", reaction: fr ? "Réaction" : "Reaction", talking_head: ct("Face cam") } as Record<string, string>;
   return (
     <div>
       <p className="mb-4 rounded-2xl bg-portal-accent/10 px-4 py-3 text-sm font-bold text-brand-navy">{fr ? ct("Choisis 3 formats, refais-les 20 fois.") : ct("Pick 3 formats, redo them 20 times.")}</p>
@@ -323,7 +323,7 @@ export function postStage(p: Post, paidAt?: string | null): { label: string; ton
   if (x.pay_status === "paid") return { label: paidAt ? `Payé le ${fmtDate(paidAt)}` : "Payé", tone: "bg-portal-green/15 text-portal-green", detail: `${eurFr(x.pay_amount)} · vues à J+7 : ${v(x.views_frozen)}` };
   if (x.pay_status === "approved") return { label: `Paiement en cours : ${eurFr(x.pay_amount)}`, tone: "bg-portal-green/10 text-portal-green", detail: `vues à J+7 : ${v(x.views_frozen)}` };
   if (x.pay_status === "ready") return { label: `Prêt pour paiement : ${eurFr(x.pay_amount)}`, tone: "bg-portal-green/10 text-portal-green", detail: `vues à J+7 : ${v(x.views_frozen)}` };
-  if (x.pay_status === "no_data") return { label: "Validé · vues introuvables", tone: "bg-portal-amber/15 text-portal-amber", detail: "l’équipe vérifie le lien avant de payer" };
+  if (x.pay_status === "no_data") return { label: ct("Validé · vues introuvables"), tone: "bg-portal-amber/15 text-portal-amber", detail: "l’équipe vérifie le lien avant de payer" };
   const j7 = x.validated_at ? new Date(new Date(x.validated_at).getTime() + 7 * 86400000).toISOString() : null;
   return { label: "Validé", tone: "bg-portal-accent/10 text-portal-accent", detail: `${p.views != null ? `${v(p.views)} vues pour l’instant · ` : ""}vues comptées le ${j7 ? fmtDate(j7) : "—"} (J+7)` };
 }

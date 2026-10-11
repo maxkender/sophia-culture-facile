@@ -320,7 +320,7 @@ export function ProfilePage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div><Label>{ct("Name")}</Label><Input value={me.full_name} readOnly /></div>
           <div><Label>{ct("Email")}</Label><Input value={me.email} readOnly /></div>
-          <div><Label>{ct("Country")}</Label><CountrySelect value={country} onChange={setCountry} lang="en" labels={{ select: "Choose a country", search: "Search…", empty: "No country found" }} /></div>
+          <div><Label>{ct("Country")}</Label><CountrySelect value={country} onChange={setCountry} lang="en" labels={{ select: ct("Choose a country"), search: "Search…", empty: ct("No country found") }} /></div>
            <div><Label>{ct("Phone")}</Label><Input type="tel" placeholder="+44 7700 900123" value={phone} onChange={(e) => setPhone(e.target.value)} /><p className="mt-1 text-xs text-brand-navySoft">{ct("Include the country code.")}</p></div>
           <div><Label>{ct("Phone type")}</Label>
             <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={platform} onChange={(e) => setPlatform(e.target.value as typeof platform)}>

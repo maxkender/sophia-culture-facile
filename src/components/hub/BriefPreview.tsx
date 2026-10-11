@@ -12,7 +12,7 @@ import { t as ct } from "@/i18n/creator-app";
 
 export type BriefAsset = { id: string; kind: string; title: string; storage_path: string | null; url: string | null; text_content: string | null; thumbnail_url: string | null; role: string };
 export type BriefRef = { id: string; title: string | null; url: string; thumbnail_url?: string | null };
-const EFFORT_FR: Record<string, string> = { pov: "POV", reaction: "Réaction", talking_head: "Face cam" };
+const EFFORT_FR: Record<string, string> = { pov: "POV", reaction: "Réaction", talking_head: ct("Face cam") };
 const KIND_ICON = { video: Video, image: ImageIcon, audio: Music, pdf: FileText, text: FileText, link: Link2 } as Record<string, typeof Video>;
 
 /** Signed-link download for one asset (links open in a new tab). */
@@ -26,7 +26,7 @@ export function useAssetDownload() {
   };
 }
 
-const FMT_FR: Record<string, string> = { title: "Gros titre centré", subtitle: "Sous-titre en bas", sticker: "Sticker", caption: "Bandeau légende", none: "Pas de texte" };
+const FMT_FR: Record<string, string> = { title: ct("Gros titre centré"), subtitle: ct("Sous-titre en bas"), sticker: "Sticker", caption: ct("Bandeau légende"), none: ct("Pas de texte") };
 void TEXT_FORMATS;
 function OnScreen({ text, fmt }: { text: string; fmt?: TextFormat | undefined }) {
   if (!text?.trim() && (!fmt || fmt.kind === "none")) return null;
