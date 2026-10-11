@@ -24,7 +24,7 @@ export function useHubExtras() {
       const [awards, tasks, tiers, jobs, apps] = await Promise.all([
         supabase.from("awards").select("kind, period, awarded_at").eq("creator_id", me.id),
         supabase.from("creator_tasks").select("*").eq("creator_id", me.id).order("created_at", { ascending: false }),
-        supabase.from("ugc_tiers").select("tier, label, per_post, cpm, cap_per_post, app_id"),
+        supabase.from("ugc_tiers").select("tier, label, per_post, cpm, cap_per_post, app_id, per_post_pov, per_post_reaction, per_post_talking_head"),
         supabase.from("jobs").select("*").eq("status", "active").eq("access", "job_feed").order("created_at", { ascending: false }),
         supabase.from("job_applications").select("job_id, status").eq("creator_id", me.id),
       ]);
@@ -231,8 +231,19 @@ function ChallengeCard() {
 }
 
 /** The creator's own pay: per-creator overrides when set ("Tes conditions"), otherwise the tier. */
-export function MyTerms({ tiers }: { tiers: { tier: string; per_post: number | string; cpm: number | string; cap_per_post: number | string; app_id?: string | null }[] }) {
-  const { me } = useCreator();
+type TierRow = { tier: string; per_post: number | string; cpm: number | string; cap_per_post: number | string; app_id?: string | null; per_post_pov?: number | string | null; per_post_reaction?: number | string | null; per_post_talking_head?: number | string | null };
+
+/** Per-post rate by format effort for this creator (override wins, then tier). */
+export function effortRates(me: Record<string, unknown>, tiers: TierRow[], appId?: string | null) {
+  const tier = String(me["tier"] ?? "trial");
+  const t = tiers.find((x) => x.tier === tier && (!appId || x.app_id === appId)) ?? tiers.find((x) => x.tier === tier);
+  const o = me["per_post_override"] == null ? null : Number(me["per_post_override"]);
+  const pick = (k: "per_post_pov" | "per_post_reaction" | "per_post_talking_head") => o ?? (t?.[k] != null ? Number(t[k]) : t ? Number(t.per_post) : 0);
+  return { pov: pick("per_post_pov"), reaction: pick("per_post_reaction"), talking_head: pick("per_post_talking_head") };
+}
+
+export function MyTerms({ tiers }: { tiers: TierRow[] }) {
+  const { me, posts, briefs } = useCreator();
   const m = me as Record<string, unknown>;
   const tier = String(m["tier"] ?? "trial");
   const appId = (m["fast_lane_app_id"] as string | null) ?? null;
@@ -255,10 +266,18 @@ export function MyTerms({ tiers }: { tiers: { tier: string; per_post: number | s
         {perPost ? <> · + <b>{eur(perPost)}</b> {fr ? "par post" : "per post"}</> : null}
         {num("welcome_bonus") ? <> · {fr ? "bonus de bienvenue" : "welcome bonus"} <b>{eur(num("welcome_bonus")!)}</b></> : null}
       </p><p className="text-xs text-brand-navySoft">{fr ? `Au prorata si moins de ${target} vidéos.` : `Prorated if fewer than ${target} videos.`}</p></> : <p className="mt-1 text-sm text-brand-navy">
-        <b>{eur(perPost)}</b> {fr ? "par post" : "per post"} · <b>{eur(rpm ?? 0)}</b> {fr ? "/ 1 000 vues" : "per 1,000 views"} · {fr ? "jusqu'à" : "up to"} <b>{eur(cap ?? 0)}</b> {fr ? "par post" : "per post"}
+        {num("per_post_override") == null && t?.per_post_pov != null ? (() => { const r = effortRates(m, tiers, appId); return <>POV <b>{eur(r.pov)}</b> · {fr ? "Réaction" : "Reaction"} <b>{eur(r.reaction)}</b> · Face cam <b>{eur(r.talking_head)}</b> {fr ? "par post" : "per post"}</>; })() : <><b>{eur(perPost)}</b> {fr ? "par post" : "per post"}</>} · <b>{eur(rpm ?? 0)}</b> {fr ? "/ 1 000 vues" : "per 1,000 views"} · {fr ? "jusqu'à" : "up to"} <b>{eur(cap ?? 0)}</b> {fr ? "par post" : "per post"}
         {own ? <> · {fr ? "objectif" : "target"} <b>{target}</b> {fr ? "posts/mois" : "posts/month"}</> : null}
         {num("welcome_bonus") ? <> · {fr ? "bonus de bienvenue" : "welcome bonus"} <b>{eur(num("welcome_bonus")!)}</b></> : null}
       </p>}
+      {(() => {
+        const min = num("min_talking_head_per_month") ?? 0;
+        if (!min || num("fixed_monthly_override")) return null;
+        const month = new Date().toISOString().slice(0, 7);
+        const effortOf = (p: { effort?: string | null; brief_id?: string | null }) => p.effort ?? (briefs.find((b) => b.id === p.brief_id) as { effort?: string | null } | undefined)?.effort ?? "talking_head";
+        const done = posts.filter((p) => p.status !== "rejected" && String(p.posted_on ?? p.created_at).slice(0, 7) === month && effortOf(p as never) === "talking_head").length;
+        return <p className="mt-1 text-xs font-semibold text-brand-navy" data-testid="facecam-count">Face cam : {done}/{min}{done < min ? <span className="font-normal text-brand-navySoft"> · {fr ? `en dessous de ${min}, la part par post est au prorata` : `below ${min}, the per-post part is prorated`}</span> : null}</p>;
+      })()}
     </div>
   );
 }

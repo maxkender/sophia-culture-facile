@@ -2,8 +2,17 @@
 import { periodBounds, platformAllowed, type MonthBreakdown, type PayCreator, type PayPost } from "./ugc-pay";
 
 export type Tier = "trial" | "active" | "pro";
-export type TierTerms = { tier: Tier; per_post: number; cpm: number; cap_per_post: number };
-export type TierCreator = PayCreator & { per_post_override?: number | null };
+export type Effort = "pov" | "reaction" | "talking_head";
+export const EFFORT_LABEL: Record<Effort, string> = { pov: "POV", reaction: "Reaction", talking_head: "Face cam" };
+export type TierTerms = { tier: Tier; per_post: number; cpm: number; cap_per_post: number; per_post_pov?: number; per_post_reaction?: number; per_post_talking_head?: number };
+/** Per-post rate for a format effort; falls back to the tier's single per-post rate. */
+export function ratePerEffort(t: TierTerms, effort: Effort | null | undefined) {
+  if (effort === "pov" && t.per_post_pov != null) return Number(t.per_post_pov);
+  if (effort === "reaction" && t.per_post_reaction != null) return Number(t.per_post_reaction);
+  if (effort === "talking_head" && t.per_post_talking_head != null) return Number(t.per_post_talking_head);
+  return Number(t.per_post);
+}
+export type TierCreator = PayCreator & { per_post_override?: number | null; min_talking_head_per_month?: number | null };
 export const TIER_LABEL: Record<Tier, string> = { trial: "Trial", active: "Active", pro: "Pro" };
 export const ACTIVE_POSTS = 20;
 
@@ -39,8 +48,19 @@ export function computeTierMonth(period: string, creator: TierCreator, t: TierTe
   const cpm = creator.rpm_override ?? t.cpm;
   const cap = creator.cap_override ?? t.cap_per_post;
   const eligible = posts.filter((p) => !p.excluded && platformAllowed(creator.required_platforms, p.platform));
-  const postsCounted = eligible.filter((p) => inMonth(p.posted_at)).length;
-  const fixedPart = round2(postsCounted * perPost);
+  const counted = eligible.filter((p) => inMonth(p.posted_at));
+  const postsCounted = counted.length;
+  // Per-post pay by format effort; a per-creator per_post_override replaces all three rates.
+  const effortLines = (["pov", "reaction", "talking_head"] as Effort[]).map((e) => {
+    const n = counted.filter((p) => ((p as PayPost & { effort?: Effort | null }).effort ?? "talking_head") === e).length;
+    const rate = creator.per_post_override ?? ratePerEffort(t, e);
+    return { effort: e, posts: n, rate, amount: round2(n * rate) };
+  });
+  const rawFixed = round2(effortLines.reduce((s, l) => s + l.amount, 0));
+  const minTh = creator.min_talking_head_per_month ?? 0;
+  const th = effortLines.find((l) => l.effort === "talking_head")?.posts ?? 0;
+  // Below the monthly face-cam minimum, the per-post part is prorated (th / minimum).
+  const fixedPart = minTh > 0 && th < minTh ? round2(rawFixed * (th / minTh)) : rawFixed;
   const bonusPosts = eligible.filter((p) => p.platform !== "instagram" && p.views_7d != null && inMonth(p.views_7d_at))
     .map((p) => {
       const raw = (Number(p.views_7d) / 1000) * cpm;
@@ -53,5 +73,6 @@ export function computeTierMonth(period: string, creator: TierCreator, t: TierTe
   return {
     period, currency: "EUR", target: 0, postsCounted, fixedMonthly: perPost, prorate: false, fixedPart: fixedCapped,
     rpm: cpm, cap, bonusPart, adjustmentsPart, total: round2(fixedCapped + bonusPart + adjustmentsPart), posts: bonusPosts, adjustments,
+    effortLines, talkingHead: { done: th, min: minTh },
   };
 }

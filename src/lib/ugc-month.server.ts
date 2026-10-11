@@ -12,23 +12,24 @@ export async function activeRateCard(admin: Admin, period: string): Promise<Rate
 
 export async function computeCreatorMonth(admin: Admin, creatorId: string, period: string) {
   const [{ data: c }, rate, { data: s }] = await Promise.all([
-    admin.from("creators").select("id, full_name, country, posts_per_month, required_platforms, fixed_monthly_override, per_post_override, rpm_override, cap_override, resign_required_at, tier").eq("id", creatorId).maybeSingle(),
+    admin.from("creators").select("id, full_name, country, posts_per_month, required_platforms, fixed_monthly_override, per_post_override, rpm_override, cap_override, resign_required_at, tier, min_talking_head_per_month").eq("id", creatorId).maybeSingle(),
     activeRateCard(admin, period),
     admin.from("ugc_settings").select("default_posts_per_month").eq("id", 1).maybeSingle(),
   ]);
   if (!c) throw new Error("Creator not found");
   const { start, end } = periodBounds(period);
   const [{ data: posts }, { data: adj }] = await Promise.all([
-    admin.from("external_posts").select("id, platform, url, posted_at, views_7d, views_7d_at, excluded").eq("creator_id", creatorId)
+    admin.from("external_posts").select("id, platform, url, posted_at, views_7d, views_7d_at, excluded, effort, briefs(effort)").eq("creator_id", creatorId)
       .or(`and(posted_at.gte.${start.toISOString()},posted_at.lt.${end.toISOString()}),and(views_7d_at.gte.${start.toISOString()},views_7d_at.lt.${end.toISOString()})`),
     admin.from("payout_adjustments").select("amount, reason").eq("creator_id", creatorId).eq("period", period),
   ]);
+  const withEffort = (posts ?? []).map((p: any) => ({ ...p, effort: p.effort ?? p.briefs?.effort ?? null }));
   const adjustments = (adj ?? []).map((a: any) => ({ amount: Number(a.amount), reason: a.reason }));
   const { data: enrol } = await admin.from("creator_apps").select("app_id").eq("creator_id", creatorId).eq("status", "active").limit(1).maybeSingle();
-  const { data: tier } = await admin.from("ugc_tiers").select("tier, per_post, cpm, cap_per_post").eq("tier", c.tier ?? "trial").eq("app_id", enrol?.app_id ?? "00000000-0000-4000-8000-000000000001").maybeSingle();
+  const { data: tier } = await admin.from("ugc_tiers").select("tier, per_post, cpm, cap_per_post, per_post_pov, per_post_reaction, per_post_talking_head").eq("tier", c.tier ?? "trial").eq("app_id", enrol?.app_id ?? "00000000-0000-4000-8000-000000000001").maybeSingle();
   // Tiers replace the single rate card; the rate card stays as fallback when no tier row exists.
   const breakdown = tier
-    ? computeTierMonth(period, c, { tier: tier.tier as Tier, per_post: Number(tier.per_post), cpm: Number(tier.cpm), cap_per_post: Number(tier.cap_per_post) }, posts ?? [], adjustments)
+    ? computeTierMonth(period, c, { tier: tier.tier as Tier, per_post: Number(tier.per_post), cpm: Number(tier.cpm), cap_per_post: Number(tier.cap_per_post), per_post_pov: Number(tier.per_post_pov), per_post_reaction: Number(tier.per_post_reaction), per_post_talking_head: Number(tier.per_post_talking_head) }, withEffort, adjustments)
     : computeMonth(period, c, rate, s?.default_posts_per_month ?? 20, posts ?? [], adjustments);
   return { creator: c, breakdown };
 }

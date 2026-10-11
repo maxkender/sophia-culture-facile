@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { effortRates, useHubExtras } from "./HubPages";
 import { cn } from "@/lib/utils";
 import { friendlyCreatorError, isHttpUrl } from "@/lib/creator-validation";
 import { Banner, EmptyState, PageTitle, PortalCard } from "@/components/portal/ui";
@@ -76,13 +77,68 @@ export function LogPostForm({ briefId: initialBrief = "", refId = null, url: ini
 /* ---------- Briefs ---------- */
 import { AssignedBriefs } from "./UgcPages";
 
+function FormatsTab() {
+  const d = useCreator();
+  const { data } = useHubExtras();
+  const formats = d.briefs.filter((b) => (b as { brief_type?: string }).brief_type === "format")
+    .sort((a, b) => Number((b as { pinned?: boolean }).pinned) - Number((a as { pinned?: boolean }).pinned) || Number((a as { sort_order?: number }).sort_order ?? 99) - Number((b as { sort_order?: number }).sort_order ?? 99));
+  const fr = (d.me as { language?: string }).language !== "en";
+  const eur = (n: number) => `${new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2, minimumFractionDigits: n % 1 ? 2 : 0 }).format(n)} €`;
+  const label = { pov: "POV", reaction: fr ? "Réaction" : "Reaction", talking_head: "Face cam" } as Record<string, string>;
+  return (
+    <div>
+      <p className="mb-4 rounded-2xl bg-portal-accent/10 px-4 py-3 text-sm font-bold text-brand-navy">{fr ? "Choisis 3 formats, refais-les 20 fois." : "Pick 3 formats, redo them 20 times."}</p>
+      {formats.length === 0 ? <EmptyState title={fr ? "Pas encore de formats" : "No formats yet"} text="" /> : (
+        <div className="grid gap-4 md:grid-cols-2" data-testid="formats-grid">
+          {formats.map((f) => {
+            const x = f as typeof f & { effort?: string; hook_text?: string; beats?: string[] };
+            const rates = effortRates(d.me as never, (data?.tiers ?? []) as never, f.app_id);
+            const rate = rates[(x.effort ?? "talking_head") as keyof typeof rates];
+            return (
+              <Link key={f.id} to="/creators/app/briefs/$briefId" params={{ briefId: f.id }} className="block">
+                <PortalCard className="h-full transition hover:ring-2 hover:ring-portal-accent/30">
+                  <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
+                    <span className="rounded-full bg-portal-bg px-2 py-0.5">{label[x.effort ?? "talking_head"]}</span>
+                    <span className="rounded-full bg-portal-green/15 px-2 py-0.5 text-portal-green" data-testid="pay-badge">{eur(rate)} + {fr ? "vues" : "views"}</span>
+                    <AppBadge appId={f.app_id} />
+                  </div>
+                  <p className="mt-3 text-xl font-extrabold leading-tight text-brand-navy">{x.hook_text ?? f.hook}</p>
+                  <p className="mt-1 text-sm text-brand-navySoft">{f.title}</p>
+                  {x.beats?.length ? <ol className="mt-2 list-decimal pl-5 text-xs text-brand-navySoft">{x.beats.map((b, i) => <li key={i}>{b}</li>)}</ol> : null}
+                </PortalCard>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function BriefsPage() {
+  const [tab, setTab] = useState<"formats" | "briefs" | "refs">("formats");
+  const d = useCreator();
+  return (
+    <div>
+      <div className="mb-5 flex gap-2 overflow-x-auto">
+        {([["formats", "Formats"], ["briefs", "Briefs"], ["refs", "Reference videos"]] as const).map(([k, l]) => (
+          <button key={k} type="button" aria-pressed={tab === k} onClick={() => setTab(k)} className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-bold ${tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy"}`}>{l}</button>
+        ))}
+      </div>
+      {tab === "formats" ? <><PageTitle title="Formats" lead="Repeatable video mechanics. The pay per post depends on the format." /><FormatsTab /></> : tab === "refs" ? (
+        <><PageTitle title="Reference videos" lead="Videos that worked. Use them as inspiration." /><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{d.refs.map((r) => <RefCard key={r.id} r={r} />)}</div></>
+      ) : <FactBriefs />}
+    </div>
+  );
+}
+
+function FactBriefs() {
   const d = useCreator();
   const [app, setApp] = useState("all");
   const [status, setStatus] = useState("all");
   const { data: allApps = [] } = useApps();
   const apps = allApps.filter((a) => d.briefs.some((b) => b.app_id === a.id));
-  const list = d.briefs.filter((b) => (app === "all" || b.app_id === app) && (status === "all" || briefStatus(d, b.id) === status));
+  const list = d.briefs.filter((b) => (b as { brief_type?: string }).brief_type !== "format" && (app === "all" || b.app_id === app) && (status === "all" || briefStatus(d, b.id) === status));
   return (
     <div>
       <PageTitle title="Briefs" lead="Your briefs for the week, then everything else. If an assigned brief doesn't suit you, swap it for one from the library." />

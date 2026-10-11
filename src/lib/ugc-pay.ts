@@ -24,6 +24,7 @@ export type PayPost = {
   views_7d: number | null;
   views_7d_at: string | null;
   excluded: boolean;
+  effort?: "pov" | "reaction" | "talking_head" | null;
 };
 
 export type MonthBreakdown = {
@@ -41,6 +42,8 @@ export type MonthBreakdown = {
   total: number;
   posts: { id: string; platform: string; url: string | null; posted_at: string | null; views_7d: number | null; bonus: number; capped: boolean }[];
   adjustments: { amount: number; reason: string }[];
+  effortLines?: { effort: string; posts: number; rate: number; amount: number }[];
+  talkingHead?: { done: number; min: number };
 };
 
 const round2 = (n: number) => Math.round(n * 100) / 100;

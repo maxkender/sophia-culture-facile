@@ -803,6 +803,7 @@ export type Database = {
           app: string
           app_id: string
           audience: string
+          beats: Json
           body: string
           brief_type: string
           created_at: string
@@ -811,24 +812,33 @@ export type Database = {
           drop_at: string | null
           due_date: string | null
           duration_target: string | null
+          effort: string | null
           format: string | null
           hook: string | null
+          hook_text: string | null
           hooks: string[]
           id: string
           must_mention: string | null
+          oral_hook: string | null
+          parent_format_id: string | null
+          pinned: boolean
           platform: string
+          product_moment: string | null
           reference_video_ids: string[]
           script: string | null
+          sort_order: number | null
           source_course_id: string | null
           status: string
           tags: string[]
           title: string
+          variations: string | null
         }
         Insert: {
           angle?: string | null
           app?: string
           app_id?: string
           audience?: string
+          beats?: Json
           body?: string
           brief_type?: string
           created_at?: string
@@ -837,24 +847,33 @@ export type Database = {
           drop_at?: string | null
           due_date?: string | null
           duration_target?: string | null
+          effort?: string | null
           format?: string | null
           hook?: string | null
+          hook_text?: string | null
           hooks?: string[]
           id?: string
           must_mention?: string | null
+          oral_hook?: string | null
+          parent_format_id?: string | null
+          pinned?: boolean
           platform?: string
+          product_moment?: string | null
           reference_video_ids?: string[]
           script?: string | null
+          sort_order?: number | null
           source_course_id?: string | null
           status?: string
           tags?: string[]
           title: string
+          variations?: string | null
         }
         Update: {
           angle?: string | null
           app?: string
           app_id?: string
           audience?: string
+          beats?: Json
           body?: string
           brief_type?: string
           created_at?: string
@@ -863,18 +882,26 @@ export type Database = {
           drop_at?: string | null
           due_date?: string | null
           duration_target?: string | null
+          effort?: string | null
           format?: string | null
           hook?: string | null
+          hook_text?: string | null
           hooks?: string[]
           id?: string
           must_mention?: string | null
+          oral_hook?: string | null
+          parent_format_id?: string | null
+          pinned?: boolean
           platform?: string
+          product_moment?: string | null
           reference_video_ids?: string[]
           script?: string | null
+          sort_order?: number | null
           source_course_id?: string | null
           status?: string
           tags?: string[]
           title?: string
+          variations?: string | null
         }
         Relationships: [
           {
@@ -889,6 +916,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "briefs_parent_format_id_fkey"
+            columns: ["parent_format_id"]
+            isOneToOne: false
+            referencedRelation: "briefs"
             referencedColumns: ["id"]
           },
         ]
@@ -1898,6 +1932,7 @@ export type Database = {
           comments: number | null
           created_at: string
           creator_id: string
+          effort: string | null
           external_id: string | null
           feedback: string | null
           format: string | null
@@ -1929,6 +1964,7 @@ export type Database = {
           comments?: number | null
           created_at?: string
           creator_id: string
+          effort?: string | null
           external_id?: string | null
           feedback?: string | null
           format?: string | null
@@ -1960,6 +1996,7 @@ export type Database = {
           comments?: number | null
           created_at?: string
           creator_id?: string
+          effort?: string | null
           external_id?: string | null
           feedback?: string | null
           format?: string | null
@@ -2458,6 +2495,7 @@ export type Database = {
           language: string | null
           last_post_at: string | null
           last_seen_at: string | null
+          min_talking_head_per_month: number
           motivation_confirmed_at: string | null
           onboarding_completed_at: string | null
           per_post_override: number | null
@@ -2527,6 +2565,7 @@ export type Database = {
           language?: string | null
           last_post_at?: string | null
           last_seen_at?: string | null
+          min_talking_head_per_month?: number
           motivation_confirmed_at?: string | null
           onboarding_completed_at?: string | null
           per_post_override?: number | null
@@ -2596,6 +2635,7 @@ export type Database = {
           language?: string | null
           last_post_at?: string | null
           last_seen_at?: string | null
+          min_talking_head_per_month?: number
           motivation_confirmed_at?: string | null
           onboarding_completed_at?: string | null
           per_post_override?: number | null
@@ -2784,6 +2824,7 @@ export type Database = {
           cover_url: string | null
           creator_id: string
           duration: number | null
+          effort: string | null
           exclude_reason: string | null
           excluded: boolean
           external_id: string
@@ -2817,6 +2858,7 @@ export type Database = {
           cover_url?: string | null
           creator_id: string
           duration?: number | null
+          effort?: string | null
           exclude_reason?: string | null
           excluded?: boolean
           external_id: string
@@ -2850,6 +2892,7 @@ export type Database = {
           cover_url?: string | null
           creator_id?: string
           duration?: number | null
+          effort?: string | null
           exclude_reason?: string | null
           excluded?: boolean
           external_id?: string
@@ -5411,6 +5454,9 @@ export type Database = {
           label: string
           monthly_cap: number
           per_post: number
+          per_post_pov: number
+          per_post_reaction: number
+          per_post_talking_head: number
           rule: string
           tier: string
         }
@@ -5422,6 +5468,9 @@ export type Database = {
           label: string
           monthly_cap?: number
           per_post?: number
+          per_post_pov?: number
+          per_post_reaction?: number
+          per_post_talking_head?: number
           rule?: string
           tier: string
         }
@@ -5433,6 +5482,9 @@ export type Database = {
           label?: string
           monthly_cap?: number
           per_post?: number
+          per_post_pov?: number
+          per_post_reaction?: number
+          per_post_talking_head?: number
           rule?: string
           tier?: string
         }
