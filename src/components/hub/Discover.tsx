@@ -46,7 +46,7 @@ function usePeople() {
     queryKey: ["hub", "discover", appId],
     queryFn: async () => {
       const [c, a, p, posts, pay] = await Promise.all([
-        supabase.from("creators").select("id, full_name, email, email_pending, country, status, ugc_status, tiktok_handle, instagram_handle, last_seen_at, admin_notes, application_id"),
+        supabase.from("creators").select("id, full_name, email, email_pending, country, status, ugc_status, tiktok_handle, instagram_handle, last_seen_at, admin_notes, application_id").eq("track", "ugc"),
         supabase.from("creator_applications").select("id, full_name, email, country, age, occupation, tiktok_url, instagram_url, status, source, created_creator_id, app_id"),
         supabase.from("creator_prospects").select("*"),
         supabase.from("creator_posts").select("creator_id, views, posted_on, created_at, status, platform"),

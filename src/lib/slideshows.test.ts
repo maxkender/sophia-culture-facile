@@ -22,7 +22,7 @@ describe("manual slideshow week", () => {
     const result = await buildWeek(sb, "2026-10-05");
     expect(result.built).toBe(1);
     expect(writes[0]).toMatchObject({ status: "draft", amount: 15, rate: 14, first_week: true, manques: null });
-    expect(writes[0]?.note).toContain("Manual week");
+    expect(writes[0]?.["note"]).toContain("Manual week");
   });
   it("does not overwrite an edited existing draft", async () => { const { sb, writes } = fixture(true); await buildWeek(sb, "2026-10-05"); expect(writes).toHaveLength(0); });
   it("does not prepare pay before the poster starts", async () => { const { sb, writes } = fixture(false, true); await buildWeek(sb, "2026-10-05"); expect(writes).toHaveLength(0); });

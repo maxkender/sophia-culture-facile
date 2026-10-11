@@ -354,17 +354,7 @@ export function PosterGuideEditor() {
     <div>
       <PageTitle
         title="Poster Guide"
-        lead={
-          slug === "creator-agreement"
-            ? "Creators who have signed keep the version they signed. UGC creators see clause 5; slideshow creators get a version without it, renumbered automatically."
-            : slug === "slideshow-guide"
-            ? "Posters read this after signing. Use {weekly_amount}, {first_week_amount} and {posts_per_day}; each person sees only their own zone's figures."
-            : slug === "creator-guide"
-            ? "UGC creators read this guide as step two of onboarding, once published."
-            : slug === "contract"
-            ? "Authors who have already signed stay bound to the version they signed. Only authors who have not signed see a new version."
-            : "Authors always read the current version of this guide."
-        }
+        lead="Posters read this after signing. Use {weekly_amount}, {first_week_amount} and {posts_per_day}; each person sees only their own zone figures."
         action={
           <div className="flex flex-wrap items-center gap-2">
             <PublishState published={doc.row.published} />
