@@ -1,4 +1,5 @@
 /** Shared Brief Studio model: fields, defaults and the /10 validation grid (used by the Studio, the creator page and the list). */
+export const STUDIO_DRAFT_KEY = "brief-studio-draft";
 export type Effort = "pov" | "reaction" | "talking_head";
 export type StudioBrief = {
   id: string; app_id: string; title: string; brief_type: "format" | "precise";

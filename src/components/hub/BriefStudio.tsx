@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SOPHIA_APP_ID, useAdminApp, useApps } from "@/lib/apps";
 import { studioAi } from "@/lib/brief-studio.functions";
-import { ASSET_ROLES, BEAT_LABELS, DEFAULT_DO, DEFAULT_DONT, GESTURES, blankBrief, briefBody, scoreBrief, scriptWords, stepDone, words, type StudioBrief } from "@/lib/brief-studio";
+import { STUDIO_DRAFT_KEY, ASSET_ROLES, BEAT_LABELS, DEFAULT_DO, DEFAULT_DONT, GESTURES, blankBrief, briefBody, scoreBrief, scriptWords, stepDone, words, type StudioBrief } from "@/lib/brief-studio";
 import { BriefView, toStudio, type BriefAsset } from "./BriefPreview";
 import { AssetUploader } from "./Assets";
 
@@ -17,7 +17,6 @@ const card = "rounded-2xl bg-card p-5 shadow-portal";
 const input = "mt-1 block min-h-10 w-full rounded-xl border border-input bg-card px-3 text-sm";
 const EFF = [["pov", "POV"], ["reaction", "Réaction"], ["talking_head", "Face cam"]] as const;
 const eur = (n: number) => `${n.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} €`;
-export const STUDIO_DRAFT_KEY = "brief-studio-draft";
 const nextMonday = () => { const d = new Date(); const add = ((8 - d.getUTCDay()) % 7) || 7; d.setUTCDate(d.getUTCDate() + add); d.setUTCHours(7, 0, 0, 0); return d.toISOString(); };
 
 function Step({ n, title, done, open, onToggle, children }: { n: number; title: string; done: boolean; open: boolean; onToggle: () => void; children: ReactNode }) {

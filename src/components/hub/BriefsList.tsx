@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { SOPHIA_APP_ID, useAdminApp } from "@/lib/apps";
 import { generateBriefsFromCourses } from "@/lib/hub-learn.functions";
 import { assetUploadSlot, briefFromVideo, studioAi } from "@/lib/brief-studio.functions";
-import { STUDIO_DRAFT_KEY } from "./BriefStudio";
+import { STUDIO_DRAFT_KEY } from "@/lib/brief-studio";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const sel = "h-9 rounded-lg border px-2 text-sm";

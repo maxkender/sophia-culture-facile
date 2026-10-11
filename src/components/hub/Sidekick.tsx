@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { STUDIO_DRAFT_KEY } from "@/lib/brief-studio";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Bot, Plus, Send } from "lucide-react";
@@ -24,6 +25,7 @@ export function SidekickDrawer({ open, onOpenChange }: { open: boolean; onOpenCh
   const ask = useServerFn(askSidekick);
   const { appId } = useAdminApp();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [threadId, setThreadId] = useState<string | null>(null);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [text, setText] = useState("");
