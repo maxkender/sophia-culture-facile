@@ -336,7 +336,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <aside className="lg:sticky lg:top-4 lg:self-start"><p className="mb-2 text-center text-xs font-bold uppercase tracking-wide text-brand-navySoft">Preview as creator</p>
           <div className="mx-auto w-full max-w-[360px] rounded-[2.5rem] border-[10px] border-brand-navy bg-portal-bg p-3 shadow-portal">
-            <div className="max-h-[70vh] overflow-y-auto rounded-[1.6rem] bg-card p-3"><BriefView b={b} assets={assets} refs={(side?.refs ?? []).filter((r) => refIds.includes(r.id))} pay={pay} /></div>
+            <div className="max-h-[70vh] overflow-y-auto rounded-[1.6rem] bg-card p-3"><BriefView b={b} assets={[...assets, ...styleAssetIds(sd).filter((id) => !assets.some((a) => a.id === id)).map((id) => (side?.library ?? []).find((l) => l.id === id)).filter(Boolean).map((l) => ({ ...(l as unknown as BriefAsset), role: (l as { role_default: string }).role_default }))]} refs={(side?.refs ?? []).filter((r) => refIds.includes(r.id))} pay={pay} /></div>
           </div>
         </aside>
         <div className="space-y-3">{steps.map(([t, body], i) => <Step key={t} n={i + 1} title={t} done={done[i] ?? false} open={open === i + 1} onToggle={() => setOpen(open === i + 1 ? 0 : i + 1)}>{body}</Step>)}</div>
