@@ -114,7 +114,7 @@ export function FilesSection({ assets, title = "Fichiers" }: { assets: BriefAsse
         const Icon = KIND_ICON[a.kind] ?? FileText;
         return (
           <li key={a.id} className="flex items-center gap-3 rounded-xl border border-brand-line bg-card p-2" data-testid="brief-file">
-            {a.kind === "link" && a.url ? <PostThumb url={a.url} className="size-12 shrink-0 rounded-lg" /> {ct(": a.thumbnail_url ?")} <img src={a.thumbnail_url} alt="" loading="lazy" className="size-12 shrink-0 rounded-lg object-cover" /> : <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-portal-bg"><Icon className="size-5 text-brand-navySoft" /></span>}
+            {a.kind === "link" && a.url ? <PostThumb url={a.url} className="size-12 shrink-0 rounded-lg" /> : a.thumbnail_url ? <img src={a.thumbnail_url} alt="" loading="lazy" className="size-12 shrink-0 rounded-lg object-cover" /> : <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-portal-bg"><Icon className="size-5 text-brand-navySoft" /></span>}
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold text-brand-navy">{a.title}</p>
               <p className="text-xs text-brand-navySoft">{ROLE_LABEL[a.role] ?? a.role}</p>
