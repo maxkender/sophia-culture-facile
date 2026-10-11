@@ -1,3 +1,4 @@
+import { creatorLang } from "@/i18n/creator-app";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE_ALLOWED_PATTERN = /^\+?[0-9\s().-]+$/;
 
@@ -22,7 +23,7 @@ export function isHttpUrl(value: string) {
   }
 }
 
-export function friendlyCreatorError(error: unknown, lang: CreatorValidationLang = "en") {
+export function friendlyCreatorError(error: unknown, lang: CreatorValidationLang = creatorLang()) {
   const fallback = lang === "fr"
     ? "Impossible d’enregistrer pour le moment. Vérifiez les informations saisies puis réessayez."
     : "We could not save this right now. Check the information you entered and try again.";

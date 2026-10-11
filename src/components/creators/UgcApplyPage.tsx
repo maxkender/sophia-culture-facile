@@ -210,14 +210,14 @@ export function UgcApplyPage() {
 
   if (done) {
     return (
-      <ApplyShell title={ct(copy.title)}>
+      <ApplyShell title={copy.title}>
         <Confirmation text={copy.confirmation} />
       </ApplyShell>
     );
   }
 
   return (
-    <ApplyShell title={ct(copy.title)} lead={ct(copy.lead)}>
+    <ApplyShell title={copy.title} lead={copy.lead}>
       {resume && (
         <div className="mt-8 flex flex-wrap items-center gap-3 rounded-2xl border border-brand-line bg-card p-4 text-sm">
           <span className="flex-1">You have an application in progress, continue?</span>
