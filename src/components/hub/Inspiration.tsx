@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { cn } from "@/lib/utils";
 import { useAdminApp, SOPHIA_APP_ID } from "@/lib/apps";
 import { STUDIO_DRAFT_KEY, STYLES, STYLE_LABEL, blankFmt, styleDefaults, type BriefStyle, type Plan, type StyleData } from "@/lib/brief-studio";
-import { deleteInspirations, importInspirations, inspirationToReference, processInspirations, retryInspirationErrors } from "@/lib/inspirations.functions";
+import { deleteInspirations, importInspirations, inspirationToReference, processInspirations, retryInspirationErrors, retranscribeInspiration } from "@/lib/inspirations.functions";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const f = "h-9 rounded-lg border bg-card px-2 text-sm";
@@ -190,7 +190,7 @@ export function draftFromInspiration(r: Insp, appId: string) {
 }
 
 function Drawer({ r, onChange }: { r: Insp; onChange: () => void }) {
-  const toRef = useServerFn(inspirationToReference); const navigate = useNavigate();
+  const toRef = useServerFn(inspirationToReference); const retx = useServerFn(retranscribeInspiration); const [rtBusy, setRtBusy] = useState(false); const navigate = useNavigate();
   const video = useRef<HTMLVideoElement>(null); const [t, setT] = useState(0); const [src, setSrc] = useState<string | null>(null);
   const [tags, setTags] = useState(r.tags.join(", "));
   useEffect(() => { setTags(r.tags.join(", ")); }, [r.id, r.tags]);
@@ -230,7 +230,7 @@ function Drawer({ r, onChange }: { r: Insp; onChange: () => void }) {
         <p><b>Text on screen:</b> {r.analysis.on_screen_text_style} · <b>Audio:</b> {r.analysis.audio} {r.analysis.audio_note}</p>
         <div><p className="text-xs font-bold uppercase text-brand-navySoft">Why it works · {r.score}/10</p><ul className="list-disc pl-5">{r.analysis.why_it_works.map((w, i) => <li key={i}>{w}</li>)}</ul></div>
       </div> : null}
-      {words.length ? <div><p className="text-xs font-bold uppercase text-brand-navySoft">Transcript</p><p className="text-sm leading-relaxed" data-testid="transcript">{words.map((w, i) => <span key={i} onClick={() => seek(w.s)} className={cn("cursor-pointer rounded", t >= w.s && t < w.e + 0.05 ? "bg-space-ugc text-card" : "")}>{w.t} </span>)}</p></div>
+      {words.length ? <div><div className="flex items-center justify-between"><p className="text-xs font-bold uppercase text-brand-navySoft">Transcript</p><Button size="sm" variant="ghost" disabled={rtBusy} onClick={async () => { setRtBusy(true); try { await retx({ data: { id: r.id } }); toast.success("Re-transcribed"); onChange(); } catch (e) { toast.error((e as Error).message); } setRtBusy(false); }}>{rtBusy ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}Re-transcribe</Button></div><p className="text-sm leading-relaxed" data-testid="transcript">{words.map((w, i) => <span key={i} onClick={() => seek(w.s)} className={cn("cursor-pointer rounded", t >= w.s && t < w.e + 0.05 ? "bg-space-ugc text-card" : "")}>{w.t} </span>)}</p></div>
         : r.transcript != null ? <p className="text-sm text-brand-navySoft">{r.transcript || "No speech in this video."}</p> : null}
       {r.caption ? <p className="text-xs text-brand-navySoft"><b>Caption:</b> {r.caption}</p> : null}
       <p className="text-xs text-brand-navySoft">Cost: Apify ${Number(c["apify_usd"] ?? 0).toFixed(4)} · ElevenLabs {Number(c["stt_minutes"] ?? 0)} min (${Number(c["stt_usd"] ?? 0).toFixed(4)}) · AI {Number(c["ai_input_tokens"] ?? 0)}+{Number(c["ai_output_tokens"] ?? 0)} tokens</p>
