@@ -229,7 +229,6 @@ export function AccountSetupPage() {
     finally { setBusy(false); }
   };
   const req = (me as any).required_platforms ?? "both";
-  const Sub = ({ k, children }: { k: string; children: React.ReactNode }) => <SetupSub k={k} done={Boolean(checks[k])}>{children}</SetupSub>;
   return (
     <div>
       <PageTitle title="Account setup" lead="Step 3 creates the Sophia email, TikTok and Instagram accounts. Steps 4 to 6 follow below: warm-up, payouts and Slack." />
@@ -237,31 +236,31 @@ export function AccountSetupPage() {
 
       <h2 className="mb-3 text-xl font-extrabold text-brand-navy">3. Create your accounts</h2>
       <div className="space-y-4">
-        <Sub k="acc_email">
+        <SetupSub k="acc_email" done={Boolean(checks["acc_email"])}>
           <div className="grid gap-3 sm:grid-cols-2">
             <div><Label htmlFor="acc-email">Sophia email address</Label><Input id="acc-email" type="email" placeholder="lea.creator@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
             <div><Label htmlFor="acc-pw">Password{account ? " (enter again to change)" : ""}</Label><Input id="acc-pw" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
           </div>
           <p className="mt-2 text-xs text-brand-navySoft">Stored encrypted. Only the Sophia team can reveal it, and every reveal is logged.</p>
           <Button className="mt-3" disabled={busy || !email || !password} onClick={() => run(() => saveStep({ data: { step: "email", email, password } }), "Email registered.")}>Register the email</Button>
-        </Sub>
+        </SetupSub>
         {req !== "instagram" && (
-          <Sub k="acc_tiktok">
+          <SetupSub k="acc_tiktok" done={Boolean(checks["acc_tiktok"])}>
             <div className="max-w-sm"><Label htmlFor="acc-tt">TikTok handle</Label><Input id="acc-tt" placeholder="@lea" value={tt} onChange={(e) => setTt(e.target.value)} /></div>
             <Button className="mt-3" disabled={busy || !tt || !checks["acc_email"]} onClick={() => run(() => saveStep({ data: { step: "tiktok", handle: tt } }), "TikTok handle registered.")}>Register TikTok</Button>
             {!checks["acc_email"] && <p className="mt-2 text-xs text-brand-navySoft">Register the email first.</p>}
-          </Sub>
+          </SetupSub>
         )}
         {req !== "tiktok" && (
-          <Sub k="acc_instagram">
+          <SetupSub k="acc_instagram" done={Boolean(checks["acc_instagram"])}>
             <div className="max-w-sm"><Label htmlFor="acc-ig">Instagram handle</Label><Input id="acc-ig" placeholder="@lea" value={ig} onChange={(e) => setIg(e.target.value)} /></div>
             <label className="mt-3 flex items-center gap-2 text-sm"><Checkbox checked={igCreator} onCheckedChange={(v) => setIgCreator(v === true)} /> The account is set to Creator account type</label>
             <Button className="mt-3" disabled={busy || !ig || !igCreator || !checks["acc_email"]} onClick={() => run(() => saveStep({ data: { step: "instagram", handle: ig, creatorType: true } }), "Instagram handle registered.")}>Register Instagram</Button>
-          </Sub>
+          </SetupSub>
         )}
-        <Sub k="acc_confirm">
+        <SetupSub k="acc_confirm" done={Boolean(checks["acc_confirm"])}>
           <Button disabled={busy || Boolean(checks["acc_confirm"])} onClick={() => run(() => saveStep({ data: { step: "confirm", publicConfirmed: true } }), "Accounts confirmed.")}>Both accounts are public and registered</Button>
-        </Sub>
+        </SetupSub>
       </div>
 
       <h2 className="mb-3 mt-10 text-xl font-extrabold text-brand-navy">4. Warm-up (24 hours)</h2>
