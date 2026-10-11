@@ -43,7 +43,7 @@ export async function enqueue(a: Admin, links: string[], appId: string | null, b
   return { added: rows.length, duplicates: existing.length, invalid, ids };
 }
 
-async function apifyRun(actor: string, input: unknown) {
+export async function apifyRun(actor: string, input: unknown) {
   const token = process.env["APIFY_TOKEN"]; if (!token) throw new Error("APIFY_TOKEN missing");
   const t0 = Date.now();
   const res = await fetch(`https://api.apify.com/v2/acts/${actor}/runs?waitForFinish=240`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(input) });

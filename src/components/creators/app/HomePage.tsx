@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { CopyButton, PageTitle, PortalCard } from "@/components/portal/ui";
 import { WeeklyGuides } from "../WeeklyGuides";
 import { TAAP_LINK, useCreator } from "./useCreator";
+import { WeeklyBar } from "./WorkPages";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { myRunningMonth } from "@/lib/ugc-creator.functions";
@@ -65,6 +66,12 @@ export function CreatorHomePage() {
   return (
     <div>
       <PageTitle title={`Welcome, ${first}`} lead="Your creator space: briefs, the reference library, your posts, calls, earnings and messages with the Sophia team." />
+      <ol className="mb-6 grid gap-3 sm:grid-cols-3" data-testid="loop-strip">
+        {([["1", "Lis ton brief", "/creators/app/briefs"], ["2", "Poste", "/creators/app/briefs"], ["3", "Colle tes liens", "/creators/app/posts"]] as const).map(([n, l, to]) => (
+          <li key={n}><Link to={to} className="flex min-h-14 items-center gap-3 rounded-2xl bg-card p-4 font-extrabold text-brand-navy shadow-portal hover:ring-2 hover:ring-portal-accent/30"><span className="grid size-8 place-items-center rounded-full bg-portal-accent text-card">{n}</span>{l}</Link></li>
+        ))}
+      </ol>
+      <div className="mb-6"><WeeklyBar /></div>
       <CreatorStatsStrip />
       <p className="-mt-4 mb-6 text-xs text-brand-navySoft">Bookmark this page: sophia-culture.com/creators/login is where you sign in from now on.</p>
 

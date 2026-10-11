@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { ZONE_BADGE } from "@/lib/slideshow-guide";
 import { APPLICANT_LANGS, countryCodeOf, langOfCountry, type ApplicantLang } from "@/config/countries";
 import { acceptPoster, keepWarm, rejectPoster, retryOs, sendPayoutLink, tickStep } from "@/lib/slideshows.functions";
-import { STATUS_LABEL, useOsStatus } from "./useOs";
+import { STATUS_LABEL, useOsStatus , OS_UI_ENABLED } from "./useOs";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const sel = "h-9 rounded-lg border border-brand-line bg-card px-2 text-sm";
@@ -79,7 +79,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
         <select aria-label="Second phone" className={sel} value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })}><option value="all">Second phone: any</option><option value="true">Has second phone</option><option value="false">No second phone</option></select>
         <span className="ml-auto text-sm text-brand-navySoft"><b className="text-brand-navy">{rows.length}</b> shown · {apps.filter((a) => a.status === "pending").length} pending</span>
       </div>
-      {!os.data?.connected ? <p className="text-xs text-brand-navySoft">Active posters per country: OS not connected yet — add OS_HUB_SECRET in Settings → Secrets.</p> : null}
+      {OS_UI_ENABLED && !os.data?.connected ? <p className="text-xs text-brand-navySoft">Active posters per country: OS not connected yet — add OS_HUB_SECRET in Settings → Secrets.</p> : null}
       {groups.map(([country, list]) => (
         <section key={country} className="overflow-hidden rounded-2xl bg-card shadow-portal" data-testid="slides-country">
           <header className="flex flex-wrap items-center gap-2 border-b border-brand-line px-4 py-3">
@@ -106,8 +106,8 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
 }
 
 const STEPS: [string, string, string | null][] = [
-  ["accepted", "Accepted", "accepted_at"], ["contract_signed", "Contract signed", "contract_signed_at"], ["os_created", "OS account created", "os_created_at"],
-  ["hm_notified", "Hiring manager notified", "hm_notified_at"], ["warmup", "Warm-up done", null], ["started", "Started Monday", "started_at"], ["dropped", "Dropped", "dropped_at"],
+  ["accepted", "Accepted", "accepted_at"], ["contract_signed", "Contract signed", "contract_signed_at"], ["os_created", "Create the OS account", "os_created_at"],
+  ["logins_sent", "Send the logins", null], ["slack_added", "Add to Slack (zone channel)", null], ["hm_notified", "Hiring manager notified", "hm_notified_at"], ["warmup", "Warm-up done", null], ["started", "Started Monday", "started_at"], ["dropped", "Dropped", "dropped_at"],
 ];
 
 export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<typeof scoreOf>; zones: { zone: string; weekly_amount: number | null; first_week_amount: number | null }[] }) {
@@ -152,7 +152,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
               <span className="flex-1">{l}</span><span className="text-xs text-brand-navySoft">{at ? `${fmt(at)}${tl[k]?.by ? ` · ${tl[k]!.by}` : ""}` : ""}</span>
             </li>); })}
         </ul>
-        {a.os_error && a.status === "contract_signed" ? (
+        {OS_UI_ENABLED && a.os_error && a.status === "contract_signed" ? (
           <div className="rounded-xl border border-portal-red/30 bg-portal-red/5 p-3 text-sm">
             <p className="font-bold text-portal-red">OS account not created</p><p className="text-xs">{a.os_error}</p>
             <Button size="sm" className="mt-2" disabled={busy} onClick={() => void run(() => retry({ data: { applicationId: a.id } }), "OS account created")}>Retry</Button>

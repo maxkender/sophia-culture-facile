@@ -6,11 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { refreshFromOs } from "@/lib/slideshows.functions";
-import { OS_NOT_CONNECTED, POSTER_STATUSES, STATUS_LABEL, useOsStatus } from "./useOs";
+import { OS_NOT_CONNECTED, OS_UI_ENABLED, POSTER_STATUSES, STATUS_LABEL, useOsStatus } from "./useOs";
 
 const mondayOf = (d = new Date()) => { const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); x.setUTCDate(x.getUTCDate() - ((x.getUTCDay() + 6) % 7)); return x.toISOString().slice(0, 10); };
 
 export function OsNotConnected({ what }: { what: string }) {
+  if (!OS_UI_ENABLED) return null;
   return <div className="rounded-2xl border border-dashed border-brand-line bg-card p-4 text-sm text-brand-navySoft" data-testid="os-not-connected"><b className="text-brand-navy">{what}:</b> {OS_NOT_CONNECTED}.</div>;
 }
 
@@ -34,10 +35,10 @@ export function Posters() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-        <p className="text-sm text-brand-navySoft">Week of {lundi} · last OS sync {os.data?.lastSync ? new Date(os.data.lastSync).toLocaleString("en-GB") : "never"} · refreshed automatically every morning at 06:30 Paris</p>
+        {OS_UI_ENABLED ? <><p className="text-sm text-brand-navySoft">Week of {lundi} · last OS sync {os.data?.lastSync ? new Date(os.data.lastSync).toLocaleString("en-GB") : "never"} · refreshed automatically every morning at 06:30 Paris</p>
         <Button size="sm" variant="outline" className="ml-auto" disabled={!connected} onClick={async () => {
           const r = await refresh(); if (r.ok) { toast.success("Refreshed from the OS"); void qc.invalidateQueries({ queryKey: ["hub", "slides"] }); } else toast.error((r as { error?: string }).error ?? "Failed");
-        }}><RefreshCw className="size-4" />Refresh from OS</Button>
+        }}><RefreshCw className="size-4" />Refresh from OS</Button></> : <p className="text-sm text-brand-navySoft">Week of {lundi} · posters are managed by hand (OS accounts, logins and Slack are ticked on each card).</p>}
       </div>
       {!connected ? <OsNotConnected what="Weekly post counts" /> : null}
       <div className="overflow-x-auto rounded-2xl bg-card shadow-portal">
@@ -59,7 +60,7 @@ export function Posters() {
               <td className="p-3">{p.payout_method ? p.payout_method : <span className="text-portal-amber">Payout method missing</span>}</td>
             </tr>); })}</tbody>
         </table>
-        {!data?.posters.length ? <p className="p-5 text-sm text-brand-navySoft">No posters yet. Posters appear here once their OS account is created.</p> : null}
+        {!data?.posters.length ? <p className="p-5 text-sm text-brand-navySoft">No posters yet. Posters appear here once "Create the OS account" is ticked on their card.</p> : null}
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ import { briefLibraryStats, declineAssignment, myRunningMonth } from "@/lib/ugc-
 import { fmtMoney } from "@/lib/ugc-pay";
 import { friendlyCreatorError } from "@/lib/creator-validation";
 import { useCreator } from "./useCreator";
+import { postStage } from "./WorkPages";
 import { LibraryPage as ReferenceLibrary } from "./WorkPages";
 import { MyTerms } from "./HubPages";
 import { supabase } from "@/integrations/supabase/client";
@@ -142,6 +143,8 @@ export function UgcEarningsPage() {
       <p className="mt-3 text-sm font-semibold text-brand-navy">Paid on the {data.paydayDay}th of next month.</p>
       <Breakdown b={b} />
 
+      <h2 className="mb-3 mt-10 text-xl font-extrabold text-brand-navy">Paiements par post</h2>
+      <PostPayments />
       <h2 className="mb-3 mt-10 text-xl font-extrabold text-brand-navy">Statements</h2>
       {payoutItems.length === 0 ? <EmptyState title="No statement yet" /> : payoutItems.map((it: any) => (
         <PortalCard key={it.id} className="mb-3 p-4">
@@ -198,4 +201,17 @@ export function Breakdown({ b }: { b: any }) {
 function EarningsTerms() {
   const { data: tiers = [] } = useQuery({ queryKey: ["creator-tiers"], queryFn: async () => (await supabase.from("ugc_tiers").select("tier, per_post, cpm, cap_per_post, app_id")).data ?? [] });
   return <PortalCard className="mb-6 p-4"><MyTerms tiers={tiers} /></PortalCard>;
+}
+
+function PostPayments() {
+  const { posts, payoutItems } = useCreator();
+  const { data: method } = useQuery({ queryKey: ["my-payout-method"], queryFn: async () => (await supabase.from("creator_payout_profiles").select("method").maybeSingle()).data?.method ?? null });
+  const rows = posts.filter((p: any) => p.status === "approved");
+  if (!rows.length) return <EmptyState title="Aucun post validé pour l’instant" />;
+  return (
+    <PortalCard className="p-4" data-testid="post-payments">
+      <p className="mb-3 text-sm text-brand-navySoft">Méthode de paiement : <b className="text-brand-navy">{method ? String(method).toUpperCase() : "à renseigner dans ton profil"}</b></p>
+      <ul className="space-y-2 text-sm">{rows.map((p: any) => { const paidAt = (payoutItems as any[]).find((i) => i.id === p.payout_item_id)?.paid_at ?? null; const st = postStage(p, paidAt); return <li key={p.id} className="flex flex-wrap justify-between gap-2 border-t border-brand-line pt-2"><a href={p.url} target="_blank" rel="noopener noreferrer" className="text-portal-accent underline">{p.platform}</a><span className="font-bold text-brand-navy">{st.label}</span>{p.pay_formula ? <span className="w-full text-xs text-brand-navySoft">{p.pay_formula}</span> : null}</li>; })}</ul>
+    </PortalCard>
+  );
 }

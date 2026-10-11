@@ -221,42 +221,46 @@ function MessagesCard() {
   );
 }
 
+function Block({ title, rows, to, search, cta }: { title: string; rows: [string, string | number][]; to: string; search?: Record<string, string>; cta: string }) {
+  return (
+    <section className={card} data-testid="home-block">
+      <h2 className="font-extrabold text-brand-navy">{title}</h2>
+      <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-2">{rows.map(([k, v]) => <div key={k}><dt className="text-xs text-brand-navySoft">{k}</dt><dd className="text-2xl font-extrabold text-brand-navy">{v}</dd></div>)}</dl>
+      <Button asChild size="sm" className="mt-4"><Link to={to} search={search as never}>{cta} <ArrowRight className="size-4" /></Link></Button>
+    </section>
+  );
+}
+
+/** UGC Home: KPI strip, the four blocks and the setup checklist — nothing else. */
 export function HubHome() {
-  const [widgets, setWidgets] = useState({ performance: true, top: true, messages: true });
-  const [customize, setCustomize] = useState(false);
+  const { appId } = useAdminApp();
+  const { data } = useQuery({
+    queryKey: ["hub", "ugc-home-blocks", appId],
+    queryFn: async () => {
+      const c = (q: PromiseLike<{ count: number | null }>) => q.then((r) => r.count ?? 0);
+      const scope = <T extends { eq: (k: string, v: string) => T }>(q: T) => (appId ? q.eq("app_id", appId) : q);
+      const [pub, drafts, active, onboarding, apps, toValidate, ready] = await Promise.all([
+        c(scope(supabase.from("briefs").select("id", { count: "exact", head: true }).eq("status", "published") as never)),
+        c(scope(supabase.from("briefs").select("id", { count: "exact", head: true }).eq("status", "draft") as never)),
+        c(supabase.from("creators").select("id", { count: "exact", head: true }).eq("track", "ugc").not("onboarding_completed_at", "is", null)),
+        c(supabase.from("creators").select("id", { count: "exact", head: true }).eq("track", "ugc").is("onboarding_completed_at", null)),
+        c(supabase.from("creator_applications").select("id", { count: "exact", head: true }).eq("status", "pending")),
+        c(scope(supabase.from("creator_posts").select("id", { count: "exact", head: true }).eq("status", "pending") as never)),
+        scope(supabase.from("creator_posts").select("pay_amount").eq("pay_status", "ready") as never) as unknown as Promise<{ data: { pay_amount: number }[] | null }>,
+      ]);
+      return { pub, drafts, active, onboarding, apps, toValidate, ready: (ready.data ?? []).reduce((s, r) => s + Number(r.pay_amount ?? 0), 0), readyN: (ready.data ?? []).length };
+    },
+  });
   return (
     <div className="space-y-5">
-      <div className="flex justify-end">
-        <Button variant="outline" size="sm" onClick={() => setCustomize((c) => !c)}><Settings2 className="size-4" /> Arrange cards</Button>
+      <Performance />
+      <div className="grid gap-5 md:grid-cols-2">
+        <Block title="Briefs" rows={[["Published", data?.pub ?? "…"], ["Drafts", data?.drafts ?? "…"]]} to="/hub/ugc/library" search={{ tab: "Briefs" }} cta="Open briefs" />
+        <Block title="Creators" rows={[["Active", data?.active ?? "…"], ["Onboarding", data?.onboarding ?? "…"], ["Applications", data?.apps ?? "…"]]} to="/hub/ugc/creators" cta="Open creators" />
+        <Block title="Posts to validate" rows={[["Waiting", data?.toValidate ?? "…"]]} to="/hub/ugc/campaigns" search={{ tab: "reviews" }} cta="Validate posts" />
+        <Block title="Ready for payment" rows={[["Amount", eur(data?.ready ?? 0)], ["Posts", data?.readyN ?? "…"]]} to="/hub/ugc/payouts" cta="Open payouts" />
       </div>
-      {customize ? (
-        <div className="flex flex-wrap gap-4 rounded-2xl bg-card p-4 text-sm shadow-portal">
-          {(Object.keys(widgets) as (keyof typeof widgets)[]).map((k) => (
-            <label key={k} className="flex items-center gap-2 capitalize"><input type="checkbox" checked={widgets[k]} onChange={() => setWidgets((w) => ({ ...w, [k]: !w[k] }))} />{k}</label>
-          ))}
-        </div>
-      ) : null}
-      <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
-        <div className="min-w-0 space-y-5">
-          <GetStarted />
-          {widgets.performance ? <Performance /> : null}
-        </div>
-        <div className="space-y-5">
-          <Wallet />
-          <NeedsAttention />
-          <RecentActivity />
-          <section className="rounded-2xl border border-portal-accent/30 bg-portal-accent/5 p-5">
-            <Megaphone className="size-5 text-portal-accent" />
-            <p className="mt-2 font-extrabold text-brand-navy">Turn creator posts into ads</p>
-            <p className="mt-1 text-sm text-brand-navySoft">Boost your best creator videos on Meta and TikTok from one place</p>
-            <Link to="/hub/ugc/ads" className="mt-3 inline-block text-sm font-bold text-portal-accent">Open Ads →</Link>
-          </section>
-        </div>
-      </div>
-      <div className="grid gap-5 lg:grid-cols-2">
-        {widgets.top ? <TopContent /> : null}
-        {widgets.messages ? <MessagesCard /> : null}
-      </div>
+      <GetStarted />
     </div>
   );
 }

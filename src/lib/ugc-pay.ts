@@ -127,3 +127,15 @@ export const previousPeriod = (d = new Date()) => {
   return p.toISOString().slice(0, 7);
 };
 export const fmtMoney = (n: number, cur = "EUR") => new Intl.NumberFormat("en-GB", { style: "currency", currency: cur }).format(n);
+
+/** Monday 00:00 Paris of the week containing `d`, as an ISO instant. */
+export function parisWeekStart(d = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit", weekday: "short" }).formatToParts(d);
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  const wd = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(get("weekday"));
+  const local = new Date(`${get("year")}-${get("month")}-${get("day")}T00:00:00Z`);
+  local.setUTCDate(local.getUTCDate() - wd);
+  const offset = new Date(local.toLocaleString("en-US", { timeZone: "Europe/Paris" })).getTime() - new Date(local.toLocaleString("en-US", { timeZone: "UTC" })).getTime();
+  return new Date(local.getTime() - offset).toISOString();
+}
+

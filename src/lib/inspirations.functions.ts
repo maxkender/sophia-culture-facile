@@ -61,6 +61,20 @@ export const retryInspirationErrors = createServerFn({ method: "POST" })
     return { requeued: (rows ?? []).length };
   });
 
+/** Re-transcribe: drop the stored transcript and run transcription + analysis again from the stored video. */
+export const retranscribeInspiration = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    const a = await admin();
+    const { data: row } = await a.from("inspirations").select("video_path").eq("id", data.id).maybeSingle();
+    if (!row?.video_path) throw new Error("No stored video to transcribe.");
+    await a.from("inspirations").update({ transcript: null, words: null, language: null, attempts: 0 }).eq("id", data.id);
+    const { processRow } = await import("./inspirations.server");
+    return processRow(a as never, data.id);
+  });
+
 export const deleteInspirations = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ ids: z.array(z.string().uuid()).min(1).max(500) }).parse(d))
