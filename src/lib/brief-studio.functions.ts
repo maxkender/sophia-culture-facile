@@ -142,6 +142,7 @@ export const briefFromVideo = createServerFn({ method: "POST" })
     caption: z.string().max(2000).optional(),
     storagePath: z.string().max(300).nullable().optional(),
     ad: metaAdSchema.nullable().optional(),
+    thumb: z.string().url().max(2000).nullable().optional(),
     style: z.enum(["reaction_demo", "broll_stickers", "sole_footage", "talked_hook_demo", "educational"]).nullable().optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
@@ -155,6 +156,8 @@ export const briefFromVideo = createServerFn({ method: "POST" })
       caption = [`Meta Ads Library — advertiser: ${ad.pageName}`, ad.title && `Title: ${ad.title}`, ad.body && `Ad copy: ${ad.body}`, ad.linkUrl && `Landing link: ${ad.linkUrl}`, ad.platforms.length && `Placements: ${ad.platforms.join(", ")}`].filter(Boolean).join("\n");
       if (!data.frames?.length) for (const i of [ad.previewImage, ...ad.images].filter(Boolean).slice(0, 5)) content.push({ type: "input_image", image_url: i });
       thumb = ad.previewImage ?? ad.images[0] ?? null;
+    } else if (data.thumb) {
+      thumb = data.thumb; content.push({ type: "input_image", image_url: data.thumb });
     } else if (data.url) {
       if (/tiktok\.com\//.test(data.url)) {
         try {

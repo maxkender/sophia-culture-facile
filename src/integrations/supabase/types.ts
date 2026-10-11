@@ -4429,6 +4429,132 @@ export type Database = {
           },
         ]
       }
+      inspirations: {
+        Row: {
+          analysis: Json | null
+          app_fit: string | null
+          app_id: string | null
+          approved_style: string | null
+          attempts: number
+          author_handle: string | null
+          batch_id: string | null
+          caption: string | null
+          comments: number | null
+          cost: Json
+          cover_path: string | null
+          created_at: string
+          created_by: string | null
+          duration_s: number | null
+          error: string | null
+          hashtags: string[]
+          hook_text: string | null
+          hook_type: string | null
+          id: string
+          kind: string
+          language: string | null
+          likes: number | null
+          next_try_at: string
+          norm_key: string
+          platform: string
+          posted_at: string | null
+          proposed_style: string | null
+          reference_id: string | null
+          score: number | null
+          shares: number | null
+          status: string
+          style_confidence: number | null
+          tags: string[]
+          transcript: string | null
+          updated_at: string
+          url: string
+          video_path: string | null
+          views: number | null
+          words: Json | null
+        }
+        Insert: {
+          analysis?: Json | null
+          app_fit?: string | null
+          app_id?: string | null
+          approved_style?: string | null
+          attempts?: number
+          author_handle?: string | null
+          batch_id?: string | null
+          caption?: string | null
+          comments?: number | null
+          cost?: Json
+          cover_path?: string | null
+          created_at?: string
+          created_by?: string | null
+          duration_s?: number | null
+          error?: string | null
+          hashtags?: string[]
+          hook_text?: string | null
+          hook_type?: string | null
+          id?: string
+          kind?: string
+          language?: string | null
+          likes?: number | null
+          next_try_at?: string
+          norm_key: string
+          platform: string
+          posted_at?: string | null
+          proposed_style?: string | null
+          reference_id?: string | null
+          score?: number | null
+          shares?: number | null
+          status?: string
+          style_confidence?: number | null
+          tags?: string[]
+          transcript?: string | null
+          updated_at?: string
+          url: string
+          video_path?: string | null
+          views?: number | null
+          words?: Json | null
+        }
+        Update: {
+          analysis?: Json | null
+          app_fit?: string | null
+          app_id?: string | null
+          approved_style?: string | null
+          attempts?: number
+          author_handle?: string | null
+          batch_id?: string | null
+          caption?: string | null
+          comments?: number | null
+          cost?: Json
+          cover_path?: string | null
+          created_at?: string
+          created_by?: string | null
+          duration_s?: number | null
+          error?: string | null
+          hashtags?: string[]
+          hook_text?: string | null
+          hook_type?: string | null
+          id?: string
+          kind?: string
+          language?: string | null
+          likes?: number | null
+          next_try_at?: string
+          norm_key?: string
+          platform?: string
+          posted_at?: string | null
+          proposed_style?: string | null
+          reference_id?: string | null
+          score?: number | null
+          shares?: number | null
+          status?: string
+          style_confidence?: number | null
+          tags?: string[]
+          transcript?: string | null
+          updated_at?: string
+          url?: string
+          video_path?: string | null
+          views?: number | null
+          words?: Json | null
+        }
+        Relationships: []
+      }
       job_applications: {
         Row: {
           answers: Json
@@ -6178,6 +6304,8 @@ export type Database = {
         Args: { _brief_id: string }
         Returns: boolean
       }
+      inspiration_queue_arm: { Args: never; Returns: undefined }
+      inspiration_queue_disarm: { Args: never; Returns: undefined }
       leaderboard_month: {
         Args: { _app?: string }
         Returns: {
