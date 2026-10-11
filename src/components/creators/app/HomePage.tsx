@@ -107,6 +107,8 @@ export function CreatorHomePage() {
         </Step>
       </div>
 
+      <div className="mt-10"><StarterKit /></div>
+
       {steps.unlocked && (
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           <PortalCard className="md:col-span-2">
@@ -137,7 +139,6 @@ export function CreatorHomePage() {
             ) : <p className="mt-2 text-sm text-brand-navySoft">Nothing waiting.</p>}
           </PortalCard>
           <AccessCodeCard />
-          <div className="md:col-span-2"><StarterKit /></div>
           <div className="md:col-span-2"><WeeklyGuides /></div>
         </div>
       )}
