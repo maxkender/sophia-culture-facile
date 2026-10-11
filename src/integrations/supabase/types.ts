@@ -5238,6 +5238,12 @@ export type Database = {
       reference_videos: {
         Row: {
           active: boolean
+          ad_copy: string | null
+          ad_end_date: string | null
+          ad_id: string | null
+          ad_platforms: string[]
+          ad_start_date: string | null
+          advertiser: string | null
           analysis: Json | null
           app_id: string
           category: string
@@ -5245,10 +5251,12 @@ export type Database = {
           format_notes: string | null
           id: string
           is_winner: boolean
+          landing_url: string | null
           note: string | null
           pinned: boolean
           platform: string
           score: number | null
+          source: string | null
           tags: string[]
           thumbnail_url: string | null
           title: string | null
@@ -5257,6 +5265,12 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          ad_copy?: string | null
+          ad_end_date?: string | null
+          ad_id?: string | null
+          ad_platforms?: string[]
+          ad_start_date?: string | null
+          advertiser?: string | null
           analysis?: Json | null
           app_id?: string
           category?: string
@@ -5264,10 +5278,12 @@ export type Database = {
           format_notes?: string | null
           id?: string
           is_winner?: boolean
+          landing_url?: string | null
           note?: string | null
           pinned?: boolean
           platform?: string
           score?: number | null
+          source?: string | null
           tags?: string[]
           thumbnail_url?: string | null
           title?: string | null
@@ -5276,6 +5292,12 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          ad_copy?: string | null
+          ad_end_date?: string | null
+          ad_id?: string | null
+          ad_platforms?: string[]
+          ad_start_date?: string | null
+          advertiser?: string | null
           analysis?: Json | null
           app_id?: string
           category?: string
@@ -5283,10 +5305,12 @@ export type Database = {
           format_notes?: string | null
           id?: string
           is_winner?: boolean
+          landing_url?: string | null
           note?: string | null
           pinned?: boolean
           platform?: string
           score?: number | null
+          source?: string | null
           tags?: string[]
           thumbnail_url?: string | null
           title?: string | null
@@ -5859,6 +5883,7 @@ export type Database = {
           id: string
           items: number
           job: string
+          meta: Json | null
           started_at: string
           status: string
         }
@@ -5870,6 +5895,7 @@ export type Database = {
           id?: string
           items?: number
           job: string
+          meta?: Json | null
           started_at?: string
           status?: string
         }
@@ -5881,6 +5907,7 @@ export type Database = {
           id?: string
           items?: number
           job?: string
+          meta?: Json | null
           started_at?: string
           status?: string
         }
