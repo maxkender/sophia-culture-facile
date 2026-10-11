@@ -904,6 +904,59 @@ export type Database = {
           },
         ]
       }
+      brief_snippets: {
+        Row: {
+          app_id: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          language: string
+          source_url: string | null
+          styles: Database["public"]["Enums"]["brief_style"][]
+          tags: string[]
+          text: string
+          usage_count: number
+          why: string | null
+        }
+        Insert: {
+          app_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind: string
+          language?: string
+          source_url?: string | null
+          styles?: Database["public"]["Enums"]["brief_style"][]
+          tags?: string[]
+          text: string
+          usage_count?: number
+          why?: string | null
+        }
+        Update: {
+          app_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          language?: string
+          source_url?: string | null
+          styles?: Database["public"]["Enums"]["brief_style"][]
+          tags?: string[]
+          text?: string
+          usage_count?: number
+          why?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brief_snippets_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       briefs: {
         Row: {
           angle: string | null
@@ -948,6 +1001,8 @@ export type Database = {
           source_course_id: string | null
           source_reference_id: string | null
           status: string
+          style: Database["public"]["Enums"]["brief_style"] | null
+          style_data: Json
           tags: string[]
           title: string
           translation_of: string | null
@@ -996,6 +1051,8 @@ export type Database = {
           source_course_id?: string | null
           source_reference_id?: string | null
           status?: string
+          style?: Database["public"]["Enums"]["brief_style"] | null
+          style_data?: Json
           tags?: string[]
           title: string
           translation_of?: string | null
@@ -1044,6 +1101,8 @@ export type Database = {
           source_course_id?: string | null
           source_reference_id?: string | null
           status?: string
+          style?: Database["public"]["Enums"]["brief_style"] | null
+          style_data?: Json
           tags?: string[]
           title?: string
           translation_of?: string | null
@@ -6146,6 +6205,12 @@ export type Database = {
     }
     Enums: {
       application_state: "pending" | "approved" | "rejected"
+      brief_style:
+        | "reaction_demo"
+        | "broll_stickers"
+        | "sole_footage"
+        | "talked_hook_demo"
+        | "educational"
       code_state: "available" | "assigned" | "sent"
       course_status:
         | "assigned"
@@ -6285,6 +6350,13 @@ export const Constants = {
   public: {
     Enums: {
       application_state: ["pending", "approved", "rejected"],
+      brief_style: [
+        "reaction_demo",
+        "broll_stickers",
+        "sole_footage",
+        "talked_hook_demo",
+        "educational",
+      ],
       code_state: ["available", "assigned", "sent"],
       course_status: [
         "assigned",
