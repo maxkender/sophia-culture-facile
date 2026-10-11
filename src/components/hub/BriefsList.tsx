@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SOPHIA_APP_ID, useAdminApp } from "@/lib/apps";
 import { generateBriefsFromCourses } from "@/lib/hub-learn.functions";
-import { assetUploadSlot, briefFromVideo, studioAi } from "@/lib/brief-studio.functions";
+import { assetUploadSlot, briefFromVideo, metaAdsPrepare, studioAi } from "@/lib/brief-studio.functions";
 import { STUDIO_DRAFT_KEY } from "@/lib/brief-studio";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -18,8 +18,8 @@ const EFF: Record<string, string> = { pov: "POV", reaction: "Réaction", talking
 const nextMonday = () => { const d = new Date(); const add = ((8 - d.getUTCDay()) % 7) || 7; d.setUTCDate(d.getUTCDate() + add); d.setUTCHours(7, 0, 0, 0); return d.toISOString(); };
 
 /** Grabs up to 5 frames from a local video file as JPEG data URLs (for the multimodal analysis). */
-async function framesOf(file: File): Promise<string[]> {
-  const v = document.createElement("video"); v.muted = true; v.src = URL.createObjectURL(file); v.preload = "auto";
+async function framesOf(file: File | string): Promise<string[]> {
+  const v = document.createElement("video"); v.muted = true; v.crossOrigin = "anonymous"; v.src = typeof file === "string" ? file : URL.createObjectURL(file); v.preload = "auto";
   await new Promise((r, j) => { v.onloadedmetadata = r; v.onerror = j; });
   const out: string[] = []; const c = document.createElement("canvas"); const w = 360; c.width = w; c.height = Math.round((w * v.videoHeight) / Math.max(1, v.videoWidth));
   for (const t of [0.3, 0.15, 0.4, 0.65, 0.9].map((p, i) => (i === 0 ? 0.3 : p * v.duration))) {
@@ -27,7 +27,7 @@ async function framesOf(file: File): Promise<string[]> {
     await new Promise((r) => { v.onseeked = r; });
     c.getContext("2d")?.drawImage(v, 0, 0, c.width, c.height); out.push(c.toDataURL("image/jpeg", 0.7));
   }
-  URL.revokeObjectURL(v.src); return out;
+  if (typeof file !== "string") URL.revokeObjectURL(v.src); return out;
 }
 
 function QuickBrief({ app, onClose }: { app: string; onClose: () => void }) {
@@ -49,7 +49,7 @@ function QuickBrief({ app, onClose }: { app: string; onClose: () => void }) {
 }
 
 function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
-  const run = useServerFn(briefFromVideo); const slot = useServerFn(assetUploadSlot); const qc = useQueryClient();
+  const run = useServerFn(briefFromVideo); const meta = useServerFn(metaAdsPrepare); const [step, setStep] = useState(""); const slot = useServerFn(assetUploadSlot); const qc = useQueryClient();
   const [urls, setUrls] = useState(""); const [file, setFile] = useState<File | null>(null); const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<{ label: string; score: number; briefIds: string[]; error?: string }[]>([]);
   async function go() {
@@ -65,6 +65,20 @@ function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
       } catch (e) { setDone((d) => [...d, { label: file.name, score: 0, briefIds: [], error: (e as Error).message }]); }
     }
     for (const u of list) {
+      if (/facebook\.com\/ads\/library/i.test(u)) {
+        try {
+          setStep("Meta Ads Library – fetching the ad…");
+          const { ads } = await meta({ data: { appId: app, url: u } });
+          for (const x of ads) {
+            setStep(x.video ? "Meta Ads Library – analysing the ad video…" : "Meta Ads Library – analysing the ad images…");
+            let frames: string[] = [];
+            if (x.video) { try { frames = await framesOf(x.video.signedUrl); } catch { frames = []; } }
+            const r = await run({ data: { appId: app, url: u, ad: x.ad, frames, storagePath: x.video?.path ?? null } });
+            setDone((d) => [...d, { label: `${x.ad.pageName || "Ad"} · ${x.ad.adId}`, score: r.score, briefIds: r.briefIds }]);
+          }
+        } catch (e) { setDone((d) => [...d, { label: u, score: 0, briefIds: [], error: (e as Error).message }]); }
+        setStep(""); continue;
+      }
       try { const r = await run({ data: { appId: app, url: u } }); setDone((d) => [...d, { label: u, score: r.score, briefIds: r.briefIds }]); }
       catch (e) { setDone((d) => [...d, { label: u, score: 0, briefIds: [], error: (e as Error).message }]); if (/credits|blocked/.test((e as Error).message)) break; }
     }
@@ -73,10 +87,10 @@ function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
   return (
     <div className={cn(card, "space-y-3")}>
       <h3 className="font-extrabold text-brand-navy">Brief depuis une vidéo</h3>
-      <p className="text-xs text-brand-navySoft">Paste up to 20 TikTok/Instagram links (one per line) or upload one file. Each video is saved in References with its 10-line analysis and a /10 score, and 1-3 adapted draft briefs are created. Links are read from their cover and caption; upload the file for a frame-by-frame read.</p>
+      <p className="text-xs text-brand-navySoft">Paste up to 20 TikTok, Instagram or Meta Ads Library links (one per line) or upload one file. Meta Ads Library ads are read with their video frame by frame (or their images and copy); a page or search link reads up to 5 ads. Each video is saved in References with its 10-line analysis and a /10 score, and 1-3 adapted draft briefs are created. Links are read from their cover and caption; upload the file for a frame-by-frame read.</p>
       <textarea aria-label="Video links" rows={4} value={urls} onChange={(e) => setUrls(e.target.value)} placeholder="https://www.tiktok.com/@…/video/…" className="w-full rounded-xl border p-3 text-sm" />
       <input type="file" accept="video/*" aria-label="Video file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm" />
-      <div className="flex gap-2"><Button disabled={busy || (!urls.trim() && !file)} onClick={() => void go()}><Film className="size-4" />{busy ? `Analysing… ${done.length}` : "Analyse"}</Button><Button variant="ghost" onClick={onClose}>Close</Button></div>
+      <div className="flex gap-2"><Button disabled={busy || (!urls.trim() && !file)} onClick={() => void go()}><Film className="size-4" />{busy ? step || `Analysing… ${done.length}` : "Analyse"}</Button><Button variant="ghost" onClick={onClose}>Close</Button></div>
       {done.length ? <ul className="space-y-1 text-sm">{done.map((d, i) => <li key={i} className="rounded-lg bg-portal-bg p-2"><span className="break-all font-semibold">{d.label}</span> — {d.error ? <span className="text-portal-red">{d.error}</span> : <>score {d.score}/10 · {d.briefIds.map((id, j) => <Link key={id} to="/hub/ugc/library/briefs/$briefId" params={{ briefId: id }} className="ml-1 font-bold text-portal-accent">brief {j + 1}</Link>)}</>}</li>)}</ul> : null}
     </div>
   );

@@ -118,6 +118,12 @@ export const studioAi = createServerFn({ method: "POST" })
     return { patch: r };
   });
 
+const metaAdSchema = z.object({
+  adId: z.string().max(40), pageName: z.string().max(300), body: z.string().max(5000), title: z.string().max(500), linkUrl: z.string().max(2000).nullable(),
+  previewImage: z.string().max(2000).nullable(), images: z.array(z.string().max(2000)).max(5), startDate: z.string().max(10).nullable(), endDate: z.string().max(10).nullable(), platforms: z.array(z.string().max(30)).max(10),
+});
+export type MetaAdInput = z.infer<typeof metaAdSchema>;
+
 const analysisShape = obj({
   hook_oral_verbatim: S, hook_text: S, hook_visual: S, promise: S, turn: S, turn_second: { type: "integer" },
   beats_with_timestamps: { type: "array", items: S }, duration_format_rhythm: S, product_appearance: S, ending: S, why_it_works: S,
@@ -135,6 +141,7 @@ export const briefFromVideo = createServerFn({ method: "POST" })
     frames: z.array(z.string().max(400_000)).max(6).optional(),
     caption: z.string().max(2000).optional(),
     storagePath: z.string().max(300).nullable().optional(),
+    ad: metaAdSchema.nullable().optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const me = await assertAdmin(context as never);
@@ -142,7 +149,12 @@ export const briefFromVideo = createServerFn({ method: "POST" })
     const app = await appContext(a, data.appId);
     const content: unknown[] = [];
     let thumb: string | null = null; let caption = data.caption ?? "";
-    if (data.url) {
+    const ad = data.ad ?? null;
+    if (ad) {
+      caption = [`Meta Ads Library — advertiser: ${ad.pageName}`, ad.title && `Title: ${ad.title}`, ad.body && `Ad copy: ${ad.body}`, ad.linkUrl && `Landing link: ${ad.linkUrl}`, ad.platforms.length && `Placements: ${ad.platforms.join(", ")}`].filter(Boolean).join("\n");
+      if (!data.frames?.length) for (const i of [ad.previewImage, ...ad.images].filter(Boolean).slice(0, 5)) content.push({ type: "input_image", image_url: i });
+      thumb = ad.previewImage ?? ad.images[0] ?? null;
+    } else if (data.url) {
       if (/tiktok\.com\//.test(data.url)) {
         try {
           const r = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(data.url)}`, { signal: AbortSignal.timeout(8000) });
@@ -153,13 +165,14 @@ export const briefFromVideo = createServerFn({ method: "POST" })
     }
     for (const f of data.frames ?? []) if (f.startsWith("data:image/")) content.push({ type: "input_image", image_url: f });
     if (!content.length && !caption) throw new Error("This video could not be read. Upload the file instead.");
-    content.unshift({ type: "input_text", text: `Analyse this short-form video${data.url ? ` (${data.url})` : ""}. Caption/author: ${caption || "unknown"}. ${data.frames?.length ? "Images are frames in order." : "The image is the cover frame."} Where audio is not available, infer carefully from frames and caption, and say "(déduit)" for guessed verbatim. Fill the 10-line grid in French, give a /10 score for how well it would work for ${app.name}, then write 1 to 3 adapted briefs keeping the structure but using a ${app.name} fact or mechanic with new hooks.` });
+    content.unshift({ type: "input_text", text: `Analyse this short-form video${data.url ? ` (${data.url})` : ""}. Caption/author: ${caption || "unknown"}. ${data.frames?.length ? "Images are frames in order." : ad ? "Images are the ad's visuals (image or carousel cards)." : "The image is the cover frame."} Where audio is not available, infer carefully from frames and caption, and say "(déduit)" for guessed verbatim. Fill the 10-line grid in French, give a /10 score for how well it would work for ${app.name}, then write 1 to 3 adapted briefs keeping the structure but using a ${app.name} fact or mechanic with new hooks.` });
     const r = await aiJson<Analysis>(`You are a short-form video strategist. ${app.about} ${RULES}`, content, "analysis", analysisShape);
     const { adapted, score, title, ...grid } = r;
-    const platform = data.url?.includes("instagram") ? "instagram" : "tiktok";
+    const platform = ad ? (ad.platforms.includes("instagram") && !ad.platforms.includes("facebook") ? "instagram" : "facebook") : data.url?.includes("instagram") ? "instagram" : "tiktok";
     const { data: ref, error } = await a.from("reference_videos").insert({
       url: data.url ?? `upload:${data.storagePath ?? "file"}`, platform, app_id: data.appId, title, thumbnail_url: thumb,
       why_it_works: grid.why_it_works, format_notes: grid.duration_format_rhythm, analysis: grid, score: Math.max(0, Math.min(10, score)), active: true,
+      ...(ad ? { source: "Meta Ads Library", advertiser: ad.pageName || null, ad_id: ad.adId || null, ad_start_date: ad.startDate, ad_end_date: ad.endDate, ad_platforms: ad.platforms, landing_url: ad.linkUrl, ad_copy: ad.body || null, url: data.url ?? `https://www.facebook.com/ads/library/?id=${ad.adId}` } : {}),
     }).select("id").single();
     if (error) throw new Error("The reference could not be saved.");
     const rows = adapted.slice(0, 3).map((x) => ({
@@ -170,6 +183,25 @@ export const briefFromVideo = createServerFn({ method: "POST" })
     }));
     const { data: made } = await a.from("briefs").insert(rows).select("id");
     return { referenceId: ref.id as string, score, grid, briefIds: (made ?? []).map((m: { id: string }) => m.id) };
+  });
+
+/** Meta Ads Library: one Apify run per link; ad videos are copied into creator-assets so the browser can read frames. */
+export const metaAdsPrepare = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ appId: z.string().uuid(), url: z.string().url().max(800), limit: z.number().int().min(1).max(5).optional() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    const a = await adminClient();
+    const { fetchMetaAds, storeAdVideo } = await import("./meta-ads.server");
+    const ads = await fetchMetaAds(a, data.url, data.limit);
+    const out = [];
+    for (const ad of ads) {
+      let video: { path: string; signedUrl: string } | null = null; let videoError: string | null = null;
+      if (ad.videoUrl) { try { video = await storeAdVideo(a, data.appId, ad.videoUrl); } catch (e) { videoError = (e as Error).message; } }
+      const { videoUrl: _v, ...rest } = ad; void _v;
+      out.push({ ad: rest, video, videoError });
+    }
+    return { ads: out };
   });
 
 /** Signed download links for assets the caller can see (RLS decides: admin = all, creator = own apps' ready assets). */
