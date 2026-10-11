@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { getMyPhotoUrl } from "@/lib/creator-app.functions";
 import { touchCreatorSeen } from "@/lib/ugc-creator.functions";
 import { useCreator } from "./useCreator";
-import { t as ct } from "@/i18n/creator-app";
+import { t as ct, CreatorLangProvider, initCreatorLang, useCreatorLang } from "@/i18n/creator-app";
 
 type Badge = "briefs" | "posts" | "calls" | "messages";
 type Item = { to: string; label: string; icon: LucideIcon; exact?: boolean; badge?: Badge; gate?: "steps" | "payouts" };
@@ -130,6 +130,8 @@ export function CreatorShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { me, briefs, counts } = useCreator();
+  initCreatorLang((me as { language?: string | null }).language, (me as { country?: string | null }).country);
+  useCreatorLang();
   const touch = useServerFn(touchCreatorSeen);
   useEffect(() => { void touch().catch(() => undefined); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const pending = Object.values(counts ?? {}).reduce((a: number, b) => a + (Number(b) || 0), 0);
@@ -173,6 +175,7 @@ export function CreatorShell({ children }: { children: ReactNode }) {
   );
 
   return (
+    <CreatorLangProvider language={(me as { language?: string | null }).language} country={(me as { country?: string | null }).country}>
     <div className="min-h-screen bg-portal-bg">
       <CommandDialog open={palette} onOpenChange={setPalette}>
         <CommandInput placeholder={ct("Search pages and briefs…")} />
@@ -211,7 +214,7 @@ export function CreatorShell({ children }: { children: ReactNode }) {
                 <div className="border-t border-brand-line p-3">{user}</div>
               </SheetContent>
             </Sheet>
-            <p className="min-w-0 flex-1 truncate text-sm font-bold text-brand-navy">{current?.label ?? ct("Creator space")}</p>
+            <p className="min-w-0 flex-1 truncate text-sm font-bold text-brand-navy">{current ? ct(current.label) : ct("Creator space")}</p>
             <button type="button" onClick={() => setPalette(true)} className="hidden items-center gap-2 rounded-full border border-brand-line px-3.5 py-2 text-sm text-brand-navySoft transition hover:border-portal-accent/40 hover:text-brand-navy sm:flex">
               <Search className="size-4" aria-hidden="true" /> {ct("Search")}
               <span className="rounded bg-portal-bg px-1.5 py-0.5 text-[10px] font-bold">⌘K</span>

@@ -41,11 +41,18 @@ export function useCreatorLang() {
 }
 
 /** Wraps the creator space: picks the language (saved choice → creator language → country → browser) and re-renders on switch. */
+let inited = false;
+/** Call at the top of a creator page render so the very first paint is already in the right language. */
+export function initCreatorLang(language?: string | null, country?: string | null) {
+  if (inited || typeof window === "undefined") return;
+  inited = true; current = storedCreatorLang() ?? guessCreatorLang(language, country);
+  document.documentElement.lang = current;
+}
+
 export function CreatorLangProvider({ language, country, children }: { language?: string | null | undefined; country?: string | null | undefined; children: ReactNode }) {
-  const initial = storedCreatorLang() ?? guessCreatorLang(language, country);
-  if (current !== initial && !listeners.size) current = initial;
+  initCreatorLang(language, country);
   const l = useCreatorLang();
-  useEffect(() => { setCreatorLang(storedCreatorLang() ?? guessCreatorLang(language, country)); return () => { current = "en"; }; }, [language, country]);
+  useEffect(() => () => { current = "en"; inited = false; }, []);
   return <div key={l} lang={l} className="contents">{children}</div>;
 }
 
