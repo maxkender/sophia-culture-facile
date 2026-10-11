@@ -1,0 +1,2 @@
+ALTER TABLE public.apps ADD COLUMN IF NOT EXISTS post_description jsonb NOT NULL DEFAULT '{}'::jsonb;
+COMMENT ON COLUMN public.apps.post_description IS 'Default caption per language {fr,en,comment_fr,comment_en}, used when a brief has none.';

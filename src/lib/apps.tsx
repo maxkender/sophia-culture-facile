@@ -20,6 +20,7 @@ export type AppRow = {
   users_line: string | null;
   creators_line: string | null;
   active: boolean;
+  post_description?: { fr?: string; en?: string; comment_fr?: string; comment_en?: string } | null;
 };
 
 export const SOPHIA_APP_ID = "00000000-0000-4000-8000-000000000001";
@@ -29,7 +30,7 @@ export function useApps() {
   return useQuery({
     queryKey: APPS_KEY,
     queryFn: async () => {
-      const { data } = await supabase.from("apps").select("*").order("created_at");
+      const { data } = await supabase.from("apps").select("*").order("created_at").order("name");
       return (data ?? []) as AppRow[];
     },
     staleTime: 5 * 60_000,

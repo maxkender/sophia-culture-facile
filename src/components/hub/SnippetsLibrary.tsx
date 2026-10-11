@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
+import { Trash2, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,7 @@ export function SnippetsLibrary() {
               {s.why ? <p className="text-sm text-brand-navySoft">{s.why}</p> : null}
               <p className="mt-1 text-xs text-brand-navySoft">{appName(s.app_id)} · {s.language.toUpperCase()} · {s.styles.map((x) => STYLE_LABEL[x]).join(", ") || "All styles"}{s.tags.length ? ` · ${s.tags.join(", ")}` : ""} · used {s.usage_count}×</p>
             </div>
+            <Button size="icon" variant="ghost" aria-label="Copy" onClick={async () => { try { await navigator.clipboard.writeText(s.text); toast.success("Copied"); } catch { toast.error("Copy failed."); } }}><Copy className="size-4" /></Button>
             <Button size="icon" variant="ghost" aria-label="Delete" onClick={async () => { if (window.confirm("Delete this snippet?")) { await supabase.from("brief_snippets").delete().eq("id", s.id); reload(); } }}><Trash2 className="size-4" /></Button>
           </li>))}</ul>
       )}

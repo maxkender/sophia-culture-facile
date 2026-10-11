@@ -60,6 +60,7 @@ export function LogPostForm({ briefId: initialBrief = "", onDone }: { briefId?: 
         <select id="link-brief" className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={briefId} onChange={(e) => setBriefId(e.target.value)}>
           <option value="">{ct("Sans brief")}</option>{briefs.map((b) => <option key={b.id} value={b.id}>{ct(b.title)}</option>)}
         </select></div>
+      {briefId ? <PostDescriptionBlock compact appId={appId} desc={(briefs.find((b) => b.id === briefId) as { style_data?: { post_desc?: PostDesc } } | undefined)?.style_data?.post_desc} briefLang={(briefs.find((b) => b.id === briefId) as { language?: string } | undefined)?.language} /> : null}
       <GuidelinesChecklist appId={appId} value={checked} onChange={setChecked} />
       <Button size="lg" disabled={busy || !urls.length || !allTicked} title={!allTicked ? ct("Coche chaque consigne avant d’envoyer") : undefined} onClick={async () => {
         const bad = urls.find((u) => !isHttpUrl(u) || !u.startsWith("https://"));
@@ -80,6 +81,7 @@ export function LogPostForm({ briefId: initialBrief = "", onDone }: { briefId?: 
 
 /* ---------- Briefs ---------- */
 import { AssignedBriefs } from "./UgcPages";
+import { PostDescriptionBlock, type PostDesc } from "@/components/creators/PostDescription";
 
 function FormatsTab() {
   const d = useCreator();
