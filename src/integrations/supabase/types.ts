@@ -5128,6 +5128,7 @@ export type Database = {
           hold_reason: string | null
           id: string
           note: string | null
+          paid_at: string | null
           period: string | null
           posts_count: number
           rate_usd: number
@@ -5149,6 +5150,7 @@ export type Database = {
           hold_reason?: string | null
           id?: string
           note?: string | null
+          paid_at?: string | null
           period?: string | null
           posts_count?: number
           rate_usd?: number
@@ -5170,6 +5172,7 @@ export type Database = {
           hold_reason?: string | null
           id?: string
           note?: string | null
+          paid_at?: string | null
           period?: string | null
           posts_count?: number
           rate_usd?: number

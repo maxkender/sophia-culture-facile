@@ -91,7 +91,7 @@ export async function freezeDue(a: Admin, opts: { postId?: string; force?: boole
 
 /** Approve a creator's Ready posts into a payable batch item (Pay via Stripe / exports reuse the batch tools). */
 export async function approveReady(a: Admin, creatorId: string, by: string) {
-  const { data: posts } = await a.from("creator_posts").select("id, pay_amount, pay_currency, url, pay_formula").eq("creator_id", creatorId).eq("pay_status", "ready");
+  const { data: posts } = await a.from("creator_posts").select("id, pay_amount, pay_currency, url, pay_formula, app_id").eq("creator_id", creatorId).eq("pay_status", "ready");
   const total = round2((posts ?? []).reduce((s: number, p: any) => s + Number(p.pay_amount ?? 0), 0));
   const { data: s } = await a.from("ugc_settings").select("min_payout").eq("id", 1).maybeSingle();
   const min = Number(s?.min_payout ?? 20);
@@ -100,7 +100,7 @@ export async function approveReady(a: Admin, creatorId: string, by: string) {
   const day = new Date().toISOString().slice(0, 10);
   const { data: batch, error } = await a.from("payout_batches").insert({ period: `J+7 ${day} · ${creatorId.slice(0, 6)}-${Date.now().toString(36)}`, status: "approved", created_by: by }).select("id").single();
   if (error) throw new Error("The payout could not be created.");
-  const { data: item, error: e2 } = await a.from("payout_items").insert({ batch_id: batch.id, creator_id: creatorId, posts_count: posts.length, amount: total, amount_usd: total, currency: "EUR", status: "pending", period: day, breakdown: { kind: "j7", posts: posts.map((p: any) => ({ id: p.id, url: p.url, amount: p.pay_amount, formula: p.pay_formula })) } }).select("id").single();
+  const { data: item, error: e2 } = await a.from("payout_items").insert({ batch_id: batch.id, creator_id: creatorId, posts_count: posts.length, amount: total, amount_usd: total, currency: "EUR", status: "pending", period: day, app_id: posts[0].app_id, breakdown: { kind: "j7", posts: posts.map((p: any) => ({ id: p.id, url: p.url, amount: p.pay_amount, formula: p.pay_formula })) } }).select("id").single();
   if (e2) throw new Error("The payout item could not be created.");
   await a.from("creator_posts").update({ pay_status: "approved", payout_item_id: item.id }).in("id", posts.map((p: any) => p.id));
   return { batchId: batch.id as string, total, posts: posts.length };
