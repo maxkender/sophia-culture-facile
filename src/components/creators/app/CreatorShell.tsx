@@ -211,7 +211,7 @@ export function CreatorShell({ children }: { children: ReactNode }) {
                 <div className="border-t border-brand-line p-3">{user}</div>
               </SheetContent>
             </Sheet>
-            <p className="min-w-0 flex-1 truncate text-sm font-bold text-brand-navy">{current?.label ?? "Creator space"}</p>
+            <p className="min-w-0 flex-1 truncate text-sm font-bold text-brand-navy">{current?.label ?? ct("Creator space")}</p>
             <button type="button" onClick={() => setPalette(true)} className="hidden items-center gap-2 rounded-full border border-brand-line px-3.5 py-2 text-sm text-brand-navySoft transition hover:border-portal-accent/40 hover:text-brand-navy sm:flex">
               <Search className="size-4" aria-hidden="true" /> {ct("Search")}
               <span className="rounded bg-portal-bg px-1.5 py-0.5 text-[10px] font-bold">⌘K</span>
@@ -250,8 +250,8 @@ export function Locked({ gate, children }: { gate: "steps" | "payouts"; children
       <p className="flex items-center gap-2 text-base font-extrabold text-brand-navy"><Lock className="size-4" /> {ct("This page is locked")}</p>
       <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
         {gate === "payouts"
-          ? "Earnings open once onboarding steps 1 to 3 are done and your payout details are set up (step 4)."
-          : "Briefs, the library, your posts and calls open once the first three onboarding steps are done: rules, agreement and account setup."}
+          ? ct("Earnings open once onboarding steps 1 to 3 are done and your payout details are set up (step 4).")
+          : ct("Briefs, the library, your posts and calls open once the first three onboarding steps are done: rules, agreement and account setup.")}
       </p>
       <Button asChild className="mt-4"><Link to={missing.to}>Go to step {missing.n}: {missing.label}</Link></Button>
     </div>

@@ -243,12 +243,12 @@ export function AccountSetupPage() {
             <div><Label htmlFor="acc-pw">Password{account ? " (enter again to change)" : ""}</Label><Input id="acc-pw" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
           </div>
           <p className="mt-2 text-xs text-brand-navySoft">{ct("Stored encrypted. Only the Sophia team can reveal it, and every reveal is logged.")}</p>
-          <Button className="mt-3" disabled={busy || !email || !password} onClick={() => run(() => saveStep({ data: { step: "email", email, password } }), "Email registered.")}>{ct("Register the email")}</Button>
+          <Button className="mt-3" disabled={busy || !email || !password} onClick={() => run(() => saveStep({ data: { step: "email", email, password } }), ct("Email registered."))}>{ct("Register the email")}</Button>
         </SetupSub>
         {req !== "instagram" && (
           <SetupSub k="acc_tiktok" done={Boolean(checks["acc_tiktok"])}>
             <div className="max-w-sm"><Label htmlFor="acc-tt">{ct("TikTok handle")}</Label><Input id="acc-tt" placeholder="@lea" value={tt} onChange={(e) => setTt(e.target.value)} /></div>
-            <Button className="mt-3" disabled={busy || !tt || !checks["acc_email"]} onClick={() => run(() => saveStep({ data: { step: "tiktok", handle: tt } }), "TikTok handle registered.")}>{ct("Register TikTok")}</Button>
+            <Button className="mt-3" disabled={busy || !tt || !checks["acc_email"]} onClick={() => run(() => saveStep({ data: { step: "tiktok", handle: tt } }), ct("TikTok handle registered."))}>{ct("Register TikTok")}</Button>
             {!checks["acc_email"] && <p className="mt-2 text-xs text-brand-navySoft">{ct("Register the email first.")}</p>}
           </SetupSub>
         )}
@@ -256,11 +256,11 @@ export function AccountSetupPage() {
           <SetupSub k="acc_instagram" done={Boolean(checks["acc_instagram"])}>
             <div className="max-w-sm"><Label htmlFor="acc-ig">{ct("Instagram handle")}</Label><Input id="acc-ig" placeholder="@lea" value={ig} onChange={(e) => setIg(e.target.value)} /></div>
             <label className="mt-3 flex items-center gap-2 text-sm"><Checkbox checked={igCreator} onCheckedChange={(v) => setIgCreator(v === true)} /> {ct("The account is set to Creator account type")}</label>
-            <Button className="mt-3" disabled={busy || !ig || !igCreator || !checks["acc_email"]} onClick={() => run(() => saveStep({ data: { step: "instagram", handle: ig, creatorType: true } }), "Instagram handle registered.")}>{ct("Register Instagram")}</Button>
+            <Button className="mt-3" disabled={busy || !ig || !igCreator || !checks["acc_email"]} onClick={() => run(() => saveStep({ data: { step: "instagram", handle: ig, creatorType: true } }), ct("Instagram handle registered."))}>{ct("Register Instagram")}</Button>
           </SetupSub>
         )}
         <SetupSub k="acc_confirm" done={Boolean(checks["acc_confirm"])}>
-          <Button disabled={busy || Boolean(checks["acc_confirm"])} onClick={() => run(() => saveStep({ data: { step: "confirm", publicConfirmed: true } }), "Accounts confirmed.")}>{ct("Both accounts are public and registered")}</Button>
+          <Button disabled={busy || Boolean(checks["acc_confirm"])} onClick={() => run(() => saveStep({ data: { step: "confirm", publicConfirmed: true } }), ct("Accounts confirmed."))}>{ct("Both accounts are public and registered")}</Button>
         </SetupSub>
       </div>
 
@@ -287,13 +287,13 @@ export function AccountSetupPage() {
       <PortalCard>
         <Button asChild><a href={SLACK_INVITE} target="_blank" rel="noopener noreferrer">{ct("Open the Slack invite")}</a></Button>
         <label className="mt-4 flex items-center gap-2 text-sm font-semibold text-brand-navy">
-          <Checkbox checked={Boolean(me.slack_joined_at)} disabled={Boolean(me.slack_joined_at)} onCheckedChange={(v) => { if (v === true) void run(() => joinSlack(), "Thanks — Slack step done."); }} /> {ct("I've joined")}
+          <Checkbox checked={Boolean(me.slack_joined_at)} disabled={Boolean(me.slack_joined_at)} onCheckedChange={(v) => { if (v === true) void run(() => joinSlack(), ct("Thanks — Slack step done.")); }} /> {ct("I've joined")}
         </label>
         {me.phone && (
           <div className="mt-6 border-t border-brand-line pt-4">
             <p className="text-sm text-brand-navy">{ct("We may also add you to the WhatsApp group.")}</p>
             <label className="mt-2 flex items-center gap-2 text-sm">
-              <Checkbox checked={(me as any).whatsapp_opt_in !== false} onCheckedChange={(v) => void run(() => setWa({ data: { optIn: v === true } }), v === true ? "You're in for WhatsApp." : "We won't add you to WhatsApp.")} />
+              <Checkbox checked={(me as any).whatsapp_opt_in !== false} onCheckedChange={(v) => void run(() => setWa({ data: { optIn: v === true } }), v === true ? ct("You're in for WhatsApp.") : ct("We won't add you to WhatsApp."))} />
               {ct("Yes, add me to the WhatsApp group")}
             </label>
           </div>
@@ -385,7 +385,7 @@ function PayoutDetails() {
               setBusy(true);
               try { const { url } = await onboard({} as never); window.location.href = url; }
               catch (e: unknown) { toast.error(friendlyCreatorError(e)); setBusy(false); }
-            }}>{busy ? "Opening Stripe…" : profile?.stripe_account_id ? "Continue Stripe setup" : "Set up payouts with Stripe"}</Button>
+            }}>{busy ? ct("Opening Stripe…") : profile?.stripe_account_id ? ct("Continue Stripe setup") : ct("Set up payouts with Stripe")}</Button>
           </div>
         )}
         <div className="border-t border-brand-line pt-4">

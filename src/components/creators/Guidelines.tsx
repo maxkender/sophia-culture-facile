@@ -113,7 +113,7 @@ export function GuidelinesEditor() {
           </div>
           <div className="flex items-center gap-2 md:col-span-3">
             {g.image_data ? <img src={g.image_data} alt="" className="size-10 rounded-lg object-cover" /> : null}
-            <label className="cursor-pointer text-xs font-bold text-portal-accent">{g.image_data ? "Change example image" : "Add example image (optional)"}<input type="file" accept="image/*" className="sr-only" onChange={(e) => void image(g.id, e.target.files?.[0])} /></label>
+            <label className="cursor-pointer text-xs font-bold text-portal-accent">{g.image_data ? ct("Change example image") : ct("Add example image (optional)")}<input type="file" accept="image/*" className="sr-only" onChange={(e) => void image(g.id, e.target.files?.[0])} /></label>
             {g.image_data ? <button type="button" className="text-xs text-brand-navySoft underline" onClick={() => void save(g.id, { image_data: null })}>{ct("Remove")}</button> : null}
           </div>
         </div>

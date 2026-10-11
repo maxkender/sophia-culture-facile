@@ -61,7 +61,7 @@ export function LogPostForm({ briefId: initialBrief = "", onDone }: { briefId?: 
           <option value="">{ct("Sans brief")}</option>{briefs.map((b) => <option key={b.id} value={b.id}>{b.title}</option>)}
         </select></div>
       <GuidelinesChecklist appId={appId} value={checked} onChange={setChecked} />
-      <Button size="lg" disabled={busy || !urls.length || !allTicked} title={!allTicked ? "Coche chaque consigne avant d’envoyer" : undefined} onClick={async () => {
+      <Button size="lg" disabled={busy || !urls.length || !allTicked} title={!allTicked ? ct("Coche chaque consigne avant d’envoyer") : undefined} onClick={async () => {
         const bad = urls.find((u) => !isHttpUrl(u) || !u.startsWith("https://"));
         if (bad) return void toast.error(ct("Colle le lien complet, qui commence par https://."));
         setBusy(true);
@@ -91,8 +91,8 @@ function FormatsTab() {
   const label = { pov: "POV", reaction: fr ? "Réaction" : "Reaction", talking_head: "Face cam" } as Record<string, string>;
   return (
     <div>
-      <p className="mb-4 rounded-2xl bg-portal-accent/10 px-4 py-3 text-sm font-bold text-brand-navy">{fr ? "Choisis 3 formats, refais-les 20 fois." : "Pick 3 formats, redo them 20 times."}</p>
-      {formats.length === 0 ? <EmptyState title={fr ? "Pas encore de formats" : "No formats yet"} text="" /> : (
+      <p className="mb-4 rounded-2xl bg-portal-accent/10 px-4 py-3 text-sm font-bold text-brand-navy">{fr ? ct("Choisis 3 formats, refais-les 20 fois.") : ct("Pick 3 formats, redo them 20 times.")}</p>
+      {formats.length === 0 ? <EmptyState title={fr ? ct("Pas encore de formats") : ct("No formats yet")} text="" /> : (
         <div className="grid gap-4 md:grid-cols-2" data-testid="formats-grid">
           {formats.map((f) => {
             const x = f as typeof f & { effort?: string; hook_text?: string; beats?: string[] };
@@ -125,7 +125,7 @@ export function BriefsPage() {
   return (
     <div>
       <div className="mb-5 flex gap-2 overflow-x-auto">
-        {([["formats", "Formats"], ["briefs", "Briefs"], ["refs", "Reference videos"]] as const).map(([k, l]) => (
+        {([["formats", "Formats"], ["briefs", "Briefs"], ["refs", ct("Reference videos")]] as const).map(([k, l]) => (
           <button key={k} type="button" aria-pressed={tab === k} onClick={() => setTab(k)} className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-bold ${tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy"}`}>{l}</button>
         ))}
       </div>
@@ -152,7 +152,7 @@ function FactBriefs() {
           <option value="all">{ct("All apps")}</option>{apps.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
         </select>
         <select aria-label={ct("Status")} className="h-10 rounded-md border border-input bg-card px-3 text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>
-          {["all", "new", "seen", "posted", "skipped"].map((s) => <option key={s} value={s}>{s === "all" ? "All statuses" : s}</option>)}
+          {["all", "new", "seen", "posted", "skipped"].map((s) => <option key={s} value={s}>{s === "all" ? ct("All statuses") : s}</option>)}
         </select>
       </div>
       {list.length === 0 ? <EmptyState title={ct("No brief yet")} text="Your briefs arrive here when Max sends you one." /> : (
@@ -164,7 +164,7 @@ function FactBriefs() {
                   <h3 className="text-lg font-extrabold text-brand-navy">{b.title}</h3>
                   <Pill s={briefStatus(d, b.id)} />
                 </div>
-                <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-brand-navySoft"><AppBadge appId={b.app_id} />{b.due_date ? `Due ${fmtDate(b.due_date)}` : "No deadline"}</p>
+                <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-brand-navySoft"><AppBadge appId={b.app_id} />{b.due_date ? `Due ${fmtDate(b.due_date)}` : ct("No deadline")}</p>
               </PortalCard>
             </Link>
           ))}
@@ -235,7 +235,7 @@ function RefCard({ r, compact = false }: { r: Ref; compact?: boolean }) {
       )}
       <div className="mb-2 flex flex-wrap gap-1"><PlatformBadge platform={r.platform} /><AppBadge appId={r.app_id} /></div>
       {cat && <span className="mb-2 w-fit rounded-full bg-portal-bg px-2.5 py-0.5 text-[11px] font-bold text-brand-navy" title={cat.line}>{cat.label}</span>}
-      <p className="font-extrabold text-brand-navy">{r.title || r.note || "Untitled video"}</p>
+      <p className="font-extrabold text-brand-navy">{r.title || r.note || ct("Untitled video")}</p>
       {r.why_it_works && <p className="mt-1 text-sm text-brand-navySoft"><b>{ct("Why it works:")}</b> {r.why_it_works}</p>}
       {r.format_notes && <p className="mt-1 text-sm text-brand-navySoft"><b>{ct("Format:")}</b> {r.format_notes}</p>}
       <div className="mt-auto flex flex-wrap gap-2 pt-3">
@@ -361,7 +361,7 @@ export function PostsPage({ refId }: { refId?: string | undefined }) {
                   <span className="flex min-w-0 flex-wrap items-center gap-2"><PlatformBadge platform={p.platform} /><a href={p.url} target="_blank" rel="noopener noreferrer" className="truncate font-bold text-portal-accent hover:underline">{p.url.replace(/^https:\/\/(www\.)?/, "").slice(0, 48)}</a></span>
                   <span className={cn("rounded-full px-3 py-1 text-xs font-bold", st.tone)}>{st.label}</span>
                 </div>
-                <p className="mt-1 text-sm text-brand-navySoft">{brief ? `Brief : ${brief.title}` : "Sans brief"} · envoyé le {fmtDate((p as LoopPost).submitted_at ?? p.created_at)}{st.detail ? ` · ${st.detail}` : ""}</p>
+                <p className="mt-1 text-sm text-brand-navySoft">{brief ? `Brief : ${brief.title}` : ct("Sans brief")} · envoyé le {fmtDate((p as LoopPost).submitted_at ?? p.created_at)}{st.detail ? ` · ${st.detail}` : ""}</p>
                 {p.status === "flagged" && p.feedback ? <div className="mt-3 rounded-xl bg-portal-amber/10 p-3 text-sm"><p>{p.feedback}</p><FeedbackReply post={p} /></div> : null}
               </PortalCard>
             );
@@ -472,7 +472,7 @@ export function EarningsPage() {
                 <td className="px-4 py-2">{fmtDate(p.posted_on)}</td>
                 <td className="px-4 py-2">{p.pay_status === "due" ? money(p.amount_usd) : "—"}</td>
                 <td className="px-4 py-2">{money(p.bonus_usd)}</td>
-                <td className="px-4 py-2">{p.pay_status === "due" ? "Due" : p.pay_status === "held" ? "On hold: no rate yet" : p.status === "flagged" ? "Needs changes" : p.status === "approved" ? "Approved" : "Waiting for review"}</td>
+                <td className="px-4 py-2">{p.pay_status === "due" ? "Due" : p.pay_status === "held" ? ct("On hold: no rate yet") : p.status === "flagged" ? ct("Needs changes") : p.status === "approved" ? "Approved" : ct("Waiting for review")}</td>
               </tr>
             ))}
           </tbody>
@@ -549,7 +549,7 @@ export function MessagesPage() {
             {list.length === 0 ? <p className="text-sm text-brand-navySoft">{ct("No message yet.")}</p> : list.map((m) => (
               <div key={m.id} className={cn("max-w-[80%] rounded-2xl px-4 py-2 text-sm", m.from_admin ? "bg-portal-bg text-brand-navy" : "ml-auto bg-brand-navy text-card")}>
                 <p className="whitespace-pre-wrap">{m.body}</p>
-                <p className="mt-1 text-[10px] opacity-70">{m.from_admin ? "Sophia team" : "You"} · {new Date(m.created_at).toLocaleString()}</p>
+                <p className="mt-1 text-[10px] opacity-70">{m.from_admin ? ct("Sophia team") : "You"} · {new Date(m.created_at).toLocaleString()}</p>
               </div>
             ))}
           </div>

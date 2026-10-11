@@ -68,7 +68,7 @@ export function CreatorHomePage() {
     <div>
       <PageTitle title={`Welcome, ${first}`} lead={ct("Your creator space: briefs, the reference library, your posts, calls, earnings and messages with the Sophia team.")} />
       <ol className="mb-6 grid gap-3 sm:grid-cols-3" data-testid="loop-strip">
-        {([["1", "Lis ton brief", "/creators/app/briefs"], ["2", "Poste", "/creators/app/briefs"], ["3", "Colle tes liens", "/creators/app/posts"]] as const).map(([n, l, to]) => (
+        {([["1", ct("Lis ton brief"), "/creators/app/briefs"], ["2", "Poste", "/creators/app/briefs"], ["3", ct("Colle tes liens"), "/creators/app/posts"]] as const).map(([n, l, to]) => (
           <li key={n}><Link to={to} className="flex min-h-14 items-center gap-3 rounded-2xl bg-card p-4 font-extrabold text-brand-navy shadow-portal hover:ring-2 hover:ring-portal-accent/30"><span className="grid size-8 place-items-center rounded-full bg-portal-accent text-card">{n}</span>{l}</Link></li>
         ))}
       </ol>
@@ -167,7 +167,7 @@ export function AccessCodeCard() {
 
 function OtherAppAccessCard({ app, code }: { app: AppRow; code: { code: string; redeem_url: string | null } | null }) {
   const { me } = useCreator();
-  const store = me.platform === "android" ? "Play Store" : "App Store";
+  const store = me.platform === "android" ? ct("Play Store") : ct("App Store");
   const link = app.taap_url || (me.platform === "android" ? app.play_store_url : app.app_store_url);
   return (
     <PortalCard>
@@ -180,8 +180,8 @@ function OtherAppAccessCard({ app, code }: { app: AppRow; code: { code: string; 
           <ol className="mt-4 list-decimal space-y-1 pl-5 text-sm leading-relaxed text-brand-navySoft">
             <li>Open the {store}, not {app.name}</li>
             <li>{ct("Tap your profile picture, top right")}</li>
-            <li>{store === "App Store" ? "Choose Redeem Gift Card or Code" : "Choose Payments and subscriptions"}</li>
-            <li>{store === "App Store" ? "Choose Enter Code Manually" : "Choose Redeem code"}</li>
+            <li>{store === "App Store" ? ct("Choose Redeem Gift Card or Code") : ct("Choose Payments and subscriptions")}</li>
+            <li>{store === "App Store" ? ct("Choose Enter Code Manually") : ct("Choose Redeem code")}</li>
             <li>{ct("Paste the code above")}</li>
           </ol>
         </>
@@ -193,7 +193,7 @@ function OtherAppAccessCard({ app, code }: { app: AppRow; code: { code: string; 
 
 function SophiaAccessCard() {
   const { me } = useCreator();
-  const store = me.platform === "android" ? "Play Store" : "App Store";
+  const store = me.platform === "android" ? ct("Play Store") : ct("App Store");
   return (
     <PortalCard>
       <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-brand-navySoft"><Smartphone className="size-4" /> {ct("Your Sophia app access")}</p>
@@ -212,8 +212,8 @@ function SophiaAccessCard() {
           <ol className="mt-4 list-decimal space-y-1 pl-5 text-sm leading-relaxed text-brand-navySoft">
             <li>Open the {store}, not Sophia</li>
             <li>{ct("Tap your profile picture, top right")}</li>
-            <li>{store === "App Store" ? "Choose Redeem Gift Card or Code" : "Choose Payments and subscriptions"}</li>
-            <li>{store === "App Store" ? "Choose Enter Code Manually" : "Choose Redeem code"}</li>
+            <li>{store === "App Store" ? ct("Choose Redeem Gift Card or Code") : ct("Choose Payments and subscriptions")}</li>
+            <li>{store === "App Store" ? ct("Choose Enter Code Manually") : ct("Choose Redeem code")}</li>
             <li>{ct("Paste the code above")}</li>
           </ol>
         </>

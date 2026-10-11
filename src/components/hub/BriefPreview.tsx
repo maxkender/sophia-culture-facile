@@ -70,7 +70,7 @@ export function StyledPlans({ b, assets }: { b: StudioBrief; assets: BriefAsset[
     {d.flashes?.length ? <section><p className="mb-1 text-sm font-extrabold text-brand-navy">{ct("À afficher à l'écran")}</p>{list(d.flashes)}</section> : null}{cta}</div>;
   return <div className="space-y-3">{body}
     {plans.map((p, i) => <PlanCard key={i} n={i + 1} label={`Plan ${i + 1}`}><OnScreen text={p.on_screen} fmt={p.fmt} /><Say t={p.say} /><Do t={p.do} />{p.camera ? <p>🎥 <b>{ct("Caméra :")}</b> {p.camera}</p> : null}{list(p.assets)}</PlanCard>)}
-    {b.style === "talked_hook_demo" && d.demo ? <PlanCard n={plans.length + 1} label={d.demo.mode === "asset" ? "Démo (enregistrement d'écran fourni)" : "Démo (filmée par toi)"}>
+    {b.style === "talked_hook_demo" && d.demo ? <PlanCard n={plans.length + 1} label={d.demo.mode === "asset" ? ct("Démo (enregistrement d'écran fourni)") : ct("Démo (filmée par toi)")}>
       {d.demo.mode === "asset" && d.demo.asset ? list([d.demo.asset]) : <Do t={d.demo.do} />}<Say t={d.demo.say} /></PlanCard> : null}{cta}</div>;
 }
 
@@ -108,7 +108,7 @@ export function FilesSection({ assets, title = "Fichiers" }: { assets: BriefAsse
     <section aria-label={title}>
       <div className="mb-2 flex items-center justify-between gap-2">
         <h3 className="text-sm font-extrabold uppercase tracking-wide text-brand-navySoft">{title}</h3>
-        {assets.length > 1 ? <Button size="sm" variant="outline" disabled={busy} onClick={() => void zipAll()}><Download className="size-3.5" />{busy ? "Préparation…" : "Tout télécharger"}</Button> : null}
+        {assets.length > 1 ? <Button size="sm" variant="outline" disabled={busy} onClick={() => void zipAll()}><Download className="size-3.5" />{busy ? "Préparation…" : ct("Tout télécharger")}</Button> : null}
       </div>
       <ul className="space-y-2">{assets.map((a) => {
         const Icon = KIND_ICON[a.kind] ?? FileText;
@@ -143,7 +143,7 @@ export function BriefView({ b, assets, refs, pay }: { b: StudioBrief; assets: Br
           {pay ? <span className="rounded-full bg-portal-green px-2.5 py-1 text-card">{pay}</span> : null}
           {b.duration_target ? <span className="rounded-full bg-card/15 px-2.5 py-1">{b.duration_target}</span> : null}
         </div>
-        <p className="text-2xl font-extrabold leading-tight">{b.hook_text || b.title || "Ton hook ici"}</p>
+        <p className="text-2xl font-extrabold leading-tight">{b.hook_text || b.title || ct("Ton hook ici")}</p>
         {b.oral_hook && !styled ? <p className="mt-3 text-sm opacity-90">🎙️ « {b.oral_hook} »</p> : null}
         {b.hook_visual && !styled ? <p className="mt-1 text-sm opacity-80">👀 {b.hook_visual}</p> : null}
       </div>

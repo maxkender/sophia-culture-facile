@@ -57,7 +57,7 @@ export function SignIn({ invite, invitedEmail, standalone = false }: { invite: s
       {state === "used" && <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy">{ct("You have already set up your account. Sign in below with your email and password.")}</p>}
       {state === "expired" && <p className="rounded-xl bg-portal-amber/10 p-3 text-sm text-brand-navy">{ct("This invite is more than 30 days old. Ask the Sophia team for a new one, or sign in if you already created your account.")}</p>}
       {state === "invalid" && <p className="rounded-xl bg-portal-amber/10 p-3 text-sm text-brand-navy">{ct("This invite link is not valid. If you already have an account, sign in below.")}</p>}
-      <p className="text-sm text-brand-navySoft">{mode === "up" ? "Create your account with the email your invite was sent to." : "Sign in to your creator space."}</p>
+      <p className="text-sm text-brand-navySoft">{mode === "up" ? ct("Create your account with the email your invite was sent to.") : ct("Sign in to your creator space.")}</p>
       <Input type="email" placeholder={ct("Email")} value={email} readOnly={Boolean(invite && invitedEmail)} onChange={(e) => setEmail(e.target.value)} />
       <Input type="password" placeholder={ct("Password")} value={password} onChange={(e) => setPassword(e.target.value)} />
       {mode === "up" && (
@@ -73,7 +73,7 @@ export function SignIn({ invite, invitedEmail, standalone = false }: { invite: s
           if (error) toast.error(error.message); else toast.success(ct("Check your inbox for a reset link."));
         }}>{ct("Forgot password?")}</button>
       )}
-      <Button className="w-full" disabled={busy} onClick={go}>{mode === "up" ? "Create account" : "Sign in"}</Button>
+      <Button className="w-full" disabled={busy} onClick={go}>{mode === "up" ? ct("Create account") : ct("Sign in")}</Button>
       {mode === "in" && (linkSent
         ? <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy">Lien envoyé : regarde ta boîte mail (et les spams). / Link sent: check your inbox.</p>
         : <Button variant="outline" className="w-full" disabled={busy} onClick={async () => {
@@ -84,7 +84,7 @@ export function SignIn({ invite, invitedEmail, standalone = false }: { invite: s
             setBusy(false);
           }}>{ct("Recevoir un lien de connexion par email")}</Button>)}
       <button className="text-xs text-brand-navySoft underline" onClick={() => setMode(mode === "up" ? "in" : "up")}>
-        {mode === "up" ? "I already have an account" : "I have an invite, create my account"}
+        {mode === "up" ? ct("I already have an account") : ct("I have an invite, create my account")}
       </button>
     </div>
   );

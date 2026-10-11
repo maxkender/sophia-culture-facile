@@ -61,7 +61,7 @@ export function CreatorStatsStrip() {
         <MyTerms tiers={data?.tiers ?? []} />
         {tier !== "pro" ? <>
           <div className="mt-3 h-2 rounded-full bg-brand-line"><div className="h-2 rounded-full bg-portal-accent" style={{ width: `${Math.min(100, (last30 / ACTIVE_POSTS) * 100)}%` }} /></div>
-          <p className="mt-1 text-xs text-brand-navySoft">{tier === "trial" ? `${Math.min(last30, ACTIVE_POSTS)}/${ACTIVE_POSTS} approved posts in 30 days to reach Active` : "Stay in the top 10% of views this month to reach Pro"}</p>
+          <p className="mt-1 text-xs text-brand-navySoft">{tier === "trial" ? `${Math.min(last30, ACTIVE_POSTS)}/${ACTIVE_POSTS} approved posts in 30 days to reach Active` : ct("Stay in the top 10% of views this month to reach Pro")}</p>
         </> : <p className="mt-2 text-xs text-brand-navySoft">{ct("You're in the top tier. Keep it up!")}</p>}
         {data?.awards.length ? <div className="mt-3 flex flex-wrap gap-2">{data.awards.map((a) => <span key={a.kind + a.period} className="inline-flex items-center gap-1 rounded-full bg-portal-amber/15 px-2.5 py-1 text-xs font-bold text-brand-navy"><Award className="size-3" />{AWARD_LABEL[a.kind] ?? a.kind}</span>)}</div> : null}
         {streak >= 3 ? <p className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-portal-amber"><Flame className="size-3.5" />{streak}-day streak</p> : null}
@@ -99,9 +99,9 @@ export function JobsPage() {
                       <Button className="w-full" onClick={async () => {
                         const r = await apply({ data: { jobId: j.id, answers } });
                         if (!r.ok) { toast.error(r.reason); return; }
-                        toast.success(r.accepted ? "You're in — this job is now active for you." : r.needsSignature ? "Applied. Sign the Creator Account Agreement to start." : "Applied — the team will reply soon.");
+                        toast.success(r.accepted ? ct("You're in — this job is now active for you.") : r.needsSignature ? ct("Applied. Sign the Creator Account Agreement to start.") : ct("Applied — the team will reply soon."));
                         setOpenId(null); void refetch();
-                      }}>{j.open ? "Join now" : "Send application"}</Button>
+                      }}>{j.open ? ct("Join now") : ct("Send application")}</Button>
                     </PortalCard>
                   ) : <Button className="w-full" onClick={() => { setOpenId(j.id); setAnswers({}); }}>{ct("Apply")}</Button>}
               </div>
@@ -122,7 +122,7 @@ function TaskCard({ t, onDone }: { t: { id: string; type: string; title: string;
   async function send(filePath?: string) {
     setBusy(true);
     try { await submit({ data: { id: t.id, response: code || undefined, validUntil: until || undefined, filePath } }); toast.success(ct("Thanks — sent to the team")); onDone(); }
-    catch (e) { toast.error((e as Error).message || "Could not send. Please try again."); }
+    catch (e) { toast.error((e as Error).message || ct("Could not send. Please try again.")); }
     finally { setBusy(false); }
   }
   async function upload(f: File) {
@@ -147,7 +147,7 @@ function TaskCard({ t, onDone }: { t: { id: string; type: string; title: string;
           <Button disabled={busy || !code.trim()} onClick={() => void send()}>{ct("Send")}</Button>
         </div>
       ) : (
-        <label className="inline-flex min-h-11 cursor-pointer items-center rounded-xl bg-brand-navy px-4 text-sm font-bold text-card">{busy ? "Uploading…" : "Upload the video"}<input type="file" accept="video/mp4,video/quicktime" className="sr-only" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) void upload(f); }} /></label>
+        <label className="inline-flex min-h-11 cursor-pointer items-center rounded-xl bg-brand-navy px-4 text-sm font-bold text-card">{busy ? "Uploading…" : ct("Upload the video")}<input type="file" accept="video/mp4,video/quicktime" className="sr-only" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) void upload(f); }} /></label>
       )) : <p className="text-xs text-brand-navySoft">{ct("Done.")}</p>}
     </PortalCard>
   );
@@ -260,7 +260,7 @@ export function MyTerms({ tiers }: { tiers: TierRow[] }) {
   const target = num("posts_per_month") ?? 20;
   return (
     <div className="mt-3" data-testid="my-terms">
-      {own ? <p className="text-xs font-bold uppercase tracking-wide text-portal-accent">{fr ? "Tes conditions" : "Your terms"}</p> : null}
+      {own ? <p className="text-xs font-bold uppercase tracking-wide text-portal-accent">{fr ? ct("Tes conditions") : ct("Your terms")}</p> : null}
       {num("fixed_monthly_override") ? <><p className="mt-1 text-sm text-brand-navy">
         <b>{eur(num("fixed_monthly_override")!)}</b> {fr ? `pour ${target} vidéos par mois` : `for ${target} videos a month`} · <b>{eur(rpm ?? 0)}</b> {fr ? "/ 1 000 vues" : "per 1,000 views"}
         {cap ? <> · {fr ? "jusqu'à" : "up to"} <b>{eur(cap)}</b> {fr ? "par post" : "per post"}</> : null}

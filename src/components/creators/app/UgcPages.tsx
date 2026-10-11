@@ -18,7 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { t as ct } from "@/i18n/creator-app";
 
 const n = (v: number) => new Intl.NumberFormat("en-GB").format(Math.round(v));
-const day = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }) : "Any day");
+const day = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }) : ct("Any day"));
 
 /* ---------- Assigned briefs with decline → replacement ---------- */
 export function AssignedBriefs() {
@@ -105,8 +105,8 @@ export function BriefLibraryPage() {
                     <PortalCard className="h-full p-4 transition hover:ring-2 hover:ring-portal-accent/30">
                       <p className="text-lg font-extrabold text-brand-navy">{b.title}</p>
                       {b.hook && <p className="mt-1 text-sm text-brand-navySoft">{b.hook}</p>}
-                      <p className="mt-2 text-xs text-brand-navySoft">{[b.format, b.platform === "both" ? "TikTok + Instagram" : b.platform, ["", "Easy", "Medium", "Hard"][b.difficulty ?? 1], ...(b.tags ?? [])].filter(Boolean).join(" · ")}</p>
-                      <p className="mt-3 text-sm font-bold text-brand-navy">{s?.posts ? `${n(s.avg)} avg views at 7 days · ${s.posts} post${s.posts > 1 ? "s" : ""}` : "Not posted yet"}</p>
+                      <p className="mt-2 text-xs text-brand-navySoft">{[b.format, b.platform === "both" ? ct("TikTok + Instagram") : b.platform, ["", "Easy", "Medium", "Hard"][b.difficulty ?? 1], ...(b.tags ?? [])].filter(Boolean).join(" · ")}</p>
+                      <p className="mt-3 text-sm font-bold text-brand-navy">{s?.posts ? `${n(s.avg)} avg views at 7 days · ${s.posts} post${s.posts > 1 ? "s" : ""}` : ct("Not posted yet")}</p>
                       {f.peers && s?.peerPosts ? <p className="text-xs text-brand-navySoft">{n(s.peerAvg)} avg for creators at your level</p> : null}
                     </PortalCard>
                   </Link>
@@ -151,7 +151,7 @@ export function UgcEarningsPage() {
         <PortalCard key={it.id} className="mb-3 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-extrabold text-brand-navy">{it.period ?? it.payout_batches?.period} · {fmtMoney(Number(it.amount ?? it.amount_usd), it.currency ?? "USD")} · {it.status}{it.hold_reason ? ` (${it.hold_reason})` : ""}</p>
-            {it.breakdown && <Button size="sm" variant="outline" onClick={() => setOpen(open === it.id ? null : it.id)}>{open === it.id ? "Hide" : "See breakdown"}</Button>}
+            {it.breakdown && <Button size="sm" variant="outline" onClick={() => setOpen(open === it.id ? null : it.id)}>{open === it.id ? "Hide" : ct("See breakdown")}</Button>}
           </div>
           {open === it.id && it.breakdown && <Breakdown b={it.breakdown} />}
         </PortalCard>
@@ -170,7 +170,7 @@ export function Breakdown({ b }: { b: any }) {
       </p>
       {b.effortLines?.length ? (
         <ul className="mt-1 text-sm text-brand-navySoft" data-testid="effort-lines">
-          {b.effortLines.map((l: { effort: string; posts: number; rate: number; amount: number }) => <li key={l.effort}>{l.effort === "pov" ? "POV" : l.effort === "reaction" ? "Reaction" : "Face cam"}: {l.posts} × {fmtMoney(l.rate, b.currency)} = <b className="text-brand-navy">{fmtMoney(l.amount, b.currency)}</b></li>)}
+          {b.effortLines.map((l: { effort: string; posts: number; rate: number; amount: number }) => <li key={l.effort}>{l.effort === "pov" ? "POV" : l.effort === "reaction" ? "Reaction" : ct("Face cam")}: {l.posts} × {fmtMoney(l.rate, b.currency)} = <b className="text-brand-navy">{fmtMoney(l.amount, b.currency)}</b></li>)}
           {b.talkingHead && b.talkingHead.min > 0 ? <li>Face cam minimum: {b.talkingHead.done}/{b.talkingHead.min}{b.talkingHead.done < b.talkingHead.min ? " — per-post part prorated" : ""}</li> : null}
         </ul>
       ) : null}
@@ -186,7 +186,7 @@ export function Breakdown({ b }: { b: any }) {
                   <td className="pr-3">{p.platform}</td>
                   <td className="pr-3 text-right">{n(p.views_7d)}</td>
                   <td className="pr-3 text-right font-semibold">{fmtMoney(p.bonus, b.currency)}</td>
-                  <td>{p.capped ? "Cap applied" : "—"}</td>
+                  <td>{p.capped ? ct("Cap applied") : "—"}</td>
                 </tr>
               ))}
             </tbody>
