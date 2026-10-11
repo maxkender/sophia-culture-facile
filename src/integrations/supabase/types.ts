@@ -652,6 +652,77 @@ export type Database = {
         }
         Relationships: []
       }
+      assets: {
+        Row: {
+          app_id: string
+          created_at: string
+          created_by: string | null
+          duration_s: number | null
+          folder: string
+          id: string
+          kind: string
+          mime: string | null
+          role_default: string
+          shot_note: string | null
+          size_bytes: number | null
+          status: string
+          storage_path: string | null
+          tags: string[]
+          text_content: string | null
+          thumbnail_url: string | null
+          title: string
+          url: string | null
+        }
+        Insert: {
+          app_id: string
+          created_at?: string
+          created_by?: string | null
+          duration_s?: number | null
+          folder?: string
+          id?: string
+          kind: string
+          mime?: string | null
+          role_default?: string
+          shot_note?: string | null
+          size_bytes?: number | null
+          status?: string
+          storage_path?: string | null
+          tags?: string[]
+          text_content?: string | null
+          thumbnail_url?: string | null
+          title: string
+          url?: string | null
+        }
+        Update: {
+          app_id?: string
+          created_at?: string
+          created_by?: string | null
+          duration_s?: number | null
+          folder?: string
+          id?: string
+          kind?: string
+          mime?: string | null
+          role_default?: string
+          shot_note?: string | null
+          size_bytes?: number | null
+          status?: string
+          storage_path?: string | null
+          tags?: string[]
+          text_content?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assets_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       awards: {
         Row: {
           awarded_at: string
@@ -680,6 +751,42 @@ export type Database = {
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brief_assets: {
+        Row: {
+          asset_id: string
+          brief_id: string
+          role: string
+          sort_order: number
+        }
+        Insert: {
+          asset_id: string
+          brief_id: string
+          role?: string
+          sort_order?: number
+        }
+        Update: {
+          asset_id?: string
+          brief_id?: string
+          role?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brief_assets_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brief_assets_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "briefs"
             referencedColumns: ["id"]
           },
         ]
@@ -803,9 +910,11 @@ export type Database = {
           app: string
           app_id: string
           audience: string
+          audience_efforts: string[]
           beats: Json
           body: string
           brief_type: string
+          campaign_id: string | null
           created_at: string
           created_by: string | null
           difficulty: number
@@ -816,21 +925,32 @@ export type Database = {
           format: string | null
           hook: string | null
           hook_text: string | null
+          hook_visual: string | null
           hooks: string[]
           id: string
+          language: string
           must_mention: string | null
           oral_hook: string | null
           parent_format_id: string | null
           pinned: boolean
           platform: string
+          product_gesture: string | null
           product_moment: string | null
+          product_second: number | null
           reference_video_ids: string[]
+          rules_do: string[]
+          rules_dont: string[]
+          rules_text: string | null
+          say_name: boolean
+          score: number | null
           script: string | null
           sort_order: number | null
           source_course_id: string | null
+          source_reference_id: string | null
           status: string
           tags: string[]
           title: string
+          translation_of: string | null
           variations: string | null
         }
         Insert: {
@@ -838,9 +958,11 @@ export type Database = {
           app?: string
           app_id?: string
           audience?: string
+          audience_efforts?: string[]
           beats?: Json
           body?: string
           brief_type?: string
+          campaign_id?: string | null
           created_at?: string
           created_by?: string | null
           difficulty?: number
@@ -851,21 +973,32 @@ export type Database = {
           format?: string | null
           hook?: string | null
           hook_text?: string | null
+          hook_visual?: string | null
           hooks?: string[]
           id?: string
+          language?: string
           must_mention?: string | null
           oral_hook?: string | null
           parent_format_id?: string | null
           pinned?: boolean
           platform?: string
+          product_gesture?: string | null
           product_moment?: string | null
+          product_second?: number | null
           reference_video_ids?: string[]
+          rules_do?: string[]
+          rules_dont?: string[]
+          rules_text?: string | null
+          say_name?: boolean
+          score?: number | null
           script?: string | null
           sort_order?: number | null
           source_course_id?: string | null
+          source_reference_id?: string | null
           status?: string
           tags?: string[]
           title: string
+          translation_of?: string | null
           variations?: string | null
         }
         Update: {
@@ -873,9 +1006,11 @@ export type Database = {
           app?: string
           app_id?: string
           audience?: string
+          audience_efforts?: string[]
           beats?: Json
           body?: string
           brief_type?: string
+          campaign_id?: string | null
           created_at?: string
           created_by?: string | null
           difficulty?: number
@@ -886,21 +1021,32 @@ export type Database = {
           format?: string | null
           hook?: string | null
           hook_text?: string | null
+          hook_visual?: string | null
           hooks?: string[]
           id?: string
+          language?: string
           must_mention?: string | null
           oral_hook?: string | null
           parent_format_id?: string | null
           pinned?: boolean
           platform?: string
+          product_gesture?: string | null
           product_moment?: string | null
+          product_second?: number | null
           reference_video_ids?: string[]
+          rules_do?: string[]
+          rules_dont?: string[]
+          rules_text?: string | null
+          say_name?: boolean
+          score?: number | null
           script?: string | null
           sort_order?: number | null
           source_course_id?: string | null
+          source_reference_id?: string | null
           status?: string
           tags?: string[]
           title?: string
+          translation_of?: string | null
           variations?: string | null
         }
         Relationships: [
@@ -909,6 +1055,13 @@ export type Database = {
             columns: ["app_id"]
             isOneToOne: false
             referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "briefs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
             referencedColumns: ["id"]
           },
           {
@@ -923,6 +1076,56 @@ export type Database = {
             columns: ["parent_format_id"]
             isOneToOne: false
             referencedRelation: "briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "briefs_source_reference_id_fkey"
+            columns: ["source_reference_id"]
+            isOneToOne: false
+            referencedRelation: "reference_videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "briefs_translation_of_fkey"
+            columns: ["translation_of"]
+            isOneToOne: false
+            referencedRelation: "briefs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_assets: {
+        Row: {
+          asset_id: string
+          campaign_id: string
+          role: string
+          sort_order: number
+        }
+        Insert: {
+          asset_id: string
+          campaign_id: string
+          role?: string
+          sort_order?: number
+        }
+        Update: {
+          asset_id?: string
+          campaign_id?: string
+          role?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_assets_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_assets_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
             referencedColumns: ["id"]
           },
         ]
@@ -1595,6 +1798,39 @@ export type Database = {
           },
           {
             foreignKeyName: "creator_apps_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_assets: {
+        Row: {
+          asset_id: string
+          creator_id: string
+          role: string
+        }
+        Insert: {
+          asset_id: string
+          creator_id: string
+          role?: string
+        }
+        Update: {
+          asset_id?: string
+          creator_id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_assets_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_assets_creator_id_fkey"
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "creators"
@@ -4872,6 +5108,7 @@ export type Database = {
       reference_videos: {
         Row: {
           active: boolean
+          analysis: Json | null
           app_id: string
           category: string
           created_at: string
@@ -4881,6 +5118,7 @@ export type Database = {
           note: string | null
           pinned: boolean
           platform: string
+          score: number | null
           tags: string[]
           thumbnail_url: string | null
           title: string | null
@@ -4889,6 +5127,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          analysis?: Json | null
           app_id?: string
           category?: string
           created_at?: string
@@ -4898,6 +5137,7 @@ export type Database = {
           note?: string | null
           pinned?: boolean
           platform?: string
+          score?: number | null
           tags?: string[]
           thumbnail_url?: string | null
           title?: string | null
@@ -4906,6 +5146,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          analysis?: Json | null
           app_id?: string
           category?: string
           created_at?: string
@@ -4915,6 +5156,7 @@ export type Database = {
           note?: string | null
           pinned?: boolean
           platform?: string
+          score?: number | null
           tags?: string[]
           thumbnail_url?: string | null
           title?: string | null

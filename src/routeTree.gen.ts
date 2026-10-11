@@ -175,6 +175,7 @@ import { Route as AuthenticatedAuteursAdminDocumentsIndexRouteImport } from './r
 import { Route as AuthenticatedAuteursAdminDocumentsSlugRouteImport } from './routes/_authenticated/auteurs/admin/documents.$slug'
 import { Route as AuthenticatedAuteursAdminReviewIndexRouteImport } from './routes/_authenticated/auteurs/admin/review.index'
 import { Route as AuthenticatedAuteursAdminReviewCourseIdRouteImport } from './routes/_authenticated/auteurs/admin/review.$courseId'
+import { Route as AuthenticatedHubLearnBriefsBriefIdRouteImport } from './routes/_authenticated/hub/learn_.briefs.$briefId'
 import { Route as ApiPublicAppCoursesSlugRouteImport } from './routes/api/public/app/courses.$slug'
 import { Route as ApiPublicCronUgcJobRouteImport } from './routes/api/public/cron/ugc.$job'
 import { Route as CreatorsInfluencerAppDealsIndexRouteImport } from './routes/creators.influencer.app.deals.index'
@@ -1089,6 +1090,12 @@ const AuthenticatedAuteursAdminReviewCourseIdRoute =
     path: '/auteurs/admin/review/$courseId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedHubLearnBriefsBriefIdRoute =
+  AuthenticatedHubLearnBriefsBriefIdRouteImport.update({
+    id: '/learn_/briefs/$briefId',
+    path: '/learn/briefs/$briefId',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
 const ApiPublicAppCoursesSlugRoute = ApiPublicAppCoursesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -1309,6 +1316,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/creators/ugc-briefs': typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRoute
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
+  '/hub/learn/briefs/$briefId': typeof AuthenticatedHubLearnBriefsBriefIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/api/public/cron/ugc/$job': typeof ApiPublicCronUgcJobRoute
   '/creators/influencer/app/deals/$dealId': typeof CreatorsInfluencerAppDealsDealIdRoute
@@ -1483,6 +1491,7 @@ export interface FileRoutesByTo {
   '/auteurs/admin/creators/ugc-briefs': typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRoute
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
+  '/hub/learn/briefs/$briefId': typeof AuthenticatedHubLearnBriefsBriefIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/api/public/cron/ugc/$job': typeof ApiPublicCronUgcJobRoute
   '/creators/influencer/app/deals/$dealId': typeof CreatorsInfluencerAppDealsDealIdRoute
@@ -1662,6 +1671,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/creators/ugc-briefs': typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRoute
   '/_authenticated/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/_authenticated/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
+  '/_authenticated/hub/learn_/briefs/$briefId': typeof AuthenticatedHubLearnBriefsBriefIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/api/public/cron/ugc/$job': typeof ApiPublicCronUgcJobRoute
   '/creators/influencer/app/deals/$dealId': typeof CreatorsInfluencerAppDealsDealIdRoute
@@ -1841,6 +1851,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/creators/ugc-briefs'
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
+    | '/hub/learn/briefs/$briefId'
     | '/api/public/app/courses/$slug'
     | '/api/public/cron/ugc/$job'
     | '/creators/influencer/app/deals/$dealId'
@@ -2015,6 +2026,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/creators/ugc-briefs'
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
+    | '/hub/learn/briefs/$briefId'
     | '/api/public/app/courses/$slug'
     | '/api/public/cron/ugc/$job'
     | '/creators/influencer/app/deals/$dealId'
@@ -2193,6 +2205,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/creators/ugc-briefs'
     | '/_authenticated/auteurs/admin/documents/$slug'
     | '/_authenticated/auteurs/admin/review/$courseId'
+    | '/_authenticated/hub/learn_/briefs/$briefId'
     | '/api/public/app/courses/$slug'
     | '/api/public/cron/ugc/$job'
     | '/creators/influencer/app/deals/$dealId'
@@ -3461,6 +3474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursAdminReviewCourseIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/hub/learn_/briefs/$briefId': {
+      id: '/_authenticated/hub/learn_/briefs/$briefId'
+      path: '/learn/briefs/$briefId'
+      fullPath: '/hub/learn/briefs/$briefId'
+      preLoaderRoute: typeof AuthenticatedHubLearnBriefsBriefIdRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
     '/api/public/app/courses/$slug': {
       id: '/api/public/app/courses/$slug'
       path: '/$slug'
@@ -3547,6 +3567,7 @@ interface AuthenticatedHubRouteRouteChildren {
   AuthenticatedHubCreatorsCreatorIdRoute: typeof AuthenticatedHubCreatorsCreatorIdRoute
   AuthenticatedHubToolsSplatRoute: typeof AuthenticatedHubToolsSplatRoute
   AuthenticatedHubCampaignsIndexRoute: typeof AuthenticatedHubCampaignsIndexRoute
+  AuthenticatedHubLearnBriefsBriefIdRoute: typeof AuthenticatedHubLearnBriefsBriefIdRoute
 }
 
 const AuthenticatedHubRouteRouteChildren: AuthenticatedHubRouteRouteChildren = {
@@ -3563,6 +3584,8 @@ const AuthenticatedHubRouteRouteChildren: AuthenticatedHubRouteRouteChildren = {
     AuthenticatedHubCreatorsCreatorIdRoute,
   AuthenticatedHubToolsSplatRoute: AuthenticatedHubToolsSplatRoute,
   AuthenticatedHubCampaignsIndexRoute: AuthenticatedHubCampaignsIndexRoute,
+  AuthenticatedHubLearnBriefsBriefIdRoute:
+    AuthenticatedHubLearnBriefsBriefIdRoute,
 }
 
 const AuthenticatedHubRouteRouteWithChildren =

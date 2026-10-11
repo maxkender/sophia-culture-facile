@@ -11,6 +11,26 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { myRunningMonth } from "@/lib/ugc-creator.functions";
 import { CreatorStatsStrip } from "./HubPages";
+import { supabase } from "@/integrations/supabase/client";
+import { FilesSection, type BriefAsset } from "@/components/hub/BriefPreview";
+
+/** "Kit de démarrage": the app's screen recordings, logos and bio/CTA texts, plus the creator's personal files. */
+function StarterKit() {
+  const { me } = useCreator();
+  const { data = [] } = useQuery({
+    queryKey: ["creator-starter-kit", me.id],
+    queryFn: async () => {
+      const [a, mine] = await Promise.all([
+        supabase.from("assets").select("id, kind, title, storage_path, url, text_content, thumbnail_url, role_default, folder").in("folder", ["screen_recordings", "logos", "captions"]).eq("status", "ready").order("folder"),
+        supabase.from("creator_assets").select("role, assets(id, kind, title, storage_path, url, text_content, thumbnail_url)").eq("creator_id", me.id),
+      ]);
+      const own = (mine.data ?? []).filter((x) => x.assets).map((x) => ({ ...(x.assets as unknown as BriefAsset), role: x.role }));
+      return [...own, ...(a.data ?? []).map((x) => ({ ...(x as unknown as BriefAsset), role: x.role_default }))];
+    },
+  });
+  if (!data.length) return null;
+  return <PortalCard><h2 className="mb-3 text-lg font-extrabold text-brand-navy">Kit de démarrage</h2><FilesSection assets={data} title="Écrans de l'app, logos et textes" /></PortalCard>;
+}
 
 function Step({ n, title, done, current, children }: { n: number; title: string; done: boolean; current: boolean; children: ReactNode }) {
   return (
@@ -86,6 +106,8 @@ export function CreatorHomePage() {
           {!steps.slack && <Button asChild className="mt-4" variant="outline"><Link to="/creators/app/account">Join Slack</Link></Button>}
         </Step>
       </div>
+
+      <div className="mt-10"><StarterKit /></div>
 
       {steps.unlocked && (
         <div className="mt-10 grid gap-4 md:grid-cols-2">

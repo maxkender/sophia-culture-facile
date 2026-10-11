@@ -265,7 +265,7 @@ function VideoReviews() {
   const { data = [] } = useQuery({
     queryKey: ["hub", "reviews", appId],
     queryFn: async () => {
-      let x = supabase.from("creator_posts").select("*, creators(full_name), briefs(title, effort)").eq("status", "pending").order("created_at", { ascending: false });
+      let x = supabase.from("creator_posts").select("*, creators(full_name), briefs(id, title, effort, product_second, product_gesture, product_moment, say_name, rules_do, rules_dont, rules_text)").eq("status", "pending").order("created_at", { ascending: false });
       if (appId) x = x.eq("app_id", appId);
       return (await x).data ?? [];
     },
@@ -315,6 +315,14 @@ function VideoReviews() {
               <div><dt className="text-brand-navySoft">Posted</dt><dd className="font-semibold">{post.posted_on ?? "—"}</dd></div>
               <div><dt className="text-brand-navySoft">Views so far</dt><dd className="font-semibold">{compact(Number(post.views ?? 0))}</dd></div>
             </dl>
+            {(() => { const bb = post.briefs as { id?: string; product_second?: number | null; product_gesture?: string | null; product_moment?: string | null; say_name?: boolean; rules_do?: string[]; rules_dont?: string[]; rules_text?: string | null } | null; if (!bb?.id) return null; return (
+              <div className="mt-3 space-y-2 rounded-xl border border-portal-accent/30 p-3 text-sm" data-testid="review-brief-checks">
+                <p className="font-bold text-brand-navy">Check against the brief</p>
+                {bb.product_gesture || bb.product_moment ? <p>📱 Product moment{bb.product_second ? ` at ${bb.product_second} s` : ""}: {[bb.product_gesture, bb.product_moment].filter(Boolean).join(" — ")}{bb.say_name ? " · name said once" : ""}</p> : null}
+                {bb.rules_do?.length ? <p>✅ {bb.rules_do.join(" · ")}</p> : null}
+                {bb.rules_dont?.length ? <p>⛔ {bb.rules_dont.join(" · ")}</p> : null}
+                {bb.rules_text ? <p className="text-brand-navySoft">{bb.rules_text}</p> : null}
+              </div>); })()}
             {(post.fraud_flags ?? []).length || post.hold_reason ? <p className="mt-3 rounded-xl bg-portal-amber/15 p-3 text-sm text-brand-navy">On hold: {[...(post.fraud_flags ?? []), post.hold_reason].filter(Boolean).join(" · ")}</p> : null}
             {post.skip_reason ? <p className="mt-3 rounded-xl bg-portal-red/10 p-3 text-sm text-portal-red">Flag: {post.skip_reason}</p> : null}
             <fieldset className="mt-4 space-y-2"><legend className="text-sm font-bold text-brand-navy">Compliance</legend>
