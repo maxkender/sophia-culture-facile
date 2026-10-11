@@ -77,7 +77,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
       if (stash) { sessionStorage.removeItem(STUDIO_DRAFT_KEY); try { setB({ ...base, ...JSON.parse(stash) }); return; } catch { /* ignore */ } }
       setB(base); return;
     }
-    if (loaded?.row) { setB(toStudio(loaded.row)); setAssets(loaded.assets); setRefIds(loaded.row.reference_video_ids ?? []); }
+    if (loaded?.row) { const t = toStudio(loaded.row); setB(t.style ? { ...t, style_data: styleDefaults(t.style, t.style_data) } : t); setAssets(loaded.assets); setRefIds(loaded.row.reference_video_ids ?? []); }
   }, [loaded, isNew, appId, b]);
 
   const app = b?.app_id ?? SOPHIA_APP_ID;

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { assetLinks } from "@/lib/brief-studio.functions";
-import { ROLE_LABEL, STYLE_LABEL, STYLE_NUM, TEXT_FORMATS, type AssetRef, type StudioBrief, type StyleData, type TextFormat } from "@/lib/brief-studio";
+import { ROLE_LABEL, STYLE_LABEL, hasStyledContent, STYLE_NUM, TEXT_FORMATS, type AssetRef, type StudioBrief, type StyleData, type TextFormat } from "@/lib/brief-studio";
 import { PostThumb } from "./PostThumb";
 
 export type BriefAsset = { id: string; kind: string; title: string; storage_path: string | null; url: string | null; text_content: string | null; thumbnail_url: string | null; role: string };
@@ -131,7 +131,8 @@ export function FilesSection({ assets, title = "Fichiers" }: { assets: BriefAsse
 
 /** Exactly what the creator sees on /creators/app/briefs/<id>; the Studio renders it inside a phone frame. */
 export function BriefView({ b, assets, refs, pay }: { b: StudioBrief; assets: BriefAsset[]; refs: BriefRef[]; pay?: string | null }) {
-  const beats = b.style ? [] : (b.beats ?? []).filter((x) => x?.trim());
+  const styled = Boolean(b.style) && hasStyledContent(b.style_data);
+  const beats = styled ? [] : (b.beats ?? []).filter((x) => x?.trim());
   return (
     <div className="space-y-5">
       {b.style ? <span className="inline-flex rounded-full bg-portal-accent/15 px-3 py-1 text-xs font-extrabold text-portal-accent" data-testid="style-badge">Style {STYLE_NUM[b.style]} · {STYLE_LABEL[b.style]}</span> : null}
@@ -142,16 +143,16 @@ export function BriefView({ b, assets, refs, pay }: { b: StudioBrief; assets: Br
           {b.duration_target ? <span className="rounded-full bg-card/15 px-2.5 py-1">{b.duration_target}</span> : null}
         </div>
         <p className="text-2xl font-extrabold leading-tight">{b.hook_text || b.title || "Ton hook ici"}</p>
-        {b.oral_hook && !b.style ? <p className="mt-3 text-sm opacity-90">🎙️ « {b.oral_hook} »</p> : null}
-        {b.hook_visual && !b.style ? <p className="mt-1 text-sm opacity-80">👀 {b.hook_visual}</p> : null}
+        {b.oral_hook && !styled ? <p className="mt-3 text-sm opacity-90">🎙️ « {b.oral_hook} »</p> : null}
+        {b.hook_visual && !styled ? <p className="mt-1 text-sm opacity-80">👀 {b.hook_visual}</p> : null}
       </div>
       {beats.length ? (
         <section><h3 className="mb-2 text-sm font-extrabold uppercase tracking-wide text-brand-navySoft">Le script en 3 temps</h3>
           <ol className="space-y-2">{beats.map((x, i) => <li key={i} className="rounded-xl bg-portal-bg p-3 text-sm text-brand-navy"><span className="mr-2 font-extrabold text-portal-accent">{["0-3 s", "3-20 s", "20-30 s"][i]}</span>{x}</li>)}</ol>
         </section>
       ) : null}
-      {b.style ? <StyledPlans b={b} assets={assets} /> : null}
-      {!b.style && (b.product_gesture || b.product_moment) ? (
+      {styled ? <StyledPlans b={b} assets={assets} /> : null}
+      {!styled && (b.product_gesture || b.product_moment) ? (
         <section className="rounded-xl border-2 border-portal-accent/30 p-3 text-sm text-brand-navy">
           <p className="font-extrabold">📱 Moment produit{b.product_second ? ` · à ${b.product_second} s` : ""}</p>
           <p className="mt-1">{b.product_gesture}{b.product_gesture && b.product_moment ? " — " : ""}{b.product_moment}</p>

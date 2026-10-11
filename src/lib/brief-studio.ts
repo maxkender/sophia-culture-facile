@@ -171,3 +171,10 @@ export function briefBody(b: StudioBrief) {
   }
   return [b.hook_text, b.oral_hook, ...b.beats].filter((x) => (x ?? "").trim()).join("\n\n");
 }
+
+/** True once the style content has any text or file (older styled formats still show their original script until then). */
+export function hasStyledContent(d: StyleData | null | undefined): boolean {
+  if (!d) return false;
+  const t = [d.body, d.cta, d.script, d.sole?.what, d.sole?.text, d.sole?.music_link, d.demo?.do, d.demo?.say, ...(d.plans ?? []).flatMap((p) => [p.on_screen, p.say, p.do, p.reaction, p.camera])];
+  return t.some((x) => (x ?? "").trim()) || styleAssetIds(d).length > 0;
+}
