@@ -12,6 +12,7 @@ import { ACTIVE_POSTS, TIER_LABEL, streakDays, type Tier } from "@/lib/ugc-tiers
 import { fmtMoney } from "@/lib/ugc-pay";
 import { JobPublicCard, type JobDraft } from "@/components/hub/JobModal";
 import { useCreator } from "./useCreator";
+import { t as ct } from "@/i18n/creator-app";
 
 const AWARD_LABEL: Record<string, string> = { first_step: "First Step", ten_posts: "10 posts", streak_7: "7-day streak", streak_30: "30-day streak", views_10k: "10K views post", views_100k: "100K views post", top10_month: "Top 10 of the month", challenge_winner: "Challenge winner" };
 const compact = (n: number) => new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(n);
@@ -55,13 +56,13 @@ export function CreatorStatsStrip() {
       <PortalCard className="p-4">
         <div className="flex items-center justify-between gap-2">
           <span className="rounded-full bg-portal-accent/10 px-3 py-1 text-xs font-bold text-portal-accent">{TIER_LABEL[tier]} tier</span>
-          {nextPayout ? <span className="text-xs text-brand-navySoft">Next payout: <b>{fmtMoney(Number(nextPayout.amount ?? 0))}</b> ({nextPayout.period})</span> : null}
+          {nextPayout ? <span className="text-xs text-brand-navySoft">{ct("Next payout:")} <b>{fmtMoney(Number(nextPayout.amount ?? 0))}</b> ({nextPayout.period})</span> : null}
         </div>
         <MyTerms tiers={data?.tiers ?? []} />
         {tier !== "pro" ? <>
           <div className="mt-3 h-2 rounded-full bg-brand-line"><div className="h-2 rounded-full bg-portal-accent" style={{ width: `${Math.min(100, (last30 / ACTIVE_POSTS) * 100)}%` }} /></div>
           <p className="mt-1 text-xs text-brand-navySoft">{tier === "trial" ? `${Math.min(last30, ACTIVE_POSTS)}/${ACTIVE_POSTS} approved posts in 30 days to reach Active` : "Stay in the top 10% of views this month to reach Pro"}</p>
-        </> : <p className="mt-2 text-xs text-brand-navySoft">You're in the top tier. Keep it up!</p>}
+        </> : <p className="mt-2 text-xs text-brand-navySoft">{ct("You're in the top tier. Keep it up!")}</p>}
         {data?.awards.length ? <div className="mt-3 flex flex-wrap gap-2">{data.awards.map((a) => <span key={a.kind + a.period} className="inline-flex items-center gap-1 rounded-full bg-portal-amber/15 px-2.5 py-1 text-xs font-bold text-brand-navy"><Award className="size-3" />{AWARD_LABEL[a.kind] ?? a.kind}</span>)}</div> : null}
         {streak >= 3 ? <p className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-portal-amber"><Flame className="size-3.5" />{streak}-day streak</p> : null}
       </PortalCard>
@@ -82,8 +83,8 @@ export function JobsPage() {
   const jobs = (data?.jobs ?? []).filter((j) => enrolledApps.length === 0 || enrolledApps.includes(j.app_id));
   return (
     <div>
-      <PageTitle title="Jobs" lead="Open jobs for your app. Open jobs start right away when you apply." />
-      {jobs.length === 0 ? <PortalCard><p className="text-sm text-brand-navySoft">No open jobs right now.</p></PortalCard> : (
+      <PageTitle title={ct("Jobs")} lead={ct("Open jobs for your app. Open jobs start right away when you apply.")} />
+      {jobs.length === 0 ? <PortalCard><p className="text-sm text-brand-navySoft">{ct("No open jobs right now.")}</p></PortalCard> : (
         <div className="grid gap-4 md:grid-cols-2">
           {jobs.map((j) => {
             const mine = data?.applications.find((a) => a.job_id === j.id);
@@ -102,7 +103,7 @@ export function JobsPage() {
                         setOpenId(null); void refetch();
                       }}>{j.open ? "Join now" : "Send application"}</Button>
                     </PortalCard>
-                  ) : <Button className="w-full" onClick={() => { setOpenId(j.id); setAnswers({}); }}>Apply</Button>}
+                  ) : <Button className="w-full" onClick={() => { setOpenId(j.id); setAnswers({}); }}>{ct("Apply")}</Button>}
               </div>
             );
           })}
@@ -120,13 +121,13 @@ function TaskCard({ t, onDone }: { t: { id: string; type: string; title: string;
   const [busy, setBusy] = useState(false);
   async function send(filePath?: string) {
     setBusy(true);
-    try { await submit({ data: { id: t.id, response: code || undefined, validUntil: until || undefined, filePath } }); toast.success("Thanks — sent to the team"); onDone(); }
+    try { await submit({ data: { id: t.id, response: code || undefined, validUntil: until || undefined, filePath } }); toast.success(ct("Thanks — sent to the team")); onDone(); }
     catch (e) { toast.error((e as Error).message || "Could not send. Please try again."); }
     finally { setBusy(false); }
   }
   async function upload(f: File) {
     const type = f.type === "video/quicktime" ? "video/quicktime" : "video/mp4";
-    if (!["video/mp4", "video/quicktime"].includes(f.type)) { toast.error("Please upload an MP4 or MOV video file."); return; }
+    if (!["video/mp4", "video/quicktime"].includes(f.type)) { toast.error(ct("Please upload an MP4 or MOV video file.")); return; }
     setBusy(true);
     try {
       const s = await slot({ data: { taskId: t.id, contentType: type } });
@@ -141,13 +142,13 @@ function TaskCard({ t, onDone }: { t: { id: string; type: string; title: string;
       <p className="whitespace-pre-line text-sm text-brand-navySoft">{t.instructions}</p>
       {t.status === "open" ? (t.type === "spark_code" ? (
         <div className="grid gap-2 sm:grid-cols-[1fr_160px_auto]">
-          <input aria-label="Spark code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Paste the code" className="min-h-11 rounded-xl border px-3 text-sm" />
-          <input aria-label="Valid until" type="date" value={until} onChange={(e) => setUntil(e.target.value)} className="min-h-11 rounded-xl border px-3 text-sm" />
-          <Button disabled={busy || !code.trim()} onClick={() => void send()}>Send</Button>
+          <input aria-label={ct("Spark code")} value={code} onChange={(e) => setCode(e.target.value)} placeholder={ct("Paste the code")} className="min-h-11 rounded-xl border px-3 text-sm" />
+          <input aria-label={ct("Valid until")} type="date" value={until} onChange={(e) => setUntil(e.target.value)} className="min-h-11 rounded-xl border px-3 text-sm" />
+          <Button disabled={busy || !code.trim()} onClick={() => void send()}>{ct("Send")}</Button>
         </div>
       ) : (
         <label className="inline-flex min-h-11 cursor-pointer items-center rounded-xl bg-brand-navy px-4 text-sm font-bold text-card">{busy ? "Uploading…" : "Upload the video"}<input type="file" accept="video/mp4,video/quicktime" className="sr-only" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) void upload(f); }} /></label>
-      )) : <p className="text-xs text-brand-navySoft">Done.</p>}
+      )) : <p className="text-xs text-brand-navySoft">{ct("Done.")}</p>}
     </PortalCard>
   );
 }
@@ -158,8 +159,8 @@ export function TasksPage() {
   const tasks = data?.tasks ?? [];
   return (
     <div>
-      <PageTitle title="Tasks" lead="Small requests from the team, like the code to boost one of your videos as an ad." />
-      {tasks.length === 0 ? <PortalCard><p className="text-sm text-brand-navySoft">No tasks right now.</p></PortalCard> : (
+      <PageTitle title={ct("Tasks")} lead={ct("Small requests from the team, like the code to boost one of your videos as an ad.")} />
+      {tasks.length === 0 ? <PortalCard><p className="text-sm text-brand-navySoft">{ct("No tasks right now.")}</p></PortalCard> : (
         <div className="space-y-3">{tasks.map((t) => <TaskCard key={t.id} t={t} onDone={() => { void refetch(); void qc.invalidateQueries({ queryKey: ["creator-space"] }); }} />)}</div>
       )}
     </div>
@@ -172,9 +173,9 @@ export function ReferralCard() {
   const link = typeof window !== "undefined" ? `${window.location.origin}/creators?ref=${encodeURIComponent(handle)}` : "";
   return (
     <PortalCard>
-      <p className="font-extrabold text-brand-navy">Invite friends</p>
-      <p className="mt-1 text-sm text-brand-navySoft">Share your link. When someone you invite joins, you earn a share of their earnings for their first 60 days.</p>
-      <div className="mt-3 flex gap-2"><input readOnly aria-label="Referral link" value={link} className="min-h-10 flex-1 rounded-xl border bg-portal-bg px-3 text-sm" /><Button onClick={() => { void navigator.clipboard.writeText(link); toast.success("Link copied"); }}>Copy</Button></div>
+      <p className="font-extrabold text-brand-navy">{ct("Invite friends")}</p>
+      <p className="mt-1 text-sm text-brand-navySoft">{ct("Share your link. When someone you invite joins, you earn a share of their earnings for their first 60 days.")}</p>
+      <div className="mt-3 flex gap-2"><input readOnly aria-label={ct("Referral link")} value={link} className="min-h-10 flex-1 rounded-xl border bg-portal-bg px-3 text-sm" /><Button onClick={() => { void navigator.clipboard.writeText(link); toast.success(ct("Link copied")); }}>{ct("Copy")}</Button></div>
     </PortalCard>
   );
 }
@@ -201,8 +202,8 @@ function LeaderboardCard() {
   const mine = board.find((r) => r.creator_id === me.id);
   return (
     <PortalCard className="p-4">
-      <div className="flex items-center justify-between"><p className="font-extrabold text-brand-navy">This month's leaderboard</p>{mine ? <span className="rounded-full bg-portal-accent/10 px-2.5 py-1 text-xs font-bold text-portal-accent">You're #{mine.rank}</span> : null}</div>
-      {board.length === 0 ? <p className="mt-2 text-sm text-brand-navySoft">The first creators start this week. Post to take the top spot.</p> : (
+      <div className="flex items-center justify-between"><p className="font-extrabold text-brand-navy">{ct("This month's leaderboard")}</p>{mine ? <span className="rounded-full bg-portal-accent/10 px-2.5 py-1 text-xs font-bold text-portal-accent">You're #{mine.rank}</span> : null}</div>
+      {board.length === 0 ? <p className="mt-2 text-sm text-brand-navySoft">{ct("The first creators start this week. Post to take the top spot.")}</p> : (
         <ol className="mt-3 space-y-1.5">{board.slice(0, 10).map((r) => (
           <li key={r.rank} className={cn("flex items-center gap-2 rounded-lg px-2 py-1 text-sm", r.creator_id === me.id && "bg-portal-accent/10")}>
             <span className="w-6 font-extrabold text-brand-navy">{r.rank}</span><span className="flex-1 truncate">{r.pseudonym}</span>
@@ -210,7 +211,7 @@ function LeaderboardCard() {
           </li>
         ))}</ol>
       )}
-      {!mine && board.length > 0 ? <p className="mt-2 text-xs text-brand-navySoft">You're not ranked yet this month — your first approved post puts you on the board.</p> : null}
+      {!mine && board.length > 0 ? <p className="mt-2 text-xs text-brand-navySoft">{ct("You're not ranked yet this month — your first approved post puts you on the board.")}</p> : null}
     </PortalCard>
   );
 }
@@ -220,12 +221,12 @@ function ChallengeCard() {
   const c = data?.challenge;
   return (
     <PortalCard className="p-4">
-      <p className="flex items-center gap-2 font-extrabold text-brand-navy"><Award className="size-4 text-portal-amber" />Challenge of the week</p>
+      <p className="flex items-center gap-2 font-extrabold text-brand-navy"><Award className="size-4 text-portal-amber" />{ct("Challenge of the week")}</p>
       {c ? <>
         <p className="mt-2 font-bold text-brand-navy">{c.title}{Number(c.reward_eur) > 0 ? ` — ${Number(c.reward_eur)} €` : ""}</p>
         {c.description ? <p className="mt-1 text-sm text-brand-navySoft">{c.description}</p> : null}
         <p className="mt-2 text-xs text-brand-navySoft">Ends {new Date(c.ends_at).toLocaleDateString()}. Every approved video posted before then counts.</p>
-      </> : <p className="mt-2 text-sm text-brand-navySoft">No challenge running right now. The next one drops soon.</p>}
+      </> : <p className="mt-2 text-sm text-brand-navySoft">{ct("No challenge running right now. The next one drops soon.")}</p>}
     </PortalCard>
   );
 }
@@ -266,7 +267,7 @@ export function MyTerms({ tiers }: { tiers: TierRow[] }) {
         {perPost ? <> · + <b>{eur(perPost)}</b> {fr ? "par post" : "per post"}</> : null}
         {num("welcome_bonus") ? <> · {fr ? "bonus de bienvenue" : "welcome bonus"} <b>{eur(num("welcome_bonus")!)}</b></> : null}
       </p><p className="text-xs text-brand-navySoft">{fr ? `Au prorata si moins de ${target} vidéos.` : `Prorated if fewer than ${target} videos.`}</p></> : <p className="mt-1 text-sm text-brand-navy">
-        {num("per_post_override") == null && t?.per_post_pov != null ? (() => { const r = effortRates(m, tiers, appId); return <>POV <b>{eur(r.pov)}</b> · {fr ? "Réaction" : "Reaction"} <b>{eur(r.reaction)}</b> · Face cam <b>{eur(r.talking_head)}</b> {fr ? "par post" : "per post"}</>; })() : <><b>{eur(perPost)}</b> {fr ? "par post" : "per post"}</>} · <b>{eur(rpm ?? 0)}</b> {fr ? "/ 1 000 vues" : "per 1,000 views"} · {fr ? "jusqu'à" : "up to"} <b>{eur(cap ?? 0)}</b> {fr ? "par post" : "per post"}
+        {num("per_post_override") == null && t?.per_post_pov != null ? (() => { const r = effortRates(m, tiers, appId); return <>{ct("POV")} <b>{eur(r.pov)}</b> · {fr ? "Réaction" : "Reaction"} <b>{eur(r.reaction)}</b> {ct("· Face cam")} <b>{eur(r.talking_head)}</b> {fr ? "par post" : "per post"}</>; })() : <><b>{eur(perPost)}</b> {fr ? "par post" : "per post"}</>} · <b>{eur(rpm ?? 0)}</b> {fr ? "/ 1 000 vues" : "per 1,000 views"} · {fr ? "jusqu'à" : "up to"} <b>{eur(cap ?? 0)}</b> {fr ? "par post" : "per post"}
         {own ? <> · {fr ? "objectif" : "target"} <b>{target}</b> {fr ? "posts/mois" : "posts/month"}</> : null}
         {num("welcome_bonus") ? <> · {fr ? "bonus de bienvenue" : "welcome bonus"} <b>{eur(num("welcome_bonus")!)}</b></> : null}
       </p>}

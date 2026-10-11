@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { DocBlock, MergeValues } from "@/lib/documents";
+import { t as ct } from "@/i18n/creator-app";
 
 export function CreatorAgreementForm({
   title,
@@ -42,15 +43,15 @@ export function CreatorAgreementForm({
         <DocumentBody blocks={blocks} merge={merge} className="mt-6" />
       </div>
       <form onSubmit={submit} className="space-y-5 rounded-2xl border border-brand-line bg-card p-5">
-        <h2 className="text-lg font-extrabold text-brand-navy">Signature</h2>
+        <h2 className="text-lg font-extrabold text-brand-navy">{ct("Signature")}</h2>
         <div className="flex items-start gap-3">
           <Checkbox id="accept" checked={accepted} onCheckedChange={(v) => setAccepted(v === true)} className="mt-0.5" />
           <Label htmlFor="accept" className="text-sm font-medium leading-relaxed text-brand-navy">
-            I have read and accept this agreement
+            {ct("I have read and accept this agreement")}
           </Label>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="signed-name">Your full legal name</Label>
+          <Label htmlFor="signed-name">{ct("Your full legal name")}</Label>
           <Input id="signed-name" value={name} maxLength={160} onChange={(e) => setName(e.target.value)} className="h-11" autoComplete="name" />
         </div>
         <p className="text-xs text-brand-navySoft">
