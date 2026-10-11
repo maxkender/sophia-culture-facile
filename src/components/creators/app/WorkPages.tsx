@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { effortRates, useHubExtras } from "./HubPages";
 import { cn } from "@/lib/utils";
+import { BriefView, toStudio, type BriefAsset } from "@/components/hub/BriefPreview";
 import { friendlyCreatorError, isHttpUrl } from "@/lib/creator-validation";
 import { Banner, EmptyState, PageTitle, PortalCard } from "@/components/portal/ui";
 import { logPostChecked, markBriefSkipped, markMyMessagesRead, reportPostViews } from "@/lib/creator-app.functions";
@@ -174,6 +175,11 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
   const d = useCreator();
   const brief = d.briefs.find((b) => b.id === briefId);
   const skip = useServerFn(markBriefSkipped);
+  const { data: extras } = useHubExtras();
+  const { data: files = [] } = useQuery({
+    queryKey: ["creator-brief-files", briefId],
+    queryFn: async () => (await supabase.from("brief_assets").select("role, sort_order, assets(id, kind, title, storage_path, url, text_content, thumbnail_url)").eq("brief_id", briefId).order("sort_order")).data?.filter((x) => x.assets).map((x) => ({ ...(x.assets as unknown as BriefAsset), role: x.role })) ?? [],
+  });
   const [mode, setMode] = useState<"none" | "post" | "skip">("none");
   const [reason, setReason] = useState("");
   useEffect(() => {
@@ -184,26 +190,15 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
   if (!brief) return <EmptyState title="Brief not found" text="It may have been withdrawn." />;
   const status = briefStatus(d, brief.id);
   const refs = d.refs.filter((r) => (brief.reference_video_ids ?? []).includes(r.id));
+  const eff = (brief as { effort?: string | null }).effort;
+  const rates = extras ? effortRates(d.me as Record<string, unknown>, (extras.tiers ?? []) as never, brief.app_id) : null;
+  const pay = rates && eff ? `${(rates as Record<string, number>)[eff]?.toLocaleString("fr-FR")} € / post` : null;
   return (
     <div>
       <Link to="/creators/app/briefs" className="text-sm font-semibold text-portal-accent">← All briefs</Link>
       <div className="mt-3"><PageTitle title={brief.title} lead={brief.due_date ? `Due ${fmtDate(brief.due_date)}` : ""} action={<Pill s={status} />} /></div>
       <div className="mb-4"><AppBadge appId={brief.app_id} className="text-sm" /></div>
-      <PortalCard>
-        {brief.hook && (
-          <div className="mb-4 rounded-2xl bg-portal-accent/5 p-4">
-            <p className="text-xs font-bold uppercase tracking-wide text-portal-accent">Hooks</p>
-            <p className="mt-1 whitespace-pre-wrap text-base font-semibold text-brand-navy">{brief.hook}</p>
-          </div>
-        )}
-        <p className="whitespace-pre-wrap text-sm leading-relaxed text-brand-navy">{brief.body}</p>
-      </PortalCard>
-      {refs.length > 0 && (
-        <>
-          <h2 className="mb-3 mt-8 text-lg font-extrabold text-brand-navy">Reference videos</h2>
-          <div className="flex gap-3 overflow-x-auto pb-2">{refs.map((r) => <RefCard key={r.id} r={r} compact />)}</div>
-        </>
-      )}
+      <PortalCard><BriefView b={toStudio(brief as Record<string, unknown>)} assets={files} refs={refs} pay={pay} /></PortalCard>
       <div className="mt-8 flex flex-wrap gap-2">
         <Button onClick={() => setMode(mode === "post" ? "none" : "post")}>I posted this</Button>
         {status !== "posted" && status !== "skipped" && <Button variant="outline" onClick={() => setMode(mode === "skip" ? "none" : "skip")}>Skip</Button>}
