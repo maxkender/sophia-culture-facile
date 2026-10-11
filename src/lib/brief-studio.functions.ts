@@ -142,6 +142,7 @@ export const briefFromVideo = createServerFn({ method: "POST" })
     caption: z.string().max(2000).optional(),
     storagePath: z.string().max(300).nullable().optional(),
     ad: metaAdSchema.nullable().optional(),
+    style: z.enum(["reaction_demo", "broll_stickers", "sole_footage", "talked_hook_demo", "educational"]).nullable().optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const me = await assertAdmin(context as never);
@@ -179,7 +180,7 @@ export const briefFromVideo = createServerFn({ method: "POST" })
       title: x.title, hook_text: x.hook_text, hook: x.hook_text, hooks: [x.hook_text], oral_hook: x.oral_hook, hook_visual: x.hook_visual, beats: x.beats,
       product_second: Math.min(15, Math.max(3, x.product_second)), product_gesture: x.product_gesture, effort: x.effort, format: x.effort,
       rules_do: x.rules_do, rules_dont: x.rules_dont, body: [x.hook_text, x.oral_hook, ...x.beats].join("\n\n"), script: x.beats.join("\n"),
-      status: "draft", app_id: data.appId, brief_type: "precise", platform: "both", created_by: me, source_reference_id: ref.id, reference_video_ids: [ref.id],
+      status: "draft", style: data.style ?? null, style_data: data.style ? { body: x.beats[1] ?? "", cta: "" } : {}, app_id: data.appId, brief_type: "precise", platform: "both", created_by: me, source_reference_id: ref.id, reference_video_ids: [ref.id],
     }));
     const { data: made } = await a.from("briefs").insert(rows).select("id");
     return { referenceId: ref.id as string, score, grid, briefIds: (made ?? []).map((m: { id: string }) => m.id) };

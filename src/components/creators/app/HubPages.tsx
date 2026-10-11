@@ -90,7 +90,7 @@ export function JobsPage() {
             const items = (j.application_items ?? []) as { type: string; label: string; required: boolean }[];
             return (
               <div key={j.id} className="space-y-2">
-                <JobPublicCard job={j as unknown as JobDraft} tiers={(data?.tiers ?? []).filter((t) => t.app_id === j.app_id) as never} />
+                <JobPublicCard job={j as unknown as JobDraft} appName={(j as { app_id?: string }).app_id === "00000000-0000-4000-8000-000000000002" ? "UnSwipe" : "Sophia"} tiers={(data?.tiers ?? []).filter((t) => t.app_id === j.app_id) as never} />
                 {mine ? <p className="rounded-xl bg-portal-bg p-3 text-sm font-bold text-brand-navy">Your application: {mine.status}</p>
                   : openId === j.id ? (
                     <PortalCard className="space-y-2 p-4">

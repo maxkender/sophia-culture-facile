@@ -27,7 +27,7 @@ export const CREATOR_NAV: { heading: string; items: Item[] }[] = [
       { to: "/creators/app", label: "Home", icon: Home, exact: true },
       { to: "/creators/app/jobs", label: "Jobs", icon: Briefcase, gate: "steps" },
       { to: "/creators/app/briefs", label: "Briefs", icon: Clapperboard, badge: "briefs", gate: "steps" },
-      { to: "/creators/app/library", label: "Learn", icon: Library, gate: "steps" },
+      { to: "/creators/app/library", label: "Library", icon: Library, gate: "steps" },
       { to: "/creators/app/posts", label: "My posts", icon: Video, badge: "posts", gate: "steps" },
       { to: "/creators/app/tasks", label: "Tasks", icon: ListChecks, gate: "steps" },
       { to: "/creators/app/calls", label: "Calls", icon: CalendarDays, badge: "calls", gate: "steps" },

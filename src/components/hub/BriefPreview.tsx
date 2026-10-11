@@ -1,17 +1,77 @@
 import { useState } from "react";
+import type React from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Copy, Download, FileText, Image as ImageIcon, Link2, Music, Video } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { assetLinks } from "@/lib/brief-studio.functions";
-import { ROLE_LABEL, type StudioBrief } from "@/lib/brief-studio";
+import { ROLE_LABEL, STYLE_LABEL, hasStyledContent, STYLE_NUM, TEXT_FORMATS, type AssetRef, type StudioBrief, type StyleData, type TextFormat } from "@/lib/brief-studio";
 import { PostThumb } from "./PostThumb";
 
 export type BriefAsset = { id: string; kind: string; title: string; storage_path: string | null; url: string | null; text_content: string | null; thumbnail_url: string | null; role: string };
 export type BriefRef = { id: string; title: string | null; url: string; thumbnail_url?: string | null };
 const EFFORT_FR: Record<string, string> = { pov: "POV", reaction: "Réaction", talking_head: "Face cam" };
 const KIND_ICON = { video: Video, image: ImageIcon, audio: Music, pdf: FileText, text: FileText, link: Link2 } as Record<string, typeof Video>;
+
+/** Signed-link download for one asset (links open in a new tab). */
+export function useAssetDownload() {
+  const links = useServerFn(assetLinks);
+  return async (a: Pick<BriefAsset, "id" | "kind" | "url">) => {
+    if (a.kind === "link" && a.url) { window.open(a.url, "_blank", "noopener"); return; }
+    const u = (await links({ data: { ids: [a.id] } })).urls[a.id];
+    if (!u) { toast.error("Ce fichier n'est pas encore disponible."); return; }
+    const el = document.createElement("a"); el.href = u; el.rel = "noopener"; el.click();
+  };
+}
+
+const FMT_FR: Record<string, string> = { title: "Gros titre centré", subtitle: "Sous-titre en bas", sticker: "Sticker", caption: "Bandeau légende", none: "Pas de texte" };
+void TEXT_FORMATS;
+function OnScreen({ text, fmt }: { text: string; fmt?: TextFormat | undefined }) {
+  if (!text?.trim() && (!fmt || fmt.kind === "none")) return null;
+  return <div className="rounded-lg bg-brand-navy p-2 text-sm text-card"><p className="text-[10px] font-bold uppercase opacity-70">Texte à l'écran · {FMT_FR[fmt?.kind ?? "subtitle"]}{fmt?.note ? ` · ${fmt.note}` : ""}</p>{text ? <p className="font-extrabold">{text}</p> : null}</div>;
+}
+function AssetLine({ r, assets }: { r: AssetRef; assets: BriefAsset[] }) {
+  const dl = useAssetDownload();
+  const a = assets.find((x) => x.id === r.asset_id);
+  return (
+    <li className="flex items-center gap-2 rounded-lg border border-brand-line p-2 text-sm" data-testid="plan-asset">
+      {a?.thumbnail_url ? <img src={a.thumbnail_url} alt="" className="size-9 rounded object-cover" /> : <span className="flex size-9 items-center justify-center rounded bg-portal-bg"><FileText className="size-4 text-brand-navySoft" /></span>}
+      <div className="min-w-0 flex-1"><p className="truncate font-bold text-brand-navy">{a?.title ?? "Fichier"}</p>{r.when ? <p className="text-xs text-brand-navySoft">Quand : {r.when}</p> : null}</div>
+      {a ? <Button size="sm" variant="outline" onClick={() => void dl(a)}><Download className="size-3.5" />{a.kind === "link" ? "Ouvrir" : "Télécharger"}</Button> : null}
+    </li>
+  );
+}
+function PlanCard({ n, label, children }: { n: number; label: string; children: React.ReactNode }) {
+  return <section className="rounded-2xl border-2 border-brand-line bg-card p-3" data-testid="plan-card"><p className="mb-2 flex items-center gap-2 text-sm font-extrabold text-brand-navy"><span className="flex size-6 items-center justify-center rounded-full bg-portal-accent text-xs text-card">{n}</span>{label}</p><div className="space-y-2 text-sm text-brand-navy">{children}</div></section>;
+}
+const Say = ({ t }: { t: string }) => (t?.trim() ? <p>🎙️ <b>À dire :</b> {t}</p> : null);
+const Do = ({ t }: { t: string }) => (t?.trim() ? <div><p className="font-bold">👉 À faire :</p><p className="whitespace-pre-wrap">{t}</p></div> : null);
+
+/** The plans as the creator sees them, following the brief's style. */
+export function StyledPlans({ b, assets }: { b: StudioBrief; assets: BriefAsset[] }) {
+  const d: StyleData = b.style_data ?? {}; const plans = d.plans ?? [];
+  const list = (rs: AssetRef[]) => (rs.length ? <ul className="space-y-1">{rs.map((r, i) => <AssetLine key={`${r.asset_id}-${i}`} r={r} assets={assets} />)}</ul> : null);
+  const cta = d.cta?.trim() ? <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy"><b>CTA :</b> {d.cta}</p> : null;
+  const body = d.body?.trim() ? <p className="rounded-xl bg-portal-bg p-3 text-sm text-brand-navy"><b>Le fond :</b> {d.body}</p> : null;
+  if (b.style === "reaction_demo") return <div className="space-y-3">{body}
+    <PlanCard n={1} label="Face (caméra sur ton visage)">{plans[0]?.reaction ? <p>😮 <b>Réaction :</b> {plans[0].reaction}</p> : null}<OnScreen text={plans[0]?.on_screen ?? ""} fmt={plans[0]?.fmt} /><Say t={plans[0]?.say ?? ""} />{list(plans[0]?.assets ?? [])}</PlanCard>
+    <PlanCard n={2} label="Téléphone / démo (caméra sur le téléphone)"><Do t={plans[1]?.do ?? ""} /><Say t={plans[1]?.say ?? ""} />{list(plans[1]?.assets ?? [])}</PlanCard>
+    {d.flips?.on ? <p className="rounded-xl border-2 border-dashed border-portal-accent/40 p-3 text-sm">🔄 <b>Retournements de caméra :</b> {d.flips.note}</p> : null}{cta}</div>;
+  if (b.style === "sole_footage") { const x = d.sole; return <div className="space-y-3">
+    <PlanCard n={1} label={`Le plan${x?.duration_s ? ` · ${x.duration_s} s` : ""}`}>{x?.what ? <p className="whitespace-pre-wrap">🎬 {x.what}</p> : null}<OnScreen text={x?.text ?? ""} fmt={x?.fmt} />
+      {x?.music_title || x?.music_link ? <p>🎵 <b>Musique :</b> {x.music_title}{x.music_link ? <> · <a href={x.music_link} target="_blank" rel="noreferrer" className="font-bold text-portal-accent underline">Ouvrir la musique</a></> : null}</p> : null}
+      {x?.music_asset_id ? list([{ asset_id: x.music_asset_id, when: "" }]) : null}</PlanCard>{cta}</div>; }
+  if (b.style === "educational") return <div className="space-y-3">
+    <p className="rounded-xl bg-portal-bg p-3 text-sm">🪑 Face cam, assis·e, un carnet dans le cadre au début.</p>
+    {d.script_fmt && d.script_fmt.kind !== "none" ? <OnScreen text="" fmt={d.script_fmt} /> : null}
+    <section className="rounded-2xl border-2 border-brand-line p-4"><p className="mb-2 text-sm font-extrabold uppercase text-brand-navySoft">Le script</p><p className="whitespace-pre-wrap text-base leading-relaxed text-brand-navy" data-testid="edu-script">{d.script}</p></section>
+    {d.flashes?.length ? <section><p className="mb-1 text-sm font-extrabold text-brand-navy">À afficher à l'écran</p>{list(d.flashes)}</section> : null}{cta}</div>;
+  return <div className="space-y-3">{body}
+    {plans.map((p, i) => <PlanCard key={i} n={i + 1} label={`Plan ${i + 1}`}><OnScreen text={p.on_screen} fmt={p.fmt} /><Say t={p.say} /><Do t={p.do} />{p.camera ? <p>🎥 <b>Caméra :</b> {p.camera}</p> : null}{list(p.assets)}</PlanCard>)}
+    {b.style === "talked_hook_demo" && d.demo ? <PlanCard n={plans.length + 1} label={d.demo.mode === "asset" ? "Démo (enregistrement d'écran fourni)" : "Démo (filmée par toi)"}>
+      {d.demo.mode === "asset" && d.demo.asset ? list([d.demo.asset]) : <Do t={d.demo.do} />}<Say t={d.demo.say} /></PlanCard> : null}{cta}</div>;
+}
 
 export function FilesSection({ assets, title = "Fichiers" }: { assets: BriefAsset[]; title?: string }) {
   const links = useServerFn(assetLinks);
@@ -71,9 +131,11 @@ export function FilesSection({ assets, title = "Fichiers" }: { assets: BriefAsse
 
 /** Exactly what the creator sees on /creators/app/briefs/<id>; the Studio renders it inside a phone frame. */
 export function BriefView({ b, assets, refs, pay }: { b: StudioBrief; assets: BriefAsset[]; refs: BriefRef[]; pay?: string | null }) {
-  const beats = (b.beats ?? []).filter((x) => x?.trim());
+  const styled = Boolean(b.style) && hasStyledContent(b.style_data);
+  const beats = styled ? [] : (b.beats ?? []).filter((x) => x?.trim());
   return (
     <div className="space-y-5">
+      {b.style ? <span className="inline-flex rounded-full bg-portal-accent/15 px-3 py-1 text-xs font-extrabold text-portal-accent" data-testid="style-badge">Style {STYLE_NUM[b.style]} · {STYLE_LABEL[b.style]}</span> : null}
       <div className="rounded-2xl bg-brand-navy p-5 text-card">
         <div className="mb-3 flex flex-wrap gap-2 text-xs font-bold">
           {b.effort ? <span className="rounded-full bg-card/15 px-2.5 py-1">{EFFORT_FR[b.effort]}</span> : null}
@@ -81,15 +143,16 @@ export function BriefView({ b, assets, refs, pay }: { b: StudioBrief; assets: Br
           {b.duration_target ? <span className="rounded-full bg-card/15 px-2.5 py-1">{b.duration_target}</span> : null}
         </div>
         <p className="text-2xl font-extrabold leading-tight">{b.hook_text || b.title || "Ton hook ici"}</p>
-        {b.oral_hook ? <p className="mt-3 text-sm opacity-90">🎙️ « {b.oral_hook} »</p> : null}
-        {b.hook_visual ? <p className="mt-1 text-sm opacity-80">👀 {b.hook_visual}</p> : null}
+        {b.oral_hook && !styled ? <p className="mt-3 text-sm opacity-90">🎙️ « {b.oral_hook} »</p> : null}
+        {b.hook_visual && !styled ? <p className="mt-1 text-sm opacity-80">👀 {b.hook_visual}</p> : null}
       </div>
       {beats.length ? (
         <section><h3 className="mb-2 text-sm font-extrabold uppercase tracking-wide text-brand-navySoft">Le script en 3 temps</h3>
           <ol className="space-y-2">{beats.map((x, i) => <li key={i} className="rounded-xl bg-portal-bg p-3 text-sm text-brand-navy"><span className="mr-2 font-extrabold text-portal-accent">{["0-3 s", "3-20 s", "20-30 s"][i]}</span>{x}</li>)}</ol>
         </section>
       ) : null}
-      {b.product_gesture || b.product_moment ? (
+      {styled ? <StyledPlans b={b} assets={assets} /> : null}
+      {!styled && (b.product_gesture || b.product_moment) ? (
         <section className="rounded-xl border-2 border-portal-accent/30 p-3 text-sm text-brand-navy">
           <p className="font-extrabold">📱 Moment produit{b.product_second ? ` · à ${b.product_second} s` : ""}</p>
           <p className="mt-1">{b.product_gesture}{b.product_gesture && b.product_moment ? " — " : ""}{b.product_moment}</p>
@@ -126,5 +189,6 @@ export function toStudio(row: unknown): StudioBrief {
     rules_do: r.rules_do ?? [], rules_dont: r.rules_dont ?? [], rules_text: r.rules_text ?? null,
     status: r.status ?? "draft", drop_at: r.drop_at ?? null, audience: r.audience ?? "all", audience_efforts: r.audience_efforts ?? [], due_date: r.due_date ?? null,
     language: r.language ?? "fr", translation_of: r.translation_of ?? null, parent_format_id: r.parent_format_id ?? null, campaign_id: r.campaign_id ?? null, score: r.score ?? null,
+    style: r.style ?? null, style_data: (r.style_data && typeof r.style_data === "object" ? r.style_data : {}) as StyleData,
   };
 }

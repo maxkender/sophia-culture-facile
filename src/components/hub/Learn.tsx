@@ -11,11 +11,12 @@ import { generateFormatVariants } from "@/lib/hub-learn.functions";
 import { PostThumb } from "./PostThumb";
 import { BriefsList } from "./BriefsList";
 import { AssetsLibrary } from "./Assets";
+import { SnippetsLibrary } from "./SnippetsLibrary";
 import { UgcBriefsGrid, WeekPlanner } from "@/components/portal/admin/UgcAdmin";
 import { CreatorOps } from "@/components/portal/admin/CreatorOps";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
-const TABS = ["Formats", "Briefs", "Assets", "References", "Guides & rules", "Templates"] as const;
+const TABS = ["Formats", "Briefs", "Hooks & CTAs", "Assets", "References", "Guides & rules", "Templates"] as const;
 
 
 type Fmt = { id: string; title: string; hook_text: string | null; oral_hook: string | null; beats: string[] | null; product_moment: string | null; variations: string | null; effort: string | null; status: string; pinned: boolean; sort_order: number | null; app_id: string };
@@ -250,7 +251,7 @@ export function Learn({ initialTab, sub }: { initialTab?: string | undefined; su
   return (
     <div className="space-y-4">
       <div className="flex gap-2 overflow-x-auto">{TABS.map((t) => <button key={t} type="button" onClick={() => setTab(t)} className={cn("min-h-10 shrink-0 rounded-full px-4 text-sm font-bold", tab === t ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{t}</button>)}</div>
-      {tab === "Formats" ? <Formats /> : tab === "Briefs" ? <BriefsArea sub={sub} /> : tab === "Assets" ? <AssetsLibrary /> : tab === "References" ? <References /> : tab === "Guides & rules" ? <Guides /> : <Templates />}
+      {tab === "Formats" ? <Formats /> : tab === "Briefs" ? <BriefsArea sub={sub} /> : tab === "Hooks & CTAs" ? <SnippetsLibrary /> : tab === "Assets" ? <AssetsLibrary /> : tab === "References" ? <References /> : tab === "Guides & rules" ? <Guides /> : <Templates />}
     </div>
   );
 }

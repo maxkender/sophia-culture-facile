@@ -386,6 +386,13 @@
       "when": 1791727534457,
       "tag": "0054_meta_ads_references",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1791736867786,
+      "tag": "0055_brief_styles_snippets",
+      "breakpoints": true
     }
   ]
 }

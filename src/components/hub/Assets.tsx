@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Download, Trash2, Upload } from "lucide-react";
@@ -92,19 +92,44 @@ export function AssetsLibrary() {
     queryFn: async () => {
       const [a, u] = await Promise.all([
         supabase.from("assets").select("*").eq("app_id", app).order("status", { ascending: false }).order("created_at", { ascending: false }),
-        supabase.from("brief_assets").select("asset_id"),
+        supabase.from("brief_assets").select("asset_id, briefs(id, title, style_data)"),
       ]);
       const used: Record<string, number> = {};
-      for (const r of u.data ?? []) used[r.asset_id] = (used[r.asset_id] ?? 0) + 1;
-      return { rows: (a.data ?? []) as unknown as Row[], used };
+      const where: Record<string, { id: string; title: string; plans: string[] }[]> = {};
+      for (const r of u.data ?? []) {
+        used[r.asset_id] = (used[r.asset_id] ?? 0) + 1;
+        const br = r.briefs as unknown as { id: string; title: string; style_data: { plans?: { assets: { asset_id: string }[] }[]; flashes?: { asset_id: string }[]; demo?: { asset?: { asset_id: string } | null } } } | null;
+        if (!br) continue;
+        const sd = br.style_data ?? {};
+        const plans = (sd.plans ?? []).map((p, i) => (p.assets?.some((x) => x.asset_id === r.asset_id) ? `Plan ${i + 1}` : "")).filter(Boolean);
+        if (sd.flashes?.some((x) => x.asset_id === r.asset_id)) plans.push("on-screen flash");
+        if (sd.demo?.asset?.asset_id === r.asset_id) plans.push("demo");
+        (where[r.asset_id] ??= []).push({ id: br.id, title: br.title, plans });
+      }
+      return { rows: (a.data ?? []) as unknown as Row[], used, where };
     },
   });
   const reload = () => void qc.invalidateQueries({ queryKey: ["hub", "assets"] });
-  const rows = useMemo(() => (data?.rows ?? []).filter((r) => r.folder === folder && (!q || `${r.title} ${r.tags.join(" ")} ${r.text_content ?? ""}`.toLowerCase().includes(q.toLowerCase()))), [data, folder, q]);
+  const rows = useMemo(() => (data?.rows ?? []).filter((r) => (q ? true : r.folder === folder) && (!q || `${r.title} ${r.tags.join(" ")} ${r.text_content ?? ""}`.toLowerCase().includes(q.toLowerCase()))), [data, folder, q]);
   async function open(r: Row) {
     if (r.kind === "link" && r.url) { window.open(r.url, "_blank", "noopener"); return; }
     const u = (await links({ data: { ids: [r.id] } })).urls[r.id];
     if (u) setPreview({ id: r.id, url: u }); else toast.error("No file yet.");
+  }
+  const [thumbs, setThumbs] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const need = rows.filter((r) => r.storage_path && !r.thumbnail_url && (r.kind === "image" || r.kind === "video") && !thumbs[r.id]).map((r) => r.id).slice(0, 60);
+    if (!need.length) return;
+    void links({ data: { ids: need } }).then((x) => setThumbs((t) => ({ ...t, ...x.urls }))).catch(() => undefined);
+  }, [rows]); // eslint-disable-line react-hooks/exhaustive-deps
+  async function downloadFolder() {
+    const list = rows.filter((r) => r.storage_path);
+    if (!list.length) { toast.error("No file to download in this folder."); return; }
+    const urls = (await links({ data: { ids: list.map((r) => r.id).slice(0, 60) } })).urls;
+    const { zipSync } = await import("fflate");
+    const entries: Record<string, Uint8Array> = {};
+    for (const r of list) { const u = urls[r.id]; if (!u) continue; entries[`${r.title.replace(/[^\w\- ]+/g, "").trim() || r.id.slice(0, 8)}${r.storage_path!.match(/\.[a-z0-9]+$/i)?.[0] ?? ""}`] = new Uint8Array(await (await fetch(u)).arrayBuffer()); }
+    const el = document.createElement("a"); el.href = URL.createObjectURL(new Blob([zipSync(entries, { level: 0 }) as BlobPart], { type: "application/zip" })); el.download = `${folder}.zip`; el.click();
   }
   async function remove(r: Row) {
     if (data?.used[r.id]) { toast.error(`Used in ${data.used[r.id]} brief(s) — detach it first.`); return; }
@@ -129,7 +154,8 @@ export function AssetsLibrary() {
             <Button type="submit">Add text</Button>
           </form>
         ) : <AssetUploader appId={app} folder={folder} onDone={reload} />}
-        <div className="flex flex-wrap gap-2"><input aria-label="Search assets" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search title, tags, text" className="h-9 flex-1 rounded-lg border px-2 text-sm" /><Button size="sm" variant="outline" disabled={!sel.length} onClick={() => void bulkTag()}>Tag selected ({sel.length})</Button></div>
+        <div className="flex flex-wrap gap-2"><input aria-label="Search assets" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or tag" className="h-9 flex-1 rounded-lg border px-2 text-sm" /><Button size="sm" variant="outline" disabled={!sel.length} onClick={() => void bulkTag()}>Tag selected ({sel.length})</Button><Button size="sm" variant="outline" onClick={() => void downloadFolder()}><Download className="size-3.5" />Download folder</Button></div>
+        {q ? <p className="text-xs text-brand-navySoft">Searching all folders.</p> : null}
       </div>
       {!rows.length ? <p className={cn(card, "text-sm text-brand-navySoft")}>Nothing in this folder yet.</p> : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{rows.map((r) => (
@@ -137,8 +163,9 @@ export function AssetsLibrary() {
             <div className="flex items-start gap-2">
               <input type="checkbox" aria-label={`Select ${r.title}`} checked={sel.includes(r.id)} onChange={(e) => setSel((s) => (e.target.checked ? [...s, r.id] : s.filter((x) => x !== r.id)))} className="mt-1" />
               <div className="min-w-0 flex-1">
-                <input aria-label="Title" defaultValue={r.title} onBlur={(e) => void supabase.from("assets").update({ title: e.target.value }).eq("id", r.id)} className="h-8 w-full rounded-lg border-transparent px-1 text-sm font-bold hover:border-input" />
+                <input aria-label="Rename" title="Click to rename (the file itself is not moved)" defaultValue={r.title} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== r.title) void supabase.from("assets").update({ title: v }).eq("id", r.id).then(({ error }) => { if (error) toast.error("Could not rename."); else { toast.success("Renamed"); reload(); } }); }} className="h-8 w-full rounded-lg border-transparent px-1 text-sm font-bold hover:border-input" />
                 <p className="px-1 text-xs text-brand-navySoft">{r.status === "to_upload" ? "À filmer" : r.kind}{r.size_bytes ? ` · ${(r.size_bytes / 1048576).toFixed(1)} MB` : ""} · used in {data?.used[r.id] ?? 0} briefs</p>
+                {data?.where[r.id]?.length ? <p className="px-1 text-[11px] text-brand-navySoft">{data.where[r.id]!.map((w) => `${w.title}${w.plans.length ? ` (${w.plans.join(", ")})` : ""}`).join(" · ")}</p> : null}
               </div>
             </div>
             {r.status === "to_upload" ? <>
@@ -148,11 +175,11 @@ export function AssetsLibrary() {
               <textarea aria-label="Text" defaultValue={r.text_content ?? ""} rows={3} onBlur={(e) => void supabase.from("assets").update({ text_content: e.target.value }).eq("id", r.id)} className="w-full rounded-lg border p-2 text-sm" />
             ) : preview?.id === r.id ? (
               r.kind === "video" ? <video src={preview.url} controls className="aspect-[9/16] max-h-80 w-full rounded-lg bg-brand-navy" /> : r.kind === "image" ? <img src={preview.url} alt="" className="w-full rounded-lg" /> : r.kind === "audio" ? <audio src={preview.url} controls className="w-full" /> : <a href={preview.url} className="text-sm text-portal-accent" target="_blank" rel="noreferrer">Open file</a>
-            ) : r.kind === "link" && r.url ? <PostThumb url={r.url} className="aspect-video w-full rounded-lg" /> : r.thumbnail_url ? <img src={r.thumbnail_url} alt="" className="aspect-video w-full rounded-lg object-cover" /> : null}
+            ) : r.kind === "link" && r.url ? <PostThumb url={r.url} className="aspect-video w-full rounded-lg" /> : r.thumbnail_url ? <img src={r.thumbnail_url} alt="" className="aspect-video w-full rounded-lg object-cover" /> : thumbs[r.id] ? (r.kind === "image" ? <img src={thumbs[r.id]} alt="" loading="lazy" className="aspect-video w-full rounded-lg object-cover" /> : <video src={`${thumbs[r.id]}#t=0.5`} preload="metadata" muted className="aspect-video w-full rounded-lg bg-brand-navy object-cover" />) : null}
             <input aria-label="Tags" defaultValue={r.tags.join(", ")} placeholder="tags, comma separated" onBlur={(e) => void supabase.from("assets").update({ tags: e.target.value.split(",").map((t) => t.trim()).filter(Boolean) }).eq("id", r.id).then(reload)} className="h-8 w-full rounded-lg border px-2 text-xs" />
             <div className="flex gap-1">
               {r.status === "ready" && r.kind !== "text" ? <Button size="sm" variant="outline" onClick={() => void open(r)}>{r.kind === "link" ? "Open" : "Preview"}</Button> : null}
-              {r.storage_path ? <Button size="sm" variant="outline" aria-label="Download" onClick={async () => { const u = (await links({ data: { ids: [r.id] } })).urls[r.id]; if (u) window.location.href = u; }}><Download className="size-3.5" /></Button> : null}
+              {r.storage_path ? <Button size="sm" variant="outline" onClick={async () => { const u = (await links({ data: { ids: [r.id] } })).urls[r.id]; if (u) window.location.href = u; }}><Download className="size-3.5" />Download</Button> : null}
               <Button size="sm" variant="ghost" aria-label="Delete" className="ml-auto" disabled={Boolean(data?.used[r.id])} title={data?.used[r.id] ? "Used in briefs" : undefined} onClick={() => void remove(r)}><Trash2 className="size-4" /></Button>
             </div>
           </div>
