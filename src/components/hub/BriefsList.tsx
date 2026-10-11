@@ -68,7 +68,7 @@ function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
       if (/facebook\.com\/ads\/library/i.test(u)) {
         try {
           setStep("Meta Ads Library – fetching the ad…");
-          const { ads } = await meta({ data: { appId: app, url: u, limit: 2 } });
+          const { ads } = await meta({ data: { appId: app, url: u } });
           for (const x of ads) {
             setStep(x.video ? "Meta Ads Library – analysing the ad video…" : "Meta Ads Library – analysing the ad images…");
             let frames: string[] = [];
