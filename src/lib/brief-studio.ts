@@ -9,7 +9,49 @@ export type StudioBrief = {
   rules_do: string[]; rules_dont: string[]; rules_text: string | null;
   status: string; drop_at: string | null; audience: string; audience_efforts: string[]; due_date: string | null;
   language: string; translation_of: string | null; parent_format_id: string | null; campaign_id: string | null; score: number | null;
+  style: BriefStyle | null; style_data: StyleData;
 };
+
+/* ---------- Max's 5 video styles ---------- */
+export type BriefStyle = "reaction_demo" | "broll_stickers" | "sole_footage" | "talked_hook_demo" | "educational";
+export const STYLES: [BriefStyle, string, string][] = [
+  ["reaction_demo", "Reaction into demo", "Direct · face plan, then phone demo"],
+  ["broll_stickers", "B-roll + stickers", "Storytelling · one visual per plan"],
+  ["sole_footage", "Sole footage + music + text", "One plan, music, text on screen"],
+  ["talked_hook_demo", "Talked hook into demo", "Indirect · our story, then the demo"],
+  ["educational", "Educational", "Talked · face cam, seated, notebook"],
+];
+export const STYLE_LABEL: Record<string, string> = Object.fromEntries(STYLES.map(([k, l]) => [k, l]));
+export const STYLE_NUM: Record<string, number> = Object.fromEntries(STYLES.map(([k], i) => [k, i + 1]));
+export const TEXT_FORMATS = [["title", "Big title centred"], ["subtitle", "Subtitle bottom"], ["sticker", "Sticker"], ["caption", "Caption bar"], ["none", "No text"]] as const;
+export type TextFormat = { kind: string; note: string };
+export type AssetRef = { asset_id: string; when: string };
+export type Plan = { on_screen: string; fmt: TextFormat; say: string; do: string; camera: string; reaction: string; assets: AssetRef[] };
+export type StyleData = {
+  plans?: Plan[];
+  flips?: { on: boolean; note: string };
+  demo?: { mode: "filmed" | "asset"; do: string; say: string; asset: AssetRef | null };
+  sole?: { what: string; duration_s: number | null; music_title: string; music_link: string; music_asset_id: string | null; text: string; fmt: TextFormat };
+  script?: string; script_fmt?: TextFormat; flashes?: AssetRef[];
+  body?: string; cta?: string;
+};
+export const blankFmt = (): TextFormat => ({ kind: "subtitle", note: "" });
+export const blankPlan = (): Plan => ({ on_screen: "", fmt: blankFmt(), say: "", do: "", camera: "", reaction: "", assets: [] });
+export function styleDefaults(style: BriefStyle, d: StyleData = {}): StyleData {
+  const plans = d.plans ?? [];
+  if (style === "reaction_demo") return { ...d, plans: [plans[0] ?? blankPlan(), plans[1] ?? blankPlan()].slice(0, 2), flips: d.flips ?? { on: false, note: "" } };
+  if (style === "broll_stickers") return { ...d, plans: plans.length ? plans : [blankPlan(), blankPlan(), blankPlan()] };
+  if (style === "talked_hook_demo") return { ...d, plans: plans.length ? plans : [blankPlan(), blankPlan()], demo: d.demo ?? { mode: "filmed", do: "", say: "", asset: null } };
+  if (style === "sole_footage") return { ...d, sole: d.sole ?? { what: "", duration_s: 7, music_title: "", music_link: "", music_asset_id: null, text: "", fmt: { kind: "title", note: "" } } };
+  return { ...d, script: d.script ?? "", script_fmt: d.script_fmt ?? blankFmt(), flashes: d.flashes ?? [] };
+}
+/** Every asset id the style content points to (synced into brief_assets so creators can download them). */
+export function styleAssetIds(d: StyleData): string[] {
+  const ids = [...(d.plans ?? []).flatMap((p) => p.assets.map((a) => a.asset_id)), ...(d.flashes ?? []).map((a) => a.asset_id)];
+  if (d.demo?.mode === "asset" && d.demo.asset) ids.push(d.demo.asset.asset_id);
+  if (d.sole?.music_asset_id) ids.push(d.sole.music_asset_id);
+  return [...new Set(ids.filter(Boolean))];
+}
 
 export const GESTURES = ["Scroller un cours", "Ouvrir l'app", "Montrer la barre du bas sans Reels", "Écran de fin de fil", "Courbe du temps d'écran", "Autre"] as const;
 export const ASSET_ROLES = [["reference_video", "Reference video"], ["app_screen_recording", "App screen recording"], ["screenshot", "Screenshot"], ["logo", "Logo"], ["sound", "Sound"], ["broll", "B-roll"], ["caption_text", "Caption text"], ["pdf", "PDF"]] as const;
@@ -25,14 +67,68 @@ export function blankBrief(appId: string): StudioBrief {
     hook_text: "", oral_hook: "", hook_visual: "", hooks: [], beats: ["", "", ""], product_second: 5, product_gesture: GESTURES[1], product_moment: "", say_name: true,
     rules_do: [...DEFAULT_DO], rules_dont: [...DEFAULT_DONT], rules_text: "", status: "draft", drop_at: null, audience: "all", audience_efforts: [], due_date: null,
     language: "fr", translation_of: null, parent_format_id: null, campaign_id: null, score: null,
+    style: null, style_data: {},
   };
 }
 
-export const words = (s: string | null | undefined) => (s ?? "").trim().split(/\s+/).filter(Boolean).length;
+export const words = (s: string | null | undefined): number => (s ?? "").trim().split(/\s+/).filter(Boolean).length;
 export const scriptWords = (b: Pick<StudioBrief, "beats" | "oral_hook">) => b.beats.reduce((n, x) => n + words(x), 0);
 
-/** The 10-point validation grid. Each item is one point. */
+const filled = (x: string | null | undefined) => Boolean((x ?? "").trim());
+/** Per-style grid: only the fields that style needs count; the result is scaled to /10. */
+export function styleChecks(b: StudioBrief, assetCount: number): [string, boolean][] {
+  const d = b.style_data ?? {}; const plans = d.plans ?? [];
+  const common: [string, boolean][] = [
+    ["Title set", filled(b.title)],
+    ["Hook written", filled(b.hook_text)],
+    ["CTA written", filled(d.cta)],
+    ["Effort chosen (sets the pay)", Boolean(b.effort)],
+  ];
+  const by: Record<BriefStyle, [string, boolean][]> = {
+    reaction_demo: [
+      ["Plan 1: the reaction to perform", filled(plans[0]?.reaction)],
+      ["Plan 1: on-screen text", filled(plans[0]?.on_screen) || plans[0]?.fmt.kind === "none"],
+      ["Plan 1: what to say", filled(plans[0]?.say)],
+      ["Plan 2: actions in the app", filled(plans[1]?.do)],
+      ["Plan 2: what to say", filled(plans[1]?.say)],
+      ["Camera flips: note when on", !d.flips?.on || filled(d.flips.note)],
+    ],
+    broll_stickers: [
+      ["At least 3 plans", plans.length >= 3],
+      ["Every plan has on-screen text", plans.length > 0 && plans.every((p) => filled(p.on_screen))],
+      ["Every plan has what to say", plans.length > 0 && plans.every((p) => filled(p.say))],
+      ["At least one asset placed", plans.some((p) => p.assets.length > 0)],
+      ["Every placed asset has a timing", plans.every((p) => p.assets.every((a) => filled(a.when)))],
+    ],
+    sole_footage: [
+      ["What is on the plan", filled(d.sole?.what)],
+      ["Duration set", Boolean(d.sole?.duration_s)],
+      ["Music (link or audio file)", filled(d.sole?.music_link) || Boolean(d.sole?.music_asset_id) || filled(d.sole?.music_title)],
+      ["Text on screen", filled(d.sole?.text)],
+    ],
+    talked_hook_demo: [
+      ["At least 2 story plans", plans.length >= 2],
+      ["Every plan has what to say", plans.length > 0 && plans.every((p) => filled(p.say))],
+      ["Every plan has on-screen text", plans.length > 0 && plans.every((p) => filled(p.on_screen))],
+      ["Demo: what to do / which recording", d.demo?.mode === "asset" ? Boolean(d.demo.asset) : filled(d.demo?.do)],
+      ["Demo: what to say", filled(d.demo?.say)],
+    ],
+    educational: [
+      ["Script written (60+ words)", words(d.script) >= 60],
+      ["Script under 220 words", words(d.script) > 0 && words(d.script) <= 220],
+      ["On-screen text format chosen", Boolean(d.script_fmt?.kind)],
+    ],
+  };
+  return [...common, ...by[b.style as BriefStyle], ["At least 1 file or reference", assetCount >= 1]];
+}
+
+/** The /10 grid. Styled briefs use the per-style checks; older briefs keep the original 10 points. */
 export function scoreBrief(b: StudioBrief, assetCount: number) {
+  if (b.style) {
+    const checks = styleChecks(b, assetCount);
+    const ok = checks.filter(([, v]) => v).length;
+    return { score: Math.round((10 * ok) / checks.length), missing: checks.filter(([, v]) => !v).map(([l]) => l), checks };
+  }
   const all = [b.oral_hook, ...b.beats].join(" ");
   const sentences = all.split(/[.!?…]+/).map((s) => s.trim()).filter(Boolean);
   const name = /unswipe/i.test(all) ? /unswipe/gi : /sophia/gi;
@@ -68,5 +164,10 @@ export function stepDone(b: StudioBrief, assetCount: number) {
 
 /** Text form used in body/script so older screens (Sidekick, exports) still read the brief. */
 export function briefBody(b: StudioBrief) {
+  const d = b.style_data ?? {};
+  if (b.style) {
+    const parts = [b.hook_text, d.body, ...(d.plans ?? []).map((p, i) => `Plan ${i + 1}: ${[p.on_screen, p.say, p.do].filter(Boolean).join(" — ")}`), d.demo?.say, d.sole?.what, d.sole?.text, d.script, d.cta];
+    return parts.filter((x) => (x ?? "").trim()).join("\n\n");
+  }
   return [b.hook_text, b.oral_hook, ...b.beats].filter((x) => (x ?? "").trim()).join("\n\n");
 }
