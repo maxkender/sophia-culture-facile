@@ -26,7 +26,7 @@ export function AssetUploader({ appId, folder, onDone, compact = false, replaceI
   async function uploadOne(f: File) {
     if (f.size > 200 * 1024 * 1024) { toast.error(`${f.name} is over 200 MB.`); return; }
     const { path, token } = await slot({ data: { appId, name: f.name } });
-    const base = import.meta.env.VITE_SUPABASE_URL as string;
+    const base = import.meta.env["VITE_SUPABASE_URL"] as string;
     await new Promise<void>((resolve, reject) => {
       const x = new XMLHttpRequest();
       x.open("PUT", `${base}/storage/v1/object/upload/sign/creator-assets/${path}?token=${encodeURIComponent(token)}`);

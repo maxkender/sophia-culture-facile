@@ -114,7 +114,8 @@ export function BriefView({ b, assets, refs, pay }: { b: StudioBrief; assets: Br
 }
 
 /** Normalizes a briefs row (old or Studio) into the Studio shape. */
-export function toStudio(r: Record<string, any>): StudioBrief { // eslint-disable-line @typescript-eslint/no-explicit-any
+export function toStudio(row: unknown): StudioBrief {
+  const r = row as any; // eslint-disable-line @typescript-eslint/no-explicit-any
   const beats = Array.isArray(r.beats) && r.beats.length ? r.beats.map(String) : [];
   return {
     id: r.id ?? "", app_id: r.app_id, title: r.title ?? "", brief_type: r.brief_type === "format" ? "format" : "precise",
