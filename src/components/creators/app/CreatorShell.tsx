@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { getMyPhotoUrl } from "@/lib/creator-app.functions";
 import { touchCreatorSeen } from "@/lib/ugc-creator.functions";
 import { useCreator } from "./useCreator";
-import { t as ct, CreatorLangProvider, initCreatorLang, useCreatorLang } from "@/i18n/creator-app";
+import { t as ct, L, CreatorLangProvider, initCreatorLang, useCreatorLang } from "@/i18n/creator-app";
 
 type Badge = "briefs" | "posts" | "calls" | "messages";
 type Item = { to: string; label: string; icon: LucideIcon; exact?: boolean; badge?: Badge; gate?: "steps" | "payouts" };
@@ -257,7 +257,7 @@ export function Locked({ gate, children }: { gate: "steps" | "payouts"; children
           ? ct("Earnings open once onboarding steps 1 to 3 are done and your payout details are set up (step 4).")
           : ct("Briefs, the library, your posts and calls open once the first three onboarding steps are done: rules, agreement and account setup.")}
       </p>
-      <Button asChild className="mt-4"><Link to={missing.to}>Go to step {missing.n}: {ct(missing.label)}</Link></Button>
+      <Button asChild className="mt-4"><Link to={missing.to}>{L("Go to step", "Aller à l’étape")} {missing.n} : {ct(missing.label)}</Link></Button>
     </div>
   );
 }

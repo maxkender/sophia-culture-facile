@@ -90,7 +90,7 @@ export function ContractPage() {
       {steps.resignPending && <div className="mb-6"><Banner tone="warning" title={L(`You signed version ${sig?.document_version}. Please sign version ${doc.current_version}.`, `Tu as signé la version ${sig?.document_version}. Signe la version ${doc.current_version}.`)}>{ct("Clauses 2 and 4 changed.")}</Banner></div>}
       {signature ? (
         <>
-          <div className="mb-6"><Banner tone="success" title={`Signed on ${fmt(signature.signed_at)} · version ${signature.document_version} · ${signature.variant} variant`} /></div>
+          <div className="mb-6"><Banner tone="success" title={L(`Signed on ${fmt(signature.signed_at)} · version ${signature.document_version} · ${signature.variant} variant`, `Signé le ${fmt(signature.signed_at)} · version ${signature.document_version} · variante ${signature.variant}`)} /></div>
           <PortalCard><DocumentBody blocks={blocks} merge={merge} /></PortalCard>
         </>
       ) : !doc.published ? (
@@ -240,7 +240,7 @@ export function AccountSetupPage() {
         <SetupSub k="acc_email" done={Boolean(checks["acc_email"])}>
           <div className="grid gap-3 sm:grid-cols-2">
             <div><Label htmlFor="acc-email">{ct("Sophia email address")}</Label><Input id="acc-email" type="email" placeholder={ct("lea.creator@gmail.com")} value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-            <div><Label htmlFor="acc-pw">Password{account ? " (enter again to change)" : ""}</Label><Input id="acc-pw" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+            <div><Label htmlFor="acc-pw">{ct("Password")}{account ? L(" (enter again to change)", " (saisis-le à nouveau pour le changer)") : ""}</Label><Input id="acc-pw" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
           </div>
           <p className="mt-2 text-xs text-brand-navySoft">{ct("Stored encrypted. Only the Sophia team can reveal it, and every reveal is logged.")}</p>
           <Button className="mt-3" disabled={busy || !email || !password} onClick={() => run(() => saveStep({ data: { step: "email", email, password } }), ct("Email registered."))}>{ct("Register the email")}</Button>
@@ -398,7 +398,7 @@ function PayoutDetails() {
             </select>
             <Input className="min-w-56 flex-1" type="email" placeholder={`${alt === "wise" ? "Wise" : "PayPal"} email`} value={altEmail} onChange={(e) => setAltEmail(e.target.value)} />
             <Button variant="outline" onClick={async () => {
-               if (!isValidEmail(altEmail)) return void toast.error(`Enter the email address used for your ${alt === "wise" ? "Wise" : "PayPal"} account, for example name@example.com.`);
+               if (!isValidEmail(altEmail)) return void toast.error(L(`Enter the email address used for your ${alt === "wise" ? "Wise" : "PayPal"} account, for example name@example.com.`, `Saisis l’adresse email de ton compte ${alt === "wise" ? "Wise" : "PayPal"}, par exemple nom@exemple.com.`));
                try { await fallback({ data: { method: alt, email: altEmail } }); toast.success(ct("Payout details saved.")); qc.invalidateQueries({ queryKey: CREATOR_KEY }); }
                catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
             }}>{ct("Save")}</Button>
