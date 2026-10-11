@@ -16,7 +16,6 @@ import { cn } from "@/lib/utils";
 import { getMyPhotoUrl } from "@/lib/creator-app.functions";
 import { touchCreatorSeen } from "@/lib/ugc-creator.functions";
 import { useCreator } from "./useCreator";
-import { t as ct } from "@/i18n/creator-app";
 
 type Badge = "briefs" | "posts" | "calls" | "messages";
 type Item = { to: string; label: string; icon: LucideIcon; exact?: boolean; badge?: Badge; gate?: "steps" | "payouts" };
@@ -54,7 +53,7 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { counts, steps } = useCreator();
   return (
-    <nav aria-label={ct("Creator space")} className="flex flex-col gap-6">
+    <nav aria-label="Creator space" className="flex flex-col gap-6">
       {CREATOR_NAV.map((group) => (
         <div key={group.heading}>
           <p className="mb-2 px-3 text-[11px] font-bold uppercase tracking-[0.12em] text-brand-navySoft/70">{group.heading}</p>
@@ -76,7 +75,7 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
                   >
                     <Icon className="size-4 shrink-0" aria-hidden="true" />
                     <span className="flex-1 truncate">{item.label}</span>
-                    {locked ? <Lock className="size-3.5 opacity-60" aria-label={ct("Locked")} /> : count > 0 ? (
+                    {locked ? <Lock className="size-3.5 opacity-60" aria-label="Locked" /> : count > 0 ? (
                       <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold", active ? "bg-white text-brand-navy" : "bg-brand-navy text-card")}>{count}</span>
                     ) : null}
                   </Link>
@@ -96,7 +95,7 @@ function CreatorBell() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button type="button" variant="ghost" size="icon" className="relative" aria-label={ct("Notifications")}>
+        <Button type="button" variant="ghost" size="icon" className="relative" aria-label="Notifications">
           <Bell className="size-5" />
           {unread.length > 0 ? (
             <span className="absolute -right-0.5 -top-0.5 flex min-w-[18px] items-center justify-center rounded-full bg-portal-amber px-1 text-[10px] font-bold text-brand-navy">{unread.length}</span>
@@ -105,16 +104,16 @@ function CreatorBell() {
       </PopoverTrigger>
       <PopoverContent align="end" className="w-[22rem] p-0">
         <div className="flex items-center justify-between border-b border-brand-line px-4 py-3">
-          <p className="text-sm font-bold text-brand-navy">{ct("Notifications")}</p>
+          <p className="text-sm font-bold text-brand-navy">Notifications</p>
           {unread.length > 0 ? (
             <button type="button" className="text-xs font-semibold text-portal-accent hover:underline" onClick={async () => {
               await supabase.from("creator_notifications").update({ read_at: new Date().toISOString() }).in("id", unread.map((n) => n.id));
               reload();
-            }}>{ct("Mark all read")}</button>
+            }}>Mark all read</button>
           ) : null}
         </div>
         <ul className="max-h-96 overflow-y-auto">
-          {notes.length === 0 ? <li className="px-4 py-6 text-center text-sm text-brand-navySoft">{ct("Nothing yet.")}</li> : notes.map((n) => (
+          {notes.length === 0 ? <li className="px-4 py-6 text-center text-sm text-brand-navySoft">Nothing yet.</li> : notes.map((n) => (
             <li key={n.id} className={cn("border-b border-brand-line px-4 py-3 text-sm", !n.read_at && "bg-portal-amber/10")}>
               <p className="text-brand-navy">{n.body}</p>
               <p className="mt-1 text-xs text-brand-navySoft">{new Date(n.created_at).toLocaleString()}</p>
@@ -166,18 +165,18 @@ export function CreatorShell({ children }: { children: ReactNode }) {
       )}
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-bold text-brand-navy">{me.full_name}</span>
-        <span className="mt-0.5 inline-flex rounded-full bg-portal-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-portal-accent">{ct("Creator")}</span>
+        <span className="mt-0.5 inline-flex rounded-full bg-portal-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-portal-accent">Creator</span>
       </span>
-      <Button variant="ghost" size="icon" aria-label={ct("Sign out")} onClick={() => void signOut()}><LogOut className="size-4" /></Button>
+      <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => void signOut()}><LogOut className="size-4" /></Button>
     </div>
   );
 
   return (
     <div className="min-h-screen bg-portal-bg">
       <CommandDialog open={palette} onOpenChange={setPalette}>
-        <CommandInput placeholder={ct("Search pages and briefs…")} />
+        <CommandInput placeholder="Search pages and briefs…" />
         <CommandList>
-          <CommandEmpty>{ct("No result.")}</CommandEmpty>
+          <CommandEmpty>No result.</CommandEmpty>
           <CommandGroup heading="Pages">
             {all.map((i) => (
               <CommandItem key={i.to} onSelect={() => { setPalette(false); void navigate({ to: i.to }); }}>{i.label}</CommandItem>
@@ -192,7 +191,7 @@ export function CreatorShell({ children }: { children: ReactNode }) {
       </CommandDialog>
 
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-brand-line bg-card lg:flex">
-        <div className="flex h-16 items-center px-4"><Link to="/creators/app" aria-label={ct("Sophia creator space")}><Logo /></Link></div>
+        <div className="flex h-16 items-center px-4"><Link to="/creators/app" aria-label="Sophia creator space"><Logo /></Link></div>
         <div className="flex-1 overflow-y-auto px-3 py-4"><Nav /></div>
         <div className="border-t border-brand-line p-3">{user}</div>
       </aside>
@@ -202,10 +201,10 @@ export function CreatorShell({ children }: { children: ReactNode }) {
           <div className="flex min-h-14 items-center gap-3 px-4 py-2 sm:px-6">
             <Sheet open={drawer} onOpenChange={setDrawer}>
               <SheetTrigger asChild>
-                <Button type="button" variant="ghost" size="icon" className="relative lg:hidden" aria-label={ct("Open navigation")}><Menu className="size-5" />{pending > 0 && <span className="absolute right-1 top-1 min-w-4 rounded-full bg-portal-accent px-1 text-[10px] font-bold leading-4 text-card">{pending}</span>}</Button>
+                <Button type="button" variant="ghost" size="icon" className="relative lg:hidden" aria-label="Open navigation"><Menu className="size-5" />{pending > 0 && <span className="absolute right-1 top-1 min-w-4 rounded-full bg-portal-accent px-1 text-[10px] font-bold leading-4 text-card">{pending}</span>}</Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-72 overflow-y-auto bg-card p-0">
-                <SheetTitle className="sr-only">{ct("Creator navigation")}</SheetTitle>
+                <SheetTitle className="sr-only">Creator navigation</SheetTitle>
                 <div className="flex h-16 items-center px-4"><Logo /></div>
                 <div className="px-3 py-4"><Nav onNavigate={() => setDrawer(false)} /></div>
                 <div className="border-t border-brand-line p-3">{user}</div>
@@ -213,16 +212,16 @@ export function CreatorShell({ children }: { children: ReactNode }) {
             </Sheet>
             <p className="min-w-0 flex-1 truncate text-sm font-bold text-brand-navy">{current?.label ?? "Creator space"}</p>
             <button type="button" onClick={() => setPalette(true)} className="hidden items-center gap-2 rounded-full border border-brand-line px-3.5 py-2 text-sm text-brand-navySoft transition hover:border-portal-accent/40 hover:text-brand-navy sm:flex">
-              <Search className="size-4" aria-hidden="true" /> {ct("Search")}
+              <Search className="size-4" aria-hidden="true" /> Search
               <span className="rounded bg-portal-bg px-1.5 py-0.5 text-[10px] font-bold">⌘K</span>
             </button>
-            <Button type="button" variant="ghost" size="icon" className="sm:hidden" aria-label={ct("Search")} onClick={() => setPalette(true)}><Search className="size-5" /></Button>
+            <Button type="button" variant="ghost" size="icon" className="sm:hidden" aria-label="Search" onClick={() => setPalette(true)}><Search className="size-5" /></Button>
             <CreatorBell />
           </div>
         </header>
         <main className="safe-bottom mx-auto w-full min-w-0 max-w-5xl px-4 pb-24 pt-8 sm:px-6 sm:py-10 lg:pb-10">{children}</main>
       </div>
-      <nav aria-label={ct("Creator mobile")} className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-brand-line bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
+      <nav aria-label="Creator mobile" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-brand-line bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
         {([["/creators/app", "Home", Home], ["/creators/app/jobs", "Jobs", Briefcase], ["/creators/app/posts", "Posts", Video], ["/creators/app/tasks", "Tasks", ListChecks], ["/creators/app/messages", "Messages", MessageSquare]] as const).map(([to, l, Icon]) => {
           const on = to === "/creators/app" ? pathname === to : pathname.startsWith(to);
           return <Link key={to} to={to} className={cn("flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold", on ? "text-portal-accent" : "text-brand-navySoft")}><Icon className="size-5" />{l}</Link>;
@@ -247,7 +246,7 @@ export function Locked({ gate, children }: { gate: "steps" | "payouts"; children
   if (!missing) return <>{children}</>;
   return (
     <div className="rounded-portal border border-portal-amber/40 bg-portal-amber/10 p-6">
-      <p className="flex items-center gap-2 text-base font-extrabold text-brand-navy"><Lock className="size-4" /> {ct("This page is locked")}</p>
+      <p className="flex items-center gap-2 text-base font-extrabold text-brand-navy"><Lock className="size-4" /> This page is locked</p>
       <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
         {gate === "payouts"
           ? "Earnings open once onboarding steps 1 to 3 are done and your payout details are set up (step 4)."

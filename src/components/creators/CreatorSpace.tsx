@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NotSetUp } from "@/components/auth/NotSetUp";
 import { homeFor, resolveAccountRole, type AccountRole } from "@/lib/account-role";
-import { t as ct } from "@/i18n/creator-app";
 
 function useSessionUser() {
   const [user, setUser] = useState<{ id: string; email?: string } | null | undefined>(undefined);
@@ -39,7 +38,7 @@ export function SignIn({ invite, invitedEmail, standalone = false }: { invite: s
     if (invite) check({ data: { token: invite } }).then((r) => { setState(r.state); if (r.state !== "fresh") setMode("in"); }).catch(() => setState("fresh"));
   }, [invite, check]);
   async function go() {
-    if (mode === "up" && !adult) { toast.error(ct("Confirm you are at least 18.")); return; }
+    if (mode === "up" && !adult) { toast.error("Confirm you are at least 18."); return; }
     setBusy(true);
     const res =
       mode === "up"
@@ -48,41 +47,41 @@ export function SignIn({ invite, invitedEmail, standalone = false }: { invite: s
     setBusy(false);
     if (res.error) toast.error(res.error.message);
     else if (standalone && res.data.session) { const role = await resolveAccountRole(); window.location.assign(role ? homeFor(role) : "/creators/app"); }
-    else if (mode === "up" && !res.data.session) toast.success(ct("Check your inbox to confirm your email, then come back to this link."));
+    else if (mode === "up" && !res.data.session) toast.success("Check your inbox to confirm your email, then come back to this link.");
   }
   return (
     <div className="mx-auto max-w-sm space-y-3 p-6 pt-[max(1.5rem,env(safe-area-inset-top))] [&_input:not([type=checkbox])]:min-h-11 [&_button]:min-h-11">
-      <h1 className="text-2xl font-extrabold text-brand-navy">{ct("Sophia creator space")}</h1>
-      <p className="text-xs text-brand-navySoft">{ct("Authors: your space is at sophia-culture.com/auteurs/login.")}</p>
-      {state === "used" && <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy">{ct("You have already set up your account. Sign in below with your email and password.")}</p>}
-      {state === "expired" && <p className="rounded-xl bg-portal-amber/10 p-3 text-sm text-brand-navy">{ct("This invite is more than 30 days old. Ask the Sophia team for a new one, or sign in if you already created your account.")}</p>}
-      {state === "invalid" && <p className="rounded-xl bg-portal-amber/10 p-3 text-sm text-brand-navy">{ct("This invite link is not valid. If you already have an account, sign in below.")}</p>}
+      <h1 className="text-2xl font-extrabold text-brand-navy">Sophia creator space</h1>
+      <p className="text-xs text-brand-navySoft">Authors: your space is at sophia-culture.com/auteurs/login.</p>
+      {state === "used" && <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy">You have already set up your account. Sign in below with your email and password.</p>}
+      {state === "expired" && <p className="rounded-xl bg-portal-amber/10 p-3 text-sm text-brand-navy">This invite is more than 30 days old. Ask the Sophia team for a new one, or sign in if you already created your account.</p>}
+      {state === "invalid" && <p className="rounded-xl bg-portal-amber/10 p-3 text-sm text-brand-navy">This invite link is not valid. If you already have an account, sign in below.</p>}
       <p className="text-sm text-brand-navySoft">{mode === "up" ? "Create your account with the email your invite was sent to." : "Sign in to your creator space."}</p>
-      <Input type="email" placeholder={ct("Email")} value={email} readOnly={Boolean(invite && invitedEmail)} onChange={(e) => setEmail(e.target.value)} />
-      <Input type="password" placeholder={ct("Password")} value={password} onChange={(e) => setPassword(e.target.value)} />
+      <Input type="email" placeholder="Email" value={email} readOnly={Boolean(invite && invitedEmail)} onChange={(e) => setEmail(e.target.value)} />
+      <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
       {mode === "up" && (
         <label className="flex items-start gap-2 text-sm text-brand-navySoft">
           <input type="checkbox" className="mt-1" checked={adult} onChange={(e) => setAdult(e.target.checked)} />
-          {ct("I confirm I am at least 18 years old.")}
+          I confirm I am at least 18 years old.
         </label>
       )}
       {mode === "in" && (
         <button className="block text-xs text-brand-navySoft underline" onClick={async () => {
-          if (!email) { toast.error(ct("Enter your email first.")); return; }
+          if (!email) { toast.error("Enter your email first."); return; }
           const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password?space=creators` });
-          if (error) toast.error(error.message); else toast.success(ct("Check your inbox for a reset link."));
-        }}>{ct("Forgot password?")}</button>
+          if (error) toast.error(error.message); else toast.success("Check your inbox for a reset link.");
+        }}>Forgot password?</button>
       )}
       <Button className="w-full" disabled={busy} onClick={go}>{mode === "up" ? "Create account" : "Sign in"}</Button>
       {mode === "in" && (linkSent
-        ? <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy">{ct("Lien envoyé : regarde ta boîte mail (et les spams). / Link sent: check your inbox.")}</p>
+        ? <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy">Lien envoyé : regarde ta boîte mail (et les spams). / Link sent: check your inbox.</p>
         : <Button variant="outline" className="w-full" disabled={busy} onClick={async () => {
-            if (!/^\S+@\S+\.\S+$/.test(email.trim())) { toast.error(ct("Entre ton email d'abord. / Enter your email first.")); return; }
+            if (!/^\S+@\S+\.\S+$/.test(email.trim())) { toast.error("Entre ton email d'abord. / Enter your email first."); return; }
             setBusy(true);
             try { await sendLink({ data: { email: email.trim(), origin: window.location.origin, lang: navigator.language.toLowerCase().startsWith("fr") ? "fr" : "en" } }); setLinkSent(true); }
-            catch { toast.error(ct("Le lien n'a pas pu être envoyé. Réessaie. / The link could not be sent.")); }
+            catch { toast.error("Le lien n'a pas pu être envoyé. Réessaie. / The link could not be sent."); }
             setBusy(false);
-          }}>{ct("Recevoir un lien de connexion par email")}</Button>)}
+          }}>Recevoir un lien de connexion par email</Button>)}
       <button className="text-xs text-brand-navySoft underline" onClick={() => setMode(mode === "up" ? "in" : "up")}>
         {mode === "up" ? "I already have an account" : "I have an invite, create my account"}
       </button>
@@ -109,9 +108,9 @@ function Workspace() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
-  if (data === undefined) return <p className="p-6 text-sm">{ct("Loading…")}</p>;
+  if (data === undefined) return <p className="p-6 text-sm">Loading…</p>;
   if (data === null) {
-    if (role === undefined || role === "creator") return <p className="p-6 text-sm">{ct("Loading…")}</p>;
+    if (role === undefined || role === "creator") return <p className="p-6 text-sm">Loading…</p>;
     return <NotSetUp loginTo="/creators/login" />;
   }
   return <CreatorShell><Outlet /></CreatorShell>;
