@@ -28,11 +28,11 @@ export function useSetupChecklist(): SetupStep[] {
   const [n0 = 0, n1 = 0, n2 = 0, n3 = 0, n4 = 0] = data ?? [];
   const n = [n0, n1, n2, n3, n4] as const;
   return [
-    { title: "Create your first campaign", subtitle: "Set the brief, the payout and who can join", done: n[0] > 0, to: "/hub/campaigns/create" },
-    { title: "Message your applicants", subtitle: "Say hello and answer their questions", done: n[1] > 0, to: "/hub/messages" },
-    { title: "Invite a creator and get them signed", subtitle: "Send an invite and get the agreement signed", done: n[2] > 0, to: "/hub/discover" },
-    { title: "Get your first live post", subtitle: "Approve a creator's first video", done: n[3] > 0, to: "/hub/campaigns" },
-    { title: "Track your results", subtitle: "Views and engagement start flowing in daily", done: n[4] > 0, to: "/hub/analytics" },
+    { title: "Publish a job", subtitle: "The brief, the pay and who can apply", done: n[0] > 0, to: "/hub/campaigns/create" },
+    { title: "Answer your applicants", subtitle: "A short hello and their questions", done: n[1] > 0, to: "/hub/messages" },
+    { title: "Sign your first creator", subtitle: "Invite and agreement", done: n[2] > 0, to: "/hub/discover" },
+    { title: "Get the first video online", subtitle: "Approve a first video", done: n[3] > 0, to: "/hub/campaigns" },
+    { title: "Read your numbers", subtitle: "Views arrive every day", done: n[4] > 0, to: "/hub/analytics" },
   ];
 }
 

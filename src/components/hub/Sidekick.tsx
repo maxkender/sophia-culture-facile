@@ -61,11 +61,11 @@ export function SidekickDrawer({ open, onOpenChange }: { open: boolean; onOpenCh
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 bg-card p-0 sm:max-w-[420px]">
-        <SheetTitle className="sr-only">Sidekick</SheetTitle>
+        <SheetTitle className="sr-only">Assistant</SheetTitle>
         <div className="flex items-center gap-2 border-b border-brand-line p-3 pr-12">
           <Bot className="size-5 text-portal-accent" />
           <select aria-label="Mode" value={mode} onChange={(e) => setMode(e.target.value as typeof mode)} className="h-9 rounded-lg border px-2 text-sm font-bold">
-            <option value="balanced">Sidekick · Balanced</option><option value="precise">Sidekick · Precise</option><option value="creative">Sidekick · Creative</option>
+            <option value="precise">Assistant · Short</option><option value="balanced">Assistant · Normal</option><option value="creative">Assistant · Detailed</option>
           </select>
           <Button size="sm" variant="outline" className="ml-auto" onClick={() => { setThreadId(null); setMsgs([]); }}><Plus className="size-4" />New chat</Button>
         </div>
@@ -86,11 +86,11 @@ export function SidekickDrawer({ open, onOpenChange }: { open: boolean; onOpenCh
               </div>
             );
           })}
-          {busy ? <p className="text-xs text-brand-navySoft">Sidekick is thinking…</p> : null}
+          {busy ? <p className="text-xs text-brand-navySoft">Assistant is thinking…</p> : null}
           <div ref={end} />
         </div>
         <form className="flex gap-2 border-t border-brand-line p-3" onSubmit={(e) => { e.preventDefault(); void send(); }}>
-          <input aria-label="Message" value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask Sidekick anything…" className="min-h-11 flex-1 rounded-xl border px-3 text-sm" />
+          <input aria-label="Message" value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask the Assistant…" className="min-h-11 flex-1 rounded-xl border px-3 text-sm" />
           <Button type="submit" disabled={busy || !text.trim()} aria-label="Send"><Send className="size-4" /></Button>
         </form>
       </SheetContent>
