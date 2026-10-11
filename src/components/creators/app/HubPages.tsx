@@ -50,7 +50,7 @@ export function CreatorStatsStrip() {
     <div className="mb-8 space-y-4">
       <div className="grid grid-cols-4 gap-2 rounded-portal bg-card p-3 text-center shadow-portal">
         {[["Views", compact(views)], ["Earned", fmtMoney(earned)], ["Posts", String(approved.length)], ["Streak", `${streak}d`]].map(([k, v]) => (
-          <div key={k}><p className="text-lg font-extrabold text-brand-navy sm:text-2xl">{v}</p><p className="text-xs text-brand-navySoft">{ct(k)}</p></div>
+          <div key={k}><p className="text-lg font-extrabold text-brand-navy sm:text-2xl">{v}</p><p className="text-xs text-brand-navySoft">{ct(String(k))}</p></div>
         ))}
       </div>
       <PortalCard className="p-4">
