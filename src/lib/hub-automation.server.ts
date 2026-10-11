@@ -136,7 +136,7 @@ async function remind(admin: Admin, c: any, kind: "d3" | "d7") {
 /** Daily: 72h without a post → dormant + reminders at day 3 and day 7; 14 days → accounts back to the pool with a password-rotation task. */
 export async function runDormancy(admin: Admin) {
   return withLock(admin, "dormancy", 15, async () => {
-    const { data: creators } = await admin.from("creators").select("id, full_name, email, tiktok_handle, instagram_handle, onboarding_completed_at, dormant_at, dormancy_reminders, ugc_status")
+    const { data: creators } = await admin.from("creators").select("id, full_name, email, language, country, tiktok_handle, instagram_handle, onboarding_completed_at, dormant_at, dormancy_reminders, ugc_status")
       .eq("track", "ugc").not("onboarding_completed_at", "is", null).limit(500);
     const now = Date.now();
     let dormant = 0, reminders = 0, pooled = 0;
