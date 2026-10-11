@@ -1949,5 +1949,6 @@ export const CREATOR_APP_DICT: Record<string, { fr: string; en: string }> = {
  "Earned": {"fr": "Gagné", "en": "Earned"},
  "Streak": {"fr": "Série", "en": "Streak"},
  "Brief": {"fr": "Brief", "en": "Brief"},
- "Delete": {"fr": "Supprimer", "en": "Delete"}
+ "Delete": {"fr": "Supprimer", "en": "Delete"},
+ "Language of your space": {"fr": "Langue de ton espace", "en": "Language of your space"}
 };

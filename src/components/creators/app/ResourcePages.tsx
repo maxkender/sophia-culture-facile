@@ -30,7 +30,7 @@ import { CreatorAgreementForm } from "../CreatorAgreementForm";
 import { AccessCodeCard } from "./HomePage";
 import { GuidelinesList } from "../Guidelines";
 import { CREATOR_KEY, fileToBase64, useCreator } from "./useCreator";
-import { t as ct } from "@/i18n/creator-app";
+import { t as ct, CreatorLangSwitch } from "@/i18n/creator-app";
 
 const fmt = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
 
@@ -315,6 +315,7 @@ export function ProfilePage() {
   return (
     <div>
       <PageTitle title={ct("Profile")} lead={ct("Your details, your Sophia app access, the creators Slack and your payout details.")} />
+      <PortalCard className="mb-6 flex flex-wrap items-center justify-between gap-3"><p className="font-extrabold text-brand-navy">{ct("Language of your space")}</p><CreatorLangSwitch /></PortalCard>
       <SetPasswordCard />
       <PortalCard>
         <div className="grid gap-4 sm:grid-cols-2">
