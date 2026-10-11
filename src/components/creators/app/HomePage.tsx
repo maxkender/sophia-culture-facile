@@ -14,7 +14,7 @@ import { myRunningMonth } from "@/lib/ugc-creator.functions";
 import { CreatorStatsStrip } from "./HubPages";
 import { supabase } from "@/integrations/supabase/client";
 import { FilesSection, type BriefAsset } from "@/components/hub/BriefPreview";
-import { t as ct } from "@/i18n/creator-app";
+import { t as ct, L } from "@/i18n/creator-app";
 
 /** "Kit de démarrage": the app's screen recordings, logos and bio/CTA texts, plus the creator's personal files. */
 function StarterKit() {
@@ -66,7 +66,7 @@ export function CreatorHomePage() {
 
   return (
     <div>
-      <PageTitle title={`Welcome, ${first}`} lead={ct("Your creator space: briefs, the reference library, your posts, calls, earnings and messages with the Sophia team.")} />
+      <PageTitle title={L(`Welcome, ${first}`, `Bienvenue, ${first}`)} lead={ct("Your creator space: briefs, the reference library, your posts, calls, earnings and messages with the Sophia team.")} />
       <ol className="mb-6 grid gap-3 sm:grid-cols-3" data-testid="loop-strip">
         {([["1", ct("Lis ton brief"), "/creators/app/briefs"], ["2", "Poste", "/creators/app/briefs"], ["3", ct("Colle tes liens"), "/creators/app/posts"]] as const).map(([n, l, to]) => (
           <li key={n}><Link to={to} className="flex min-h-14 items-center gap-3 rounded-2xl bg-card p-4 font-extrabold text-brand-navy shadow-portal hover:ring-2 hover:ring-portal-accent/30"><span className="grid size-8 place-items-center rounded-full bg-portal-accent text-card">{n}</span>{l}</Link></li>

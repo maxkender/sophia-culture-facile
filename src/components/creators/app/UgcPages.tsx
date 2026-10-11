@@ -15,7 +15,7 @@ import { postStage } from "./WorkPages";
 import { LibraryPage as ReferenceLibrary } from "./WorkPages";
 import { MyTerms } from "./HubPages";
 import { supabase } from "@/integrations/supabase/client";
-import { t as ct } from "@/i18n/creator-app";
+import { t as ct, L } from "@/i18n/creator-app";
 
 const n = (v: number) => new Intl.NumberFormat("en-GB").format(Math.round(v));
 const day = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }) : ct("Any day"));
@@ -130,7 +130,7 @@ export function UgcEarningsPage() {
   const b = data.breakdown;
   return (
     <div>
-      <PageTitle title={ct("Earnings")} lead={`Live for ${b.period}. Our system reads views directly from your accounts.`} />
+      <PageTitle title={ct("Earnings")} lead={L(`Live for ${b.period}. Our system reads views directly from your accounts.`, `En direct pour ${b.period}. Notre système lit les vues directement sur tes comptes.`)} />
       <EarningsTerms />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {[

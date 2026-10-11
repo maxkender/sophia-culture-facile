@@ -30,7 +30,7 @@ import { CreatorAgreementForm } from "../CreatorAgreementForm";
 import { AccessCodeCard } from "./HomePage";
 import { GuidelinesList } from "../Guidelines";
 import { CREATOR_KEY, fileToBase64, useCreator } from "./useCreator";
-import { t as ct, CreatorLangSwitch } from "@/i18n/creator-app";
+import { t as ct, L, CreatorLangSwitch } from "@/i18n/creator-app";
 
 const fmt = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
 
@@ -50,8 +50,8 @@ export function RulesPage() {
   if (!doc) return <p className="text-sm text-brand-navySoft">{ct("Loading…")}</p>;
   return (
     <div>
-      <PageTitle title={ct("Creator rules")} lead={`Version ${doc.current_version} · updated ${fmt(doc.updated_at)}`} />
-      {me.rules_accepted_at && <div className="mb-6"><Banner tone="success" title={`You accepted these rules on ${fmt(me.rules_accepted_at)}`} /></div>}
+      <PageTitle title={ct("Creator rules")} lead={L(`Version ${doc.current_version} · updated ${fmt(doc.updated_at)}`, `Version ${doc.current_version} · mise à jour le ${fmt(doc.updated_at)}`)} />
+      {me.rules_accepted_at && <div className="mb-6"><Banner tone="success" title={L(`You accepted these rules on ${fmt(me.rules_accepted_at)}`, `Tu as accepté ces règles le ${fmt(me.rules_accepted_at)}`)} /></div>}
       <PortalCard>
         <h2 className="mb-4 text-2xl font-extrabold text-brand-navy">{ct(doc.title)}</h2>
         <DocumentBody blocks={parseBlocks(doc.content)} />
@@ -87,7 +87,7 @@ export function ContractPage() {
   return (
     <div>
       <PageTitle title={ct("Creator Account Agreement")} lead={ct("The accounts you set up belong to Sophia. Read the agreement in full, then sign.")} />
-      {steps.resignPending && <div className="mb-6"><Banner tone="warning" title={`You signed version ${sig?.document_version}. Please sign version ${doc.current_version}.`}>{ct("Clauses 2 and 4 changed.")}</Banner></div>}
+      {steps.resignPending && <div className="mb-6"><Banner tone="warning" title={L(`You signed version ${sig?.document_version}. Please sign version ${doc.current_version}.`, `Tu as signé la version ${sig?.document_version}. Signe la version ${doc.current_version}.`)}>{ct("Clauses 2 and 4 changed.")}</Banner></div>}
       {signature ? (
         <>
           <div className="mb-6"><Banner tone="success" title={`Signed on ${fmt(signature.signed_at)} · version ${signature.document_version} · ${signature.variant} variant`} /></div>

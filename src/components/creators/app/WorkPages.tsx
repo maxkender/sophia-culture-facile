@@ -21,7 +21,7 @@ import { submitPostLinks } from "@/lib/ugc-loop.functions";
 import { GuidelinesBlock, GuidelinesChecklist, useGuidelines } from "../Guidelines";
 import { parisWeekStart } from "@/lib/ugc-pay";
 import { CATEGORY_LEGEND, briefStatus, fileToBase64, useCreator, type CreatorData } from "./useCreator";
-import { t as ct } from "@/i18n/creator-app";
+import { t as ct, L } from "@/i18n/creator-app";
 
 type Post = CreatorData["posts"][number];
 type Ref = CreatorData["refs"][number];
@@ -164,7 +164,7 @@ function FactBriefs() {
                   <h3 className="text-lg font-extrabold text-brand-navy">{ct(b.title)}</h3>
                   <Pill s={briefStatus(d, b.id)} />
                 </div>
-                <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-brand-navySoft"><AppBadge appId={b.app_id} />{b.due_date ? `Due ${fmtDate(b.due_date)}` : ct("No deadline")}</p>
+                <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-brand-navySoft"><AppBadge appId={b.app_id} />{b.due_date ? L(`Due ${fmtDate(b.due_date)}`, `À rendre le ${fmtDate(b.due_date)}`) : ct("No deadline")}</p>
               </PortalCard>
             </Link>
           ))}
@@ -199,7 +199,7 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
   return (
     <div>
       <Link to="/creators/app/briefs" className="text-sm font-semibold text-portal-accent">{ct("← All briefs")}</Link>
-      <div className="mt-3"><PageTitle title={ct(brief.title)} lead={brief.due_date ? `Due ${fmtDate(brief.due_date)}` : ""} action={<Pill s={status} />} /></div>
+      <div className="mt-3"><PageTitle title={ct(brief.title)} lead={brief.due_date ? L(`Due ${fmtDate(brief.due_date)}`, `À rendre le ${fmtDate(brief.due_date)}`) : ""} action={<Pill s={status} />} /></div>
       <div className="mb-4"><AppBadge appId={brief.app_id} className="text-sm" /></div>
       <PortalCard><BriefView b={toStudio(brief as Record<string, unknown>)} assets={files} refs={refs} pay={pay} /></PortalCard>
       <div className="mt-4"><GuidelinesBlock appId={brief.app_id} /></div>
@@ -318,11 +318,11 @@ type LoopPost = Post & { pay_status?: string | null; views_frozen?: number | nul
 export function postStage(p: Post, paidAt?: string | null): { label: string; tone: string; detail?: string | undefined } {
   const x = p as LoopPost;
   const v = (n: number | null | undefined) => Number(n ?? 0).toLocaleString("fr-FR");
-  if (p.status === "rejected") return { label: "Refusé", tone: "bg-portal-red/10 text-portal-red", detail: p.feedback ? `Raison : ${p.feedback}` : undefined };
+  if (p.status === "rejected") return { label: "Refusé", tone: "bg-portal-red/10 text-portal-red", detail: p.feedback ? L(`Reason: ${p.feedback}`, `Raison : ${p.feedback}`) : undefined };
   if (p.status === "pending" || p.status === "flagged") return { label: "Envoyé", tone: "bg-brand-surfaceStrong text-brand-navySoft", detail: "en attente de validation" };
-  if (x.pay_status === "paid") return { label: paidAt ? `Payé le ${fmtDate(paidAt)}` : "Payé", tone: "bg-portal-green/15 text-portal-green", detail: `${eurFr(x.pay_amount)} · vues à J+7 : ${v(x.views_frozen)}` };
-  if (x.pay_status === "approved") return { label: `Paiement en cours : ${eurFr(x.pay_amount)}`, tone: "bg-portal-green/10 text-portal-green", detail: `vues à J+7 : ${v(x.views_frozen)}` };
-  if (x.pay_status === "ready") return { label: `Prêt pour paiement : ${eurFr(x.pay_amount)}`, tone: "bg-portal-green/10 text-portal-green", detail: `vues à J+7 : ${v(x.views_frozen)}` };
+  if (x.pay_status === "paid") return { label: paidAt ? L(`Paid on ${fmtDate(paidAt)}`, `Payé le ${fmtDate(paidAt)}`) : "Payé", tone: "bg-portal-green/15 text-portal-green", detail: `${eurFr(x.pay_amount)} · vues à J+7 : ${v(x.views_frozen)}` };
+  if (x.pay_status === "approved") return { label: L(`Payment in progress: ${eurFr(x.pay_amount)}`, `Paiement en cours : ${eurFr(x.pay_amount)}`), tone: "bg-portal-green/10 text-portal-green", detail: `vues à J+7 : ${v(x.views_frozen)}` };
+  if (x.pay_status === "ready") return { label: L(`Ready for payment: ${eurFr(x.pay_amount)}`, `Prêt pour paiement : ${eurFr(x.pay_amount)}`), tone: "bg-portal-green/10 text-portal-green", detail: `vues à J+7 : ${v(x.views_frozen)}` };
   if (x.pay_status === "no_data") return { label: ct("Validé · vues introuvables"), tone: "bg-portal-amber/15 text-portal-amber", detail: "l’équipe vérifie le lien avant de payer" };
   const j7 = x.validated_at ? new Date(new Date(x.validated_at).getTime() + 7 * 86400000).toISOString() : null;
   return { label: "Validé", tone: "bg-portal-accent/10 text-portal-accent", detail: `${p.views != null ? `${v(p.views)} vues pour l’instant · ` : ""}vues comptées le ${j7 ? fmtDate(j7) : "—"} (J+7)` };
@@ -417,7 +417,7 @@ export function CallsPage() {
             return (
               <div key={c.id} className="flex items-center justify-between px-5 py-3 text-sm">
                 <span><b className="text-brand-navy">{ct(c.title)}</b> <span className="text-brand-navySoft">· {fmtDate(c.starts_at)}</span></span>
-                <span className="text-brand-navySoft">{r?.attended == null ? `RSVP: ${r?.answer ?? "none"}` : r.attended ? "Attended" : "Missed"}</span>
+                <span className="text-brand-navySoft">{r?.attended == null ? L(`RSVP: ${r?.answer ?? "none"}`, `Réponse : ${r?.answer ?? "aucune"}`) : r.attended ? "Attended" : "Missed"}</span>
               </div>
             );
           })}
@@ -510,7 +510,7 @@ export function MessagesPage() {
     posts.filter((p) => p.feedback).forEach((p) => ids.add(p.id));
     return [
       { id: "general", label: "General", unread: msgs.filter((m) => !m.post_id && m.from_admin && !m.read_at).length },
-      ...posts.filter((p) => ids.has(p.id)).map((p) => ({ id: p.id, label: `Post · ${fmtDate(p.posted_on)}`, unread: msgs.filter((m) => m.post_id === p.id && m.from_admin && !m.read_at).length })),
+      ...posts.filter((p) => ids.has(p.id)).map((p) => ({ id: p.id, label: L(`Post · ${fmtDate(p.posted_on)}`, `Post · ${fmtDate(p.posted_on)}`), unread: msgs.filter((m) => m.post_id === p.id && m.from_admin && !m.read_at).length })),
     ];
   }, [msgs, posts]);
   const postId = thread === "general" ? null : thread;
