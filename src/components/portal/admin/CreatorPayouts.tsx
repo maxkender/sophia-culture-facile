@@ -108,7 +108,7 @@ export function CreatorPayouts({ inHub = false }: { inHub?: boolean } = {}) {
   return (
     <div className="space-y-6">
       <PageTitle title="Creator payouts" lead="Monthly batches, paid by Stripe Connect or exported for Wise, PayPal and bank transfer." />
-      {!inHub && <p className="rounded-xl bg-muted px-4 py-2 text-sm">Payouts now live in the Creator Hub: <a className="font-semibold underline" href="/hub/payouts">open Hub → Payouts</a>.</p>}
+      {!inHub && <p className="rounded-xl bg-muted px-4 py-2 text-sm">Payouts now live in the Creator Hub: <a className="font-semibold underline" href="/hub/ugc/payouts">open Hub → Payouts</a>.</p>}
       {tab === "batches" && <UgcMonthPanel />}
       <div className="flex flex-wrap gap-2">
         {(["batches", "rates", "creators"] as Tab[]).map((t) => (

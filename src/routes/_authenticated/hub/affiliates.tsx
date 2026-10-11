@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Affiliates } from "@/components/hub/Affiliates";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Moved into a Hub space; kept so old links keep working. */
 export const Route = createFileRoute("/_authenticated/hub/affiliates")({
-  head: () => ({ meta: [{ title: "Affiliates | Creator Hub" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: Affiliates,
+  beforeLoad: () => {
+    throw redirect({ to: "/hub/ugc/referrals", replace: true, statusCode: 301 } as never);
+  },
 });

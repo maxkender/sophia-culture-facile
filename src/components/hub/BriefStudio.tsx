@@ -128,7 +128,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
     setB({ ...x, id });
     void qc.invalidateQueries({ queryKey: ["hub", "learn"] });
     if (!quiet) toast.success(x.status === "published" ? "Published" : "Saved");
-    if (!b!.id) void navigate({ to: "/hub/learn/briefs/$briefId", params: { briefId: id }, replace: true });
+    if (!b!.id) void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: id }, replace: true });
     return id;
   }
 
@@ -142,7 +142,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
       const { data, error } = await supabase.from("briefs").insert({ app_id: en.app_id, title: en.title, brief_type: en.brief_type, effort: en.effort, format: en.effort, platform: en.platform, duration_target: en.duration_target, hook_text: en.hook_text, hook: en.hook_text, hooks: [en.hook_text ?? ""], oral_hook: en.oral_hook, hook_visual: en.hook_visual, beats: en.beats, body: briefBody(en), product_second: en.product_second, product_gesture: en.product_gesture, product_moment: en.product_moment, say_name: en.say_name, rules_do: en.rules_do, rules_dont: en.rules_dont, rules_text: en.rules_text, status: "draft", language: "en", translation_of: id, reference_video_ids: refIds } as never).select("id").single();
       if (error || !data) throw new Error("The English version could not be saved.");
       if (assets.length) await supabase.from("brief_assets").insert(assets.map((a, i) => ({ brief_id: data.id, asset_id: a.id, role: a.role, sort_order: i })));
-      toast.success("English version saved as a draft", { action: { label: "Open", onClick: () => void navigate({ to: "/hub/learn/briefs/$briefId", params: { briefId: data.id } }) } });
+      toast.success("English version saved as a draft", { action: { label: "Open", onClick: () => void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: data.id } }) } });
     } catch (e) { toast.error((e as Error).message); } finally { setBusy(null); }
   }
   async function duplicate() {
@@ -151,7 +151,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
     if (!src) return;
     const { id: _i, created_at: _c, ...rest } = src as Record<string, unknown>;
     const { data } = await supabase.from("briefs").insert({ ...rest, title: `${src.title} (copie)`, status: "draft" } as never).select("id").single();
-    if (data) { if (assets.length) await supabase.from("brief_assets").insert(assets.map((a, i) => ({ brief_id: data.id, asset_id: a.id, role: a.role, sort_order: i }))); toast.success("Duplicated"); setB(null); void navigate({ to: "/hub/learn/briefs/$briefId", params: { briefId: data.id } }); }
+    if (data) { if (assets.length) await supabase.from("brief_assets").insert(assets.map((a, i) => ({ brief_id: data.id, asset_id: a.id, role: a.role, sort_order: i }))); toast.success("Duplicated"); setB(null); void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: data.id } }); }
   }
   async function assignTo() {
     const id = await save({}, true); if (!id || !assign.creatorId) return;
@@ -227,7 +227,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
         <Button onClick={() => void save()}>{b.status === "published" ? "Publish" : b.status === "scheduled" ? "Schedule" : "Save draft"}</Button>
         <Button variant="outline" disabled={busy === "translate"} onClick={() => void translate()}><Sparkles className="size-4" />{busy === "translate" ? "Translating…" : "Translate to EN"}</Button>
         <Button variant="outline" onClick={() => void duplicate()}>Duplicate</Button>
-        <Button variant="ghost" onClick={async () => { if (window.confirm("Archive this brief?")) { await save({ status: "archived" }); void navigate({ to: "/hub/learn" }); } }}>Archive</Button>
+        <Button variant="ghost" onClick={async () => { if (window.confirm("Archive this brief?")) { await save({ status: "archived" }); void navigate({ to: "/hub/ugc/library" }); } }}>Archive</Button>
       </div>
     </>],
   ];
@@ -237,7 +237,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-        <Link to="/hub/learn" className="text-sm font-semibold text-portal-accent">← Learn</Link>
+        <Link to="/hub/ugc/library" className="text-sm font-semibold text-portal-accent">← Learn</Link>
         <h1 className="flex-1 text-xl font-extrabold text-brand-navy">Brief Studio{b.language === "en" ? " · EN" : ""}</h1>
         <span className="rounded-full bg-portal-bg px-3 py-1 text-sm font-bold" data-testid="studio-progress">{doneCount}/7</span>
         <span title={grade.missing.join("\n")} data-testid="studio-score" className={cn("rounded-full px-3 py-1 text-sm font-extrabold", grade.score >= 8 ? "bg-portal-green/15 text-portal-green" : "bg-portal-amber/20 text-brand-navy")}>Score {grade.score}/10</span>

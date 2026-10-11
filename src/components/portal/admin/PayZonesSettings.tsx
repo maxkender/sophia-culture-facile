@@ -49,16 +49,16 @@ export function PayZonesSettings() {
 
   return (
     <PortalCard className="md:col-span-2">
-      <p className="text-sm font-bold text-brand-navy">Pay zones (slideshow track only)</p>
-      <p className="mt-1 text-xs text-brand-navySoft">Figures in USD. A country not listed has no zone and cannot be accepted without a manual zone.</p>
+      <p className="text-sm font-bold text-brand-navy">Weekly pay per zone</p>
+      <p className="mt-1 text-xs text-brand-navySoft">Figures in USD per week, 2 posts a day, 7 days a week. The first week pays the first-week figure. A country not listed has no zone: "country not open" (still kept in the pool).</p>
       <div className="mt-4 overflow-x-auto">
         <table className="w-full min-w-[520px] text-sm">
-          <thead><tr className="text-left text-xs uppercase text-brand-navySoft"><th className="py-2">Zone</th><th>Trial</th><th>Monthly</th><th>Ceiling</th><th>Posts/day</th></tr></thead>
+          <thead><tr className="text-left text-xs uppercase text-brand-navySoft"><th className="py-2">Zone</th><th>Per week</th><th>First week</th><th>Posts/day</th></tr></thead>
           <tbody>
             {data?.zones.map((z) => (
               <tr key={z.zone} className="border-t border-brand-line">
                 <td className="py-2"><span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${ZONE_BADGE[z.zone]}`}>Zone {z.zone}</span></td>
-                {(["trial_amount", "monthly_amount", "ceiling_amount", "posts_per_day"] as const).map((f) => (
+                {(["weekly_amount", "first_week_amount", "posts_per_day"] as const).map((f) => (
                   <td key={f} className="pr-2">
                     <Input
                       type="number" min="0" step={f === "posts_per_day" ? "1" : "0.01"} className="h-9 w-24"
@@ -66,7 +66,7 @@ export function PayZonesSettings() {
                       onBlur={(e) => {
                         const v = e.target.value === "" ? null : Number(e.target.value);
                         if (v === (z[f] === null ? null : Number(z[f]))) return;
-                        if (v === null && f !== "ceiling_amount") return;
+                        if (v === null) return;
                         void saveZone(z.zone, { [f]: v });
                       }}
                     />
@@ -81,7 +81,7 @@ export function PayZonesSettings() {
       <p className="mt-6 text-sm font-bold text-brand-navy">Countries ({data?.countries.length ?? 0})</p>
       <div className="mt-2 max-h-[420px] overflow-auto rounded-lg border border-brand-line">
         <table className="w-full min-w-[480px] text-sm">
-          <thead className="sticky top-0 bg-card"><tr className="text-left text-xs uppercase text-brand-navySoft"><th className="p-2">Code</th><th>Country</th><th>Zone</th><th>Ceiling applies</th><th /></tr></thead>
+          <thead className="sticky top-0 bg-card"><tr className="text-left text-xs uppercase text-brand-navySoft"><th className="p-2">Code</th><th>Country</th><th>Zone</th><th>Ceiling (legacy)</th><th /></tr></thead>
           <tbody>
             {data?.countries.map((c) => (
               <tr key={c.country_code} className="border-t border-brand-line">

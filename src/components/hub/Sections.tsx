@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AppBadge, useAdminApp } from "@/lib/apps";
-import { CreatorApplications } from "@/components/portal/admin/CreatorApplications";
 import { PayZonesSettings } from "@/components/portal/admin/PayZonesSettings";
 import { DocumentEditor } from "@/components/portal/admin/DocumentEditor";
 import { InfluencerApplications } from "@/components/portal/admin/InfluencerApplications";
@@ -18,12 +17,16 @@ import { AppsSettings } from "@/components/portal/admin/AppsSettings";
 import { CodesPool } from "@/components/portal/admin/CodesPool";
 import { AdminSettings } from "@/components/portal/admin/AdminSettings";
 import { IntegrationsSetup } from "@/components/portal/admin/UgcAdmin";
-import { HubPayouts } from "./HubPayouts";
+import { SlideshowApplications } from "./slides/SlideshowApplications";
+import { Posters } from "./slides/Posters";
+import { SlidesPayouts } from "./slides/SlidesPayouts";
+import { OsConnectionCard } from "./slides/OsConnectionCard";
+import { HubAccessCodes } from "./HubAccessCodes";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 
 /** Pill tabs that are real links, so each tab has its own URL. */
-export function SectionTabs({ base, tabs, current }: { base: "/hub/slideshows" | "/hub/influencers" | "/hub/settings" | "/hub/payouts"; tabs: [string, string][]; current: string }) {
+export function SectionTabs({ base, tabs, current }: { base: "/hub/settings"; tabs: [string, string][]; current: string }) {
   return (
     <div className="mb-5 flex gap-1 overflow-x-auto border-b border-brand-line" role="tablist">
       {tabs.map(([k, l]) => (
@@ -36,8 +39,6 @@ export function SectionTabs({ base, tabs, current }: { base: "/hub/slideshows" |
 const pick = (tabs: [string, string][], t?: string) => (tabs.some(([k]) => k === t) ? t! : tabs[0]![0]);
 
 /* ---------------- Slideshows ---------------- */
-export const SLIDESHOW_TABS: [string, string][] = [["applications", "Applications"], ["assign", "Hiring managers"], ["creators", "Slideshow creators"], ["zones", "Pay zones"], ["guide", "Guide"], ["platform", "Old platform"]];
-
 function useAdmins() {
   return useQuery({
     queryKey: ["hub", "admins-hm"],
@@ -76,7 +77,7 @@ function SlideshowAssign() {
       </div>
       <div className="overflow-x-auto rounded-2xl bg-card shadow-portal">
         <table className="w-full min-w-[640px] text-sm" data-testid="slideshow-assign">
-          <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Slideshow creator</th><th className="p-3">Country</th><th className="p-3">Zone</th><th className="p-3">Status</th><th className="p-3">Hiring manager</th></tr></thead>
+          <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Applicant</th><th className="p-3">Country</th><th className="p-3">Zone</th><th className="p-3">Status</th><th className="p-3">Hiring manager</th></tr></thead>
           <tbody>{rows.map((r) => (
             <tr key={r.id} className="border-t border-brand-line">
               <td className="p-3 font-bold text-brand-navy"><AppBadge appId={r.app_id} /> {r.full_name}</td>
@@ -89,25 +90,6 @@ function SlideshowAssign() {
         </table>
       </div>
     </div>
-  );
-}
-
-function SlideshowCreators() {
-  const { appId } = useAdminApp();
-  const { data = [] } = useQuery({
-    queryKey: ["hub", "slideshow-creators", appId],
-    queryFn: async () => {
-      let q = supabase.from("slideshow_applications").select("id, full_name, email, country, zone, zone_override, status, agreement_signed_at, guide_opened_at, app_id").in("status", ["approved", "accepted"]).order("agreement_signed_at", { ascending: false, nullsFirst: false });
-      if (appId) q = q.eq("app_id", appId);
-      return (await q).data ?? [];
-    },
-  });
-  if (!data.length) return <p className={cn(card, "text-sm text-brand-navySoft")}>No accepted slideshow creators yet. Accept an application to send the signature link.</p>;
-  return (
-    <div className="overflow-x-auto rounded-2xl bg-card shadow-portal"><table className="w-full min-w-[640px] text-sm">
-      <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Name</th><th className="p-3">Country · zone</th><th className="p-3">Agreement</th><th className="p-3">Guide</th></tr></thead>
-      <tbody>{data.map((r) => <tr key={r.id} className="border-t border-brand-line"><td className="p-3 font-bold">{r.full_name}<span className="block text-xs font-normal text-brand-navySoft">{r.email}</span></td><td className="p-3">{r.country} · {r.zone_override ?? r.zone ?? "—"}</td><td className="p-3">{r.agreement_signed_at ? `Signed ${new Date(r.agreement_signed_at).toLocaleDateString()}` : "Waiting for signature"}</td><td className="p-3">{r.guide_opened_at ? "Opened" : "Not opened"}</td></tr>)}</tbody>
-    </table></div>
   );
 }
 
@@ -127,42 +109,51 @@ function SettingLink({ k, label, help }: { k: string; label: string; help: strin
   );
 }
 
-export function Slideshows({ tab }: { tab?: string | undefined }) {
-  const t = pick(SLIDESHOW_TABS, tab);
-  const body: Record<string, ReactNode> = {
-    applications: <CreatorApplications key="slideshow" track="slideshow" />,
-    assign: <SlideshowAssign />,
-    creators: <SlideshowCreators />,
-    zones: <PayZonesSettings />,
-    guide: <DocumentEditor slug={"slideshow-guide" as never} />,
-    platform: <SettingLink k="slideshow_platform_url" label="Old slideshow platform" help="Where slideshow creators used to work. Kept here so the team can still open it." />,
-  };
-  return <div><SectionTabs base="/hub/slideshows" tabs={SLIDESHOW_TABS} current={t} />{body[t]}</div>;
+export function SlideshowSection({ section, id }: { section: string; id?: string | undefined }) {
+  switch (section) {
+    case "applications": return <SlideshowApplications focusId={id} />;
+    case "posters": return <Posters />;
+    case "managers": return <div className="space-y-6"><SlideshowAssign /><Team track="slideshow" /></div>;
+    case "rates": return <PayZonesSettings />;
+    case "payouts": return <SlidesPayouts />;
+    case "guide": return (
+      <div className="space-y-4">
+        <div className="grid gap-4 md:grid-cols-2">
+          <SettingLink k="slideshow_poster_guide_url" label="Poster Guide link" help="Sent to every new poster with their OS logins." />
+          <SettingLink k="slideshow_slack_invite_url" label="Slack invite link" help="Sent to every new poster with their OS logins." />
+        </div>
+        <DocumentEditor slug={"slideshow-guide" as never} />
+      </div>
+    );
+    case "platform": return <SettingLink k="slideshow_platform_url" label="Old slideshow platform" help="Where posters used to work. Kept here so the team can still open it." />;
+    default: return <p className={cn(card, "text-sm")}>This page does not exist. <Link to="/hub/slideshows" className="font-bold underline">Slideshows home</Link></p>;
+  }
 }
 
 /* ---------------- Influencers ---------------- */
-export const INFLUENCER_TABS: [string, string][] = [["applications", "Applications"], ["influencers", "Influencers"], ["offers", "Briefs & offers"], ["deals", "Deals"], ["messages", "Messages"], ["performance", "Attribution & performance"], ["agreement", "Master agreement"], ["settings", "Rights & settings"]];
+export function InfluencersHome() {
+  return <div className="space-y-4"><p className="text-sm text-brand-navySoft">Every deal at a glance. Open one to see its deliverables, payments and messages.</p><InfluencerDealsBoard /></div>;
+}
 
-export function Influencers({ tab, id }: { tab?: string | undefined; id?: string | undefined }) {
-  const t = pick(INFLUENCER_TABS, tab);
-  const body: Record<string, ReactNode> = {
-    applications: <InfluencerApplications />,
-    influencers: id ? <InfluencerAdminDetail influencerId={id} /> : <InfluencersGrid />,
-    offers: id ? <InfluencerBriefDetail briefId={id} /> : <InfluencerBriefsList />,
-    deals: id ? <InfluencerDealDetail dealId={id} /> : <InfluencerDealsBoard />,
-    messages: <InfluencerInbox />,
-    performance: <InfluencerPerformance />,
-    agreement: <DocumentEditor slug={"influencer-agreement" as never} />,
-    settings: <InfluencerSettingsAdmin />,
-  };
-  return <div><SectionTabs base="/hub/influencers" tabs={INFLUENCER_TABS} current={t} />{body[t]}</div>;
+export function InfluencerSection({ section, id }: { section: string; id?: string | undefined }) {
+  switch (section) {
+    case "applications": return <InfluencerApplications />;
+    case "influencers": return id ? <InfluencerAdminDetail influencerId={id} /> : <InfluencersGrid />;
+    case "offers": return id ? <InfluencerBriefDetail briefId={id} /> : <InfluencerBriefsList />;
+    case "deals": return id ? <InfluencerDealDetail dealId={id} /> : <InfluencerDealsBoard />;
+    case "messages": return <InfluencerInbox />;
+    case "attribution": return <InfluencerPerformance />;
+    case "settings": return <div className="space-y-6"><InfluencerSettingsAdmin /><DocumentEditor slug={"influencer-agreement" as never} /></div>;
+    case "payouts": return <InfluencerPayoutsAdmin />;
+    default: return <p className={cn(card, "text-sm")}>This page does not exist. <Link to="/hub/influencers" className="font-bold underline">Influencers home</Link></p>;
+  }
 }
 
 /* ---------------- Settings ---------------- */
 export const SETTINGS_TABS: [string, string][] = [["apps", "Apps & store links"], ["codes", "Access codes"], ["email", "Email"], ["connections", "Connections"], ["team", "Team & hiring managers"], ["security", "Security"]];
 
-const TRACKS = [["ugc", "Creators (UGC)"], ["slideshow", "Slideshow creators"], ["influencer", "Influencers"]] as const;
-function Team() {
+const TRACKS = [["ugc", "UGC"], ["slideshow", "Slideshows"], ["influencer", "Influencers"]] as const;
+function Team({ track }: { track?: string } = {}) {
   const qc = useQueryClient();
   const { data } = useAdmins();
   const { data: queues = {} } = useQuery({
@@ -185,7 +176,7 @@ function Team() {
   }
   return (
     <div className="space-y-3">
-      <p className="text-sm text-brand-navySoft">Every admin can be a hiring manager. Tick the tracks they handle and the countries they cover; their open queue is counted from the applications assigned to them.</p>
+      <p className="text-sm text-brand-navySoft">{track === "slideshow" ? "Zones and countries each hiring manager covers. " : ""}Every admin can be a hiring manager. Tick the tracks they handle and the countries they cover; their open queue is counted from the applications assigned to them.</p>
       <div className="overflow-x-auto rounded-2xl bg-card shadow-portal"><table className="w-full min-w-[720px] text-sm" data-testid="hm-team">
         <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Person</th><th className="p-3">Hiring manager</th><th className="p-3">Tracks</th><th className="p-3">Countries</th><th className="p-3">Open queue</th></tr></thead>
         <tbody>{(data?.admins ?? []).map((a) => { const h = data?.hms.find((x) => x.profile_id === a.id); return (
@@ -207,7 +198,7 @@ function EmailSettings() {
       <div className={cn(card, "space-y-2 text-sm")}>
         <h3 className="font-extrabold text-brand-navy">Emails to creators</h3>
         <p className="text-brand-navySoft">Acceptance, welcome and follow-up emails are sent through Brevo from the verified sophia-culture.com address. Subjects and texts are edited in Library → Templates.</p>
-        <Button asChild variant="outline"><Link to="/hub/learn">Open Library → Templates</Link></Button>
+        <Button asChild variant="outline"><Link to="/hub/ugc/library">Open Library → Templates</Link></Button>
       </div>
       <IntegrationsSetup />
     </div>
@@ -217,24 +208,8 @@ function EmailSettings() {
 export function HubSettings({ tab }: { tab?: string | undefined }) {
   const t = pick(SETTINGS_TABS, tab);
   const body: Record<string, ReactNode> = {
-    apps: <AppsSettings />, codes: <CodesPool />, email: <EmailSettings />, connections: <IntegrationsSetup />, team: <Team />, security: <AdminSettings />,
+    apps: <AppsSettings />, codes: <div className="space-y-6"><HubAccessCodes /><details className="rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold">Author codes and assignment history</summary><div className="mt-4"><CodesPool /></div></details></div>, email: <EmailSettings />, connections: <div className="space-y-4"><OsConnectionCard /><IntegrationsSetup /></div>, team: <Team />, security: <AdminSettings />,
   };
   return <div><SectionTabs base="/hub/settings" tabs={SETTINGS_TABS} current={t} />{body[t]}</div>;
 }
 
-/* ---------------- Payouts (three tracks) ---------------- */
-export const PAYOUT_TABS: [string, string][] = [["ugc", "Creators (UGC)"], ["slideshow", "Slideshow creators"], ["influencer", "Influencers"]];
-export function PayoutsSection({ tab }: { tab?: string | undefined }) {
-  const t = pick(PAYOUT_TABS, tab);
-  return (
-    <div>
-      <SectionTabs base="/hub/payouts" tabs={PAYOUT_TABS} current={t} />
-      {t === "ugc" ? <HubPayouts /> : t === "influencer" ? <InfluencerPayoutsAdmin /> : (
-        <div className="space-y-4">
-          <p className={cn(card, "text-sm text-brand-navySoft")}>Slideshow creators are paid by the zone of the country they live in. Their monthly lines are created in the same batches as UGC (Creators tab), with the zone rate below.</p>
-          <PayZonesSettings />
-        </div>
-      )}
-    </div>
-  );
-}

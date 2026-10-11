@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { CampaignWizard } from "@/components/hub/CampaignWizard";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Moved into a Hub space; kept so old links keep working. */
 export const Route = createFileRoute("/_authenticated/hub/campaigns/create")({
-  head: () => ({ meta: [{ title: "Create campaign | Creator Hub" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: CampaignWizard,
+  beforeLoad: () => {
+    throw redirect({ to: "/hub/ugc/campaigns/create", replace: true, statusCode: 301 } as never);
+  },
 });

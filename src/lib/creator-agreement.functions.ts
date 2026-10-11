@@ -82,9 +82,9 @@ export const getSigningPage = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!app) {
       const { data: signed } = await supabaseAdmin.from("slideshow_applications").select("status").eq("guide_token", data.token).maybeSingle();
-      return signed?.status === "approved" ? { state: "signed" as const } : { state: "invalid" as const };
+      return signed && ["approved", "contract_signed", "os_created", "started"].includes(signed.status) ? { state: "signed" as const } : { state: "invalid" as const };
     }
-    if (app.status !== "approved") return { state: "invalid" as const };
+    if (!["approved", "accepted"].includes(app.status)) return { state: "invalid" as const };
     const { data: doc } = await supabaseAdmin.from("documents").select("title, content, current_version, published").eq("slug", "creator-agreement").maybeSingle();
     if (!doc?.published) return { state: "unpublished" as const };
     return {
@@ -108,7 +108,7 @@ export const signWithToken = createServerFn({ method: "POST" })
       .select("id, status")
       .eq("signing_token", data.token)
       .maybeSingle();
-    if (!app || app.status !== "approved") throw new Error("This link is no longer valid.");
+    if (!app || !["approved", "accepted"].includes(app.status)) throw new Error("This link is no longer valid.");
     const version = await currentVersion(supabaseAdmin);
     if (version !== data.documentVersion) throw new Error("A new version was published. Reload the page.");
     const { ip, ua } = requestMeta(data.userAgent);
@@ -125,6 +125,14 @@ export const signWithToken = createServerFn({ method: "POST" })
       .from("slideshow_applications")
       .update({ signing_token: null, guide_token: data.token, agreement_signed_at: new Date().toISOString() })
       .eq("id", app.id);
+    if (app.status === "accepted") {
+      // New flow: contract signed → create the poster in the OS (failures stay on the card with Retry).
+      const now = new Date().toISOString();
+      const { data: cur } = await supabaseAdmin.from("slideshow_applications").select("timeline").eq("id", app.id).maybeSingle();
+      await supabaseAdmin.from("slideshow_applications").update({ status: "contract_signed", contract_signed_at: now, timeline: { ...((cur?.timeline as object) ?? {}), contract_signed: { at: now, by: "Poster" } } }).eq("id", app.id);
+      const { createPosterInOs } = await import("./slideshows.server");
+      await createPosterInOs(supabaseAdmin, app.id).catch(() => null);
+    }
     return { ok: true };
   });
 

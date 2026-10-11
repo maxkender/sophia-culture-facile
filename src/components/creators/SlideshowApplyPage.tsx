@@ -13,13 +13,19 @@ import { ApplyShell, Confirmation, FormSection, Honeypot, YesNo } from "./ApplyS
 import { useI18n, useLocalePath } from "@/i18n";
 import { CREATOR_FORMS } from "@/i18n/creator-forms";
 import { isHttpUrl, isValidEmail, isValidInternationalPhone } from "@/lib/creator-validation";
+import { APPLICANT_LANGS, langOfCountry, type ApplicantLang } from "@/config/countries";
+
+const LANG_NAMES: Record<ApplicantLang, string> = { fr: "Français", en: "English", es: "Español", it: "Italiano", pt: "Português", de: "Deutsch" };
 
 export function SlideshowApplyPage() {
   const { lang } = useI18n();
   const privacyPath = useLocalePath("privacy");
   const { common, slideshow: copy } = CREATOR_FORMS[lang];
   const submitFn = useServerFn(submitSlideshowApplication);
-  const [f, setF] = useState({ full_name: "", email: "", phone: "", country: "", referral: "", upwork_url: "" });
+  const [f, setF] = useState({ full_name: "", email: "", phone: "", country: "", referral: "", upwork_url: "", q_country_now: "", q_hours: "", q_tiktok: "", q_previous: "" });
+  const [phone2, setPhone2] = useState<"" | "yes" | "no">("");
+  const [langue, setLangue] = useState<ApplicantLang | null>(null);
+  const autoLang: ApplicantLang = f.country ? langOfCountry(f.country) : lang;
   const [adult, setAdult] = useState<"" | "yes" | "no">("");
   const [upwork, setUpwork] = useState<"" | "yes" | "no">("");
   const [consent, setConsent] = useState(false);
@@ -33,8 +39,12 @@ export function SlideshowApplyPage() {
     e.preventDefault();
     setError(null);
     if (adult === "no") return;
-    if (!f.full_name.trim() || !f.email.trim() || !f.country || !adult || !upwork) {
+    if (!f.full_name.trim() || !f.email.trim() || !f.country || !adult || !upwork || !phone2) {
       setError(common.requiredError);
+      return;
+    }
+    if (f.q_country_now.trim().length < 2 || !f.q_hours.trim() || !f.q_tiktok.trim() || f.q_previous.trim().length < 2) {
+      setError(copy.screeningError);
       return;
     }
     if (!isValidEmail(f.email)) {
@@ -67,6 +77,12 @@ export function SlideshowApplyPage() {
           upwork_profile_url: upwork === "yes" ? f.upwork_url : "",
           referral_source: f.referral,
           consent: true,
+          deux_telephones: phone2 === "yes",
+          langue: langue ?? autoLang,
+          q_country_now: f.q_country_now,
+          q_hours_per_day: f.q_hours,
+          q_tiktok_daily: f.q_tiktok,
+          q_previous_content: f.q_previous,
         },
       });
       if (!res.ok) {
@@ -135,8 +151,36 @@ export function SlideshowApplyPage() {
             ) : null}
           </div>
           <div className="space-y-2">
+            <Label htmlFor="phone2">{copy.secondPhone}</Label>
+            <YesNo id="phone2" value={phone2} onChange={setPhone2} yes={common.yes} no={common.no} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="langue">{copy.language}</Label>
+            <select id="langue" value={langue ?? autoLang} onChange={(e) => setLangue(e.target.value as ApplicantLang)} className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm">
+              {APPLICANT_LANGS.map((l) => <option key={l} value={l}>{LANG_NAMES[l]}</option>)}
+            </select>
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="referral">{copy.referral}</Label>
             <Textarea id="referral" rows={2} value={f.referral} onChange={(e) => set("referral", e.target.value)} />
+          </div>
+        </FormSection>
+        <FormSection title={copy.screening}>
+          <div className="space-y-2">
+            <Label htmlFor="q1">{copy.qCountryNow}</Label>
+            <Input id="q1" className="h-11" value={f.q_country_now} onChange={(e) => set("q_country_now", e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="q2">{copy.qHours}</Label>
+            <Input id="q2" className="h-11" value={f.q_hours} onChange={(e) => set("q_hours", e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="q3">{copy.qTiktok}</Label>
+            <Input id="q3" className="h-11" value={f.q_tiktok} onChange={(e) => set("q_tiktok", e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="q4">{copy.qPrevious}</Label>
+            <Textarea id="q4" rows={3} value={f.q_previous} onChange={(e) => set("q_previous", e.target.value)} />
           </div>
         </FormSection>
         <FormSection title={common.consent}>

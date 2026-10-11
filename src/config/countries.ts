@@ -21,3 +21,30 @@ export function countryNames(locale: "fr" | "en" = "en"): string[] {
   cache[locale] = sorted;
   return sorted;
 }
+
+/** Resolves a typed or picked country name (French or English) or a 2-letter code to its ISO code. */
+export function countryCodeOf(value: string | null | undefined): string | null {
+  const v = (value ?? "").trim().toLowerCase();
+  if (!v) return null;
+  if (/^[a-z]{2}$/.test(v) && CODES.includes(v.toUpperCase())) return v.toUpperCase();
+  for (const locale of ["en", "fr", "es", "it", "pt", "de"]) {
+    try {
+      const dn = new Intl.DisplayNames([locale], { type: "region" });
+      const hit = CODES.find((c) => (dn.of(c) ?? "").toLowerCase() === v);
+      if (hit) return hit;
+    } catch { /* Intl unavailable */ }
+  }
+  return null;
+}
+
+export type ApplicantLang = "fr" | "en" | "es" | "it" | "pt" | "de";
+const LANG_BY_CODE: Record<string, ApplicantLang> = {
+  FR: "fr", BE: "fr", LU: "fr", CH: "fr", MC: "fr", MA: "fr", SN: "fr", CI: "fr", TN: "fr", DZ: "fr", CM: "fr",
+  ES: "es", MX: "es", CO: "es", AR: "es", CL: "es", UY: "es", PE: "es", EC: "es", VE: "es", BO: "es", PY: "es", CR: "es", GT: "es", DO: "es",
+  IT: "it", SM: "it", PT: "pt", BR: "pt", AO: "pt", MZ: "pt", DE: "de", AT: "de", LI: "de",
+};
+export const APPLICANT_LANGS: ApplicantLang[] = ["fr", "en", "es", "it", "pt", "de"];
+export function langOfCountry(value: string | null | undefined): ApplicantLang {
+  const c = countryCodeOf(value);
+  return (c && LANG_BY_CODE[c]) || "en";
+}

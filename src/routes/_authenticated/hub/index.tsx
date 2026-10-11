@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { HubHome } from "@/components/hub/HubHome";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { lastSpace, SPACE_HOME } from "@/components/hub/spaces";
 
+/** /hub opens the last used space (UGC by default). */
 export const Route = createFileRoute("/_authenticated/hub/")({
-  head: () => ({ meta: [{ title: "Home | Creator Hub" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: HubHome,
+  beforeLoad: () => {
+    throw redirect({ to: SPACE_HOME[lastSpace()], replace: true } as never);
+  },
 });

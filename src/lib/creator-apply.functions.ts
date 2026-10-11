@@ -119,6 +119,12 @@ const slideSchema = z.object({
   referral_source: z.string().trim().max(1000).optional(),
   consent: z.literal(true),
   app: z.string().regex(/^[a-z0-9-]{2,40}$/).optional(),
+  deux_telephones: z.boolean(),
+  langue: z.enum(["fr", "en", "es", "it", "pt", "de"]),
+  q_country_now: z.string().trim().min(2).max(120),
+  q_hours_per_day: z.string().trim().min(1).max(120),
+  q_tiktok_daily: z.string().trim().min(1).max(120),
+  q_previous_content: z.string().trim().min(2).max(2000),
 });
 
 export const submitSlideshowApplication = createServerFn({ method: "POST" })
@@ -129,7 +135,7 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
     const hash = await ipHash();
     if (await rateLimited("slideshow_applications", hash, email)) return { ok: false as const, reason: "rate" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("slideshow_applications").insert({
+    const { data: inserted, error } = await supabaseAdmin.from("slideshow_applications").insert({
       app_id: await resolveAppId(data.app),
       full_name: data.full_name,
       email,
@@ -140,10 +146,22 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
       upwork_profile_url: data.has_upwork ? data.upwork_profile_url || null : null,
       referral_source: data.referral_source || null,
       submit_ip_hash: hash,
-    });
+      deux_telephones: data.deux_telephones,
+      langue: data.langue,
+      q_country_now: data.q_country_now,
+      q_hours_per_day: data.q_hours_per_day,
+      q_tiktok_daily: data.q_tiktok_daily,
+      q_previous_content: data.q_previous_content,
+    }).select("id").single();
     if (error) {
       console.error("slideshow application insert failed", error.message);
       return { ok: false as const, reason: "server" as const };
     }
+    // The one automatic email: an acknowledgement in the applicant's language. Nothing else is sent by itself.
+    try {
+      const { posterEmails } = await import("./slideshow-emails.server");
+      const r = await posterEmails.ack(email, data.full_name, data.langue);
+      if (r.sent) await supabaseAdmin.from("slideshow_applications").update({ ack_sent_at: new Date().toISOString() }).eq("id", inserted.id);
+    } catch { /* the application is saved either way */ }
     return { ok: true as const };
   });

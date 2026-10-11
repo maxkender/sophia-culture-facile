@@ -118,7 +118,7 @@ function InviteButton({ p, className }: { p: Person; className?: string }) {
       {open ? (
         <div className="absolute bottom-full left-0 z-20 mb-1 w-56 rounded-xl border bg-card p-1 shadow-lg" onClick={(e) => e.stopPropagation()}>
           <p className="px-2 py-1 text-xs font-bold text-brand-navySoft">Choose a job</p>
-          {jobs.length === 0 ? <p className="px-2 py-1 text-xs">No active job. <Link to="/hub/campaigns" search={{ tab: "jobs" }} className="underline">Create one</Link></p> : jobs.map((j) => <button key={j.id} type="button" onClick={() => void invite(j.id)} className="block w-full rounded-lg px-2 py-1.5 text-left text-sm hover:bg-portal-bg">{j.title}</button>)}
+          {jobs.length === 0 ? <p className="px-2 py-1 text-xs">No active job. <Link to="/hub/ugc/campaigns" search={{ tab: "jobs" }} className="underline">Create one</Link></p> : jobs.map((j) => <button key={j.id} type="button" onClick={() => void invite(j.id)} className="block w-full rounded-lg px-2 py-1.5 text-left text-sm hover:bg-portal-bg">{j.title}</button>)}
         </div>
       ) : null}
     </div>
@@ -187,7 +187,7 @@ function Drawer({ list, index, setIndex, maxViews, onFastLane }: { list: Person[
             </div>
           </div>
           <StatStrip p={p} />
-          <div className="flex gap-2"><InviteButton p={p} className="flex-1" />{p.kind === "creator" ? <Button asChild variant="outline" size="sm"><Link to="/hub/creators/$creatorId" params={{ creatorId: p.id }}>Full profile</Link></Button> : null}</div>
+          <div className="flex gap-2"><InviteButton p={p} className="flex-1" />{p.kind === "creator" ? <Button asChild variant="outline" size="sm"><Link to="/hub/ugc/creators/$creatorId" params={{ creatorId: p.id }}>Full profile</Link></Button> : null}</div>
           {p.kind === "creator" ? <FastLaneBlock creatorId={p.id} firstName={p.name.split(/\s+/)[0] ?? ""} /> : <Button size="sm" variant="outline" className="w-full" onClick={() => onFastLane({ kind: p.kind, id: p.id, name: p.name, email: p.email, country: p.country, tiktok: p.tiktok, instagram: p.instagram })}>Générer un lien (fast lane)</Button>}
           <div className="grid gap-3 sm:grid-cols-2">
             {([["Instagram", p.instagram, "https://instagram.com/"], ["TikTok", p.tiktok, "https://tiktok.com/@"]] as const).map(([n, h, base]) => (
@@ -206,7 +206,7 @@ function Drawer({ list, index, setIndex, maxViews, onFastLane }: { list: Person[
               <Button size="sm" variant="outline" className="mt-2" onClick={() => void saveNotes()}>Save notes</Button>
             </section>
           ) : null}
-          {p.kind === "creator" ? <div className="flex flex-wrap gap-2 border-t pt-4"><Button asChild size="sm" variant="outline"><Link to="/hub/messages">Message</Link></Button><Button asChild size="sm" variant="outline"><Link to="/hub/creators/$creatorId" params={{ creatorId: p.id }}>Change tier, rates or account</Link></Button></div> : null}
+          {p.kind === "creator" ? <div className="flex flex-wrap gap-2 border-t pt-4"><Button asChild size="sm" variant="outline"><Link to="/hub/ugc/messages">Message</Link></Button><Button asChild size="sm" variant="outline"><Link to="/hub/ugc/creators/$creatorId" params={{ creatorId: p.id }}>Change tier, rates or account</Link></Button></div> : null}
         </div>
       </SheetContent>
     </Sheet>

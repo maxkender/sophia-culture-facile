@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 const ACTIVE_ADVERTISER = "7675679952181493778";
-const back = (q: string) => new Response(null, { status: 302, headers: { Location: `/hub/ads?tab=connections&tiktok=${q}`, "Cache-Control": "no-store" } });
+const back = (q: string) => new Response(null, { status: 302, headers: { Location: `/hub/ugc/ads?tab=connections&tiktok=${q}`, "Cache-Control": "no-store" } });
 
 /* TikTok OAuth callback: signed state is verified before the auth code is exchanged; the token is stored server-side only. */
 export const Route = createFileRoute("/api/public/tiktok/oauth")({

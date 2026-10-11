@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Learn } from "@/components/hub/Learn";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Moved into a Hub space; kept so old links keep working. */
 export const Route = createFileRoute("/_authenticated/hub/learn")({
-  head: () => ({ meta: [{ title: "Library | Hub" }, { name: "robots", content: "noindex, nofollow" }] }),
-  validateSearch: (s: Record<string, unknown>): { tab?: string | undefined; sub?: string | undefined } => ({ tab: typeof s["tab"] === "string" ? s["tab"] : undefined, sub: typeof s["sub"] === "string" ? s["sub"] : undefined }),
-  component: function R() { const { tab, sub } = Route.useSearch(); return <Learn key={`${tab}-${sub}`} initialTab={tab} sub={sub} />; },
+  beforeLoad: ({ location }) => {
+    throw redirect({ to: "/hub/ugc/library", search: location.search, replace: true, statusCode: 301 } as never);
+  },
 });

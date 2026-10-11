@@ -271,10 +271,16 @@ export const adminRevealCredentials = createServerFn({ method: "POST" })
 
 export const adminAssignCreatorCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ creatorId: z.string().uuid(), platform: z.enum(["ios", "android"]) }).parse(d))
+  .inputValidator((d) => z.object({ creatorId: z.string().uuid(), platform: z.enum(["ios", "android"]), appId: z.string().uuid().optional() }).parse(d))
   .handler(async ({ data, context }) => {
     const admin = await adminProfile(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (data.appId && data.appId !== "00000000-0000-4000-8000-000000000001") {
+      const { assignAppCode } = await import("./access-codes.server");
+      const r = await assignAppCode(supabaseAdmin, data.creatorId, data.appId, data.platform);
+      if (!r.ok) throw new Error("No code left in this app's pool.");
+      return { ok: true as const };
+    }
     const { data: code } = await supabaseAdmin.from("access_codes").select("id, code, redeem_url").eq("state", "available").eq("platform", data.platform).eq("app_id", "00000000-0000-4000-8000-000000000001").is("assigned_to", null).is("assigned_creator_id", null).order("created_at").limit(1).maybeSingle();
     if (!code) throw new Error(`No ${data.platform === "ios" ? "Apple" : "Google"} code left in the pool.`);
     await supabaseAdmin.from("access_codes").update({ state: "assigned", assigned_creator_id: data.creatorId, assigned_at: new Date().toISOString() }).eq("id", code.id);

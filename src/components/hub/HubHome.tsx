@@ -54,7 +54,7 @@ function Performance() {
           <select aria-label="Date range" value={days} onChange={(e) => setDays(Number(e.target.value))} className="min-h-9 rounded-lg border border-brand-line bg-card px-2 text-sm">
             <option value={7}>Last 7 days</option><option value={30}>Last 30 days</option><option value={90}>Last 90 days</option>
           </select>
-          <Link to="/hub/analytics" className="text-sm font-semibold text-portal-accent">View All →</Link>
+          <Link to="/hub/ugc/analytics" className="text-sm font-semibold text-portal-accent">View All →</Link>
         </div>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
@@ -107,7 +107,7 @@ function Wallet() {
         <div><dt className="opacity-80">Currently owed</dt><dd className="font-bold">{eur(data?.currentlyOwed ?? 0)}</dd></div>
         <div><dt className="opacity-80">Pending balance</dt><dd className="font-bold">{eur(data?.pending ?? 0)}</dd></div>
       </dl>
-      <Button asChild variant="secondary" size="sm" className="mt-4 w-full"><Link to="/hub/payouts">Add Funds</Link></Button>
+      <Button asChild variant="secondary" size="sm" className="mt-4 w-full"><Link to="/hub/ugc/payouts">Add Funds</Link></Button>
     </section>
   );
 }
@@ -130,9 +130,9 @@ function NeedsAttention() {
       const posted = new Set((recent.data ?? []).map((r) => r.creator_id));
       const quiet = (active.data ?? []).filter((r) => !posted.has(r.id)).length;
       return [
-        { n: ugc + slide + jobs, label: "pending applications", to: "/hub/campaigns" },
-        { n: posts, label: "posts to review", to: "/hub/campaigns" },
-        { n: quiet, label: "creators with no post in 72h", to: "/hub/discover" },
+        { n: ugc + slide + jobs, label: "pending applications", to: "/hub/ugc/campaigns" },
+        { n: posts, label: "posts to review", to: "/hub/ugc/campaigns" },
+        { n: quiet, label: "creators with no post in 72h", to: "/hub/ugc/creators" },
       ].filter((x) => x.n > 0);
     },
   });
@@ -211,7 +211,7 @@ function MessagesCard() {
   });
   return (
     <section className={card}>
-      <div className="flex justify-between"><h2 className="font-extrabold text-brand-navy">Messages</h2><Link to="/hub/messages" className="text-sm font-semibold text-portal-accent">Open →</Link></div>
+      <div className="flex justify-between"><h2 className="font-extrabold text-brand-navy">Messages</h2><Link to="/hub/ugc/messages" className="text-sm font-semibold text-portal-accent">Open →</Link></div>
       {data.length === 0 ? <p className="mt-3 text-sm text-brand-navySoft">No conversations yet.</p> : (
         <ul className="mt-3 divide-y divide-brand-line">{data.map((m) => (
           <li key={m.id} className="py-2.5 text-sm"><p className="font-bold text-brand-navy">{(m.creators as { full_name?: string } | null)?.full_name}{!m.from_admin && !m.read_at ? <span className="ml-2 inline-block size-2 rounded-full bg-portal-accent" /> : null}</p><p className="truncate text-brand-navySoft">{m.body}</p></li>
@@ -249,7 +249,7 @@ export function HubHome() {
             <Megaphone className="size-5 text-portal-accent" />
             <p className="mt-2 font-extrabold text-brand-navy">Turn creator posts into ads</p>
             <p className="mt-1 text-sm text-brand-navySoft">Boost your best creator videos on Meta and TikTok from one place</p>
-            <Link to="/hub/ads" className="mt-3 inline-block text-sm font-bold text-portal-accent">Open Ads →</Link>
+            <Link to="/hub/ugc/ads" className="mt-3 inline-block text-sm font-bold text-portal-accent">Open Ads →</Link>
           </section>
         </div>
       </div>

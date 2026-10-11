@@ -142,7 +142,7 @@ function FactBriefs() {
   const list = d.briefs.filter((b) => (b as { brief_type?: string }).brief_type !== "format" && (app === "all" || b.app_id === app) && (status === "all" || briefStatus(d, b.id) === status));
   return (
     <div>
-      <PageTitle title="Briefs" lead="Your briefs for the week, then everything else. If an assigned brief doesn't suit you, swap it for one from the library." />
+      <PageTitle title="Briefs" lead="Briefs Max sends you, one by one." />
       <AssignedBriefs />
       <div className="mb-6 flex flex-wrap gap-2">
         <select aria-label="App" className="h-10 rounded-md border border-input bg-card px-3 text-sm" value={app} onChange={(e) => setApp(e.target.value)}>
@@ -152,7 +152,7 @@ function FactBriefs() {
           {["all", "new", "seen", "posted", "skipped"].map((s) => <option key={s} value={s}>{s === "all" ? "All statuses" : s}</option>)}
         </select>
       </div>
-      {list.length === 0 ? <EmptyState title="No brief here" text="New briefs appear here and in your notifications." /> : (
+      {list.length === 0 ? <EmptyState title="No brief yet" text="Your briefs arrive here when Max sends you one." /> : (
         <div className="grid gap-4 md:grid-cols-2">
           {list.map((b) => (
             <Link key={b.id} to="/creators/app/briefs/$briefId" params={{ briefId: b.id }} className="block">

@@ -1,0 +1,16 @@
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { osStatus } from "@/lib/slideshows.functions";
+
+export const OS_NOT_CONNECTED = "Not connected yet — add OS_HUB_SECRET in Settings → Secrets";
+
+export function useOsStatus() {
+  const fn = useServerFn(osStatus);
+  return useQuery({ queryKey: ["hub", "os-status"], queryFn: () => fn(), staleTime: 60_000, retry: false });
+}
+
+export const STATUS_LABEL: Record<string, string> = {
+  pending: "Pending", pool: "Kept warm", accepted: "Accepted", contract_signed: "Contract signed", os_created: "OS account created",
+  started: "Started", dropped: "Dropped", rejected: "Rejected", expired: "Expired", approved: "Accepted (old flow)",
+};
+export const POSTER_STATUSES = ["os_created", "started", "dropped"];
