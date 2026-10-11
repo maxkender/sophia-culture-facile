@@ -171,7 +171,7 @@ function OtherAppAccessCard({ app, code }: { app: AppRow; code: { code: string; 
   const link = app.taap_url || (me.platform === "android" ? app.play_store_url : app.app_store_url);
   return (
     <PortalCard>
-      <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-brand-navySoft"><Smartphone className="size-4" /> Your {app.name} app access <AppBadge appId={app.id} /></p>
+      <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-brand-navySoft"><Smartphone className="size-4" /> {L(`Your ${app.name} app access`, `Ton accès à l’app ${app.name}`)} <AppBadge appId={app.id} /></p>
       {code ? (
         <>
           <p className="mt-2 text-base font-extrabold text-brand-navy">Your code goes into the {store}, not into the {app.name} app.</p>

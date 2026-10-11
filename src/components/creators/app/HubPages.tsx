@@ -12,7 +12,7 @@ import { ACTIVE_POSTS, TIER_LABEL, streakDays, type Tier } from "@/lib/ugc-tiers
 import { fmtMoney } from "@/lib/ugc-pay";
 import { JobPublicCard, type JobDraft } from "@/components/hub/JobModal";
 import { useCreator } from "./useCreator";
-import { t as ct } from "@/i18n/creator-app";
+import { t as ct, L } from "@/i18n/creator-app";
 
 const AWARD_LABEL: Record<string, string> = { first_step: ct("First Step"), ten_posts: "10 posts", streak_7: "7-day streak", streak_30: "30-day streak", views_10k: "10K views post", views_100k: "100K views post", top10_month: ct("Top 10 of the month"), challenge_winner: ct("Challenge winner") };
 const compact = (n: number) => new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(n);
@@ -50,7 +50,7 @@ export function CreatorStatsStrip() {
     <div className="mb-8 space-y-4">
       <div className="grid grid-cols-4 gap-2 rounded-portal bg-card p-3 text-center shadow-portal">
         {[["Views", compact(views)], ["Earned", fmtMoney(earned)], ["Posts", String(approved.length)], ["Streak", `${streak}d`]].map(([k, v]) => (
-          <div key={k}><p className="text-lg font-extrabold text-brand-navy sm:text-2xl">{v}</p><p className="text-xs text-brand-navySoft">{k}</p></div>
+          <div key={k}><p className="text-lg font-extrabold text-brand-navy sm:text-2xl">{v}</p><p className="text-xs text-brand-navySoft">{ct(k)}</p></div>
         ))}
       </div>
       <PortalCard className="p-4">
@@ -61,7 +61,7 @@ export function CreatorStatsStrip() {
         <MyTerms tiers={data?.tiers ?? []} />
         {tier !== "pro" ? <>
           <div className="mt-3 h-2 rounded-full bg-brand-line"><div className="h-2 rounded-full bg-portal-accent" style={{ width: `${Math.min(100, (last30 / ACTIVE_POSTS) * 100)}%` }} /></div>
-          <p className="mt-1 text-xs text-brand-navySoft">{tier === "trial" ? `${Math.min(last30, ACTIVE_POSTS)}/${ACTIVE_POSTS} approved posts in 30 days to reach Active` : ct("Stay in the top 10% of views this month to reach Pro")}</p>
+          <p className="mt-1 text-xs text-brand-navySoft">{tier === "trial" ? L(`${Math.min(last30, ACTIVE_POSTS)}/${ACTIVE_POSTS} approved posts in 30 days to reach Active`, `${Math.min(last30, ACTIVE_POSTS)}/${ACTIVE_POSTS} posts validés en 30 jours pour passer Active`) : ct("Stay in the top 10% of views this month to reach Pro")}</p>
         </> : <p className="mt-2 text-xs text-brand-navySoft">{ct("You're in the top tier. Keep it up!")}</p>}
         {data?.awards.length ? <div className="mt-3 flex flex-wrap gap-2">{data.awards.map((a) => <span key={a.kind + a.period} className="inline-flex items-center gap-1 rounded-full bg-portal-amber/15 px-2.5 py-1 text-xs font-bold text-brand-navy"><Award className="size-3" />{AWARD_LABEL[a.kind] ?? a.kind}</span>)}</div> : null}
         {streak >= 3 ? <p className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-portal-amber"><Flame className="size-3.5" />{streak}-day streak</p> : null}
