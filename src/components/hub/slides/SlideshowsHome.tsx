@@ -12,7 +12,6 @@ export function SlideshowsHome() {
   const apps = data?.apps ?? [];
   const n = (s: string) => apps.filter((a) => a.status === s).length;
   const notOpen = apps.filter((a) => a.status === "pending" && !a.zone).length;
-  const osErrors = apps.filter((a) => a.status === "contract_signed" && a.os_error).length;
   const tiles: [string, number, string][] = [
     ["Pending applications", n("pending"), "/hub/slideshows/applications"], ["Kept warm", n("pool"), "/hub/slideshows/applications"],
     ["Waiting for contract", n("accepted"), "/hub/slideshows/applications"], ["OS account created", n("os_created"), "/hub/slideshows/posters"],
