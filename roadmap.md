@@ -1,4 +1,11 @@
-# UGC loop + guidelines + QA (Oct 11 evening)
+# Slideshows separation audit (Oct 11)
+- [ ] Isolate Applications, UGC KPIs and space-labelled search
+- [ ] Status tabs, country groups and ordered phone-friendly poster cards
+- [ ] Slideshow-only Home, signed Posters and manual weekly payouts
+- [ ] Public country-opening response text and exact mobile navigation
+- [ ] Signed-in hub.test desktop/mobile checks, republish and page report
+
+# Previous UGC work (historical checklist; completed in prior turns)
 - [ ] Hide Sophia OS card and "not connected" notices; slideshow accept stops at contract signed + manual checklist
 - [ ] J1 ugc_guidelines table (FR/EN, app, image, on/off, order), seed 10; Settings → UGC guidelines + Library link; creator Rules, brief block, submit checklist
 - [ ] J2 creator Home 3-step strip; Mes posts (multi-link, brief, checklist, weekly target bar, statuses, duplicates); Paiements
