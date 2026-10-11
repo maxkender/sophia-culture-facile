@@ -7,17 +7,6 @@ const round2 = (n: number) => Math.round(n * 100) / 100;
 const eur = (n: number) => `${n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
 const k = (v: number) => (v >= 1000 ? `${(v / 1000).toLocaleString("en-GB", { maximumFractionDigits: 1 })}k` : String(v));
 
-/** Monday 00:00 Paris of the week containing `d`, as an ISO instant. */
-export function parisWeekStart(d = new Date()) {
-  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit", weekday: "short" }).formatToParts(d);
-  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
-  const wd = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(get("weekday"));
-  const local = new Date(`${get("year")}-${get("month")}-${get("day")}T00:00:00Z`);
-  local.setUTCDate(local.getUTCDate() - wd);
-  const offset = new Date(local.toLocaleString("en-US", { timeZone: "Europe/Paris" })).getTime() - new Date(local.toLocaleString("en-US", { timeZone: "UTC" })).getTime();
-  return new Date(local.getTime() - offset).toISOString();
-}
-
 /** Pay for one post: per-post by format + RPM on frozen views, views part capped per post. */
 export async function priceFor(a: Admin, post: { creator_id: string; app_id: string; platform: string; effort: string | null; brief_id: string | null }, views: number) {
   const { data: c } = await a.from("creators").select("tier, per_post_override, rpm_override, cap_override, fixed_monthly_override").eq("id", post.creator_id).single();
