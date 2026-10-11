@@ -2,13 +2,15 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronDown, Sparkles, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, ChevronDown, Plus, Sparkles, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SOPHIA_APP_ID, useAdminApp, useApps } from "@/lib/apps";
 import { studioAi } from "@/lib/brief-studio.functions";
+import { STYLES, blankPlan, styleAssetIds, styleDefaults, type BriefStyle, type Plan, type StyleData } from "@/lib/brief-studio";
+import { FmtPicker, PlanAssets, SnippetSlot, type LibAsset } from "./StylePickers";
 import { STUDIO_DRAFT_KEY, ASSET_ROLES, BEAT_LABELS, DEFAULT_DO, DEFAULT_DONT, GESTURES, blankBrief, briefBody, scoreBrief, scriptWords, stepDone, words, type StudioBrief } from "@/lib/brief-studio";
 import { BriefView, toStudio, type BriefAsset } from "./BriefPreview";
 import { AssetUploader } from "./Assets";
@@ -87,14 +89,14 @@ export function BriefStudio({ briefId }: { briefId: string }) {
         supabase.from("ugc_tiers").select("tier, per_post_pov, per_post_reaction, per_post_talking_head").eq("app_id", app).eq("tier", "active").maybeSingle(),
         supabase.from("reference_videos").select("id, title, url, thumbnail_url").eq("app_id", app).eq("active", true).order("created_at", { ascending: false }).limit(200),
         supabase.from("creators").select("id, full_name, creator_apps!inner(app_id)").eq("creator_apps.app_id", app).order("full_name").limit(500),
-        supabase.from("assets").select("id, kind, title, storage_path, url, text_content, thumbnail_url, role_default, folder, status").eq("app_id", app).eq("status", "ready").order("created_at", { ascending: false }),
+        supabase.from("assets").select("id, kind, title, storage_path, url, text_content, thumbnail_url, role_default, folder, status, tags").eq("app_id", app).eq("status", "ready").order("created_at", { ascending: false }),
       ]);
       return { tier: t.data, refs: refs.data ?? [], creators: cr.data ?? [], library: lib.data ?? [] };
     },
   });
   const rate = (e: string | null) => { const t = side?.tier as Record<string, number> | null | undefined; return t && e ? Number(t[`per_post_${e}`] ?? 0) : null; };
-  const grade = useMemo(() => (b ? scoreBrief(b, assets.length) : null), [b, assets.length]);
-  const done = b ? stepDone(b, assets.length) : [];
+  const grade = useMemo(() => (b ? scoreBrief(b, assets.length + (b.style ? styleAssetIds(b.style_data).length : 0) + refIds.length * (b.style ? 1 : 0)) : null), [b, assets.length, refIds.length]);
+  const doneLegacy = b ? stepDone(b, assets.length) : [];
   if (!b || !grade) return <p className="p-6 text-sm text-brand-navySoft">Loading the brief…</p>;
   const set = <K extends keyof StudioBrief>(k: K, v: StudioBrief[K]) => setB({ ...b, [k]: v });
   const wc = scriptWords(b);
@@ -115,14 +117,17 @@ export function BriefStudio({ briefId }: { briefId: string }) {
       must_mention: x.product_gesture ? `${x.product_gesture} à ${x.product_second ?? 5} s` : null,
       rules_do: x.rules_do, rules_dont: x.rules_dont, rules_text: x.rules_text, status: x.status, drop_at: x.drop_at, audience: x.audience === "effort" ? "all" : x.audience, audience_efforts: x.audience === "effort" ? x.audience_efforts : [],
       due_date: x.due_date, language: x.language, translation_of: x.translation_of, parent_format_id: x.parent_format_id, campaign_id: x.campaign_id,
-      score: grade!.score, reference_video_ids: refIds,
+      score: grade!.score, reference_video_ids: refIds, style: x.style, style_data: x.style_data as never,
     };
     const res = x.id ? await supabase.from("briefs").update(row as never).eq("id", x.id).select("id").single() : await supabase.from("briefs").insert(row as never).select("id").single();
     if (res.error || !res.data) { toast.error("Could not save the brief."); return null; }
     const id = res.data.id as string;
     await supabase.from("brief_assets").delete().eq("brief_id", id);
-    if (assets.length) {
-      const { error } = await supabase.from("brief_assets").insert(assets.map((a, i) => ({ brief_id: id, asset_id: a.id, role: a.role, sort_order: i })));
+    const lib = (side?.library ?? []) as unknown as (BriefAsset & { role_default: string })[];
+    const extra = styleAssetIds(x.style_data).filter((aid) => !assets.some((a) => a.id === aid)).map((aid) => lib.find((l) => l.id === aid)).filter(Boolean).map((l) => ({ ...l!, role: l!.role_default }));
+    const all = [...assets, ...extra];
+    if (all.length) {
+      const { error } = await supabase.from("brief_assets").insert(all.map((a, i) => ({ brief_id: id, asset_id: a.id, role: a.role, sort_order: i })));
       if (error) toast.error("Files could not be attached.");
     }
     setB({ ...x, id });
@@ -159,8 +164,79 @@ export function BriefStudio({ briefId }: { briefId: string }) {
     if (error) toast.error("Could not assign."); else { await supabase.from("creator_notifications").insert({ creator_id: assign.creatorId, body: `Nouveau brief pour toi : ${b!.title || b!.hook_text}` }); toast.success("Assigned"); }
   }
 
-  const steps: [string, ReactNode][] = [
+  const lib = (side?.library ?? []) as unknown as LibAsset[];
+  const sd = b.style_data ?? {};
+  const setSd = (patch: Partial<StyleData>) => setB({ ...b, style_data: { ...sd, ...patch } });
+  const stylePicker = (
+    <div className="grid gap-2 sm:grid-cols-5" role="radiogroup" aria-label="Style">{STYLES.map(([k, l, hint], i) => (
+      <button key={k} type="button" role="radio" aria-checked={b.style === k} onClick={() => setB({ ...b, style: k, style_data: styleDefaults(k, sd) })} className={cn("rounded-xl border p-2 text-left", b.style === k ? "border-portal-accent bg-portal-accent/10" : "")}>
+        <p className="text-xs font-extrabold text-portal-accent">Style {i + 1}</p><p className="text-sm font-bold leading-tight">{l}</p><p className="mt-1 text-[11px] text-brand-navySoft">{hint}</p></button>))}</div>
+  );
+  const basics = <>
+    {stylePicker}
+    <label className="block text-sm font-semibold">Title (admin only)<input className={input} value={b.title} onChange={(e) => set("title", e.target.value)} /></label>
+    <div className="grid gap-2 sm:grid-cols-3">{EFF.map(([k, l]) => <button key={k} type="button" onClick={() => set("effort", k)} className={cn("rounded-xl border p-3 text-left", b.effort === k ? "border-portal-accent bg-portal-accent/10" : "")}><p className="font-bold">{l}</p><p className="text-xs text-brand-navySoft">{rate(k) != null ? `${eur(rate(k)!)} / post (Active)` : "—"}</p></button>)}</div>
+    <div className="grid gap-2 sm:grid-cols-4">
+      <label className="text-sm font-semibold">App<select className={input} value={b.app_id} onChange={(e) => set("app_id", e.target.value)}>{apps.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</select></label>
+      <label className="text-sm font-semibold">Language<select className={input} value={b.language} onChange={(e) => set("language", e.target.value)}><option value="fr">French</option><option value="en">English</option></select></label>
+      <label className="text-sm font-semibold">Platforms<select className={input} value={b.platform} onChange={(e) => set("platform", e.target.value)}><option value="both">TikTok + Instagram</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option></select></label>
+      <label className="text-sm font-semibold">Duration target<select className={input} value={b.duration_target ?? "30s"} onChange={(e) => set("duration_target", e.target.value)}>{["7s", "10s", "15s", "20s", "30s", "45s", "60s"].map((d) => <option key={d}>{d}</option>)}</select></label>
+    </div>
+  </>;
+  const plans = sd.plans ?? [];
+  const setPlan = (i: number, patch: Partial<Plan>) => setSd({ plans: plans.map((p, j) => (j === i ? { ...p, ...patch } : p)) });
+  const movePlan = (i: number, dir: -1 | 1) => { const n = [...plans]; const j = i + dir; if (j < 0 || j >= n.length) return; [n[i], n[j]] = [n[j]!, n[i]!]; setSd({ plans: n }); };
+  const ta = (label: string, v: string, on: (x: string) => void, rows = 2) => <label className="block text-xs font-semibold">{label}<textarea rows={rows} className={cn(input, "py-2")} value={v} onChange={(e) => on(e.target.value)} /></label>;
+  const storyPlans = (
+    <div className="space-y-3">{plans.map((p, i) => (
+      <div key={i} className="space-y-2 rounded-xl border p-3" data-testid="studio-plan">
+        <div className="flex items-center gap-1"><p className="flex-1 text-sm font-extrabold">Plan {i + 1}</p>
+          <Button type="button" size="icon" variant="ghost" aria-label="Move up" onClick={() => movePlan(i, -1)}><ArrowUp className="size-4" /></Button>
+          <Button type="button" size="icon" variant="ghost" aria-label="Move down" onClick={() => movePlan(i, 1)}><ArrowDown className="size-4" /></Button>
+          <Button type="button" size="icon" variant="ghost" aria-label="Remove plan" onClick={() => setSd({ plans: plans.filter((_, j) => j !== i) })}><Trash2 className="size-4" /></Button></div>
+        {ta("Texte à l'écran", p.on_screen, (x) => setPlan(i, { on_screen: x }), 1)}
+        {ta("Texte à dire", p.say, (x) => setPlan(i, { say: x }))}
+        <PlanAssets value={p.assets} onChange={(v) => setPlan(i, { assets: v })} library={lib} />
+        <label className="block text-xs font-semibold">Plan caméra (optional)<input className={input} value={p.camera} onChange={(e) => setPlan(i, { camera: e.target.value })} /></label>
+      </div>))}
+      <Button type="button" size="sm" variant="outline" onClick={() => setSd({ plans: [...plans, blankPlan()] })}><Plus className="size-4" />Add a plan</Button>
+    </div>
+  );
+  const styleEditor: ReactNode = b.style === "reaction_demo" ? <>
+    <div className="space-y-2 rounded-xl border p-3"><p className="text-sm font-extrabold">Plan 1 · Face (camera on your face)</p>
+      {ta("La réaction à faire", plans[0]?.reaction ?? "", (x) => setPlan(0, { reaction: x }))}
+      {ta("Le texte à mettre", plans[0]?.on_screen ?? "", (x) => setPlan(0, { on_screen: x }), 1)}
+      <FmtPicker value={plans[0]?.fmt ?? { kind: "subtitle", note: "" }} onChange={(v) => setPlan(0, { fmt: v })} />
+      {ta("Ce qu'il faut dire", plans[0]?.say ?? "", (x) => setPlan(0, { say: x }))}</div>
+    <div className="space-y-2 rounded-xl border p-3"><p className="text-sm font-extrabold">Plan 2 · Téléphone / démo (camera on the phone)</p>
+      {ta("Ce qu'il faut faire (step by step in the app)", plans[1]?.do ?? "", (x) => setPlan(1, { do: x }), 4)}
+      {ta("Ce qu'il faut dire", plans[1]?.say ?? "", (x) => setPlan(1, { say: x }))}</div>
+    <label className="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked={sd.flips?.on ?? false} onChange={(e) => setSd({ flips: { on: e.target.checked, note: sd.flips?.note ?? "" } })} />Retournements de caméra (camera flips)</label>
+    {sd.flips?.on ? <input aria-label="Where the flips happen" className={input} placeholder="Where the flips happen" value={sd.flips.note} onChange={(e) => setSd({ flips: { on: true, note: e.target.value } })} /> : null}
+  </> : b.style === "broll_stickers" ? storyPlans : b.style === "sole_footage" && sd.sole ? (() => { const x = sd.sole; const up = (p: Partial<typeof x>) => setSd({ sole: { ...x, ...p } }); return <>
+    {ta("What is on the plan", x.what, (v) => up({ what: v }), 3)}
+    <label className="block text-xs font-semibold">Duration (seconds)<input type="number" min={1} max={60} className={input} value={x.duration_s ?? ""} onChange={(e) => up({ duration_s: e.target.value ? Number(e.target.value) : null })} /></label>
+    <div className="grid gap-2 sm:grid-cols-2"><label className="text-xs font-semibold">Music title<input className={input} value={x.music_title} onChange={(e) => up({ music_title: e.target.value })} /></label><label className="text-xs font-semibold">Music link<input className={input} value={x.music_link} onChange={(e) => up({ music_link: e.target.value })} placeholder="https://" /></label></div>
+    <PlanAssets single label="Or an audio file from the library" value={x.music_asset_id ? [{ asset_id: x.music_asset_id, when: "" }] : []} onChange={(v) => up({ music_asset_id: v[0]?.asset_id ?? null })} library={lib.filter((a) => a.kind === "audio")} />
+    {ta("Text to put on screen", x.text, (v) => up({ text: v }), 1)}
+    <FmtPicker value={x.fmt} onChange={(v) => up({ fmt: v })} />
+  </>; })() : b.style === "talked_hook_demo" && sd.demo ? (() => { const dm = sd.demo; const up = (p: Partial<typeof dm>) => setSd({ demo: { ...dm, ...p } }); return <>
+    {storyPlans}
+    <div className="space-y-2 rounded-xl border-2 border-portal-accent/30 p-3"><p className="text-sm font-extrabold">Demo plan</p>
+      <div className="flex gap-2">{([["filmed", "Demo filmed by the creator"], ["asset", "Demo = a screen recording"]] as const).map(([k, l]) => <button key={k} type="button" onClick={() => up({ mode: k })} className={cn("min-h-9 rounded-full border px-3 text-xs font-bold", dm.mode === k ? "border-brand-navy bg-brand-navy text-card" : "")}>{l}</button>)}</div>
+      {dm.mode === "filmed" ? ta("What to do", dm.do, (v) => up({ do: v }), 3) : <PlanAssets single label="Screen recording + when to show it" value={dm.asset ? [dm.asset] : []} onChange={(v) => up({ asset: v[0] ?? null })} library={lib.filter((a) => a.kind === "video" || a.folder === "screen_recordings")} />}
+      {ta(dm.mode === "asset" ? "What to say over it" : "What to say", dm.say, (v) => up({ say: v }))}
+    </div>
+  </>; })() : b.style === "educational" ? <>
+    {ta("The script (long, talked)", sd.script ?? "", (v) => setSd({ script: v }), 12)}
+    <p className="text-xs text-brand-navySoft">{words(sd.script)} words · line breaks are kept for the creator.</p>
+    <FmtPicker value={sd.script_fmt ?? { kind: "subtitle", note: "" }} onChange={(v) => setSd({ script_fmt: v })} />
+    <PlanAssets label="Assets to flash on screen (optional)" value={sd.flashes ?? []} onChange={(v) => setSd({ flashes: v })} library={lib} />
+  </> : <p className="text-sm text-brand-navySoft">Choose a style first.</p>;
+
+  const oldSteps: [string, ReactNode][] = [
     ["Type & format", <>
+      {stylePicker}
       <label className="block text-sm font-semibold">Title (admin only)<input className={input} value={b.title} onChange={(e) => set("title", e.target.value)} /></label>
       <div className="flex flex-wrap gap-2">{(["precise", "format"] as const).map((t) => <button key={t} type="button" onClick={() => set("brief_type", t)} className={cn("min-h-10 rounded-full border px-4 text-sm font-bold", b.brief_type === t ? "border-brand-navy bg-brand-navy text-card" : "")}>{t === "precise" ? "Brief précis" : "Format (répétable)"}</button>)}</div>
       <div className="grid gap-2 sm:grid-cols-3">{EFF.map(([k, l]) => <button key={k} type="button" onClick={() => set("effort", k)} className={cn("rounded-xl border p-3 text-left", b.effort === k ? "border-portal-accent bg-portal-accent/10" : "")}><p className="font-bold">{l}</p><p className="text-xs text-brand-navySoft">{rate(k) != null ? `${eur(rate(k)!)} / post (Active)` : "—"}</p></button>)}</div>
@@ -231,15 +307,28 @@ export function BriefStudio({ briefId }: { briefId: string }) {
       </div>
     </>],
   ];
+  const filesStep = oldSteps[4]!; const rulesStep = oldSteps[5]!; const publishStep = oldSteps[6]!;
+  const steps: [string, ReactNode][] = b.style ? [
+    ["Style & basics", basics],
+    ["Hook · Body · CTA", <>
+      <SnippetSlot kind="hook" label="Hook (frame 1)" value={b.hook_text ?? ""} onChange={(v) => set("hook_text", v)} appId={app} style={b.style} language={b.language} rows={1} />
+      <SnippetSlot kind="body" label="Body (the idea in one or two lines)" value={sd.body ?? ""} onChange={(v) => setSd({ body: v })} appId={app} style={b.style} language={b.language} />
+      <SnippetSlot kind="cta" label="CTA" value={sd.cta ?? ""} onChange={(v) => setSd({ cta: v })} appId={app} style={b.style} language={b.language} rows={1} />
+    </>],
+    [b.style === "educational" ? "Script" : b.style === "sole_footage" ? "The plan" : "Plans", styleEditor],
+    filesStep, rulesStep, publishStep,
+  ] : oldSteps;
+  const done = b.style ? [Boolean(b.title.trim() && b.effort), Boolean(b.hook_text?.trim() && sd.cta?.trim()), grade.missing.filter((m) => /Plan|plan|Script|Demo|music|Music|Duration|Text on screen|asset placed|timing|flips|reaction/i.test(m)).length === 0, assets.length + styleAssetIds(sd).length > 0, b.rules_do.length + b.rules_dont.length > 0, b.status !== "draft"] : doneLegacy;
   const doneCount = done.filter(Boolean).length;
   const pay = rate(b.effort) != null ? `${eur(rate(b.effort)!)} / post` : null;
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-        <Link to="/hub/ugc/library" className="text-sm font-semibold text-portal-accent">← Learn</Link>
-        <h1 className="flex-1 text-xl font-extrabold text-brand-navy">Brief Studio{b.language === "en" ? " · EN" : ""}</h1>
-        <span className="rounded-full bg-portal-bg px-3 py-1 text-sm font-bold" data-testid="studio-progress">{doneCount}/7</span>
+        <Link to="/hub/ugc/library" className="text-sm font-semibold text-portal-accent">← Library</Link>
+        <p className="sr-only">Preview as creator</p><h1 className="flex-1 text-xl font-extrabold text-brand-navy">Brief Studio{b.language === "en" ? " · EN" : ""}</h1>
+        <span className="rounded-full bg-portal-bg px-3 py-1 text-sm font-bold" data-testid="studio-progress">{doneCount}/{steps.length}</span>
+        {b.style ? <span className="rounded-full bg-portal-accent/15 px-3 py-1 text-xs font-extrabold text-portal-accent">Style {STYLES.findIndex(([k]) => k === b.style) + 1}</span> : null}
         <span title={grade.missing.join("\n")} data-testid="studio-score" className={cn("rounded-full px-3 py-1 text-sm font-extrabold", grade.score >= 8 ? "bg-portal-green/15 text-portal-green" : "bg-portal-amber/20 text-brand-navy")}>Score {grade.score}/10</span>
         <Button onClick={() => void save()}>Save</Button>
       </div>
