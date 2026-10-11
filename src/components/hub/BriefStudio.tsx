@@ -326,7 +326,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
         <Link to="/hub/ugc/library" className="text-sm font-semibold text-portal-accent">← Library</Link>
-        <p className="sr-only">Preview as creator</p><h1 className="flex-1 text-xl font-extrabold text-brand-navy">Brief Studio{b.language === "en" ? " · EN" : ""}</h1>
+        <h1 className="flex-1 text-xl font-extrabold text-brand-navy">Brief Studio{b.language === "en" ? " · EN" : ""}</h1>
         <span className="rounded-full bg-portal-bg px-3 py-1 text-sm font-bold" data-testid="studio-progress">{doneCount}/{steps.length}</span>
         {b.style ? <span className="rounded-full bg-portal-accent/15 px-3 py-1 text-xs font-extrabold text-portal-accent">Style {STYLES.findIndex(([k]) => k === b.style) + 1}</span> : null}
         <span title={grade.missing.join("\n")} data-testid="studio-score" className={cn("rounded-full px-3 py-1 text-sm font-extrabold", grade.score >= 8 ? "bg-portal-green/15 text-portal-green" : "bg-portal-amber/20 text-brand-navy")}>Score {grade.score}/10</span>
@@ -334,7 +334,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
       </div>
       {grade.missing.length ? <details className={cn(card, "py-3 text-sm")}><summary className="cursor-pointer font-bold text-brand-navy">{grade.score >= 8 ? "Ready to publish" : "Publishing is allowed from 8/10"} — {grade.missing.length} point{grade.missing.length > 1 ? "s" : ""} missing</summary><ul className="mt-2 list-disc pl-5 text-brand-navySoft">{grade.missing.map((m) => <li key={m}>{m}</li>)}</ul></details> : null}
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-        <aside className="lg:sticky lg:top-4 lg:self-start">
+        <aside className="lg:sticky lg:top-4 lg:self-start"><p className="mb-2 text-center text-xs font-bold uppercase tracking-wide text-brand-navySoft">Preview as creator</p>
           <div className="mx-auto w-full max-w-[360px] rounded-[2.5rem] border-[10px] border-brand-navy bg-portal-bg p-3 shadow-portal">
             <div className="max-h-[70vh] overflow-y-auto rounded-[1.6rem] bg-card p-3"><BriefView b={b} assets={assets} refs={(side?.refs ?? []).filter((r) => refIds.includes(r.id))} pay={pay} /></div>
           </div>
