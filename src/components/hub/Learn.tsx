@@ -7,59 +7,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SOPHIA_APP_ID, useAdminApp } from "@/lib/apps";
-import { generateBriefsFromCourses, generateFormatVariants } from "@/lib/hub-learn.functions";
+import { generateFormatVariants } from "@/lib/hub-learn.functions";
 import { PostThumb } from "./PostThumb";
+import { BriefsList } from "./BriefsList";
+import { AssetsLibrary } from "./Assets";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const input = "mt-1 block min-h-10 w-full rounded-xl border border-input bg-card px-3 text-sm";
-const TABS = ["Formats", "Briefs", "Reference videos", "Guides & rules", "Templates"] as const;
+const TABS = ["Formats", "Briefs", "Assets", "Reference videos", "Guides & rules", "Templates"] as const;
 const FORMATS = ["talking_head", "pov", "reaction", "voiceover", "skit", "green_screen", "list"];
 
 /** Next Monday 09:00 Paris (07:00 or 08:00 UTC depending on DST; stored as 07:00 UTC so the 09:00 Paris run always picks it up). */
 function nextMonday() {
   const d = new Date(); const add = ((8 - d.getUTCDay()) % 7) || 7;
   d.setUTCDate(d.getUTCDate() + add); d.setUTCHours(7, 0, 0, 0); return d;
-}
-
-type Brief = { id: string; title: string; hooks: string[]; hook: string | null; angle: string | null; script: string | null; body: string; must_mention: string | null; format: string | null; duration_target: string | null; difficulty: number; reference_video_ids: string[]; status: string; drop_at: string | null; app_id: string };
-
-function BriefEditor({ b, refs, onClose }: { b: Brief; refs: { id: string; title: string | null; url: string }[]; onClose: () => void }) {
-  const qc = useQueryClient();
-  const [f, setF] = useState(b);
-  const hooks = [0, 1, 2].map((i) => f.hooks[i] ?? (i === 0 ? f.hook ?? "" : ""));
-  async function save(extra: Partial<Brief> = {}) {
-    const row = { ...f, ...extra, hooks: hooks.filter(Boolean), hook: hooks[0] || null, body: f.script ?? f.body ?? "" };
-    const { id, ...rest } = row;
-    const { error } = id ? await supabase.from("briefs").update(rest).eq("id", id) : await supabase.from("briefs").insert(rest);
-    if (error) { toast.error("Could not save the brief."); return; }
-    toast.success("Brief saved"); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); onClose();
-  }
-  return (
-    <div className={cn(card, "space-y-3")}>
-      <label className="block text-sm font-semibold">Title<input className={input} value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></label>
-      <div className="grid gap-2 md:grid-cols-3">{hooks.map((h, i) => <label key={i} className="text-sm font-semibold">Hook {i + 1}<input className={input} value={h} onChange={(e) => { const n = [...hooks]; n[i] = e.target.value; setF({ ...f, hooks: n }); }} /></label>)}</div>
-      <label className="block text-sm font-semibold">Angle<input className={input} value={f.angle ?? ""} onChange={(e) => setF({ ...f, angle: e.target.value })} /></label>
-      <label className="block text-sm font-semibold">Script<textarea rows={6} className={cn(input, "py-2")} value={f.script ?? ""} onChange={(e) => setF({ ...f, script: e.target.value })} /></label>
-      <label className="block text-sm font-semibold">Must mention<input className={input} value={f.must_mention ?? ""} onChange={(e) => setF({ ...f, must_mention: e.target.value })} /></label>
-      <div className="grid gap-2 sm:grid-cols-3">
-        <label className="text-sm font-semibold">Format<select className={input} value={f.format ?? ""} onChange={(e) => setF({ ...f, format: e.target.value })}><option value="">—</option>{FORMATS.map((x) => <option key={x} value={x}>{x.replace("_", " ")}</option>)}</select></label>
-        <label className="text-sm font-semibold">Duration<input className={input} placeholder="30s" value={f.duration_target ?? ""} onChange={(e) => setF({ ...f, duration_target: e.target.value })} /></label>
-        <label className="text-sm font-semibold">Difficulty<select className={input} value={f.difficulty} onChange={(e) => setF({ ...f, difficulty: Number(e.target.value) })}><option value={1}>Easy</option><option value={2}>Medium</option><option value={3}>Hard</option></select></label>
-      </div>
-      <fieldset><legend className="text-sm font-semibold">References</legend>
-        <div className="mt-1 flex max-h-32 flex-wrap gap-2 overflow-y-auto">{refs.map((r) => {
-          const on = f.reference_video_ids.includes(r.id);
-          return <button type="button" key={r.id} onClick={() => setF({ ...f, reference_video_ids: on ? f.reference_video_ids.filter((x) => x !== r.id) : [...f.reference_video_ids, r.id] })} className={cn("rounded-full border px-3 py-1 text-xs", on ? "border-portal-accent bg-portal-accent/10 text-portal-accent" : "")}>{r.title || r.url.slice(0, 40)}</button>;
-        })}</div>
-      </fieldset>
-      <div className="flex flex-wrap gap-2">
-        <Button onClick={() => void save()}>Save draft</Button>
-        <Button variant="outline" onClick={() => void save({ status: "scheduled", drop_at: nextMonday().toISOString() })}>Add to Monday drop</Button>
-        <Button variant="outline" onClick={() => void save({ status: "published" })}>Publish now</Button>
-        <Button variant="ghost" onClick={onClose}>Cancel</Button>
-      </div>
-    </div>
-  );
 }
 
 type Fmt = { id: string; title: string; hook_text: string | null; oral_hook: string | null; beats: string[] | null; product_moment: string | null; variations: string | null; effort: string | null; status: string; pinned: boolean; sort_order: number | null; app_id: string };
@@ -130,62 +91,6 @@ function Formats() {
           </div>
         </div>
       ))}</div>
-    </div>
-  );
-}
-
-function Briefs() {
-  const { appId } = useAdminApp();
-  const app = appId ?? SOPHIA_APP_ID;
-  const qc = useQueryClient();
-  const gen = useServerFn(generateBriefsFromCourses);
-  const [edit, setEdit] = useState<Brief | null>(null);
-  const [n, setN] = useState(3);
-  const [busy, setBusy] = useState(false);
-  const [sel, setSel] = useState<string[]>([]);
-  const [status, setStatus] = useState("all");
-  const { data } = useQuery({
-    queryKey: ["hub", "learn", "briefs", app],
-    queryFn: async () => {
-      const [b, r] = await Promise.all([
-        supabase.from("briefs").select("*").eq("app_id", app).order("created_at", { ascending: false }).limit(500),
-        supabase.from("reference_videos").select("id, title, url").eq("app_id", app).eq("active", true),
-      ]);
-      return { briefs: (b.data ?? []) as unknown as Brief[], refs: r.data ?? [] };
-    },
-  });
-  const briefs = (data?.briefs ?? []).filter((b) => (b as { brief_type?: string }).brief_type !== "format" && (status === "all" || b.status === status));
-  async function schedule() {
-    const { error } = await supabase.from("briefs").update({ status: "scheduled", drop_at: nextMonday().toISOString() }).in("id", sel);
-    if (error) toast.error("Could not schedule."); else { toast.success(`${sel.length} briefs drop ${nextMonday().toLocaleString()}`); setSel([]); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); }
-  }
-  const blank: Brief = { id: "", title: "", hooks: [], hook: null, angle: "", script: "", body: "", must_mention: "", format: "talking_head", duration_target: "30s", difficulty: 1, reference_video_ids: [], status: "draft", drop_at: null, app_id: app };
-  if (edit) return <BriefEditor b={edit} refs={data?.refs ?? []} onClose={() => setEdit(null)} />;
-  return (
-    <div className="space-y-4">
-      <div className={cn(card, "flex flex-wrap items-end gap-3")}>
-        <Button onClick={() => setEdit(blank)}>New brief</Button>
-        <label className="text-xs font-semibold text-brand-navySoft">Courses<input type="number" min={1} max={20} value={n} onChange={(e) => setN(Math.min(20, Math.max(1, Number(e.target.value))))} className="mt-1 block h-10 w-20 rounded-xl border px-2" /></label>
-        <Button variant="outline" disabled={busy} onClick={async () => {
-          setBusy(true);
-          try { const r = await gen({ data: { count: n, appId: app, language: "fr" } }); toast[r.errors.length ? "warning" : "success"](`${r.created} draft briefs from ${r.courses} courses${r.errors.length ? ` — ${r.errors[0]}` : ""}`); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); void qc.refetchQueries({ queryKey: ["hub", "learn", "briefs"] }); setStatus("all"); }
-          catch (e) { toast.error((e as Error).message); } finally { setBusy(false); }
-        }}><Sparkles className="size-4" />{busy ? "Writing…" : "Generate from courses"}</Button>
-        <Button variant="outline" disabled={!sel.length} onClick={() => void schedule()}>Drop selected on Monday 09:00 ({sel.length})</Button>
-        <select aria-label="Status" className="ml-auto h-10 rounded-xl border px-2 text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>{["all", "draft", "scheduled", "published", "archived"].map((s) => <option key={s}>{s}</option>)}</select>
-      </div>
-      {briefs.length === 0 ? <p className={cn(card, "text-sm text-brand-navySoft")}>No briefs here yet.</p> : (
-        <div className="grid gap-3 md:grid-cols-2">{briefs.map((b) => (
-          <div key={b.id} className={cn(card, "flex gap-3")}>
-            <input type="checkbox" aria-label={`Select ${b.title}`} checked={sel.includes(b.id)} onChange={(e) => setSel((s) => (e.target.checked ? [...s, b.id] : s.filter((x) => x !== b.id)))} />
-            <button type="button" className="min-w-0 flex-1 text-left" onClick={() => setEdit(b)}>
-              <p className="font-extrabold text-brand-navy">{b.title}</p>
-              <p className="mt-1 line-clamp-2 text-sm text-brand-navySoft">{b.hooks?.[0] ?? b.hook ?? b.angle}</p>
-              <p className="mt-2 text-xs text-brand-navySoft"><span className="rounded-full bg-portal-bg px-2 py-0.5 font-bold">{b.status}</span>{b.drop_at && b.status === "scheduled" ? ` · drops ${new Date(b.drop_at).toLocaleDateString()}` : ""} · {b.format ?? "—"} · {b.duration_target ?? ""}</p>
-            </button>
-          </div>
-        ))}</div>
-      )}
     </div>
   );
 }
@@ -339,7 +244,7 @@ export function Learn() {
   return (
     <div className="space-y-4">
       <div className="flex gap-2 overflow-x-auto">{TABS.map((t) => <button key={t} type="button" onClick={() => setTab(t)} className={cn("min-h-10 shrink-0 rounded-full px-4 text-sm font-bold", tab === t ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{t}</button>)}</div>
-      {tab === "Formats" ? <Formats /> : tab === "Briefs" ? <Briefs /> : tab === "Reference videos" ? <References /> : tab === "Guides & rules" ? <Guides /> : <Templates />}
+      {tab === "Formats" ? <Formats /> : tab === "Briefs" ? <BriefsList /> : tab === "Assets" ? <AssetsLibrary /> : tab === "Reference videos" ? <References /> : tab === "Guides & rules" ? <Guides /> : <Templates />}
     </div>
   );
 }
