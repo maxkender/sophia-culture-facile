@@ -43,3 +43,12 @@
 - [x] Brief rapide, Brief depuis une vidéo (links + file frames), Briefs list filters/columns/bulk
 - [x] Video Reviews brief checks, Sidekick Open in Studio, UnSwipe multi-platform formats
 - [x] E2E admin/creator test, republish
+
+# Hub split into spaces + OS bridge (Oct 11)
+- [ ] P1. Space switcher UGC/Slideshows/Influencers, /hub/<space>/..., 301s, per-space nav/home/accent/mobile bar, shared Settings (access codes per app+platform)
+- [ ] P2. Slideshow applications: new columns/statuses, ack email (6 langs), form fields (2nd phone, langue, 4 questions), grouped list + score, timeline card, Accept/Reject/Keep warm, slideshow-accept flow, pool expiry job 10:00
+- [ ] P3. Weekly pay zones A14/15 B10/11 C7/8, country map, public page/guide/contract weekly
+- [ ] P4. Posters view + os_snapshots 06:30, weekly payouts job Mon 07:00, approve/pay/export, tokenized payout-method link
+- [ ] P5. os-bridge (OS_HUB_SECRET, retries, os_calls log), Settings → Connections → Sophia OS card
+- [ ] P6. Access code follows creator job app (UnSwipe iOS vs Sophia), app name shown, CSV import with app+platform
+- [ ] Test signed in (admin + creator), mobile, republish
