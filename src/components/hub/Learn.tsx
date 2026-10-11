@@ -11,9 +11,11 @@ import { generateFormatVariants } from "@/lib/hub-learn.functions";
 import { PostThumb } from "./PostThumb";
 import { BriefsList } from "./BriefsList";
 import { AssetsLibrary } from "./Assets";
+import { UgcBriefsGrid, WeekPlanner } from "@/components/portal/admin/UgcAdmin";
+import { CreatorOps } from "@/components/portal/admin/CreatorOps";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
-const TABS = ["Formats", "Briefs", "Assets", "Reference videos", "Guides & rules", "Templates"] as const;
+const TABS = ["Formats", "Briefs", "Assets", "References", "Guides & rules", "Templates"] as const;
 
 
 type Fmt = { id: string; title: string; hook_text: string | null; oral_hook: string | null; beats: string[] | null; product_moment: string | null; variations: string | null; effort: string | null; status: string; pinned: boolean; sort_order: number | null; app_id: string };
@@ -232,12 +234,23 @@ function Templates() {
   );
 }
 
-export function Learn() {
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Formats");
+const BRIEF_SUBS = [["list", "All briefs"], ["planner", "Week planner"], ["scripts", "Scripts grid"], ["ops", "Posts & calls"]] as const;
+function BriefsArea({ sub }: { sub?: string | undefined }) {
+  const [s, setS] = useState<string>(BRIEF_SUBS.some(([k]) => k === sub) ? sub! : "list");
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-1 overflow-x-auto">{BRIEF_SUBS.map(([k, l]) => <button key={k} type="button" onClick={() => setS(k)} className={cn("min-h-9 shrink-0 rounded-full border px-3 text-xs font-bold", s === k ? "border-brand-navy bg-brand-navy text-card" : "border-brand-line bg-card text-brand-navy")}>{l}</button>)}</div>
+      {s === "planner" ? <WeekPlanner /> : s === "scripts" ? <UgcBriefsGrid /> : s === "ops" ? <CreatorOps /> : <BriefsList />}
+    </div>
+  );
+}
+
+export function Learn({ initialTab, sub }: { initialTab?: string | undefined; sub?: string | undefined } = {}) {
+  const [tab, setTab] = useState<(typeof TABS)[number]>((TABS as readonly string[]).includes(initialTab ?? "") ? (initialTab as (typeof TABS)[number]) : "Formats");
   return (
     <div className="space-y-4">
       <div className="flex gap-2 overflow-x-auto">{TABS.map((t) => <button key={t} type="button" onClick={() => setTab(t)} className={cn("min-h-10 shrink-0 rounded-full px-4 text-sm font-bold", tab === t ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{t}</button>)}</div>
-      {tab === "Formats" ? <Formats /> : tab === "Briefs" ? <BriefsList /> : tab === "Assets" ? <AssetsLibrary /> : tab === "Reference videos" ? <References /> : tab === "Guides & rules" ? <Guides /> : <Templates />}
+      {tab === "Formats" ? <Formats /> : tab === "Briefs" ? <BriefsArea sub={sub} /> : tab === "Assets" ? <AssetsLibrary /> : tab === "References" ? <References /> : tab === "Guides & rules" ? <Guides /> : <Templates />}
     </div>
   );
 }

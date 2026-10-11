@@ -127,7 +127,7 @@ function SettingLink({ k, label, help }: { k: string; label: string; help: strin
   );
 }
 
-export function Slideshows({ tab }: { tab?: string }) {
+export function Slideshows({ tab }: { tab?: string | undefined }) {
   const t = pick(SLIDESHOW_TABS, tab);
   const body: Record<string, ReactNode> = {
     applications: <CreatorApplications key="slideshow" track="slideshow" />,
@@ -143,7 +143,7 @@ export function Slideshows({ tab }: { tab?: string }) {
 /* ---------------- Influencers ---------------- */
 export const INFLUENCER_TABS: [string, string][] = [["applications", "Applications"], ["influencers", "Influencers"], ["offers", "Briefs & offers"], ["deals", "Deals"], ["messages", "Messages"], ["performance", "Attribution & performance"], ["agreement", "Master agreement"], ["settings", "Rights & settings"]];
 
-export function Influencers({ tab, id }: { tab?: string; id?: string }) {
+export function Influencers({ tab, id }: { tab?: string | undefined; id?: string | undefined }) {
   const t = pick(INFLUENCER_TABS, tab);
   const body: Record<string, ReactNode> = {
     applications: <InfluencerApplications />,
@@ -214,7 +214,7 @@ function EmailSettings() {
   );
 }
 
-export function HubSettings({ tab }: { tab?: string }) {
+export function HubSettings({ tab }: { tab?: string | undefined }) {
   const t = pick(SETTINGS_TABS, tab);
   const body: Record<string, ReactNode> = {
     apps: <AppsSettings />, codes: <CodesPool />, email: <EmailSettings />, connections: <IntegrationsSetup />, team: <Team />, security: <AdminSettings />,
@@ -224,7 +224,7 @@ export function HubSettings({ tab }: { tab?: string }) {
 
 /* ---------------- Payouts (three tracks) ---------------- */
 export const PAYOUT_TABS: [string, string][] = [["ugc", "Creators (UGC)"], ["slideshow", "Slideshow creators"], ["influencer", "Influencers"]];
-export function PayoutsSection({ tab }: { tab?: string }) {
+export function PayoutsSection({ tab }: { tab?: string | undefined }) {
   const t = pick(PAYOUT_TABS, tab);
   return (
     <div>
