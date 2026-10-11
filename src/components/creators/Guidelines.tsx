@@ -20,7 +20,7 @@ export function useGuidelines(appId?: string | null, all = false) {
   });
 }
 
-function GuidelineItem({ g, en }: { g: Guideline; en?: boolean }) {
+function GuidelineItem({ g, en }: { g: Guideline; en?: boolean | undefined }) {
   return (
     <li className="flex gap-3">
       {g.image_data ? <img src={g.image_data} alt="" className="size-12 shrink-0 rounded-lg object-cover" /> : null}
@@ -29,7 +29,7 @@ function GuidelineItem({ g, en }: { g: Guideline; en?: boolean }) {
   );
 }
 
-export function GuidelinesList({ appId, en }: { appId?: string | null; en?: boolean }) {
+export function GuidelinesList({ appId, en }: { appId?: string | null | undefined; en?: boolean | undefined }) {
   const { data = [] } = useGuidelines(appId);
   if (!data.length) return null;
   return <ol className="space-y-3">{data.map((g) => <GuidelineItem key={g.id} g={g} en={en} />)}</ol>;
