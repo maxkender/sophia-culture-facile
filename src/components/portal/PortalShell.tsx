@@ -160,7 +160,7 @@ export function PortalShell({
     if (next === "creators") { window.localStorage.setItem(MODE_KEY, "authors"); void navigate({ to: "/hub" }); return; }
     void navigate({ to: "/auteurs/admin" });
   }
-  const groups = isAdmin ? (mode === "creators" ? ADMIN_CREATOR_NAV : ADMIN_AUTHOR_NAV) : AUTHOR_NAV;
+  const groups = isAdmin ? ADMIN_AUTHOR_NAV : AUTHOR_NAV;
   const modeTabs = isAdmin ? (
     <div className="mx-3 mt-1 grid grid-cols-2 rounded-xl bg-portal-bg p-1" role="tablist" aria-label="Portal mode">
       {(["authors", "creators"] as const).map((m) => (
