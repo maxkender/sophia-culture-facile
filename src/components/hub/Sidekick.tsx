@@ -50,7 +50,9 @@ export function SidekickDrawer({ open, onOpenChange }: { open: boolean; onOpenCh
   }
   async function saveBrief(b: Record<string, unknown>) {
     const hooks = Array.isArray(b["hooks"]) ? (b["hooks"] as string[]) : [];
-    const { error } = await supabase.from("briefs").insert({ title: String(b["title"]), hooks, hook: hooks[0] ?? null, angle: String(b["angle"] ?? ""), script: String(b["script"] ?? ""), body: String(b["script"] ?? ""), must_mention: String(b["must_mention"] ?? ""), format: String(b["format"] ?? "talking_head"), duration_target: String(b["duration_target"] ?? "30s"), status: "draft", app_id: appId ?? SOPHIA_APP_ID });
+    const beats = Array.isArray(b["beats"]) ? (b["beats"] as string[]) : [];
+    const hookText = String(b["hook_text"] ?? hooks[0] ?? "");
+    const { error } = await supabase.from("briefs").insert({ title: String(b["title"]), hooks: hooks.length ? hooks : [hookText], hook: hookText || null, hook_text: hookText || null, oral_hook: (b["oral_hook"] as string) ?? null, hook_visual: (b["hook_visual"] as string) ?? null, beats, script: beats.join("\n") || String(b["script"] ?? ""), body: [hookText, ...beats].join("\n\n") || String(b["script"] ?? ""), effort: (b["effort"] as string) ?? null, format: String(b["effort"] ?? b["format"] ?? "talking_head"), product_second: (b["product_second"] as number) ?? null, product_gesture: (b["product_gesture"] as string) ?? null, rules_do: (b["rules_do"] as string[]) ?? [], rules_dont: (b["rules_dont"] as string[]) ?? [], duration_target: String(b["duration_target"] ?? "30s"), status: "draft", app_id: appId ?? SOPHIA_APP_ID } as never);
     if (error) toast.error("Could not save the brief."); else { toast.success("Saved as a draft brief in Learn"); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); }
   }
 
@@ -78,7 +80,7 @@ export function SidekickDrawer({ open, onOpenChange }: { open: boolean; onOpenCh
               <div key={i} className={cn("max-w-[90%] rounded-2xl px-3 py-2 text-sm", m.role === "user" ? "ml-auto bg-brand-navy text-card" : "bg-portal-bg text-brand-navy")}>
                 <p className="whitespace-pre-wrap">{m.content.replace(/```brief[\s\S]*?```/g, "").split("**").map((part, k) => (k % 2 ? <b key={k}>{part}</b> : part))}</p>
                 {m.cited?.length ? <div className="mt-2 flex flex-wrap gap-1">{m.cited.map((c) => <Link key={c.name} to="/hub/discover" search={{ q: c.name }} onClick={() => onOpenChange(false)} className="rounded-full bg-card px-2 py-0.5 text-xs font-bold text-portal-accent">{c.name}</Link>)}</div> : null}
-                {b ? <Button size="sm" className="mt-2" onClick={() => void saveBrief(b)}>Save as draft</Button> : null}
+                {b ? <div className="mt-2 flex gap-2"><Button size="sm" onClick={() => { sessionStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify({ ...b, app_id: appId ?? SOPHIA_APP_ID, beats: Array.isArray(b["beats"]) ? b["beats"] : [String(b["script"] ?? ""), "", ""] })); onOpenChange(false); void navigate({ to: "/hub/learn/briefs/$briefId", params: { briefId: "new" } }); }}>Open in Studio</Button><Button size="sm" variant="outline" onClick={() => void saveBrief(b)}>Save as draft</Button></div> : null}
               </div>
             );
           })}
