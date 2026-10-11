@@ -9,11 +9,11 @@ UGC creator acceptance and onboarding mutations use authenticated server functio
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
-- Creator programme data (creator_applications, slideshow_applications, later creators/briefs/posts) lives in its own tables and routes (/creators, /fr/createurs, /en/creators); never reuse author tables — the two sides must never mix.
+- Creator data uses separate tables and /creators, /fr/createurs, /en/creators routes; never reuse author tables, to prevent mixing.
 - Public creator forms write through server functions in src/lib/creator-apply.functions.ts (honeypot + IP/email rate limit, service role); the tables have no anon policies.
 - Creator Account Agreement lives in `documents` (slug `creator-agreement`); the slideshow variant is derived in code by dropping clause 5 and renumbering — keep one text, never two.
 - Public creator application forms use distinct localized routes (`/fr/candidature-*`, `/en/*-application`); legacy `/creators/*/apply` paths only detect language and redirect.
-- Admin spaces: authors admin uses ADMIN_AUTHOR_NAV only; all creator tracks (UGC, slideshow, influencer) live in the /hub shell, linked both ways at the sidebar bottom; old creator-admin URLs 301 into Hub sections; why: authors and creators must stay visually separate.
+- Authors admin uses ADMIN_AUTHOR_NAV only; creator tracks use /hub, with reciprocal sidebar-bottom links and 301s from old creator-admin URLs; why: keep spaces separate.
 - Prospects grid prefs and saved views live in admin_ui_prefs (per user); why: choices must follow the admin across devices.
 
 - Space routing is decided by src/lib/account-role.ts (admin > author > creator > none) in the /auteurs gate, the creator space and both login pages; why: one shared login must never show a person the wrong space.
