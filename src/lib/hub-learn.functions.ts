@@ -83,3 +83,71 @@ export const generateBriefsFromCourses = createServerFn({ method: "POST" })
     }
     return { courses: pick.length, created, errors };
   });
+
+const variantSchema = {
+  type: "object", additionalProperties: false, required: ["variants"],
+  properties: {
+    variants: {
+      type: "array", minItems: 5, maxItems: 5,
+      items: {
+        type: "object", additionalProperties: false,
+        required: ["title", "hook_text", "oral_hook", "beats", "script"],
+        properties: {
+          title: { type: "string" }, hook_text: { type: "string" }, oral_hook: { type: "string" },
+          beats: { type: "array", minItems: 3, maxItems: 3, items: { type: "string" } }, script: { type: "string" },
+        },
+      },
+    },
+  },
+} as const;
+
+/** "Générer 5 variantes": 5 ready-to-shoot draft briefs from one format (Sophia plugs real course facts; other apps vary number/situation/objection). */
+export const generateFormatVariants = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ formatId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const ctx = context as unknown as { supabase: Admin; userId: string };
+    const { data: me } = await ctx.supabase.from("profiles").select("id, role").eq("user_id", ctx.userId).maybeSingle();
+    if (me?.role !== "admin") throw new Error("Admins only");
+    const key = process.env["LOVABLE_API_KEY"];
+    if (!key) throw new Error("The AI key is not configured.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const a = supabaseAdmin as Admin;
+    const { data: f } = await a.from("briefs").select("*, apps(slug, name, short_description)").eq("id", data.formatId).eq("brief_type", "format").maybeSingle();
+    if (!f) throw new Error("Format not found");
+    const isSophia = f.apps?.slug === "sophia";
+    let facts = "";
+    if (isSophia) {
+      const { data: bank } = await a.from("briefs").select("title, script, body").eq("app_id", f.app_id).neq("brief_type", "format").not("source_course_id", "is", null).limit(200);
+      const pick = (bank ?? []).sort(() => Math.random() - 0.5).slice(0, 5);
+      facts = pick.map((b: { title: string; script: string | null; body: string | null }, i: number) => `Fact ${i + 1} — ${b.title}: ${(b.script ?? b.body ?? "").slice(0, 600)}`).join("\n\n");
+    }
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: MODEL, reasoning: { effort: "low" }, store: false,
+        instructions: `You write ready-to-shoot short-form video variants (TikTok/Reels) in French for UGC creators promoting ${f.apps?.name} (${f.apps?.short_description ?? ""}). Keep the format's mechanic exactly: same structure, same 3 beats, same product moment. ${isSophia ? "Each variant plugs in exactly one of the given course facts (one fact per variant, never invent facts)." : "Each variant changes the number, the situation or the objection, keeping it believable and personal."} The hook_text is what is written on frame 1 (max 8 words). The script is spoken, casual, first person, 15-35 seconds.`,
+        input: `Format: ${f.title}\nHook écrit: ${f.hook_text ?? ""}\nHook oral: ${f.oral_hook ?? ""}\nBeats: ${(f.beats ?? []).join(" / ")}\nProduct moment: ${f.product_moment ?? ""}\nVariations: ${f.variations ?? ""}\n\n${facts ? `Course facts:\n${facts}\n\n` : ""}Write exactly 5 different variants.`,
+        text: { format: { type: "json_schema", name: "variants", strict: true, schema: variantSchema } },
+      }),
+    });
+    if (!res.ok) {
+      if (res.status === 402) throw new Error("AI credits are used up. Add credits, then try again.");
+      if (res.status === 403) throw new Error("AI access is blocked for this workspace.");
+      if (res.status === 429) throw new Error("The AI is busy. Try again in a minute.");
+      throw new Error(`AI error ${res.status}`);
+    }
+    const out = await res.json() as { output_text?: string; output?: { content?: { type: string; text?: string }[] }[] };
+    const raw = out.output_text ?? out.output?.flatMap((o) => o.content ?? []).find((x) => x.type === "output_text")?.text ?? "";
+    let parsed: { variants: { title: string; hook_text: string; oral_hook: string; beats: string[]; script: string }[] };
+    try { parsed = JSON.parse(raw); } catch { throw new Error("The AI reply could not be read. Try again."); }
+    const rows = parsed.variants.map((v) => ({
+      title: `${f.title} — ${v.title}`, hook: v.hook_text, hooks: [v.hook_text], hook_text: v.hook_text, oral_hook: v.oral_hook, beats: v.beats,
+      script: v.script, body: v.script, product_moment: f.product_moment, effort: f.effort, format: f.effort, status: "draft", app_id: f.app_id,
+      parent_format_id: f.id, created_by: me.id, brief_type: "precise", platform: f.platform ?? "both",
+    }));
+    const { error } = await a.from("briefs").insert(rows);
+    if (error) throw new Error("The variants could not be saved.");
+    return { created: rows.length };
+  });

@@ -164,6 +164,12 @@ export function Breakdown({ b }: { b: any }) {
         {b.prorate ? `${fmtMoney(b.fixedMonthly, b.currency)} × min(1, ${b.postsCounted} / ${b.target}) = ` : `${b.postsCounted} / ${b.target} posts → `}
         <b className="text-brand-navy">{fmtMoney(b.fixedPart, b.currency)}</b>
       </p>
+      {b.effortLines?.length ? (
+        <ul className="mt-1 text-sm text-brand-navySoft" data-testid="effort-lines">
+          {b.effortLines.map((l: { effort: string; posts: number; rate: number; amount: number }) => <li key={l.effort}>{l.effort === "pov" ? "POV" : l.effort === "reaction" ? "Reaction" : "Face cam"}: {l.posts} × {fmtMoney(l.rate, b.currency)} = <b className="text-brand-navy">{fmtMoney(l.amount, b.currency)}</b></li>)}
+          {b.talkingHead && b.talkingHead.min > 0 ? <li>Face cam minimum: {b.talkingHead.done}/{b.talkingHead.min}{b.talkingHead.done < b.talkingHead.min ? " — per-post part prorated" : ""}</li> : null}
+        </ul>
+      ) : null}
       <p className="mt-4 text-sm font-bold text-brand-navy">Views bonus — {fmtMoney(b.rpm, b.currency)} per 1,000 views at 7 days, capped at {fmtMoney(b.cap, b.currency)} per post</p>
       {b.posts.length === 0 ? <p className="text-sm text-brand-navySoft">No 7-day views counted yet this month.</p> : (
         <div className="mt-2 overflow-x-auto">

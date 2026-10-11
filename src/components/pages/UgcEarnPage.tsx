@@ -56,14 +56,23 @@ const COPY = {
 
 const money = (n: number, lang: string) => new Intl.NumberFormat(lang === "fr" ? "fr-FR" : "en-GB", { style: "currency", currency: "EUR", maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
 
-export function UgcEarnPage() {
+const BRANDS = {
+  sophia: { id: SOPHIA, job: JOB, name: "Sophia", tagline: null as string | null },
+  unswipe: { id: "00000000-0000-4000-8000-000000000002", job: "unswipe-ugc-fr", name: "UnSwipe", tagline: "Instagram without the Reels" },
+};
+
+export function UgcEarnPage({ app }: { app?: "unswipe" } = {}) {
   const { lang } = useI18n();
-  const t = COPY[lang === "fr" ? "fr" : "en"];
+  const brand = BRANDS[app ?? "sophia"];
+  const base = COPY[lang === "fr" ? "fr" : "en"];
+  const t = (app === "unswipe"
+    ? JSON.parse(JSON.stringify(base).replace(/des cours Sophia/g, "de la vraie vie sans Reels").replace(/from Sophia courses/g, "from real life without Reels").replace(/Sophia/g, "UnSwipe").replace(/Face-to-camera videos/g, "POV, reaction or face-cam videos").replace(/Des vidéos face caméra/g, "Des vidéos POV, réaction ou face caméra"))
+    : base) as typeof base;
   const apply = useServerFn(applyToJob);
   const agreementFn = useServerFn(getAgreementForJob);
   const { data: agreement } = useQuery({ queryKey: ["job-agreement"], queryFn: () => agreementFn() });
-  const { data: tiers = [] } = useQuery({ queryKey: ["public-tiers"], queryFn: async () => (await supabase.from("ugc_tiers").select("tier, label, per_post, cpm, cap_per_post").eq("app_id", SOPHIA)).data ?? [] });
-  const { data: board = [] } = useQuery({ queryKey: ["public-board"], queryFn: async () => ((await supabase.rpc("leaderboard_month", { _app: SOPHIA })).data ?? []) as { rank: number; pseudonym: string; earnings: number; views: number; posts: number }[] });
+  const { data: tiers = [] } = useQuery({ queryKey: ["public-tiers", brand.id], queryFn: async () => (await supabase.from("ugc_tiers").select("tier, label, per_post, cpm, cap_per_post").eq("app_id", brand.id)).data ?? [] });
+  const { data: board = [] } = useQuery({ queryKey: ["public-board", brand.id], queryFn: async () => ((await supabase.rpc("leaderboard_month", { _app: brand.id })).data ?? []) as { rank: number; pseudonym: string; earnings: number; views: number; posts: number }[] });
   const [f, setF] = useState({ first: "", email: "", country: lang === "fr" ? "FR" : "", adult: false, device: "ios" as "ios" | "android", tiktok: "", website: "" });
   const [meta, setMeta] = useState({ src: "", ref: "" });
   const [step, setStep] = useState<"form" | "sign" | "done">("form");
@@ -81,7 +90,7 @@ export function UgcEarnPage() {
   async function submit(signedName: string) {
     setBusy(true); setError(null);
     try {
-      const r = await apply({ data: { slug: JOB, fullName: f.first.trim(), email: f.email.trim(), country: f.country.trim().toUpperCase(), age: 18, tiktok: f.tiktok || undefined, answers: {}, signedName, documentVersion: agreement?.version, origin: window.location.origin, userAgent: navigator.userAgent, website: f.website || undefined, quick: true, device: f.device, src: meta.src || undefined, ref: meta.ref || undefined } as never });
+      const r = await apply({ data: { slug: brand.job, fullName: f.first.trim(), email: f.email.trim(), country: f.country.trim().toUpperCase(), age: 18, tiktok: f.tiktok || undefined, answers: {}, signedName, documentVersion: agreement?.version, origin: window.location.origin, userAgent: navigator.userAgent, website: f.website || undefined, quick: true, device: f.device, src: meta.src || undefined, ref: meta.ref || undefined } as never });
       if (!r.ok) { setError(r.reason); setStep("form"); return; }
       setStep("done");
     } catch { setError(t.errGeneric); setStep("form"); } finally { setBusy(false); }
@@ -90,6 +99,7 @@ export function UgcEarnPage() {
 
   return (
     <Shell>
+      {brand.tagline && <p className="bg-brand-navy px-4 py-2 text-center text-sm font-bold text-card">{brand.name} · {brand.tagline}</p>}
       <section className="mx-auto w-full max-w-3xl px-5 pb-8 pt-10 text-center sm:pt-16">
         <h1 className="text-[44px] font-extrabold leading-[1.05] tracking-tight text-brand-navy sm:text-[64px]">{t.hero}</h1>
         <p className="mx-auto mt-4 max-w-xl text-lg text-brand-navySoft">{t.sub}</p>

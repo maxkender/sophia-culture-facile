@@ -265,7 +265,7 @@ function VideoReviews() {
   const { data = [] } = useQuery({
     queryKey: ["hub", "reviews", appId],
     queryFn: async () => {
-      let x = supabase.from("creator_posts").select("*, creators(full_name), briefs(title)").eq("status", "pending").order("created_at", { ascending: false });
+      let x = supabase.from("creator_posts").select("*, creators(full_name), briefs(title, effort)").eq("status", "pending").order("created_at", { ascending: false });
       if (appId) x = x.eq("app_id", appId);
       return (await x).data ?? [];
     },
@@ -311,6 +311,7 @@ function VideoReviews() {
             <dl className="mt-2 grid grid-cols-2 gap-2 text-sm">
               <div><dt className="text-brand-navySoft">Brief</dt><dd className="font-semibold">{(post.briefs as { title?: string } | null)?.title ?? "—"}</dd></div>
               <div><dt className="text-brand-navySoft">Platform</dt><dd className="font-semibold">{post.platform}</dd></div>
+              <div><dt className="text-brand-navySoft">Format effort</dt><dd><select aria-label="Format effort" key={post.id} defaultValue={post.effort ?? (post.briefs as { effort?: string } | null)?.effort ?? "talking_head"} onChange={async (e) => { const { error } = await supabase.from("creator_posts").update({ effort: e.target.value }).eq("id", post.id); if (error) toast.error("Could not save."); else toast.success("Effort saved"); }} className="h-8 rounded-lg border px-2 text-sm font-semibold"><option value="pov">POV</option><option value="reaction">Reaction</option><option value="talking_head">Face cam</option></select></dd></div>
               <div><dt className="text-brand-navySoft">Posted</dt><dd className="font-semibold">{post.posted_on ?? "—"}</dd></div>
               <div><dt className="text-brand-navySoft">Views so far</dt><dd className="font-semibold">{compact(Number(post.views ?? 0))}</dd></div>
             </dl>

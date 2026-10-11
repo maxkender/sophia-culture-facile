@@ -90,6 +90,7 @@ function AppEditor({ app }: { app: AppRow }) {
             <Label htmlFor={`${app.id}-${k}`}>{label}</Label>
             {long ? <Textarea id={`${app.id}-${k}`} rows={3} value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} /> : <Input id={`${app.id}-${k}`} value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} />}
             {hint ? <p className="mt-1 text-xs text-brand-navySoft">{hint}</p> : null}
+            {k === "app_store_url" && !f[k] ? <p className="mt-1 text-xs font-semibold text-destructive">lien store à renseigner</p> : null}
           </div>
         ))}
       </div>

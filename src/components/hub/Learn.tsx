@@ -7,12 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SOPHIA_APP_ID, useAdminApp } from "@/lib/apps";
-import { generateBriefsFromCourses } from "@/lib/hub-learn.functions";
+import { generateBriefsFromCourses, generateFormatVariants } from "@/lib/hub-learn.functions";
 import { PostThumb } from "./PostThumb";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const input = "mt-1 block min-h-10 w-full rounded-xl border border-input bg-card px-3 text-sm";
-const TABS = ["Briefs", "Reference videos", "Guides & rules", "Templates"] as const;
+const TABS = ["Formats", "Briefs", "Reference videos", "Guides & rules", "Templates"] as const;
 const FORMATS = ["talking_head", "pov", "reaction", "voiceover", "skit", "green_screen", "list"];
 
 /** Next Monday 09:00 Paris (07:00 or 08:00 UTC depending on DST; stored as 07:00 UTC so the 09:00 Paris run always picks it up). */
@@ -62,6 +62,78 @@ function BriefEditor({ b, refs, onClose }: { b: Brief; refs: { id: string; title
   );
 }
 
+type Fmt = { id: string; title: string; hook_text: string | null; oral_hook: string | null; beats: string[] | null; product_moment: string | null; variations: string | null; effort: string | null; status: string; pinned: boolean; sort_order: number | null; app_id: string };
+const EFFORTS = [["pov", "POV"], ["reaction", "Reaction"], ["talking_head", "Face cam"]] as const;
+
+function Formats() {
+  const { appId } = useAdminApp();
+  const app = appId ?? SOPHIA_APP_ID;
+  const qc = useQueryClient();
+  const gen = useServerFn(generateFormatVariants);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [edit, setEdit] = useState<Fmt | null>(null);
+  const { data } = useQuery({
+    queryKey: ["hub", "learn", "formats", app],
+    queryFn: async () => {
+      const [f, v] = await Promise.all([
+        supabase.from("briefs").select("id, title, hook_text, oral_hook, beats, product_moment, variations, effort, status, pinned, sort_order, app_id").eq("app_id", app).eq("brief_type", "format").order("pinned", { ascending: false }).order("sort_order"),
+        supabase.from("briefs").select("parent_format_id").eq("app_id", app).not("parent_format_id", "is", null),
+      ]);
+      const counts: Record<string, number> = {};
+      for (const r of v.data ?? []) counts[r.parent_format_id as string] = (counts[r.parent_format_id as string] ?? 0) + 1;
+      return { formats: (f.data ?? []) as unknown as Fmt[], counts };
+    },
+  });
+  async function save(x: Fmt) {
+    const row = { title: x.title, hook_text: x.hook_text, hook: x.hook_text, oral_hook: x.oral_hook, beats: x.beats ?? [], product_moment: x.product_moment, variations: x.variations, effort: x.effort, status: x.status, pinned: x.pinned, app_id: app, brief_type: "format", platform: "both", body: [x.hook_text, ...(x.beats ?? [])].filter(Boolean).join("\n") };
+    const { error } = x.id ? await supabase.from("briefs").update(row as never).eq("id", x.id) : await supabase.from("briefs").insert(row as never);
+    if (error) toast.error("Could not save."); else { toast.success("Format saved"); setEdit(null); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); }
+  }
+  if (edit) {
+    const set = (k: keyof Fmt, v: unknown) => setEdit({ ...edit, [k]: v } as Fmt);
+    const beats = [...(edit.beats ?? []), "", "", ""].slice(0, 3);
+    return (
+      <div className={cn(card, "space-y-3")}>
+        <button type="button" className="text-sm font-semibold text-portal-accent" onClick={() => setEdit(null)}>← Formats</button>
+        <label className="block text-sm font-semibold">Title<input value={edit.title} onChange={(e) => set("title", e.target.value)} className="mt-1 h-10 w-full rounded-xl border px-3" /></label>
+        <label className="block text-sm font-semibold">Hook on frame 1<input value={edit.hook_text ?? ""} onChange={(e) => set("hook_text", e.target.value)} className="mt-1 h-10 w-full rounded-xl border px-3" /></label>
+        <label className="block text-sm font-semibold">Oral hook<input value={edit.oral_hook ?? ""} onChange={(e) => set("oral_hook", e.target.value)} className="mt-1 h-10 w-full rounded-xl border px-3" /></label>
+        {beats.map((b, i) => <label key={i} className="block text-sm font-semibold">Beat {i + 1}<input value={b} onChange={(e) => { const nb = [...beats]; nb[i] = e.target.value; set("beats", nb); }} className="mt-1 h-10 w-full rounded-xl border px-3" /></label>)}
+        <label className="block text-sm font-semibold">Product moment<textarea value={edit.product_moment ?? ""} onChange={(e) => set("product_moment", e.target.value)} className="mt-1 w-full rounded-xl border p-3" rows={2} /></label>
+        <label className="block text-sm font-semibold">Variations (how to make 10 videos from it)<textarea value={edit.variations ?? ""} onChange={(e) => set("variations", e.target.value)} className="mt-1 w-full rounded-xl border p-3" rows={2} /></label>
+        <div className="flex flex-wrap gap-3">
+          <label className="text-sm font-semibold">Effort<select value={edit.effort ?? "pov"} onChange={(e) => set("effort", e.target.value)} className="mt-1 block h-10 rounded-xl border px-2">{EFFORTS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+          <label className="text-sm font-semibold">Status<select value={edit.status} onChange={(e) => set("status", e.target.value)} className="mt-1 block h-10 rounded-xl border px-2">{["draft", "published", "archived"].map((s) => <option key={s}>{s}</option>)}</select></label>
+          <label className="mt-6 flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked={edit.pinned} onChange={(e) => set("pinned", e.target.checked)} />Pinned</label>
+        </div>
+        <Button onClick={() => void save(edit)}>Save format</Button>
+      </div>
+    );
+  }
+  const list = data?.formats ?? [];
+  return (
+    <div className="space-y-4">
+      <div className={cn(card, "flex flex-wrap items-center gap-3")}>
+        <Button onClick={() => setEdit({ id: "", title: "", hook_text: "", oral_hook: "", beats: ["", "", ""], product_moment: "", variations: "", effort: "pov", status: "draft", pinned: false, sort_order: null, app_id: app })}>New format</Button>
+        <p className="text-sm text-brand-navySoft">{list.length} formats · repeatable mechanics creators shoot again and again. Variants land as draft briefs in Briefs.</p>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{list.map((f, i) => (
+        <div key={f.id} className={cn(card, "flex flex-col gap-2")} data-testid="format-card">
+          <div className="flex items-center justify-between gap-2"><span className="text-xs font-bold text-brand-navySoft">#{i + 1}{f.pinned ? " · pinned" : ""} · {f.status}</span><span className="rounded-full bg-portal-bg px-2 py-0.5 text-xs font-bold">{EFFORTS.find(([k]) => k === f.effort)?.[1] ?? "—"}</span></div>
+          <p className="text-lg font-extrabold leading-tight text-brand-navy">{f.hook_text}</p>
+          <p className="text-sm font-semibold text-brand-navySoft">{f.title}</p>
+          <ol className="list-decimal pl-5 text-xs text-brand-navySoft">{(f.beats ?? []).map((b, j) => <li key={j}>{b}</li>)}</ol>
+          <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
+            <Button size="sm" variant="outline" onClick={() => setEdit(f)}>Edit</Button>
+            <Button size="sm" disabled={busy === f.id} onClick={async () => { setBusy(f.id); try { const r = await gen({ data: { formatId: f.id } }); toast.success(`${r.created} draft variants saved in Briefs`); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); } catch (e) { toast.error((e as Error).message); } finally { setBusy(null); } }}><Sparkles className="size-4" />{busy === f.id ? "Writing…" : "Générer 5 variantes"}</Button>
+            {data?.counts[f.id] ? <span className="text-xs text-brand-navySoft">{data.counts[f.id]} variants</span> : null}
+          </div>
+        </div>
+      ))}</div>
+    </div>
+  );
+}
+
 function Briefs() {
   const { appId } = useAdminApp();
   const app = appId ?? SOPHIA_APP_ID;
@@ -82,7 +154,7 @@ function Briefs() {
       return { briefs: (b.data ?? []) as unknown as Brief[], refs: r.data ?? [] };
     },
   });
-  const briefs = (data?.briefs ?? []).filter((b) => status === "all" || b.status === status);
+  const briefs = (data?.briefs ?? []).filter((b) => (b as { brief_type?: string }).brief_type !== "format" && (status === "all" || b.status === status));
   async function schedule() {
     const { error } = await supabase.from("briefs").update({ status: "scheduled", drop_at: nextMonday().toISOString() }).in("id", sel);
     if (error) toast.error("Could not schedule."); else { toast.success(`${sel.length} briefs drop ${nextMonday().toLocaleString()}`); setSel([]); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); }
@@ -263,11 +335,11 @@ function Templates() {
 }
 
 export function Learn() {
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Briefs");
+  const [tab, setTab] = useState<(typeof TABS)[number]>("Formats");
   return (
     <div className="space-y-4">
       <div className="flex gap-2 overflow-x-auto">{TABS.map((t) => <button key={t} type="button" onClick={() => setTab(t)} className={cn("min-h-10 shrink-0 rounded-full px-4 text-sm font-bold", tab === t ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{t}</button>)}</div>
-      {tab === "Briefs" ? <Briefs /> : tab === "Reference videos" ? <References /> : tab === "Guides & rules" ? <Guides /> : <Templates />}
+      {tab === "Formats" ? <Formats /> : tab === "Briefs" ? <Briefs /> : tab === "Reference videos" ? <References /> : tab === "Guides & rules" ? <Guides /> : <Templates />}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { UgcLandingPage } from "@/components/pages/CreatorsPages";
+import { UgcEarnPage } from "@/components/pages/UgcEarnPage";
 
 export const Route = createFileRoute("/fr/createurs/unswipe/ugc")({
   head: () => ({
@@ -12,5 +12,5 @@ export const Route = createFileRoute("/fr/createurs/unswipe/ugc")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: () => <UgcLandingPage app="unswipe" />,
+  component: () => <UgcEarnPage app="unswipe" />,
 });
