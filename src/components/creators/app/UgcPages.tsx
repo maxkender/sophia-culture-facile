@@ -166,7 +166,7 @@ export function Breakdown({ b }: { b: any }) {
       </p>
       {b.effortLines?.length ? (
         <ul className="mt-1 text-sm text-brand-navySoft" data-testid="effort-lines">
-          {b.effortLines.map((l) => <li key={l.effort}>{l.effort === "pov" ? "POV" : l.effort === "reaction" ? "Reaction" : "Face cam"}: {l.posts} × {fmtMoney(l.rate, b.currency)} = <b className="text-brand-navy">{fmtMoney(l.amount, b.currency)}</b></li>)}
+          {b.effortLines.map((l: { effort: string; posts: number; rate: number; amount: number }) => <li key={l.effort}>{l.effort === "pov" ? "POV" : l.effort === "reaction" ? "Reaction" : "Face cam"}: {l.posts} × {fmtMoney(l.rate, b.currency)} = <b className="text-brand-navy">{fmtMoney(l.amount, b.currency)}</b></li>)}
           {b.talkingHead && b.talkingHead.min > 0 ? <li>Face cam minimum: {b.talkingHead.done}/{b.talkingHead.min}{b.talkingHead.done < b.talkingHead.min ? " — per-post part prorated" : ""}</li> : null}
         </ul>
       ) : null}
