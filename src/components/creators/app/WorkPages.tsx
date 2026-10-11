@@ -21,6 +21,7 @@ import { submitPostLinks } from "@/lib/ugc-loop.functions";
 import { GuidelinesBlock, GuidelinesChecklist, useGuidelines } from "../Guidelines";
 import { parisWeekStart } from "@/lib/ugc-pay";
 import { CATEGORY_LEGEND, briefStatus, fileToBase64, useCreator, type CreatorData } from "./useCreator";
+import { t as ct } from "@/i18n/creator-app";
 
 type Post = CreatorData["posts"][number];
 type Ref = CreatorData["refs"][number];
@@ -52,27 +53,27 @@ export function LogPostForm({ briefId: initialBrief = "", onDone }: { briefId?: 
   const allTicked = guidelines.every((g) => checked.includes(g.id));
   return (
     <div className="space-y-4">
-      <div><Label htmlFor="links" className="text-base font-extrabold">Ajouter un lien</Label>
+      <div><Label htmlFor="links" className="text-base font-extrabold">{ct("Ajouter un lien")}</Label>
         <Textarea id="links" rows={3} className="mt-1 text-base" placeholder={"https://www.tiktok.com/@…/video/…\nhttps://www.instagram.com/reel/…"} value={text} onChange={(e) => setText(e.target.value)} />
-        <p className="mt-1 text-xs text-brand-navySoft">TikTok ou Instagram, un ou plusieurs liens (un par ligne).</p></div>
-      <div><Label htmlFor="link-brief">Brief (optionnel)</Label>
+        <p className="mt-1 text-xs text-brand-navySoft">{ct("TikTok ou Instagram, un ou plusieurs liens (un par ligne).")}</p></div>
+      <div><Label htmlFor="link-brief">{ct("Brief (optionnel)")}</Label>
         <select id="link-brief" className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={briefId} onChange={(e) => setBriefId(e.target.value)}>
-          <option value="">Sans brief</option>{briefs.map((b) => <option key={b.id} value={b.id}>{b.title}</option>)}
+          <option value="">{ct("Sans brief")}</option>{briefs.map((b) => <option key={b.id} value={b.id}>{b.title}</option>)}
         </select></div>
       <GuidelinesChecklist appId={appId} value={checked} onChange={setChecked} />
       <Button size="lg" disabled={busy || !urls.length || !allTicked} title={!allTicked ? "Coche chaque consigne avant d’envoyer" : undefined} onClick={async () => {
         const bad = urls.find((u) => !isHttpUrl(u) || !u.startsWith("https://"));
-        if (bad) return void toast.error("Colle le lien complet, qui commence par https://.");
+        if (bad) return void toast.error(ct("Colle le lien complet, qui commence par https://."));
         setBusy(true);
         try {
           const r = await submit({ data: { urls, briefId: briefId || null, guidelines: checked } });
           setOut(r.results); const ok = r.results.filter((x) => x.ok).length;
           if (ok) { toast.success(`${ok} lien${ok > 1 ? "s" : ""} envoyé${ok > 1 ? "s" : ""}.`); setText(r.results.filter((x) => !x.ok).map((x) => x.url).join("\n")); setChecked([]); await reload(); onDone?.(); }
-          else toast.error("Aucun lien n’a été envoyé.");
+          else toast.error(ct("Aucun lien n’a été envoyé."));
         } catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
         setBusy(false);
-      }}>Envoyer</Button>
-      {out.some((x) => !x.ok) ? <ul className="space-y-1 text-sm" data-testid="link-errors">{out.filter((x) => !x.ok).map((x) => <li key={x.url} className="text-portal-red">{x.url} — {x.reason === "Already submitted." ? "déjà envoyé" : x.reason === "Not a TikTok or Instagram video link." ? "ce n’est pas un lien de vidéo TikTok ou Instagram" : "n’a pas pu être enregistré"}</li>)}</ul> : null}
+      }}>{ct("Envoyer")}</Button>
+      {out.some((x) => {ct("!x.ok) ?")} <ul className="space-y-1 text-sm" data-testid="link-errors">{out.filter((x) => !x.ok).map((x) => <li key={x.url} className="text-portal-red">{x.url} — {x.reason === "Already submitted." ? "déjà envoyé" : x.reason === "Not a TikTok or Instagram video link." ? "ce n’est pas un lien de vidéo TikTok ou Instagram" : "n’a pas pu être enregistré"}</li>)}</ul> : null}
     </div>
   );
 }
@@ -128,8 +129,8 @@ export function BriefsPage() {
           <button key={k} type="button" aria-pressed={tab === k} onClick={() => setTab(k)} className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-bold ${tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy"}`}>{l}</button>
         ))}
       </div>
-      {tab === "formats" ? <><PageTitle title="Formats" lead="Repeatable video mechanics. The pay per post depends on the format." /><FormatsTab /></> : tab === "refs" ? (
-        <><PageTitle title="Reference videos" lead="Videos that worked. Use them as inspiration." /><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{d.refs.map((r) => <RefCard key={r.id} r={r} />)}</div></>
+      {tab === "formats" ? <><PageTitle title={ct("Formats")} lead={ct("Repeatable video mechanics. The pay per post depends on the format.")} /><FormatsTab /></> : tab === "refs" ? (
+        <><PageTitle title={ct("Reference videos")} lead={ct("Videos that worked. Use them as inspiration.")} /><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{d.refs.map((r) => <RefCard key={r.id} r={r} />)}</div></>
       ) : <FactBriefs />}
     </div>
   );
@@ -144,17 +145,17 @@ function FactBriefs() {
   const list = d.briefs.filter((b) => (b as { brief_type?: string }).brief_type !== "format" && (app === "all" || b.app_id === app) && (status === "all" || briefStatus(d, b.id) === status));
   return (
     <div>
-      <PageTitle title="Briefs" lead="Briefs Max sends you, one by one." />
+      <PageTitle title={ct("Briefs")} lead={ct("Briefs Max sends you, one by one.")} />
       <AssignedBriefs />
       <div className="mb-6 flex flex-wrap gap-2">
-        <select aria-label="App" className="h-10 rounded-md border border-input bg-card px-3 text-sm" value={app} onChange={(e) => setApp(e.target.value)}>
-          <option value="all">All apps</option>{apps.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+        <select aria-label={ct("App")} className="h-10 rounded-md border border-input bg-card px-3 text-sm" value={app} onChange={(e) => setApp(e.target.value)}>
+          <option value="all">{ct("All apps")}</option>{apps.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
         </select>
-        <select aria-label="Status" className="h-10 rounded-md border border-input bg-card px-3 text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>
+        <select aria-label={ct("Status")} className="h-10 rounded-md border border-input bg-card px-3 text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>
           {["all", "new", "seen", "posted", "skipped"].map((s) => <option key={s} value={s}>{s === "all" ? "All statuses" : s}</option>)}
         </select>
       </div>
-      {list.length === 0 ? <EmptyState title="No brief yet" text="Your briefs arrive here when Max sends you one." /> : (
+      {list.length === 0 ? <EmptyState title={ct("No brief yet")} text="Your briefs arrive here when Max sends you one." /> : (
         <div className="grid gap-4 md:grid-cols-2">
           {list.map((b) => (
             <Link key={b.id} to="/creators/app/briefs/$briefId" params={{ briefId: b.id }} className="block">
@@ -189,7 +190,7 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
     supabase.from("brief_reads").insert({ brief_id: brief.id, creator_id: d.me.id }).then(() => d.reload());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [brief?.id]);
-  if (!brief) return <EmptyState title="Brief not found" text="It may have been withdrawn." />;
+  if (!brief) return <EmptyState title={ct("Brief not found")} text="It may have been withdrawn." />;
   const status = briefStatus(d, brief.id);
   const refs = d.refs.filter((r) => (brief.reference_video_ids ?? []).includes(r.id));
   const eff = (brief as { effort?: string | null }).effort;
@@ -197,24 +198,24 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
   const pay = rates && eff ? `${(rates as Record<string, number>)[eff]?.toLocaleString("fr-FR")} € / post` : null;
   return (
     <div>
-      <Link to="/creators/app/briefs" className="text-sm font-semibold text-portal-accent">← All briefs</Link>
+      <Link to="/creators/app/briefs" className="text-sm font-semibold text-portal-accent">{ct("← All briefs")}</Link>
       <div className="mt-3"><PageTitle title={brief.title} lead={brief.due_date ? `Due ${fmtDate(brief.due_date)}` : ""} action={<Pill s={status} />} /></div>
       <div className="mb-4"><AppBadge appId={brief.app_id} className="text-sm" /></div>
       <PortalCard><BriefView b={toStudio(brief as Record<string, unknown>)} assets={files} refs={refs} pay={pay} /></PortalCard>
       <div className="mt-4"><GuidelinesBlock appId={brief.app_id} /></div>
       <div className="mt-8 flex flex-wrap gap-2">
-        <Button onClick={() => setMode(mode === "post" ? "none" : "post")}>J’ai posté : coller mon lien</Button>
-        {status !== "posted" && status !== "skipped" && <Button variant="outline" onClick={() => setMode(mode === "skip" ? "none" : "skip")}>Skip</Button>}
+        <Button onClick={() => setMode(mode === "post" ? "none" : "post")}>{ct("J’ai posté : coller mon lien")}</Button>
+        {status !== "posted" && status !== "skipped" && <Button variant="outline" onClick={() => setMode(mode === "skip" ? "none" : "skip")}>{ct("Skip")}</Button>}
       </div>
       {mode === "post" && <PortalCard className="mt-4"><LogPostForm briefId={brief.id} onDone={() => setMode("none")} /></PortalCard>}
       {mode === "skip" && (
         <PortalCard className="mt-4 space-y-3">
-          <Label>Why are you skipping this brief?</Label>
+          <Label>{ct("Why are you skipping this brief?")}</Label>
           <Textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} />
           <Button variant="outline" disabled={reason.trim().length < 3} onClick={async () => {
-            try { await skip({ data: { briefId: brief.id, reason } }); toast.success("Skipped. The team has your reason."); setMode("none"); d.reload(); }
+            try { await skip({ data: { briefId: brief.id, reason } }); toast.success(ct("Skipped. The team has your reason.")); setMode("none"); d.reload(); }
             catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
-          }}>Skip this brief</Button>
+          }}>{ct("Skip this brief")}</Button>
         </PortalCard>
       )}
     </div>
@@ -235,11 +236,11 @@ function RefCard({ r, compact = false }: { r: Ref; compact?: boolean }) {
       <div className="mb-2 flex flex-wrap gap-1"><PlatformBadge platform={r.platform} /><AppBadge appId={r.app_id} /></div>
       {cat && <span className="mb-2 w-fit rounded-full bg-portal-bg px-2.5 py-0.5 text-[11px] font-bold text-brand-navy" title={cat.line}>{cat.label}</span>}
       <p className="font-extrabold text-brand-navy">{r.title || r.note || "Untitled video"}</p>
-      {r.why_it_works && <p className="mt-1 text-sm text-brand-navySoft"><b>Why it works:</b> {r.why_it_works}</p>}
-      {r.format_notes && <p className="mt-1 text-sm text-brand-navySoft"><b>Format:</b> {r.format_notes}</p>}
+      {r.why_it_works && <p className="mt-1 text-sm text-brand-navySoft"><b>{ct("Why it works:")}</b> {r.why_it_works}</p>}
+      {r.format_notes && <p className="mt-1 text-sm text-brand-navySoft"><b>{ct("Format:")}</b> {r.format_notes}</p>}
       <div className="mt-auto flex flex-wrap gap-2 pt-3">
-        <Button asChild size="sm" variant="outline"><a href={r.url} target="_blank" rel="noopener noreferrer"><ExternalLink className="size-3.5" /> Open</a></Button>
-        <Button size="sm" onClick={() => navigate({ to: "/creators/app/posts", search: { ref: r.id } })}>Use this</Button>
+        <Button asChild size="sm" variant="outline"><a href={r.url} target="_blank" rel="noopener noreferrer"><ExternalLink className="size-3.5" /> {ct("Open")}</a></Button>
+        <Button size="sm" onClick={() => navigate({ to: "/creators/app/posts", search: { ref: r.id } })}>{ct("Use this")}</Button>
       </div>
     </PortalCard>
   );
@@ -252,9 +253,9 @@ export function LibraryPage() {
   const list = refs.filter((r) => r.platform === platform && (cat === "all" || r.category === cat));
   return (
     <div>
-      <PageTitle title="Library" lead="Videos to study and reproduce. Use one as the starting point for a post and we will know which references work." />
+      <PageTitle title={ct("Library")} lead={ct("Videos to study and reproduce. Use one as the starting point for a post and we will know which references work.")} />
       <Tabs value={platform} onValueChange={(v) => setPlatform(v as "tiktok")}>
-        <TabsList><TabsTrigger value="tiktok">TikTok</TabsTrigger><TabsTrigger value="instagram">Instagram</TabsTrigger></TabsList>
+        <TabsList><TabsTrigger value="tiktok">{ct("TikTok")}</TabsTrigger><TabsTrigger value="instagram">{ct("Instagram")}</TabsTrigger></TabsList>
       </Tabs>
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
         {Object.entries(CATEGORY_LEGEND).map(([k, v]) => (
@@ -264,7 +265,7 @@ export function LibraryPage() {
         ))}
       </div>
       <div className="mt-6">
-        {list.length === 0 ? <EmptyState title="No video here yet" text="The Sophia team adds references regularly." /> : (
+        {list.length === 0 ? <EmptyState title={ct("No video here yet")} text="The Sophia team adds references regularly." /> : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{list.map((r) => <RefCard key={r.id} r={r} />)}</div>
         )}
       </div>
@@ -279,19 +280,19 @@ function ReportViews({ post }: { post: Post }) {
   const [open, setOpen] = useState(false);
   const [views, setViews] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  if (!open) return <button className="mt-2 text-sm font-bold text-portal-accent underline" onClick={() => setOpen(true)}>Report views (day 7)</button>;
+  if (!open) return <button className="mt-2 text-sm font-bold text-portal-accent underline" onClick={() => setOpen(true)}>{ct("Report views (day 7)")}</button>;
   return (
     <div className="mt-3 grid gap-2 rounded-xl bg-portal-bg p-3 sm:grid-cols-[140px_1fr_auto]">
-      <Input type="number" min={0} placeholder="Views" value={views} onChange={(e) => setViews(e.target.value)} />
+      <Input type="number" min={0} placeholder={ct("Views")} value={views} onChange={(e) => setViews(e.target.value)} />
       <Input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
       <Button size="sm" onClick={async () => {
         const v = Number(views);
-        if (!Number.isFinite(v) || v < 0 || views === "") return void toast.error("Enter the view count.");
-        if (!file) return void toast.error("Add a screenshot showing the views.");
-        if (file.size > 5_000_000) return void toast.error("Screenshot must be under 5 MB.");
-        try { await report({ data: { postId: post.id, views: Math.round(v), screenshotBase64: await fileToBase64(file), contentType: file.type as "image/png" } }); toast.success("Views reported."); reload(); }
+        if (!Number.isFinite(v) || v < 0 || views === "") return void toast.error(ct("Enter the view count."));
+        if (!file) return void toast.error(ct("Add a screenshot showing the views."));
+        if (file.size > 5_000_000) return void toast.error(ct("Screenshot must be under 5 MB."));
+        try { await report({ data: { postId: post.id, views: Math.round(v), screenshotBase64: await fileToBase64(file), contentType: file.type as "image/png" } }); toast.success(ct("Views reported.")); reload(); }
         catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
-      }}>Send</Button>
+      }}>{ct("Send")}</Button>
     </div>
   );
 }
@@ -301,12 +302,12 @@ function FeedbackReply({ post }: { post: Post }) {
   const [text, setText] = useState("");
   return (
     <div className="mt-3 flex gap-2">
-      <Input placeholder="Reply to this feedback" value={text} onChange={(e) => setText(e.target.value)} />
+      <Input placeholder={ct("Reply to this feedback")} value={text} onChange={(e) => setText(e.target.value)} />
       <Button size="sm" disabled={!text.trim()} onClick={async () => {
         const { error } = await supabase.from("creator_messages").insert({ creator_id: me.id, from_admin: false, body: text.trim(), post_id: post.id });
-        if (error) return void toast.error("Your reply was not sent. Check your connection and try again.");
-        setText(""); toast.success("Reply sent."); reload();
-      }}>Reply</Button>
+        if (error) return void toast.error(ct("Your reply was not sent. Check your connection and try again."));
+        setText(""); toast.success(ct("Reply sent.")); reload();
+      }}>{ct("Reply")}</Button>
     </div>
   );
 }
@@ -334,7 +335,7 @@ export function WeeklyBar() {
   const done = posts.filter((p) => p.status !== "rejected" && ((p as LoopPost).submitted_at ?? p.created_at) >= start).length;
   return (
     <PortalCard className="p-4">
-      <div data-testid="weekly-bar" className="flex items-baseline justify-between"><p className="text-lg font-extrabold text-brand-navy">{done} / {target} cette semaine</p><p className="text-xs text-brand-navySoft">du lundi au dimanche</p></div>
+      <div data-testid="weekly-bar" className="flex items-baseline justify-between"><p className="text-lg font-extrabold text-brand-navy">{done} / {target} cette semaine</p><p className="text-xs text-brand-navySoft">{ct("du lundi au dimanche")}</p></div>
       <div className="mt-2 h-3 rounded-full bg-brand-line"><div className="h-3 rounded-full bg-portal-accent transition-all" style={{ width: `${Math.min(100, (done / target) * 100)}%` }} /></div>
     </PortalCard>
   );
@@ -346,10 +347,10 @@ export function PostsPage({ refId }: { refId?: string | undefined }) {
   const paidAt = (p: Post) => (payoutItems as { id: string; paid_at?: string | null }[]).find((i) => i.id === (p as LoopPost).payout_item_id)?.paid_at ?? null;
   return (
     <div>
-      <PageTitle title="Mes posts" lead="Colle ici le lien de chaque vidéo publiée. C’est le seul endroit pour envoyer tes liens." />
+      <PageTitle title={ct("Mes posts")} lead={ct("Colle ici le lien de chaque vidéo publiée. C’est le seul endroit pour envoyer tes liens.")} />
       <div className="mb-6"><WeeklyBar /></div>
       <PortalCard className="mb-8"><LogPostForm /></PortalCard>
-      {posts.length === 0 ? <EmptyState title="Aucun lien envoyé pour l’instant" /> : (
+      {posts.length === 0 ? <EmptyState title={ct("Aucun lien envoyé pour l’instant")} /> : (
         <div className="space-y-3">
           {posts.map((p) => {
             const brief = briefs.find((b) => b.id === p.brief_id);
@@ -379,9 +380,9 @@ export function CallsPage() {
   const past = calls.filter((c) => new Date(c.starts_at).getTime() <= now);
   return (
     <div>
-      <PageTitle title="Calls" lead="RSVP to every call, and come to the ones you said yes to." />
-      <h2 className="mb-3 text-lg font-extrabold text-brand-navy">Upcoming</h2>
-      {upcoming.length === 0 ? <EmptyState title="No call scheduled" /> : (
+      <PageTitle title={ct("Calls")} lead={ct("RSVP to every call, and come to the ones you said yes to.")} />
+      <h2 className="mb-3 text-lg font-extrabold text-brand-navy">{ct("Upcoming")}</h2>
+      {upcoming.length === 0 ? <EmptyState title={ct("No call scheduled")} /> : (
         <div className="space-y-3">
           {upcoming.map((c) => {
             const mine = rsvps.find((r) => r.call_id === c.id)?.answer;
@@ -393,13 +394,13 @@ export function CallsPage() {
                     <p className="text-sm text-brand-navySoft">{new Date(c.starts_at).toLocaleString()}</p>
                     {c.notes && <p className="mt-1 text-sm text-brand-navySoft">{c.notes}</p>}
                   </div>
-                  {c.link && <Button asChild size="sm" variant="outline"><a href={c.link} target="_blank" rel="noopener noreferrer">Join link</a></Button>}
+                  {c.link && <Button asChild size="sm" variant="outline"><a href={c.link} target="_blank" rel="noopener noreferrer">{ct("Join link")}</a></Button>}
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {(["yes", "maybe", "no"] as const).map((a) => (
                     <Button key={a} size="sm" variant={mine === a ? "default" : "outline"} onClick={async () => {
                       const { error } = await supabase.from("creator_call_rsvps").upsert({ call_id: c.id, creator_id: me.id, answer: a }, { onConflict: "call_id,creator_id" });
-                      if (error) toast.error("Your RSVP was not saved. Check your connection and try again."); else reload();
+                      if (error) toast.error(ct("Your RSVP was not saved. Check your connection and try again.")); else reload();
                     }}>{a === "yes" ? "Yes" : a === "no" ? "No" : "Maybe"}</Button>
                   ))}
                 </div>
@@ -408,8 +409,8 @@ export function CallsPage() {
           })}
         </div>
       )}
-      <h2 className="mb-3 mt-10 text-lg font-extrabold text-brand-navy">Past</h2>
-      {past.length === 0 ? <p className="text-sm text-brand-navySoft">No past call.</p> : (
+      <h2 className="mb-3 mt-10 text-lg font-extrabold text-brand-navy">{ct("Past")}</h2>
+      {past.length === 0 ? <p className="text-sm text-brand-navySoft">{ct("No past call.")}</p> : (
         <PortalCard className="divide-y divide-brand-line p-0">
           {past.map((c) => {
             const r = rsvps.find((x) => x.call_id === c.id);
@@ -449,22 +450,22 @@ export function EarningsPage() {
   }
   return (
     <div>
-      <PageTitle title="Earnings" lead="Paid monthly: a fixed amount per approved post, plus a bonus by views." />
+      <PageTitle title={ct("Earnings")} lead={ct("Paid monthly: a fixed amount per approved post, plus a bonus by views.")} />
       <PortalCard>
-        <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Accrued this month</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">{ct("Accrued this month")}</p>
         <p className="mt-1 text-3xl font-extrabold text-brand-navy">{money(accrued)}</p>
         {apps.filter((a) => thisMonth.some((p) => p.app_id === a.id)).map((a) => (
           <p key={a.id} className="mt-1 text-sm text-brand-navySoft">{a.name}: <b className="text-brand-navy">{money(thisMonth.filter((p) => p.app_id === a.id && p.pay_status === "due").reduce((s, p) => s + Number(p.amount_usd ?? 0) + Number(p.bonus_usd ?? 0), 0))}</b></p>
         ))}
       </PortalCard>
       {held.length > 0 && <div className="mt-4"><Banner tone="warning" title={`${held.length} approved post${held.length > 1 ? "s are" : " is"} on hold`}>No rate has been set yet for your country. They will be paid at the right rate as soon as it is set; nothing is lost.</Banner></div>}
-      {waitingViews.length > 0 && <div className="mt-4"><Banner tone="info" title={`${waitingViews.length} post${waitingViews.length > 1 ? "s are" : " is"} waiting for a view count`}>Report views with a screenshot on <Link to="/creators/app/posts" className="underline">My posts</Link>. Without it, the bonus for that post is zero.</Banner></div>}
-      <h2 className="mb-3 mt-8 text-lg font-extrabold text-brand-navy">This month</h2>
+      {waitingViews.length > 0 && <div className="mt-4"><Banner tone="info" title={`${waitingViews.length} post${waitingViews.length > 1 ? "s are" : " is"} waiting for a view count`}>{ct("Report views with a screenshot on")} <Link to="/creators/app/posts" className="underline">{ct("My posts")}</Link>{ct(". Without it, the bonus for that post is zero.")}</Banner></div>}
+      <h2 className="mb-3 mt-8 text-lg font-extrabold text-brand-navy">{ct("This month")}</h2>
       <PortalCard className="overflow-x-auto p-0">
         <table className="w-full text-sm">
-          <thead className="bg-portal-bg text-left text-xs uppercase tracking-wide text-brand-navySoft"><tr><th className="px-4 py-2">Post</th><th className="px-4 py-2">App</th><th className="px-4 py-2">Date</th><th className="px-4 py-2">Fixed</th><th className="px-4 py-2">Bonus</th><th className="px-4 py-2">Status</th></tr></thead>
+          <thead className="bg-portal-bg text-left text-xs uppercase tracking-wide text-brand-navySoft"><tr><th className="px-4 py-2">{ct("Post")}</th><th className="px-4 py-2">{ct("App")}</th><th className="px-4 py-2">{ct("Date")}</th><th className="px-4 py-2">{ct("Fixed")}</th><th className="px-4 py-2">{ct("Bonus")}</th><th className="px-4 py-2">{ct("Status")}</th></tr></thead>
           <tbody className="divide-y divide-brand-line">
-            {thisMonth.length === 0 ? <tr><td colSpan={6} className="px-4 py-6 text-center text-brand-navySoft">No post this month yet.</td></tr> : thisMonth.map((p) => (
+            {thisMonth.length === 0 ? <tr><td colSpan={6} className="px-4 py-6 text-center text-brand-navySoft">{ct("No post this month yet.")}</td></tr> : thisMonth.map((p) => (
               <tr key={p.id}>
                 <td className="px-4 py-2"><a href={p.url} target="_blank" rel="noopener noreferrer" className="text-portal-accent underline">{platformName(p.platform)}</a></td>
                 <td className="px-4 py-2"><AppBadge appId={p.app_id} /></td>
@@ -477,13 +478,13 @@ export function EarningsPage() {
           </tbody>
         </table>
       </PortalCard>
-      <h2 className="mb-3 mt-8 text-lg font-extrabold text-brand-navy">Past months</h2>
-      {payoutItems.length === 0 ? <p className="text-sm text-brand-navySoft">No statement yet.</p> : (
+      <h2 className="mb-3 mt-8 text-lg font-extrabold text-brand-navy">{ct("Past months")}</h2>
+      {payoutItems.length === 0 ? <p className="text-sm text-brand-navySoft">{ct("No statement yet.")}</p> : (
         <PortalCard className="divide-y divide-brand-line p-0">
           {payoutItems.map((i) => (
             <div key={i.id} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm">
               <span className="flex flex-wrap items-center gap-2"><b className="text-brand-navy">{i.payout_batches?.period}</b> <AppBadge appId={i.app_id} /> <span className="text-brand-navySoft"> {i.posts_count} post(s) · {money(i.amount_usd)} · {i.status}</span></span>
-              <Button size="sm" variant="outline" onClick={() => download(i)}>Download statement</Button>
+              <Button size="sm" variant="outline" onClick={() => download(i)}>{ct("Download statement")}</Button>
             </div>
           ))}
         </PortalCard>
@@ -522,12 +523,12 @@ export function MessagesPage() {
   async function send() {
     if (!text.trim()) return;
     const { error } = await supabase.from("creator_messages").insert({ creator_id: me.id, from_admin: false, body: text.trim(), post_id: postId });
-    if (error) return void toast.error("Your message was not sent. Check your connection and try again.");
+    if (error) return void toast.error(ct("Your message was not sent. Check your connection and try again."));
     setText(""); qc.invalidateQueries({ queryKey: ["creator-messages-all", me.id] });
   }
   return (
     <div>
-      <PageTitle title="Messages" lead="Your conversations with the Sophia team: a general thread, plus one per post." />
+      <PageTitle title={ct("Messages")} lead={ct("Your conversations with the Sophia team: a general thread, plus one per post.")} />
       <div className="grid gap-4 md:grid-cols-[240px_1fr]">
         <PortalCard className="p-2">
           {threads.map((t) => (
@@ -540,12 +541,12 @@ export function MessagesPage() {
         <PortalCard className="flex min-h-[420px] flex-col">
           {post && (
             <div className="mb-3 rounded-xl bg-portal-bg p-3 text-sm">
-              <a href={post.url} target="_blank" rel="noopener noreferrer" className="font-bold text-portal-accent underline">Open the post</a>
-              {post.feedback && <p className="mt-1 text-brand-navy"><b>Feedback:</b> {post.feedback}</p>}
+              <a href={post.url} target="_blank" rel="noopener noreferrer" className="font-bold text-portal-accent underline">{ct("Open the post")}</a>
+              {post.feedback && <p className="mt-1 text-brand-navy"><b>{ct("Feedback:")}</b> {post.feedback}</p>}
             </div>
           )}
           <div className="flex-1 space-y-2 overflow-y-auto">
-            {list.length === 0 ? <p className="text-sm text-brand-navySoft">No message yet.</p> : list.map((m) => (
+            {list.length === 0 ? <p className="text-sm text-brand-navySoft">{ct("No message yet.")}</p> : list.map((m) => (
               <div key={m.id} className={cn("max-w-[80%] rounded-2xl px-4 py-2 text-sm", m.from_admin ? "bg-portal-bg text-brand-navy" : "ml-auto bg-brand-navy text-card")}>
                 <p className="whitespace-pre-wrap">{m.body}</p>
                 <p className="mt-1 text-[10px] opacity-70">{m.from_admin ? "Sophia team" : "You"} · {new Date(m.created_at).toLocaleString()}</p>
@@ -553,8 +554,8 @@ export function MessagesPage() {
             ))}
           </div>
           <div className="mt-4 flex gap-2">
-            <Textarea rows={2} placeholder="Write a message" value={text} onChange={(e) => setText(e.target.value)} />
-            <Button onClick={() => void send()} disabled={!text.trim()}>Send</Button>
+            <Textarea rows={2} placeholder={ct("Write a message")} value={text} onChange={(e) => setText(e.target.value)} />
+            <Button onClick={() => void send()} disabled={!text.trim()}>{ct("Send")}</Button>
           </div>
         </PortalCard>
       </div>

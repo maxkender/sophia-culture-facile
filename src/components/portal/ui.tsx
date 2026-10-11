@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { STATUS_LABEL, type CourseStatus } from "@/config/portal";
 import { boldParts } from "@/lib/portal";
+import { t as ct } from "@/i18n/creator-app";
 
 export function PortalCard({ className, children }: { className?: string; children: ReactNode }) {
   return (
@@ -98,7 +99,7 @@ export function BoldText({ text }: { text: string }) {
   return (
     <>
       {boldParts(text).map((part, index) =>
-        part.bold ? <strong key={index}>{part.text}</strong> : <span key={index}>{part.text}</span>,
+        {ct("part.bold ?")} <strong key={index}>{part.text}</strong> : <span key={index}>{part.text}</span>,
       )}
     </>
   );
@@ -126,7 +127,7 @@ export function ConfirmButton({
   title: string;
   description?: string;
   confirmLabel: string;
-  onConfirm: () => void | Promise<void>;
+  onConfirm: () => {ct("void | Promise")}<void>;
   label?: string;
 }) {
   return (
@@ -140,7 +141,7 @@ export function ConfirmButton({
           {description ? <AlertDialogDescription>{description}</AlertDialogDescription> : null}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{ct("Cancel")}</AlertDialogCancel>
           <AlertDialogAction onClick={() => void onConfirm()}>{confirmLabel}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

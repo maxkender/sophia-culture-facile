@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SOPHIA_APP_ID } from "@/lib/apps";
+import { t as ct } from "@/i18n/creator-app";
 
 /* "Consignes de tournage": one editable list shown on the creator Rules page, on every brief and as the submit checklist. */
 export type Guideline = { id: string; sort_order: number; title_fr: string; title_en: string; body_fr: string; body_en: string; image_data: string | null; app_id: string | null; active: boolean };
@@ -73,7 +74,7 @@ const f = "h-9 w-full rounded-lg border bg-card px-2 text-sm";
 export function GuidelinesEditor() {
   const { data = [] } = useGuidelines(null, true); const qc = useQueryClient();
   const reload = () => void qc.invalidateQueries({ queryKey: KEY });
-  async function save(id: string, patch: Partial<Guideline>) { const { error } = await supabase.from("ugc_guidelines").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", id); if (error) toast.error("Could not save"); reload(); }
+  async function save(id: string, patch: Partial<Guideline>) { const { error } = await supabase.from("ugc_guidelines").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", id); if (error) toast.error(ct("Could not save")); reload(); }
   async function move(i: number, d: -1 | 1) {
     const a = data[i]; const b = data[i + d]; if (!a || !b) return;
     await Promise.all([supabase.from("ugc_guidelines").update({ sort_order: b.sort_order }).eq("id", a.id), supabase.from("ugc_guidelines").update({ sort_order: a.sort_order }).eq("id", b.id)]);
@@ -81,39 +82,39 @@ export function GuidelinesEditor() {
     reload();
   }
   async function image(id: string, file: File | undefined) {
-    if (!file) return; if (file.size > 400_000) { toast.error("Pick an image under 400 KB."); return; }
+    if (!file) return; if (file.size > 400_000) { toast.error(ct("Pick an image under 400 KB.")); return; }
     const url = await new Promise<string>((res) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.readAsDataURL(file); });
     await save(id, { image_data: url });
   }
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <div><h3 className="font-extrabold text-brand-navy">Consignes de tournage</h3><p className="text-xs text-brand-navySoft">Shown on the creator Rules page, on every brief (collapsible) and as the checklist when a creator submits a link.</p></div>
-        <Button size="sm" onClick={async () => { await supabase.from("ugc_guidelines").insert({ title_fr: "Nouvelle consigne", title_en: "New guideline", sort_order: (data.at(-1)?.sort_order ?? 0) + 1 }); reload(); }}><Plus className="size-4" />Add</Button>
+        <div><h3 className="font-extrabold text-brand-navy">{ct("Consignes de tournage")}</h3><p className="text-xs text-brand-navySoft">{ct("Shown on the creator Rules page, on every brief (collapsible) and as the checklist when a creator submits a link.")}</p></div>
+        <Button size="sm" onClick={async () => { await supabase.from("ugc_guidelines").insert({ title_fr: "Nouvelle consigne", title_en: "New guideline", sort_order: (data.at(-1)?.sort_order ?? 0) + 1 }); reload(); }}><Plus className="size-4" />{ct("Add")}</Button>
       </div>
       {data.map((g, i) => (
         <div key={g.id} className={cn("grid gap-2 rounded-2xl bg-card p-4 shadow-portal md:grid-cols-[1fr_1fr_auto]", !g.active && "opacity-60")} data-testid="guideline-row">
           <div className="space-y-1">
-            <input aria-label="Title (FR)" className={cn(f, "font-bold")} defaultValue={g.title_fr} onBlur={(e) => e.target.value !== g.title_fr && void save(g.id, { title_fr: e.target.value })} />
-            <input aria-label="Explanation (FR)" className={f} defaultValue={g.body_fr} placeholder="Explication en une ligne" onBlur={(e) => e.target.value !== g.body_fr && void save(g.id, { body_fr: e.target.value })} />
+            <input aria-label={ct("Title (FR)")} className={cn(f, "font-bold")} defaultValue={g.title_fr} onBlur={(e) => e.target.value !== g.title_fr && void save(g.id, { title_fr: e.target.value })} />
+            <input aria-label={ct("Explanation (FR)")} className={f} defaultValue={g.body_fr} placeholder={ct("Explication en une ligne")} onBlur={(e) => e.target.value !== g.body_fr && void save(g.id, { body_fr: e.target.value })} />
           </div>
           <div className="space-y-1">
-            <input aria-label="Title (EN)" className={cn(f, "font-bold")} defaultValue={g.title_en} onBlur={(e) => e.target.value !== g.title_en && void save(g.id, { title_en: e.target.value })} />
-            <input aria-label="Explanation (EN)" className={f} defaultValue={g.body_en} placeholder="One-line explanation" onBlur={(e) => e.target.value !== g.body_en && void save(g.id, { body_en: e.target.value })} />
+            <input aria-label={ct("Title (EN)")} className={cn(f, "font-bold")} defaultValue={g.title_en} onBlur={(e) => e.target.value !== g.title_en && void save(g.id, { title_en: e.target.value })} />
+            <input aria-label={ct("Explanation (EN)")} className={f} defaultValue={g.body_en} placeholder={ct("One-line explanation")} onBlur={(e) => e.target.value !== g.body_en && void save(g.id, { body_en: e.target.value })} />
           </div>
           <div className="flex flex-wrap items-center gap-2 md:flex-col md:items-end">
-            <select aria-label="App" className="h-9 rounded-lg border bg-card px-2 text-sm" value={g.app_id ?? ""} onChange={(e) => void save(g.id, { app_id: e.target.value || null })}><option value="">Both apps</option><option value={SOPHIA_APP_ID}>Sophia</option><option value={UNSWIPE}>UnSwipe</option></select>
-            <label className="inline-flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked={g.active} onChange={(e) => void save(g.id, { active: e.target.checked })} />On</label>
+            <select aria-label={ct("App")} className="h-9 rounded-lg border bg-card px-2 text-sm" value={g.app_id ?? ""} onChange={(e) => void save(g.id, { app_id: e.target.value || null })}><option value="">{ct("Both apps")}</option><option value={SOPHIA_APP_ID}>{ct("Sophia")}</option><option value={UNSWIPE}>{ct("UnSwipe")}</option></select>
+            <label className="inline-flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked={g.active} onChange={(e) => void save(g.id, { active: e.target.checked })} />{ct("On")}</label>
             <div className="flex gap-1">
-              <Button size="icon" variant="ghost" aria-label="Move up" disabled={i === 0} onClick={() => void move(i, -1)}><ArrowUp className="size-4" /></Button>
-              <Button size="icon" variant="ghost" aria-label="Move down" disabled={i === data.length - 1} onClick={() => void move(i, 1)}><ArrowDown className="size-4" /></Button>
-              <Button size="icon" variant="ghost" aria-label="Delete guideline" onClick={async () => { if (!window.confirm(`Delete "${g.title_fr}"?`)) return; await supabase.from("ugc_guidelines").delete().eq("id", g.id); reload(); }}><Trash2 className="size-4" /></Button>
+              <Button size="icon" variant="ghost" aria-label={ct("Move up")} disabled={i === 0} onClick={() => void move(i, -1)}><ArrowUp className="size-4" /></Button>
+              <Button size="icon" variant="ghost" aria-label={ct("Move down")} disabled={i === data.length - 1} onClick={() => void move(i, 1)}><ArrowDown className="size-4" /></Button>
+              <Button size="icon" variant="ghost" aria-label={ct("Delete guideline")} onClick={async () => { if (!window.confirm(`Delete "${g.title_fr}"?`)) return; await supabase.from("ugc_guidelines").delete().eq("id", g.id); reload(); }}><Trash2 className="size-4" /></Button>
             </div>
           </div>
           <div className="flex items-center gap-2 md:col-span-3">
             {g.image_data ? <img src={g.image_data} alt="" className="size-10 rounded-lg object-cover" /> : null}
             <label className="cursor-pointer text-xs font-bold text-portal-accent">{g.image_data ? "Change example image" : "Add example image (optional)"}<input type="file" accept="image/*" className="sr-only" onChange={(e) => void image(g.id, e.target.files?.[0])} /></label>
-            {g.image_data ? <button type="button" className="text-xs text-brand-navySoft underline" onClick={() => void save(g.id, { image_data: null })}>Remove</button> : null}
+            {g.image_data ? <button type="button" className="text-xs text-brand-navySoft underline" onClick={() => void save(g.id, { image_data: null })}>{ct("Remove")}</button> : null}
           </div>
         </div>
       ))}
