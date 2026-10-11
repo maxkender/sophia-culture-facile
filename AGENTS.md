@@ -33,3 +33,5 @@ UGC creator acceptance and onboarding mutations use authenticated server functio
 - Creator space i18n: `t`/`L` from src/i18n/creator-app.tsx (dict keyed by source text); Hub stays English; why: one UI, two languages.
 - Never define components inside render around inputs; save on button/blur; why: remounts broke typing.
 - UGC programme overview uses UgcOverview, never the legacy mixed CreatorsDashboard; why: author-side legacy code remains untouched and slideshow/influencer counts stay outside UGC.
+
+- Slideshows uses its own PosterGuideEditor with poster labels and zone merge fields; why: keep author editing pages unchanged.

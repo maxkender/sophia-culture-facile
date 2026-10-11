@@ -19,6 +19,7 @@ import { AdminSettings } from "@/components/portal/admin/AdminSettings";
 import { IntegrationsSetup } from "@/components/portal/admin/UgcAdmin";
 import { SlideshowApplications } from "./slides/SlideshowApplications";
 import { Posters } from "./slides/Posters";
+import { PosterGuideEditor } from "./slides/PosterGuideEditor";
 import { SlidesPayouts } from "./slides/SlidesPayouts";
 import { OsConnectionCard } from "./slides/OsConnectionCard";
 import { OS_UI_ENABLED } from "./slides/useOs";
@@ -125,7 +126,7 @@ export function SlideshowSection({ section, id }: { section: string; id?: string
           <SettingLink k="slideshow_poster_guide_url" label="Poster Guide link" help="Shared with new posters by hand with their logins." />
           <SettingLink k="slideshow_slack_invite_url" label="Slack invite link" help="Shared with new posters by hand with their logins." />
         </div>
-        <DocumentEditor slug={"slideshow-guide" as never} />
+        <PosterGuideEditor />
       </div>
     );
     case "platform": return <SettingLink k="slideshow_platform_url" label="Old slideshow platform" help="Where posters used to work. Kept here so the team can still open it." />;
