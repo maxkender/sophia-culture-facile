@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { acceptJobApplication, declineJobApplication } from "@/lib/hub.functions";
 import { PostThumb } from "./PostThumb";
+import { UgcPosts } from "./UgcPosts";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -16,7 +17,7 @@ import { JobModal, type JobDraft } from "./JobModal";
 import { compact, eur, flag } from "./hub-data";
 
 export type CampaignTab = "campaigns" | "applicants" | "requests" | "jobs" | "reviews" | "challenges";
-const TABS: [CampaignTab, string][] = [["campaigns", "Campaigns"], ["applicants", "Applicants"], ["requests", "Requests"], ["jobs", "Jobs"], ["reviews", "Video Reviews"], ["challenges", "Challenges"]];
+const TABS: [CampaignTab, string][] = [["campaigns", "Campaigns"], ["applicants", "Applicants"], ["requests", "Requests"], ["jobs", "Jobs"], ["reviews", "Posts"], ["challenges", "Challenges"]];
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 
 function Toolbar({ active, setActive, counts, q, setQ, action, filters }: { active: boolean; setActive: (b: boolean) => void; counts: [number, number]; q: string; setQ: (s: string) => void; action?: React.ReactNode; filters?: React.ReactNode }) {
@@ -351,7 +352,7 @@ export function Campaigns({ tab, newJob }: { tab: CampaignTab; newJob?: boolean 
           <button key={k} type="button" onClick={() => void navigate({ to: "/hub/ugc/campaigns", search: { tab: k } })} className={cn("shrink-0 border-b-2 px-3 pb-2.5 text-sm font-bold", tab === k ? "border-brand-navy text-brand-navy" : "border-transparent text-brand-navySoft")}>{l}</button>
         ))}
       </div>
-      {tab === "campaigns" ? <CampaignsList /> : tab === "applicants" ? <Applicants /> : tab === "requests" ? <Requests /> : tab === "jobs" ? <JobsList autoNew={newJob} /> : tab === "challenges" ? <Challenges /> : <VideoReviews />}
+      {tab === "campaigns" ? <CampaignsList /> : tab === "applicants" ? <Applicants /> : tab === "requests" ? <Requests /> : tab === "jobs" ? <JobsList autoNew={newJob} /> : tab === "challenges" ? <Challenges /> : <UgcPosts />}
     </div>
   );
 }

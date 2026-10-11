@@ -9,6 +9,7 @@ import { CreatorPayouts } from "@/components/portal/admin/CreatorPayouts";
 import { runTiersNow } from "@/lib/hub.functions";
 import { stripeModeInfo } from "@/lib/creator-payouts.functions";
 import { eur, useWallet } from "./hub-data";
+import { ReadyForPayment } from "./UgcPosts";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const input = "mt-1 block min-h-10 w-full rounded-xl border border-input bg-card px-3 text-sm";
@@ -129,10 +130,11 @@ export function HubPayouts() {
           <div key={k as string} className="rounded-2xl bg-gradient-to-br from-brand-navy to-portal-accent p-4 text-card shadow-portal"><p className="text-xs opacity-80">{k}</p><p className="text-2xl font-extrabold">{eur(Number(v ?? 0))}</p></div>
         ))}
       </div>
-      <Settings />
-      <Tiers />
+      <ReadyForPayment />
+      <section className={card}><h2 className="mb-1 font-extrabold text-brand-navy">Batches · Pay via Stripe or export Wise / PayPal / IBAN</h2><p className="mb-3 text-xs text-brand-navySoft">Approved J+7 payouts appear here as “J+7 …” batches. Monthly “Generate month” still works below but is secondary.</p><CreatorPayouts inHub /></section>
       <StripeStatus />
-      <section className={card}><h2 className="mb-3 font-extrabold text-brand-navy">Months, statements & batches</h2><CreatorPayouts inHub /></section>
+      <details className={card}><summary className="cursor-pointer font-extrabold text-brand-navy">Pay settings & tiers</summary><div className="mt-4 space-y-5"><Settings />
+      <Tiers /></div></details>
     </div>
   );
 }
