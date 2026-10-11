@@ -13,15 +13,8 @@ import { BriefsList } from "./BriefsList";
 import { AssetsLibrary } from "./Assets";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
-const input = "mt-1 block min-h-10 w-full rounded-xl border border-input bg-card px-3 text-sm";
 const TABS = ["Formats", "Briefs", "Assets", "Reference videos", "Guides & rules", "Templates"] as const;
-const FORMATS = ["talking_head", "pov", "reaction", "voiceover", "skit", "green_screen", "list"];
 
-/** Next Monday 09:00 Paris (07:00 or 08:00 UTC depending on DST; stored as 07:00 UTC so the 09:00 Paris run always picks it up). */
-function nextMonday() {
-  const d = new Date(); const add = ((8 - d.getUTCDay()) % 7) || 7;
-  d.setUTCDate(d.getUTCDate() + add); d.setUTCHours(7, 0, 0, 0); return d;
-}
 
 type Fmt = { id: string; title: string; hook_text: string | null; oral_hook: string | null; beats: string[] | null; product_moment: string | null; variations: string | null; effort: string | null; status: string; pinned: boolean; sort_order: number | null; app_id: string };
 const EFFORTS = [["pov", "POV"], ["reaction", "Reaction"], ["talking_head", "Face cam"]] as const;
