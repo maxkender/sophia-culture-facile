@@ -35,3 +35,11 @@
 - [x] Fiche Fast lane block, Générer un lien for creators/applicants/prospects, editable pay, "Tes conditions"
 - [x] Sidekick create_fast_lane
 - [x] Test end-to-end, clean test records, republish
+
+# Brief Studio + Assets (Oct 11)
+- [x] Studio page /hub/learn/briefs/<id|new>, 7 steps, phone preview, score /10
+- [x] Assets library, bucket creator-assets, brief/campaign/creator links, 12 "to film" placeholders
+- [x] Creator Fichiers section + zip, Home "Kit de démarrage"
+- [x] Brief rapide, Brief depuis une vidéo (links + file frames), Briefs list filters/columns/bulk
+- [x] Video Reviews brief checks, Sidekick Open in Studio, UnSwipe multi-platform formats
+- [x] E2E admin/creator test, republish
