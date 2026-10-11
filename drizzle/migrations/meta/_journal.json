@@ -337,6 +337,13 @@
       "when": 1791709394515,
       "tag": "0047_formats_library",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1791710223604,
+      "tag": "0048_brief_studio_assets",
+      "breakpoints": true
     }
   ]
 }
