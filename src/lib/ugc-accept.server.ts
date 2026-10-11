@@ -72,7 +72,7 @@ export async function acceptApplication(supabaseAdmin: Admin, applicationId: str
 
     const inviteUrl = `${origin.replace(/\/$/, "")}/creators/invite?token=${encodeURIComponent(inviteToken)}&email=${encodeURIComponent(application.email)}`;
 
-    const { sendTemplated } = await import("./ugc-email.server");
+    const { sendTemplated, emailLang } = await import("./ugc-email.server");
     const send = await sendTemplated(supabaseAdmin, "ugc-welcome", application.email.toLowerCase(), application.full_name, inviteUrl, emailLang((application as { language?: string | null }).language, (application as { country?: string | null }).country));
     await supabaseAdmin.from("creator_applications").update({
       ...(send.sent ? { acceptance_email_sent_at: new Date().toISOString() } : {}),

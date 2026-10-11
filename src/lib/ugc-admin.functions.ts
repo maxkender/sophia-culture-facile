@@ -107,7 +107,7 @@ export const resendWelcomeEmail = createServerFn({ method: "POST" })
     if (!app?.created_creator_id) throw new Error("Accept the application first.");
     const { data: c } = await a.from("creators").select("invite_token").eq("id", app.created_creator_id).maybeSingle();
     const url = `${data.origin.replace(/\/$/, "")}/creators/invite?token=${encodeURIComponent(c?.invite_token ?? "")}&email=${encodeURIComponent(app.email)}`;
-    const { sendTemplated } = await import("./ugc-email.server");
+    const { sendTemplated, emailLang } = await import("./ugc-email.server");
     const r = await sendTemplated(a, "ugc-welcome", app.email, app.full_name, url, emailLang(null, app.country));
     await a.from("creator_applications").update({
       acceptance_email_sent_at: r.sent ? new Date().toISOString() : undefined,
@@ -126,7 +126,7 @@ export const rejectUgcApplication = createServerFn({ method: "POST" })
     if (!app) throw new Error("Application not found.");
     await a.from("creator_applications").update({ status: "rejected", rejection_reason: data.reason || null, decided_at: new Date().toISOString(), decided_by: me }).eq("id", app.id);
     if (!data.notify) return { sent: false, note: null };
-    const { sendTemplated } = await import("./ugc-email.server");
+    const { sendTemplated, emailLang } = await import("./ugc-email.server");
     const r = await sendTemplated(a, "ugc-decline", app.email, app.full_name, undefined, emailLang(null, app.country));
     if (r.sent) await a.from("creator_applications").update({ decline_email_sent_at: new Date().toISOString(), decline_email_message_id: r.messageId }).eq("id", app.id);
     return { sent: r.sent, note: r.note };
