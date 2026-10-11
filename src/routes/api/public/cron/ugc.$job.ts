@@ -22,6 +22,12 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             if (!process.env["APIFY_TOKEN"]) return Response.json({ skipped: "APIFY_TOKEN missing" });
             const sync = await import("@/lib/ugc-sync.server");
             const r = params.job === "compliance" ? await sync.runComplianceSync(a) : await sync.runD7Sync(a);
+            if (params.job === "d7") {
+              // Validated posts: daily view refresh, then J+7 freeze and pricing.
+              const j7 = await import("@/lib/ugc-j7.server");
+              const tracked = await j7.trackValidated(a).catch((e: Error) => ({ error: e.message }));
+              return Response.json({ ...r, tracked, frozen: await j7.freezeDue(a) });
+            }
             return Response.json(r);
           }
           if (params.job === "monthly") {
