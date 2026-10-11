@@ -21,6 +21,7 @@ import { SlideshowApplications } from "./slides/SlideshowApplications";
 import { Posters } from "./slides/Posters";
 import { SlidesPayouts } from "./slides/SlidesPayouts";
 import { OsConnectionCard } from "./slides/OsConnectionCard";
+import { OS_UI_ENABLED } from "./slides/useOs";
 import { HubAccessCodes } from "./HubAccessCodes";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -119,8 +120,8 @@ export function SlideshowSection({ section, id }: { section: string; id?: string
     case "guide": return (
       <div className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
-          <SettingLink k="slideshow_poster_guide_url" label="Poster Guide link" help="Sent to every new poster with their OS logins." />
-          <SettingLink k="slideshow_slack_invite_url" label="Slack invite link" help="Sent to every new poster with their OS logins." />
+          <SettingLink k="slideshow_poster_guide_url" label="Poster Guide link" help="Shared with new posters by hand with their logins." />
+          <SettingLink k="slideshow_slack_invite_url" label="Slack invite link" help="Shared with new posters by hand with their logins." />
         </div>
         <DocumentEditor slug={"slideshow-guide" as never} />
       </div>
@@ -208,7 +209,7 @@ function EmailSettings() {
 export function HubSettings({ tab }: { tab?: string | undefined }) {
   const t = pick(SETTINGS_TABS, tab);
   const body: Record<string, ReactNode> = {
-    apps: <AppsSettings />, codes: <div className="space-y-6"><HubAccessCodes /><details className="rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold">Author codes and assignment history</summary><div className="mt-4"><CodesPool /></div></details></div>, email: <EmailSettings />, connections: <div className="space-y-4"><OsConnectionCard /><IntegrationsSetup /></div>, team: <Team />, security: <AdminSettings />,
+    apps: <AppsSettings />, codes: <div className="space-y-6"><HubAccessCodes /><details className="rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold">Author codes and assignment history</summary><div className="mt-4"><CodesPool /></div></details></div>, email: <EmailSettings />, connections: <div className="space-y-4">{OS_UI_ENABLED ? <OsConnectionCard /> : null}<IntegrationsSetup /></div>, team: <Team />, security: <AdminSettings />,
   };
   return <div><SectionTabs base="/hub/settings" tabs={SETTINGS_TABS} current={t} />{body[t]}</div>;
 }

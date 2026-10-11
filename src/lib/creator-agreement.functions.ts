@@ -130,8 +130,8 @@ export const signWithToken = createServerFn({ method: "POST" })
       const now = new Date().toISOString();
       const { data: cur } = await supabaseAdmin.from("slideshow_applications").select("timeline").eq("id", app.id).maybeSingle();
       await supabaseAdmin.from("slideshow_applications").update({ status: "contract_signed", contract_signed_at: now, timeline: { ...((cur?.timeline as object) ?? {}), contract_signed: { at: now, by: "Poster" } } }).eq("id", app.id);
-      const { createPosterInOs } = await import("./slideshows.server");
-      await createPosterInOs(supabaseAdmin, app.id).catch(() => null);
+      // OS link is dormant: the flow stops here and Max ticks the manual checklist (create OS account, send logins, add to Slack).
+      if (process.env["OS_AUTOCREATE"] === "true") { const { createPosterInOs } = await import("./slideshows.server"); await createPosterInOs(supabaseAdmin, app.id).catch(() => null); }
     }
     return { ok: true };
   });

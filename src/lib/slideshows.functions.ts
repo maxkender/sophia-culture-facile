@@ -117,7 +117,7 @@ export const keepWarm = createServerFn({ method: "POST" })
 /** Manual checklist tick/untick on the card. */
 export const tickStep = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ applicationId: id, step: z.enum(["accepted", "contract_signed", "os_created", "hm_notified", "warmup", "started", "dropped"]), done: z.boolean() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ applicationId: id, step: z.enum(["accepted", "contract_signed", "os_created", "logins_sent", "slack_added", "hm_notified", "warmup", "started", "dropped"]), done: z.boolean() }).parse(d))
   .handler(async ({ data, context }) => {
     const me = await assertAdmin(context);
     const a = await admin();
@@ -126,6 +126,9 @@ export const tickStep = createServerFn({ method: "POST" })
     if (data.done) timeline[data.step] = { at: new Date().toISOString(), by: me.name }; else delete timeline[data.step];
     const patch: Record<string, unknown> = { timeline };
     if (data.step === "dropped" && data.done) Object.assign(patch, { status: "dropped", dropped_at: new Date().toISOString() });
+    // Manual flow: ticking "Create the OS account" moves a signed poster on, so Posters and weekly pay pick them up.
+    if (data.step === "os_created" && data.done && app?.status === "contract_signed") Object.assign(patch, { status: "os_created", os_created_at: new Date().toISOString() });
+    if (data.step === "os_created" && !data.done && app?.status === "os_created") Object.assign(patch, { status: "contract_signed", os_created_at: null });
     if (data.step === "started" && data.done && app?.status === "os_created") Object.assign(patch, { status: "started", started_at: new Date().toISOString() });
     await a.from("slideshow_applications").update(patch).eq("id", data.applicationId);
     return { ok: true };

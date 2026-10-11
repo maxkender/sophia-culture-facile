@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { osStatus } from "@/lib/slideshows.functions";
 
+/** The OS link is dormant: no OS card, notices or OS-triggered steps are shown until this is turned on. */
+export const OS_UI_ENABLED = false;
 export const OS_NOT_CONNECTED = "Not connected yet — add OS_HUB_SECRET in Settings → Secrets";
 
 export function useOsStatus() {
