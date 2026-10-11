@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS access_codes_app_platform_state_idx ON public.access_codes (app_id, platform, state);

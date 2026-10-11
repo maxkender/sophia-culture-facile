@@ -19,7 +19,7 @@ export function creatorAgreementBlocks(blocks: DocBlock[], variant: CreatorVaria
     }
     if (skipping) continue;
     if (block.type === "paragraph") {
-      out.push({ ...block, text: block.text.replace("Clauses 2, 4, 5, 7 and 10 survive.", "Clauses 2, 4, 6 and 9 survive.") });
+      out.push({ ...block, text: block.text.replace("Clauses 2, 4, 5, 7 and 10 survive.", "Clauses 2, 4, 6 and 9 survive.").replace("per the rate communicated at acceptance, monthly,", "per the weekly rate of their pay zone communicated at acceptance, every week,") });
       continue;
     }
     out.push(block);

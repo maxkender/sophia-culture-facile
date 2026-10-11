@@ -152,7 +152,7 @@ export const applyToJob = createServerFn({ method: "POST" })
     const { ip, ua } = reqMeta(data.userAgent);
     const { data: existing } = await a.from("creator_signatures").select("id").eq("creator_id", acc.creatorId).maybeSingle();
     if (!existing) await a.from("creator_signatures").insert({ creator_id: acc.creatorId, variant: "ugc", document_version: String(doc.current_version), signed_name: data.signedName, signature_ip: ip, user_agent: ua });
-    await a.from("creator_apps").upsert({ creator_id: acc.creatorId, app_id: job.app_id, status: "active" }, { onConflict: "creator_id,app_id" });
+    await a.from("creator_apps").upsert({ creator_id: acc.creatorId, app_id: job.app_id, status: "active" }, { onConflict: "creator_id,app_id" }); await (await import("./access-codes.server")).assignAppCode(a, acc.creatorId, job.app_id);
     if (data.device) await a.from("creators").update({ platform: data.device }).eq("id", acc.creatorId);
     await a.from("job_applications").update({ status: "accepted", creator_id: acc.creatorId, contract_signed_at: new Date().toISOString(), decided_at: new Date().toISOString() }).eq("id", ja?.id);
     return { ok: true as const, accepted: true, emailSent: acc.emailSent };
@@ -176,7 +176,7 @@ export const acceptJobApplication = createServerFn({ method: "POST" })
     } else if (creatorId) {
       await a.from("creator_notifications").insert({ creator_id: creatorId, body: `You were accepted on the job "${ja.jobs?.title}".` });
     }
-    if (creatorId) await a.from("creator_apps").upsert({ creator_id: creatorId, app_id: ja.jobs?.app_id, status: "active" }, { onConflict: "creator_id,app_id" });
+    if (creatorId) { await a.from("creator_apps").upsert({ creator_id: creatorId, app_id: ja.jobs?.app_id, status: "active" }, { onConflict: "creator_id,app_id" }); await (await import("./access-codes.server")).assignAppCode(a, creatorId, ja.jobs?.app_id); }
     await a.from("job_applications").update({ status: "accepted", creator_id: creatorId, decided_at: new Date().toISOString(), decided_by: context.userId }).eq("id", data.id);
     return { ok: true, emailSent, emailReason };
   });
@@ -450,7 +450,7 @@ export const applyAsCreator = createServerFn({ method: "POST" })
     const { data: sig } = await a.from("creator_signatures").select("id").eq("creator_id", me.id).maybeSingle();
     const accept = job.open && Boolean(sig);
     await a.from("job_applications").insert({ job_id: job.id, creator_id: me.id, answers: data.answers, status: accept ? "accepted" : "pending", ...(accept ? { contract_signed_at: new Date().toISOString(), decided_at: new Date().toISOString() } : {}) });
-    if (accept) await a.from("creator_apps").upsert({ creator_id: me.id, app_id: job.app_id, status: "active" }, { onConflict: "creator_id,app_id" });
+    if (accept) { await a.from("creator_apps").upsert({ creator_id: me.id, app_id: job.app_id, status: "active" }, { onConflict: "creator_id,app_id" }); await (await import("./access-codes.server")).assignAppCode(a, me.id, job.app_id); }
     return { ok: true as const, accepted: accept, needsSignature: job.open && !sig };
   });
 

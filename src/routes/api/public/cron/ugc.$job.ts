@@ -58,6 +58,20 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             const { applyBudgetCap } = await import("@/lib/hub-automation.server");
             return Response.json(await applyBudgetCap(a));
           }
+          if (params.job === "slides-pool-expiry") {
+            const { expirePool } = await import("@/lib/slideshows.server");
+            return Response.json(await expirePool(a));
+          }
+          if (params.job === "slides-snapshots") {
+            const { refreshSnapshots } = await import("@/lib/slideshows.server");
+            const { withLock } = await import("@/lib/hub-automation.server");
+            return Response.json(await withLock(a, "slides-snapshots", 15, () => refreshSnapshots(a)));
+          }
+          if (params.job === "slides-week") {
+            const { buildWeek } = await import("@/lib/slideshows.server");
+            const { withLock } = await import("@/lib/hub-automation.server");
+            return Response.json(await withLock(a, "slides-week", 15, () => buildWeek(a)));
+          }
           if (params.job === "planner-reminder") {
             const { data: admins } = await a.from("profiles").select("id").eq("role", "admin");
             await a.from("notifications").insert((admins ?? []).map((p: any) => ({ profile_id: p.id, type: "message", body: "Reminder: publish next week's UGC briefs in the Week planner by Friday." })));

@@ -56,6 +56,7 @@ import { Route as GoHandleRouteImport } from './routes/go.$handle'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as JTokenRouteImport } from './routes/j.$token'
 import { Route as JobsSlugRouteImport } from './routes/jobs.$slug'
+import { Route as PayoutTokenRouteImport } from './routes/payout.$token'
 import { Route as AuthenticatedAuteursIndexRouteImport } from './routes/_authenticated/auteurs/index'
 import { Route as AuthenticatedAuteursContractRouteImport } from './routes/_authenticated/auteurs/contract'
 import { Route as AuthenticatedAuteursExamplesRouteImport } from './routes/_authenticated/auteurs/examples'
@@ -68,12 +69,10 @@ import { Route as AuthenticatedHubAdsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedHubAffiliatesRouteImport } from './routes/_authenticated/hub/affiliates'
 import { Route as AuthenticatedHubAnalyticsRouteImport } from './routes/_authenticated/hub/analytics'
 import { Route as AuthenticatedHubDiscoverRouteImport } from './routes/_authenticated/hub/discover'
-import { Route as AuthenticatedHubInfluencersRouteImport } from './routes/_authenticated/hub/influencers'
 import { Route as AuthenticatedHubLearnRouteImport } from './routes/_authenticated/hub/learn'
 import { Route as AuthenticatedHubMessagesRouteImport } from './routes/_authenticated/hub/messages'
 import { Route as AuthenticatedHubPayoutsRouteImport } from './routes/_authenticated/hub/payouts'
 import { Route as AuthenticatedHubSettingsRouteImport } from './routes/_authenticated/hub/settings'
-import { Route as AuthenticatedHubSlideshowsRouteImport } from './routes/_authenticated/hub/slideshows'
 import { Route as CreatorsAppIndexRouteImport } from './routes/creators.app.index'
 import { Route as CreatorsAppAccountRouteImport } from './routes/creators.app.account'
 import { Route as CreatorsAppCallsRouteImport } from './routes/creators.app.calls'
@@ -127,7 +126,18 @@ import { Route as AuthenticatedAuteursCoursesCourseIdRouteImport } from './route
 import { Route as AuthenticatedHubCampaignsIndexRouteImport } from './routes/_authenticated/hub/campaigns.index'
 import { Route as AuthenticatedHubCampaignsCreateRouteImport } from './routes/_authenticated/hub/campaigns.create'
 import { Route as AuthenticatedHubCreatorsCreatorIdRouteImport } from './routes/_authenticated/hub/creators.$creatorId'
+import { Route as AuthenticatedHubInfluencersIndexRouteImport } from './routes/_authenticated/hub/influencers/index'
+import { Route as AuthenticatedHubInfluencersSectionRouteImport } from './routes/_authenticated/hub/influencers/$section'
+import { Route as AuthenticatedHubSlideshowsIndexRouteImport } from './routes/_authenticated/hub/slideshows/index'
+import { Route as AuthenticatedHubSlideshowsSectionRouteImport } from './routes/_authenticated/hub/slideshows/$section'
 import { Route as AuthenticatedHubToolsSplatRouteImport } from './routes/_authenticated/hub/tools.$'
+import { Route as AuthenticatedHubUgcIndexRouteImport } from './routes/_authenticated/hub/ugc/index'
+import { Route as AuthenticatedHubUgcAdsRouteImport } from './routes/_authenticated/hub/ugc/ads'
+import { Route as AuthenticatedHubUgcAnalyticsRouteImport } from './routes/_authenticated/hub/ugc/analytics'
+import { Route as AuthenticatedHubUgcLibraryRouteImport } from './routes/_authenticated/hub/ugc/library'
+import { Route as AuthenticatedHubUgcMessagesRouteImport } from './routes/_authenticated/hub/ugc/messages'
+import { Route as AuthenticatedHubUgcPayoutsRouteImport } from './routes/_authenticated/hub/ugc/payouts'
+import { Route as AuthenticatedHubUgcReferralsRouteImport } from './routes/_authenticated/hub/ugc/referrals'
 import { Route as ApiPublicAppCoursesRouteImport } from './routes/api/public/app/courses'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 import { Route as ApiPublicTiktokOauthRouteImport } from './routes/api/public/tiktok/oauth'
@@ -179,6 +189,10 @@ import { Route as AuthenticatedAuteursAdminDocumentsSlugRouteImport } from './ro
 import { Route as AuthenticatedAuteursAdminReviewIndexRouteImport } from './routes/_authenticated/auteurs/admin/review.index'
 import { Route as AuthenticatedAuteursAdminReviewCourseIdRouteImport } from './routes/_authenticated/auteurs/admin/review.$courseId'
 import { Route as AuthenticatedHubLearnBriefsBriefIdRouteImport } from './routes/_authenticated/hub/learn_.briefs.$briefId'
+import { Route as AuthenticatedHubUgcCampaignsIndexRouteImport } from './routes/_authenticated/hub/ugc/campaigns.index'
+import { Route as AuthenticatedHubUgcCampaignsCreateRouteImport } from './routes/_authenticated/hub/ugc/campaigns.create'
+import { Route as AuthenticatedHubUgcCreatorsIndexRouteImport } from './routes/_authenticated/hub/ugc/creators.index'
+import { Route as AuthenticatedHubUgcCreatorsCreatorIdRouteImport } from './routes/_authenticated/hub/ugc/creators.$creatorId'
 import { Route as ApiPublicAppCoursesSlugRouteImport } from './routes/api/public/app/courses.$slug'
 import { Route as ApiPublicCronUgcJobRouteImport } from './routes/api/public/cron/ugc.$job'
 import { Route as CreatorsInfluencerAppDealsIndexRouteImport } from './routes/creators.influencer.app.deals.index'
@@ -189,6 +203,7 @@ import { Route as AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRouteImpo
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-deals.$dealId'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencersIndexRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencers.index'
 import { Route as AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencers.$influencerId'
+import { Route as AuthenticatedHubUgcLibraryBriefsBriefIdRouteImport } from './routes/_authenticated/hub/ugc/library_.briefs.$briefId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -427,6 +442,11 @@ const JobsSlugRoute = JobsSlugRouteImport.update({
   path: '/jobs/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PayoutTokenRoute = PayoutTokenRouteImport.update({
+  id: '/payout/$token',
+  path: '/payout/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAuteursIndexRoute =
   AuthenticatedAuteursIndexRouteImport.update({
     id: '/auteurs/',
@@ -497,12 +517,6 @@ const AuthenticatedHubDiscoverRoute =
     path: '/discover',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
-const AuthenticatedHubInfluencersRoute =
-  AuthenticatedHubInfluencersRouteImport.update({
-    id: '/influencers',
-    path: '/influencers',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
 const AuthenticatedHubLearnRoute = AuthenticatedHubLearnRouteImport.update({
   id: '/learn',
   path: '/learn',
@@ -523,12 +537,6 @@ const AuthenticatedHubSettingsRoute =
   AuthenticatedHubSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubSlideshowsRoute =
-  AuthenticatedHubSlideshowsRouteImport.update({
-    id: '/slideshows',
-    path: '/slideshows',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
 const CreatorsAppIndexRoute = CreatorsAppIndexRouteImport.update({
@@ -813,10 +821,75 @@ const AuthenticatedHubCreatorsCreatorIdRoute =
     path: '/creators/$creatorId',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
+const AuthenticatedHubInfluencersIndexRoute =
+  AuthenticatedHubInfluencersIndexRouteImport.update({
+    id: '/influencers/',
+    path: '/influencers/',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubInfluencersSectionRoute =
+  AuthenticatedHubInfluencersSectionRouteImport.update({
+    id: '/influencers/$section',
+    path: '/influencers/$section',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubSlideshowsIndexRoute =
+  AuthenticatedHubSlideshowsIndexRouteImport.update({
+    id: '/slideshows/',
+    path: '/slideshows/',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubSlideshowsSectionRoute =
+  AuthenticatedHubSlideshowsSectionRouteImport.update({
+    id: '/slideshows/$section',
+    path: '/slideshows/$section',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
 const AuthenticatedHubToolsSplatRoute =
   AuthenticatedHubToolsSplatRouteImport.update({
     id: '/tools/$',
     path: '/tools/$',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubUgcIndexRoute =
+  AuthenticatedHubUgcIndexRouteImport.update({
+    id: '/ugc/',
+    path: '/ugc/',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubUgcAdsRoute = AuthenticatedHubUgcAdsRouteImport.update({
+  id: '/ugc/ads',
+  path: '/ugc/ads',
+  getParentRoute: () => AuthenticatedHubRouteRoute,
+} as any)
+const AuthenticatedHubUgcAnalyticsRoute =
+  AuthenticatedHubUgcAnalyticsRouteImport.update({
+    id: '/ugc/analytics',
+    path: '/ugc/analytics',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubUgcLibraryRoute =
+  AuthenticatedHubUgcLibraryRouteImport.update({
+    id: '/ugc/library',
+    path: '/ugc/library',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubUgcMessagesRoute =
+  AuthenticatedHubUgcMessagesRouteImport.update({
+    id: '/ugc/messages',
+    path: '/ugc/messages',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubUgcPayoutsRoute =
+  AuthenticatedHubUgcPayoutsRouteImport.update({
+    id: '/ugc/payouts',
+    path: '/ugc/payouts',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubUgcReferralsRoute =
+  AuthenticatedHubUgcReferralsRouteImport.update({
+    id: '/ugc/referrals',
+    path: '/ugc/referrals',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
 const ApiPublicAppCoursesRoute = ApiPublicAppCoursesRouteImport.update({
@@ -1117,6 +1190,30 @@ const AuthenticatedHubLearnBriefsBriefIdRoute =
     path: '/learn/briefs/$briefId',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
+const AuthenticatedHubUgcCampaignsIndexRoute =
+  AuthenticatedHubUgcCampaignsIndexRouteImport.update({
+    id: '/ugc/campaigns/',
+    path: '/ugc/campaigns/',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubUgcCampaignsCreateRoute =
+  AuthenticatedHubUgcCampaignsCreateRouteImport.update({
+    id: '/ugc/campaigns/create',
+    path: '/ugc/campaigns/create',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubUgcCreatorsIndexRoute =
+  AuthenticatedHubUgcCreatorsIndexRouteImport.update({
+    id: '/ugc/creators/',
+    path: '/ugc/creators/',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubUgcCreatorsCreatorIdRoute =
+  AuthenticatedHubUgcCreatorsCreatorIdRouteImport.update({
+    id: '/ugc/creators/$creatorId',
+    path: '/ugc/creators/$creatorId',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
 const ApiPublicAppCoursesSlugRoute = ApiPublicAppCoursesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -1175,6 +1272,12 @@ const AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRoute =
     path: '/auteurs/admin/creators/influencers/$influencerId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedHubUgcLibraryBriefsBriefIdRoute =
+  AuthenticatedHubUgcLibraryBriefsBriefIdRouteImport.update({
+    id: '/ugc/library_/briefs/$briefId',
+    path: '/ugc/library/briefs/$briefId',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -1219,6 +1322,7 @@ export interface FileRoutesByFullPath {
   '/invite/$token': typeof InviteTokenRoute
   '/j/$token': typeof JTokenRoute
   '/jobs/$slug': typeof JobsSlugRoute
+  '/payout/$token': typeof PayoutTokenRoute
   '/cours/': typeof CoursIndexRoute
   '/creators/': typeof CreatorsIndexRoute
   '/en/': typeof EnIndexRoute
@@ -1233,12 +1337,10 @@ export interface FileRoutesByFullPath {
   '/hub/affiliates': typeof AuthenticatedHubAffiliatesRoute
   '/hub/analytics': typeof AuthenticatedHubAnalyticsRoute
   '/hub/discover': typeof AuthenticatedHubDiscoverRoute
-  '/hub/influencers': typeof AuthenticatedHubInfluencersRoute
   '/hub/learn': typeof AuthenticatedHubLearnRoute
   '/hub/messages': typeof AuthenticatedHubMessagesRoute
   '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/hub/settings': typeof AuthenticatedHubSettingsRoute
-  '/hub/slideshows': typeof AuthenticatedHubSlideshowsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
@@ -1291,7 +1393,15 @@ export interface FileRoutesByFullPath {
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
   '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
+  '/hub/influencers/$section': typeof AuthenticatedHubInfluencersSectionRoute
+  '/hub/slideshows/$section': typeof AuthenticatedHubSlideshowsSectionRoute
   '/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
+  '/hub/ugc/ads': typeof AuthenticatedHubUgcAdsRoute
+  '/hub/ugc/analytics': typeof AuthenticatedHubUgcAnalyticsRoute
+  '/hub/ugc/library': typeof AuthenticatedHubUgcLibraryRoute
+  '/hub/ugc/messages': typeof AuthenticatedHubUgcMessagesRoute
+  '/hub/ugc/payouts': typeof AuthenticatedHubUgcPayoutsRoute
+  '/hub/ugc/referrals': typeof AuthenticatedHubUgcReferralsRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/tiktok/oauth': typeof ApiPublicTiktokOauthRoute
@@ -1313,6 +1423,9 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
   '/hub/campaigns/': typeof AuthenticatedHubCampaignsIndexRoute
+  '/hub/influencers/': typeof AuthenticatedHubInfluencersIndexRoute
+  '/hub/slideshows/': typeof AuthenticatedHubSlideshowsIndexRoute
+  '/hub/ugc/': typeof AuthenticatedHubUgcIndexRoute
   '/creators/app/briefs/': typeof CreatorsAppBriefsIndexRoute
   '/creators/influencer/app/': typeof CreatorsInfluencerAppIndexRoute
   '/en/creators/unswipe/': typeof EnCreatorsUnswipeIndexRoute
@@ -1341,6 +1454,8 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/hub/learn/briefs/$briefId': typeof AuthenticatedHubLearnBriefsBriefIdRoute
+  '/hub/ugc/campaigns/create': typeof AuthenticatedHubUgcCampaignsCreateRoute
+  '/hub/ugc/creators/$creatorId': typeof AuthenticatedHubUgcCreatorsCreatorIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/api/public/cron/ugc/$job': typeof ApiPublicCronUgcJobRoute
   '/creators/influencer/app/deals/$dealId': typeof CreatorsInfluencerAppDealsDealIdRoute
@@ -1349,10 +1464,13 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/creators/': typeof AuthenticatedAuteursAdminCreatorsIndexRoute
   '/auteurs/admin/documents/': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
   '/auteurs/admin/review/': typeof AuthenticatedAuteursAdminReviewIndexRoute
+  '/hub/ugc/campaigns/': typeof AuthenticatedHubUgcCampaignsIndexRoute
+  '/hub/ugc/creators/': typeof AuthenticatedHubUgcCreatorsIndexRoute
   '/creators/influencer/app/deals/': typeof CreatorsInfluencerAppDealsIndexRoute
   '/auteurs/admin/creators/influencer-briefs/$briefId': typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRoute
   '/auteurs/admin/creators/influencer-deals/$dealId': typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRoute
   '/auteurs/admin/creators/influencers/$influencerId': typeof AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRoute
+  '/hub/ugc/library/briefs/$briefId': typeof AuthenticatedHubUgcLibraryBriefsBriefIdRoute
   '/auteurs/admin/creators/influencer-briefs/': typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRoute
   '/auteurs/admin/creators/influencer-deals/': typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRoute
   '/auteurs/admin/creators/influencers/': typeof AuthenticatedAuteursAdminCreatorsInfluencersIndexRoute
@@ -1398,6 +1516,7 @@ export interface FileRoutesByTo {
   '/invite/$token': typeof InviteTokenRoute
   '/j/$token': typeof JTokenRoute
   '/jobs/$slug': typeof JobsSlugRoute
+  '/payout/$token': typeof PayoutTokenRoute
   '/cours': typeof CoursIndexRoute
   '/creators': typeof CreatorsIndexRoute
   '/en': typeof EnIndexRoute
@@ -1412,12 +1531,10 @@ export interface FileRoutesByTo {
   '/hub/affiliates': typeof AuthenticatedHubAffiliatesRoute
   '/hub/analytics': typeof AuthenticatedHubAnalyticsRoute
   '/hub/discover': typeof AuthenticatedHubDiscoverRoute
-  '/hub/influencers': typeof AuthenticatedHubInfluencersRoute
   '/hub/learn': typeof AuthenticatedHubLearnRoute
   '/hub/messages': typeof AuthenticatedHubMessagesRoute
   '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/hub/settings': typeof AuthenticatedHubSettingsRoute
-  '/hub/slideshows': typeof AuthenticatedHubSlideshowsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
@@ -1469,7 +1586,15 @@ export interface FileRoutesByTo {
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
   '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
+  '/hub/influencers/$section': typeof AuthenticatedHubInfluencersSectionRoute
+  '/hub/slideshows/$section': typeof AuthenticatedHubSlideshowsSectionRoute
   '/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
+  '/hub/ugc/ads': typeof AuthenticatedHubUgcAdsRoute
+  '/hub/ugc/analytics': typeof AuthenticatedHubUgcAnalyticsRoute
+  '/hub/ugc/library': typeof AuthenticatedHubUgcLibraryRoute
+  '/hub/ugc/messages': typeof AuthenticatedHubUgcMessagesRoute
+  '/hub/ugc/payouts': typeof AuthenticatedHubUgcPayoutsRoute
+  '/hub/ugc/referrals': typeof AuthenticatedHubUgcReferralsRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/tiktok/oauth': typeof ApiPublicTiktokOauthRoute
@@ -1491,6 +1616,9 @@ export interface FileRoutesByTo {
   '/auteurs/admin': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses': typeof AuthenticatedAuteursCoursesIndexRoute
   '/hub/campaigns': typeof AuthenticatedHubCampaignsIndexRoute
+  '/hub/influencers': typeof AuthenticatedHubInfluencersIndexRoute
+  '/hub/slideshows': typeof AuthenticatedHubSlideshowsIndexRoute
+  '/hub/ugc': typeof AuthenticatedHubUgcIndexRoute
   '/creators/app/briefs': typeof CreatorsAppBriefsIndexRoute
   '/creators/influencer/app': typeof CreatorsInfluencerAppIndexRoute
   '/en/creators/unswipe': typeof EnCreatorsUnswipeIndexRoute
@@ -1519,6 +1647,8 @@ export interface FileRoutesByTo {
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/hub/learn/briefs/$briefId': typeof AuthenticatedHubLearnBriefsBriefIdRoute
+  '/hub/ugc/campaigns/create': typeof AuthenticatedHubUgcCampaignsCreateRoute
+  '/hub/ugc/creators/$creatorId': typeof AuthenticatedHubUgcCreatorsCreatorIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/api/public/cron/ugc/$job': typeof ApiPublicCronUgcJobRoute
   '/creators/influencer/app/deals/$dealId': typeof CreatorsInfluencerAppDealsDealIdRoute
@@ -1527,10 +1657,13 @@ export interface FileRoutesByTo {
   '/auteurs/admin/creators': typeof AuthenticatedAuteursAdminCreatorsIndexRoute
   '/auteurs/admin/documents': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
   '/auteurs/admin/review': typeof AuthenticatedAuteursAdminReviewIndexRoute
+  '/hub/ugc/campaigns': typeof AuthenticatedHubUgcCampaignsIndexRoute
+  '/hub/ugc/creators': typeof AuthenticatedHubUgcCreatorsIndexRoute
   '/creators/influencer/app/deals': typeof CreatorsInfluencerAppDealsIndexRoute
   '/auteurs/admin/creators/influencer-briefs/$briefId': typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRoute
   '/auteurs/admin/creators/influencer-deals/$dealId': typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRoute
   '/auteurs/admin/creators/influencers/$influencerId': typeof AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRoute
+  '/hub/ugc/library/briefs/$briefId': typeof AuthenticatedHubUgcLibraryBriefsBriefIdRoute
   '/auteurs/admin/creators/influencer-briefs': typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRoute
   '/auteurs/admin/creators/influencer-deals': typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRoute
   '/auteurs/admin/creators/influencers': typeof AuthenticatedAuteursAdminCreatorsInfluencersIndexRoute
@@ -1580,6 +1713,7 @@ export interface FileRoutesById {
   '/invite/$token': typeof InviteTokenRoute
   '/j/$token': typeof JTokenRoute
   '/jobs/$slug': typeof JobsSlugRoute
+  '/payout/$token': typeof PayoutTokenRoute
   '/cours/': typeof CoursIndexRoute
   '/creators/': typeof CreatorsIndexRoute
   '/en/': typeof EnIndexRoute
@@ -1594,12 +1728,10 @@ export interface FileRoutesById {
   '/_authenticated/hub/affiliates': typeof AuthenticatedHubAffiliatesRoute
   '/_authenticated/hub/analytics': typeof AuthenticatedHubAnalyticsRoute
   '/_authenticated/hub/discover': typeof AuthenticatedHubDiscoverRoute
-  '/_authenticated/hub/influencers': typeof AuthenticatedHubInfluencersRoute
   '/_authenticated/hub/learn': typeof AuthenticatedHubLearnRoute
   '/_authenticated/hub/messages': typeof AuthenticatedHubMessagesRoute
   '/_authenticated/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/_authenticated/hub/settings': typeof AuthenticatedHubSettingsRoute
-  '/_authenticated/hub/slideshows': typeof AuthenticatedHubSlideshowsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
@@ -1652,7 +1784,15 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
   '/_authenticated/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
   '/_authenticated/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
+  '/_authenticated/hub/influencers/$section': typeof AuthenticatedHubInfluencersSectionRoute
+  '/_authenticated/hub/slideshows/$section': typeof AuthenticatedHubSlideshowsSectionRoute
   '/_authenticated/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
+  '/_authenticated/hub/ugc/ads': typeof AuthenticatedHubUgcAdsRoute
+  '/_authenticated/hub/ugc/analytics': typeof AuthenticatedHubUgcAnalyticsRoute
+  '/_authenticated/hub/ugc/library': typeof AuthenticatedHubUgcLibraryRoute
+  '/_authenticated/hub/ugc/messages': typeof AuthenticatedHubUgcMessagesRoute
+  '/_authenticated/hub/ugc/payouts': typeof AuthenticatedHubUgcPayoutsRoute
+  '/_authenticated/hub/ugc/referrals': typeof AuthenticatedHubUgcReferralsRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/tiktok/oauth': typeof ApiPublicTiktokOauthRoute
@@ -1674,6 +1814,9 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/_authenticated/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
   '/_authenticated/hub/campaigns/': typeof AuthenticatedHubCampaignsIndexRoute
+  '/_authenticated/hub/influencers/': typeof AuthenticatedHubInfluencersIndexRoute
+  '/_authenticated/hub/slideshows/': typeof AuthenticatedHubSlideshowsIndexRoute
+  '/_authenticated/hub/ugc/': typeof AuthenticatedHubUgcIndexRoute
   '/creators/app/briefs/': typeof CreatorsAppBriefsIndexRoute
   '/creators/influencer/app/': typeof CreatorsInfluencerAppIndexRoute
   '/en/creators/unswipe/': typeof EnCreatorsUnswipeIndexRoute
@@ -1702,6 +1845,8 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/_authenticated/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/_authenticated/hub/learn_/briefs/$briefId': typeof AuthenticatedHubLearnBriefsBriefIdRoute
+  '/_authenticated/hub/ugc/campaigns/create': typeof AuthenticatedHubUgcCampaignsCreateRoute
+  '/_authenticated/hub/ugc/creators/$creatorId': typeof AuthenticatedHubUgcCreatorsCreatorIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/api/public/cron/ugc/$job': typeof ApiPublicCronUgcJobRoute
   '/creators/influencer/app/deals/$dealId': typeof CreatorsInfluencerAppDealsDealIdRoute
@@ -1710,10 +1855,13 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/creators/': typeof AuthenticatedAuteursAdminCreatorsIndexRoute
   '/_authenticated/auteurs/admin/documents/': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
   '/_authenticated/auteurs/admin/review/': typeof AuthenticatedAuteursAdminReviewIndexRoute
+  '/_authenticated/hub/ugc/campaigns/': typeof AuthenticatedHubUgcCampaignsIndexRoute
+  '/_authenticated/hub/ugc/creators/': typeof AuthenticatedHubUgcCreatorsIndexRoute
   '/creators/influencer/app/deals/': typeof CreatorsInfluencerAppDealsIndexRoute
   '/_authenticated/auteurs/admin/creators/influencer-briefs/$briefId': typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRoute
   '/_authenticated/auteurs/admin/creators/influencer-deals/$dealId': typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRoute
   '/_authenticated/auteurs/admin/creators/influencers/$influencerId': typeof AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRoute
+  '/_authenticated/hub/ugc/library_/briefs/$briefId': typeof AuthenticatedHubUgcLibraryBriefsBriefIdRoute
   '/_authenticated/auteurs/admin/creators/influencer-briefs/': typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRoute
   '/_authenticated/auteurs/admin/creators/influencer-deals/': typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRoute
   '/_authenticated/auteurs/admin/creators/influencers/': typeof AuthenticatedAuteursAdminCreatorsInfluencersIndexRoute
@@ -1763,6 +1911,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/j/$token'
     | '/jobs/$slug'
+    | '/payout/$token'
     | '/cours/'
     | '/creators/'
     | '/en/'
@@ -1777,12 +1926,10 @@ export interface FileRouteTypes {
     | '/hub/affiliates'
     | '/hub/analytics'
     | '/hub/discover'
-    | '/hub/influencers'
     | '/hub/learn'
     | '/hub/messages'
     | '/hub/payouts'
     | '/hub/settings'
-    | '/hub/slideshows'
     | '/creators/app/account'
     | '/creators/app/calls'
     | '/creators/app/contract'
@@ -1835,7 +1982,15 @@ export interface FileRouteTypes {
     | '/auteurs/courses/$courseId'
     | '/hub/campaigns/create'
     | '/hub/creators/$creatorId'
+    | '/hub/influencers/$section'
+    | '/hub/slideshows/$section'
     | '/hub/tools/$'
+    | '/hub/ugc/ads'
+    | '/hub/ugc/analytics'
+    | '/hub/ugc/library'
+    | '/hub/ugc/messages'
+    | '/hub/ugc/payouts'
+    | '/hub/ugc/referrals'
     | '/api/public/app/courses'
     | '/api/public/stripe/webhook'
     | '/api/public/tiktok/oauth'
@@ -1857,6 +2012,9 @@ export interface FileRouteTypes {
     | '/auteurs/admin/'
     | '/auteurs/courses/'
     | '/hub/campaigns/'
+    | '/hub/influencers/'
+    | '/hub/slideshows/'
+    | '/hub/ugc/'
     | '/creators/app/briefs/'
     | '/creators/influencer/app/'
     | '/en/creators/unswipe/'
@@ -1885,6 +2043,8 @@ export interface FileRouteTypes {
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/hub/learn/briefs/$briefId'
+    | '/hub/ugc/campaigns/create'
+    | '/hub/ugc/creators/$creatorId'
     | '/api/public/app/courses/$slug'
     | '/api/public/cron/ugc/$job'
     | '/creators/influencer/app/deals/$dealId'
@@ -1893,10 +2053,13 @@ export interface FileRouteTypes {
     | '/auteurs/admin/creators/'
     | '/auteurs/admin/documents/'
     | '/auteurs/admin/review/'
+    | '/hub/ugc/campaigns/'
+    | '/hub/ugc/creators/'
     | '/creators/influencer/app/deals/'
     | '/auteurs/admin/creators/influencer-briefs/$briefId'
     | '/auteurs/admin/creators/influencer-deals/$dealId'
     | '/auteurs/admin/creators/influencers/$influencerId'
+    | '/hub/ugc/library/briefs/$briefId'
     | '/auteurs/admin/creators/influencer-briefs/'
     | '/auteurs/admin/creators/influencer-deals/'
     | '/auteurs/admin/creators/influencers/'
@@ -1942,6 +2105,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/j/$token'
     | '/jobs/$slug'
+    | '/payout/$token'
     | '/cours'
     | '/creators'
     | '/en'
@@ -1956,12 +2120,10 @@ export interface FileRouteTypes {
     | '/hub/affiliates'
     | '/hub/analytics'
     | '/hub/discover'
-    | '/hub/influencers'
     | '/hub/learn'
     | '/hub/messages'
     | '/hub/payouts'
     | '/hub/settings'
-    | '/hub/slideshows'
     | '/creators/app/account'
     | '/creators/app/calls'
     | '/creators/app/contract'
@@ -2013,7 +2175,15 @@ export interface FileRouteTypes {
     | '/auteurs/courses/$courseId'
     | '/hub/campaigns/create'
     | '/hub/creators/$creatorId'
+    | '/hub/influencers/$section'
+    | '/hub/slideshows/$section'
     | '/hub/tools/$'
+    | '/hub/ugc/ads'
+    | '/hub/ugc/analytics'
+    | '/hub/ugc/library'
+    | '/hub/ugc/messages'
+    | '/hub/ugc/payouts'
+    | '/hub/ugc/referrals'
     | '/api/public/app/courses'
     | '/api/public/stripe/webhook'
     | '/api/public/tiktok/oauth'
@@ -2035,6 +2205,9 @@ export interface FileRouteTypes {
     | '/auteurs/admin'
     | '/auteurs/courses'
     | '/hub/campaigns'
+    | '/hub/influencers'
+    | '/hub/slideshows'
+    | '/hub/ugc'
     | '/creators/app/briefs'
     | '/creators/influencer/app'
     | '/en/creators/unswipe'
@@ -2063,6 +2236,8 @@ export interface FileRouteTypes {
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/hub/learn/briefs/$briefId'
+    | '/hub/ugc/campaigns/create'
+    | '/hub/ugc/creators/$creatorId'
     | '/api/public/app/courses/$slug'
     | '/api/public/cron/ugc/$job'
     | '/creators/influencer/app/deals/$dealId'
@@ -2071,10 +2246,13 @@ export interface FileRouteTypes {
     | '/auteurs/admin/creators'
     | '/auteurs/admin/documents'
     | '/auteurs/admin/review'
+    | '/hub/ugc/campaigns'
+    | '/hub/ugc/creators'
     | '/creators/influencer/app/deals'
     | '/auteurs/admin/creators/influencer-briefs/$briefId'
     | '/auteurs/admin/creators/influencer-deals/$dealId'
     | '/auteurs/admin/creators/influencers/$influencerId'
+    | '/hub/ugc/library/briefs/$briefId'
     | '/auteurs/admin/creators/influencer-briefs'
     | '/auteurs/admin/creators/influencer-deals'
     | '/auteurs/admin/creators/influencers'
@@ -2123,6 +2301,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/j/$token'
     | '/jobs/$slug'
+    | '/payout/$token'
     | '/cours/'
     | '/creators/'
     | '/en/'
@@ -2137,12 +2316,10 @@ export interface FileRouteTypes {
     | '/_authenticated/hub/affiliates'
     | '/_authenticated/hub/analytics'
     | '/_authenticated/hub/discover'
-    | '/_authenticated/hub/influencers'
     | '/_authenticated/hub/learn'
     | '/_authenticated/hub/messages'
     | '/_authenticated/hub/payouts'
     | '/_authenticated/hub/settings'
-    | '/_authenticated/hub/slideshows'
     | '/creators/app/account'
     | '/creators/app/calls'
     | '/creators/app/contract'
@@ -2195,7 +2372,15 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/courses/$courseId'
     | '/_authenticated/hub/campaigns/create'
     | '/_authenticated/hub/creators/$creatorId'
+    | '/_authenticated/hub/influencers/$section'
+    | '/_authenticated/hub/slideshows/$section'
     | '/_authenticated/hub/tools/$'
+    | '/_authenticated/hub/ugc/ads'
+    | '/_authenticated/hub/ugc/analytics'
+    | '/_authenticated/hub/ugc/library'
+    | '/_authenticated/hub/ugc/messages'
+    | '/_authenticated/hub/ugc/payouts'
+    | '/_authenticated/hub/ugc/referrals'
     | '/api/public/app/courses'
     | '/api/public/stripe/webhook'
     | '/api/public/tiktok/oauth'
@@ -2217,6 +2402,9 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/'
     | '/_authenticated/auteurs/courses/'
     | '/_authenticated/hub/campaigns/'
+    | '/_authenticated/hub/influencers/'
+    | '/_authenticated/hub/slideshows/'
+    | '/_authenticated/hub/ugc/'
     | '/creators/app/briefs/'
     | '/creators/influencer/app/'
     | '/en/creators/unswipe/'
@@ -2245,6 +2433,8 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/documents/$slug'
     | '/_authenticated/auteurs/admin/review/$courseId'
     | '/_authenticated/hub/learn_/briefs/$briefId'
+    | '/_authenticated/hub/ugc/campaigns/create'
+    | '/_authenticated/hub/ugc/creators/$creatorId'
     | '/api/public/app/courses/$slug'
     | '/api/public/cron/ugc/$job'
     | '/creators/influencer/app/deals/$dealId'
@@ -2253,10 +2443,13 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/creators/'
     | '/_authenticated/auteurs/admin/documents/'
     | '/_authenticated/auteurs/admin/review/'
+    | '/_authenticated/hub/ugc/campaigns/'
+    | '/_authenticated/hub/ugc/creators/'
     | '/creators/influencer/app/deals/'
     | '/_authenticated/auteurs/admin/creators/influencer-briefs/$briefId'
     | '/_authenticated/auteurs/admin/creators/influencer-deals/$dealId'
     | '/_authenticated/auteurs/admin/creators/influencers/$influencerId'
+    | '/_authenticated/hub/ugc/library_/briefs/$briefId'
     | '/_authenticated/auteurs/admin/creators/influencer-briefs/'
     | '/_authenticated/auteurs/admin/creators/influencer-deals/'
     | '/_authenticated/auteurs/admin/creators/influencers/'
@@ -2305,6 +2498,7 @@ export interface RootRouteChildren {
   InviteTokenRoute: typeof InviteTokenRoute
   JTokenRoute: typeof JTokenRoute
   JobsSlugRoute: typeof JobsSlugRoute
+  PayoutTokenRoute: typeof PayoutTokenRoute
   CoursIndexRoute: typeof CoursIndexRoute
   CreatorsIndexRoute: typeof CreatorsIndexRoute
   EnIndexRoute: typeof EnIndexRoute
@@ -2680,6 +2874,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payout/$token': {
+      id: '/payout/$token'
+      path: '/payout/$token'
+      fullPath: '/payout/$token'
+      preLoaderRoute: typeof PayoutTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/auteurs/': {
       id: '/_authenticated/auteurs/'
       path: '/auteurs'
@@ -2764,13 +2965,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHubDiscoverRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
-    '/_authenticated/hub/influencers': {
-      id: '/_authenticated/hub/influencers'
-      path: '/influencers'
-      fullPath: '/hub/influencers'
-      preLoaderRoute: typeof AuthenticatedHubInfluencersRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
     '/_authenticated/hub/learn': {
       id: '/_authenticated/hub/learn'
       path: '/learn'
@@ -2797,13 +2991,6 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/hub/settings'
       preLoaderRoute: typeof AuthenticatedHubSettingsRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/slideshows': {
-      id: '/_authenticated/hub/slideshows'
-      path: '/slideshows'
-      fullPath: '/hub/slideshows'
-      preLoaderRoute: typeof AuthenticatedHubSlideshowsRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
     '/creators/app/': {
@@ -3177,11 +3364,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHubCreatorsCreatorIdRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
+    '/_authenticated/hub/influencers/': {
+      id: '/_authenticated/hub/influencers/'
+      path: '/influencers'
+      fullPath: '/hub/influencers/'
+      preLoaderRoute: typeof AuthenticatedHubInfluencersIndexRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/influencers/$section': {
+      id: '/_authenticated/hub/influencers/$section'
+      path: '/influencers/$section'
+      fullPath: '/hub/influencers/$section'
+      preLoaderRoute: typeof AuthenticatedHubInfluencersSectionRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/slideshows/': {
+      id: '/_authenticated/hub/slideshows/'
+      path: '/slideshows'
+      fullPath: '/hub/slideshows/'
+      preLoaderRoute: typeof AuthenticatedHubSlideshowsIndexRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/slideshows/$section': {
+      id: '/_authenticated/hub/slideshows/$section'
+      path: '/slideshows/$section'
+      fullPath: '/hub/slideshows/$section'
+      preLoaderRoute: typeof AuthenticatedHubSlideshowsSectionRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
     '/_authenticated/hub/tools/$': {
       id: '/_authenticated/hub/tools/$'
       path: '/tools/$'
       fullPath: '/hub/tools/$'
       preLoaderRoute: typeof AuthenticatedHubToolsSplatRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/ugc/': {
+      id: '/_authenticated/hub/ugc/'
+      path: '/ugc'
+      fullPath: '/hub/ugc/'
+      preLoaderRoute: typeof AuthenticatedHubUgcIndexRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/ugc/ads': {
+      id: '/_authenticated/hub/ugc/ads'
+      path: '/ugc/ads'
+      fullPath: '/hub/ugc/ads'
+      preLoaderRoute: typeof AuthenticatedHubUgcAdsRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/ugc/analytics': {
+      id: '/_authenticated/hub/ugc/analytics'
+      path: '/ugc/analytics'
+      fullPath: '/hub/ugc/analytics'
+      preLoaderRoute: typeof AuthenticatedHubUgcAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/ugc/library': {
+      id: '/_authenticated/hub/ugc/library'
+      path: '/ugc/library'
+      fullPath: '/hub/ugc/library'
+      preLoaderRoute: typeof AuthenticatedHubUgcLibraryRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/ugc/messages': {
+      id: '/_authenticated/hub/ugc/messages'
+      path: '/ugc/messages'
+      fullPath: '/hub/ugc/messages'
+      preLoaderRoute: typeof AuthenticatedHubUgcMessagesRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/ugc/payouts': {
+      id: '/_authenticated/hub/ugc/payouts'
+      path: '/ugc/payouts'
+      fullPath: '/hub/ugc/payouts'
+      preLoaderRoute: typeof AuthenticatedHubUgcPayoutsRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/ugc/referrals': {
+      id: '/_authenticated/hub/ugc/referrals'
+      path: '/ugc/referrals'
+      fullPath: '/hub/ugc/referrals'
+      preLoaderRoute: typeof AuthenticatedHubUgcReferralsRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
     '/api/public/app/courses': {
@@ -3541,6 +3805,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHubLearnBriefsBriefIdRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
+    '/_authenticated/hub/ugc/campaigns/': {
+      id: '/_authenticated/hub/ugc/campaigns/'
+      path: '/ugc/campaigns'
+      fullPath: '/hub/ugc/campaigns/'
+      preLoaderRoute: typeof AuthenticatedHubUgcCampaignsIndexRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/ugc/campaigns/create': {
+      id: '/_authenticated/hub/ugc/campaigns/create'
+      path: '/ugc/campaigns/create'
+      fullPath: '/hub/ugc/campaigns/create'
+      preLoaderRoute: typeof AuthenticatedHubUgcCampaignsCreateRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/ugc/creators/': {
+      id: '/_authenticated/hub/ugc/creators/'
+      path: '/ugc/creators'
+      fullPath: '/hub/ugc/creators/'
+      preLoaderRoute: typeof AuthenticatedHubUgcCreatorsIndexRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/ugc/creators/$creatorId': {
+      id: '/_authenticated/hub/ugc/creators/$creatorId'
+      path: '/ugc/creators/$creatorId'
+      fullPath: '/hub/ugc/creators/$creatorId'
+      preLoaderRoute: typeof AuthenticatedHubUgcCreatorsCreatorIdRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
     '/api/public/app/courses/$slug': {
       id: '/api/public/app/courses/$slug'
       path: '/$slug'
@@ -3611,6 +3903,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/hub/ugc/library_/briefs/$briefId': {
+      id: '/_authenticated/hub/ugc/library_/briefs/$briefId'
+      path: '/ugc/library/briefs/$briefId'
+      fullPath: '/hub/ugc/library/briefs/$briefId'
+      preLoaderRoute: typeof AuthenticatedHubUgcLibraryBriefsBriefIdRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
   }
 }
 
@@ -3619,18 +3918,32 @@ interface AuthenticatedHubRouteRouteChildren {
   AuthenticatedHubAffiliatesRoute: typeof AuthenticatedHubAffiliatesRoute
   AuthenticatedHubAnalyticsRoute: typeof AuthenticatedHubAnalyticsRoute
   AuthenticatedHubDiscoverRoute: typeof AuthenticatedHubDiscoverRoute
-  AuthenticatedHubInfluencersRoute: typeof AuthenticatedHubInfluencersRoute
   AuthenticatedHubLearnRoute: typeof AuthenticatedHubLearnRoute
   AuthenticatedHubMessagesRoute: typeof AuthenticatedHubMessagesRoute
   AuthenticatedHubPayoutsRoute: typeof AuthenticatedHubPayoutsRoute
   AuthenticatedHubSettingsRoute: typeof AuthenticatedHubSettingsRoute
-  AuthenticatedHubSlideshowsRoute: typeof AuthenticatedHubSlideshowsRoute
   AuthenticatedHubIndexRoute: typeof AuthenticatedHubIndexRoute
   AuthenticatedHubCampaignsCreateRoute: typeof AuthenticatedHubCampaignsCreateRoute
   AuthenticatedHubCreatorsCreatorIdRoute: typeof AuthenticatedHubCreatorsCreatorIdRoute
+  AuthenticatedHubInfluencersSectionRoute: typeof AuthenticatedHubInfluencersSectionRoute
+  AuthenticatedHubSlideshowsSectionRoute: typeof AuthenticatedHubSlideshowsSectionRoute
   AuthenticatedHubToolsSplatRoute: typeof AuthenticatedHubToolsSplatRoute
+  AuthenticatedHubUgcAdsRoute: typeof AuthenticatedHubUgcAdsRoute
+  AuthenticatedHubUgcAnalyticsRoute: typeof AuthenticatedHubUgcAnalyticsRoute
+  AuthenticatedHubUgcLibraryRoute: typeof AuthenticatedHubUgcLibraryRoute
+  AuthenticatedHubUgcMessagesRoute: typeof AuthenticatedHubUgcMessagesRoute
+  AuthenticatedHubUgcPayoutsRoute: typeof AuthenticatedHubUgcPayoutsRoute
+  AuthenticatedHubUgcReferralsRoute: typeof AuthenticatedHubUgcReferralsRoute
   AuthenticatedHubCampaignsIndexRoute: typeof AuthenticatedHubCampaignsIndexRoute
+  AuthenticatedHubInfluencersIndexRoute: typeof AuthenticatedHubInfluencersIndexRoute
+  AuthenticatedHubSlideshowsIndexRoute: typeof AuthenticatedHubSlideshowsIndexRoute
+  AuthenticatedHubUgcIndexRoute: typeof AuthenticatedHubUgcIndexRoute
   AuthenticatedHubLearnBriefsBriefIdRoute: typeof AuthenticatedHubLearnBriefsBriefIdRoute
+  AuthenticatedHubUgcCampaignsCreateRoute: typeof AuthenticatedHubUgcCampaignsCreateRoute
+  AuthenticatedHubUgcCreatorsCreatorIdRoute: typeof AuthenticatedHubUgcCreatorsCreatorIdRoute
+  AuthenticatedHubUgcCampaignsIndexRoute: typeof AuthenticatedHubUgcCampaignsIndexRoute
+  AuthenticatedHubUgcCreatorsIndexRoute: typeof AuthenticatedHubUgcCreatorsIndexRoute
+  AuthenticatedHubUgcLibraryBriefsBriefIdRoute: typeof AuthenticatedHubUgcLibraryBriefsBriefIdRoute
 }
 
 const AuthenticatedHubRouteRouteChildren: AuthenticatedHubRouteRouteChildren = {
@@ -3638,20 +3951,40 @@ const AuthenticatedHubRouteRouteChildren: AuthenticatedHubRouteRouteChildren = {
   AuthenticatedHubAffiliatesRoute: AuthenticatedHubAffiliatesRoute,
   AuthenticatedHubAnalyticsRoute: AuthenticatedHubAnalyticsRoute,
   AuthenticatedHubDiscoverRoute: AuthenticatedHubDiscoverRoute,
-  AuthenticatedHubInfluencersRoute: AuthenticatedHubInfluencersRoute,
   AuthenticatedHubLearnRoute: AuthenticatedHubLearnRoute,
   AuthenticatedHubMessagesRoute: AuthenticatedHubMessagesRoute,
   AuthenticatedHubPayoutsRoute: AuthenticatedHubPayoutsRoute,
   AuthenticatedHubSettingsRoute: AuthenticatedHubSettingsRoute,
-  AuthenticatedHubSlideshowsRoute: AuthenticatedHubSlideshowsRoute,
   AuthenticatedHubIndexRoute: AuthenticatedHubIndexRoute,
   AuthenticatedHubCampaignsCreateRoute: AuthenticatedHubCampaignsCreateRoute,
   AuthenticatedHubCreatorsCreatorIdRoute:
     AuthenticatedHubCreatorsCreatorIdRoute,
+  AuthenticatedHubInfluencersSectionRoute:
+    AuthenticatedHubInfluencersSectionRoute,
+  AuthenticatedHubSlideshowsSectionRoute:
+    AuthenticatedHubSlideshowsSectionRoute,
   AuthenticatedHubToolsSplatRoute: AuthenticatedHubToolsSplatRoute,
+  AuthenticatedHubUgcAdsRoute: AuthenticatedHubUgcAdsRoute,
+  AuthenticatedHubUgcAnalyticsRoute: AuthenticatedHubUgcAnalyticsRoute,
+  AuthenticatedHubUgcLibraryRoute: AuthenticatedHubUgcLibraryRoute,
+  AuthenticatedHubUgcMessagesRoute: AuthenticatedHubUgcMessagesRoute,
+  AuthenticatedHubUgcPayoutsRoute: AuthenticatedHubUgcPayoutsRoute,
+  AuthenticatedHubUgcReferralsRoute: AuthenticatedHubUgcReferralsRoute,
   AuthenticatedHubCampaignsIndexRoute: AuthenticatedHubCampaignsIndexRoute,
+  AuthenticatedHubInfluencersIndexRoute: AuthenticatedHubInfluencersIndexRoute,
+  AuthenticatedHubSlideshowsIndexRoute: AuthenticatedHubSlideshowsIndexRoute,
+  AuthenticatedHubUgcIndexRoute: AuthenticatedHubUgcIndexRoute,
   AuthenticatedHubLearnBriefsBriefIdRoute:
     AuthenticatedHubLearnBriefsBriefIdRoute,
+  AuthenticatedHubUgcCampaignsCreateRoute:
+    AuthenticatedHubUgcCampaignsCreateRoute,
+  AuthenticatedHubUgcCreatorsCreatorIdRoute:
+    AuthenticatedHubUgcCreatorsCreatorIdRoute,
+  AuthenticatedHubUgcCampaignsIndexRoute:
+    AuthenticatedHubUgcCampaignsIndexRoute,
+  AuthenticatedHubUgcCreatorsIndexRoute: AuthenticatedHubUgcCreatorsIndexRoute,
+  AuthenticatedHubUgcLibraryBriefsBriefIdRoute:
+    AuthenticatedHubUgcLibraryBriefsBriefIdRoute,
 }
 
 const AuthenticatedHubRouteRouteWithChildren =
@@ -3943,6 +4276,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteTokenRoute: InviteTokenRoute,
   JTokenRoute: JTokenRoute,
   JobsSlugRoute: JobsSlugRoute,
+  PayoutTokenRoute: PayoutTokenRoute,
   CoursIndexRoute: CoursIndexRoute,
   CreatorsIndexRoute: CreatorsIndexRoute,
   EnIndexRoute: EnIndexRoute,

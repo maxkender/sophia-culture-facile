@@ -78,15 +78,11 @@ export async function acceptApplication(supabaseAdmin: Admin, applicationId: str
       ...(send.sent ? { acceptance_email_sent_at: new Date().toISOString() } : {}),
       welcome_email_provider: send.provider, welcome_email_message_id: send.messageId, welcome_email_error: send.note,
     }).eq("id", application.id);
-    // J. hand out an App Store code from the pool if the creator has none
-    const { data: cr } = await supabaseAdmin.from("creators").select("access_code").eq("id", creatorId).maybeSingle();
-    if (cr && !cr.access_code) {
-      const { data: code } = await supabaseAdmin.from("access_codes").select("id, code, redeem_url").eq("state", "available").eq("platform", "ios").order("batch_label", { ascending: false, nullsFirst: false }).limit(1).maybeSingle();
-      if (code) {
-        await supabaseAdmin.from("access_codes").update({ state: "assigned", assigned_creator_id: creatorId, assigned_at: new Date().toISOString() }).eq("id", code.id);
-        await supabaseAdmin.from("creators").update({ access_code: code.code, access_redeem_url: code.redeem_url, platform: "ios" }).eq("id", creatorId);
-      }
-    }
+    // J. hand out the store code of each app the creator works on (Sophia by default), never another app's code.
+    const { assignAppCode } = await import("./access-codes.server");
+    const { data: enrolled } = await supabaseAdmin.from("creator_apps").select("app_id").eq("creator_id", creatorId).eq("status", "active");
+    const appIds = (enrolled ?? []).map((e: { app_id: string }) => e.app_id);
+    for (const appId of appIds.length ? appIds : [null]) await assignAppCode(supabaseAdmin, creatorId, appId);
 
     return { ok: true as const, creatorId, inviteUrl, emailSent: send.sent, emailReason: send.note ?? null, emailProvider: send.provider };
 }

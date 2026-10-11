@@ -41,7 +41,7 @@ function QuickBrief({ app, onClose }: { app: string; onClose: () => void }) {
       <select aria-label="Format" value={fmt} onChange={(e) => setFmt(e.target.value)} className={cn(sel, "w-full")}><option value="">No format (free)</option>{formats.map((f) => <option key={f.id} value={f.id}>{f.title}</option>)}</select>
       <div className="flex gap-2"><Button disabled={busy || idea.trim().length < 5} onClick={async () => {
         setBusy(true);
-        try { const r = await ai({ data: { mode: "quick", appId: app, idea, formatId: fmt || null } }); sessionStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify({ ...r.patch, app_id: app, parent_format_id: fmt || null })); void navigate({ to: "/hub/learn/briefs/$briefId", params: { briefId: "new" } }); }
+        try { const r = await ai({ data: { mode: "quick", appId: app, idea, formatId: fmt || null } }); sessionStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify({ ...r.patch, app_id: app, parent_format_id: fmt || null })); void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: "new" } }); }
         catch (e) { toast.error((e as Error).message); } finally { setBusy(false); }
       }}><Sparkles className="size-4" />{busy ? "Writing…" : "Fill and open the Studio"}</Button><Button variant="ghost" onClick={onClose}>Cancel</Button></div>
     </div>
@@ -77,7 +77,7 @@ function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
       <textarea aria-label="Video links" rows={4} value={urls} onChange={(e) => setUrls(e.target.value)} placeholder="https://www.tiktok.com/@…/video/…" className="w-full rounded-xl border p-3 text-sm" />
       <input type="file" accept="video/*" aria-label="Video file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm" />
       <div className="flex gap-2"><Button disabled={busy || (!urls.trim() && !file)} onClick={() => void go()}><Film className="size-4" />{busy ? `Analysing… ${done.length}` : "Analyse"}</Button><Button variant="ghost" onClick={onClose}>Close</Button></div>
-      {done.length ? <ul className="space-y-1 text-sm">{done.map((d, i) => <li key={i} className="rounded-lg bg-portal-bg p-2"><span className="break-all font-semibold">{d.label}</span> — {d.error ? <span className="text-portal-red">{d.error}</span> : <>score {d.score}/10 · {d.briefIds.map((id, j) => <Link key={id} to="/hub/learn/briefs/$briefId" params={{ briefId: id }} className="ml-1 font-bold text-portal-accent">brief {j + 1}</Link>)}</>}</li>)}</ul> : null}
+      {done.length ? <ul className="space-y-1 text-sm">{done.map((d, i) => <li key={i} className="rounded-lg bg-portal-bg p-2"><span className="break-all font-semibold">{d.label}</span> — {d.error ? <span className="text-portal-red">{d.error}</span> : <>score {d.score}/10 · {d.briefIds.map((id, j) => <Link key={id} to="/hub/ugc/library/briefs/$briefId" params={{ briefId: id }} className="ml-1 font-bold text-portal-accent">brief {j + 1}</Link>)}</>}</li>)}</ul> : null}
     </div>
   );
 }
@@ -130,7 +130,7 @@ export function BriefsList() {
   return (
     <div className="space-y-4">
       <div className={cn(card, "flex flex-wrap items-end gap-2")}>
-        <Button asChild><Link to="/hub/learn/briefs/$briefId" params={{ briefId: "new" }}>New brief</Link></Button>
+        <Button asChild><Link to="/hub/ugc/library/briefs/$briefId" params={{ briefId: "new" }}>New brief</Link></Button>
         <Button variant="outline" onClick={() => setPanel(panel === "quick" ? "none" : "quick")}><Zap className="size-4" />Brief rapide</Button>
         <Button variant="outline" onClick={() => setPanel(panel === "video" ? "none" : "video")}><Film className="size-4" />Brief depuis une vidéo</Button>
         <label className="text-xs font-semibold text-brand-navySoft">Courses<input type="number" min={1} max={20} value={n} onChange={(e) => setN(Math.min(20, Math.max(1, Number(e.target.value))))} className="mt-1 block h-9 w-16 rounded-lg border px-2" /></label>
@@ -166,7 +166,7 @@ export function BriefsList() {
           <tbody>{rows.map((r) => { const s = data?.stats[r.id]; const avg = s?.v7.length ? Math.round(s.v7.reduce((a, b) => a + b, 0) / s.v7.length) : null; return (
             <tr key={r.id} className="border-t border-brand-line">
               <td className="p-3"><input type="checkbox" aria-label={`Select ${r.title}`} checked={picked.includes(r.id)} onChange={(e) => setPicked((x) => (e.target.checked ? [...x, r.id] : x.filter((y) => y !== r.id)))} /></td>
-              <td className="max-w-[320px] p-3"><Link to="/hub/learn/briefs/$briefId" params={{ briefId: r.id }} className="font-bold text-brand-navy hover:underline">{r.title}</Link>{r.language === "en" ? <span className="ml-1 rounded bg-portal-bg px-1 text-[10px] font-bold">EN</span> : null}<p className="truncate text-xs text-brand-navySoft">{r.hook_text ?? r.hook}</p></td>
+              <td className="max-w-[320px] p-3"><Link to="/hub/ugc/library/briefs/$briefId" params={{ briefId: r.id }} className="font-bold text-brand-navy hover:underline">{r.title}</Link>{r.language === "en" ? <span className="ml-1 rounded bg-portal-bg px-1 text-[10px] font-bold">EN</span> : null}<p className="truncate text-xs text-brand-navySoft">{r.hook_text ?? r.hook}</p></td>
               <td className="p-3">{r.score != null ? <span className={cn("rounded-full px-2 py-0.5 text-xs font-bold", r.score >= 8 ? "bg-portal-green/15 text-portal-green" : "bg-portal-amber/20")}>{r.score}/10</span> : "—"}</td>
               <td className="p-3">{EFF[r.effort ?? ""] ?? "—"}</td>
               <td className="p-3">{r.status}{r.status === "scheduled" && r.drop_at ? <span className="block text-xs text-brand-navySoft">{new Date(r.drop_at).toLocaleDateString()}</span> : null}</td>

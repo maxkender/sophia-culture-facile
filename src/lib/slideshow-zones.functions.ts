@@ -8,11 +8,11 @@ async function loadGuide(admin: any, zone: string | null) {
   if (!zone) return { state: "no_zone" as const };
   const [{ data: doc }, { data: pz }] = await Promise.all([
     admin.from("documents").select("title, content, current_version, published").eq("slug", "slideshow-guide").maybeSingle(),
-    admin.from("pay_zones").select("trial_amount, monthly_amount, posts_per_day").eq("zone", zone).maybeSingle(),
+    admin.from("pay_zones").select("weekly_amount, first_week_amount, posts_per_day").eq("zone", zone).maybeSingle(),
   ]);
   if (!doc?.published) return { state: "unpublished" as const };
   if (!pz) return { state: "no_zone" as const };
-  const figures = { trial_amount: Number(pz.trial_amount), monthly_amount: Number(pz.monthly_amount), posts_per_day: Number(pz.posts_per_day) };
+  const figures = { weekly_amount: Number(pz.weekly_amount), first_week_amount: Number(pz.first_week_amount), posts_per_day: Number(pz.posts_per_day) };
   return {
     state: "ready" as const,
     title: doc.title as string,
@@ -32,7 +32,7 @@ export const getGuideByToken = createServerFn({ method: "POST" })
       .select("id, zone, status, guide_opened_at")
       .eq("guide_token", data.token)
       .maybeSingle();
-    if (!app || app.status !== "approved") return { state: "invalid" as const };
+    if (!app || !["approved", "accepted", "contract_signed", "os_created", "started"].includes(app.status)) return { state: "invalid" as const };
     const guide = await loadGuide(supabaseAdmin, app.zone);
     if (guide.state !== "ready") return { state: guide.state };
     await supabaseAdmin

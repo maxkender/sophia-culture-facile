@@ -1,6 +1,6 @@
 import type { DocBlock } from "./documents";
 
-export type ZoneFigures = { trial_amount: number; monthly_amount: number; posts_per_day: number };
+export type ZoneFigures = { weekly_amount: number; first_week_amount: number; posts_per_day: number };
 
 export const GUIDE_PDF_NAME = "Sophia - Creator Guide.pdf";
 
@@ -8,11 +8,11 @@ function fmt(n: number) {
   return Number.isInteger(n) ? String(n) : n.toFixed(2);
 }
 
-/** Fills {trial_amount}, {monthly_amount}, {posts_per_day}. Runs server-side so no other zone's figures ever reach the reader. */
+/** Fills {weekly_amount}, {first_week_amount}, {posts_per_day}. Runs server-side so no other zone's figures ever reach the reader. */
 export function mergeGuideText(text: string, f: ZoneFigures): string {
   return text
-    .replaceAll("{trial_amount}", fmt(f.trial_amount))
-    .replaceAll("{monthly_amount}", fmt(f.monthly_amount))
+    .replaceAll("{first_week_amount}", fmt(f.first_week_amount))
+    .replaceAll("{weekly_amount}", fmt(f.weekly_amount))
     .replaceAll("{posts_per_day}", String(f.posts_per_day));
 }
 

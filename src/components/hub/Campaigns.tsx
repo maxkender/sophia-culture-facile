@@ -61,7 +61,7 @@ function CampaignsList() {
     <>
       <Toolbar active={active} setActive={setActive} counts={[data.filter(isActive).length, data.filter((c) => !isActive(c)).length]} q={q} setQ={setQ}
         filters={<select aria-label="Type" value={type} onChange={(e) => setType(e.target.value)} className="min-h-9 rounded-lg border px-2 text-sm"><option value="">All types</option><option value="high_volume_ugc">High-volume UGC</option><option value="influencer">Influencer</option><option value="paid_ads">Paid ads</option><option value="analytics_only">Analytics only</option></select>}
-        action={<Button asChild className="bg-brand-navy"><Link to="/hub/campaigns/create">Create Campaign</Link></Button>} />
+        action={<Button asChild className="bg-brand-navy"><Link to="/hub/ugc/campaigns/create">Create Campaign</Link></Button>} />
       {rows.length === 0 ? <p className={cn(card, "text-sm text-brand-navySoft")}>No campaigns here yet.</p> : (
         <div className="grid gap-3 md:grid-cols-2">
           {rows.map((c) => (
@@ -195,7 +195,7 @@ function Applicants() {
                           <td className="whitespace-nowrap p-2">
                             <Button size="icon" variant="ghost" aria-label="Shortlist" onClick={() => void shortlist(a.id, !a.shortlisted)}><Star className={cn("size-4", a.shortlisted && "fill-portal-amber text-portal-amber")} /></Button>
                             {a.status === "pending" ? <><Button size="sm" onClick={() => void decide([a.id], "accepted")}>Accept</Button> <Button size="sm" variant="outline" onClick={() => void decide([a.id], "declined", window.prompt("Reason for declining") ?? undefined)}>Decline</Button></> : null}
-                            {a.creator_id ? <Button size="sm" variant="ghost" onClick={() => void navigate({ to: "/hub/messages" })}>Message</Button> : null}
+                            {a.creator_id ? <Button size="sm" variant="ghost" onClick={() => void navigate({ to: "/hub/ugc/messages" })}>Message</Button> : null}
                           </td>
                         </tr>
                       );
@@ -347,7 +347,7 @@ export function Campaigns({ tab, newJob }: { tab: CampaignTab; newJob?: boolean 
     <div>
       <div className="mb-5 flex gap-1 overflow-x-auto border-b border-brand-line">
         {TABS.map(([k, l]) => (
-          <button key={k} type="button" onClick={() => void navigate({ to: "/hub/campaigns", search: { tab: k } })} className={cn("shrink-0 border-b-2 px-3 pb-2.5 text-sm font-bold", tab === k ? "border-brand-navy text-brand-navy" : "border-transparent text-brand-navySoft")}>{l}</button>
+          <button key={k} type="button" onClick={() => void navigate({ to: "/hub/ugc/campaigns", search: { tab: k } })} className={cn("shrink-0 border-b-2 px-3 pb-2.5 text-sm font-bold", tab === k ? "border-brand-navy text-brand-navy" : "border-transparent text-brand-navySoft")}>{l}</button>
         ))}
       </div>
       {tab === "campaigns" ? <CampaignsList /> : tab === "applicants" ? <Applicants /> : tab === "requests" ? <Requests /> : tab === "jobs" ? <JobsList autoNew={newJob} /> : tab === "challenges" ? <Challenges /> : <VideoReviews />}

@@ -78,14 +78,14 @@ export function CampaignWizard() {
     toast.success("Campaign is live");
     window.localStorage.removeItem(KEY);
     void qc.invalidateQueries({ queryKey: ["hub"] });
-    if (d.dist.createJob) setJobFor(data.id); else void navigate({ to: "/hub/campaigns", search: { tab: "campaigns" } });
+    if (d.dist.createJob) setJobFor(data.id); else void navigate({ to: "/hub/ugc/campaigns", search: { tab: "campaigns" } });
   }
 
   const app = apps.find((a) => a.id === (appId ?? SOPHIA_APP_ID));
 
   return (
     <div className="grid gap-5 lg:grid-cols-[220px_1fr]">
-      <JobModal open={Boolean(jobFor)} onOpenChange={(o) => { if (!o) { setJobFor(null); void navigate({ to: "/hub/campaigns", search: { tab: "jobs" } }); } }}
+      <JobModal open={Boolean(jobFor)} onOpenChange={(o) => { if (!o) { setJobFor(null); void navigate({ to: "/hub/ugc/campaigns", search: { tab: "jobs" } }); } }}
         initial={{ ...d.job, campaign_id: jobFor, title: d.job.title || d.name, access: d.dist.feed ? "job_feed" : d.dist.share ? "link" : "invite_only" }} />
       <aside className="rounded-2xl bg-card p-4 shadow-portal">
         <ol className="flex gap-2 overflow-x-auto lg:flex-col">

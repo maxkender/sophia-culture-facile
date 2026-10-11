@@ -68,6 +68,14 @@ export type CreatorFormCopy = {
     upwork: string;
     upworkLink: string;
     referral: string;
+    secondPhone: string;
+    language: string;
+    screening: string;
+    qCountryNow: string;
+    qHours: string;
+    qTiktok: string;
+    qPrevious: string;
+    screeningError: string;
   };
 };
 
@@ -133,13 +141,21 @@ export const CREATOR_FORMS: Record<Lang, CreatorFormCopy> = {
     slideshow: {
       title: "Apply as a slideshow creator",
       lead: "One minute, no video needed.",
-      confirmation: "Thank you. We reply within five days by email.",
+      confirmation: "Thanks! We open places country by country, week after week. If your country opens, we'll write to you by email.",
       about: "About you",
       adult: "Are you at least 18? *",
       underage: "You need to be at least 18 to apply.",
       upwork: "Do you have an Upwork account? *",
       upworkLink: "Your Upwork profile link (optional)",
       referral: "How did you hear about us?",
+      secondPhone: "Do you have a second phone you can use for filming? *",
+      language: "Language for our emails",
+      screening: "Four quick questions",
+      qCountryNow: "1. Which country do you live in right now? *",
+      qHours: "2. How many hours a day can you post? *",
+      qTiktok: "3. Do you already use TikTok daily? *",
+      qPrevious: "4. Tell us about any content you've posted before *",
+      screeningError: "Please answer the four questions.",
     },
   },
   fr: {
@@ -203,13 +219,21 @@ export const CREATOR_FORMS: Record<Lang, CreatorFormCopy> = {
     slideshow: {
       title: "Postuler comme créateur de slideshows",
       lead: "Une minute, aucune vidéo nécessaire.",
-      confirmation: "Merci. Nous vous répondrons par e-mail sous cinq jours.",
+      confirmation: "Merci ! Nous ouvrons des places pays par pays, semaine après semaine. Si votre pays ouvre, nous vous écrirons par e-mail.",
       about: "À propos de vous",
       adult: "Avez-vous au moins 18 ans ? *",
       underage: "Vous devez avoir au moins 18 ans pour postuler.",
       upwork: "Avez-vous un compte Upwork ? *",
       upworkLink: "Lien de votre profil Upwork (facultatif)",
       referral: "Comment avez-vous entendu parler de nous ?",
+      secondPhone: "Avez-vous un second téléphone utilisable pour filmer ? *",
+      language: "Langue de nos e-mails",
+      screening: "Quatre questions rapides",
+      qCountryNow: "1. Dans quel pays vivez-vous en ce moment ? *",
+      qHours: "2. Combien d'heures par jour pouvez-vous publier ? *",
+      qTiktok: "3. Utilisez-vous déjà TikTok tous les jours ? *",
+      qPrevious: "4. Parlez-nous des contenus que vous avez déjà publiés *",
+      screeningError: "Répondez aux quatre questions.",
     },
   },
 };

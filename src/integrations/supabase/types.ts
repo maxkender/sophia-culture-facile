@@ -4705,32 +4705,112 @@ export type Database = {
           },
         ]
       }
+      os_calls: {
+        Row: {
+          action: string
+          created_at: string
+          error: string | null
+          id: string
+          ms: number | null
+          ok: boolean
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          ms?: number | null
+          ok: boolean
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          ms?: number | null
+          ok?: boolean
+        }
+        Relationships: []
+      }
+      os_snapshots: {
+        Row: {
+          application_id: string
+          dernier_post_at: string | null
+          fetched_at: string
+          id: string
+          is_active: boolean | null
+          lundi: string
+          manques: number | null
+          os_profile_id: string
+          prevus: number | null
+          publies: number | null
+        }
+        Insert: {
+          application_id: string
+          dernier_post_at?: string | null
+          fetched_at?: string
+          id?: string
+          is_active?: boolean | null
+          lundi: string
+          manques?: number | null
+          os_profile_id: string
+          prevus?: number | null
+          publies?: number | null
+        }
+        Update: {
+          application_id?: string
+          dernier_post_at?: string | null
+          fetched_at?: string
+          id?: string
+          is_active?: boolean | null
+          lundi?: string
+          manques?: number | null
+          os_profile_id?: string
+          prevus?: number | null
+          publies?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_snapshots_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "slideshow_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pay_zones: {
         Row: {
           ceiling_amount: number | null
           currency: string
+          first_week_amount: number | null
           monthly_amount: number
           posts_per_day: number
           trial_amount: number
           updated_at: string
+          weekly_amount: number | null
           zone: string
         }
         Insert: {
           ceiling_amount?: number | null
           currency?: string
+          first_week_amount?: number | null
           monthly_amount: number
           posts_per_day?: number
           trial_amount: number
           updated_at?: string
+          weekly_amount?: number | null
           zone: string
         }
         Update: {
           ceiling_amount?: number | null
           currency?: string
+          first_week_amount?: number | null
           monthly_amount?: number
           posts_per_day?: number
           trial_amount?: number
           updated_at?: string
+          weekly_amount?: number | null
           zone?: string
         }
         Relationships: []
@@ -5417,94 +5497,190 @@ export type Database = {
       }
       slideshow_applications: {
         Row: {
+          accepted_at: string | null
+          ack_sent_at: string | null
           admin_notes: string | null
           agreement_signed_at: string | null
           app_id: string
+          applications: string[]
           assigned_hm_id: string | null
           consent_at: string
+          contract_signed_at: string | null
           country: string
           created_at: string
           decided_at: string | null
           decided_by: string | null
+          deux_telephones: boolean | null
+          dropped_at: string | null
           email: string
+          expired_at: string | null
           full_name: string
           guide_figures_shown: Json | null
           guide_opened_at: string | null
           guide_token: string | null
           guide_zone_shown: string | null
           has_upwork: boolean
+          hm_notified_at: string | null
           id: string
           is_adult: boolean
+          langue: string | null
+          manager_email: string | null
+          manager_name: string | null
+          os_created_at: string | null
+          os_email: string | null
+          os_error: string | null
+          os_profile_id: string | null
+          payout_method: string | null
+          payout_token: string | null
+          payout_token_expires_at: string | null
+          paypal_email: string | null
           phone: string | null
+          pool_at: string | null
+          q_country_now: string | null
+          q_hours_per_day: string | null
+          q_previous_content: string | null
+          q_tiktok_daily: string | null
           referral_source: string | null
+          rejected_reason: string | null
           rejection_reason: string | null
           signing_token: string | null
           signing_token_created_at: string | null
+          start_monday: string | null
+          started_at: string | null
           status: string
+          stripe_account_id: string | null
+          stripe_onboarded: boolean
           submit_ip_hash: string | null
+          timeline: Json
+          unswipe_code_id: string | null
           upwork_profile_url: string | null
+          wise_email: string | null
           zone: string | null
           zone_note: string | null
           zone_override: boolean
         }
         Insert: {
+          accepted_at?: string | null
+          ack_sent_at?: string | null
           admin_notes?: string | null
           agreement_signed_at?: string | null
           app_id?: string
+          applications?: string[]
           assigned_hm_id?: string | null
           consent_at?: string
+          contract_signed_at?: string | null
           country: string
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          deux_telephones?: boolean | null
+          dropped_at?: string | null
           email: string
+          expired_at?: string | null
           full_name: string
           guide_figures_shown?: Json | null
           guide_opened_at?: string | null
           guide_token?: string | null
           guide_zone_shown?: string | null
           has_upwork?: boolean
+          hm_notified_at?: string | null
           id?: string
           is_adult: boolean
+          langue?: string | null
+          manager_email?: string | null
+          manager_name?: string | null
+          os_created_at?: string | null
+          os_email?: string | null
+          os_error?: string | null
+          os_profile_id?: string | null
+          payout_method?: string | null
+          payout_token?: string | null
+          payout_token_expires_at?: string | null
+          paypal_email?: string | null
           phone?: string | null
+          pool_at?: string | null
+          q_country_now?: string | null
+          q_hours_per_day?: string | null
+          q_previous_content?: string | null
+          q_tiktok_daily?: string | null
           referral_source?: string | null
+          rejected_reason?: string | null
           rejection_reason?: string | null
           signing_token?: string | null
           signing_token_created_at?: string | null
+          start_monday?: string | null
+          started_at?: string | null
           status?: string
+          stripe_account_id?: string | null
+          stripe_onboarded?: boolean
           submit_ip_hash?: string | null
+          timeline?: Json
+          unswipe_code_id?: string | null
           upwork_profile_url?: string | null
+          wise_email?: string | null
           zone?: string | null
           zone_note?: string | null
           zone_override?: boolean
         }
         Update: {
+          accepted_at?: string | null
+          ack_sent_at?: string | null
           admin_notes?: string | null
           agreement_signed_at?: string | null
           app_id?: string
+          applications?: string[]
           assigned_hm_id?: string | null
           consent_at?: string
+          contract_signed_at?: string | null
           country?: string
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          deux_telephones?: boolean | null
+          dropped_at?: string | null
           email?: string
+          expired_at?: string | null
           full_name?: string
           guide_figures_shown?: Json | null
           guide_opened_at?: string | null
           guide_token?: string | null
           guide_zone_shown?: string | null
           has_upwork?: boolean
+          hm_notified_at?: string | null
           id?: string
           is_adult?: boolean
+          langue?: string | null
+          manager_email?: string | null
+          manager_name?: string | null
+          os_created_at?: string | null
+          os_email?: string | null
+          os_error?: string | null
+          os_profile_id?: string | null
+          payout_method?: string | null
+          payout_token?: string | null
+          payout_token_expires_at?: string | null
+          paypal_email?: string | null
           phone?: string | null
+          pool_at?: string | null
+          q_country_now?: string | null
+          q_hours_per_day?: string | null
+          q_previous_content?: string | null
+          q_tiktok_daily?: string | null
           referral_source?: string | null
+          rejected_reason?: string | null
           rejection_reason?: string | null
           signing_token?: string | null
           signing_token_created_at?: string | null
+          start_monday?: string | null
+          started_at?: string | null
           status?: string
+          stripe_account_id?: string | null
+          stripe_onboarded?: boolean
           submit_ip_hash?: string | null
+          timeline?: Json
+          unswipe_code_id?: string | null
           upwork_profile_url?: string | null
+          wise_email?: string | null
           zone?: string | null
           zone_note?: string | null
           zone_override?: boolean
@@ -5558,6 +5734,83 @@ export type Database = {
             columns: ["app_id"]
             isOneToOne: false
             referencedRelation: "apps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      slideshow_payouts: {
+        Row: {
+          amount: number | null
+          application_id: string
+          approved_at: string | null
+          approved_by: string | null
+          carried_in: number
+          created_at: string
+          first_week: boolean
+          id: string
+          manques: number | null
+          note: string | null
+          paid_at: string | null
+          prevus: number | null
+          publies: number | null
+          rate: number | null
+          skip_reason: string | null
+          status: string
+          stripe_transfer_id: string | null
+          suggested: number | null
+          week_start: string
+          zone: string | null
+        }
+        Insert: {
+          amount?: number | null
+          application_id: string
+          approved_at?: string | null
+          approved_by?: string | null
+          carried_in?: number
+          created_at?: string
+          first_week?: boolean
+          id?: string
+          manques?: number | null
+          note?: string | null
+          paid_at?: string | null
+          prevus?: number | null
+          publies?: number | null
+          rate?: number | null
+          skip_reason?: string | null
+          status?: string
+          stripe_transfer_id?: string | null
+          suggested?: number | null
+          week_start: string
+          zone?: string | null
+        }
+        Update: {
+          amount?: number | null
+          application_id?: string
+          approved_at?: string | null
+          approved_by?: string | null
+          carried_in?: number
+          created_at?: string
+          first_week?: boolean
+          id?: string
+          manques?: number | null
+          note?: string | null
+          paid_at?: string | null
+          prevus?: number | null
+          publies?: number | null
+          rate?: number | null
+          skip_reason?: string | null
+          status?: string
+          stripe_transfer_id?: string | null
+          suggested?: number | null
+          week_start?: string
+          zone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slideshow_payouts_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "slideshow_applications"
             referencedColumns: ["id"]
           },
         ]

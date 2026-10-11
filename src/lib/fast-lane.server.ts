@@ -74,7 +74,7 @@ export async function createFastLaneOne(a: Admin, person: FastPerson, pay: FastP
   }
   if (applicationId) await a.from("creator_applications").update({ status: "approved", decided_at: new Date().toISOString(), created_creator_id: creatorId, admin_notes: "Fast lane" }).eq("id", applicationId);
   if (person.ref?.kind === "prospect") await a.from("creator_prospects").update({ status: "converted" }).eq("id", person.ref.id);
-  await a.from("creator_apps").upsert({ creator_id: creatorId, app_id: appId, status: "active" }, { onConflict: "creator_id,app_id" });
+  await a.from("creator_apps").upsert({ creator_id: creatorId, app_id: appId, status: "active" }, { onConflict: "creator_id,app_id" }); await (await import("./access-codes.server")).assignAppCode(a, creatorId, appId);
   if (jobId) await a.from("job_invites").insert({ job_id: jobId, creator_id: creatorId, email: pending ? null : email });
   return { creatorId: creatorId as string, name: fullName, email, link: fastLink(origin, token) };
 }

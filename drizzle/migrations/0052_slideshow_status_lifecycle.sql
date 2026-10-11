@@ -1,0 +1,2 @@
+ALTER TABLE public.slideshow_applications DROP CONSTRAINT IF EXISTS slideshow_applications_status_check;
+ALTER TABLE public.slideshow_applications ADD CONSTRAINT slideshow_applications_status_check CHECK (status = ANY (ARRAY['pending','interview','approved','rejected','new','reviewing','accepted','waitlist','pool','contract_signed','os_created','started','dropped','expired']::text[]));

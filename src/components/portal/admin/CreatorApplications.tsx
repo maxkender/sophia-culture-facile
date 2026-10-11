@@ -403,13 +403,13 @@ function ZonePanel({ app, onChange }: { app: SlideshowApplication; onChange: (ne
       await downloadDocumentPdf({ slug: "slideshow-guide", title: g.title, subtitle: "Sophia · TikTok slideshow programme", version: g.version, blocks: g.blocks, filename: GUIDE_PDF_NAME });
     } catch (e: any) { toast.error(e?.message ?? "Could not build the PDF."); }
   }
-  const shown = app.guide_figures_shown as { trial_amount?: number; monthly_amount?: number } | null;
+  const shown = app.guide_figures_shown as { weekly_amount?: number; first_week_amount?: number; trial_amount?: number; monthly_amount?: number } | null;
   return (
     <div className="space-y-3 rounded-xl border border-brand-line p-3 text-sm">
       <div className="flex flex-wrap items-center gap-2">
         <ZoneBadge zone={app.zone} />
         {info?.pz ? (
-          <span className="text-brand-navy">Trial ${Number(info.pz.trial_amount)} · Monthly ${Number(info.pz.monthly_amount)}</span>
+          <span className="text-brand-navy">${Number(info.pz.weekly_amount)}/week · first week ${Number(info.pz.first_week_amount)}</span>
         ) : null}
         {app.zone === "A" && info?.ceiling && info.pz?.ceiling_amount ? (
           <span className="text-xs text-brand-navySoft">ceiling ${Number(info.pz.ceiling_amount)}, only as a response to a refusal</span>
@@ -433,7 +433,7 @@ function ZonePanel({ app, onChange }: { app: SlideshowApplication; onChange: (ne
         <div className="space-y-1 border-t border-brand-line pt-3">
           <p className="text-xs text-brand-navySoft">
             {app.guide_opened_at
-              ? `Guide opened ${formatDateTime(app.guide_opened_at)} · Zone ${app.guide_zone_shown ?? "?"} figures shown${shown ? ` (trial $${shown.trial_amount}, monthly $${shown.monthly_amount})` : ""}`
+              ? `Guide opened ${formatDateTime(app.guide_opened_at)} · Zone ${app.guide_zone_shown ?? "?"} figures shown${shown ? ` ($${shown.weekly_amount ?? "?"}/week, first week $${shown.first_week_amount ?? "?"})` : ""}`
               : "Guide not opened yet."}
           </p>
           {app.zone ? <Button type="button" size="sm" variant="outline" onClick={() => void pdf()}>Download guide PDF</Button> : null}
