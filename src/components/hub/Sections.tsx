@@ -80,12 +80,12 @@ function SlideshowAssign() {
       </div>
       <div className="overflow-x-auto rounded-2xl bg-card shadow-portal">
         <table className="w-full min-w-[640px] text-sm" data-testid="slideshow-assign">
-          <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Applicant</th><th className="p-3">Country</th><th className="p-3">Zone</th><th className="p-3">Status</th><th className="p-3">Hiring manager</th></tr></thead>
+          <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Poster</th><th className="p-3">Country</th><th className="p-3">Zone</th><th className="p-3">Status</th><th className="p-3">Hiring manager</th></tr></thead>
           <tbody>{rows.map((r) => (
             <tr key={r.id} className="border-t border-brand-line">
               <td className="p-3 font-bold text-brand-navy"><AppBadge appId={r.app_id} /> {r.full_name}</td>
               <td className="p-3">{r.country}</td>
-              <td className="p-3">{r.zone_override ?? r.zone ?? <span className="text-portal-red">none</span>}</td>
+              <td className="p-3">{r.zone ?? <span className="text-portal-red">none</span>}</td>
               <td className="p-3">{r.status}</td>
               <td className="p-3"><select aria-label={`Hiring manager for ${r.full_name}`} value={r.assigned_hm_id ?? ""} onChange={(e) => void assign(r.id, e.target.value)} className="h-9 rounded-lg border px-2"><option value="">—</option>{choices.map((a) => <option key={a.id} value={a.id}>{a.full_name ?? a.email}</option>)}</select></td>
             </tr>
@@ -160,11 +160,11 @@ function Team({ track }: { track?: string } = {}) {
   const qc = useQueryClient();
   const { data } = useAdmins();
   const { data: queues = {} } = useQuery({
-    queryKey: ["hub", "hm-queues"],
+    queryKey: ["hub", "hm-queues", track],
     queryFn: async () => {
       const [s, i] = await Promise.all([
         supabase.from("slideshow_applications").select("assigned_hm_id").eq("status", "pending").not("assigned_hm_id", "is", null),
-        supabase.from("influencer_applications").select("assigned_hm_id").eq("status", "pending").not("assigned_hm_id", "is", null),
+        track === "slideshow" ? Promise.resolve({ data: [] }) : supabase.from("influencer_applications").select("assigned_hm_id").eq("status", "pending").not("assigned_hm_id", "is", null),
       ]);
       const q: Record<string, number> = {};
       for (const r of [...(s.data ?? []), ...(i.data ?? [])]) q[r.assigned_hm_id as string] = (q[r.assigned_hm_id as string] ?? 0) + 1;
@@ -186,7 +186,7 @@ function Team({ track }: { track?: string } = {}) {
           <tr key={a.id} className="border-t border-brand-line">
             <td className="p-3 font-bold">{a.full_name ?? "—"}<span className="block text-xs font-normal text-brand-navySoft">{a.email}</span></td>
             <td className="p-3"><input type="checkbox" aria-label={`Hiring manager ${a.full_name}`} checked={Boolean(h?.active)} onChange={(e) => void save(a.id, { active: e.target.checked })} /></td>
-            <td className="p-3">{TRACKS.map(([k, l]) => <label key={k} className="mr-3 inline-flex items-center gap-1 text-xs"><input type="checkbox" disabled={!h?.active} checked={(h?.tracks ?? []).includes(k)} onChange={(e) => void save(a.id, { tracks: e.target.checked ? [...(h?.tracks ?? []), k] : (h?.tracks ?? []).filter((x) => x !== k) })} />{l}</label>)}</td>
+            <td className="p-3">{TRACKS.filter(([k]) => !track || k === track).map(([k, l]) => <label key={k} className="mr-3 inline-flex items-center gap-1 text-xs"><input type="checkbox" disabled={!h?.active} checked={(h?.tracks ?? []).includes(k)} onChange={(e) => void save(a.id, { tracks: e.target.checked ? [...(h?.tracks ?? []), k] : (h?.tracks ?? []).filter((x) => x !== k) })} />{l}</label>)}</td>
             <td className="p-3"><input aria-label={`Countries for ${a.full_name}`} disabled={!h?.active} defaultValue={(h?.countries ?? []).join(", ")} placeholder="FR, BE, CH" onBlur={(e) => void save(a.id, { countries: e.target.value.split(",").map((c) => c.trim().toUpperCase()).filter(Boolean) })} className="h-9 w-40 rounded-lg border px-2" /></td>
             <td className="p-3">{(queues as Record<string, number>)[a.id] ?? 0}</td>
           </tr>); })}</tbody>
