@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SOPHIA_APP_ID, useAdminApp } from "@/lib/apps";
 import { generateBriefsFromCourses } from "@/lib/hub-learn.functions";
+import { inspirationForLink } from "@/lib/inspirations.functions";
 import { assetUploadSlot, briefFromVideo, metaAdsPrepare, studioAi } from "@/lib/brief-studio.functions";
 import { STUDIO_DRAFT_KEY, STYLES, STYLE_LABEL, STYLE_NUM, styleDefaults, type BriefStyle } from "@/lib/brief-studio";
 
@@ -54,7 +55,7 @@ function QuickBrief({ app, onClose }: { app: string; onClose: () => void }) {
 }
 
 function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
-  const run = useServerFn(briefFromVideo); const meta = useServerFn(metaAdsPrepare); const [step, setStep] = useState(""); const slot = useServerFn(assetUploadSlot); const qc = useQueryClient();
+  const run = useServerFn(briefFromVideo); const forLink = useServerFn(inspirationForLink); const meta = useServerFn(metaAdsPrepare); const [step, setStep] = useState(""); const slot = useServerFn(assetUploadSlot); const qc = useQueryClient();
   const [style, setStyle] = useState<BriefStyle | "">("");
   const [urls, setUrls] = useState(""); const [file, setFile] = useState<File | null>(null); const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<{ label: string; score: number; briefIds: string[]; error?: string }[]>([]);
@@ -85,6 +86,16 @@ function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
         } catch (e) { setDone((d) => [...d, { label: u, score: 0, briefIds: [], error: (e as Error).message }]); }
         setStep(""); continue;
       }
+      if (/tiktok\.com|instagram\.com/i.test(u)) {
+        try {
+          setStep("Fetching, transcribing and analysing the video (also saved in Inspiration)…");
+          const ins = await forLink({ data: { appId: app, url: u } });
+          const ctx = ins ? `@${ins.handle ?? ""}: ${ins.caption ?? ""}\nTranscript (verbatim): ${(ins.transcript ?? "").slice(0, 1400)}` : undefined;
+          const r = await run({ data: { appId: app, url: u, caption: ctx?.slice(0, 2000), thumb: ins?.coverUrl ?? null, style: style || null } });
+          setDone((d) => [...d, { label: u, score: r.score, briefIds: r.briefIds }]);
+        } catch (e) { setDone((d) => [...d, { label: u, score: 0, briefIds: [], error: (e as Error).message }]); if (/credits|blocked/.test((e as Error).message)) break; }
+        setStep(""); continue;
+      }
       try { const r = await run({ data: { appId: app, url: u, style: style || null } }); setDone((d) => [...d, { label: u, score: r.score, briefIds: r.briefIds }]); }
       catch (e) { setDone((d) => [...d, { label: u, score: 0, briefIds: [], error: (e as Error).message }]); if (/credits|blocked/.test((e as Error).message)) break; }
     }
@@ -94,7 +105,7 @@ function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
     <div className={cn(card, "space-y-3")}>
       <h3 className="font-extrabold text-brand-navy">Brief depuis une vidéo</h3>
       <StylePick value={style} onChange={setStyle} />
-      <p className="text-xs text-brand-navySoft">Paste up to 20 TikTok, Instagram or Meta Ads Library links (one per line) or upload one file. Meta Ads Library ads are read with their video frame by frame (or their images and copy); a page or search link reads up to 5 ads. Each video is saved in References with its 10-line analysis and a /10 score, and 1-3 adapted draft briefs (never published) are created in the chosen style. Links are read from their cover and caption; upload the file for a frame-by-frame read.</p>
+      <p className="text-xs text-brand-navySoft">Paste up to 20 TikTok, Instagram or Meta Ads Library links (one per line) or upload one file. Meta Ads Library ads are read with their video frame by frame (or their images and copy); a page or search link reads up to 5 ads. Each video is saved in References with its 10-line analysis and a /10 score, and 1-3 adapted draft briefs (never published) are created in the chosen style. TikTok and Instagram links are downloaded, transcribed and analysed through Inspiration (each one also appears there).</p>
       <textarea aria-label="Video links" rows={4} value={urls} onChange={(e) => setUrls(e.target.value)} placeholder="https://www.tiktok.com/@…/video/…" className="w-full rounded-xl border p-3 text-sm" />
       <input type="file" accept="video/*" aria-label="Video file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm" />
       <div className="flex gap-2"><Button disabled={busy || !style || (!urls.trim() && !file)} onClick={() => void go()}><Film className="size-4" />{busy ? step || `Analysing… ${done.length}` : "Analyse"}</Button><Button variant="ghost" onClick={onClose}>Close</Button></div>

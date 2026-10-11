@@ -74,7 +74,8 @@ export function BriefStudio({ briefId }: { briefId: string }) {
     if (isNew) {
       const stash = typeof window !== "undefined" ? sessionStorage.getItem(STUDIO_DRAFT_KEY) : null;
       const base = blankBrief(appId ?? SOPHIA_APP_ID);
-      if (stash) { sessionStorage.removeItem(STUDIO_DRAFT_KEY); try { setB({ ...base, ...JSON.parse(stash) }); return; } catch { /* ignore */ } }
+      // Removed after a beat so a dev double-mount still reads the prefilled draft.
+      if (stash) { window.setTimeout(() => sessionStorage.removeItem(STUDIO_DRAFT_KEY), 1500); try { setB({ ...base, ...JSON.parse(stash) }); return; } catch { /* ignore */ } }
       setB(base); return;
     }
     if (loaded?.row) { const t = toStudio(loaded.row); setB(t.style ? { ...t, style_data: styleDefaults(t.style, t.style_data) } : t); setAssets(loaded.assets); setRefIds(loaded.row.reference_video_ids ?? []); }

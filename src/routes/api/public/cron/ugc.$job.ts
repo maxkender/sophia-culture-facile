@@ -72,6 +72,11 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             const { withLock } = await import("@/lib/hub-automation.server");
             return Response.json(await withLock(a, "slides-week", 15, () => buildWeek(a)));
           }
+          if (params.job === "inspiration") {
+            const { runInspirationTick } = await import("@/lib/inspirations.server");
+            const { withLock } = await import("@/lib/hub-automation.server");
+            return Response.json(await withLock(a, "inspiration", 10, () => runInspirationTick(a)));
+          }
           if (params.job === "planner-reminder") {
             const { data: admins } = await a.from("profiles").select("id").eq("role", "admin");
             await a.from("notifications").insert((admins ?? []).map((p: any) => ({ profile_id: p.id, type: "message", body: "Reminder: publish next week's UGC briefs in the Week planner by Friday." })));

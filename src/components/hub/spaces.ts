@@ -1,5 +1,5 @@
 import {
-  BarChart3, Banknote, BookOpen, CalendarCheck, ClipboardList, ExternalLink, FileSignature, GraduationCap, Handshake, Home, Inbox,
+  BarChart3, Banknote, BookOpen, CalendarCheck, ClipboardList, ExternalLink, FileSignature, GraduationCap, Handshake, Home, Inbox, Lightbulb,
   Map as MapIcon, Megaphone, MessageSquare, Percent, Shield, Star, Target, Users, type LucideIcon,
 } from "lucide-react";
 
@@ -26,6 +26,7 @@ export const SPACE_NAV: Record<Space, NavItem[]> = {
     { to: "/hub/ugc/analytics", label: "Analytics", icon: BarChart3, lead: "Views, posts and cost" },
     { to: "/hub/ugc/payouts", label: "Payouts", icon: Banknote, lead: "Monthly creator payouts through Stripe" },
     { to: "/hub/ugc/library", label: "Library", icon: GraduationCap, lead: "Formats, briefs, files, references and templates" },
+    { to: "/hub/ugc/inspiration", label: "Inspiration", icon: Lightbulb, lead: "Imported TikToks and Reels, transcribed and analysed" },
   ],
   slideshows: [
     { to: "/hub/slideshows", label: "Home", icon: Home, exact: true, mobile: true, lead: "This week across every zone" },
