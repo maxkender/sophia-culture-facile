@@ -343,10 +343,11 @@ function VideoReviews() {
 
 export function Campaigns({ tab, newJob }: { tab: CampaignTab; newJob?: boolean }) {
   const navigate = useNavigate();
+  const { data: challengeCount = 0 } = useQuery({ queryKey: ["hub", "challenge-count"], queryFn: async () => (await supabase.from("challenges").select("id", { count: "exact", head: true })).count ?? 0 });
   return (
     <div>
       <div className="mb-5 flex gap-1 overflow-x-auto border-b border-brand-line">
-        {TABS.map(([k, l]) => (
+        {TABS.filter(([k]) => k !== "challenges" || challengeCount > 0 || tab === "challenges").map(([k, l]) => (
           <button key={k} type="button" onClick={() => void navigate({ to: "/hub/ugc/campaigns", search: { tab: k } })} className={cn("shrink-0 border-b-2 px-3 pb-2.5 text-sm font-bold", tab === k ? "border-brand-navy text-brand-navy" : "border-transparent text-brand-navySoft")}>{l}</button>
         ))}
       </div>

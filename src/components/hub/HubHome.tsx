@@ -107,7 +107,7 @@ function Wallet() {
         <div><dt className="opacity-80">Currently owed</dt><dd className="font-bold">{eur(data?.currentlyOwed ?? 0)}</dd></div>
         <div><dt className="opacity-80">Pending balance</dt><dd className="font-bold">{eur(data?.pending ?? 0)}</dd></div>
       </dl>
-      <Button asChild variant="secondary" size="sm" className="mt-4 w-full"><Link to="/hub/ugc/payouts">Add Funds</Link></Button>
+      <Button asChild variant="secondary" size="sm" className="mt-4 w-full"><Link to="/hub/ugc/payouts">Open payouts</Link></Button>
     </section>
   );
 }
@@ -119,7 +119,7 @@ function NeedsAttention() {
     queryFn: async () => {
       const c = (q: PromiseLike<{ count: number | null }>) => q.then((r) => r.count ?? 0);
       const since = new Date(Date.now() - 72 * 3600_000).toISOString();
-      const [ugc, slide, jobs, posts, active, recent] = await Promise.all([
+      const [ugc, , jobs, posts, active, recent] = await Promise.all([
         c(supabase.from("creator_applications").select("id", { count: "exact", head: true }).eq("status", "pending")),
         c(supabase.from("slideshow_applications").select("id", { count: "exact", head: true }).eq("status", "pending")),
         c(supabase.from("job_applications").select("id", { count: "exact", head: true }).eq("status", "pending")),
@@ -130,7 +130,7 @@ function NeedsAttention() {
       const posted = new Set((recent.data ?? []).map((r) => r.creator_id));
       const quiet = (active.data ?? []).filter((r) => !posted.has(r.id)).length;
       return [
-        { n: ugc + slide + jobs, label: "pending applications", to: "/hub/ugc/campaigns" },
+        { n: ugc + jobs, label: "pending applications", to: "/hub/ugc/campaigns" },
         { n: posts, label: "posts to review", to: "/hub/ugc/campaigns" },
         { n: quiet, label: "creators with no post in 72h", to: "/hub/ugc/creators" },
       ].filter((x) => x.n > 0);
@@ -158,7 +158,7 @@ function RecentActivity() {
       ]);
       return [
         ...(a.data ?? []).map((r) => ({ id: r.id, text: `${r.full_name} applied`, at: r.created_at })),
-        ...(p.data ?? []).map((r) => ({ id: r.id, text: `${(r.creators as { full_name?: string } | null)?.full_name ?? "A creator"} logged a ${r.platform ?? ""} post`, at: r.created_at })),
+        ...(p.data ?? []).map((r) => ({ id: r.id, text: `${(r.creators as { full_name?: string } | null)?.full_name ?? "A deleted creator"} logged a ${r.platform ?? ""} post`, at: r.created_at })),
       ].sort((x, y) => y.at.localeCompare(x.at)).slice(0, 6);
     },
   });
@@ -227,7 +227,7 @@ export function HubHome() {
   return (
     <div className="space-y-5">
       <div className="flex justify-end">
-        <Button variant="outline" size="sm" onClick={() => setCustomize((c) => !c)}><Settings2 className="size-4" /> Customize</Button>
+        <Button variant="outline" size="sm" onClick={() => setCustomize((c) => !c)}><Settings2 className="size-4" /> Arrange cards</Button>
       </div>
       {customize ? (
         <div className="flex flex-wrap gap-4 rounded-2xl bg-card p-4 text-sm shadow-portal">
