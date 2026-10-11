@@ -75,7 +75,7 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
                     )}
                   >
                     <Icon className="size-4 shrink-0" aria-hidden="true" />
-                    <span className="flex-1 truncate">{item.label}</span>
+                    <span className="flex-1 truncate">{ct(item.label)}</span>
                     {locked ? <Lock className="size-3.5 opacity-60" aria-label={ct("Locked")} /> : count > 0 ? (
                       <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold", active ? "bg-white text-brand-navy" : "bg-brand-navy text-card")}>{count}</span>
                     ) : null}
@@ -180,12 +180,12 @@ export function CreatorShell({ children }: { children: ReactNode }) {
           <CommandEmpty>{ct("No result.")}</CommandEmpty>
           <CommandGroup heading="Pages">
             {all.map((i) => (
-              <CommandItem key={i.to} onSelect={() => { setPalette(false); void navigate({ to: i.to }); }}>{i.label}</CommandItem>
+              <CommandItem key={i.to} onSelect={() => { setPalette(false); void navigate({ to: i.to }); }}>{ct(i.label)}</CommandItem>
             ))}
           </CommandGroup>
           <CommandGroup heading="Briefs">
             {briefs.map((b) => (
-              <CommandItem key={b.id} value={`brief ${b.title}`} onSelect={() => { setPalette(false); void navigate({ to: "/creators/app/briefs/$briefId", params: { briefId: b.id } }); }}>{b.title}</CommandItem>
+              <CommandItem key={b.id} value={`brief ${ct(b.title)}`} onSelect={() => { setPalette(false); void navigate({ to: "/creators/app/briefs/$briefId", params: { briefId: b.id } }); }}>{ct(b.title)}</CommandItem>
             ))}
           </CommandGroup>
         </CommandList>
@@ -253,7 +253,7 @@ export function Locked({ gate, children }: { gate: "steps" | "payouts"; children
           ? ct("Earnings open once onboarding steps 1 to 3 are done and your payout details are set up (step 4).")
           : ct("Briefs, the library, your posts and calls open once the first three onboarding steps are done: rules, agreement and account setup.")}
       </p>
-      <Button asChild className="mt-4"><Link to={missing.to}>Go to step {missing.n}: {missing.label}</Link></Button>
+      <Button asChild className="mt-4"><Link to={missing.to}>Go to step {missing.n}: {ct(missing.label)}</Link></Button>
     </div>
   );
 }

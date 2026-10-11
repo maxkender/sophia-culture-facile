@@ -42,7 +42,7 @@ export function CreatorMessages({ creatorId }: { creatorId: string }) {
       {anns.map((a) => (
         <section key={a.id} className="rounded-2xl border border-primary/40 bg-primary/5 p-4 text-sm">
           <div className="flex items-start justify-between gap-2">
-            <p className="font-bold text-brand-navy">{a.title}</p>
+            <p className="font-bold text-brand-navy">{ct(a.title)}</p>
             <button className="text-xs text-muted-foreground" onClick={() => dismiss(a.id)}>{ct("Dismiss")}</button>
           </div>
           <p className="mt-1 whitespace-pre-wrap">{a.body}</p>

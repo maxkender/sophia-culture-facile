@@ -48,7 +48,7 @@ export function AssignedBriefs() {
                 <Label htmlFor={`pick-${a.id}`}>{ct("Pick a replacement from the library")}</Label>
                 <select id={`pick-${a.id}`} className="h-10 w-full rounded-md border border-input bg-card px-3 text-sm" value={pick} onChange={(e) => setPick(e.target.value)}>
                   <option value="">{ct("Choose a brief…")}</option>
-                  {d.briefs.filter((b) => b.id !== a.brief_id).map((b) => <option key={b.id} value={b.id}>{b.title}</option>)}
+                  {d.briefs.filter((b) => b.id !== a.brief_id).map((b) => <option key={b.id} value={b.id}>{ct(b.title)}</option>)}
                 </select>
                 <Label htmlFor={`why-${a.id}`}>{ct("Why doesn't this one suit you?")}</Label>
                 <Textarea id={`why-${a.id}`} rows={2} value={reason} onChange={(e) => setReason(e.target.value)} />
@@ -103,7 +103,7 @@ export function BriefLibraryPage() {
                 return (
                   <Link key={b.id} to="/creators/app/briefs/$briefId" params={{ briefId: b.id }}>
                     <PortalCard className="h-full p-4 transition hover:ring-2 hover:ring-portal-accent/30">
-                      <p className="text-lg font-extrabold text-brand-navy">{b.title}</p>
+                      <p className="text-lg font-extrabold text-brand-navy">{ct(b.title)}</p>
                       {b.hook && <p className="mt-1 text-sm text-brand-navySoft">{b.hook}</p>}
                       <p className="mt-2 text-xs text-brand-navySoft">{[b.format, b.platform === "both" ? ct("TikTok + Instagram") : b.platform, ["", "Easy", "Medium", "Hard"][b.difficulty ?? 1], ...(b.tags ?? [])].filter(Boolean).join(" · ")}</p>
                       <p className="mt-3 text-sm font-bold text-brand-navy">{s?.posts ? `${n(s.avg)} avg views at 7 days · ${s.posts} post${s.posts > 1 ? "s" : ""}` : ct("Not posted yet")}</p>
@@ -212,7 +212,7 @@ function PostPayments() {
   return (
     <PortalCard className="p-4" data-testid="post-payments">
       <p className="mb-3 text-sm text-brand-navySoft">{ct("Méthode de paiement :")} <b className="text-brand-navy">{method ? String(method).toUpperCase() : "à renseigner dans ton profil"}</b></p>
-      <ul className="space-y-2 text-sm">{rows.map((p: any) => { const paidAt = (payoutItems as any[]).find((i) => i.id === p.payout_item_id)?.paid_at ?? null; const st = postStage(p, paidAt); return <li key={p.id} className="flex flex-wrap justify-between gap-2 border-t border-brand-line pt-2"><a href={p.url} target="_blank" rel="noopener noreferrer" className="text-portal-accent underline">{p.platform}</a><span className="font-bold text-brand-navy">{st.label}</span>{p.pay_formula ? <span className="w-full text-xs text-brand-navySoft">{p.pay_formula}</span> : null}</li>; })}</ul>
+      <ul className="space-y-2 text-sm">{rows.map((p: any) => { const paidAt = (payoutItems as any[]).find((i) => i.id === p.payout_item_id)?.paid_at ?? null; const st = postStage(p, paidAt); return <li key={p.id} className="flex flex-wrap justify-between gap-2 border-t border-brand-line pt-2"><a href={p.url} target="_blank" rel="noopener noreferrer" className="text-portal-accent underline">{p.platform}</a><span className="font-bold text-brand-navy">{ct(st.label)}</span>{p.pay_formula ? <span className="w-full text-xs text-brand-navySoft">{p.pay_formula}</span> : null}</li>; })}</ul>
     </PortalCard>
   );
 }

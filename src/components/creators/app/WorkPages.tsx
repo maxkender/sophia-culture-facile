@@ -58,7 +58,7 @@ export function LogPostForm({ briefId: initialBrief = "", onDone }: { briefId?: 
         <p className="mt-1 text-xs text-brand-navySoft">TikTok ou Instagram, un ou plusieurs liens (un par ligne).</p></div>
       <div><Label htmlFor="link-brief">Brief (optionnel)</Label>
         <select id="link-brief" className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={briefId} onChange={(e) => setBriefId(e.target.value)}>
-          <option value="">{ct("Sans brief")}</option>{briefs.map((b) => <option key={b.id} value={b.id}>{b.title}</option>)}
+          <option value="">{ct("Sans brief")}</option>{briefs.map((b) => <option key={b.id} value={b.id}>{ct(b.title)}</option>)}
         </select></div>
       <GuidelinesChecklist appId={appId} value={checked} onChange={setChecked} />
       <Button size="lg" disabled={busy || !urls.length || !allTicked} title={!allTicked ? ct("Coche chaque consigne avant d’envoyer") : undefined} onClick={async () => {
@@ -107,7 +107,7 @@ function FormatsTab() {
                     <AppBadge appId={f.app_id} />
                   </div>
                   <p className="mt-3 text-xl font-extrabold leading-tight text-brand-navy">{x.hook_text ?? f.hook}</p>
-                  <p className="mt-1 text-sm text-brand-navySoft">{f.title}</p>
+                  <p className="mt-1 text-sm text-brand-navySoft">{ct(f.title)}</p>
                   {x.beats?.length ? <ol className="mt-2 list-decimal pl-5 text-xs text-brand-navySoft">{x.beats.map((b, i) => <li key={i}>{b}</li>)}</ol> : null}
                 </PortalCard>
               </Link>
@@ -161,7 +161,7 @@ function FactBriefs() {
             <Link key={b.id} to="/creators/app/briefs/$briefId" params={{ briefId: b.id }} className="block">
               <PortalCard className="h-full transition hover:ring-2 hover:ring-portal-accent/30">
                 <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-lg font-extrabold text-brand-navy">{b.title}</h3>
+                  <h3 className="text-lg font-extrabold text-brand-navy">{ct(b.title)}</h3>
                   <Pill s={briefStatus(d, b.id)} />
                 </div>
                 <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-brand-navySoft"><AppBadge appId={b.app_id} />{b.due_date ? `Due ${fmtDate(b.due_date)}` : ct("No deadline")}</p>
@@ -199,7 +199,7 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
   return (
     <div>
       <Link to="/creators/app/briefs" className="text-sm font-semibold text-portal-accent">{ct("← All briefs")}</Link>
-      <div className="mt-3"><PageTitle title={brief.title} lead={brief.due_date ? `Due ${fmtDate(brief.due_date)}` : ""} action={<Pill s={status} />} /></div>
+      <div className="mt-3"><PageTitle title={ct(brief.title)} lead={brief.due_date ? `Due ${fmtDate(brief.due_date)}` : ""} action={<Pill s={status} />} /></div>
       <div className="mb-4"><AppBadge appId={brief.app_id} className="text-sm" /></div>
       <PortalCard><BriefView b={toStudio(brief as Record<string, unknown>)} assets={files} refs={refs} pay={pay} /></PortalCard>
       <div className="mt-4"><GuidelinesBlock appId={brief.app_id} /></div>
@@ -234,7 +234,7 @@ function RefCard({ r, compact = false }: { r: Ref; compact?: boolean }) {
         <div className={cn("mb-3 flex aspect-[9/12] w-full items-center justify-center rounded-xl text-sm font-bold", r.platform === "instagram" ? "bg-portal-accent/10 text-portal-accent" : "bg-brand-navy/10 text-brand-navy")}>{r.platform === "instagram" ? "Instagram" : "TikTok"}</div>
       )}
       <div className="mb-2 flex flex-wrap gap-1"><PlatformBadge platform={r.platform} /><AppBadge appId={r.app_id} /></div>
-      {cat && <span className="mb-2 w-fit rounded-full bg-portal-bg px-2.5 py-0.5 text-[11px] font-bold text-brand-navy" title={cat.line}>{cat.label}</span>}
+      {cat && <span className="mb-2 w-fit rounded-full bg-portal-bg px-2.5 py-0.5 text-[11px] font-bold text-brand-navy" title={cat.line}>{ct(cat.label)}</span>}
       <p className="font-extrabold text-brand-navy">{r.title || r.note || ct("Untitled video")}</p>
       {r.why_it_works && <p className="mt-1 text-sm text-brand-navySoft"><b>{ct("Why it works:")}</b> {r.why_it_works}</p>}
       {r.format_notes && <p className="mt-1 text-sm text-brand-navySoft"><b>{ct("Format:")}</b> {r.format_notes}</p>}
@@ -260,7 +260,7 @@ export function LibraryPage() {
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
         {Object.entries(CATEGORY_LEGEND).map(([k, v]) => (
           <button key={k} type="button" onClick={() => setCat(cat === k ? "all" : k)} className={cn("rounded-xl border px-3 py-2 text-left text-sm transition", cat === k ? "border-brand-navy bg-brand-navy text-card" : "border-brand-line bg-card text-brand-navy hover:border-portal-accent/40")}>
-            <b>{v.label}</b> <span className={cat === k ? "opacity-80" : "text-brand-navySoft"}>— {v.line}</span>
+            <b>{ct(v.label)}</b> <span className={cat === k ? "opacity-80" : "text-brand-navySoft"}>— {v.line}</span>
           </button>
         ))}
       </div>
@@ -359,9 +359,9 @@ export function PostsPage({ refId }: { refId?: string | undefined }) {
               <PortalCard key={p.id} className="p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2" data-testid="post-row">
                   <span className="flex min-w-0 flex-wrap items-center gap-2"><PlatformBadge platform={p.platform} /><a href={p.url} target="_blank" rel="noopener noreferrer" className="truncate font-bold text-portal-accent hover:underline">{p.url.replace(/^https:\/\/(www\.)?/, "").slice(0, 48)}</a></span>
-                  <span className={cn("rounded-full px-3 py-1 text-xs font-bold", st.tone)}>{st.label}</span>
+                  <span className={cn("rounded-full px-3 py-1 text-xs font-bold", st.tone)}>{ct(st.label)}</span>
                 </div>
-                <p className="mt-1 text-sm text-brand-navySoft">{brief ? `Brief : ${brief.title}` : ct("Sans brief")} · envoyé le {fmtDate((p as LoopPost).submitted_at ?? p.created_at)}{st.detail ? ` · ${st.detail}` : ""}</p>
+                <p className="mt-1 text-sm text-brand-navySoft">{brief ? `Brief : ${ct(brief.title)}` : ct("Sans brief")} · envoyé le {fmtDate((p as LoopPost).submitted_at ?? p.created_at)}{st.detail ? ` · ${st.detail}` : ""}</p>
                 {p.status === "flagged" && p.feedback ? <div className="mt-3 rounded-xl bg-portal-amber/10 p-3 text-sm"><p>{p.feedback}</p><FeedbackReply post={p} /></div> : null}
               </PortalCard>
             );
@@ -390,7 +390,7 @@ export function CallsPage() {
               <PortalCard key={c.id} className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="font-extrabold text-brand-navy">{c.title}</p>
+                    <p className="font-extrabold text-brand-navy">{ct(c.title)}</p>
                     <p className="text-sm text-brand-navySoft">{new Date(c.starts_at).toLocaleString()}</p>
                     {c.notes && <p className="mt-1 text-sm text-brand-navySoft">{c.notes}</p>}
                   </div>
@@ -416,7 +416,7 @@ export function CallsPage() {
             const r = rsvps.find((x) => x.call_id === c.id);
             return (
               <div key={c.id} className="flex items-center justify-between px-5 py-3 text-sm">
-                <span><b className="text-brand-navy">{c.title}</b> <span className="text-brand-navySoft">· {fmtDate(c.starts_at)}</span></span>
+                <span><b className="text-brand-navy">{ct(c.title)}</b> <span className="text-brand-navySoft">· {fmtDate(c.starts_at)}</span></span>
                 <span className="text-brand-navySoft">{r?.attended == null ? `RSVP: ${r?.answer ?? "none"}` : r.attended ? "Attended" : "Missed"}</span>
               </div>
             );
@@ -533,7 +533,7 @@ export function MessagesPage() {
         <PortalCard className="p-2">
           {threads.map((t) => (
             <button key={t.id} type="button" onClick={() => setThread(t.id)} className={cn("flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-semibold", thread === t.id ? "bg-brand-navy text-white" : "text-brand-navy hover:bg-brand-navy/10")}>
-              <span className="truncate">{t.label}</span>
+              <span className="truncate">{ct(t.label)}</span>
               {t.unread > 0 && <span className="rounded-full bg-portal-amber px-2 text-[11px] font-bold text-brand-navy">{t.unread}</span>}
             </button>
           ))}

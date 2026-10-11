@@ -129,7 +129,7 @@ export function InfluencerApplyPage() {
     }
   }
 
-  if (done) return <ApplyShell title={t.title}><Confirmation text={t.done} /></ApplyShell>;
+  if (done) return <ApplyShell title={ct(t.title)}><Confirmation text={t.done} /></ApplyShell>;
 
   const field = (id: keyof typeof f, label: string, props: React.ComponentProps<typeof Input> = {}) => (
     <div className="grid gap-2">
@@ -152,7 +152,7 @@ export function InfluencerApplyPage() {
   );
 
   return (
-    <ApplyShell title={t.title} lead={t.lead}>
+    <ApplyShell title={ct(t.title)} lead={ct(t.lead)}>
       <form onSubmit={onSubmit} noValidate className="mt-8 grid gap-8">
         <Honeypot value={honey} onChange={setHoney} />
         <FormSection title={t.about}>

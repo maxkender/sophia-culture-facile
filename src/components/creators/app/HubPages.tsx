@@ -95,7 +95,7 @@ export function JobsPage() {
                 {mine ? <p className="rounded-xl bg-portal-bg p-3 text-sm font-bold text-brand-navy">Your application: {mine.status}</p>
                   : openId === j.id ? (
                     <PortalCard className="space-y-2 p-4">
-                      {items.filter((i) => i.type !== "video").map((i) => <label key={i.label} className="block text-sm font-semibold">{i.label}{i.required ? " *" : ""}<input className="mt-1 block min-h-10 w-full rounded-xl border px-3" value={answers[i.label] ?? ""} onChange={(e) => setAnswers((a) => ({ ...a, [i.label]: e.target.value }))} /></label>)}
+                      {items.filter((i) => i.type !== "video").map((i) => <label key={ct(i.label)} className="block text-sm font-semibold">{ct(i.label)}{i.required ? " *" : ""}<input className="mt-1 block min-h-10 w-full rounded-xl border px-3" value={answers[i.label] ?? ""} onChange={(e) => setAnswers((a) => ({ ...a, [i.label]: e.target.value }))} /></label>)}
                       <Button className="w-full" onClick={async () => {
                         const r = await apply({ data: { jobId: j.id, answers } });
                         if (!r.ok) { toast.error(r.reason); return; }
@@ -138,7 +138,7 @@ function TaskCard({ t, onDone }: { t: { id: string; type: string; title: string;
   }
   return (
     <PortalCard className={cn("space-y-3", t.status !== "open" && "opacity-70")}>
-      <p className="flex items-center gap-2 font-extrabold text-brand-navy">{t.status === "done" ? <CheckCircle2 className="size-5 text-portal-green" /> : null}{t.title}</p>
+      <p className="flex items-center gap-2 font-extrabold text-brand-navy">{t.status === "done" ? <CheckCircle2 className="size-5 text-portal-green" /> : null}{ct(t.title)}</p>
       <p className="whitespace-pre-line text-sm text-brand-navySoft">{t.instructions}</p>
       {t.status === "open" ? (t.type === "spark_code" ? (
         <div className="grid gap-2 sm:grid-cols-[1fr_160px_auto]">
@@ -223,8 +223,8 @@ function ChallengeCard() {
     <PortalCard className="p-4">
       <p className="flex items-center gap-2 font-extrabold text-brand-navy"><Award className="size-4 text-portal-amber" />{ct("Challenge of the week")}</p>
       {c ? <>
-        <p className="mt-2 font-bold text-brand-navy">{c.title}{Number(c.reward_eur) > 0 ? ` — ${Number(c.reward_eur)} €` : ""}</p>
-        {c.description ? <p className="mt-1 text-sm text-brand-navySoft">{c.description}</p> : null}
+        <p className="mt-2 font-bold text-brand-navy">{ct(c.title)}{Number(c.reward_eur) > 0 ? ` — ${Number(c.reward_eur)} €` : ""}</p>
+        {c.description ? <p className="mt-1 text-sm text-brand-navySoft">{ct(c.description)}</p> : null}
         <p className="mt-2 text-xs text-brand-navySoft">Ends {new Date(c.ends_at).toLocaleDateString()}. Every approved video posted before then counts.</p>
       </> : <p className="mt-2 text-sm text-brand-navySoft">{ct("No challenge running right now. The next one drops soon.")}</p>}
     </PortalCard>

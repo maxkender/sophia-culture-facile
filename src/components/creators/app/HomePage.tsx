@@ -134,7 +134,7 @@ export function CreatorHomePage() {
             <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">{ct("Next call")}</p>
             {nextCall ? (
               <div className="mt-2 text-sm">
-                <p className="font-extrabold text-brand-navy">{nextCall.title}</p>
+                <p className="font-extrabold text-brand-navy">{ct(nextCall.title)}</p>
                 <p className="text-brand-navySoft">{new Date(nextCall.starts_at).toLocaleString()} · {rsvps.find((r) => r.call_id === nextCall.id)?.answer ?? "no answer yet"}</p>
                 <Link to="/creators/app/calls" className="text-xs font-semibold text-portal-accent underline">{ct("RSVP")}</Link>
               </div>

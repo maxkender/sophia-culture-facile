@@ -53,7 +53,7 @@ export function RulesPage() {
       <PageTitle title={ct("Creator rules")} lead={`Version ${doc.current_version} · updated ${fmt(doc.updated_at)}`} />
       {me.rules_accepted_at && <div className="mb-6"><Banner tone="success" title={`You accepted these rules on ${fmt(me.rules_accepted_at)}`} /></div>}
       <PortalCard>
-        <h2 className="mb-4 text-2xl font-extrabold text-brand-navy">{doc.title}</h2>
+        <h2 className="mb-4 text-2xl font-extrabold text-brand-navy">{ct(doc.title)}</h2>
         <DocumentBody blocks={parseBlocks(doc.content)} />
         <div className="mt-8 border-t border-brand-line pt-6"><h3 className="mb-3 text-xl font-extrabold text-brand-navy">{ct("Consignes de tournage")}</h3><GuidelinesList /></div>
         <p className="mt-4 text-sm"><a href={SLACK_INVITE_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-portal-accent underline">Join the creators Slack (optional)</a></p>
@@ -97,7 +97,7 @@ export function ContractPage() {
         <Banner tone="info" title={ct("The agreement is being finalised")}>{ct("You will be able to sign it here soon.")}</Banner>
       ) : (
         <CreatorAgreementForm
-          title={doc.title}
+          title={ct(doc.title)}
           version={String(doc.current_version)}
           blocks={blocks}
           merge={merge}
@@ -188,14 +188,14 @@ function SetupSub({ k, done, children }: { k: string; done: boolean; children: R
     return (
       <PortalCard>
         <div className="flex items-start gap-3">
-          <Checkbox className="mt-1" checked={done} disabled aria-label={`${sub.title} done`} />
+          <Checkbox className="mt-1" checked={done} disabled aria-label={`${ct(sub.title)} done`} />
           <div className="min-w-0 flex-1">
-            <p className="font-extrabold text-brand-navy">{sub.title}</p>
-            <p className="mt-1 text-sm text-brand-navySoft">{sub.text}</p>
+            <p className="font-extrabold text-brand-navy">{ct(sub.title)}</p>
+            <p className="mt-1 text-sm text-brand-navySoft">{ct(sub.text)}</p>
             {(k === "acc_tiktok" || k === "acc_instagram") && (
               <div className="mt-3 space-y-2 text-sm text-brand-navySoft">
                 <p>Use the new email registered above.{k === "acc_instagram" ? " Switch it to a Creator account (Settings → Account type and tools)." : ""}</p>
-                {UGC_PROFILE_GUIDANCE.map((item) => <p key={item.label}><span className="font-semibold">{item.label}: </span>{item.text}</p>)}
+                {UGC_PROFILE_GUIDANCE.map((item) => <p key={ct(item.label)}><span className="font-semibold">{ct(item.label)}: </span>{ct(item.text)}</p>)}
               </div>
             )}
             <div className="mt-4">{children}</div>
@@ -272,7 +272,7 @@ export function AccountSetupPage() {
             <Checkbox className="mt-1" disabled={!steps.accounts} checked={Boolean(warm[String(d.day)])} onCheckedChange={async (v) => {
               try { await tick({ data: { day: d.day, checked: v === true } }); reload(); } catch (e: unknown) { toast.error(friendlyCreatorError(e)); }
             }} />
-            <span className="flex-1 text-sm text-brand-navy">{d.text}</span>
+            <span className="flex-1 text-sm text-brand-navy">{ct(d.text)}</span>
             {warm[String(d.day)] && <span className="text-xs font-semibold text-portal-green">{fmt(warm[String(d.day)]!)}</span>}
           </label>
         ))}

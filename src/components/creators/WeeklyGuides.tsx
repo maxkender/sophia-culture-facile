@@ -25,7 +25,7 @@ export function WeeklyGuides() {
       {guides.length === 0 && <p className="text-sm text-brand-navySoft">{ct("No weekly guide yet.")}</p>}
       {guides.map((g, i) => (
         <details key={g.id} open={i === 0} className="rounded-2xl border border-brand-line p-4">
-          <summary className="cursor-pointer font-semibold text-brand-navy">Week of {g.week_start} — {g.title}</summary>
+          <summary className="cursor-pointer font-semibold text-brand-navy">Week of {g.week_start} — {ct(g.title)}</summary>
           <p className="mt-2 whitespace-pre-wrap text-sm">{g.body}</p>
           <div className="mt-3 space-y-3">
             {g.creator_guide_media.map((m) =>
