@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { usePortalProfile } from "../usePortal";
 import { PageTitle, PortalCard } from "../ui";
-import { PayZonesSettings } from "./PayZonesSettings";
 
 export function AdminSettings() {
   const { data: me } = usePortalProfile();
@@ -63,7 +62,7 @@ export function AdminSettings() {
             ))}
           </dl>
         </PortalCard>
-        <PayZonesSettings />
+        <PortalCard><p className="text-sm font-bold text-brand-navy">Slideshow pay zones</p><p className="mt-2 text-sm text-brand-navySoft">Now in the Hub under Slideshows → Pay zones.</p><Button asChild variant="outline" className="mt-3"><Link to="/hub/slideshows" search={{ tab: "zones" }}>Open pay zones</Link></Button></PortalCard>
       </div>
     </div>
   );

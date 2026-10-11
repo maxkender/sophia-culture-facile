@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { HubPayouts } from "@/components/hub/HubPayouts";
+import { PayoutsSection } from "@/components/hub/Sections";
 
 export const Route = createFileRoute("/_authenticated/hub/payouts")({
-  head: () => ({ meta: [{ title: "Payouts | Creator Hub" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: HubPayouts,
+  head: () => ({ meta: [{ title: "Payouts | Hub" }, { name: "robots", content: "noindex, nofollow" }] }),
+  validateSearch: (s: Record<string, unknown>): { tab?: string | undefined } => ({ tab: typeof s["tab"] === "string" ? s["tab"] : undefined }),
+  component: function R() { const { tab } = Route.useSearch(); return <PayoutsSection tab={tab} />; },
 });

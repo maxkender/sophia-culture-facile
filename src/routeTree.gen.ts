@@ -68,9 +68,12 @@ import { Route as AuthenticatedHubAdsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedHubAffiliatesRouteImport } from './routes/_authenticated/hub/affiliates'
 import { Route as AuthenticatedHubAnalyticsRouteImport } from './routes/_authenticated/hub/analytics'
 import { Route as AuthenticatedHubDiscoverRouteImport } from './routes/_authenticated/hub/discover'
+import { Route as AuthenticatedHubInfluencersRouteImport } from './routes/_authenticated/hub/influencers'
 import { Route as AuthenticatedHubLearnRouteImport } from './routes/_authenticated/hub/learn'
 import { Route as AuthenticatedHubMessagesRouteImport } from './routes/_authenticated/hub/messages'
 import { Route as AuthenticatedHubPayoutsRouteImport } from './routes/_authenticated/hub/payouts'
+import { Route as AuthenticatedHubSettingsRouteImport } from './routes/_authenticated/hub/settings'
+import { Route as AuthenticatedHubSlideshowsRouteImport } from './routes/_authenticated/hub/slideshows'
 import { Route as CreatorsAppIndexRouteImport } from './routes/creators.app.index'
 import { Route as CreatorsAppAccountRouteImport } from './routes/creators.app.account'
 import { Route as CreatorsAppCallsRouteImport } from './routes/creators.app.calls'
@@ -494,6 +497,12 @@ const AuthenticatedHubDiscoverRoute =
     path: '/discover',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
+const AuthenticatedHubInfluencersRoute =
+  AuthenticatedHubInfluencersRouteImport.update({
+    id: '/influencers',
+    path: '/influencers',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
 const AuthenticatedHubLearnRoute = AuthenticatedHubLearnRouteImport.update({
   id: '/learn',
   path: '/learn',
@@ -510,6 +519,18 @@ const AuthenticatedHubPayoutsRoute = AuthenticatedHubPayoutsRouteImport.update({
   path: '/payouts',
   getParentRoute: () => AuthenticatedHubRouteRoute,
 } as any)
+const AuthenticatedHubSettingsRoute =
+  AuthenticatedHubSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubSlideshowsRoute =
+  AuthenticatedHubSlideshowsRouteImport.update({
+    id: '/slideshows',
+    path: '/slideshows',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
 const CreatorsAppIndexRoute = CreatorsAppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -1212,9 +1233,12 @@ export interface FileRoutesByFullPath {
   '/hub/affiliates': typeof AuthenticatedHubAffiliatesRoute
   '/hub/analytics': typeof AuthenticatedHubAnalyticsRoute
   '/hub/discover': typeof AuthenticatedHubDiscoverRoute
+  '/hub/influencers': typeof AuthenticatedHubInfluencersRoute
   '/hub/learn': typeof AuthenticatedHubLearnRoute
   '/hub/messages': typeof AuthenticatedHubMessagesRoute
   '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
+  '/hub/settings': typeof AuthenticatedHubSettingsRoute
+  '/hub/slideshows': typeof AuthenticatedHubSlideshowsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
@@ -1388,9 +1412,12 @@ export interface FileRoutesByTo {
   '/hub/affiliates': typeof AuthenticatedHubAffiliatesRoute
   '/hub/analytics': typeof AuthenticatedHubAnalyticsRoute
   '/hub/discover': typeof AuthenticatedHubDiscoverRoute
+  '/hub/influencers': typeof AuthenticatedHubInfluencersRoute
   '/hub/learn': typeof AuthenticatedHubLearnRoute
   '/hub/messages': typeof AuthenticatedHubMessagesRoute
   '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
+  '/hub/settings': typeof AuthenticatedHubSettingsRoute
+  '/hub/slideshows': typeof AuthenticatedHubSlideshowsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
@@ -1567,9 +1594,12 @@ export interface FileRoutesById {
   '/_authenticated/hub/affiliates': typeof AuthenticatedHubAffiliatesRoute
   '/_authenticated/hub/analytics': typeof AuthenticatedHubAnalyticsRoute
   '/_authenticated/hub/discover': typeof AuthenticatedHubDiscoverRoute
+  '/_authenticated/hub/influencers': typeof AuthenticatedHubInfluencersRoute
   '/_authenticated/hub/learn': typeof AuthenticatedHubLearnRoute
   '/_authenticated/hub/messages': typeof AuthenticatedHubMessagesRoute
   '/_authenticated/hub/payouts': typeof AuthenticatedHubPayoutsRoute
+  '/_authenticated/hub/settings': typeof AuthenticatedHubSettingsRoute
+  '/_authenticated/hub/slideshows': typeof AuthenticatedHubSlideshowsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
@@ -1747,9 +1777,12 @@ export interface FileRouteTypes {
     | '/hub/affiliates'
     | '/hub/analytics'
     | '/hub/discover'
+    | '/hub/influencers'
     | '/hub/learn'
     | '/hub/messages'
     | '/hub/payouts'
+    | '/hub/settings'
+    | '/hub/slideshows'
     | '/creators/app/account'
     | '/creators/app/calls'
     | '/creators/app/contract'
@@ -1923,9 +1956,12 @@ export interface FileRouteTypes {
     | '/hub/affiliates'
     | '/hub/analytics'
     | '/hub/discover'
+    | '/hub/influencers'
     | '/hub/learn'
     | '/hub/messages'
     | '/hub/payouts'
+    | '/hub/settings'
+    | '/hub/slideshows'
     | '/creators/app/account'
     | '/creators/app/calls'
     | '/creators/app/contract'
@@ -2101,9 +2137,12 @@ export interface FileRouteTypes {
     | '/_authenticated/hub/affiliates'
     | '/_authenticated/hub/analytics'
     | '/_authenticated/hub/discover'
+    | '/_authenticated/hub/influencers'
     | '/_authenticated/hub/learn'
     | '/_authenticated/hub/messages'
     | '/_authenticated/hub/payouts'
+    | '/_authenticated/hub/settings'
+    | '/_authenticated/hub/slideshows'
     | '/creators/app/account'
     | '/creators/app/calls'
     | '/creators/app/contract'
@@ -2725,6 +2764,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHubDiscoverRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
+    '/_authenticated/hub/influencers': {
+      id: '/_authenticated/hub/influencers'
+      path: '/influencers'
+      fullPath: '/hub/influencers'
+      preLoaderRoute: typeof AuthenticatedHubInfluencersRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
     '/_authenticated/hub/learn': {
       id: '/_authenticated/hub/learn'
       path: '/learn'
@@ -2744,6 +2790,20 @@ declare module '@tanstack/react-router' {
       path: '/payouts'
       fullPath: '/hub/payouts'
       preLoaderRoute: typeof AuthenticatedHubPayoutsRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/settings': {
+      id: '/_authenticated/hub/settings'
+      path: '/settings'
+      fullPath: '/hub/settings'
+      preLoaderRoute: typeof AuthenticatedHubSettingsRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/slideshows': {
+      id: '/_authenticated/hub/slideshows'
+      path: '/slideshows'
+      fullPath: '/hub/slideshows'
+      preLoaderRoute: typeof AuthenticatedHubSlideshowsRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
     '/creators/app/': {
@@ -3559,9 +3619,12 @@ interface AuthenticatedHubRouteRouteChildren {
   AuthenticatedHubAffiliatesRoute: typeof AuthenticatedHubAffiliatesRoute
   AuthenticatedHubAnalyticsRoute: typeof AuthenticatedHubAnalyticsRoute
   AuthenticatedHubDiscoverRoute: typeof AuthenticatedHubDiscoverRoute
+  AuthenticatedHubInfluencersRoute: typeof AuthenticatedHubInfluencersRoute
   AuthenticatedHubLearnRoute: typeof AuthenticatedHubLearnRoute
   AuthenticatedHubMessagesRoute: typeof AuthenticatedHubMessagesRoute
   AuthenticatedHubPayoutsRoute: typeof AuthenticatedHubPayoutsRoute
+  AuthenticatedHubSettingsRoute: typeof AuthenticatedHubSettingsRoute
+  AuthenticatedHubSlideshowsRoute: typeof AuthenticatedHubSlideshowsRoute
   AuthenticatedHubIndexRoute: typeof AuthenticatedHubIndexRoute
   AuthenticatedHubCampaignsCreateRoute: typeof AuthenticatedHubCampaignsCreateRoute
   AuthenticatedHubCreatorsCreatorIdRoute: typeof AuthenticatedHubCreatorsCreatorIdRoute
@@ -3575,9 +3638,12 @@ const AuthenticatedHubRouteRouteChildren: AuthenticatedHubRouteRouteChildren = {
   AuthenticatedHubAffiliatesRoute: AuthenticatedHubAffiliatesRoute,
   AuthenticatedHubAnalyticsRoute: AuthenticatedHubAnalyticsRoute,
   AuthenticatedHubDiscoverRoute: AuthenticatedHubDiscoverRoute,
+  AuthenticatedHubInfluencersRoute: AuthenticatedHubInfluencersRoute,
   AuthenticatedHubLearnRoute: AuthenticatedHubLearnRoute,
   AuthenticatedHubMessagesRoute: AuthenticatedHubMessagesRoute,
   AuthenticatedHubPayoutsRoute: AuthenticatedHubPayoutsRoute,
+  AuthenticatedHubSettingsRoute: AuthenticatedHubSettingsRoute,
+  AuthenticatedHubSlideshowsRoute: AuthenticatedHubSlideshowsRoute,
   AuthenticatedHubIndexRoute: AuthenticatedHubIndexRoute,
   AuthenticatedHubCampaignsCreateRoute: AuthenticatedHubCampaignsCreateRoute,
   AuthenticatedHubCreatorsCreatorIdRoute:

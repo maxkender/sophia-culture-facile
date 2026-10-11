@@ -26,7 +26,7 @@ function GetStarted() {
   const current = steps.findIndex((s) => !s.done);
   return (
     <section className={card}>
-      <div className="flex items-center justify-between"><h2 className="font-extrabold text-brand-navy">Get started</h2><span className="text-sm text-brand-navySoft">{done} of 5 complete</span></div>
+      <div className="flex items-center justify-between"><h2 className="font-extrabold text-brand-navy">Get started</h2><span className="text-sm text-brand-navySoft">{done} of 5 done</span></div>
       <div className="mt-3 h-2 rounded-full bg-portal-bg"><div className="h-2 rounded-full bg-portal-accent transition-all" style={{ width: `${done * 20}%` }} /></div>
       <ol className="mt-4 divide-y divide-brand-line">
         {steps.map((s, i) => (

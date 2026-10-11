@@ -3219,6 +3219,56 @@ export type Database = {
           },
         ]
       }
+      hiring_managers: {
+        Row: {
+          active: boolean
+          countries: string[]
+          created_at: string
+          profile_id: string
+          tracks: string[]
+        }
+        Insert: {
+          active?: boolean
+          countries?: string[]
+          created_at?: string
+          profile_id: string
+          tracks?: string[]
+        }
+        Update: {
+          active?: boolean
+          countries?: string[]
+          created_at?: string
+          profile_id?: string
+          tracks?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hiring_managers_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hub_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string | null
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: string | null
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
       influencer_applications: {
         Row: {
           accepts_recurring: string

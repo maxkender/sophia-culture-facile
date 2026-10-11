@@ -160,7 +160,7 @@ export function PortalShell({
     if (next === "creators") { window.localStorage.setItem(MODE_KEY, "authors"); void navigate({ to: "/hub" }); return; }
     void navigate({ to: "/auteurs/admin" });
   }
-  const groups = isAdmin ? (mode === "creators" ? ADMIN_CREATOR_NAV : ADMIN_AUTHOR_NAV) : AUTHOR_NAV;
+  const groups = isAdmin ? ADMIN_AUTHOR_NAV : AUTHOR_NAV;
   const modeTabs = isAdmin ? (
     <div className="mx-3 mt-1 grid grid-cols-2 rounded-xl bg-portal-bg p-1" role="tablist" aria-label="Portal mode">
       {(["authors", "creators"] as const).map((m) => (
@@ -283,12 +283,11 @@ export function PortalShell({
             )}
           </Link>
         </div>
-        {modeTabs}
-        {appSelector}
         <div className="flex-1 overflow-y-auto px-3 py-4">
           <SidebarNav groups={groups} counts={counts} collapsed={collapsed} />
         </div>
         <div className="border-t border-brand-line p-3">
+          {isAdmin ? <Link to="/hub" className={cn("mb-2 flex min-h-10 items-center rounded-xl px-3 text-sm font-semibold text-portal-accent hover:bg-brand-navy/10", collapsed && "justify-center px-0")}>{collapsed ? "UGC" : "Passer à l'espace UGC →"}</Link> : null}
           {userMenu}
           <button
             type="button"
@@ -324,8 +323,6 @@ export function PortalShell({
                 <div className="flex h-16 items-center px-4">
                   <Logo />
                 </div>
-                {modeTabs}
-                {appSelector}
                 <div className="px-3 py-4">
                   <SidebarNav
                     groups={groups}
@@ -334,7 +331,7 @@ export function PortalShell({
                     onNavigate={() => setDrawerOpen(false)}
                   />
                 </div>
-                <div className="border-t border-brand-line p-3">{userMenu}</div>
+                <div className="border-t border-brand-line p-3">{isAdmin ? <Link to="/hub" className={cn("mb-2 flex min-h-10 items-center rounded-xl px-3 text-sm font-semibold text-portal-accent hover:bg-brand-navy/10")}>{collapsed ? "UGC" : "Passer à l'espace UGC →"}</Link> : null}{userMenu}</div>
               </SheetContent>
             </Sheet>
 

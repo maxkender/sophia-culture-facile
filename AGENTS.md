@@ -13,7 +13,7 @@ UGC creator acceptance and onboarding mutations use authenticated server functio
 - Public creator forms write through server functions in src/lib/creator-apply.functions.ts (honeypot + IP/email rate limit, service role); the tables have no anon policies.
 - Creator Account Agreement lives in `documents` (slug `creator-agreement`); the slideshow variant is derived in code by dropping clause 5 and renumbering — keep one text, never two.
 - Public creator application forms use distinct localized routes (`/fr/candidature-*`, `/en/*-application`); legacy `/creators/*/apply` paths only detect language and redirect.
-- Admin sidebar has two modes (ADMIN_AUTHOR_NAV / ADMIN_CREATOR_NAV in nav.ts), picked from the URL then localStorage; why: authors and creators must stay visually separate.
+- Admin spaces: authors admin uses ADMIN_AUTHOR_NAV only; all creator tracks (UGC, slideshow, influencer) live in the /hub shell, linked both ways at the sidebar bottom; old creator-admin URLs 301 into Hub sections; why: authors and creators must stay visually separate.
 - Prospects grid prefs and saved views live in admin_ui_prefs (per user); why: choices must follow the admin across devices.
 
 - Space routing is decided by src/lib/account-role.ts (admin > author > creator > none) in the /auteurs gate, the creator space and both login pages; why: one shared login must never show a person the wrong space.

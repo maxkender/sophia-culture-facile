@@ -2,8 +2,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  BarChart3, Banknote, Bot, ChevronsUpDown, Compass, GraduationCap, Home, Megaphone, MessageSquare, Plus,
-  Search, Share2, Target, X, LogOut, type LucideIcon,
+  BarChart3, Banknote, Bot, ChevronsUpDown, GraduationCap, Home, Images, Megaphone, MessageSquare, MoreHorizontal, Plus,
+  Search, Settings, Share2, Star, Target, Users, X, LogOut, type LucideIcon,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/site/Logo";
@@ -18,30 +18,37 @@ import { useSetupChecklist } from "./hub-data";
 import { SidekickDrawer } from "./Sidekick";
 
 type Item = { to: string; label: string; icon: LucideIcon; exact?: boolean; disabled?: boolean; pill?: string; mobile?: boolean };
+const ADS_NEW_UNTIL = "2026-10-25";
 export const HUB_NAV: Item[] = [
   { to: "/hub", label: "Home", icon: Home, exact: true, mobile: true },
-  { to: "#sidekick", label: "Sidekick", icon: Bot },
+  { to: "#assistant", label: "Assistant", icon: Bot },
   { to: "/hub/campaigns", label: "Campaigns", icon: Target, mobile: true },
-  { to: "/hub/discover", label: "Discover", icon: Compass, mobile: true },
+  { to: "/hub/discover", label: "Creators", icon: Users, mobile: true },
+  { to: "/hub/slideshows", label: "Slideshows", icon: Images },
+  { to: "/hub/influencers", label: "Influencers", icon: Star },
   { to: "/hub/messages", label: "Messages", icon: MessageSquare, mobile: true },
-  { to: "/hub/ads", label: "Ads", icon: Megaphone, pill: "New" },
+  { to: "/hub/ads", label: "Ads", icon: Megaphone, ...(new Date().toISOString().slice(0, 10) < ADS_NEW_UNTIL ? { pill: "New" } : {}) },
   { to: "/hub/analytics", label: "Analytics", icon: BarChart3 },
-  { to: "/hub/payouts", label: "Payouts", icon: Banknote, mobile: true },
-  { to: "/hub/affiliates", label: "Affiliates", icon: Share2 },
-  { to: "/hub/learn", label: "Learn", icon: GraduationCap },
+  { to: "/hub/payouts", label: "Payouts", icon: Banknote },
+  { to: "/hub/affiliates", label: "Referrals", icon: Share2 },
+  { to: "/hub/learn", label: "Library", icon: GraduationCap },
+  { to: "/hub/settings", label: "Settings", icon: Settings },
 ];
 
 export const HUB_TITLES: Record<string, [string, string]> = {
-  "/hub": ["Home", "What needs attention, how campaigns are doing, and where to continue"],
-  "/hub/campaigns": ["Campaigns", "Manage and track your creator campaigns"],
-  "/hub/discover": ["Discover", "Everyone you can recruit: creators, applicants and prospects"],
+  "/hub": ["Home", "What needs you today"],
+  "/hub/campaigns": ["Campaigns", "UGC campaigns, jobs, applicants and video reviews"],
+  "/hub/discover": ["Creators", "Directory, applications, prospects and the fast lane"],
+  "/hub/creators": ["Creators", "Creator file"],
+  "/hub/slideshows": ["Slideshows", "Slideshow creators: applications, hiring managers, pay zones and guide"],
+  "/hub/influencers": ["Influencers", "Applications, offers, deals and attribution"],
   "/hub/messages": ["Messages", "Conversations with applicants and creators"],
-  "/hub/ads": ["Ads", "Turn winning creator posts into paid ads"],
-  "/hub/analytics": ["Analytics", "Views, posts and cost across campaigns"],
-  "/hub/payouts": ["Payouts", "Budget, balances and monthly creator payouts"],
-  "/hub/affiliates": ["Affiliates", "Creator referral programme"],
-  "/hub/learn": ["Learn", "Briefs, reference videos, guides and templates"],
-  "/hub/tools": ["Tools", "Existing creator tools"],
+  "/hub/ads": ["Ads", "Turn the best creator videos into paid ads"],
+  "/hub/analytics": ["Analytics", "Views, posts and cost"],
+  "/hub/payouts": ["Payouts", "Creators, slideshow creators and influencers"],
+  "/hub/affiliates": ["Referrals", "Creators who bring other creators"],
+  "/hub/learn": ["Library", "Formats, briefs, files, references, guides and templates"],
+  "/hub/settings": ["Settings", "Apps, access codes, email, connections and team"],
 };
 
 function isActive(pathname: string, i: Item) {
@@ -59,7 +66,7 @@ function AppSwitcher() {
           <span className="flex size-9 items-center justify-center rounded-xl bg-brand-navy text-xs font-extrabold text-card">{(current?.name ?? "All").slice(0, 2)}</span>
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-bold text-brand-navy">{current?.name ?? "All apps"}</span>
-            <span className="mt-0.5 inline-flex rounded-full bg-portal-accent/10 px-2 text-[10px] font-bold uppercase text-portal-accent">Starter plan</span>
+            <span className="block text-[11px] text-brand-navySoft">App shown in the Hub</span>
           </span>
           <ChevronsUpDown className="size-4 text-brand-navySoft" />
         </button>
@@ -78,25 +85,31 @@ function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
     queryKey: ["hub", "search-index"],
     enabled: open,
     queryFn: async () => {
-      const [c, p, b, j] = await Promise.all([
+      const [c, p, b, j, s, inf, d] = await Promise.all([
         supabase.from("creators").select("id, full_name").limit(500),
         supabase.from("creator_posts").select("id, url").order("created_at", { ascending: false }).limit(200),
         supabase.from("briefs").select("id, title").limit(300),
         supabase.from("jobs").select("id, title").limit(200),
+        supabase.from("slideshow_applications").select("id, full_name, country").limit(500),
+        supabase.from("influencers").select("id, display_name").limit(500),
+        supabase.from("influencer_deals").select("id, influencers(display_name), influencer_briefs(title)").limit(300),
       ]);
-      return { creators: c.data ?? [], posts: p.data ?? [], briefs: b.data ?? [], jobs: j.data ?? [] };
+      return { creators: c.data ?? [], posts: p.data ?? [], briefs: b.data ?? [], jobs: j.data ?? [], slides: s.data ?? [], infl: inf.data ?? [], deals: d.data ?? [] };
     },
   });
-  const go = (to: string, params?: Record<string, string>) => { onOpenChange(false); void navigate({ to, params } as never); };
+  const go = (to: string, params?: Record<string, string>, search?: Record<string, string>) => { onOpenChange(false); void navigate({ to, params, search } as never); };
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandInput placeholder="Search creators, posts, briefs, jobs…" />
+      <CommandInput placeholder="Search creators, slideshow creators, influencers, briefs, jobs…" />
       <CommandList>
         <CommandEmpty>No result.</CommandEmpty>
         <CommandGroup heading="Pages">{HUB_NAV.filter((i) => !i.disabled && i.to.startsWith("/")).map((i) => <CommandItem key={i.label} onSelect={() => go(i.to)}>{i.label}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="Creators">{data?.creators.map((c) => <CommandItem key={c.id} value={`creator ${c.full_name}`} onSelect={() => go("/hub/creators/$creatorId", { creatorId: c.id })}>{c.full_name}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="Jobs">{data?.jobs.map((j) => <CommandItem key={j.id} value={`job ${j.title}`} onSelect={() => go("/hub/campaigns")}>{j.title}</CommandItem>)}</CommandGroup>
-        <CommandGroup heading="Briefs">{data?.briefs.map((b) => <CommandItem key={b.id} value={`brief ${b.title}`} onSelect={() => go("/hub/learn")}>{b.title}</CommandItem>)}</CommandGroup>
+        <CommandGroup heading="Briefs">{data?.briefs.map((b) => <CommandItem key={b.id} value={`brief ${b.title}`} onSelect={() => go("/hub/learn/briefs/$briefId", { briefId: b.id })}>{b.title}</CommandItem>)}</CommandGroup>
+        <CommandGroup heading="Slideshow creators">{data?.slides.map((s) => <CommandItem key={s.id} value={`slideshow ${s.full_name} ${s.country}`} onSelect={() => go("/hub/slideshows", undefined, { tab: "assign" })}>{s.full_name} · {s.country}</CommandItem>)}</CommandGroup>
+        <CommandGroup heading="Influencers">{data?.infl.map((i) => <CommandItem key={i.id} value={`influencer ${i.display_name}`} onSelect={() => go("/hub/influencers", undefined, { tab: "influencers", id: i.id })}>{i.display_name}</CommandItem>)}</CommandGroup>
+        <CommandGroup heading="Influencer deals">{data?.deals.map((d) => { const n = `${(d.influencers as { display_name?: string } | null)?.display_name ?? ""} · ${(d.influencer_briefs as { title?: string } | null)?.title ?? ""}`; return <CommandItem key={d.id} value={`deal ${n}`} onSelect={() => go("/hub/influencers", undefined, { tab: "deals", id: d.id })}>{n}</CommandItem>; })}</CommandGroup>
         <CommandGroup heading="Posts">{data?.posts.map((p) => <CommandItem key={p.id} value={`post ${p.url}`} onSelect={() => go("/hub/campaigns", undefined)}>{p.url}</CommandItem>)}</CommandGroup>
       </CommandList>
     </CommandDialog>
@@ -108,15 +121,14 @@ const BANNER_KEY = "sophia.hub.banner.dismissed";
 function SetupBanner() {
   const steps = useSetupChecklist();
   const [hidden, setHidden] = useState(true);
-  useEffect(() => setHidden(window.sessionStorage.getItem(BANNER_KEY) === "1"), []);
+  useEffect(() => setHidden(window.localStorage.getItem(BANNER_KEY) === "1"), []);
   const next = steps.find((s) => !s.done);
   if (hidden || !next) return null;
-  const left = steps.filter((s) => !s.done).length;
   return (
-    <div className="sticky top-0 z-40 flex items-center gap-3 bg-brand-navy px-4 py-2.5 text-sm text-card">
-      <p className="min-w-0 flex-1 truncate"><b>{next.title}</b> · {left === 1 ? "Last step" : `${left} steps left`} — {next.subtitle}</p>
-      <Button asChild size="sm" variant="secondary"><Link to={next.to}>{left === 1 ? "Finish launch" : "Continue"}</Link></Button>
-      <button type="button" aria-label="Dismiss" className="p-2" onClick={() => { window.sessionStorage.setItem(BANNER_KEY, "1"); setHidden(true); }}><X className="size-4" /></button>
+    <div className="sticky top-0 z-40 flex items-center gap-3 bg-brand-navy px-4 py-2.5 text-sm text-card" data-testid="hub-banner">
+      <p className="min-w-0 flex-1 truncate">Next step: <b>{next.title}</b></p>
+      <Button asChild size="sm" variant="secondary"><Link to={next.to}>Open</Link></Button>
+      <button type="button" aria-label="Dismiss" className="p-2" onClick={() => { window.localStorage.setItem(BANNER_KEY, "1"); setHidden(true); }}><X className="size-4" /></button>
     </div>
   );
 }
@@ -162,15 +174,12 @@ export function HubShell({ children }: { children: ReactNode }) {
             const Icon = i.icon;
             const cls = cn("flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition", i.disabled ? "cursor-not-allowed text-brand-navySoft/50" : isActive(pathname, i) ? "bg-brand-navy text-card" : "text-brand-navy hover:bg-brand-navy/10");
             const inner = <><Icon className="size-4" aria-hidden="true" /><span className="flex-1">{i.label}</span>{i.pill ? <span className="rounded-full bg-portal-accent px-2 py-0.5 text-[10px] font-bold text-card">{i.pill}</span> : null}{i.disabled ? <span className="text-[10px]">Soon</span> : null}</>;
-            return i.to === "#sidekick" ? <button key={i.label} type="button" onClick={() => setSidekick(true)} className={cn(cls, "w-full text-left")}>{inner}</button> : i.disabled ? <span key={i.label} className={cls} aria-disabled="true">{inner}</span> : <Link key={i.label} to={i.to} className={cls}>{inner}</Link>;
+            return i.to === "#assistant" ? <button key={i.label} type="button" onClick={() => setSidekick(true)} className={cn(cls, "w-full text-left")}>{inner}</button> : i.disabled ? <span key={i.label} className={cls} aria-disabled="true">{inner}</span> : <Link key={i.label} to={i.to} className={cls}>{inner}</Link>;
           })}
-          <div className="mt-4 border-t border-brand-line pt-3">
-            <Link to="/hub/tools/$" params={{ _splat: "" }} className="flex min-h-10 items-center rounded-xl px-3 text-xs font-semibold text-brand-navySoft hover:bg-brand-navy/10">All existing tools →</Link>
-            <Link to="/auteurs/admin" className="flex min-h-10 items-center rounded-xl px-3 text-xs font-semibold text-brand-navySoft hover:bg-brand-navy/10">Authors admin →</Link>
-          </div>
         </nav>
         <div className="space-y-2 border-t border-brand-line p-3">
           <AppSwitcher />
+          <Link to="/auteurs/admin" className="flex min-h-10 items-center rounded-xl px-3 text-sm font-semibold text-portal-accent hover:bg-brand-navy/10">Passer à l'espace profs →</Link>
           <div className="flex items-center gap-2 px-1">
             <span className="flex size-8 items-center justify-center rounded-full bg-portal-accent text-xs font-bold text-card">{name.slice(0, 1)}</span>
             <span className="min-w-0 flex-1 truncate text-sm font-semibold text-brand-navy">{name}</span>
@@ -196,19 +205,19 @@ export function HubShell({ children }: { children: ReactNode }) {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/campaigns/create" })}>Campaign</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/campaigns", search: { tab: "jobs", newJob: 1 } as never })}>Job</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/tools/$", params: { _splat: "ugc-briefs" } })}>Brief</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/learn/briefs/$briefId", params: { briefId: "new" } })}>Brief</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/discover" })}>Invite creator</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/discover", search: { add: 1 } as never })}>Add validated creator</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button size="icon" variant="outline" aria-label="Open Sidekick" onClick={() => setSidekick(true)}><Bot className="size-4" /></Button>
+            <Button size="icon" variant="outline" aria-label="Open Assistant" title="Assistant" onClick={() => setSidekick(true)}><Bot className="size-4" /></Button>
             <NotificationBell profileId={profile.id} />
           </div>
         </header>
         <main className="safe-bottom mx-auto w-full min-w-0 max-w-7xl px-4 py-6 sm:px-6">{children}</main>
       </div>
 
-      <nav aria-label="Hub mobile" className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-6 border-t border-brand-line bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
+      <nav aria-label="Hub mobile" className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-brand-line bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
         {HUB_NAV.filter((i) => i.mobile).map((i) => {
           const Icon = i.icon;
           return (
@@ -217,7 +226,13 @@ export function HubShell({ children }: { children: ReactNode }) {
             </Link>
           );
         })}
-        <Link to="/hub/learn" className="flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold text-brand-navySoft"><GraduationCap className="size-5" />More</Link>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild><button type="button" className="flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold text-brand-navySoft"><MoreHorizontal className="size-5" />More</button></DropdownMenuTrigger>
+          <DropdownMenuContent align="end" side="top" className="w-56">
+            {HUB_NAV.filter((i) => !i.mobile).map((i) => <DropdownMenuItem key={i.label} onSelect={() => (i.to === "#assistant" ? setSidekick(true) : void navigate({ to: i.to }))}>{i.label}</DropdownMenuItem>)}
+            <DropdownMenuItem onSelect={() => void navigate({ to: "/auteurs/admin" })}>Passer à l'espace profs →</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </nav>
     </div>
   );
