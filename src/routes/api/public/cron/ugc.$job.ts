@@ -68,6 +68,7 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             const { expirePool } = await import("@/lib/slideshows.server");
             return Response.json(await expirePool(a));
           }
+          if (["slides-snapshots", "slides-week"].includes(params.job)) return Response.json({ skipped: "Slideshows is manual; OS integration is dormant" });
           if (params.job === "slides-snapshots") {
             const { refreshSnapshots } = await import("@/lib/slideshows.server");
             const { withLock } = await import("@/lib/hub-automation.server");
