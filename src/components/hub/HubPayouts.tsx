@@ -15,7 +15,6 @@ const card = "rounded-2xl bg-card p-5 shadow-portal";
 const input = "mt-1 block min-h-10 w-full rounded-xl border border-input bg-card px-3 text-sm";
 const SETTINGS = [
   ["monthly_budget_cap", "Monthly budget cap (€)", "When reached, new posts wait for next month and open jobs close."],
-  ["hold_days", "Hold days", "Posts stay pending this long before they count."],
   ["min_payout", "Minimum payout (€)", "Smaller amounts roll over to the next month."],
   ["ad_selection_bonus", "Ad selection bonus (€)", "Paid once when a creator's video wins in Ads."],
   ["cpi_target", "Target cost per install (€)", "Ads below it get the winner badge."],
