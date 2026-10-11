@@ -1950,5 +1950,9 @@ export const CREATOR_APP_DICT: Record<string, { fr: string; en: string }> = {
  "Streak": {"fr": "Série", "en": "Streak"},
  "Brief": {"fr": "Brief", "en": "Brief"},
  "Delete": {"fr": "Supprimer", "en": "Delete"},
- "Language of your space": {"fr": "Langue de ton espace", "en": "Language of your space"}
+ "Language of your space": {"fr": "Langue de ton espace", "en": "Language of your space"},
+ "a. Create a new email address for Sophia": {"fr": "a. Crée une nouvelle adresse email pour Sophia", "en": "a. Create a new email address for Sophia"},
+ "b. Create the TikTok account": {"fr": "b. Crée le compte TikTok", "en": "b. Create the TikTok account"},
+ "c. Create the Instagram account": {"fr": "c. Crée le compte Instagram", "en": "c. Create the Instagram account"},
+ "d. Confirm both accounts are public and registered": {"fr": "d. Confirme que les deux comptes sont publics et enregistrés", "en": "d. Confirm both accounts are public and registered"}
 };
