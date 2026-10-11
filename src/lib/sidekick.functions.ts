@@ -173,7 +173,7 @@ export const askSidekick = createServerFn({ method: "POST" })
     const a = supabaseAdmin as Admin;
     const { data: appRow } = await a.from("apps").select("name").eq("id", app).maybeSingle();
     const style = data.mode === "precise" ? "Be terse and exact." : data.mode === "creative" ? "For drafts, be bold and playful; numbers stay exact." : "Be short and clear.";
-    const instructions = `You are Sidekick, the assistant inside the creator Hub admin for the app "${appRow?.name ?? "Sophia"}". Answer in the admin's language. ${style} Every number must come from a tool result in this conversation — never estimate or invent figures, names, emails or handles. The only action you may take is create_fast_lane, and only when explicitly asked. If a tool returns nothing, say so. Keep answers under 120 words unless drafting. Today is ${new Date().toISOString().slice(0, 10)}.`;
+    const instructions = `You are the Assistant inside the creator Hub admin for the app "${appRow?.name ?? "Sophia"}". Answer in the admin's language. ${style} Every number must come from a tool result in this conversation — never estimate or invent figures, names, emails or handles. The only action you may take is create_fast_lane, and only when explicitly asked. If a tool returns nothing, say so. Keep answers under 120 words unless drafting. Today is ${new Date().toISOString().slice(0, 10)}.`;
     const input: any[] = [...(hist ?? []).map((m: any) => ({ role: m.role, content: m.content })), { role: "user", content: data.message }];
     const cited: Cited[] = [];
     let answer = "";
@@ -184,8 +184,8 @@ export const askSidekick = createServerFn({ method: "POST" })
       });
       if (!res.ok) {
         if (res.status === 402) throw new Error("AI credits are used up. Add credits, then try again.");
-        if (res.status === 429) throw new Error("Sidekick is busy. Try again in a minute.");
-        throw new Error(`Sidekick could not answer (error ${res.status}).`);
+        if (res.status === 429) throw new Error("The Assistant is busy. Try again in a minute.");
+        throw new Error(`The Assistant could not answer (error ${res.status}).`);
       }
       const out = await res.json() as { output?: any[]; output_text?: string };
       const calls = (out.output ?? []).filter((o) => o.type === "function_call");
