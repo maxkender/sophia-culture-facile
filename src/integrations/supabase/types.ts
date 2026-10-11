@@ -2225,6 +2225,7 @@ export type Database = {
           brief_id: string | null
           caption: string | null
           comments: number | null
+          cover_url: string | null
           created_at: string
           creator_id: string
           effort: string | null
@@ -2232,10 +2233,17 @@ export type Database = {
           feedback: string | null
           format: string | null
           fraud_flags: string[]
+          frozen_at: string | null
+          guidelines_checked: string[]
           hold_reason: string | null
           id: string
           likes: number | null
+          pay_amount: number | null
+          pay_currency: string
+          pay_flag: string | null
+          pay_formula: string | null
           pay_status: string | null
+          payout_item_id: string | null
           platform: string
           posted_on: string
           queued_period: string | null
@@ -2244,9 +2252,14 @@ export type Database = {
           shares: number | null
           skip_reason: string | null
           status: string
+          submitted_at: string | null
           url: string
+          url_key: string | null
+          validated_at: string | null
+          validated_by: string | null
           views: number | null
           views_entered_at: string | null
+          views_frozen: number | null
           views_screenshot_path: string | null
         }
         Insert: {
@@ -2257,6 +2270,7 @@ export type Database = {
           brief_id?: string | null
           caption?: string | null
           comments?: number | null
+          cover_url?: string | null
           created_at?: string
           creator_id: string
           effort?: string | null
@@ -2264,10 +2278,17 @@ export type Database = {
           feedback?: string | null
           format?: string | null
           fraud_flags?: string[]
+          frozen_at?: string | null
+          guidelines_checked?: string[]
           hold_reason?: string | null
           id?: string
           likes?: number | null
+          pay_amount?: number | null
+          pay_currency?: string
+          pay_flag?: string | null
+          pay_formula?: string | null
           pay_status?: string | null
+          payout_item_id?: string | null
           platform?: string
           posted_on?: string
           queued_period?: string | null
@@ -2276,9 +2297,14 @@ export type Database = {
           shares?: number | null
           skip_reason?: string | null
           status?: string
+          submitted_at?: string | null
           url: string
+          url_key?: string | null
+          validated_at?: string | null
+          validated_by?: string | null
           views?: number | null
           views_entered_at?: string | null
+          views_frozen?: number | null
           views_screenshot_path?: string | null
         }
         Update: {
@@ -2289,6 +2315,7 @@ export type Database = {
           brief_id?: string | null
           caption?: string | null
           comments?: number | null
+          cover_url?: string | null
           created_at?: string
           creator_id?: string
           effort?: string | null
@@ -2296,10 +2323,17 @@ export type Database = {
           feedback?: string | null
           format?: string | null
           fraud_flags?: string[]
+          frozen_at?: string | null
+          guidelines_checked?: string[]
           hold_reason?: string | null
           id?: string
           likes?: number | null
+          pay_amount?: number | null
+          pay_currency?: string
+          pay_flag?: string | null
+          pay_formula?: string | null
           pay_status?: string | null
+          payout_item_id?: string | null
           platform?: string
           posted_on?: string
           queued_period?: string | null
@@ -2308,9 +2342,14 @@ export type Database = {
           shares?: number | null
           skip_reason?: string | null
           status?: string
+          submitted_at?: string | null
           url?: string
+          url_key?: string | null
+          validated_at?: string | null
+          validated_by?: string | null
           views?: number | null
           views_entered_at?: string | null
+          views_frozen?: number | null
           views_screenshot_path?: string | null
         }
         Relationships: [
@@ -6102,6 +6141,56 @@ export type Database = {
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ugc_guidelines: {
+        Row: {
+          active: boolean
+          app_id: string | null
+          body_en: string
+          body_fr: string
+          created_at: string
+          id: string
+          image_data: string | null
+          sort_order: number
+          title_en: string
+          title_fr: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          app_id?: string | null
+          body_en?: string
+          body_fr?: string
+          created_at?: string
+          id?: string
+          image_data?: string | null
+          sort_order?: number
+          title_en: string
+          title_fr: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          app_id?: string | null
+          body_en?: string
+          body_fr?: string
+          created_at?: string
+          id?: string
+          image_data?: string | null
+          sort_order?: number
+          title_en?: string
+          title_fr?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ugc_guidelines_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "apps"
             referencedColumns: ["id"]
           },
         ]
