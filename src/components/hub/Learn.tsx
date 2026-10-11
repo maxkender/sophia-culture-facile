@@ -251,7 +251,7 @@ function BriefsArea({ sub }: { sub?: string | undefined }) {
 }
 
 export function Learn({ initialTab, sub }: { initialTab?: string | undefined; sub?: string | undefined } = {}) {
-  const [tab, setTab] = useState<(typeof TABS)[number]>((TABS as readonly string[]).includes(initialTab ?? "") ? (initialTab as (typeof TABS)[number]) : "Formats");
+  const [tab, setTab] = useState<(typeof TABS)[number]>(() => { const k = (initialTab ?? "").toLowerCase().replace(/[^a-z]/g, ""); return TABS.find((x) => x.toLowerCase().replace(/[^a-z]/g, "") === k || (k === "hooks" && x === "Hooks & CTAs")) ?? "Formats"; });
   return (
     <div className="space-y-4">
       <div className="flex gap-2 overflow-x-auto">{TABS.map((t) => <button key={t} type="button" onClick={() => setTab(t)} className={cn("min-h-10 shrink-0 rounded-full px-4 text-sm font-bold", tab === t ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{t}</button>)}</div>

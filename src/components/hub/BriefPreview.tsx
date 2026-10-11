@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 import { assetLinks } from "@/lib/brief-studio.functions";
 import { ROLE_LABEL, STYLE_LABEL, hasStyledContent, STYLE_NUM, TEXT_FORMATS, type AssetRef, type StudioBrief, type StyleData, type TextFormat } from "@/lib/brief-studio";
 import { PostThumb } from "./PostThumb";
-import { t as ct } from "@/i18n/creator-app";
+import { PostDescriptionBlock } from "@/components/creators/PostDescription";
+import { t as ct, L } from "@/i18n/creator-app";
 
 export type BriefAsset = { id: string; kind: string; title: string; storage_path: string | null; url: string | null; text_content: string | null; thumbnail_url: string | null; role: string };
 export type BriefRef = { id: string; title: string | null; url: string; thumbnail_url?: string | null };
@@ -26,11 +27,12 @@ export function useAssetDownload() {
   };
 }
 
-const FMT_FR: Record<string, string> = { title: ct("Gros titre centré"), subtitle: ct("Sous-titre en bas"), sticker: "Sticker", caption: ct("Bandeau légende"), none: ct("Pas de texte") };
+/** Built per render (not at import) so the FR/EN switch applies. */
+const fmtLabel = (k: string) => ({ title: L("Big title centred", "Gros titre centré"), subtitle: L("Subtitle at the bottom", "Sous-titre en bas"), sticker: "Sticker", caption: L("Caption bar", "Bandeau légende"), none: L("No text", "Pas de texte") } as Record<string, string>)[k] ?? k;
 void TEXT_FORMATS;
 function OnScreen({ text, fmt }: { text: string; fmt?: TextFormat | undefined }) {
   if (!text?.trim() && (!fmt || fmt.kind === "none")) return null;
-  return <div className="rounded-lg bg-brand-navy p-2 text-sm text-card"><p className="text-[10px] font-bold uppercase opacity-70">Texte à l'écran · {FMT_FR[fmt?.kind ?? "subtitle"]}{fmt?.note ? ` · ${fmt.note}` : ""}</p>{text ? <p className="font-extrabold">{text}</p> : null}</div>;
+  return <div className="rounded-lg bg-brand-navy p-2 text-sm text-card"><p className="text-[10px] font-bold uppercase opacity-70">{L("Text on screen", "Texte à l'écran")} · {fmtLabel(fmt?.kind ?? "subtitle")}{fmt?.note ? ` · ${fmt.note}` : ""}</p>{text ? <p className="font-extrabold">{text}</p> : null}</div>;
 }
 function AssetLine({ r, assets }: { r: AssetRef; assets: BriefAsset[] }) {
   const dl = useAssetDownload();
@@ -38,8 +40,8 @@ function AssetLine({ r, assets }: { r: AssetRef; assets: BriefAsset[] }) {
   return (
     <li className="flex items-center gap-2 rounded-lg border border-brand-line p-2 text-sm" data-testid="plan-asset">
       {a?.thumbnail_url ? <img src={a.thumbnail_url} alt="" className="size-9 rounded object-cover" /> : <span className="flex size-9 items-center justify-center rounded bg-portal-bg"><FileText className="size-4 text-brand-navySoft" /></span>}
-      <div className="min-w-0 flex-1"><p className="truncate font-bold text-brand-navy">{a?.title ?? "Fichier"}</p>{r.when ? <p className="text-xs text-brand-navySoft">Quand : {r.when}</p> : null}</div>
-      {a ? <Button size="sm" variant="outline" onClick={() => void dl(a)}><Download className="size-3.5" />{a.kind === "link" ? "Ouvrir" : "Télécharger"}</Button> : null}
+      <div className="min-w-0 flex-1"><p className="truncate font-bold text-brand-navy">{a?.title ?? L("File", "Fichier")}</p>{r.when ? <p className="text-xs text-brand-navySoft">{L("When:", "Quand :")} {r.when}</p> : null}</div>
+      {a ? <Button size="sm" variant="outline" onClick={() => void dl(a)}><Download className="size-3.5" />{a.kind === "link" ? L("Open", "Ouvrir") : L("Download", "Télécharger")}</Button> : null}
     </li>
   );
 }
@@ -56,15 +58,15 @@ export function StyledPlans({ b, assets }: { b: StudioBrief; assets: BriefAsset[
   const cta = d.cta?.trim() ? <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy"><b>{ct("CTA :")}</b> {d.cta}</p> : null;
   const body = d.body?.trim() ? <p className="rounded-xl bg-portal-bg p-3 text-sm text-brand-navy"><b>{ct("Le fond :")}</b> {d.body}</p> : null;
   if (b.style === "reaction_demo") return <div className="space-y-3">{body}
-    <PlanCard n={1} label="Face (caméra sur ton visage)">{plans[0]?.reaction ? <p>😮 <b>{ct("Réaction :")}</b> {plans[0].reaction}</p> : null}<OnScreen text={plans[0]?.on_screen ?? ""} fmt={plans[0]?.fmt} /><Say t={plans[0]?.say ?? ""} />{list(plans[0]?.assets ?? [])}</PlanCard>
-    <PlanCard n={2} label="Téléphone / démo (caméra sur le téléphone)"><Do t={plans[1]?.do ?? ""} /><Say t={plans[1]?.say ?? ""} />{list(plans[1]?.assets ?? [])}</PlanCard>
+    <PlanCard n={1} label={L("Face (camera on your face)", "Face (caméra sur ton visage)")}>{plans[0]?.reaction ? <p>😮 <b>{ct("Réaction :")}</b> {plans[0].reaction}</p> : null}<OnScreen text={plans[0]?.on_screen ?? ""} fmt={plans[0]?.fmt} /><Say t={plans[0]?.say ?? ""} />{list(plans[0]?.assets ?? [])}</PlanCard>
+    <PlanCard n={2} label={L("Phone / demo (camera on the phone)", "Téléphone / démo (caméra sur le téléphone)")}><Do t={plans[1]?.do ?? ""} /><Say t={plans[1]?.say ?? ""} />{list(plans[1]?.assets ?? [])}</PlanCard>
     {d.flips?.on ? <p className="rounded-xl border-2 border-dashed border-portal-accent/40 p-3 text-sm">🔄 <b>{ct("Retournements de caméra :")}</b> {d.flips.note}</p> : null}{cta}</div>;
-  if (b.style === "sole_footage") { const x = d.sole; return <div className="space-y-3">
-    <PlanCard n={1} label={`Le plan${x?.duration_s ? ` · ${x.duration_s} s` : ""}`}>{x?.what ? <p className="whitespace-pre-wrap">🎬 {x.what}</p> : null}<OnScreen text={x?.text ?? ""} fmt={x?.fmt} />
+  if (b.style === "sole_footage") { const x = d.sole; return <div className="space-y-3">{body}
+    <PlanCard n={1} label={`${L("The shot", "Le plan")}${x?.duration_s ? ` · ${x.duration_s} s` : ""}`}>{x?.what ? <p className="whitespace-pre-wrap">🎬 {x.what}</p> : null}<OnScreen text={x?.text ?? ""} fmt={x?.fmt} />
       {x?.music_title || x?.music_link ? <p>🎵 <b>{ct("Musique :")}</b> {x.music_title}{x.music_link ? <> · <a href={x.music_link} target="_blank" rel="noreferrer" className="font-bold text-portal-accent underline">{ct("Ouvrir la musique")}</a></> : null}</p> : null}
       {x?.music_asset_id ? list([{ asset_id: x.music_asset_id, when: "" }]) : null}</PlanCard>{cta}</div>; }
   if (b.style === "educational") return <div className="space-y-3">
-    <p className="rounded-xl bg-portal-bg p-3 text-sm">{ct("🪑 Face cam, assis·e, un carnet dans le cadre au début.")}</p>
+    <p className="rounded-xl bg-portal-bg p-3 text-sm">{ct("🪑 Face cam, assis·e, un carnet dans le cadre au début.")}</p>{body}
     {d.script_fmt && d.script_fmt.kind !== "none" ? <OnScreen text="" fmt={d.script_fmt} /> : null}
     <section className="rounded-2xl border-2 border-brand-line p-4"><p className="mb-2 text-sm font-extrabold uppercase text-brand-navySoft">{ct("Le script")}</p><p className="whitespace-pre-wrap text-base leading-relaxed text-brand-navy" data-testid="edu-script">{d.script}</p></section>
     {d.flashes?.length ? <section><p className="mb-1 text-sm font-extrabold text-brand-navy">{ct("À afficher à l'écran")}</p>{list(d.flashes)}</section> : null}{cta}</div>;
@@ -74,7 +76,7 @@ export function StyledPlans({ b, assets }: { b: StudioBrief; assets: BriefAsset[
       {d.demo.mode === "asset" && d.demo.asset ? list([d.demo.asset]) : <Do t={d.demo.do} />}<Say t={d.demo.say} /></PlanCard> : null}{cta}</div>;
 }
 
-export function FilesSection({ assets, title = "Fichiers" }: { assets: BriefAsset[]; title?: string }) {
+export function FilesSection({ assets, title }: { assets: BriefAsset[]; title?: string }) {
   const links = useServerFn(assetLinks);
   const [busy, setBusy] = useState(false);
   async function urlsFor(ids: string[]) { return ids.length ? (await links({ data: { ids } })).urls : {}; }
@@ -96,7 +98,9 @@ export function FilesSection({ assets, title = "Fichiers" }: { assets: BriefAsse
         if (a.kind === "text") { entries[`${safe}.txt`] = strToU8(a.text_content ?? ""); continue; }
         const u = urls[a.id]; if (!u) continue;
         const buf = new Uint8Array(await (await fetch(u)).arrayBuffer());
-        entries[`${safe}${a.storage_path?.match(/\.[a-z0-9]+$/i)?.[0] ?? ""}`] = buf;
+        const ext = a.storage_path?.match(/\.[a-z0-9]+$/i)?.[0] ?? ""; let name = `${safe}${ext}`; let n = 2;
+        while (entries[name]) name = `${safe} (${n++})${ext}`; // same title twice must not overwrite a file in the zip
+        entries[name] = buf;
       }
       const blob = new Blob([zipSync(entries, { level: 0 }) as BlobPart], { type: "application/zip" });
       const el = document.createElement("a"); el.href = URL.createObjectURL(blob); el.download = "fichiers-brief.zip"; el.click();
@@ -104,11 +108,12 @@ export function FilesSection({ assets, title = "Fichiers" }: { assets: BriefAsse
     finally { setBusy(false); }
   }
   if (!assets.length) return null;
+  title = title ?? L("Files", "Fichiers");
   return (
     <section aria-label={title}>
       <div className="mb-2 flex items-center justify-between gap-2">
         <h3 className="text-sm font-extrabold uppercase tracking-wide text-brand-navySoft">{title}</h3>
-        {assets.length > 1 ? <Button size="sm" variant="outline" disabled={busy} onClick={() => void zipAll()}><Download className="size-3.5" />{busy ? "Préparation…" : ct("Tout télécharger")}</Button> : null}
+        {assets.length > 1 ? <Button size="sm" variant="outline" disabled={busy} onClick={() => void zipAll()}><Download className="size-3.5" />{busy ? L("Preparing…", "Préparation…") : ct("Tout télécharger")}</Button> : null}
       </div>
       <ul className="space-y-2">{assets.map((a) => {
         const Icon = KIND_ICON[a.kind] ?? FileText;
@@ -122,7 +127,7 @@ export function FilesSection({ assets, title = "Fichiers" }: { assets: BriefAsse
             </div>
             {a.kind === "text"
               ? <Button size="sm" variant="outline" onClick={async () => { await navigator.clipboard.writeText(a.text_content ?? ""); toast.success(ct("Texte copié")); }}><Copy className="size-3.5" />{ct("Copier")}</Button>
-              : <Button size="sm" variant="outline" onClick={() => void download(a)}><Download className="size-3.5" />{a.kind === "link" ? "Ouvrir" : "Télécharger"}</Button>}
+              : <Button size="sm" variant="outline" onClick={() => void download(a)}><Download className="size-3.5" />{a.kind === "link" ? L("Open", "Ouvrir") : L("Download", "Télécharger")}</Button>}
           </li>
         );
       })}</ul>
@@ -153,9 +158,9 @@ export function BriefView({ b, assets, refs, pay }: { b: StudioBrief; assets: Br
         </section>
       ) : null}
       {styled ? <StyledPlans b={b} assets={assets} /> : null}
-      {!styled && (b.product_gesture || b.product_moment) ? (
+      {!b.style && (b.product_gesture || b.product_moment) ? (
         <section className="rounded-xl border-2 border-portal-accent/30 p-3 text-sm text-brand-navy">
-          <p className="font-extrabold">📱 Moment produit{b.product_second ? ` · à ${b.product_second} s` : ""}</p>
+          <p className="font-extrabold">📱 {L("Product moment", "Moment produit")}{b.product_second ? L(` · at ${b.product_second} s`, ` · à ${b.product_second} s`) : ""}</p>
           <p className="mt-1">{b.product_gesture}{b.product_gesture && b.product_moment ? " — " : ""}{b.product_moment}</p>
           {b.say_name ? <p className="mt-1 text-xs text-brand-navySoft">{ct("Dis le nom de l'app une fois, à la fin.")}</p> : null}
         </section>
@@ -166,6 +171,7 @@ export function BriefView({ b, assets, refs, pay }: { b: StudioBrief; assets: Br
           <div className="flex gap-2 overflow-x-auto pb-1">{refs.map((r) => <a key={r.id} href={r.url} target="_blank" rel="noreferrer" className="w-24 shrink-0">{r.thumbnail_url ? <img src={r.thumbnail_url} alt="" loading="lazy" className="aspect-[9/16] w-full rounded-lg object-cover" /> : <PostThumb url={r.url} className="aspect-[9/16] w-full rounded-lg" />}<p className="mt-1 truncate text-xs text-brand-navy">{r.title ?? "Vidéo"}</p></a>)}</div>
         </section>
       ) : null}
+      <PostDescriptionBlock appId={b.app_id} desc={b.style_data?.post_desc} briefLang={b.language} />
       {b.rules_do.length || b.rules_dont.length || b.rules_text ? (
         <section className="grid gap-2 text-sm sm:grid-cols-2">
           <ul className="space-y-1 rounded-xl bg-portal-green/10 p-3">{b.rules_do.map((r) => <li key={r}>✅ {r}</li>)}</ul>

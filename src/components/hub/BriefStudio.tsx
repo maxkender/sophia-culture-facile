@@ -14,6 +14,7 @@ import { FmtPicker, PlanAssets, SnippetSlot, type LibAsset } from "./StylePicker
 import { STUDIO_DRAFT_KEY, ASSET_ROLES, BEAT_LABELS, DEFAULT_DO, DEFAULT_DONT, GESTURES, blankBrief, briefBody, scoreBrief, scriptWords, stepDone, words, type StudioBrief } from "@/lib/brief-studio";
 import { BriefView, toStudio, type BriefAsset } from "./BriefPreview";
 import { AssetUploader } from "./Assets";
+import { PostDescriptionFields } from "@/components/creators/PostDescription";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const input = "mt-1 block min-h-10 w-full rounded-xl border border-input bg-card px-3 text-sm";
@@ -289,6 +290,9 @@ export function BriefStudio({ briefId }: { briefId: string }) {
       <p className="text-xs font-bold uppercase text-brand-navySoft">Don't</p><Chips items={b.rules_dont} onChange={(v) => set("rules_dont", v)} tone="dont" />
       <Button size="sm" variant="ghost" onClick={() => setB({ ...b, rules_do: [...new Set([...b.rules_do, ...DEFAULT_DO])], rules_dont: [...new Set([...b.rules_dont, ...DEFAULT_DONT])] })}>Reset to app defaults</Button>
       <label className="block text-sm font-semibold">Free text<textarea rows={2} className={cn(input, "py-2")} value={b.rules_text ?? ""} onChange={(e) => set("rules_text", e.target.value)} /></label>
+      <div className="border-t pt-3" data-testid="studio-post-desc"><p className="mb-1 text-xs font-bold uppercase text-brand-navySoft">Description to paste under the post</p>
+        <p className="mb-2 text-xs text-brand-navySoft">Leave empty to use the app default (Settings → Post descriptions).</p>
+        <PostDescriptionFields value={b.style_data?.post_desc ?? {}} onChange={(v) => set("style_data", { ...(b.style_data ?? {}), post_desc: v })} /></div>
     </>],
     ["Publish", <>
       <div className="flex flex-wrap gap-2">{([["draft", "Draft"], ["scheduled", "Monday drop"], ["published", "Published"]] as const).map(([k, l]) => <button key={k} type="button" onClick={() => setB({ ...b, status: k, drop_at: k === "scheduled" ? nextMonday() : b.drop_at })} className={cn("min-h-10 rounded-full border px-4 text-sm font-bold", b.status === k ? "border-brand-navy bg-brand-navy text-card" : "")}>{l}</button>)}</div>

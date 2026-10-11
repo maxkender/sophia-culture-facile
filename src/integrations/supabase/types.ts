@@ -607,6 +607,7 @@ export type Database = {
           logo_path: string | null
           name: string
           play_store_url: string | null
+          post_description: Json
           primary_color: string | null
           short_description: string | null
           slug: string
@@ -625,6 +626,7 @@ export type Database = {
           logo_path?: string | null
           name: string
           play_store_url?: string | null
+          post_description?: Json
           primary_color?: string | null
           short_description?: string | null
           slug: string
@@ -643,6 +645,7 @@ export type Database = {
           logo_path?: string | null
           name?: string
           play_store_url?: string | null
+          post_description?: Json
           primary_color?: string | null
           short_description?: string | null
           slug?: string

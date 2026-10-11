@@ -34,6 +34,8 @@ export type StyleData = {
   sole?: { what: string; duration_s: number | null; music_title: string; music_link: string; music_asset_id: string | null; text: string; fmt: TextFormat };
   script?: string; script_fmt?: TextFormat; flashes?: AssetRef[];
   body?: string; cta?: string;
+  /** Caption + hashtags to paste under the post, and an optional pinned-comment note, per language. */
+  post_desc?: { fr?: string; en?: string; comment_fr?: string; comment_en?: string };
 };
 export const blankFmt = (): TextFormat => ({ kind: "subtitle", note: "" });
 export const blankPlan = (): Plan => ({ on_screen: "", fmt: blankFmt(), say: "", do: "", camera: "", reaction: "", assets: [] });
