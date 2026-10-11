@@ -10,7 +10,11 @@ import { cn } from "@/lib/utils";
 import { SOPHIA_APP_ID, useAdminApp } from "@/lib/apps";
 import { generateBriefsFromCourses } from "@/lib/hub-learn.functions";
 import { assetUploadSlot, briefFromVideo, metaAdsPrepare, studioAi } from "@/lib/brief-studio.functions";
-import { STUDIO_DRAFT_KEY } from "@/lib/brief-studio";
+import { STUDIO_DRAFT_KEY, STYLES, STYLE_LABEL, STYLE_NUM, styleDefaults, type BriefStyle } from "@/lib/brief-studio";
+
+function StylePick({ value, onChange }: { value: BriefStyle | ""; onChange: (v: BriefStyle) => void }) {
+  return <div><p className="text-sm font-semibold">1. Style</p><div className="mt-1 flex flex-wrap gap-1.5">{STYLES.map(([k, l], i) => <button key={k} type="button" onClick={() => onChange(k)} className={cn("rounded-full border px-3 py-1 text-xs font-bold", value === k ? "border-portal-accent bg-portal-accent/10 text-portal-accent" : "")}>{i + 1}. {l}</button>)}</div></div>;
+}
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const sel = "h-9 rounded-lg border px-2 text-sm";
@@ -32,16 +36,17 @@ async function framesOf(file: File | string): Promise<string[]> {
 
 function QuickBrief({ app, onClose }: { app: string; onClose: () => void }) {
   const ai = useServerFn(studioAi); const navigate = useNavigate();
-  const [idea, setIdea] = useState(""); const [fmt, setFmt] = useState(""); const [busy, setBusy] = useState(false);
+  const [idea, setIdea] = useState(""); const [fmt, setFmt] = useState(""); const [busy, setBusy] = useState(false); const [style, setStyle] = useState<BriefStyle | "">("");
   const { data: formats = [] } = useQuery({ queryKey: ["hub", "learn", "fmt-pick", app], queryFn: async () => (await supabase.from("briefs").select("id, title").eq("app_id", app).eq("brief_type", "format").order("sort_order")).data ?? [] });
   return (
     <div className={cn(card, "space-y-3")}>
       <h3 className="font-extrabold text-brand-navy">Brief rapide</h3>
+      <StylePick value={style} onChange={setStyle} />
       <label className="block text-sm font-semibold">Le fait / l'idée<textarea rows={3} value={idea} onChange={(e) => setIdea(e.target.value)} className="mt-1 w-full rounded-xl border p-3 text-sm" /></label>
       <select aria-label="Format" value={fmt} onChange={(e) => setFmt(e.target.value)} className={cn(sel, "w-full")}><option value="">No format (free)</option>{formats.map((f) => <option key={f.id} value={f.id}>{f.title}</option>)}</select>
-      <div className="flex gap-2"><Button disabled={busy || idea.trim().length < 5} onClick={async () => {
+      <div className="flex gap-2"><Button disabled={busy || !style || idea.trim().length < 5} onClick={async () => {
         setBusy(true);
-        try { const r = await ai({ data: { mode: "quick", appId: app, idea, formatId: fmt || null } }); sessionStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify({ ...r.patch, app_id: app, parent_format_id: fmt || null })); void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: "new" } }); }
+        try { const r = await ai({ data: { mode: "quick", appId: app, idea, formatId: fmt || null } }); sessionStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify({ ...r.patch, app_id: app, parent_format_id: fmt || null, status: "draft", style, style_data: styleDefaults(style as BriefStyle, { body: (r.patch as { beats?: string[] }).beats?.[1] ?? "" }) })); void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: "new" } }); }
         catch (e) { toast.error((e as Error).message); } finally { setBusy(false); }
       }}><Sparkles className="size-4" />{busy ? "Writing…" : "Fill and open the Studio"}</Button><Button variant="ghost" onClick={onClose}>Cancel</Button></div>
     </div>
@@ -50,6 +55,7 @@ function QuickBrief({ app, onClose }: { app: string; onClose: () => void }) {
 
 function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
   const run = useServerFn(briefFromVideo); const meta = useServerFn(metaAdsPrepare); const [step, setStep] = useState(""); const slot = useServerFn(assetUploadSlot); const qc = useQueryClient();
+  const [style, setStyle] = useState<BriefStyle | "">("");
   const [urls, setUrls] = useState(""); const [file, setFile] = useState<File | null>(null); const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<{ label: string; score: number; briefIds: string[]; error?: string }[]>([]);
   async function go() {
@@ -60,7 +66,7 @@ function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
         const frames = await framesOf(file);
         const { path, token } = await slot({ data: { appId: app, name: file.name } });
         await supabase.storage.from("creator-assets").uploadToSignedUrl(path, token, file);
-        const r = await run({ data: { appId: app, frames, caption: file.name, storagePath: path } });
+        const r = await run({ data: { appId: app, frames, caption: file.name, storagePath: path, style: style || null } });
         setDone((d) => [...d, { label: file.name, score: r.score, briefIds: r.briefIds }]);
       } catch (e) { setDone((d) => [...d, { label: file.name, score: 0, briefIds: [], error: (e as Error).message }]); }
     }
@@ -73,13 +79,13 @@ function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
             setStep(x.video ? "Meta Ads Library – analysing the ad video…" : "Meta Ads Library – analysing the ad images…");
             let frames: string[] = [];
             if (x.video) { try { frames = await framesOf(x.video.signedUrl); } catch { frames = []; } }
-            const r = await run({ data: { appId: app, url: u, ad: x.ad, frames, storagePath: x.video?.path ?? null } });
+            const r = await run({ data: { appId: app, url: u, ad: x.ad, frames, storagePath: x.video?.path ?? null, style: style || null } });
             setDone((d) => [...d, { label: `${x.ad.pageName || "Ad"} · ${x.ad.adId}`, score: r.score, briefIds: r.briefIds }]);
           }
         } catch (e) { setDone((d) => [...d, { label: u, score: 0, briefIds: [], error: (e as Error).message }]); }
         setStep(""); continue;
       }
-      try { const r = await run({ data: { appId: app, url: u } }); setDone((d) => [...d, { label: u, score: r.score, briefIds: r.briefIds }]); }
+      try { const r = await run({ data: { appId: app, url: u, style: style || null } }); setDone((d) => [...d, { label: u, score: r.score, briefIds: r.briefIds }]); }
       catch (e) { setDone((d) => [...d, { label: u, score: 0, briefIds: [], error: (e as Error).message }]); if (/credits|blocked/.test((e as Error).message)) break; }
     }
     setBusy(false); void qc.invalidateQueries({ queryKey: ["hub", "learn"] });
@@ -87,16 +93,17 @@ function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
   return (
     <div className={cn(card, "space-y-3")}>
       <h3 className="font-extrabold text-brand-navy">Brief depuis une vidéo</h3>
-      <p className="text-xs text-brand-navySoft">Paste up to 20 TikTok, Instagram or Meta Ads Library links (one per line) or upload one file. Meta Ads Library ads are read with their video frame by frame (or their images and copy); a page or search link reads up to 5 ads. Each video is saved in References with its 10-line analysis and a /10 score, and 1-3 adapted draft briefs are created. Links are read from their cover and caption; upload the file for a frame-by-frame read.</p>
+      <StylePick value={style} onChange={setStyle} />
+      <p className="text-xs text-brand-navySoft">Paste up to 20 TikTok, Instagram or Meta Ads Library links (one per line) or upload one file. Meta Ads Library ads are read with their video frame by frame (or their images and copy); a page or search link reads up to 5 ads. Each video is saved in References with its 10-line analysis and a /10 score, and 1-3 adapted draft briefs (never published) are created in the chosen style. Links are read from their cover and caption; upload the file for a frame-by-frame read.</p>
       <textarea aria-label="Video links" rows={4} value={urls} onChange={(e) => setUrls(e.target.value)} placeholder="https://www.tiktok.com/@…/video/…" className="w-full rounded-xl border p-3 text-sm" />
       <input type="file" accept="video/*" aria-label="Video file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm" />
-      <div className="flex gap-2"><Button disabled={busy || (!urls.trim() && !file)} onClick={() => void go()}><Film className="size-4" />{busy ? step || `Analysing… ${done.length}` : "Analyse"}</Button><Button variant="ghost" onClick={onClose}>Close</Button></div>
+      <div className="flex gap-2"><Button disabled={busy || !style || (!urls.trim() && !file)} onClick={() => void go()}><Film className="size-4" />{busy ? step || `Analysing… ${done.length}` : "Analyse"}</Button><Button variant="ghost" onClick={onClose}>Close</Button></div>
       {done.length ? <ul className="space-y-1 text-sm">{done.map((d, i) => <li key={i} className="rounded-lg bg-portal-bg p-2"><span className="break-all font-semibold">{d.label}</span> — {d.error ? <span className="text-portal-red">{d.error}</span> : <>score {d.score}/10 · {d.briefIds.map((id, j) => <Link key={id} to="/hub/ugc/library/briefs/$briefId" params={{ briefId: id }} className="ml-1 font-bold text-portal-accent">brief {j + 1}</Link>)}</>}</li>)}</ul> : null}
     </div>
   );
 }
 
-type Row = { id: string; title: string; hook_text: string | null; hook: string | null; brief_type: string; effort: string | null; status: string; audience: string; audience_efforts: string[]; score: number | null; drop_at: string | null; language: string; created_at: string };
+type Row = { id: string; title: string; hook_text: string | null; hook: string | null; brief_type: string; effort: string | null; status: string; audience: string; audience_efforts: string[]; score: number | null; drop_at: string | null; language: string; created_at: string; style: string | null };
 
 export function BriefsList() {
   const { appId } = useAdminApp();
@@ -107,13 +114,14 @@ export function BriefsList() {
   const [n, setN] = useState(3);
   const [busy, setBusy] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
-  const [f, setF] = useState({ type: "all", effort: "all", status: "all", audience: "all" });
+  const [f, setF] = useState({ type: "all", effort: "all", status: "all", audience: "all", style: "all" });
+  const [more, setMore] = useState(false);
   const [assignTo, setAssignTo] = useState("");
   const { data } = useQuery({
     queryKey: ["hub", "learn", "briefs", app],
     queryFn: async () => {
       const [b, p, a, c] = await Promise.all([
-        supabase.from("briefs").select("id, title, hook_text, hook, brief_type, effort, status, audience, audience_efforts, score, drop_at, language, created_at").eq("app_id", app).neq("brief_type", "format").order("created_at", { ascending: false }).limit(500),
+        supabase.from("briefs").select("id, title, hook_text, hook, brief_type, effort, status, audience, audience_efforts, score, drop_at, language, created_at, style").eq("app_id", app).neq("brief_type", "format").order("created_at", { ascending: false }).limit(500),
         supabase.from("creator_posts").select("brief_id, views, posted_on").eq("app_id", app).not("brief_id", "is", null),
         supabase.from("brief_assets").select("brief_id"),
         supabase.from("creators").select("id, full_name, creator_apps!inner(app_id)").eq("creator_apps.app_id", app).order("full_name").limit(500),
@@ -127,7 +135,7 @@ export function BriefsList() {
     },
   });
   const rows = useMemo(() => (data?.rows ?? []).filter((r) =>
-    (f.type === "all" || (f.type === "variant" ? false : r.brief_type === f.type)) && (f.effort === "all" || r.effort === f.effort) && (f.status === "all" || r.status === f.status)
+    (f.style === "all" || (f.style === "none" ? !r.style : r.style === f.style)) && (f.type === "all" || (f.type === "variant" ? false : r.brief_type === f.type)) && (f.effort === "all" || r.effort === f.effort) && (f.status === "all" || r.status === f.status)
     && (f.audience === "all" || (f.audience === "effort" ? r.audience_efforts?.length : r.audience === f.audience && !r.audience_efforts?.length))), [data, f]);
   const reload = () => void qc.invalidateQueries({ queryKey: ["hub", "learn"] });
   async function bulk(patch: Record<string, unknown>, label: string) {
@@ -147,14 +155,19 @@ export function BriefsList() {
         <Button asChild><Link to="/hub/ugc/library/briefs/$briefId" params={{ briefId: "new" }}>New brief</Link></Button>
         <Button variant="outline" onClick={() => setPanel(panel === "quick" ? "none" : "quick")}><Zap className="size-4" />Brief rapide</Button>
         <Button variant="outline" onClick={() => setPanel(panel === "video" ? "none" : "video")}><Film className="size-4" />Brief depuis une vidéo</Button>
+        <div className="relative ml-auto"><Button variant="ghost" size="sm" aria-expanded={more} onClick={() => setMore(!more)}>More ▾</Button>
+          {more ? <div className="absolute right-0 z-20 mt-1 flex w-72 flex-wrap items-end gap-2 rounded-xl border bg-card p-3 shadow-portal"><p className="w-full text-xs text-brand-navySoft">Creates drafts only, from Sophia courses.</p>
         <label className="text-xs font-semibold text-brand-navySoft">Courses<input type="number" min={1} max={20} value={n} onChange={(e) => setN(Math.min(20, Math.max(1, Number(e.target.value))))} className="mt-1 block h-9 w-16 rounded-lg border px-2" /></label>
         <Button variant="outline" disabled={busy} onClick={async () => {
           setBusy(true);
           try { const r = await gen({ data: { count: n, appId: app, language: "fr" } }); toast[r.errors.length ? "warning" : "success"](`${r.created} draft briefs from ${r.courses} courses${r.errors.length ? ` — ${r.errors[0]}` : ""}`); reload(); }
           catch (e) { toast.error((e as Error).message); } finally { setBusy(false); }
         }}><Sparkles className="size-4" />{busy ? "Writing…" : "Generate from courses"}</Button>
+          </div> : null}
+        </div>
       </div>
       {panel === "quick" ? <QuickBrief app={app} onClose={() => setPanel("none")} /> : panel === "video" ? <FromVideo app={app} onClose={() => setPanel("none")} /> : null}
+      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Style">{[["all", "All"], ...STYLES.map(([k, l], i) => [k, `${i + 1}. ${l}`]), ["none", "No style"]].map(([k, l]) => <button key={k} type="button" onClick={() => setF({ ...f, style: k! })} className={cn("min-h-8 rounded-full px-3 text-xs font-bold", f.style === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l}</button>)}</div>
       <div className="flex flex-wrap gap-2">
         <select aria-label="Type" className={sel} value={f.type} onChange={(e) => setF({ ...f, type: e.target.value })}><option value="all">All types</option><option value="precise">Précis</option></select>
         <select aria-label="Effort" className={sel} value={f.effort} onChange={(e) => setF({ ...f, effort: e.target.value })}><option value="all">All efforts</option>{Object.entries(EFF).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
@@ -175,17 +188,20 @@ export function BriefsList() {
         <table className="w-full min-w-[760px] text-sm">
           <thead className="text-left text-xs uppercase text-brand-navySoft"><tr>
             <th className="p-3"><input type="checkbox" aria-label="Select all" checked={rows.length > 0 && picked.length === rows.length} onChange={(e) => setPicked(e.target.checked ? rows.map((r) => r.id) : [])} /></th>
-            <th className="p-3">Brief</th><th className="p-3">Score</th><th className="p-3">Effort</th><th className="p-3">Status</th><th className="p-3">Posts</th><th className="p-3">Avg views 7 d</th><th className="p-3">Files</th>
+            <th className="p-3">Brief</th><th className="p-3">Style</th><th className="p-3">Score</th><th className="p-3">Effort</th><th className="p-3">Status</th><th className="p-3">Posts</th><th className="p-3">Avg views 7 d</th><th className="p-3">Files</th>
           </tr></thead>
-          <tbody>{rows.map((r) => { const s = data?.stats[r.id]; const avg = s?.v7.length ? Math.round(s.v7.reduce((a, b) => a + b, 0) / s.v7.length) : null; return (
+          <tbody>{(f.style === "all" ? [...STYLES.map(([k]) => k as string), ""].map((k) => ({ k, list: rows.filter((r) => (r.style ?? "") === k) })).filter((g) => g.list.length) : [{ k: "-", list: rows }]).flatMap((g) => [
+            ...(g.k !== "-" ? [<tr key={`g-${g.k}`} className="bg-portal-bg"><td colSpan={9} className="px-3 py-2 text-xs font-extrabold uppercase tracking-wide text-brand-navySoft">{g.k ? `Style ${STYLE_NUM[g.k]} · ${STYLE_LABEL[g.k]}` : "No style yet"} · {g.list.length}</td></tr>] : []),
+            ...g.list.map((r) => { const s = data?.stats[r.id]; const avg = s?.v7.length ? Math.round(s.v7.reduce((a, b) => a + b, 0) / s.v7.length) : null; return (
             <tr key={r.id} className="border-t border-brand-line">
               <td className="p-3"><input type="checkbox" aria-label={`Select ${r.title}`} checked={picked.includes(r.id)} onChange={(e) => setPicked((x) => (e.target.checked ? [...x, r.id] : x.filter((y) => y !== r.id)))} /></td>
               <td className="max-w-[320px] p-3"><Link to="/hub/ugc/library/briefs/$briefId" params={{ briefId: r.id }} className="font-bold text-brand-navy hover:underline">{r.title}</Link>{r.language === "en" ? <span className="ml-1 rounded bg-portal-bg px-1 text-[10px] font-bold">EN</span> : null}<p className="truncate text-xs text-brand-navySoft">{r.hook_text ?? r.hook}</p></td>
+              <td className="p-3 text-xs">{r.style ? `${STYLE_NUM[r.style]}. ${STYLE_LABEL[r.style]}` : "—"}</td>
               <td className="p-3">{r.score != null ? <span className={cn("rounded-full px-2 py-0.5 text-xs font-bold", r.score >= 8 ? "bg-portal-green/15 text-portal-green" : "bg-portal-amber/20")}>{r.score}/10</span> : "—"}</td>
               <td className="p-3">{EFF[r.effort ?? ""] ?? "—"}</td>
               <td className="p-3">{r.status}{r.status === "scheduled" && r.drop_at ? <span className="block text-xs text-brand-navySoft">{new Date(r.drop_at).toLocaleDateString()}</span> : null}</td>
               <td className="p-3">{s?.posts ?? 0}</td><td className="p-3">{avg != null ? avg.toLocaleString() : "—"}</td><td className="p-3">{s?.assets ?? 0}</td>
-            </tr>); })}</tbody>
+            </tr>); })])}</tbody>
         </table>
         {!rows.length ? <p className="p-5 text-sm text-brand-navySoft">No briefs match.</p> : null}
       </div>
