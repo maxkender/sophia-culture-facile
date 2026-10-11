@@ -104,7 +104,7 @@ export async function refreshSnapshots(admin: Admin) {
 
 export const MIN_PAYOUT = 20;
 
-/** Monday 07:00 Paris: build the week just ended for every started poster. Posters without OS data are skipped and say so. */
+/** Explicit admin action: prepare editable weekly rows, using cached counts when available; never call the OS. */
 export async function buildWeek(admin: Admin, lundi = addDays(mondayOf(), -7)) {
   const [{ data: posters }, { data: zones }] = await Promise.all([
     admin.from("slideshow_applications").select("id, zone, start_monday, os_profile_id").eq("status", "started"),
@@ -122,15 +122,10 @@ export async function buildWeek(admin: Admin, lundi = addDays(mondayOf(), -7)) {
     const first = p.start_monday === lundi;
     const base = rate[p.zone] ?? 0;
     const row: Record<string, unknown> = { application_id: p.id, week_start: lundi, zone: p.zone, rate: base, first_week: first };
-    if (!snap && false) {
-      Object.assign(row, { status: "skipped", skip_reason: "No OS data for this week (not connected or no snapshot)", suggested: null, amount: null, carried_in: 0 });
-      skipped++;
-    } else {
-      const missed = Number(snap?.manques ?? 0);
-      const suggested = Math.max(0, base + (first ? 1 : 0) - Math.max(0, missed - 1));
-      Object.assign(row, { status: "draft", skip_reason: null, prevus: snap?.prevus ?? null, publies: snap?.publies ?? null, manques: missed, suggested, amount: suggested, carried_in: carriedIn, ...(!snap ? { note: "Manual week — confirm attendance and adjust amount before approval" } : {}) });
-      built++;
-    }
+    const missed = Number(snap?.manques ?? 0);
+    const suggested = Math.max(0, base + (first ? 1 : 0) - Math.max(0, missed - 1));
+    Object.assign(row, { status: "draft", skip_reason: null, prevus: snap?.prevus ?? null, publies: snap?.publies ?? null, manques: snap ? missed : null, suggested, amount: suggested, carried_in: carriedIn, ...(!snap ? { note: "Manual week — confirm attendance and adjust amount before approval" } : {}) });
+    built++;
     await admin.from("slideshow_payouts").upsert(row, { onConflict: "application_id,week_start" });
     if (carried?.length) await admin.from("slideshow_payouts").update({ status: "rolled" }).in("id", carried.map((c: any) => c.id));
   }

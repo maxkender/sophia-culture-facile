@@ -53,7 +53,7 @@ export function Posters() {
               <td className="p-3">{STATUS_LABEL[p.status] ?? p.status}</td>
               <td className="p-3">{p.zone ?? "—"} · {data?.rates[p.zone ?? ""] != null ? `$${Number(data.rates[p.zone ?? ""])}/wk` : "—"}</td>
               <td className="p-3">{p.start_monday ?? "—"}</td>
-               <td className="p-3"><div className="space-y-1 text-xs">{[["os_created", "OS account created"], ["logins_sent", "Logins sent"], ["slack_added", "Added to Slack"]].map(([key, label]) => <p key={key}>{(key === "os_created" ? p.os_created_at : (p.timeline as Record<string, unknown> | null)?.[key]) ? "✓" : "○"} {label}</p>)}</div></td>
+               <td className="p-3"><div className="space-y-1 text-xs">{([["os_created", "OS account created"], ["logins_sent", "Logins sent"], ["slack_added", "Added to Slack"]] as const).map(([key, label]) => <p key={key}>{(key === "os_created" ? p.os_created_at : (p.timeline as Record<string, unknown> | null)?.[key]) ? "✓" : "○"} {label}</p>)}</div></td>
                <td className="p-3">{s?.prevus ?? "—"}</td><td className="p-3">{s?.publies ?? "—"}</td>
               <td className={cn("p-3", (s?.manques ?? 0) > 1 && "font-bold text-portal-red")}>{s?.manques ?? "—"}</td>
               <td className="p-3">{s?.dernier_post_at ? new Date(s.dernier_post_at).toLocaleDateString("en-GB") : "—"}</td>
