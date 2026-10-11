@@ -228,10 +228,11 @@ export function CreatorShell({ children }: { children: ReactNode }) {
       <nav aria-label={ct("Creator mobile")} className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-brand-line bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
         {([["/creators/app", "Home", Home], ["/creators/app/jobs", "Jobs", Briefcase], ["/creators/app/posts", "Posts", Video], ["/creators/app/tasks", "Tasks", ListChecks], ["/creators/app/messages", "Messages", MessageSquare]] as const).map(([to, l, Icon]) => {
           const on = to === "/creators/app" ? pathname === to : pathname.startsWith(to);
-          return <Link key={to} to={to} className={cn("flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold", on ? "text-portal-accent" : "text-brand-navySoft")}><Icon className="size-5" />{l}</Link>;
+          return <Link key={to} to={to} className={cn("flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold", on ? "text-portal-accent" : "text-brand-navySoft")}><Icon className="size-5" />{ct(l)}</Link>;
         })}
       </nav>
     </div>
+    </CreatorLangProvider>
   );
 }
 

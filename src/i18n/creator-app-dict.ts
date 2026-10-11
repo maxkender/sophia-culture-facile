@@ -1927,5 +1927,27 @@ export const CREATOR_APP_DICT: Record<string, { fr: string; en: string }> = {
  "🪑 Face cam, assis·e, un carnet dans le cadre au début.": {
   "fr": "🪑 Face cam, assis·e, un carnet dans le cadre au début.",
   "en": "🪑 Face cam, seated, with a notebook in frame at the start."
- }
+ },
+ "Home": {"fr": "Accueil", "en": "Home"},
+ "Payouts": {"fr": "Paiements", "en": "Payouts"},
+ "Rules": {"fr": "Règles", "en": "Rules"},
+ "Posts": {"fr": "Posts", "en": "Posts"},
+ "Hide": {"fr": "Masquer", "en": "Hide"},
+ "Agreement": {"fr": "Contrat", "en": "Agreement"},
+ "Download": {"fr": "Télécharger", "en": "Download"},
+ "Copied": {"fr": "Copié", "en": "Copied"},
+ "Hook": {"fr": "Accroche", "en": "Hook"},
+ "Script": {"fr": "Script", "en": "Script"},
+ "Shots": {"fr": "Plans", "en": "Shots"},
+ "Files": {"fr": "Fichiers", "en": "Files"},
+ "References": {"fr": "Références", "en": "References"},
+ "Sign": {"fr": "Signer", "en": "Sign"},
+ "Close": {"fr": "Fermer", "en": "Close"},
+ "Submit": {"fr": "Envoyer", "en": "Submit"},
+ "Done": {"fr": "Fait", "en": "Done"},
+ "Total": {"fr": "Total", "en": "Total"},
+ "Earned": {"fr": "Gagné", "en": "Earned"},
+ "Streak": {"fr": "Série", "en": "Streak"},
+ "Brief": {"fr": "Brief", "en": "Brief"},
+ "Delete": {"fr": "Supprimer", "en": "Delete"}
 };
