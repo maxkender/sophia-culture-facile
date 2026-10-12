@@ -95,14 +95,12 @@ function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
       <CommandList>
         <CommandEmpty>No result.</CommandEmpty>
         {SPACES.map((sp) => <CommandGroup key={sp} heading={`${SPACE_LABEL[sp]} · pages`}>{SPACE_NAV[sp].map((i) => <CommandItem key={i.to} value={`${SPACE_LABEL[sp]} ${i.label}`} onSelect={() => go(i.to)}>{i.label}</CommandItem>)}</CommandGroup>)}
-        <CommandGroup heading="Shared · pages"><CommandItem onSelect={() => go("/hub/settings")}>Settings</CommandItem></CommandGroup>
-        <CommandGroup heading="UGC · creators">{data?.creators.map((c) => <CommandItem key={c.id} value={`creator ${c.full_name}`} onSelect={() => go("/hub/ugc/creators/$creatorId", { creatorId: c.id })}>{c.full_name}</CommandItem>)}</CommandGroup>
-        <CommandGroup heading="UGC · jobs">{data?.jobs.map((j) => <CommandItem key={j.id} value={`job ${j.title}`} onSelect={() => go("/hub/ugc/campaigns")}>{j.title}</CommandItem>)}</CommandGroup>
-        <CommandGroup heading="UGC · briefs">{data?.briefs.map((b) => <CommandItem key={b.id} value={`brief ${b.title}`} onSelect={() => go("/hub/ugc/library/briefs/$briefId", { briefId: b.id })}>{b.title}</CommandItem>)}</CommandGroup>
+                <CommandGroup heading="UGC · creators">{data?.creators.map((c) => <CommandItem key={c.id} value={`creator ${c.full_name}`} onSelect={() => go("/hub/ugc/creators/$creatorId", { creatorId: c.id })}>{c.full_name}</CommandItem>)}</CommandGroup>
+        <CommandGroup heading="UGC · briefs">{data?.briefs.map((b) => <CommandItem key={b.id} value={`brief ${b.title}`} onSelect={() => go("/hub/ugc/briefs/$briefId", { briefId: b.id })}>{b.title}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="Slideshows · applications & posters">{data?.slides.map((s) => <CommandItem key={s.id} value={`slideshow ${s.full_name} ${s.country}`} onSelect={() => go("/hub/slideshows/applications", undefined, { id: s.id })}>{s.full_name} · {s.country}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="Influencers · profiles">{data?.infl.map((i) => <CommandItem key={i.id} value={`influencer ${i.display_name}`} onSelect={() => go("/hub/influencers/influencers", undefined, { id: i.id })}>{i.display_name}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="Influencers · deals">{data?.deals.map((d) => { const n = `${(d.influencers as { display_name?: string } | null)?.display_name ?? ""} · ${(d.influencer_briefs as { title?: string } | null)?.title ?? ""}`; return <CommandItem key={d.id} value={`deal ${n}`} onSelect={() => go("/hub/influencers/deals", undefined, { id: d.id })}>{n}</CommandItem>; })}</CommandGroup>
-        <CommandGroup heading="UGC · posts">{data?.posts.map((p) => <CommandItem key={p.id} value={`post ${p.url}`} onSelect={() => go("/hub/ugc/campaigns", undefined)}>{p.url}</CommandItem>)}</CommandGroup>
+        <CommandGroup heading="UGC · posts">{data?.posts.map((p) => <CommandItem key={p.id} value={`post ${p.url}`} onSelect={() => go("/hub/ugc/posts", undefined)}>{p.url}</CommandItem>)}</CommandGroup>
       </CommandList>
     </CommandDialog>
   );
@@ -188,7 +186,7 @@ export function HubShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="pb-20 lg:pb-0 lg:pl-60">
-        {space === "ugc" ? <SetupBanner /> : null}
+        
         <header className="safe-top border-b border-brand-line bg-card">
           <div className="flex min-h-16 flex-wrap items-center gap-3 px-4 py-2 sm:px-6">
             <div className="lg:hidden"><SpaceSwitcher space={space} /></div>
