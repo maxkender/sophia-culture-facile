@@ -14,7 +14,7 @@ import type { BriefAsset } from "./BriefPreview";
 import { PostThumb } from "./PostThumb";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
-const FOLDER_ROLE: Record<string, string> = { screen_recordings: "app_screen_recording", logos: "logo", sounds: "sound", broll: "broll", captions: "caption_text", references: "reference_video" };
+const FOLDER_ROLE: Record<string, string> = { screen_recordings: "app_screen_recording", logos: "logo", sounds: "sound", broll: "broll", captions: "caption_text", references: "reference_video", generic: "asset" };
 function kindOf(f: File) { const t = f.type; return t.startsWith("video/") ? "video" : t.startsWith("image/") ? "image" : t.startsWith("audio/") ? "audio" : t === "application/pdf" ? "pdf" : "text"; }
 function folderFor(kind: string) { return kind === "audio" ? "sounds" : kind === "image" ? "logos" : kind === "video" ? "screen_recordings" : "references"; }
 

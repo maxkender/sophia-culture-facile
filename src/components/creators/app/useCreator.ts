@@ -1,3 +1,4 @@
+import { setTermsVisible, meTermsVisible } from "@/lib/creator-terms";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { creatorSteps } from "@/lib/creator-steps";
@@ -58,6 +59,7 @@ export function useCreator() {
   const { data } = useCreatorQuery();
   const qc = useQueryClient();
   const d = data as CreatorData;
+  setTermsVisible(meTermsVisible(d.me));
   const steps = creatorSteps(d.me, Boolean(d.signature), d.payoutProfile, d.signature?.document_version);
   const now = Date.now();
   const counts = {

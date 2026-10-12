@@ -63,6 +63,9 @@ export const saveCreatorUgcSettings = createServerFn({ method: "POST" })
     cap_override: z.number().min(0).max(100000).nullable(),
     assigned_hm_id: z.string().uuid().nullable(),
     admin_notes: z.string().max(8000).nullable(),
+    terms_visible: z.boolean().optional(),
+    terms_text_fr: z.string().max(4000).nullable().optional(),
+    terms_text_en: z.string().max(4000).nullable().optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const me = await adminId(context);

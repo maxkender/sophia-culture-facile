@@ -1,3 +1,4 @@
+import { termsVisible } from "@/lib/creator-terms";
 import { STYLE_LABEL } from "@/lib/brief-studio";
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
@@ -83,12 +84,9 @@ export function BriefLibraryPage() {
   const sel = "h-10 rounded-md border border-input bg-card px-3 text-sm";
   return (
     <div>
-      <PageTitle title={ct("Library")} lead={ct("Every brief you can use, with how it performs across the network, plus reference videos to study.")} />
-      <div className="mb-6 flex gap-2">
-        <Button variant={tab === "briefs" ? "default" : "outline"} onClick={() => setTab("briefs")}>{ct("Briefs")}</Button>
-        <Button variant={tab === "videos" ? "default" : "outline"} onClick={() => setTab("videos")}>{ct("Reference videos")}</Button>
-      </div>
-      {tab === "videos" ? <ReferenceLibrary /> : (
+      <PageTitle title={ct("Briefs")} lead={ct("The briefs published for you. Each one includes its reference video when there is one.")} />
+      {/* Standalone reference-video library is hidden for creators; references live inside each brief. */}
+      {tab === "videos" && false ? <ReferenceLibrary /> : (
         <>
           <div className="mb-6 flex flex-wrap gap-2">
             <select aria-label={ct("Format")} className={sel} value={f.format} onChange={(e) => setF({ ...f, format: e.target.value })}><option value="">{ct("All formats")}</option>{formats.map((x) => <option key={x} value={x}>{STYLE_LABEL[x]}</option>)}</select>
@@ -123,10 +121,23 @@ export function BriefLibraryPage() {
 
 /* ---------- Earnings: running month + statements ---------- */
 export function UgcEarningsPage() {
-  const { payoutItems } = useCreator();
+  const { payoutItems, me } = useCreator();
+  const show = Boolean((me as { terms_visible?: boolean }).terms_visible);
   const fn = useServerFn(myRunningMonth);
-  const { data, isLoading } = useQuery({ queryKey: ["creator-month"], queryFn: () => fn() });
+  const { data, isLoading } = useQuery({ queryKey: ["creator-month"], queryFn: () => fn(), enabled: show });
   const [open, setOpen] = useState<string | null>(null);
+  if (!show) return (
+    <div>
+      <PageTitle title={ct("Payouts")} lead={L("Your terms will be shared with you.", "Tes conditions te seront communiquées.")} />
+      <PortalCard className="mb-6 p-4">
+        <p className="text-sm text-brand-navy">{L("Set up how you get paid: Stripe (bank account), Wise, PayPal or IBAN.", "Choisis comment être payé·e : Stripe (compte bancaire), Wise, PayPal ou IBAN.")}</p>
+        <Button asChild className="mt-3"><Link to="/creators/app/profile" hash="payouts">{ct("Set up payouts")}</Link></Button>
+      </PortalCard>
+      <h2 className="mb-3 text-xl font-extrabold text-brand-navy">{L("Your validated posts", "Tes posts validés")}</h2>
+      <PostPayments />
+      {payoutItems.length > 0 && <><h2 className="mb-3 mt-10 text-xl font-extrabold text-brand-navy">{ct("Statements")}</h2>{payoutItems.map((it: any) => <PortalCard key={it.id} className="mb-3 p-4"><p className="font-extrabold text-brand-navy">{it.period ?? it.payout_batches?.period} · {it.status === "paid" ? L("Paid", "Payé") : L("In progress", "En cours")}</p></PortalCard>)}</>}
+    </div>
+  );
   if (isLoading || !data) return <p className="text-sm text-brand-navySoft">{ct("Loading…")}</p>;
   const b = data.breakdown;
   return (
@@ -142,7 +153,7 @@ export function UgcEarningsPage() {
           ["Total projected", fmtMoney(b.total, b.currency)],
         ].map(([k, v]) => <PortalCard key={k} className="p-4"><p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">{k}</p><p className="mt-1 text-2xl font-extrabold text-brand-navy">{v}</p></PortalCard>)}
       </div>
-      <p className="mt-3 text-sm font-semibold text-brand-navy">Paid on the {data.paydayDay}th of next month.</p>
+      <p className="mt-3 text-sm font-semibold text-brand-navy">{L(`Paid on the ${data.paydayDay}th of next month.`, `Payé le ${data.paydayDay} du mois suivant.`)}</p>
       <Breakdown b={b} />
 
       <h2 className="mb-3 mt-10 text-xl font-extrabold text-brand-navy">{ct("Paiements par post")}</h2>
@@ -209,11 +220,11 @@ function PostPayments() {
   const { posts, payoutItems } = useCreator();
   const { data: method } = useQuery({ queryKey: ["my-payout-method"], queryFn: async () => (await supabase.from("creator_payout_profiles").select("method").maybeSingle()).data?.method ?? null });
   const rows = posts.filter((p: any) => p.status === "approved");
-  if (!rows.length) return <EmptyState title={ct("Aucun post validé pour l’instant")} />;
+  if (!rows.length) return <EmptyState title={L("No validated post yet", "Aucun post validé pour l’instant")} />;
   return (
     <PortalCard className="p-4" data-testid="post-payments">
-      <p className="mb-3 text-sm text-brand-navySoft">{ct("Méthode de paiement :")} <b className="text-brand-navy">{method ? String(method).toUpperCase() : "à renseigner dans ton profil"}</b></p>
-      <ul className="space-y-2 text-sm">{rows.map((p: any) => { const paidAt = (payoutItems as any[]).find((i) => i.id === p.payout_item_id)?.paid_at ?? null; const st = postStage(p, paidAt); return <li key={p.id} className="flex flex-wrap justify-between gap-2 border-t border-brand-line pt-2"><a href={p.url} target="_blank" rel="noopener noreferrer" className="text-portal-accent underline">{p.platform}</a><span className="font-bold text-brand-navy">{ct(st.label)}</span>{p.pay_formula ? <span className="w-full text-xs text-brand-navySoft">{p.pay_formula}</span> : null}</li>; })}</ul>
+      <p className="mb-3 text-sm text-brand-navySoft">{L("Payout method:", "Méthode de paiement :")} <b className="text-brand-navy">{method ? String(method).toUpperCase() : L("to set in your profile", "à renseigner dans ton profil")}</b></p>
+      <ul className="space-y-2 text-sm">{rows.map((p: any) => { const paidAt = (payoutItems as any[]).find((i) => i.id === p.payout_item_id)?.paid_at ?? null; const st = postStage(p, paidAt); return <li key={p.id} className="flex flex-wrap justify-between gap-2 border-t border-brand-line pt-2"><a href={p.url} target="_blank" rel="noopener noreferrer" className="text-portal-accent underline">{p.platform}</a><span className="font-bold text-brand-navy">{ct(st.label)}</span>{p.pay_formula && termsVisible() ? <span className="w-full text-xs text-brand-navySoft">{p.pay_formula}</span> : null}</li>; })}</ul>
     </PortalCard>
   );
 }

@@ -1,3 +1,4 @@
+import { termsVisible } from "@/lib/creator-terms";
 import { AppBadge, PlatformBadge, platformName, useApps } from "@/lib/apps";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -99,18 +100,17 @@ function FormatsTab() {
 }
 
 export function BriefsPage() {
-  const [tab, setTab] = useState<"formats" | "briefs" | "refs">("formats");
-  const d = useCreator();
+  // Standalone reference videos are hidden for creators (references live inside each brief); RefCard stays dormant.
+  const [tab, setTab] = useState<"formats" | "briefs">("briefs");
+  void RefCard;
   return (
     <div>
       <div className="mb-5 flex gap-2 overflow-x-auto">
-        {([["formats", "Formats"], ["briefs", "Briefs"], ["refs", ct("Reference videos")]] as const).map(([k, l]) => (
-          <button key={k} type="button" aria-pressed={tab === k} onClick={() => setTab(k)} className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-bold ${tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy"}`}>{l}</button>
+        {([["briefs", "Briefs"], ["formats", "Formats"]] as const).map(([k, l]) => (
+          <button key={k} type="button" aria-pressed={tab === k} onClick={() => setTab(k)} className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-bold ${tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy"}`}>{ct(l)}</button>
         ))}
       </div>
-      {tab === "formats" ? <><PageTitle title={ct("Formats")}  /><FormatsTab /></> : tab === "refs" ? (
-        <><PageTitle title={ct("Reference videos")} lead={ct("Videos that worked. Use them as inspiration.")} /><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{d.refs.map((r) => <RefCard key={r.id} r={r} />)}</div></>
-      ) : <FactBriefs />}
+      {tab === "formats" ? <><PageTitle title={ct("Formats")}  /><FormatsTab /></> : <FactBriefs />}
     </div>
   );
 }
@@ -176,7 +176,7 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
   const refs = d.refs.filter((r) => (brief.reference_video_ids ?? []).includes(r.id));
   const eff = (brief as { effort?: string | null }).effort;
   const rates = extras ? effortRates(d.me as Record<string, unknown>, (extras.tiers ?? []) as never, brief.app_id) : null;
-  const pay = rates && eff ? `${(rates as Record<string, number>)[eff]?.toLocaleString("fr-FR")} € / post` : null;
+  const pay = termsVisible() && rates && eff ? `${(rates as Record<string, number>)[eff]?.toLocaleString("fr-FR")} € / post` : null;
   return (
     <div>
       <Link to="/creators/app/briefs" className="text-sm font-semibold text-portal-accent">{ct("← All briefs")}</Link>
@@ -299,15 +299,18 @@ type LoopPost = Post & { pay_status?: string | null; views_frozen?: number | nul
 /** Envoyé → Validé (or Refusé) → Vues à J+7 → Prêt pour paiement → Payé le … */
 export function postStage(p: Post, paidAt?: string | null): { label: string; tone: string; detail?: string | undefined } {
   const x = p as LoopPost;
-  const v = (n: number | null | undefined) => Number(n ?? 0).toLocaleString("fr-FR");
-  if (p.status === "rejected") return { label: "Refusé", tone: "bg-portal-red/10 text-portal-red", detail: p.feedback ? L(`Reason: ${p.feedback}`, `Raison : ${p.feedback}`) : undefined };
-  if (p.status === "pending" || p.status === "flagged") return { label: "Envoyé", tone: "bg-brand-surfaceStrong text-brand-navySoft", detail: "en attente de validation" };
-  if (x.pay_status === "paid") return { label: paidAt ? L(`Paid on ${fmtDate(paidAt)}`, `Payé le ${fmtDate(paidAt)}`) : "Payé", tone: "bg-portal-green/15 text-portal-green", detail: `${eurFr(x.pay_amount)} · vues à J+7 : ${v(x.views_frozen)}` };
-  if (x.pay_status === "approved") return { label: L(`Payment in progress: ${eurFr(x.pay_amount)}`, `Paiement en cours : ${eurFr(x.pay_amount)}`), tone: "bg-portal-green/10 text-portal-green", detail: `vues à J+7 : ${v(x.views_frozen)}` };
-  if (x.pay_status === "ready") return { label: L(`Ready for payment: ${eurFr(x.pay_amount)}`, `Prêt pour paiement : ${eurFr(x.pay_amount)}`), tone: "bg-portal-green/10 text-portal-green", detail: `vues à J+7 : ${v(x.views_frozen)}` };
-  if (x.pay_status === "no_data") return { label: ct("Validé · vues introuvables"), tone: "bg-portal-amber/15 text-portal-amber", detail: "l’équipe vérifie le lien avant de payer" };
+  const money = termsVisible();
+  const v = (n: number | null | undefined) => Number(n ?? 0).toLocaleString(creatorLang() === "fr" ? "fr-FR" : "en-GB");
+  const amt = (n: unknown) => (money ? `: ${eurFr(n)}` : "");
+  const views = L(`views at day 7: ${v(x.views_frozen)}`, `vues à J+7 : ${v(x.views_frozen)}`);
+  if (p.status === "rejected") return { label: L("Refused", "Refusé"), tone: "bg-portal-red/10 text-portal-red", detail: p.feedback ? L(`Reason: ${p.feedback}`, `Raison : ${p.feedback}`) : undefined };
+  if (p.status === "pending" || p.status === "flagged") return { label: L("Sent", "Envoyé"), tone: "bg-brand-surfaceStrong text-brand-navySoft", detail: L("waiting for validation", "en attente de validation") };
+  if (x.pay_status === "paid") return { label: paidAt ? L(`Paid on ${fmtDate(paidAt)}`, `Payé le ${fmtDate(paidAt)}`) : L("Paid", "Payé"), tone: "bg-portal-green/15 text-portal-green", detail: money ? `${eurFr(x.pay_amount)} · ${views}` : views };
+  if (x.pay_status === "approved") return { label: L(`Payment in progress${amt(x.pay_amount)}`, `Paiement en cours${amt(x.pay_amount)}`), tone: "bg-portal-green/10 text-portal-green", detail: views };
+  if (x.pay_status === "ready") return { label: L(`Ready for payment${amt(x.pay_amount)}`, `Prêt pour paiement${amt(x.pay_amount)}`), tone: "bg-portal-green/10 text-portal-green", detail: views };
+  if (x.pay_status === "no_data") return { label: L("Validated · views not found", "Validé · vues introuvables"), tone: "bg-portal-amber/15 text-portal-amber", detail: L("the team is checking the link before paying", "l’équipe vérifie le lien avant de payer") };
   const j7 = x.validated_at ? new Date(new Date(x.validated_at).getTime() + 7 * 86400000).toISOString() : null;
-  return { label: "Validé", tone: "bg-portal-accent/10 text-portal-accent", detail: `${p.views != null ? `${v(p.views)} vues pour l’instant · ` : ""}vues comptées le ${j7 ? fmtDate(j7) : "—"} (J+7)` };
+  return { label: L("Validated", "Validé"), tone: "bg-portal-accent/10 text-portal-accent", detail: `${p.views != null ? L(`${v(p.views)} views so far · `, `${v(p.views)} vues pour l’instant · `) : ""}${L(`views counted on ${j7 ? fmtDate(j7) : "—"} (day 7)`, `vues comptées le ${j7 ? fmtDate(j7) : "—"} (J+7)`)}` };
 }
 
 export function WeeklyBar() {

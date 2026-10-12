@@ -74,6 +74,7 @@ import { Route as AuthenticatedHubPayoutsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedHubSettingsRouteImport } from './routes/_authenticated/hub/settings'
 import { Route as CreatorsAppIndexRouteImport } from './routes/creators.app.index'
 import { Route as CreatorsAppAccountRouteImport } from './routes/creators.app.account'
+import { Route as CreatorsAppAppsRouteImport } from './routes/creators.app.apps'
 import { Route as CreatorsAppCallsRouteImport } from './routes/creators.app.calls'
 import { Route as CreatorsAppContractRouteImport } from './routes/creators.app.contract'
 import { Route as CreatorsAppEarningsRouteImport } from './routes/creators.app.earnings'
@@ -545,6 +546,11 @@ const CreatorsAppIndexRoute = CreatorsAppIndexRouteImport.update({
 const CreatorsAppAccountRoute = CreatorsAppAccountRouteImport.update({
   id: '/account',
   path: '/account',
+  getParentRoute: () => CreatorsAppRoute,
+} as any)
+const CreatorsAppAppsRoute = CreatorsAppAppsRouteImport.update({
+  id: '/apps',
+  path: '/apps',
   getParentRoute: () => CreatorsAppRoute,
 } as any)
 const CreatorsAppCallsRoute = CreatorsAppCallsRouteImport.update({
@@ -1363,6 +1369,7 @@ export interface FileRoutesByFullPath {
   '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/hub/settings': typeof AuthenticatedHubSettingsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
+  '/creators/app/apps': typeof CreatorsAppAppsRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
   '/creators/app/earnings': typeof CreatorsAppEarningsRoute
@@ -1560,6 +1567,7 @@ export interface FileRoutesByTo {
   '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/hub/settings': typeof AuthenticatedHubSettingsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
+  '/creators/app/apps': typeof CreatorsAppAppsRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
   '/creators/app/earnings': typeof CreatorsAppEarningsRoute
@@ -1760,6 +1768,7 @@ export interface FileRoutesById {
   '/_authenticated/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/_authenticated/hub/settings': typeof AuthenticatedHubSettingsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
+  '/creators/app/apps': typeof CreatorsAppAppsRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
   '/creators/app/contract': typeof CreatorsAppContractRoute
   '/creators/app/earnings': typeof CreatorsAppEarningsRoute
@@ -1961,6 +1970,7 @@ export interface FileRouteTypes {
     | '/hub/payouts'
     | '/hub/settings'
     | '/creators/app/account'
+    | '/creators/app/apps'
     | '/creators/app/calls'
     | '/creators/app/contract'
     | '/creators/app/earnings'
@@ -2158,6 +2168,7 @@ export interface FileRouteTypes {
     | '/hub/payouts'
     | '/hub/settings'
     | '/creators/app/account'
+    | '/creators/app/apps'
     | '/creators/app/calls'
     | '/creators/app/contract'
     | '/creators/app/earnings'
@@ -2357,6 +2368,7 @@ export interface FileRouteTypes {
     | '/_authenticated/hub/payouts'
     | '/_authenticated/hub/settings'
     | '/creators/app/account'
+    | '/creators/app/apps'
     | '/creators/app/calls'
     | '/creators/app/contract'
     | '/creators/app/earnings'
@@ -3037,6 +3049,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/creators/app/account'
       preLoaderRoute: typeof CreatorsAppAccountRouteImport
+      parentRoute: typeof CreatorsAppRoute
+    }
+    '/creators/app/apps': {
+      id: '/creators/app/apps'
+      path: '/apps'
+      fullPath: '/creators/app/apps'
+      preLoaderRoute: typeof CreatorsAppAppsRouteImport
       parentRoute: typeof CreatorsAppRoute
     }
     '/creators/app/calls': {
@@ -4220,6 +4239,7 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface CreatorsAppRouteChildren {
   CreatorsAppAccountRoute: typeof CreatorsAppAccountRoute
+  CreatorsAppAppsRoute: typeof CreatorsAppAppsRoute
   CreatorsAppCallsRoute: typeof CreatorsAppCallsRoute
   CreatorsAppContractRoute: typeof CreatorsAppContractRoute
   CreatorsAppEarningsRoute: typeof CreatorsAppEarningsRoute
@@ -4237,6 +4257,7 @@ interface CreatorsAppRouteChildren {
 
 const CreatorsAppRouteChildren: CreatorsAppRouteChildren = {
   CreatorsAppAccountRoute: CreatorsAppAccountRoute,
+  CreatorsAppAppsRoute: CreatorsAppAppsRoute,
   CreatorsAppCallsRoute: CreatorsAppCallsRoute,
   CreatorsAppContractRoute: CreatorsAppContractRoute,
   CreatorsAppEarningsRoute: CreatorsAppEarningsRoute,

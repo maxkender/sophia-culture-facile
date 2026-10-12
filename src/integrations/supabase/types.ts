@@ -2944,6 +2944,9 @@ export type Database = {
           sync_checked_at: string | null
           sync_error: string | null
           sync_status: string | null
+          terms_text_en: string | null
+          terms_text_fr: string | null
+          terms_visible: boolean
           tier: string
           tier_locked: boolean
           tier_since: string
@@ -3015,6 +3018,9 @@ export type Database = {
           sync_checked_at?: string | null
           sync_error?: string | null
           sync_status?: string | null
+          terms_text_en?: string | null
+          terms_text_fr?: string | null
+          terms_visible?: boolean
           tier?: string
           tier_locked?: boolean
           tier_since?: string
@@ -3086,6 +3092,9 @@ export type Database = {
           sync_checked_at?: string | null
           sync_error?: string | null
           sync_status?: string | null
+          terms_text_en?: string | null
+          terms_text_fr?: string | null
+          terms_visible?: boolean
           tier?: string
           tier_locked?: boolean
           tier_since?: string
