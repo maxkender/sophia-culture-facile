@@ -241,7 +241,7 @@ function Templates() {
 
 const BRIEF_SUBS = [["list", "All briefs"], ["planner", "Week planner"], ["scripts", "Scripts grid"], ["ops", "Posts & calls"]] as const;
 // Sub-tabs are hidden from Library (code kept; reachable only via ?sub=).
-function BriefsArea({ sub, initialTab }: { sub?: string | undefined; initialTab?: string }) {
+function BriefsArea({ sub, initialTab }: { sub?: string | undefined; initialTab?: string | undefined }) {
   const [s, setS] = useState<string>(BRIEF_SUBS.some(([k]) => k === sub) ? sub! : "list");
   return (
     <div className="space-y-4">

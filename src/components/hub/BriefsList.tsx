@@ -120,7 +120,7 @@ const inTab = (t: string, s: string) => (t === "published" ? s === "published" |
 const STATUS_LABEL: Record<string, string> = { draft: "Draft", ready: "Ready", published: "Published", scheduled: "Scheduled", archived: "Archived" };
 export { QuickBrief, FromVideo };
 
-export function BriefsList({ formats, initialTab }: { formats?: ReactNode; initialTab?: string } = {}) {
+export function BriefsList({ formats, initialTab }: { formats?: ReactNode; initialTab?: string | undefined } = {}) {
   const { appId } = useAdminApp();
   const app = appId ?? SOPHIA_APP_ID;
   const qc = useQueryClient(); const navigate = useNavigate();
