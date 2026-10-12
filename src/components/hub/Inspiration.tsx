@@ -1,3 +1,4 @@
+import { AccountsTab, useInspirationAccounts } from "@/components/hub/InspirationAccounts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -56,11 +57,12 @@ function useCovers(rows: Insp[]) {
   });
 }
 
-export function Inspiration({ initialOpen, initialAuthor }: { initialOpen?: string | undefined; initialAuthor?: string | undefined } = {}) {
+export function Inspiration({ initialOpen, initialAuthor, initialTab }: { initialOpen?: string | undefined; initialAuthor?: string | undefined; initialTab?: string | undefined } = {}) {
+  const { data: accounts = [] } = useInspirationAccounts();
   const { data: all = [], isLoading } = useInspirations(); const { appId } = useAdminApp(); const qc = useQueryClient();
   const [flt, setFlt] = useState({ q: initialAuthor ?? "", style: "all", fit: "all", lang: "all", platform: "all", hook: "all", minScore: 0, status: "all", tag: "", since: "" });
   const [sort, setSort] = useState<"date" | "views" | "score">("date");
-  const [sel, setSel] = useState<Set<string>>(new Set()); const [open, setOpen] = useState<string | null>(initialOpen ?? null); const [tab, setTab] = useState<"videos" | "notion">("videos"); const [adding, setAdding] = useState(false);
+  const [sel, setSel] = useState<Set<string>>(new Set()); const [open, setOpen] = useState<string | null>(initialOpen ?? null); const [tab, setTab] = useState<"videos" | "accounts" | "notion">(initialTab === "accounts" ? "accounts" : "videos"); const [adding, setAdding] = useState(false);
   const rows = useMemo(() => {
     const q = flt.q.toLowerCase();
     const out = all.filter((r) => (!appId || !r.app_id || r.app_id === appId)
@@ -79,8 +81,8 @@ export function Inspiration({ initialOpen, initialAuthor }: { initialOpen?: stri
 
   return (
     <div className="space-y-5">
-      <div className="flex gap-2" role="tablist">{([["videos", "Videos"], ["notion", "Notion"]] as const).map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cn("min-h-9 rounded-full px-4 text-sm font-bold", tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l}</button>)}</div>
-      {tab === "notion" ? <NotionItemsTab onOpen={(id) => setOpen(id)} /> : <>
+      <div className="flex gap-2" role="tablist">{([["videos", "Videos"], ["accounts", `Accounts (${accounts.length})`], ["notion", "Notion"]] as const).map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cn("min-h-9 rounded-full px-4 text-sm font-bold", tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l}</button>)}</div>
+      {tab === "accounts" ? <AccountsTab /> : tab === "notion" ? <NotionItemsTab onOpen={(id) => setOpen(id)} /> : <>
       <div className="flex flex-wrap items-center gap-2">
         <input aria-label="Search inspiration" placeholder="Search…" value={flt.q} onChange={(e) => setFlt({ ...flt, q: e.target.value })} className={cn(f, "min-w-0 flex-1 sm:max-w-80")} />
         <Button onClick={() => setAdding(!adding)} aria-expanded={adding}><Upload className="size-4" />Add links</Button>
