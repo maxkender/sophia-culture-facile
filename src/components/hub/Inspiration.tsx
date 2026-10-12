@@ -61,18 +61,18 @@ export function Inspiration({ initialOpen, initialAuthor, initialTab }: { initia
   const { data: accounts = [] } = useInspirationAccounts();
   const { data: all = [], isLoading } = useInspirations(); const { appId } = useAdminApp(); const qc = useQueryClient();
   const [flt, setFlt] = useState({ q: initialAuthor ?? "", style: "all", fit: "all", lang: "all", platform: "all", hook: "all", minScore: 0, status: "all", tag: "", since: "" });
-  const [sort, setSort] = useState<"date" | "views" | "score">("date");
+  const [sort, setSort] = useState<"date" | "views" | "score">("date"); const [appF, setAppF] = useState<"all" | "sophia" | "unswipe" | "none">("all");
   const [sel, setSel] = useState<Set<string>>(new Set()); const [open, setOpen] = useState<string | null>(initialOpen ?? null); const [tab, setTab] = useState<"videos" | "accounts" | "notion">(initialTab === "accounts" ? "accounts" : "videos"); const [adding, setAdding] = useState(false);
   const rows = useMemo(() => {
     const q = flt.q.toLowerCase();
-    const out = all.filter((r) => (!appId || !r.app_id || r.app_id === appId)
+    const out = all.filter((r) => (appF === "all" || (appF === "none" ? !r.app_id : r.app_id === (appF === "sophia" ? SOPHIA_APP_ID : UNSWIPE_ID)))
       && (flt.style === "all" || styleOf(r) === flt.style) && (flt.fit === "all" || r.app_fit === flt.fit) && (flt.lang === "all" || r.language === flt.lang)
       && (flt.platform === "all" || r.platform === flt.platform) && (flt.hook === "all" || r.hook_type === flt.hook) && (r.score ?? 0) >= flt.minScore
       && (flt.status === "all" || r.status === flt.status) && (!flt.tag || r.tags.some((t) => t.includes(flt.tag.toLowerCase())))
       && (!flt.since || (r.posted_at ?? r.created_at) >= flt.since)
       && (!q || `${r.transcript ?? ""} ${r.caption ?? ""} ${r.author_handle ?? ""}`.toLowerCase().includes(q)));
     return out.sort((a, b) => sort === "views" ? (b.views ?? 0) - (a.views ?? 0) : sort === "score" ? (b.score ?? 0) - (a.score ?? 0) : b.created_at.localeCompare(a.created_at));
-  }, [all, appId, flt, sort]);
+  }, [all, appF, flt, sort]);
   const covers = useCovers(rows.slice(0, 120)).data ?? {};
   const langs = [...new Set(all.map((r) => r.language).filter(Boolean))] as string[];
   const hooks = [...new Set(all.map((r) => r.hook_type).filter(Boolean))] as string[];
@@ -87,6 +87,10 @@ export function Inspiration({ initialOpen, initialAuthor, initialTab }: { initia
         <input aria-label="Search inspiration" placeholder="Search…" value={flt.q} onChange={(e) => setFlt({ ...flt, q: e.target.value })} className={cn(f, "min-w-0 flex-1 sm:max-w-80")} />
         <Button onClick={() => setAdding(!adding)} aria-expanded={adding}><Upload className="size-4" />Add links</Button>
         <SyncNotionButton onDone={refresh} />
+      </div>
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        {([["all", "All"], ["sophia", "Sophia"], ["unswipe", "UnSwipe"], ["none", "No app"]] as const).map(([k, l]) => <button key={k} type="button" aria-pressed={appF === k} onClick={() => setAppF(k)} className={cn("rounded-full px-3 py-1 font-bold", appF === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l}</button>)}
+        <span className="ml-auto text-brand-navySoft">{all.length} videos · {all.filter((r) => r.notion_page_id).length} from Notion · {all.filter((r) => !r.notion_page_id).length} added by hand</span>
       </div>
       {adding ? <ImportPanel rows={all} appId={appId} onDone={refresh} /> : null}
       {isLoading ? <p className="text-sm text-brand-navySoft">Loading…</p> : !rows.length ? (
@@ -106,6 +110,7 @@ export function Inspiration({ initialOpen, initialAuthor, initialTab }: { initia
                   {r.hook_text || r.analysis?.hook.verbatim ? <p className="line-clamp-2 text-xs text-brand-navy">« {r.hook_text || r.analysis?.hook.verbatim} »</p> : null}
                   <div className="flex flex-wrap gap-1">
                     {styleOf(r) ? <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-bold", r.approved_style ? "bg-space-ugc text-card" : "bg-space-ugc/10 text-space-ugc")}>{SLABEL[styleOf(r)!]}</span> : null}
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold text-brand-navy">{r.app_id === SOPHIA_APP_ID ? "Sophia" : r.app_id === UNSWIPE_ID ? "UnSwipe" : "No app"}</span>
                     {r.notion_page_id ? <span className="rounded-full bg-brand-navy px-2 py-0.5 text-[10px] font-bold text-card" title="Imported from Notion">N · From Notion</span> : null}
                   </div>
                 </div>
@@ -121,6 +126,8 @@ export function Inspiration({ initialOpen, initialAuthor, initialTab }: { initia
     </div>
   );
 }
+
+const UNSWIPE_ID = "00000000-0000-4000-8000-000000000002";
 
 function SyncNotionButton({ onDone }: { onDone: () => void }) {
   const run = useServerFn(notionSyncNow); const [busy, setBusy] = useState(false);
