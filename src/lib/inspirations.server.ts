@@ -75,7 +75,7 @@ async function fetchStage(a: Admin, row: any) {
   if (row.platform === "tiktok") {
     const r = await apifyRun(INSPIRATION_ACTORS.tiktok, { postURLs: [row.url], shouldDownloadVideos: true, shouldDownloadCovers: true, resultsPerPage: 1 });
     const i = r.items.find((x) => x && x.id && !x.error);
-    if (!i) throw new Error("Video not found on TikTok (private, deleted or region-locked).");
+    if (!i) throw new Error("Vidéo privée ou supprimée (TikTok).");
     const videoSrc = (i.mediaUrls ?? [])[0] ?? i.videoMeta?.downloadAddr;
     const coverSrc = i.videoMeta?.originalCoverUrl ?? i.videoMeta?.coverUrl ?? (i.covers ?? [])[0];
     return {
@@ -85,7 +85,7 @@ async function fetchStage(a: Admin, row: any) {
   }
   const r = await apifyRun(INSPIRATION_ACTORS.instagram, { directUrls: [row.url], resultsType: "posts", resultsLimit: 1, addParentData: false });
   const i = r.items.find((x) => x && (x.shortCode || x.id) && !x.error);
-  if (!i) throw new Error("Reel not found on Instagram (private or deleted).");
+  if (!i) throw new Error("Vidéo privée ou supprimée (Instagram).");
   return {
     meta: { author_handle: i.ownerUsername ?? null, caption: i.caption ?? null, hashtags: i.hashtags ?? [], duration_s: num(i.videoDuration), views: num(i.videoPlayCount ?? i.videoViewCount), likes: num(i.likesCount), comments: num(i.commentsCount), shares: null, posted_at: i.timestamp ?? null, kind: i.type === "Sidecar" ? "slideshow" : "video" },
     videoSrc: i.videoUrl, coverSrc: i.displayUrl, apify: r, auth: {},
@@ -126,7 +126,7 @@ async function analyse(input: { caption: string; transcript: string; words: { t:
   const timed = input.words.length ? input.words.reduce<string[]>((acc, w, i) => { if (i % 12 === 0) acc.push(`[${w.s.toFixed(1)}s]`); acc.push(w.t); return acc; }, []).join(" ") : input.transcript;
   const text = `Analyse this ${input.platform} ${input.kind} by @${input.handle ?? "?"} (${input.duration ?? "?"} s).
 Caption: ${input.caption || "(none)"}
-Transcript with timestamps: ${timed || "(no speech)"}
+Transcript with timestamps: ${timed || "(no speech — no usable audio track; analyse from the cover image and caption, audio = none)"}
 
 The 5 UGC styles: reaction_demo = Reaction into demo (face reaction plan then phone/app demo); broll_stickers = B-roll + stickers storytelling, one visual per plan, talked; sole_footage = one single plan + music + text on screen, no talking; talked_hook_demo = talked personal-story hook then app demo; educational = face cam talking, teaching. Use slideshow for photo carousels, other if none fits.
 Apps: Sophia = 5-minute daily culture/general-knowledge courses instead of doom-scrolling. UnSwipe = keeps social apps without Reels/For You/Shorts, reduces screen time.
@@ -184,7 +184,18 @@ export async function processRow(a: Admin, id: string, from?: "analyse") {
     if (row.video_path && row.transcript == null && from !== "analyse") {
       await set(a, id, { status: "transcribing" });
       if (!buf) { const { data: blob, error } = await a.storage.from(BUCKET).download(row.video_path); if (error) throw new Error("Stored video could not be read."); buf = await blob.arrayBuffer(); }
-      const t = await transcribe(buf!);
+      let t: { text: string; language: string | null; words: { t: string; s: number; e: number; ev?: boolean }[] };
+      try { t = await transcribe(buf!); }
+      catch (e) {
+        if (!/invalid_audio|corrupt/i.test((e as Error).message)) throw e;
+        // Stored file unreadable as audio: fetch a fresh copy via Apify once, else treat the reel as silent.
+        try {
+          const f = await fetchStage(a, row);
+          if (!f.videoSrc) throw new Error("no video");
+          buf = await store(a, row.video_path, f.videoSrc, "video/mp4", f.auth);
+          t = await transcribe(buf);
+        } catch { t = { text: "", language: null, words: [] }; row.no_audio = true; await set(a, id, { no_audio: true }); }
+      }
       cost["stt_minutes"] = Math.round(((row.duration_s ?? (t.words.at(-1)?.e ?? 0)) / 60) * 100) / 100;
       cost["stt_usd"] = Math.round((Number(cost["stt_minutes"]) / 60) * STT_USD_PER_HOUR * 10000) / 10000;
       Object.assign(row, { transcript: t.text, language: t.language, words: t.words });
@@ -211,13 +222,16 @@ export async function processRow(a: Admin, id: string, from?: "analyse") {
 
 /** Cron tick: re-queues stuck rows, then processes up to 5 queued rows in parallel. */
 export async function runInspirationTick(a: Admin) {
+  const { runProfileStep } = await import("./notion-sync.server");
+  const prof = await runProfileStep(a).catch((e) => ({ error: (e as Error).message }));
   const stuck = new Date(Date.now() - 12 * 60_000).toISOString();
   await a.from("inspirations").update({ status: "queued" }).in("status", ["fetching", "transcribing", "analysing"]).lt("updated_at", stuck);
   const { data: rows } = await a.from("inspirations").select("id").eq("status", "queued").lte("next_try_at", new Date().toISOString()).order("created_at").limit(5);
   if (!rows?.length) {
     const { count } = await a.from("inspirations").select("id", { count: "exact", head: true }).in("status", ["queued", "fetching", "transcribing", "analysing"]);
-    if (!count) await a.rpc("inspiration_queue_disarm");
-    return { processed: 0, pending: count ?? 0 };
+    const { count: pc } = await a.from("notion_items").select("notion_page_id", { count: "exact", head: true }).eq("kind", "profile").in("profile_status", ["queued", "running"]);
+    if (!count && !pc) await a.rpc("inspiration_queue_disarm");
+    return { processed: 0, pending: count ?? 0, profilesPending: pc ?? 0, prof };
   }
   await a.from("inspirations").update({ status: "fetching", updated_at: new Date().toISOString() }).in("id", rows.map((r: { id: string }) => r.id));
   const t0 = Date.now();
@@ -226,4 +240,4 @@ export async function runInspirationTick(a: Admin) {
   return { processed: rows.length };
 }
 
-export { signed as signedInspirationUrl };
+export { signed as signedInspirationUrl, fetchStage };
