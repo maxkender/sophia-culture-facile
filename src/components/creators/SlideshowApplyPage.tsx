@@ -43,7 +43,7 @@ export function SlideshowApplyPage() {
       setError(common.requiredError);
       return;
     }
-    if (f.q_country_now.trim().length < 2 || !f.q_hours.trim() || !f.q_tiktok.trim() || f.q_previous.trim().length < 2) {
+    if (f.q_country_now.trim().length < 2 || !f.q_tiktok.trim() || f.q_previous.trim().length < 2) {
       setError(copy.screeningError);
       return;
     }
@@ -80,7 +80,6 @@ export function SlideshowApplyPage() {
           deux_telephones: phone2 === "yes",
           langue: langue ?? autoLang,
           q_country_now: f.q_country_now,
-          q_hours_per_day: f.q_hours,
           q_tiktok_daily: f.q_tiktok,
           q_previous_content: f.q_previous,
         },
@@ -169,10 +168,6 @@ export function SlideshowApplyPage() {
           <div className="space-y-2">
             <Label htmlFor="q1">{copy.qCountryNow}</Label>
             <Input id="q1" className="h-11" value={f.q_country_now} onChange={(e) => set("q_country_now", e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="q2">{copy.qHours}</Label>
-            <Input id="q2" className="h-11" value={f.q_hours} onChange={(e) => set("q_hours", e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="q3">{copy.qTiktok}</Label>
