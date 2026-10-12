@@ -22,26 +22,17 @@ import { t as ct, L, CreatorLangProvider, initCreatorLang, useCreatorLang } from
 type Badge = "briefs" | "posts" | "calls" | "messages";
 type Item = { to: string; label: string; icon: LucideIcon; exact?: boolean; badge?: Badge; gate?: "steps" | "payouts" };
 
+/** Missions (jobs), tasks, calls, messages and rules are hidden from navigation; their code stays dormant. */
 export const CREATOR_NAV: { heading: string; items: Item[] }[] = [
   {
     heading: "Workspace",
     items: [
       { to: "/creators/app", label: "Home", icon: Home, exact: true },
-      { to: "/creators/app/jobs", label: "Jobs", icon: Briefcase, gate: "steps" },
       { to: "/creators/app/briefs", label: "Briefs", icon: Clapperboard, badge: "briefs", gate: "steps" },
+      { to: "/creators/app/posts", label: "My posts", icon: Video, badge: "posts", gate: "steps" },
       { to: "/creators/app/library", label: "Library", icon: Library, gate: "steps" },
-      { to: "/creators/app/posts", label: ct("My posts"), icon: Video, badge: "posts", gate: "steps" },
-      { to: "/creators/app/tasks", label: "Tasks", icon: ListChecks, gate: "steps" },
-      { to: "/creators/app/calls", label: "Calls", icon: CalendarDays, badge: "calls", gate: "steps" },
       { to: "/creators/app/earnings", label: "Payouts", icon: Banknote, gate: "payouts" },
-      { to: "/creators/app/messages", label: "Messages", icon: MessageSquare, badge: "messages" },
-    ],
-  },
-  {
-    heading: "Resources",
-    items: [
-      { to: "/creators/app/rules", label: "Rules", icon: BookOpen },
-      { to: "/creators/app/account", label: ct("Account setup"), icon: Smartphone },
+      { to: "/creators/app/account", label: "My apps & codes", icon: Smartphone },
       { to: "/creators/app/profile", label: "Profile", icon: UserCircle },
     ],
   },
@@ -227,7 +218,7 @@ export function CreatorShell({ children }: { children: ReactNode }) {
         <main className="safe-bottom mx-auto w-full min-w-0 max-w-5xl px-4 pb-24 pt-8 sm:px-6 sm:py-10 lg:pb-10">{children}</main>
       </div>
       <nav aria-label={ct("Creator mobile")} className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-brand-line bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
-        {([["/creators/app", "Home", Home], ["/creators/app/jobs", "Jobs", Briefcase], ["/creators/app/posts", "Posts", Video], ["/creators/app/tasks", "Tasks", ListChecks], ["/creators/app/messages", "Messages", MessageSquare]] as const).map(([to, l, Icon]) => {
+        {([["/creators/app", "Home", Home], ["/creators/app/briefs", "Briefs", Clapperboard], ["/creators/app/posts", "My posts", Video], ["/creators/app/earnings", "Payouts", Banknote], ["/creators/app/profile", "Profile", UserCircle]] as const).map(([to, l, Icon]) => {
           const on = to === "/creators/app" ? pathname === to : pathname.startsWith(to);
           return <Link key={to} to={to} className={cn("flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold", on ? "text-portal-accent" : "text-brand-navySoft")}><Icon className="size-5" />{ct(l)}</Link>;
         })}
