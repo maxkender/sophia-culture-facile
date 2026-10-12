@@ -26,6 +26,7 @@ import { OsConnectionCard } from "./slides/OsConnectionCard";
 import { OS_UI_ENABLED } from "./slides/useOs";
 import { GuidelinesEditor } from "@/components/creators/Guidelines";
 import { HubAccessCodes } from "./HubAccessCodes";
+import { Templates } from "./Learn";
 import { PostDescriptionSettings } from "@/components/creators/PostDescription";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -155,7 +156,7 @@ export function InfluencerSection({ section, id }: { section: string; id?: strin
 }
 
 /* ---------------- Settings ---------------- */
-export const SETTINGS_TABS: [string, string][] = [["apps", "Apps & store links"], ["codes", "Access codes"], ["email", "Email"], ["ugc-guidelines", "UGC guidelines"], ["post-descriptions", "Post descriptions"], ["notion", "Notion (UGC)"], ["connections", "Connections"], ["team", "Team & hiring managers"], ["security", "Security"]];
+export const SETTINGS_TABS: [string, string][] = [["ugc-guidelines", "Shooting rules"], ["post-descriptions", "Post descriptions"], ["notion", "Notion"], ["connections", "Payments"], ["email", "Emails & team"], ["apps", "Apps & codes"], ["security", "Security"]];
 
 const TRACKS = [["ugc", "UGC"], ["slideshow", "Slideshows"], ["influencer", "Influencers"]] as const;
 function Team({ track }: { track?: string } = {}) {
@@ -202,18 +203,18 @@ function EmailSettings() {
     <div className="space-y-4">
       <div className={cn(card, "space-y-2 text-sm")}>
         <h3 className="font-extrabold text-brand-navy">Emails to creators</h3>
-        <p className="text-brand-navySoft">Acceptance, welcome and follow-up emails are sent through Brevo from the verified sophia-culture.com address. Subjects and texts are edited in Library → Templates.</p>
-        <Button asChild variant="outline"><Link to="/hub/ugc/library">Open Library → Templates</Link></Button>
+        <p className="text-brand-navySoft">Acceptance, welcome and follow-up emails are sent through Brevo from the verified sophia-culture.com address. Subjects and texts are edited below.</p>
       </div>
-      <IntegrationsSetup />
+      <Templates />
+      <Team />
     </div>
   );
 }
 
 export function HubSettings({ tab }: { tab?: string | undefined }) {
-  const t = pick(SETTINGS_TABS, tab);
+  const t = pick(SETTINGS_TABS, tab === "codes" ? "apps" : tab === "team" ? "email" : tab);
   const body: Record<string, ReactNode> = {
-    apps: <AppsSettings />, codes: <div className="space-y-6"><HubAccessCodes /><details className="rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold">Author codes and assignment history</summary><div className="mt-4"><CodesPool /></div></details></div>, email: <EmailSettings />, "ugc-guidelines": <GuidelinesEditor />, "post-descriptions": <PostDescriptionSettings />, notion: <NotionSettingsCard />, connections: <div className="space-y-4">{OS_UI_ENABLED ? <OsConnectionCard /> : null}<IntegrationsSetup /></div>, team: <Team />, security: <AdminSettings />,
+    apps: <div className="space-y-6"><AppsSettings /><HubAccessCodes /><details className="rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold">Author codes and assignment history</summary><div className="mt-4"><CodesPool /></div></details></div>, codes: null, email: <EmailSettings />, "ugc-guidelines": <div className={card}><GuidelinesEditor /></div>, "post-descriptions": <PostDescriptionSettings />, notion: <NotionSettingsCard />, connections: <div className="space-y-4">{OS_UI_ENABLED ? <OsConnectionCard /> : null}<IntegrationsSetup /></div>, team: <Team />, security: <AdminSettings />,
   };
   return <div><SectionTabs base="/hub/settings" tabs={SETTINGS_TABS} current={t} />{body[t]}</div>;
 }

@@ -1,6 +1,7 @@
 import { GuidelinesEditor } from "@/components/creators/Guidelines";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -17,7 +18,7 @@ import { UgcBriefsGrid, WeekPlanner } from "@/components/portal/admin/UgcAdmin";
 import { CreatorOps } from "@/components/portal/admin/CreatorOps";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
-const TABS = ["Briefs", "Hooks & CTAs", "Assets", "References", "Guides & rules", "Templates"] as const;
+const TABS = ["Formats", "Assets", "Hooks & CTAs"] as const;
 
 
 type Fmt = { id: string; title: string; hook_text: string | null; oral_hook: string | null; beats: string[] | null; product_moment: string | null; variations: string | null; effort: string | null; status: string; pinned: boolean; sort_order: number | null; app_id: string };
@@ -198,7 +199,7 @@ function Guides() {
   );
 }
 
-function Templates() {
+export function Templates() {
   const { appId } = useAdminApp();
   const qc = useQueryClient();
   const { data } = useQuery({
@@ -250,12 +251,48 @@ function BriefsArea({ sub, initialTab }: { sub?: string | undefined; initialTab?
   );
 }
 
-export function Learn({ initialTab, sub }: { initialTab?: string | undefined; sub?: string | undefined } = {}) {
-  const [tab, setTab] = useState<(typeof TABS)[number]>(() => { const k = (initialTab ?? "").toLowerCase().replace(/[^a-z]/g, ""); return TABS.find((x) => x.toLowerCase().replace(/[^a-z]/g, "") === k || (k === "hooks" && x === "Hooks & CTAs")) ?? "Briefs"; });
+/** The owner's own reusable brief templates (brief_type = format), saved from the editor. */
+function MyFormats() {
+  const { appId } = useAdminApp();
+  const app = appId ?? SOPHIA_APP_ID;
+  const navigate = useNavigate();
+  const { data = [], isLoading } = useQuery({
+    queryKey: ["hub", "learn", "my-formats", app],
+    queryFn: async () => ((await supabase.from("briefs").select("id, title, hook_text, style, updated_at").eq("app_id", app).eq("brief_type", "format").order("updated_at", { ascending: false })).data ?? []),
+  });
+  async function use(id: string) {
+    const { data: src } = await supabase.from("briefs").select("*").eq("id", id).single(); if (!src) return;
+    const { id: _i, created_at: _c, updated_at: _u, ...rest } = src as Record<string, unknown>; void _i; void _c; void _u;
+    const { data: n, error } = await supabase.from("briefs").insert({ ...rest, brief_type: "precise", parent_format_id: id, status: "draft", drop_at: null } as never).select("id").single();
+    if (error || !n) { toast.error("Could not start a brief from this format."); return; }
+    const { data: ba } = await supabase.from("brief_assets").select("asset_id, role, sort_order").eq("brief_id", id);
+    if (ba?.length) await supabase.from("brief_assets").insert(ba.map((x) => ({ ...x, brief_id: n.id })));
+    void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: n.id } });
+  }
+  if (isLoading) return <p className="text-sm text-brand-navySoft">Loading…</p>;
+  if (!data.length) return <p className={cn(card, "text-sm text-brand-navySoft")}>No formats yet — save a brief as a format from the editor.</p>;
+  return (
+    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{data.map((f) => (
+      <div key={f.id} className={cn(card, "flex flex-col gap-2")} data-testid="format-card">
+        <p className="font-extrabold text-brand-navy">{f.title || "Untitled format"}</p>
+        {f.hook_text ? <p className="text-sm text-brand-navySoft">{f.hook_text}</p> : null}
+        <div className="mt-auto flex gap-2 pt-2">
+          <Button size="sm" onClick={() => void use(f.id)}>Use for a new brief</Button>
+          <Button size="sm" variant="outline" onClick={() => void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: f.id } })}>Edit</Button>
+        </div>
+      </div>
+    ))}</div>
+  );
+}
+
+export function Learn({ initialTab }: { initialTab?: string | undefined; sub?: string | undefined } = {}) {
+  const [tab, setTab] = useState<(typeof TABS)[number]>(() => { const k = (initialTab ?? "").toLowerCase().replace(/[^a-z]/g, ""); return TABS.find((x) => x.toLowerCase().replace(/[^a-z]/g, "") === k || (k === "hooks" && x === "Hooks & CTAs")) ?? "Formats"; });
   return (
     <div className="space-y-4">
-      <div className="flex gap-2 overflow-x-auto">{TABS.map((t) => <button key={t} type="button" onClick={() => setTab(t)} className={cn("min-h-10 shrink-0 rounded-full px-4 text-sm font-bold", tab === t ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{t}</button>)}</div>
-      {tab === "Briefs" ? <BriefsArea sub={sub} initialTab={(initialTab ?? "").toLowerCase() === "formats" ? "formats" : undefined} /> : tab === "Hooks & CTAs" ? <SnippetsLibrary /> : tab === "Assets" ? <AssetsLibrary /> : tab === "References" ? <References /> : tab === "Guides & rules" ? <Guides /> : <Templates />}
+      <div className="flex gap-2 overflow-x-auto" role="tablist">{TABS.map((t) => <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={cn("min-h-10 shrink-0 rounded-full px-4 text-sm font-bold", tab === t ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{t}</button>)}</div>
+      {tab === "Formats" ? <MyFormats /> : tab === "Hooks & CTAs" ? <SnippetsLibrary /> : <AssetsLibrary />}
     </div>
   );
 }
+// Dormant (hidden from Library): Formats editor, References, Guides, Briefs area.
+export const DormantLibrary = { Formats, References, Guides, BriefsArea };
