@@ -17,7 +17,7 @@ export function VideoFormats() {
   const [search, setSearch] = useState("");
   const [busy, setBusy] = useState(false);
   const qc = useQueryClient();
-  const { data: examples = [] } = useQuery({ queryKey: ["format-example-picker"], enabled: Boolean(edit), queryFn: async () => { const { data, error } = await supabase.from("inspirations").select("id, author_handle, hook_text, url").order("created_at", { ascending: false }); if (error) throw error; return data ?? []; } });
+  const { data: examples = [] } = useQuery({ queryKey: ["format-example-picker"], queryFn: async () => { const { data, error } = await supabase.from("inspirations").select("id, author_handle, hook_text, url").order("created_at", { ascending: false }); if (error) throw error; return data ?? []; } });
   const { data: assets = [] } = useQuery({ queryKey: ["format-asset-picker"], enabled: Boolean(edit), queryFn: async () => { const { data, error } = await supabase.from("assets").select("id, kind, title, thumbnail_url, tags, folder").eq("status", "ready"); if (error) throw error; return data ?? []; } });
   const change = (patch: Partial<UgcFormat>) => setEdit((v) => v ? { ...v, ...patch } : v);
   async function save() {
@@ -38,6 +38,7 @@ export function VideoFormats() {
       <div className="text-sm"><p className="font-semibold">When to use it</p><p>{formatText(f.when_to_use)}</p></div>
       <ol className="list-inside list-decimal text-sm">{f.structure.shots.map((s, i) => <li key={i}>{s.label || `Shot ${i + 1}`}</li>)}</ol>
       <p className="whitespace-pre-wrap text-sm text-muted-foreground">{formatText(f.tips)}</p>
+      {f.example_inspiration_ids.length ? <div className="space-y-1 text-sm"><p className="font-semibold">Examples</p>{f.example_inspiration_ids.map((id) => { const e = examples.find((v) => v.id === id); return e ? <a key={id} href={e.url} target="_blank" rel="noreferrer" className="block text-portal-accent underline">{e.author_handle || "Inspiration"} · {e.hook_text || "Open example"}</a> : null; })}</div> : null}
       <Button size="sm" variant="outline" className="mt-auto self-start" onClick={() => { setEdit(structuredClone(f)); setSearch(""); }}><Pencil className="size-3.5" />Edit</Button>
     </article>)}</div>
     <Dialog open={Boolean(edit)} onOpenChange={(open) => { if (!open) setEdit(null); }}><DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl"><DialogHeader><DialogTitle>{edit?.sort_order}. {edit?.name_en}</DialogTitle></DialogHeader>

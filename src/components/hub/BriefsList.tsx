@@ -14,7 +14,7 @@ import { assetUploadSlot, briefFromVideo, metaAdsPrepare, studioAi } from "@/lib
 import { STUDIO_DRAFT_KEY, STYLES, STYLE_LABEL, STYLE_NUM, styleDefaults, type BriefStyle } from "@/lib/brief-studio";
 
 function StylePick({ value, onChange }: { value: BriefStyle | ""; onChange: (v: BriefStyle) => void }) {
-  return <div><p className="text-sm font-semibold">1. Style</p><div className="mt-1 flex flex-wrap gap-1.5">{STYLES.map(([k, l], i) => <button key={k} type="button" onClick={() => onChange(k)} className={cn("rounded-full border px-3 py-1 text-xs font-bold", value === k ? "border-portal-accent bg-portal-accent/10 text-portal-accent" : "")}>{i + 1}. {l}</button>)}</div></div>;
+  return <div><p className="text-sm font-semibold">1. Format</p><div className="mt-1 flex flex-wrap gap-1.5">{STYLES.map(([k, l], i) => <button key={k} type="button" onClick={() => onChange(k)} className={cn("rounded-full border px-3 py-1 text-xs font-bold", value === k ? "border-portal-accent bg-portal-accent/10 text-portal-accent" : "")}>{i + 1}. {l}</button>)}</div></div>;
 }
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
