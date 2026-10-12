@@ -9,13 +9,12 @@ export function UgcHome() {
   const { data } = useQuery({
     queryKey: ["hub", "ugc-home", appId],
     queryFn: async () => {
-      let ins = supabase.from("inspirations").select("id, app_id").eq("status", "analyzed").limit(2000);
+      const ins = supabase.from("inspirations").select("id, app_id").eq("status", "analyzed").limit(2000);
       let used = supabase.from("briefs").select("inspiration_id").not("inspiration_id", "is", null);
       let pub = supabase.from("briefs").select("id", { count: "exact", head: true }).eq("status", "published").neq("brief_type", "format");
       let posts = supabase.from("creator_posts").select("id", { count: "exact", head: true }).eq("status", "pending");
       if (appId) { used = used.eq("app_id", appId); pub = pub.eq("app_id", appId); posts = posts.eq("app_id", appId); }
       const [i, u, p, q] = await Promise.all([ins, used, pub, posts]);
-      void ins;
       const done = new Set((u.data ?? []).map((r) => r.inspiration_id as string));
       const toReview = (i.data ?? []).filter((r) => (!appId || !r.app_id || r.app_id === appId) && !done.has(r.id)).length;
       return { toReview, published: p.count ?? 0, toValidate: q.count ?? 0 };
