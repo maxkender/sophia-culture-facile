@@ -41,7 +41,7 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
         <PersonAvatar name={me.full_name} url={photos[creatorId]} size={64} />
         <div className="min-w-0">
           <h1 className="text-2xl font-extrabold text-brand-navy">{me.full_name} <span className="text-lg">{flag(me.country)}</span></h1>
-          <p className="text-sm text-brand-navySoft">{me.email_pending ? "email pending" : me.email}{me.phone ? ` · ${me.phone}` : ""} · {me.country ?? "no country"} · {String(me.ugc_status ?? me.status)}</p>
+          <p className="text-sm text-brand-navySoft">{me.email_pending ? "email pending" : me.email}{me.phone ? ` · ${me.phone}` : ""} · {me.country ?? "no country"} · {["paused", "ended", "dormant"].includes(String(me.ugc_status ?? me.status)) ? "paused" : "active"}</p>
           <HandleLinksInline tiktok={me.tiktok_handle} instagram={me.instagram_handle} />
         </div>
       </div>
