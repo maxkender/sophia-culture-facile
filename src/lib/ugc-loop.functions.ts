@@ -31,13 +31,24 @@ export const submitPostLinks = createServerFn({ method: "POST" })
     if (!appId) { const { data: en } = await context.supabase.from("creator_apps").select("app_id").eq("creator_id", me.id).limit(1).maybeSingle(); appId = en?.app_id ?? null; }
     const { normalise } = await import("./inspirations.server");
     const a = await admin();
+    // Draft review: when required, links for a brief open only once a draft for it is validated.
+    const { data: cfg } = await a.from("ugc_settings").select("draft_required").eq("id", 1).maybeSingle();
+    let draftId: string | null = null;
+    if (data.briefId) {
+      const { data: dr } = await a.from("creator_drafts").select("id").eq("creator_id", me.id).eq("brief_id", data.briefId).eq("status", "validated").order("version", { ascending: false }).limit(1).maybeSingle();
+      draftId = dr?.id ?? null;
+    }
+    if (cfg?.draft_required !== false) {
+      if (!data.briefId) throw new Error("Choose the brief of this video first.");
+      if (!draftId) throw new Error("Send your draft and wait for it to be validated before posting.");
+    }
     const results: { url: string; ok: boolean; reason?: string }[] = [];
     for (const raw of data.urls) {
       const n = normalise(raw);
       if (!n) { results.push({ url: raw, ok: false, reason: "Not a TikTok or Instagram video link." }); continue; }
       const { data: dup } = await a.from("creator_posts").select("id").eq("url_key", n.key).maybeSingle();
       if (dup) { results.push({ url: raw, ok: false, reason: "Already submitted." }); continue; }
-      const { error } = await a.from("creator_posts").insert({ creator_id: me.id, url: n.url, url_key: n.key, platform: n.platform, brief_id: data.briefId, posted_on: new Date().toISOString().slice(0, 10), status: "pending", submitted_at: new Date().toISOString(), guidelines_checked: data.guidelines, ...(appId ? { app_id: appId } : {}) });
+      const { error } = await a.from("creator_posts").insert({ creator_id: me.id, url: n.url, url_key: n.key, platform: n.platform, brief_id: data.briefId, posted_on: new Date().toISOString().slice(0, 10), status: "pending", submitted_at: new Date().toISOString(), guidelines_checked: data.guidelines, draft_id: draftId, ...(appId ? { app_id: appId } : {}) });
       results.push(error ? { url: raw, ok: false, reason: error.code === "23505" ? "Already submitted." : "Could not be saved." } : { url: raw, ok: true });
     }
     if (results.some((r) => r.ok)) await a.from("creators").update({ status: "active", onboarding_completed_at: new Date().toISOString() }).eq("id", me.id).is("onboarding_completed_at", null);
