@@ -1985,6 +1985,69 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_drafts: {
+        Row: {
+          admin_comment: string | null
+          app_id: string | null
+          brief_id: string
+          created_at: string
+          creator_id: string
+          id: string
+          link_url: string | null
+          note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          version: number
+          video_path: string | null
+        }
+        Insert: {
+          admin_comment?: string | null
+          app_id?: string | null
+          brief_id: string
+          created_at?: string
+          creator_id: string
+          id?: string
+          link_url?: string | null
+          note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          version?: number
+          video_path?: string | null
+        }
+        Update: {
+          admin_comment?: string | null
+          app_id?: string | null
+          brief_id?: string
+          created_at?: string
+          creator_id?: string
+          id?: string
+          link_url?: string | null
+          note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          version?: number
+          video_path?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_drafts_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_drafts_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_email_sequence: {
         Row: {
           created_at: string
@@ -2244,6 +2307,7 @@ export type Database = {
           cover_url: string | null
           created_at: string
           creator_id: string
+          draft_id: string | null
           effort: string | null
           external_id: string | null
           feedback: string | null
@@ -2289,6 +2353,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           creator_id: string
+          draft_id?: string | null
           effort?: string | null
           external_id?: string | null
           feedback?: string | null
@@ -2334,6 +2399,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           creator_id?: string
+          draft_id?: string | null
           effort?: string | null
           external_id?: string | null
           feedback?: string | null
@@ -2388,6 +2454,13 @@ export type Database = {
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_posts_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "creator_drafts"
             referencedColumns: ["id"]
           },
           {
@@ -6324,6 +6397,7 @@ export type Database = {
           cpi_target: number
           cron_token: string
           default_posts_per_month: number
+          draft_required: boolean
           hold_days: number
           id: number
           min_payout: number
@@ -6348,6 +6422,7 @@ export type Database = {
           cpi_target?: number
           cron_token?: string
           default_posts_per_month?: number
+          draft_required?: boolean
           hold_days?: number
           id?: number
           min_payout?: number
@@ -6372,6 +6447,7 @@ export type Database = {
           cpi_target?: number
           cron_token?: string
           default_posts_per_month?: number
+          draft_required?: boolean
           hold_days?: number
           id?: number
           min_payout?: number
@@ -6517,6 +6593,7 @@ export type Database = {
         Returns: undefined
       }
       slugify: { Args: { value: string }; Returns: string }
+      ugc_draft_required: { Args: never; Returns: boolean }
       unaccent_fallback: { Args: { value: string }; Returns: string }
     }
     Enums: {
