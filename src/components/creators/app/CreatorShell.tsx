@@ -49,7 +49,7 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
     <nav aria-label={ct("Creator space")} className="flex flex-col gap-6">
       {CREATOR_NAV.map((group) => (
         <div key={group.heading}>
-          <p className="mb-2 px-3 text-[11px] font-bold uppercase tracking-[0.12em] text-brand-navySoft/70">{group.heading}</p>
+          <p className="mb-2 px-3 text-[11px] font-bold uppercase tracking-[0.12em] text-brand-navySoft/70">{ct(group.heading)}</p>
           <ul className="space-y-1">
             {group.items.map((item) => {
               const Icon = item.icon;
