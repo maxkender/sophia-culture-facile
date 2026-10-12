@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useAdminApp, SOPHIA_APP_ID } from "@/lib/apps";
-import { STUDIO_DRAFT_KEY, STYLES, STYLE_LABEL, blankFmt, styleDefaults, type BriefStyle, type Plan, type StyleData } from "@/lib/brief-studio";
+import { STYLES, STYLE_LABEL, blankBrief, blankFmt, scoreBrief, styleAssetIds, styleDefaults, type BriefStyle, type Plan, type StyleData } from "@/lib/brief-studio";
+import { backfillNotionFormat } from "@/lib/notion.functions";
+import { NotionItemsTab } from "./NotionSync";
 import { deleteInspirations, importInspirations, inspirationToReference, processInspirations, retryInspirationErrors, retranscribeInspiration } from "@/lib/inspirations.functions";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -28,7 +30,10 @@ export type Insp = {
   views: number | null; likes: number | null; comments: number | null; shares: number | null; posted_at: string | null;
   transcript: string | null; language: string | null; words: Word[] | null; analysis: An | null; proposed_style: string | null; style_confidence: number | null; approved_style: string | null;
   hook_text: string | null; hook_type: string | null; score: number | null; app_fit: string | null; tags: string[]; cost: Record<string, number | string>; reference_id: string | null; created_at: string;
+  notion_page_id?: string | null; notion_notes?: string | null; notion_format?: string | null;
 };
+export const NOTION_FORMATS = ["Face caméra", "POV / lifestyle", "Démo app", "Storytime", "Sketch", "Slideshow", "Montage / edit", "Voix off", "Autre"];
+const UNSWIPE_ID = "00000000-0000-4000-8000-000000000002";
 const KEY = ["hub", "inspirations"];
 const fmtN = (n: number | null) => (n == null ? "—" : n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}k` : String(n));
 const styleOf = (r: Insp) => r.approved_style ?? r.proposed_style;
@@ -49,11 +54,11 @@ function useCovers(rows: Insp[]) {
   });
 }
 
-export function Inspiration() {
+export function Inspiration({ initialOpen }: { initialOpen?: string | undefined } = {}) {
   const { data: all = [], isLoading } = useInspirations(); const { appId } = useAdminApp(); const qc = useQueryClient();
   const [flt, setFlt] = useState({ q: "", style: "all", fit: "all", lang: "all", platform: "all", hook: "all", minScore: 0, status: "all", tag: "", since: "" });
   const [sort, setSort] = useState<"date" | "views" | "score">("date");
-  const [sel, setSel] = useState<Set<string>>(new Set()); const [open, setOpen] = useState<string | null>(null);
+  const [sel, setSel] = useState<Set<string>>(new Set()); const [open, setOpen] = useState<string | null>(initialOpen ?? null); const [tab, setTab] = useState<"videos" | "notion">("videos");
   const rows = useMemo(() => {
     const q = flt.q.toLowerCase();
     const out = all.filter((r) => (!appId || !r.app_id || r.app_id === appId)
@@ -72,6 +77,8 @@ export function Inspiration() {
 
   return (
     <div className="space-y-5">
+      <div className="flex gap-2" role="tablist">{([["videos", "Videos"], ["notion", "Notion"]] as const).map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cn("min-h-9 rounded-full px-4 text-sm font-bold", tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l}</button>)}</div>
+      {tab === "notion" ? <NotionItemsTab onOpen={(id) => setOpen(id)} /> : <>
       <ImportPanel rows={all} appId={appId} onDone={refresh} />
       <div className={cn(card, "space-y-3")}>
         <div className="flex flex-wrap gap-2">
@@ -107,13 +114,16 @@ export function Inspiration() {
                   <div className="flex flex-wrap gap-1">
                     {styleOf(r) ? <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-bold", r.approved_style ? "bg-space-ugc text-card" : "bg-space-ugc/10 text-space-ugc")}>{SLABEL[styleOf(r)!]}</span> : null}
                     {r.app_fit ? <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold text-brand-navy">{FIT.find(([k]) => k === r.app_fit)?.[1]}</span> : null}
+                    {r.notion_page_id ? <span className="rounded-full bg-brand-navy px-2 py-0.5 text-[10px] font-bold text-card" title="Imported from Notion">N · From Notion</span> : null}
                   </div>
                 </div>
               </button>
+              <CreateBriefButton r={r} compact />
             </div>
           ))}
         </div>
       )}
+      </>}
       <Sheet open={Boolean(current)} onOpenChange={(o) => !o && setOpen(null)}>
         <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">{current ? <Drawer r={current} onChange={refresh} /> : null}</SheetContent>
       </Sheet>
@@ -189,8 +199,64 @@ export function draftFromInspiration(r: Insp, appId: string) {
   };
 }
 
+const firstWords = (s: string, n: number) => s.split(/\s+/).filter(Boolean).slice(0, n).join(" ");
+/** Why the button is disabled, or null when the inspiration can become a brief. */
+export function briefBlocker(r: Insp): string | null {
+  if (r.status === "analyzed" && r.analysis && r.transcript != null) return null;
+  if (r.transcript == null && (r.status === "error" || r.video_path)) return "Transcription failed → Re-transcribe";
+  return "Not analyzed yet";
+}
+/** Creates ONE draft brief from the inspiration (never published) and returns its id. */
+export async function createBriefFromInspiration(r: Insp, appId: string): Promise<string> {
+  const d = draftFromInspiration(r, appId); const an = r.analysis; const st = an?.structure ?? [];
+  const beats = st.map((s) => `${s.start_s.toFixed(1)}–${s.end_s.toFixed(1)} s · Seen: ${s.seen}${s.on_screen ? ` · On screen: ${s.on_screen}` : ""}${s.said ? ` · Said: « ${s.said} »` : ""}`);
+  const pm = st.find((s) => /\b(app|phone|screen|écran|téléphone|sophia|unswipe)\b/i.test(`${s.seen} ${s.said}`));
+  const hook = r.hook_text || an?.hook.on_screen || an?.hook.verbatim || "";
+  const b = { ...blankBrief(appId), ...d, brief_type: "precise" as const, beats: beats.length ? beats : ["", "", ""], hook_text: hook, oral_hook: an?.hook.verbatim ?? "", hook_visual: an?.hook.on_screen || an?.hook.visual || "", product_moment: pm ? `${pm.start_s.toFixed(1)} s — ${pm.seen}` : "", title: `From: @${r.author_handle ?? "inspiration"} – ${firstWords(hook, 6)}`.slice(0, 140) };
+  const grade = scoreBrief(b as never, (b.style ? styleAssetIds(b.style_data).length : 0) + (r.reference_id ? 1 : 0));
+  const { data, error } = await supabase.from("briefs").insert({
+    app_id: appId, title: b.title, brief_type: "precise", status: "draft", style: b.style, style_data: b.style_data as never, effort: b.effort, format: b.effort, platform: b.platform, duration_target: b.duration_target,
+    hook_text: b.hook_text, hook: b.hook_text, hooks: [b.hook_text, b.oral_hook, b.hook_visual].filter(Boolean), oral_hook: b.oral_hook, hook_visual: b.hook_visual, beats: b.beats as never, script: b.beats.join("\n"),
+    product_moment: b.product_moment, product_second: pm ? Math.round(pm.start_s) : b.product_second, product_gesture: b.product_gesture, say_name: b.say_name, rules_do: b.rules_do, rules_dont: b.rules_dont,
+    tags: r.tags, language: b.language, audience: "all", score: grade.score, inspiration_id: r.id, source_reference_id: r.reference_id, reference_video_ids: r.reference_id ? [r.reference_id] : [],
+  } as never).select("id").single();
+  if (error || !data) throw new Error("The brief could not be created.");
+  return (data as { id: string }).id;
+}
+function CreateBriefButton({ r, compact }: { r: Insp; compact?: boolean }) {
+  const navigate = useNavigate(); const qc = useQueryClient(); const [busy, setBusy] = useState(false);
+  const [app, setApp] = useState<string>(r.app_id ?? (r.app_fit === "unswipe" ? UNSWIPE_ID : SOPHIA_APP_ID));
+  const why = briefBlocker(r);
+  const go = async () => { setBusy(true); try { const id = await createBriefFromInspiration(r, app); toast.success("Draft brief created"); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: id } }); } catch (e) { toast.error((e as Error).message); } setBusy(false); };
+  if (compact) return <button type="button" disabled={Boolean(why) || busy} title={why ?? "Create brief from this inspiration"} onClick={() => void go()} className="w-full border-t border-brand-line px-3 py-1.5 text-left text-[11px] font-bold text-portal-accent disabled:text-brand-navySoft">{why ?? "Create brief from this inspiration"}</button>;
+  return <span className="inline-flex flex-wrap items-center gap-1">
+    {!r.app_id ? <select aria-label="App for the brief" className={f} value={app} onChange={(e) => setApp(e.target.value)}><option value={SOPHIA_APP_ID}>Sophia</option><option value={UNSWIPE_ID}>UnSwipe</option></select> : null}
+    <Button size="sm" variant="outline" disabled={Boolean(why) || busy} title={why ?? undefined} onClick={() => void go()}>{busy ? <Loader2 className="size-4 animate-spin" /> : null}Create brief from this inspiration</Button>
+    {why ? <span className="text-xs text-brand-navySoft">{why}</span> : null}
+  </span>;
+}
+
+/** Reference panel in the Brief Studio: video, transcript and why it works. */
+export function InspirationReference({ id }: { id: string }) {
+  const { data: r } = useQuery({ queryKey: ["hub", "insp-ref", id], queryFn: async () => (await supabase.from("inspirations").select("*").eq("id", id).maybeSingle()).data as unknown as Insp | null });
+  const [src, setSrc] = useState<string | null>(null); const [t, setT] = useState(0); const v = useRef<HTMLVideoElement>(null);
+  useEffect(() => { if (r?.video_path) void supabase.storage.from("inspirations").createSignedUrl(r.video_path, 3600).then(({ data }) => setSrc(data?.signedUrl ?? null)); }, [r?.video_path]);
+  if (!r) return null;
+  const words = (r.words ?? []).filter((w) => !w.ev);
+  return <details open className={cn(card, "space-y-3")} data-testid="inspiration-ref"><summary className="cursor-pointer font-extrabold text-brand-navy">Reference · @{r.author_handle ?? "…"} (Inspiration)</summary>
+    <div className="mt-3 grid gap-4 sm:grid-cols-[220px_1fr]">
+      {src ? <video ref={v} src={src} controls playsInline onTimeUpdate={(e) => setT(e.currentTarget.currentTime)} className="max-h-96 w-full rounded-xl bg-brand-navy" aria-label="Reference video" /> : <div className="h-40 rounded-xl bg-muted" />}
+      <div className="space-y-2 text-sm text-brand-navy">
+        <p className="text-xs font-bold uppercase text-brand-navySoft">Why it works</p><ul className="list-disc pl-5">{(r.analysis?.why_it_works ?? []).map((w, i) => <li key={i}>{w}</li>)}</ul>
+        <p className="text-xs font-bold uppercase text-brand-navySoft">Transcript</p>
+        {words.length ? <p className="max-h-48 overflow-y-auto leading-relaxed" data-testid="ref-transcript">{words.map((w, i) => <span key={i} onClick={() => { if (v.current) { v.current.currentTime = w.s; void v.current.play(); } }} className={cn("cursor-pointer rounded", t >= w.s && t < w.e + 0.05 ? "bg-space-ugc text-card" : "")}>{w.t} </span>)}</p> : <p className="text-brand-navySoft">{r.transcript || "No speech in this video."}</p>}
+      </div>
+    </div>
+  </details>;
+}
+
 function Drawer({ r, onChange }: { r: Insp; onChange: () => void }) {
-  const toRef = useServerFn(inspirationToReference); const retx = useServerFn(retranscribeInspiration); const [rtBusy, setRtBusy] = useState(false); const navigate = useNavigate();
+  const toRef = useServerFn(inspirationToReference); const retx = useServerFn(retranscribeInspiration); const [rtBusy, setRtBusy] = useState(false);
   const video = useRef<HTMLVideoElement>(null); const [t, setT] = useState(0); const [src, setSrc] = useState<string | null>(null);
   const [tags, setTags] = useState(r.tags.join(", "));
   useEffect(() => { setTags(r.tags.join(", ")); }, [r.id, r.tags]);
@@ -205,6 +271,8 @@ function Drawer({ r, onChange }: { r: Insp; onChange: () => void }) {
   }
   const words = (r.words ?? []).filter((w) => !w.ev);
   const c = r.cost ?? {};
+  const fill = useServerFn(backfillNotionFormat);
+  useEffect(() => { if (r.status === "analyzed" && !r.notion_format) void fill({ data: { ids: [r.id] } }).then(onChange).catch(() => undefined); }, [r.id]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div className="space-y-4">
       <SheetHeader><SheetTitle>@{r.author_handle ?? "…"} · {r.platform === "tiktok" ? "TikTok" : "Instagram"}</SheetTitle></SheetHeader>
@@ -218,9 +286,16 @@ function Drawer({ r, onChange }: { r: Insp; onChange: () => void }) {
         <label className="text-xs font-bold text-brand-navy">App fit<select aria-label="App fit for this video" className={cn(f, "mt-1 w-full")} value={r.app_fit ?? ""} onChange={(e) => void upd({ app_fit: e.target.value || null })}><option value="">—</option>{FIT.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
         <label className="col-span-2 text-xs font-bold text-brand-navy">Tags<input aria-label="Tags" className={cn(f, "mt-1 w-full")} value={tags} onChange={(e) => setTags(e.target.value)} onBlur={() => void upd({ tags: tags.split(",").map((x) => x.trim().toLowerCase()).filter(Boolean) })} /></label>
       </div>
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <label className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 font-bold text-brand-navy">Notion format:
+          <select aria-label="Notion format" className="bg-transparent font-bold" value={r.notion_format ?? ""} onChange={(e) => void upd({ notion_format: e.target.value || null })}><option value="">—</option>{NOTION_FORMATS.map((x) => <option key={x}>{x}</option>)}</select></label>
+        {r.notion_page_id ? <a href={`https://www.notion.so/${r.notion_page_id.replace(/-/g, "")}`} target="_blank" rel="noreferrer" className="rounded-full bg-brand-navy px-2 py-1 font-bold text-card">From Notion ↗</a> : null}
+      </div>
+      {r.notion_notes ? <div className="rounded-lg bg-muted/60 p-2 text-sm"><p className="text-xs font-bold uppercase text-brand-navySoft">Notes (Notion)</p><p className="whitespace-pre-wrap">{r.notion_notes}</p></div> : null}
+      {r.status !== "analyzed" ? <CreateBriefButton r={r} /> : null}
       {r.status === "analyzed" ? <div className="flex flex-wrap gap-2">
         <Button size="sm" onClick={() => void saveHook()}>Save hook to Hooks library</Button>
-        <Button size="sm" variant="outline" onClick={() => { sessionStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify(draftFromInspiration(r, appForSave))); void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: "new" } }); }}>Create a draft brief from this inspiration</Button>
+        <CreateBriefButton r={r} />
         <Button size="sm" variant="outline" onClick={async () => { try { const x = await toRef({ data: { id: r.id } }); toast.success(x.existed ? "Already in Reference videos" : "Saved in Library → Reference videos"); onChange(); } catch (e) { toast.error((e as Error).message); } }}>{r.reference_id ? "In references ✓" : "Save as reference"}</Button>
       </div> : null}
       {r.analysis ? <div className="space-y-3 text-sm text-brand-navy">

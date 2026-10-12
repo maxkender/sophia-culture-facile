@@ -117,8 +117,9 @@ const analysisSchema = obj({
   cta: S, on_screen_text_style: S, audio: { type: "string", enum: ["voice", "music", "voice_and_music", "none"] }, audio_note: S,
   why_it_works: { type: "array", items: S }, score: { type: "integer" },
   app_fit: { type: "string", enum: ["sophia", "unswipe", "both", "none"] }, tags: { type: "array", items: S },
+  notion_format: { type: "string", enum: ["Face caméra", "POV / lifestyle", "Démo app", "Storytime", "Sketch", "Slideshow", "Montage / edit", "Voix off", "Autre"] },
 });
-export type InspirationAnalysis = { style: string; style_confidence: number; hook: { verbatim: string; on_screen: string; visual: string }; hook_type: string; structure: { start_s: number; end_s: number; seen: string; said: string; on_screen: string }[]; cta: string; on_screen_text_style: string; audio: string; audio_note: string; why_it_works: string[]; score: number; app_fit: string; tags: string[] };
+export type InspirationAnalysis = { style: string; style_confidence: number; hook: { verbatim: string; on_screen: string; visual: string }; hook_type: string; structure: { start_s: number; end_s: number; seen: string; said: string; on_screen: string }[]; cta: string; on_screen_text_style: string; audio: string; audio_note: string; why_it_works: string[]; score: number; app_fit: string; tags: string[]; notion_format?: string };
 
 async function analyse(input: { caption: string; transcript: string; words: { t: string; s: number }[]; duration: number | null; coverUrl: string | null; platform: string; handle: string | null; kind: string }) {
   const key = process.env["LOVABLE_API_KEY"]; if (!key) throw new Error("The AI key is not configured.");
@@ -129,7 +130,7 @@ Transcript with timestamps: ${timed || "(no speech)"}
 
 The 5 UGC styles: reaction_demo = Reaction into demo (face reaction plan then phone/app demo); broll_stickers = B-roll + stickers storytelling, one visual per plan, talked; sole_footage = one single plan + music + text on screen, no talking; talked_hook_demo = talked personal-story hook then app demo; educational = face cam talking, teaching. Use slideshow for photo carousels, other if none fits.
 Apps: Sophia = 5-minute daily culture/general-knowledge courses instead of doom-scrolling. UnSwipe = keeps social apps without Reels/For You/Shorts, reduces screen time.
-Hook = first 3 seconds: verbatim from the transcript (empty if no speech) + what is on screen. Structure = plans with timecodes (seconds). why_it_works = exactly 3 short lines. score = virality /10. tags = 3-6 short lowercase tags. Write analysis text in English; keep verbatim quotes in the original language.`;
+Hook = first 3 seconds: verbatim from the transcript (empty if no speech) + what is on screen. Structure = plans with timecodes (seconds). why_it_works = exactly 3 short lines. score = virality /10. tags = 3-6 short lowercase tags. notion_format = the single best-fitting format among the 9 listed options. Write analysis text in English; keep verbatim quotes in the original language.`;
   const content: unknown[] = [{ type: "input_text", text }];
   if (input.coverUrl) content.push({ type: "input_image", image_url: input.coverUrl });
   const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
@@ -196,7 +197,7 @@ export async function processRow(a: Admin, id: string, from?: "analyse") {
     await set(a, id, {
       status: "analyzed", error: null, analysis: an, proposed_style: an.style, style_confidence: Math.max(0, Math.min(1, an.style_confidence > 1 ? an.style_confidence / 100 : an.style_confidence)),
       hook_text: [an.hook.verbatim, an.hook.on_screen].filter(Boolean).join(" — ") || an.hook.visual, hook_type: an.hook_type, score: Math.max(0, Math.min(10, Math.round(an.score))),
-      app_fit: row.app_fit ?? an.app_fit, tags: row.tags?.length ? row.tags : an.tags.slice(0, 6).map((t) => t.toLowerCase()), cost,
+      app_fit: row.app_fit ?? an.app_fit, tags: row.notion_page_id ? [...new Set([...(row.tags ?? []), ...an.tags.slice(0, 6).map((t) => t.toLowerCase())])] : row.tags?.length ? row.tags : an.tags.slice(0, 6).map((t) => t.toLowerCase()), notion_format: row.notion_format ?? an.notion_format ?? null, cost,
     });
     return { id, status: "analyzed" };
   } catch (e) {
