@@ -65,7 +65,7 @@ export async function acceptApplication(supabaseAdmin: Admin, applicationId: str
 
     // Every UGC creator works on every active app; enrolments become active only now.
     const appOf = (application as { app_id?: string | null }).app_id ?? "00000000-0000-4000-8000-000000000001";
-    const { data: activeApps } = await supabaseAdmin.from("apps").select("id").eq("status", "active");
+    const { data: activeApps } = await supabaseAdmin.from("apps").select("id").eq("active", true);
     const allApps = [...new Set([appOf, ...((activeApps ?? []) as { id: string }[]).map((a) => a.id)])];
     await supabaseAdmin.from("creator_apps").upsert(allApps.map((app_id) => ({ creator_id: creatorId, app_id, status: "active" })), { onConflict: "creator_id,app_id" });
 

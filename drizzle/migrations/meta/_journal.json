@@ -477,6 +477,13 @@
       "when": 1791814976255,
       "tag": "0067_ugc_video_format_definitions",
       "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1791816276282,
+      "tag": "0068_creator_terms_visible",
+      "breakpoints": true
     }
   ]
 }
