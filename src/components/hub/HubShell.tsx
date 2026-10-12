@@ -20,9 +20,8 @@ import { lastSpace, SPACE_ACCENT, SPACE_HOME, SPACE_KEY, SPACE_LABEL, SPACE_NAV,
 
 type Item = NavItem;
 const SHARED_TITLES: Record<string, [string, string]> = {
-  "/hub/settings": ["Settings", "Apps, access codes, email, connections and team"],
+  "/hub/settings": ["Settings", "Shooting rules, descriptions, Notion, payments and team"],
   "/hub/ugc/creators": ["Creators", "Creator file"],
-  "/hub/ugc/referrals": ["Referrals", "Creators who bring other creators"],
 };
 
 function isActive(pathname: string, i: Item) {
@@ -96,14 +95,12 @@ function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
       <CommandList>
         <CommandEmpty>No result.</CommandEmpty>
         {SPACES.map((sp) => <CommandGroup key={sp} heading={`${SPACE_LABEL[sp]} · pages`}>{SPACE_NAV[sp].map((i) => <CommandItem key={i.to} value={`${SPACE_LABEL[sp]} ${i.label}`} onSelect={() => go(i.to)}>{i.label}</CommandItem>)}</CommandGroup>)}
-        <CommandGroup heading="Shared · pages"><CommandItem onSelect={() => go("/hub/settings")}>Settings</CommandItem></CommandGroup>
-        <CommandGroup heading="UGC · creators">{data?.creators.map((c) => <CommandItem key={c.id} value={`creator ${c.full_name}`} onSelect={() => go("/hub/ugc/creators/$creatorId", { creatorId: c.id })}>{c.full_name}</CommandItem>)}</CommandGroup>
-        <CommandGroup heading="UGC · jobs">{data?.jobs.map((j) => <CommandItem key={j.id} value={`job ${j.title}`} onSelect={() => go("/hub/ugc/campaigns")}>{j.title}</CommandItem>)}</CommandGroup>
-        <CommandGroup heading="UGC · briefs">{data?.briefs.map((b) => <CommandItem key={b.id} value={`brief ${b.title}`} onSelect={() => go("/hub/ugc/library/briefs/$briefId", { briefId: b.id })}>{b.title}</CommandItem>)}</CommandGroup>
+                <CommandGroup heading="UGC · creators">{data?.creators.map((c) => <CommandItem key={c.id} value={`creator ${c.full_name}`} onSelect={() => go("/hub/ugc/creators/$creatorId", { creatorId: c.id })}>{c.full_name}</CommandItem>)}</CommandGroup>
+        <CommandGroup heading="UGC · briefs">{data?.briefs.map((b) => <CommandItem key={b.id} value={`brief ${b.title}`} onSelect={() => go("/hub/ugc/briefs/$briefId", { briefId: b.id })}>{b.title}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="Slideshows · applications & posters">{data?.slides.map((s) => <CommandItem key={s.id} value={`slideshow ${s.full_name} ${s.country}`} onSelect={() => go("/hub/slideshows/applications", undefined, { id: s.id })}>{s.full_name} · {s.country}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="Influencers · profiles">{data?.infl.map((i) => <CommandItem key={i.id} value={`influencer ${i.display_name}`} onSelect={() => go("/hub/influencers/influencers", undefined, { id: i.id })}>{i.display_name}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="Influencers · deals">{data?.deals.map((d) => { const n = `${(d.influencers as { display_name?: string } | null)?.display_name ?? ""} · ${(d.influencer_briefs as { title?: string } | null)?.title ?? ""}`; return <CommandItem key={d.id} value={`deal ${n}`} onSelect={() => go("/hub/influencers/deals", undefined, { id: d.id })}>{n}</CommandItem>; })}</CommandGroup>
-        <CommandGroup heading="UGC · posts">{data?.posts.map((p) => <CommandItem key={p.id} value={`post ${p.url}`} onSelect={() => go("/hub/ugc/campaigns", undefined)}>{p.url}</CommandItem>)}</CommandGroup>
+        <CommandGroup heading="UGC · posts">{data?.posts.map((p) => <CommandItem key={p.id} value={`post ${p.url}`} onSelect={() => go("/hub/ugc/posts", undefined)}>{p.url}</CommandItem>)}</CommandGroup>
       </CommandList>
     </CommandDialog>
   );
@@ -111,7 +108,7 @@ function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
 
 const BANNER_KEY = "sophia.hub.banner.dismissed";
 
-function SetupBanner() {
+export function SetupBanner() {
   const steps = useSetupChecklist();
   const [hidden, setHidden] = useState(true);
   useEffect(() => setHidden(window.localStorage.getItem(BANNER_KEY) === "1"), []);
@@ -177,8 +174,8 @@ export function HubShell({ children }: { children: ReactNode }) {
         </nav>
         <div className="space-y-1 border-t border-brand-line p-3">
           <AppSwitcher />
-          <button type="button" onClick={() => setSidekick(true)} className="flex min-h-10 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold text-brand-navy hover:bg-brand-navy/10"><Bot className="size-4" />Assistant</button>
-          <Link to="/hub/settings" className={cn("flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold", pathname.startsWith("/hub/settings") ? "bg-brand-navy text-card" : "text-brand-navy hover:bg-brand-navy/10")}><Settings className="size-4" />Settings</Link>
+          {space !== "ugc" ? <button type="button" onClick={() => setSidekick(true)} className="flex min-h-10 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold text-brand-navy hover:bg-brand-navy/10"><Bot className="size-4" />Assistant</button> : null}
+          {space !== "ugc" ? <Link to="/hub/settings" className={cn("flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold", pathname.startsWith("/hub/settings") ? "bg-brand-navy text-card" : "text-brand-navy hover:bg-brand-navy/10")}><Settings className="size-4" />Settings</Link> : null}
           <Link to="/auteurs/admin" className="flex min-h-10 items-center rounded-xl px-3 text-sm font-semibold text-portal-accent hover:bg-brand-navy/10">Passer à l'espace profs →</Link>
           <div className="flex items-center gap-2 px-1">
             <span className="flex size-8 items-center justify-center rounded-full bg-portal-accent text-xs font-bold text-card">{name.slice(0, 1)}</span>
@@ -189,7 +186,7 @@ export function HubShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="pb-20 lg:pb-0 lg:pl-60">
-        {space === "ugc" ? <SetupBanner /> : null}
+        
         <header className="safe-top border-b border-brand-line bg-card">
           <div className="flex min-h-16 flex-wrap items-center gap-3 px-4 py-2 sm:px-6">
             <div className="lg:hidden"><SpaceSwitcher space={space} /></div>
@@ -201,17 +198,8 @@ export function HubShell({ children }: { children: ReactNode }) {
               <Search className="size-4" /> <span className="flex-1 text-left">Search Hub</span><span className="text-[10px] font-bold">⌘K</span>
             </button>
             <Button variant="ghost" size="icon" className="md:hidden" aria-label="Search" onClick={() => setSearch(true)}><Search className="size-5" /></Button>
-            {space === "ugc" ? <DropdownMenu>
-              <DropdownMenuTrigger asChild><Button size="icon" aria-label="Create"><Plus className="size-5" /></Button></DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/ugc/campaigns/create" })}>Campaign</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/ugc/campaigns", search: { tab: "jobs", newJob: 1 } as never })}>Job</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: "new" } })}>Brief</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/ugc/creators" })}>Invite creator</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/ugc/creators", search: { add: 1 } as never })}>Add validated creator</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu> : null}
-            <Button size="icon" variant="outline" aria-label="Open Assistant" title="Assistant" onClick={() => setSidekick(true)}><Bot className="size-4" /></Button>
+            {space === "ugc" ? <Button size="icon" aria-label="New brief" title="New brief" onClick={() => void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: "new" } })}><Plus className="size-5" /></Button>
+            : <Button size="icon" variant="outline" aria-label="Open Assistant" title="Assistant" onClick={() => setSidekick(true)}><Bot className="size-4" /></Button>}
             <NotificationBell profileId={profile.id} />
           </div>
         </header>
@@ -231,8 +219,8 @@ export function HubShell({ children }: { children: ReactNode }) {
           <DropdownMenuTrigger asChild><button type="button" className="flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold text-brand-navySoft"><MoreHorizontal className="size-5" />More</button></DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="top" className="w-56">
             {nav.filter((i) => !i.mobile).map((i) => <DropdownMenuItem key={i.label} onSelect={() => void navigate({ to: i.to } as never)}>{i.label}</DropdownMenuItem>)}
-            <DropdownMenuItem onSelect={() => setSidekick(true)}>Assistant</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/settings" })}>Settings</DropdownMenuItem>
+            {space !== "ugc" ? <DropdownMenuItem onSelect={() => setSidekick(true)}>Assistant</DropdownMenuItem> : null}
+            {space !== "ugc" ? <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/settings" })}>Settings</DropdownMenuItem> : null}
             <DropdownMenuItem onSelect={() => void navigate({ to: "/auteurs/admin" })}>Passer à l'espace profs →</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

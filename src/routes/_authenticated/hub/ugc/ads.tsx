@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Ads } from "@/components/hub/Ads";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Hidden from the simplified UGC space (code kept dormant); old links land on UGC Home. */
 export const Route = createFileRoute("/_authenticated/hub/ugc/ads")({
-  head: () => ({ meta: [{ title: "Ads | Creator Hub" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: Ads,
+  beforeLoad: () => {
+    throw redirect({ to: "/hub/ugc", replace: true });
+  },
 });

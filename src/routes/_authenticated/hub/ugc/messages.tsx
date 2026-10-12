@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { CreatorInbox } from "@/components/portal/admin/CreatorInbox";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Hidden from the simplified UGC space (code kept dormant); old links land on UGC Home. */
 export const Route = createFileRoute("/_authenticated/hub/ugc/messages")({
-  head: () => ({ meta: [{ title: "Messages | Creator Hub" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: CreatorInbox,
+  beforeLoad: () => {
+    throw redirect({ to: "/hub/ugc", replace: true });
+  },
 });
