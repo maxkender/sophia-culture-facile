@@ -1,3 +1,4 @@
+import { TEST_CHIP, useShowTest } from "./show-test";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -15,15 +16,17 @@ import { UgcPosts } from "./UgcPosts";
 
 type DraftRow = {
   id: string; creator_id: string; brief_id: string; app_id: string | null; version: number; video_path: string | null; link_url: string | null; note: string | null; created_at: string;
-  creators: { full_name: string } | null; briefs: { title: string; hook: string | null; style: string | null } | null;
+  creators: { full_name: string; is_test?: boolean } | null; briefs: { title: string; hook: string | null; style: string | null } | null;
 };
 
 export function useDraftsToReview(appId: string | null) {
+  const [showTest] = useShowTest();
   return useQuery({
-    queryKey: ["hub", "ugc-drafts", appId],
+    queryKey: [...["hub", "ugc-drafts", appId], showTest],
     queryFn: async () => {
-      let q = supabase.from("creator_drafts").select("id, creator_id, brief_id, app_id, version, video_path, link_url, note, created_at, creators!inner(full_name, is_test), briefs(title, hook, style)").eq("status", "submitted").eq("creators.is_test", false).order("created_at", { ascending: true }).limit(500);
+      let q = supabase.from("creator_drafts").select("id, creator_id, brief_id, app_id, version, video_path, link_url, note, created_at, creators!inner(full_name, is_test), briefs(title, hook, style)").eq("status", "submitted").order("created_at", { ascending: true }).limit(500);
       if (appId) q = q.eq("app_id", appId);
+      if (!showTest) q = q.eq("creators.is_test", false);
       return ((await q).data ?? []) as unknown as DraftRow[];
     },
   });
@@ -57,7 +60,7 @@ function DraftsList({ rows }: { rows: DraftRow[] }) {
           <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Creator</th><th className="p-3">Brief</th><th className="p-3">Version</th><th className="p-3">Sent on</th><th className="p-3">Note</th></tr></thead>
           <tbody>{rows.map((r) => (
             <tr key={r.id} onClick={() => setOpen(r)} className="cursor-pointer border-t border-brand-line hover:bg-portal-bg">
-              <td className="p-3"><span className="flex items-center gap-2"><PersonAvatar name={r.creators?.full_name ?? "?"} url={photos[r.creator_id]} /><b className="text-brand-navy">{r.creators?.full_name}</b></span></td>
+              <td className="p-3"><span className="flex items-center gap-2"><PersonAvatar name={r.creators?.full_name ?? "?"} url={photos[r.creator_id]} /><b className="text-brand-navy">{r.creators?.full_name}</b>{r.creators?.is_test ? <span className={TEST_CHIP}>test</span> : null}</span></td>
               <td className="p-3"><span className="flex items-center gap-2">{r.briefs?.title ?? "—"}<AppBadge appId={r.app_id} /></span></td>
               <td className="p-3">v{r.version}</td>
               <td className="p-3 text-brand-navySoft">{new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</td>
