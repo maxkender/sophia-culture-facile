@@ -84,6 +84,14 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             const { withLock } = await import("@/lib/hub-automation.server");
             return Response.json(await withLock(a, "inspiration", 10, () => runInspirationTick(a)));
           }
+          if (params.job === "notion-sync") {
+            if (!process.env["NOTION_TOKEN"]) return Response.json({ skipped: "NOTION_TOKEN missing" });
+            const { data: s } = await a.from("ugc_settings").select("notion_auto").eq("id", 1).maybeSingle();
+            if (s && s.notion_auto === false) return Response.json({ skipped: "auto-sync off" });
+            const { runNotionSync } = await import("@/lib/notion-sync.server");
+            const { withLock } = await import("@/lib/hub-automation.server");
+            return Response.json(await withLock(a, "notion-sync", 5, () => runNotionSync(a)));
+          }
           if (params.job === "planner-reminder") {
             const { data: admins } = await a.from("profiles").select("id").eq("role", "admin");
             await a.from("notifications").insert((admins ?? []).map((p: any) => ({ profile_id: p.id, type: "message", body: "Reminder: publish next week's UGC briefs in the Week planner by Friday." })));
