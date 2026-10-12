@@ -1,3 +1,6 @@
+import { DeleteConfirm } from "@/components/hub/DeleteConfirm";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
 import { AccountsTab, useInspirationAccounts } from "@/components/hub/InspirationAccounts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -78,6 +81,7 @@ export function Inspiration({ initialOpen, initialAuthor, initialTab }: { initia
   const hooks = [...new Set(all.map((r) => r.hook_type).filter(Boolean))] as string[];
   const current = all.find((r) => r.id === open) ?? null;
   const refresh = () => void qc.invalidateQueries({ queryKey: KEY });
+  const delMany = useServerFn(deleteInspirations); const [delIds, setDelIds] = useState<string[] | null>(null);
 
   return (
     <div className="space-y-5">
@@ -92,6 +96,8 @@ export function Inspiration({ initialOpen, initialAuthor, initialTab }: { initia
         {([["all", "All"], ["sophia", "Sophia"], ["unswipe", "UnSwipe"], ["none", "No app"]] as const).map(([k, l]) => <button key={k} type="button" aria-pressed={appF === k} onClick={() => setAppF(k)} className={cn("rounded-full px-3 py-1 font-bold", appF === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l}</button>)}
         <span className="ml-auto text-brand-navySoft">{all.length} videos · {all.filter((r) => r.notion_page_id).length} from Notion · {all.filter((r) => !r.notion_page_id).length} added by hand</span>
       </div>
+      {sel.size ? <div className="flex flex-wrap items-center gap-2 rounded-xl bg-muted/60 p-2 text-sm"><b className="px-1 text-brand-navy">{sel.size} selected</b><Button size="sm" variant="outline" className="text-destructive" onClick={() => setDelIds([...sel])}><Trash2 className="size-4" />Delete selected</Button><Button size="sm" variant="ghost" onClick={() => setSel(new Set())}>Clear</Button></div> : null}
+      <DeleteConfirm open={Boolean(delIds)} onOpenChange={(o) => !o && setDelIds(null)} title={`Delete ${delIds?.length ?? 0} video(s)?`} onConfirm={async (archiveNotion) => { const ids = delIds ?? []; for (let i = 0; i < ids.length; i += 200) await delMany({ data: { ids: ids.slice(i, i + 200), archiveNotion } }); toast.success(`${ids.length} deleted`); setSel(new Set()); refresh(); }} />
       {adding ? <ImportPanel rows={all} appId={appId} onDone={refresh} /> : null}
       {isLoading ? <p className="text-sm text-brand-navySoft">Loading…</p> : !rows.length ? (
         <div className={cn(card, "text-center text-sm text-brand-navySoft")}>{all.length ? "Nothing matches this search." : "No inspiration yet — click Add links."}</div>
@@ -99,6 +105,9 @@ export function Inspiration({ initialOpen, initialAuthor, initialTab }: { initia
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {rows.map((r) => (
             <div key={r.id} className="group relative overflow-hidden rounded-2xl bg-card shadow-portal">
+              <input type="checkbox" aria-label="Select video" checked={sel.has(r.id)} onChange={(e) => { const n = new Set(sel); if (e.target.checked) n.add(r.id); else n.delete(r.id); setSel(n); }} className="absolute left-2 top-2 z-10 size-4" />
+              <DropdownMenu><DropdownMenuTrigger asChild><button type="button" aria-label="More actions" className="absolute bottom-[4.5rem] right-2 z-10 rounded-full bg-card p-1 text-brand-navy shadow"><MoreHorizontal className="size-4" /></button></DropdownMenuTrigger>
+                <DropdownMenuContent align="end"><DropdownMenuItem className="text-destructive" onSelect={() => setDelIds([r.id])}><Trash2 className="size-4" />Delete</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
               <button type="button" onClick={() => setOpen(r.id)} className="block w-full text-left">
                 <div className="relative aspect-[9/14] bg-muted">
                   {r.cover_path && covers[r.cover_path] ? <img src={covers[r.cover_path]} alt="" loading="lazy" className="size-full object-cover" /> : <div className="flex size-full items-center justify-center text-xs text-brand-navySoft">{STAGE_LABEL[r.status] ?? r.status}</div>}
@@ -264,7 +273,7 @@ export function InspirationReference({ id }: { id: string }) {
 }
 
 function Drawer({ r, onChange, onClose }: { r: Insp; onChange: () => void; onClose?: () => void }) {
-  const del = useServerFn(deleteInspirations);
+  const del = useServerFn(deleteInspirations); const [askDel, setAskDel] = useState(false);
   const toRef = useServerFn(inspirationToReference); const retx = useServerFn(retranscribeInspiration); const [rtBusy, setRtBusy] = useState(false);
   const video = useRef<HTMLVideoElement>(null); const [t, setT] = useState(0); const [src, setSrc] = useState<string | null>(null);
   const [tags, setTags] = useState(r.tags.join(", "));
@@ -295,7 +304,8 @@ function Drawer({ r, onChange, onClose }: { r: Insp; onChange: () => void; onClo
           <Button size="sm" variant="ghost" disabled={r.status !== "analyzed"} onClick={() => void saveHook()}>Hook → library</Button>
           <Button size="sm" variant="ghost" disabled={rtBusy || !r.video_path} onClick={async () => { setRtBusy(true); try { await retx({ data: { id: r.id } }); toast.success("Re-transcribed"); onChange(); } catch (e) { toast.error((e as Error).message); } setRtBusy(false); }}>{rtBusy ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}Re-transcribe</Button>
           <Button size="sm" variant="ghost" asChild><a href={r.url} target="_blank" rel="noreferrer"><ExternalLink className="size-4" />Open original</a></Button>
-          <Button size="sm" variant="ghost" className="text-destructive" onClick={async () => { if (!window.confirm("Delete this inspiration and its stored video?")) return; await del({ data: { ids: [r.id] } }); onClose?.(); onChange(); }}><Trash2 className="size-4" />Delete</Button>
+          <Button size="sm" variant="ghost" className="text-destructive" onClick={() => setAskDel(true)}><Trash2 className="size-4" />Delete</Button>
+          <DeleteConfirm open={askDel} onOpenChange={setAskDel} title="Delete this video?" onConfirm={async (archiveNotion) => { await del({ data: { ids: [r.id], archiveNotion } }); toast.success("Deleted"); onClose?.(); onChange(); }} />
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-2 text-xs">

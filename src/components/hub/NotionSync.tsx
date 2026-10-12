@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { notionStatus, notionSyncNow, notionTest } from "@/lib/notion.functions";
+import { restoreNotionRow, notionStatus, notionSyncNow, notionTest } from "@/lib/notion.functions";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const f = "h-9 rounded-lg border bg-card px-2 text-sm";
@@ -58,12 +58,13 @@ export function NotionSettingsCard() {
   );
 }
 
-type Item = { notion_page_id: string; url: string | null; kind: string; hub_status: string | null; error: string | null; inspiration_id: string | null; imported_count: number; profile_status: string | null; inspirations: { score: number | null } | null };
+type Item = { notion_page_id: string; url: string | null; kind: string; hub_status: string | null; error: string | null; inspiration_id: string | null; deleted_at: string | null; imported_count: number; profile_status: string | null; inspirations: { score: number | null } | null };
 
 /** Inspiration → Notion tab. */
 export function NotionItemsTab({ onOpen }: { onOpen: (id: string) => void }) {
   const { data: s } = useNotionStatus();
-  const { data: items = [], isLoading } = useQuery({ queryKey: ["hub", "notion-items"], queryFn: async () => ((await supabase.from("notion_items").select("notion_page_id, url, kind, hub_status, error, inspiration_id, imported_count, profile_status, inspirations(score)").order("created_at", { ascending: false })).data ?? []) as unknown as Item[] });
+  const { data: items = [], isLoading } = useQuery({ queryKey: ["hub", "notion-items"], queryFn: async () => ((await supabase.from("notion_items").select("notion_page_id, url, kind, hub_status, error, inspiration_id, deleted_at, imported_count, profile_status, inspirations(score)").order("created_at", { ascending: false })).data ?? []) as unknown as Item[] });
+  const restore = useServerFn(restoreNotionRow); const qc = useQueryClient();
   const [kind, setKind] = useState("all"); const [status, setStatus] = useState("all");
   const statuses = [...new Set(items.map((i) => i.hub_status).filter(Boolean))] as string[];
   const rows = useMemo(() => items.filter((i) => (kind === "all" || i.kind === kind) && (status === "all" || i.hub_status === status)), [items, kind, status]);
@@ -79,11 +80,11 @@ export function NotionItemsTab({ onOpen }: { onOpen: (id: string) => void }) {
         <table className="w-full min-w-[720px] text-sm">
           <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Link</th><th className="p-3">Kind</th><th className="p-3">Hub status</th><th className="p-3">Score</th><th className="p-3">Error</th><th className="p-3" /></tr></thead>
           <tbody>{rows.map((i) => (
-            <tr key={i.notion_page_id} className="border-t border-brand-line">
+            <tr key={i.notion_page_id} className={cn("border-t border-brand-line", i.deleted_at && "opacity-50")}>
               <td className="max-w-[280px] truncate p-3"><a href={i.url ?? "#"} target="_blank" rel="noreferrer" className="text-brand-blue">{i.url || "—"}</a></td>
-              <td className="p-3">{i.kind}</td><td className="p-3">{i.hub_status ?? "—"}</td><td className="p-3">{i.inspirations?.score != null ? `${i.inspirations.score}/10` : "—"}</td>
+              <td className="p-3">{i.kind}</td><td className="p-3">{i.deleted_at ? "Deleted in Hub" : i.hub_status ?? "—"}</td><td className="p-3">{i.inspirations?.score != null ? `${i.inspirations.score}/10` : "—"}</td>
               <td className="max-w-[220px] p-3 text-xs text-portal-red">{i.error ?? ""}</td>
-              <td className="whitespace-nowrap p-3 text-right"><a href={`https://www.notion.so/${i.notion_page_id.replace(/-/g, "")}`} target="_blank" rel="noreferrer" className="mr-3 inline-flex items-center gap-1 text-xs font-bold text-brand-blue">Open in Notion <ExternalLink className="size-3" /></a>{i.inspiration_id ? <button type="button" className="text-xs font-bold text-portal-accent" onClick={() => onOpen(i.inspiration_id!)}>Open fiche</button> : null}</td>
+              <td className="whitespace-nowrap p-3 text-right"><a href={`https://www.notion.so/${i.notion_page_id.replace(/-/g, "")}`} target="_blank" rel="noreferrer" className="mr-3 inline-flex items-center gap-1 text-xs font-bold text-brand-blue">Open in Notion <ExternalLink className="size-3" /></a>{i.deleted_at ? <button type="button" className="mr-3 text-xs font-bold text-portal-accent" onClick={async () => { try { await restore({ data: { pageId: i.notion_page_id } }); toast.success("Restored — re-imported at the next sync"); void qc.invalidateQueries({ queryKey: ["hub", "notion-items"] }); } catch (e) { toast.error((e as Error).message); } }}>Restore / re-import</button> : null}{i.inspiration_id ? <button type="button" className="text-xs font-bold text-portal-accent" onClick={() => onOpen(i.inspiration_id!)}>Open fiche</button> : null}</td>
             </tr>))}</tbody>
         </table>
         {isLoading ? <p className="p-5 text-sm">Loading…</p> : !rows.length ? <p className="p-5 text-sm text-brand-navySoft">{items.length ? "Nothing matches these filters." : "No Notion rows yet. Add NOTION_TOKEN, share the Notion page with the integration, then Sync now."}</p> : null}
