@@ -115,7 +115,7 @@ function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
 }
 
 type Row = { id: string; title: string; hook_text: string | null; hook: string | null; brief_type: string; effort: string | null; status: string; audience: string; audience_efforts: string[]; score: number | null; drop_at: string | null; language: string; created_at: string; style: string | null; app_id: string; updated_at: string | null; inspiration_id: string | null; inspirations: { cover_path: string | null; author_handle: string | null } | null };
-const TABS = [["formats", "Formats"], ["mine", "My briefs"], ["published", "Published"], ["archived", "Archived"]] as const;
+const TABS = [["mine", "My briefs"], ["published", "Published"], ["archived", "Archived"]] as const;
 const inTab = (t: string, s: string) => (t === "published" ? s === "published" || s === "scheduled" : t === "mine" ? s === "draft" || s === "ready" : s === t);
 const STATUS_LABEL: Record<string, string> = { draft: "Draft", ready: "Ready", published: "Published", scheduled: "Scheduled", archived: "Archived" };
 export { QuickBrief, FromVideo };
@@ -126,7 +126,7 @@ export function BriefsList({ formats, initialTab }: { formats?: ReactNode; initi
   const qc = useQueryClient(); const navigate = useNavigate();
   const { data: apps = [] } = useApps();
   const appName = (id: string) => (apps as { id: string; name: string }[]).find((a) => a.id === id)?.name ?? "—";
-  const [tab, setTab] = useState<string>(initialTab === "formats" ? "formats" : "mine");
+  const [tab, setTab] = useState<string>(initialTab === "published" || initialTab === "archived" ? initialTab : "mine");
   const [q, setQ] = useState(""); const [style, setStyle] = useState("all"); const [lang, setLang] = useState("all");
   const [menu, setMenu] = useState(false); const [filterOpen, setFilterOpen] = useState(false); const [pickFmt, setPickFmt] = useState(false);
   const { data } = useQuery({
@@ -188,28 +188,18 @@ export function BriefsList({ formats, initialTab }: { formats?: ReactNode; initi
       </div>
       {pickFmt ? <div className={cn(card, "space-y-2")}><div className="flex items-center justify-between"><b className="text-brand-navy">Pick a format to start from</b><Button size="sm" variant="ghost" onClick={() => setPickFmt(false)}>Cancel</Button></div>
         <p className="text-xs text-brand-navySoft">It is copied as a draft; the format itself is not changed.</p>
-        <div className="grid max-h-80 gap-1 overflow-y-auto sm:grid-cols-2">{(data?.formats ?? []).map((f) => <button key={f.id} type="button" onClick={() => { setPickFmt(false); void copyBrief(f.id, true); }} className="rounded-lg border px-3 py-2 text-left text-sm hover:bg-portal-bg">{f.title}</button>)}</div></div> : null}
-      {tab === "formats" ? formats ?? null : <>
-      <div className="flex gap-2">
-        <input aria-label="Search briefs" placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} className={cn(sel, "min-w-0 flex-1")} />
-        <div className="relative"><Button variant="outline" size="sm" className="h-9" aria-expanded={filterOpen} onClick={() => setFilterOpen(!filterOpen)}>Filter{filtered ? " •" : ""}</Button>
-          {filterOpen ? <div className="absolute right-0 z-20 mt-1 w-64 space-y-2 rounded-xl border bg-card p-3 shadow-portal">
-            <label className="block text-xs font-semibold">Style<select className={cn(sel, "mt-1 w-full")} value={style} onChange={(e) => setStyle(e.target.value)}><option value="all">All styles</option>{STYLES.map(([k, l], i) => <option key={k} value={k}>{i + 1}. {l}</option>)}<option value="none">No style</option></select></label>
-            <label className="block text-xs font-semibold">Language<select className={cn(sel, "mt-1 w-full")} value={lang} onChange={(e) => setLang(e.target.value)}><option value="all">All</option><option value="fr">FR</option><option value="en">EN</option></select></label>
-          </div> : null}
-        </div>
-      </div>
+        {!(data?.formats ?? []).length ? <p className="text-sm text-brand-navySoft">No formats yet — save a brief as a format from the editor.</p> : null}<div className="grid max-h-80 gap-1 overflow-y-auto sm:grid-cols-2">{(data?.formats ?? []).map((f) => <button key={f.id} type="button" onClick={() => { setPickFmt(false); void copyBrief(f.id, true); }} className="rounded-lg border px-3 py-2 text-left text-sm hover:bg-portal-bg">{f.title}</button>)}</div></div> : null}
+      <input aria-label="Search briefs" placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} className={cn(sel, "w-full sm:w-80")} />
       <div className="overflow-x-auto rounded-2xl bg-card shadow-portal">
         {rows.length ? <table className="w-full min-w-[560px] text-sm">
-          <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Brief</th><th className="p-3">Status</th><th className="p-3">Score</th>{pub ? <><th className="p-3">Posts</th><th className="p-3">Avg views 7d</th></> : null}<th className="p-3">Last edited</th><th className="p-3"><span className="sr-only">Actions</span></th></tr></thead>
+          <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Brief</th><th className="p-3">Status</th><th className="p-3">Last edited</th>{pub ? <th className="p-3">Posts</th> : null}<th className="p-3"><span className="sr-only">Actions</span></th></tr></thead>
           <tbody>{rows.map((r) => { const s = data?.stats[r.id]; const avg = s?.v7.length ? Math.round(s.v7.reduce((a, b) => a + b, 0) / s.v7.length) : null; const isPub = r.status === "published" || r.status === "scheduled"; return (
             <tr key={r.id} className="border-t border-brand-line">
               <td className="max-w-[380px] p-3"><div className="flex items-start gap-2">{r.inspirations?.cover_path && covers[r.inspirations.cover_path] ? <img src={covers[r.inspirations.cover_path]} alt="" className="h-10 w-7 shrink-0 rounded object-cover" loading="lazy" /> : null}<div className="min-w-0"><Link to="/hub/ugc/briefs/$briefId" params={{ briefId: r.id }} className="font-bold text-brand-navy hover:underline">{r.title || "Untitled"}</Link>
                 <div className="mt-1 flex flex-wrap gap-1"><span className={chip}>{appName(r.app_id)}</span>{r.style ? <span className={chip}>{STYLE_NUM[r.style]}. {STYLE_LABEL[r.style]}</span> : null}{r.language === "en" ? <span className={chip}>EN</span> : null}</div></div></div></td>
               <td className="p-3">{STATUS_LABEL[r.status] ?? r.status}</td>
-              <td className="p-3">{r.score != null ? <span className={cn("rounded-full px-2 py-0.5 text-xs font-bold", r.score >= 8 ? "bg-portal-green/15 text-portal-green" : "bg-portal-amber/20")}>{r.score}/10</span> : "—"}</td>
-              {pub ? <><td className="p-3">{s?.posts ?? 0}</td><td className="p-3">{avg != null ? avg.toLocaleString() : "—"}</td></> : null}
               <td className="whitespace-nowrap p-3 text-xs text-brand-navySoft">{new Date(r.updated_at ?? r.created_at).toLocaleDateString("en-GB")}</td>
+              {pub ? <td className="p-3">{s?.posts ?? 0}{avg != null ? <span className="block text-[10px] text-brand-navySoft">avg {avg.toLocaleString()} views 7d</span> : null}</td> : null}
               <td className="p-3"><select aria-label={`Actions for ${r.title}`} className={cn(sel, "h-8 w-12 text-xs")} value="" onChange={(e) => { const v = e.target.value;
                 if (v === "open") void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: r.id } });
                 else if (v === "dup") void copyBrief(r.id, false);
@@ -226,7 +216,6 @@ export function BriefsList({ formats, initialTab }: { formats?: ReactNode; initi
             </tr>); })}</tbody>
         </table> : <p className="p-5 text-sm text-brand-navySoft">{tab === "mine" ? "No briefs yet — click New brief." : tab === "published" ? "No published briefs yet." : "No archived briefs."}</p>}
       </div>
-      </>}
     </div>
   );
 }
