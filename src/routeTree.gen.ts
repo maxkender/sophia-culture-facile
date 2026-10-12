@@ -134,6 +134,7 @@ import { Route as AuthenticatedHubToolsSplatRouteImport } from './routes/_authen
 import { Route as AuthenticatedHubUgcIndexRouteImport } from './routes/_authenticated/hub/ugc/index'
 import { Route as AuthenticatedHubUgcAdsRouteImport } from './routes/_authenticated/hub/ugc/ads'
 import { Route as AuthenticatedHubUgcAnalyticsRouteImport } from './routes/_authenticated/hub/ugc/analytics'
+import { Route as AuthenticatedHubUgcApplicationsRouteImport } from './routes/_authenticated/hub/ugc/applications'
 import { Route as AuthenticatedHubUgcInspirationRouteImport } from './routes/_authenticated/hub/ugc/inspiration'
 import { Route as AuthenticatedHubUgcLibraryRouteImport } from './routes/_authenticated/hub/ugc/library'
 import { Route as AuthenticatedHubUgcMessagesRouteImport } from './routes/_authenticated/hub/ugc/messages'
@@ -872,6 +873,12 @@ const AuthenticatedHubUgcAnalyticsRoute =
     path: '/ugc/analytics',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
+const AuthenticatedHubUgcApplicationsRoute =
+  AuthenticatedHubUgcApplicationsRouteImport.update({
+    id: '/ugc/applications',
+    path: '/ugc/applications',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
 const AuthenticatedHubUgcInspirationRoute =
   AuthenticatedHubUgcInspirationRouteImport.update({
     id: '/ugc/inspiration',
@@ -1426,6 +1433,7 @@ export interface FileRoutesByFullPath {
   '/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
   '/hub/ugc/ads': typeof AuthenticatedHubUgcAdsRoute
   '/hub/ugc/analytics': typeof AuthenticatedHubUgcAnalyticsRoute
+  '/hub/ugc/applications': typeof AuthenticatedHubUgcApplicationsRoute
   '/hub/ugc/inspiration': typeof AuthenticatedHubUgcInspirationRoute
   '/hub/ugc/library': typeof AuthenticatedHubUgcLibraryRoute
   '/hub/ugc/messages': typeof AuthenticatedHubUgcMessagesRoute
@@ -1623,6 +1631,7 @@ export interface FileRoutesByTo {
   '/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
   '/hub/ugc/ads': typeof AuthenticatedHubUgcAdsRoute
   '/hub/ugc/analytics': typeof AuthenticatedHubUgcAnalyticsRoute
+  '/hub/ugc/applications': typeof AuthenticatedHubUgcApplicationsRoute
   '/hub/ugc/inspiration': typeof AuthenticatedHubUgcInspirationRoute
   '/hub/ugc/library': typeof AuthenticatedHubUgcLibraryRoute
   '/hub/ugc/messages': typeof AuthenticatedHubUgcMessagesRoute
@@ -1825,6 +1834,7 @@ export interface FileRoutesById {
   '/_authenticated/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
   '/_authenticated/hub/ugc/ads': typeof AuthenticatedHubUgcAdsRoute
   '/_authenticated/hub/ugc/analytics': typeof AuthenticatedHubUgcAnalyticsRoute
+  '/_authenticated/hub/ugc/applications': typeof AuthenticatedHubUgcApplicationsRoute
   '/_authenticated/hub/ugc/inspiration': typeof AuthenticatedHubUgcInspirationRoute
   '/_authenticated/hub/ugc/library': typeof AuthenticatedHubUgcLibraryRoute
   '/_authenticated/hub/ugc/messages': typeof AuthenticatedHubUgcMessagesRoute
@@ -2027,6 +2037,7 @@ export interface FileRouteTypes {
     | '/hub/tools/$'
     | '/hub/ugc/ads'
     | '/hub/ugc/analytics'
+    | '/hub/ugc/applications'
     | '/hub/ugc/inspiration'
     | '/hub/ugc/library'
     | '/hub/ugc/messages'
@@ -2224,6 +2235,7 @@ export interface FileRouteTypes {
     | '/hub/tools/$'
     | '/hub/ugc/ads'
     | '/hub/ugc/analytics'
+    | '/hub/ugc/applications'
     | '/hub/ugc/inspiration'
     | '/hub/ugc/library'
     | '/hub/ugc/messages'
@@ -2425,6 +2437,7 @@ export interface FileRouteTypes {
     | '/_authenticated/hub/tools/$'
     | '/_authenticated/hub/ugc/ads'
     | '/_authenticated/hub/ugc/analytics'
+    | '/_authenticated/hub/ugc/applications'
     | '/_authenticated/hub/ugc/inspiration'
     | '/_authenticated/hub/ugc/library'
     | '/_authenticated/hub/ugc/messages'
@@ -3471,6 +3484,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHubUgcAnalyticsRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
+    '/_authenticated/hub/ugc/applications': {
+      id: '/_authenticated/hub/ugc/applications'
+      path: '/ugc/applications'
+      fullPath: '/hub/ugc/applications'
+      preLoaderRoute: typeof AuthenticatedHubUgcApplicationsRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
     '/_authenticated/hub/ugc/inspiration': {
       id: '/_authenticated/hub/ugc/inspiration'
       path: '/ugc/inspiration'
@@ -4009,6 +4029,7 @@ interface AuthenticatedHubRouteRouteChildren {
   AuthenticatedHubToolsSplatRoute: typeof AuthenticatedHubToolsSplatRoute
   AuthenticatedHubUgcAdsRoute: typeof AuthenticatedHubUgcAdsRoute
   AuthenticatedHubUgcAnalyticsRoute: typeof AuthenticatedHubUgcAnalyticsRoute
+  AuthenticatedHubUgcApplicationsRoute: typeof AuthenticatedHubUgcApplicationsRoute
   AuthenticatedHubUgcInspirationRoute: typeof AuthenticatedHubUgcInspirationRoute
   AuthenticatedHubUgcLibraryRoute: typeof AuthenticatedHubUgcLibraryRoute
   AuthenticatedHubUgcMessagesRoute: typeof AuthenticatedHubUgcMessagesRoute
@@ -4049,6 +4070,7 @@ const AuthenticatedHubRouteRouteChildren: AuthenticatedHubRouteRouteChildren = {
   AuthenticatedHubToolsSplatRoute: AuthenticatedHubToolsSplatRoute,
   AuthenticatedHubUgcAdsRoute: AuthenticatedHubUgcAdsRoute,
   AuthenticatedHubUgcAnalyticsRoute: AuthenticatedHubUgcAnalyticsRoute,
+  AuthenticatedHubUgcApplicationsRoute: AuthenticatedHubUgcApplicationsRoute,
   AuthenticatedHubUgcInspirationRoute: AuthenticatedHubUgcInspirationRoute,
   AuthenticatedHubUgcLibraryRoute: AuthenticatedHubUgcLibraryRoute,
   AuthenticatedHubUgcMessagesRoute: AuthenticatedHubUgcMessagesRoute,
