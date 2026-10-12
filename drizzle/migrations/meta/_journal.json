@@ -484,6 +484,13 @@
       "when": 1791816276282,
       "tag": "0068_creator_terms_visible",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1791816408449,
+      "tag": "0069_assets_generic_folder",
+      "breakpoints": true
     }
   ]
 }

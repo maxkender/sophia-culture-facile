@@ -58,7 +58,7 @@ export function styleAssetIds(d: StyleData): string[] {
 export const GESTURES = ["Scroller un cours", "Ouvrir l'app", "Montrer la barre du bas sans Reels", "Écran de fin de fil", "Courbe du temps d'écran", "Autre"] as const;
 export const ASSET_ROLES = [["reference_video", "Reference video"], ["app_screen_recording", "App screen recording"], ["screenshot", "Screenshot"], ["logo", "Logo"], ["sound", "Sound"], ["broll", "B-roll"], ["caption_text", "Caption text"], ["pdf", "PDF"]] as const;
 export const ROLE_LABEL: Record<string, string> = Object.fromEntries(ASSET_ROLES);
-export const FOLDERS = [["screen_recordings", "App screen recordings"], ["logos", "Logos & icons"], ["sounds", "Sounds"], ["broll", "B-roll"], ["captions", "Captions & copy"], ["references", "References"]] as const;
+export const FOLDERS = [["screen_recordings", "App screen recordings"], ["logos", "Logos & icons"], ["sounds", "Sounds"], ["broll", "B-roll"], ["captions", "Captions & copy"], ["references", "References"], ["generic", "Assets"]] as const;
 export const DEFAULT_DO = ["App visible à l'écran", "Nom de l'app dit une fois", "Fin qui boucle ou pose une question"];
 export const DEFAULT_DONT = ["Pas de politique, religion ou médical", "Pas de réutilisation entre comptes", "Pas de logo en premier"];
 export const BEAT_LABELS = ["0-3 s · hook", "3-20 s · le fait / la mécanique avec le retournement", "20-30 s · payoff + app + fin"];
