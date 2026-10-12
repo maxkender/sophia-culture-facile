@@ -47,11 +47,11 @@ export const notionSyncNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context as never);
-    if (!process.env["NOTION_TOKEN"]) return { skipped: "Not connected — add NOTION_TOKEN" } as Record<string, unknown>;
+    if (!process.env["NOTION_TOKEN"]) return { skipped: "Not connected — add NOTION_TOKEN" } as Record<string, string | number | boolean | null>;
     const a = await admin();
     const { runNotionSync } = await import("./notion-sync.server");
     const { withLock } = await import("./hub-automation.server");
-    return (await withLock(a, "notion-sync", 5, () => runNotionSync(a))) as Record<string, unknown>;
+    return (await withLock(a, "notion-sync", 5, () => runNotionSync(a))) as Record<string, string | number | boolean | null>;
   });
 
 /** Fills notion_format from the stored analysis (no transcription). */
