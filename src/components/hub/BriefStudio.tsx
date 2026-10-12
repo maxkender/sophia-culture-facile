@@ -16,6 +16,8 @@ import { BriefView, toStudio, type BriefAsset } from "./BriefPreview";
 import { AssetUploader } from "./Assets";
 import { InspirationReference } from "./Inspiration";
 import { PostDescriptionFields } from "@/components/creators/PostDescription";
+import { GuidelinesList } from "@/components/creators/Guidelines";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const input = "mt-1 block min-h-10 w-full rounded-xl border border-input bg-card px-3 text-sm";
@@ -59,6 +61,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
   const [open, setOpen] = useState<number>(1);
   const [busy, setBusy] = useState<string | null>(null);
   const [assign, setAssign] = useState<{ creatorId: string; date: string }>({ creatorId: "", date: "" });
+  const [preview, setPreview] = useState(false);
 
   const { data: loaded } = useQuery({
     queryKey: ["hub", "studio", briefId],
@@ -104,7 +107,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
   const bRef = useRef(b); bRef.current = b;
   const lastSaved = useRef<string>(""); const saveRef = useRef<((p?: Partial<StudioBrief>, q?: boolean) => Promise<string | null>) | null>(null);
   useEffect(() => { if (b?.id && !lastSaved.current) lastSaved.current = JSON.stringify(b); }, [b]);
-  useEffect(() => { const t = window.setInterval(() => { const x = bRef.current; if (x?.id && x.status === "draft" && JSON.stringify(x) !== lastSaved.current) void saveRef.current?.({}, true); }, 10_000); return () => window.clearInterval(t); }, []);
+  useEffect(() => { const t = window.setInterval(() => { const x = bRef.current; if (x?.id && (x.status === "draft" || x.status === "ready") && JSON.stringify(x) !== lastSaved.current) void saveRef.current?.({}, true); }, 10_000); return () => window.clearInterval(t); }, []);
   if (!b || !grade) return <p className="p-6 text-sm text-brand-navySoft">Loading the brief…</p>;
   const set = <K extends keyof StudioBrief>(k: K, v: StudioBrief[K]) => setB({ ...b, [k]: v });
   const wc = scriptWords(b);
@@ -118,7 +121,6 @@ export function BriefStudio({ briefId }: { briefId: string }) {
   async function save(patch: Partial<StudioBrief> = {}, quiet = false): Promise<string | null> {
     const x = { ...b!, ...patch };
     if (x.status === "published" && loaded?.row?.status !== "published" && !window.confirm("Publish to creators? This is the only step that makes the brief visible to creators.")) return null;
-    if (x.status === "published" && grade!.score < 8 && !window.confirm(`Score ${grade!.score}/10 — publishing is allowed from 8. Publish anyway?`)) return null;
     const row = {
       app_id: x.app_id, title: x.title || x.hook_text || "Brief sans titre", brief_type: x.brief_type, effort: x.effort, format: x.effort, platform: x.platform, duration_target: x.duration_target,
       hook_text: x.hook_text, hook: x.hook_text, hooks: [x.hook_text, x.oral_hook, x.hook_visual].filter(Boolean) as string[], oral_hook: x.oral_hook, hook_visual: x.hook_visual,
@@ -148,12 +150,12 @@ export function BriefStudio({ briefId }: { briefId: string }) {
   }
   saveRef.current = save;
   async function remove() {
-    if (!b!.id) { void navigate({ to: "/hub/ugc/library" }); return; }
+    if (!b!.id) { void navigate({ to: "/hub/ugc/briefs" }); return; }
     if (!window.confirm(`Delete “${b!.title || "this brief"}”? This cannot be undone.`)) return;
     await supabase.from("brief_assets").delete().eq("brief_id", b!.id);
     const { error } = await supabase.from("briefs").delete().eq("id", b!.id);
     if (error) { toast.error("Could not delete the brief."); return; }
-    toast.success("Brief deleted"); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); void navigate({ to: "/hub/ugc/library", search: { tab: "briefs" } as never });
+    toast.success("Brief deleted"); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); void navigate({ to: b!.brief_type === "format" ? "/hub/ugc/library" : "/hub/ugc/briefs" });
   }
 
   async function translate() {
@@ -213,10 +215,11 @@ export function BriefStudio({ briefId }: { briefId: string }) {
           <Button type="button" size="icon" variant="ghost" aria-label="Move up" onClick={() => movePlan(i, -1)}><ArrowUp className="size-4" /></Button>
           <Button type="button" size="icon" variant="ghost" aria-label="Move down" onClick={() => movePlan(i, 1)}><ArrowDown className="size-4" /></Button>
           <Button type="button" size="icon" variant="ghost" aria-label="Remove plan" onClick={() => setSd({ plans: plans.filter((_, j) => j !== i) })}><Trash2 className="size-4" /></Button></div>
-        {ta("Texte à l'écran", p.on_screen, (x) => setPlan(i, { on_screen: x }), 1)}
-        {ta("Texte à dire", p.say, (x) => setPlan(i, { say: x }))}
+        {ta("What we see", p.do, (x) => setPlan(i, { do: x }))}
+        {ta("Text on screen", p.on_screen, (x) => setPlan(i, { on_screen: x }), 1)}
+        {ta("What is said", p.say, (x) => setPlan(i, { say: x }))}
         <PlanAssets value={p.assets} onChange={(v) => setPlan(i, { assets: v })} library={lib} />
-        <label className="block text-xs font-semibold">Plan caméra (optional)<input className={input} value={p.camera} onChange={(e) => setPlan(i, { camera: e.target.value })} /></label>
+        <label className="block text-xs font-semibold">Timing / framing (optional)<input className={input} value={p.camera} onChange={(e) => setPlan(i, { camera: e.target.value })} /></label>
       </div>))}
       <Button type="button" size="sm" variant="outline" onClick={() => setSd({ plans: [...plans, blankPlan()] })}><Plus className="size-4" />Add a plan</Button>
     </div>
@@ -253,127 +256,73 @@ export function BriefStudio({ briefId }: { briefId: string }) {
     <PlanAssets label="Assets to flash on screen (optional)" value={sd.flashes ?? []} onChange={(v) => setSd({ flashes: v })} library={lib} />
   </> : <p className="text-sm text-brand-navySoft">Choose a style first.</p>;
 
-  const oldSteps: [string, ReactNode][] = [
-    ["Type & format", <>
-      {stylePicker}
-      <label className="block text-sm font-semibold">Title (admin only)<input className={input} value={b.title} onChange={(e) => set("title", e.target.value)} /></label>
-      <div className="flex flex-wrap gap-2">{(["precise", "format"] as const).map((t) => <button key={t} type="button" onClick={() => set("brief_type", t)} className={cn("min-h-10 rounded-full border px-4 text-sm font-bold", b.brief_type === t ? "border-brand-navy bg-brand-navy text-card" : "")}>{t === "precise" ? "Brief précis" : "Format (répétable)"}</button>)}</div>
-      <div className="grid gap-2 sm:grid-cols-3">{EFF.map(([k, l]) => <button key={k} type="button" onClick={() => set("effort", k)} className={cn("rounded-xl border p-3 text-left", b.effort === k ? "border-portal-accent bg-portal-accent/10" : "")}><p className="font-bold">{l}</p><p className="text-xs text-brand-navySoft">{rate(k) != null ? `${eur(rate(k)!)} / post (Active)` : "—"}</p></button>)}</div>
-      <div className="grid gap-2 sm:grid-cols-3">
-        <label className="text-sm font-semibold">App<select className={input} value={b.app_id} onChange={(e) => set("app_id", e.target.value)}>{apps.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</select></label>
-        <label className="text-sm font-semibold">Platforms<select className={input} value={b.platform} onChange={(e) => set("platform", e.target.value)}><option value="both">TikTok + Instagram</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option></select></label>
-        <label className="text-sm font-semibold">Duration target<select className={input} value={b.duration_target ?? "30s"} onChange={(e) => set("duration_target", e.target.value)}>{["15s", "20s", "30s", "45s", "60s"].map((d) => <option key={d}>{d}</option>)}</select></label>
-      </div>
-    </>],
-    ["Hook", <>
-      <label className="block text-sm font-semibold">On screen (frame 1, 5 words max) <span className={cn("ml-1 text-xs", words(b.hook_text) > 5 ? "text-portal-red" : "text-brand-navySoft")}>{words(b.hook_text)}/5</span><input className={input} value={b.hook_text ?? ""} onChange={(e) => set("hook_text", e.target.value)} /></label>
-      <label className="block text-sm font-semibold">Oral (first sentence)<input className={input} value={b.oral_hook ?? ""} onChange={(e) => set("oral_hook", e.target.value)} /></label>
-      <label className="block text-sm font-semibold">Visual (what we see)<input className={input} value={b.hook_visual ?? ""} onChange={(e) => set("hook_visual", e.target.value)} /></label>
-      <Button variant="outline" size="sm" disabled={busy === "hooks"} onClick={() => void runAi("hooks")}><Sparkles className="size-4" />{busy === "hooks" ? "Writing…" : "Suggest 3 hooks"}</Button>
-    </>],
-    ["Script in 3 beats", <>
-      {BEAT_LABELS.map((l, i) => <label key={l} className="block text-sm font-semibold">{l}<textarea rows={3} className={cn(input, "py-2")} value={b.beats[i] ?? ""} onChange={(e) => { const nb = [...b.beats]; nb[i] = e.target.value; set("beats", nb); }} /></label>)}
-      <p className={cn("text-sm font-bold", wc > 140 ? "text-portal-red" : wc >= 110 ? "text-portal-amber" : "text-portal-green")}>{wc} words · target under 110{wc > 140 ? " — too long, it will not hold 30 s" : ""}</p>
-      <div className="flex flex-wrap gap-2">
-        <Button variant="outline" size="sm" disabled={!!busy} onClick={() => void runAi("shorter")}><Sparkles className="size-4" />{busy === "shorter" ? "Writing…" : "Rewrite shorter"}</Button>
-        <Button variant="outline" size="sm" disabled={!!busy} onClick={() => void runAi("casual")}><Sparkles className="size-4" />{busy === "casual" ? "Writing…" : "Rewrite more casual (18-25)"}</Button>
-      </div>
-    </>],
-    ["Product moment", <>
-      <label className="block text-sm font-semibold">At second <b>{b.product_second ?? 5}</b><input type="range" min={3} max={15} value={b.product_second ?? 5} onChange={(e) => set("product_second", Number(e.target.value))} className="mt-2 w-full" aria-label="Product second" /></label>
-      <label className="block text-sm font-semibold">Gesture<select className={input} value={GESTURES.includes(b.product_gesture as never) ? b.product_gesture! : "Autre"} onChange={(e) => set("product_gesture", e.target.value === "Autre" ? "" : e.target.value)}>{GESTURES.map((g) => <option key={g}>{g}</option>)}</select></label>
-      {!GESTURES.includes(b.product_gesture as never) ? <input aria-label="Custom gesture" className={input} placeholder="Describe the gesture" value={b.product_gesture ?? ""} onChange={(e) => set("product_gesture", e.target.value)} /> : null}
-      <label className="block text-sm font-semibold">Notes<input className={input} value={b.product_moment ?? ""} onChange={(e) => set("product_moment", e.target.value)} /></label>
-      <label className="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked={b.say_name} onChange={(e) => set("say_name", e.target.checked)} />Say the app name at the end</label>
-    </>],
-    ["Assets", <>
-      {assets.length ? <ul className="space-y-2">{assets.map((a, i) => (
-        <li key={a.id} className="flex items-center gap-2 rounded-xl border p-2 text-sm"><span className="min-w-0 flex-1 truncate font-semibold">{a.title}</span>
-          <select aria-label="Role" value={a.role} onChange={(e) => setAssets(assets.map((y, j) => (j === i ? { ...y, role: e.target.value } : y)))} className="h-8 rounded-lg border px-1 text-xs">{ASSET_ROLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
-          <Button size="sm" variant="ghost" aria-label="Remove" onClick={() => setAssets(assets.filter((_, j) => j !== i))}><X className="size-4" /></Button></li>
-      ))}</ul> : <p className="text-sm text-brand-navySoft">No file yet.</p>}
-      <label className="block text-sm font-semibold">Attach from the library
-        <select aria-label="Attach from library" className={input} value="" onChange={(e) => { const a = side?.library.find((x) => x.id === e.target.value); if (a && !assets.some((y) => y.id === a.id)) setAssets([...assets, { ...(a as unknown as BriefAsset), role: a.role_default }]); }}>
-          <option value="">Choose a file…</option>{(side?.library ?? []).filter((a) => !assets.some((y) => y.id === a.id)).map((a) => <option key={a.id} value={a.id}>{a.title} · {a.kind}</option>)}
-        </select>
-      </label>
-      <AssetUploader appId={app} onDone={(a) => setAssets((x) => [...x, a])} compact />
-      <fieldset><legend className="text-sm font-semibold">Reference videos</legend>
-        <div className="mt-1 flex max-h-32 flex-wrap gap-2 overflow-y-auto">{(side?.refs ?? []).map((r) => { const on = refIds.includes(r.id); return <button type="button" key={r.id} onClick={() => setRefIds(on ? refIds.filter((x) => x !== r.id) : [...refIds, r.id])} className={cn("rounded-full border px-3 py-1 text-xs", on ? "border-portal-accent bg-portal-accent/10 text-portal-accent" : "")}>{r.title || r.url.slice(0, 40)}</button>; })}</div>
-      </fieldset>
-    </>],
-    ["Rules", <>
-      <p className="text-xs font-bold uppercase text-brand-navySoft">Do</p><Chips items={b.rules_do} onChange={(v) => set("rules_do", v)} tone="do" />
-      <p className="text-xs font-bold uppercase text-brand-navySoft">Don't</p><Chips items={b.rules_dont} onChange={(v) => set("rules_dont", v)} tone="dont" />
-      <Button size="sm" variant="ghost" onClick={() => setB({ ...b, rules_do: [...new Set([...b.rules_do, ...DEFAULT_DO])], rules_dont: [...new Set([...b.rules_dont, ...DEFAULT_DONT])] })}>Reset to app defaults</Button>
-      <label className="block text-sm font-semibold">Free text<textarea rows={2} className={cn(input, "py-2")} value={b.rules_text ?? ""} onChange={(e) => set("rules_text", e.target.value)} /></label>
-      <div className="border-t pt-3" data-testid="studio-post-desc"><p className="mb-1 text-xs font-bold uppercase text-brand-navySoft">Description to paste under the post</p>
-        <p className="mb-2 text-xs text-brand-navySoft">Leave empty to use the app default (Settings → Post descriptions).</p>
-        <PostDescriptionFields value={b.style_data?.post_desc ?? {}} onChange={(v) => set("style_data", { ...(b.style_data ?? {}), post_desc: v })} /></div>
-    </>],
-    ["Publish", <>
-      <div className="flex flex-wrap gap-2">{([["draft", "Draft"], ["ready", "Ready"], ["scheduled", "Monday drop"], ["published", "Published"]] as const).map(([k, l]) => <button key={k} type="button" onClick={() => setB({ ...b, status: k, drop_at: k === "scheduled" ? nextMonday() : b.drop_at })} className={cn("min-h-10 rounded-full border px-4 text-sm font-bold", b.status === k ? "border-brand-navy bg-brand-navy text-card" : "")}>{l}</button>)}</div>
-      {b.status === "scheduled" && b.drop_at ? <p className="text-xs text-brand-navySoft">Drops {new Date(b.drop_at).toLocaleString()}</p> : null}
-      <label className="block text-sm font-semibold">Audience<select className={input} value={b.audience_efforts.length ? "effort" : b.audience} onChange={(e) => setB({ ...b, audience: e.target.value, audience_efforts: e.target.value === "effort" ? ["talking_head"] : [] })}><option value="all">All creators</option><option value="selected">Selected creators only (assign below)</option><option value="effort">By effort</option></select></label>
-      {b.audience === "effort" || b.audience_efforts.length ? <div className="flex gap-2">{EFF.map(([k, l]) => <label key={k} className="flex items-center gap-1 text-sm"><input type="checkbox" checked={b.audience_efforts.includes(k)} onChange={(e) => set("audience_efforts", e.target.checked ? [...b.audience_efforts, k] : b.audience_efforts.filter((x) => x !== k))} />{l}</label>)}</div> : null}
-      <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto]">
-        <select aria-label="Assign to creator" className={input} value={assign.creatorId} onChange={(e) => setAssign({ ...assign, creatorId: e.target.value })}><option value="">Assign to a creator…</option>{(side?.creators ?? []).map((c) => <option key={c.id} value={c.id}>{c.full_name}</option>)}</select>
-        <input type="date" aria-label="Target date" className={input} value={assign.date} onChange={(e) => setAssign({ ...assign, date: e.target.value })} />
-        <Button variant="outline" className="mt-1" disabled={!assign.creatorId} onClick={() => void assignTo()}>Assign</Button>
-      </div>
-      <div className="flex flex-wrap gap-2 pt-2">
-        <Button onClick={() => void save()}>{b.status === "published" ? "Publish to creators" : b.status === "scheduled" ? "Schedule" : b.status === "ready" ? "Save (ready)" : "Save as draft"}</Button>
-        {b.status === "draft" ? <Button variant="outline" onClick={() => void save({ status: "ready" })}>Mark ready</Button> : null}
-        {b.status !== "published" ? <Button variant="ghost" className="text-portal-red" onClick={() => void remove()}>Delete</Button> : null}
-        <Button variant="outline" disabled={busy === "translate"} onClick={() => void translate()}><Sparkles className="size-4" />{busy === "translate" ? "Translating…" : "Translate to EN"}</Button>
-        <Button variant="outline" onClick={() => void duplicate()}>Duplicate</Button>
-        <Button variant="ghost" onClick={async () => { if (window.confirm("Archive this brief?")) { await save({ status: "archived" }); void navigate({ to: "/hub/ugc/library" }); } }}>Archive</Button>
-      </div>
-    </>],
-  ];
-  const filesStep = oldSteps[4]!; const rulesStep = oldSteps[5]!; const publishStep = oldSteps[6]!;
-  const steps: [string, ReactNode][] = b.style ? [
-    ["Style & basics", basics],
-    ["Hook · Body · CTA", <>
-      <SnippetSlot kind="hook" label="Hook (frame 1)" value={b.hook_text ?? ""} onChange={(v) => set("hook_text", v)} appId={app} style={b.style} language={b.language} rows={1} />
-      <SnippetSlot kind="body" label="Body (the idea in one or two lines)" value={sd.body ?? ""} onChange={(v) => setSd({ body: v })} appId={app} style={b.style} language={b.language} />
-      <SnippetSlot kind="cta" label="CTA" value={sd.cta ?? ""} onChange={(v) => setSd({ cta: v })} appId={app} style={b.style} language={b.language} rows={1} />
-    </>],
-    [b.style === "educational" ? "Script" : b.style === "sole_footage" ? "The plan" : "Plans", styleEditor],
-    filesStep, rulesStep, publishStep,
-  ] : oldSteps;
-  const done = b.style ? [Boolean(b.title.trim() && b.effort), Boolean(b.hook_text?.trim() && sd.cta?.trim()), grade.missing.filter((m) => /Plan|plan|Script|Demo|music|Music|Duration|Text on screen|asset placed|timing|flips|reaction/i.test(m)).length === 0, assets.length + styleAssetIds(sd).length > 0, b.rules_do.length + b.rules_dont.length > 0, b.status !== "draft"] : doneLegacy;
-  const doneCount = done.filter(Boolean).length;
   const pay = rate(b.effort) != null ? `${eur(rate(b.effort)!)} / post` : null;
+  const dirty = JSON.stringify(b) !== lastSaved.current;
+  const inspirationId = (loaded?.row as { inspiration_id?: string | null } | null | undefined)?.inspiration_id ?? null;
+  const previewAssets = [...assets, ...styleAssetIds(sd).filter((id) => !assets.some((a) => a.id === id)).map((id) => (side?.library ?? []).find((l) => l.id === id)).filter(Boolean).map((l) => ({ ...(l as unknown as BriefAsset), role: (l as { role_default: string }).role_default }))];
+  async function saveAsFormat() {
+    const id = await save({}, true); if (!id) return;
+    const { data: src } = await supabase.from("briefs").select("*").eq("id", id).single(); if (!src) return;
+    const { id: _i, created_at: _c, updated_at: _u, ...rest } = src as Record<string, unknown>; void _i; void _c; void _u;
+    const { error } = await supabase.from("briefs").insert({ ...rest, brief_type: "format", status: "draft", drop_at: null, inspiration_id: null, title: String(src.title || "Format") } as never);
+    if (error) toast.error("Could not save the format."); else { toast.success("Saved in Library → Formats"); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); }
+  }
+  const sec = (title: string, body: ReactNode, extra?: ReactNode) => <section className={cn(card, "space-y-3")}><div className="flex items-center justify-between gap-2"><h2 className="font-extrabold text-brand-navy">{title}</h2>{extra}</div>{body}</section>;
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <Link to="/hub/ugc/library" className="text-sm font-semibold text-portal-accent">← Library</Link>
-        <h1 className="flex-1 text-xl font-extrabold text-brand-navy">Brief Studio{b.language === "en" ? " · EN" : ""}</h1>
-        <span className="rounded-full bg-portal-bg px-3 py-1 text-sm font-bold" data-testid="studio-progress">{doneCount}/{steps.length}</span>
-        {b.style ? <span className="rounded-full bg-portal-accent/15 px-3 py-1 text-xs font-extrabold text-portal-accent">Style {STYLES.findIndex(([k]) => k === b.style) + 1}</span> : null}
-        <span title={grade.missing.join("\n")} data-testid="studio-score" className={cn("rounded-full px-3 py-1 text-sm font-extrabold", grade.score >= 8 ? "bg-portal-green/15 text-portal-green" : "bg-portal-amber/20 text-brand-navy")}>Score {grade.score}/10</span>
-        <Button variant="outline" onClick={() => void save()} title="Drafts also autosave every 10 s">Save</Button>
+      <div className="flex flex-wrap items-center gap-2">
+        <Link to="/hub/ugc/briefs" className="text-sm font-semibold text-portal-accent">← Briefs</Link>
+        <h1 className="min-w-0 flex-1 truncate text-xl font-extrabold text-brand-navy">{b.title || "New brief"}{b.brief_type === "format" ? " · format" : ""}</h1>
+        <span className="text-xs font-semibold text-brand-navySoft" data-testid="autosave">{!b.id ? "Not saved yet" : dirty ? (b.status === "draft" ? "Unsaved · autosaves in a few seconds" : "Unsaved changes") : "Saved"}</span>
+        <Button variant="outline" onClick={() => void save()}>Save</Button>
         {b.status === "draft" ? <Button variant="outline" onClick={() => void save({ status: "ready" })}>Mark ready</Button> : null}
-        {b.status !== "published" && b.status !== "archived" ? <Button onClick={() => void save({ status: "published" })}>Publish</Button> : null}
+        {b.status !== "published" && b.status !== "archived" && b.brief_type !== "format" ? <Button onClick={() => void save({ status: "published" })}>Publish to creators</Button> : null}
+        <Button variant="outline" onClick={() => setPreview(true)}>Preview as creator</Button>
         <details className="relative"><summary className="flex h-9 cursor-pointer list-none items-center rounded-md border px-3 text-sm font-bold" aria-label="More actions">⋯</summary>
-          <div className="absolute right-0 z-20 mt-1 w-44 rounded-xl border bg-card p-1 shadow-portal">
+          <div className="absolute right-0 z-20 mt-1 w-48 rounded-xl border bg-card p-1 shadow-portal">
             <button type="button" className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-portal-bg" onClick={() => void duplicate()}>Duplicate</button>
-            <button type="button" className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-portal-bg" onClick={async () => { if (window.confirm("Archive this brief?")) { await save({ status: "archived" }); void navigate({ to: "/hub/ugc/library" }); } }}>Archive</button>
+            {b.brief_type !== "format" ? <button type="button" className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-portal-bg" onClick={() => void saveAsFormat()}>Save as format</button> : null}
+            <button type="button" className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-portal-bg" onClick={async () => { if (window.confirm("Archive this brief?")) { await save({ status: "archived" }); void navigate({ to: "/hub/ugc/briefs" }); } }}>Archive</button>
             {b.status !== "published" ? <button type="button" className="block w-full rounded-lg px-3 py-2 text-left text-sm text-portal-red hover:bg-portal-bg" onClick={() => void remove()}>Delete</button> : null}
           </div></details>
       </div>
-      {loaded?.row && (loaded.row as { inspiration_id?: string | null }).inspiration_id ? <InspirationReference id={(loaded.row as { inspiration_id: string }).inspiration_id} /> : null}
-      {grade.missing.length ? <details className={cn(card, "py-3 text-sm")}><summary className="cursor-pointer font-bold text-brand-navy">{grade.score >= 8 ? "Ready to publish" : "Publishing is allowed from 8/10"} — {grade.missing.length} point{grade.missing.length > 1 ? "s" : ""} missing</summary><ul className="mt-2 list-disc pl-5 text-brand-navySoft">{grade.missing.map((m) => <li key={m}>{m}</li>)}</ul></details> : null}
-      <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-        <aside className="lg:sticky lg:top-4 lg:self-start"><p className="mb-2 text-center text-xs font-bold uppercase tracking-wide text-brand-navySoft">Preview as creator</p>
-          <div className="mx-auto w-full max-w-[360px] rounded-[2.5rem] border-[10px] border-brand-navy bg-portal-bg p-3 shadow-portal">
-            <div className="max-h-[70vh] overflow-y-auto rounded-[1.6rem] bg-card p-3"><BriefView b={b} assets={[...assets, ...styleAssetIds(sd).filter((id) => !assets.some((a) => a.id === id)).map((id) => (side?.library ?? []).find((l) => l.id === id)).filter(Boolean).map((l) => ({ ...(l as unknown as BriefAsset), role: (l as { role_default: string }).role_default }))]} refs={(side?.refs ?? []).filter((r) => refIds.includes(r.id))} pay={pay} /></div>
-          </div>
-        </aside>
-        <div className="space-y-3">{steps.map(([t, body], i) => <Step key={t} n={i + 1} title={t} done={done[i] ?? false} open={open === i + 1} onToggle={() => setOpen(open === i + 1 ? 0 : i + 1)}>{body}</Step>)}</div>
+      <div className={cn("grid gap-6", inspirationId && "lg:grid-cols-[1fr_380px]")}>
+        <div className="min-w-0 space-y-4">
+          {sec("Title, app & style", <>
+            <div className="grid gap-2 sm:grid-cols-[1fr_180px_140px]">
+              <label className="text-sm font-semibold">Title (admin only)<input className={input} value={b.title} onChange={(e) => set("title", e.target.value)} /></label>
+              <label className="text-sm font-semibold">App<select className={input} value={b.app_id} onChange={(e) => set("app_id", e.target.value)}>{apps.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</select></label>
+              <label className="text-sm font-semibold">Language<select className={input} value={b.language} onChange={(e) => set("language", e.target.value)}><option value="fr">French</option><option value="en">English</option></select></label>
+            </div>
+            {stylePicker}
+          </>)}
+          {sec("Hook", <>
+            <SnippetSlot kind="hook" label="On screen (frame 1)" value={b.hook_text ?? ""} onChange={(v) => set("hook_text", v)} appId={app} style={b.style} language={b.language} rows={1} />
+            <label className="block text-sm font-semibold">Oral (first sentence said)<input className={input} value={b.oral_hook ?? ""} onChange={(e) => set("oral_hook", e.target.value)} /></label>
+          </>)}
+          {sec(b.style === "educational" ? "Plan · script" : "Plan", styleEditor)}
+          {sec("Product moment", <>
+            <div className="grid gap-2 sm:grid-cols-[1fr_1fr]">
+              <label className="block text-sm font-semibold">At second <b>{b.product_second ?? 5}</b><input type="range" min={1} max={30} value={b.product_second ?? 5} onChange={(e) => set("product_second", Number(e.target.value))} className="mt-3 w-full" aria-label="Product second" /></label>
+              <label className="block text-sm font-semibold">Gesture<select className={input} value={GESTURES.includes(b.product_gesture as never) ? b.product_gesture! : "Autre"} onChange={(e) => set("product_gesture", e.target.value === "Autre" ? "" : e.target.value)}>{GESTURES.map((g) => <option key={g}>{g}</option>)}</select></label>
+            </div>
+            <label className="block text-sm font-semibold">What happens<input className={input} value={b.product_moment ?? ""} onChange={(e) => set("product_moment", e.target.value)} /></label>
+            <label className="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked={b.say_name} onChange={(e) => set("say_name", e.target.checked)} />Say the app name</label>
+          </>)}
+          {sec("CTA", <SnippetSlot kind="cta" label="CTA" value={sd.cta ?? ""} onChange={(v) => setSd({ cta: v })} appId={app} style={b.style} language={b.language} rows={1} />)}
+          {sec("Shooting rules", <GuidelinesList appId={app} en={b.language === "en"} />, <Link to="/hub/settings" search={{ tab: "ugc-guidelines" }} className="text-xs font-bold text-portal-accent">Edit rules →</Link>)}
+          {sec("Description to paste", <div data-testid="studio-post-desc"><p className="mb-2 text-xs text-brand-navySoft">Leave empty to use the app default (Settings → Post descriptions).</p>
+            <PostDescriptionFields value={b.style_data?.post_desc ?? {}} onChange={(v) => set("style_data", { ...(b.style_data ?? {}), post_desc: v })} /></div>)}
+        </div>
+        {inspirationId ? <aside className="lg:sticky lg:top-4 lg:self-start"><InspirationReference id={inspirationId} /></aside> : null}
       </div>
+      <Sheet open={preview} onOpenChange={setPreview}>
+        <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md">
+          <SheetHeader><SheetTitle>Preview as creator</SheetTitle></SheetHeader>
+          <div className="mt-3 rounded-[1.6rem] border-[8px] border-brand-navy bg-card p-3"><BriefView b={b} assets={previewAssets} refs={(side?.refs ?? []).filter((r) => refIds.includes(r.id))} pay={pay} /></div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
