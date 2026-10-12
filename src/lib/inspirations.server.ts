@@ -222,16 +222,14 @@ export async function processRow(a: Admin, id: string, from?: "analyse") {
 
 /** Cron tick: re-queues stuck rows, then processes up to 5 queued rows in parallel. */
 export async function runInspirationTick(a: Admin) {
-  const { runProfileStep } = await import("./notion-sync.server");
-  const prof = await runProfileStep(a).catch((e) => ({ error: (e as Error).message }));
+
   const stuck = new Date(Date.now() - 12 * 60_000).toISOString();
   await a.from("inspirations").update({ status: "queued" }).in("status", ["fetching", "transcribing", "analysing"]).lt("updated_at", stuck);
   const { data: rows } = await a.from("inspirations").select("id").eq("status", "queued").lte("next_try_at", new Date().toISOString()).order("created_at").limit(5);
   if (!rows?.length) {
     const { count } = await a.from("inspirations").select("id", { count: "exact", head: true }).in("status", ["queued", "fetching", "transcribing", "analysing"]);
-    const { count: pc } = await a.from("notion_items").select("notion_page_id", { count: "exact", head: true }).eq("kind", "profile").in("profile_status", ["queued", "running"]);
-    if (!count && !pc) await a.rpc("inspiration_queue_disarm");
-    return { processed: 0, pending: count ?? 0, profilesPending: pc ?? 0, prof };
+    if (!count) await a.rpc("inspiration_queue_disarm");
+    return { processed: 0, pending: count ?? 0 };
   }
   await a.from("inspirations").update({ status: "fetching", updated_at: new Date().toISOString() }).in("id", rows.map((r: { id: string }) => r.id));
   const t0 = Date.now();

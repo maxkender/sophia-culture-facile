@@ -4560,6 +4560,54 @@ export type Database = {
           },
         ]
       }
+      inspiration_accounts: {
+        Row: {
+          app_ids: string[]
+          avatar_path: string | null
+          created_at: string
+          display_name: string | null
+          error: string | null
+          followers: number | null
+          handle: string
+          id: string
+          notes: string | null
+          notion_page_id: string | null
+          platform: string
+          refreshed_at: string | null
+          url: string
+        }
+        Insert: {
+          app_ids?: string[]
+          avatar_path?: string | null
+          created_at?: string
+          display_name?: string | null
+          error?: string | null
+          followers?: number | null
+          handle: string
+          id?: string
+          notes?: string | null
+          notion_page_id?: string | null
+          platform: string
+          refreshed_at?: string | null
+          url: string
+        }
+        Update: {
+          app_ids?: string[]
+          avatar_path?: string | null
+          created_at?: string
+          display_name?: string | null
+          error?: string | null
+          followers?: number | null
+          handle?: string
+          id?: string
+          notes?: string | null
+          notion_page_id?: string | null
+          platform?: string
+          refreshed_at?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       inspirations: {
         Row: {
           analysis: Json | null
