@@ -83,7 +83,7 @@ export function UgcCreatorsPage({ view }: { view: "applications" | "directory" }
   const [q, setQ] = useState(""); const [add, setAdd] = useState(false);
   const { data: active = [] } = useActiveCreators(appId);
   const { data: pending = 0 } = useQuery({ queryKey: ["portal", "admin", "creator-applications", "count", appId], queryFn: async () => { let x = supabase.from("creator_applications").select("id", { count: "exact", head: true }).eq("status", "pending"); if (appId) x = x.eq("app_id", appId); return (await x).count ?? 0; } });
-  const tabs: ["applications" | "directory", string][] = [["applications", `Applications (${pending})`], ["directory", `Creators (${active.length})`]];
+  const tabs: ["applications" | "directory", string][] = [["applications", `Applications (${pending})`], ["directory", `Creators (${active.filter((c) => !isInactive(c)).length})`]];
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
