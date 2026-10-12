@@ -1,3 +1,4 @@
+import { DraftRequiredToggle } from "./UgcDrafts";
 import { NotionSettingsCard } from "./NotionSync";
 import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
@@ -214,7 +215,7 @@ function EmailSettings() {
 export function HubSettings({ tab }: { tab?: string | undefined }) {
   const t = pick(SETTINGS_TABS, tab === "codes" ? "apps" : tab === "team" ? "email" : tab);
   const body: Record<string, ReactNode> = {
-    apps: <div className="space-y-6"><AppsSettings /><HubAccessCodes /><details className="rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold">Author codes and assignment history</summary><div className="mt-4"><CodesPool /></div></details></div>, codes: null, email: <EmailSettings />, "ugc-guidelines": <div className={card}><GuidelinesEditor /></div>, "post-descriptions": <PostDescriptionSettings />, notion: <NotionSettingsCard />, connections: <div className="space-y-4">{OS_UI_ENABLED ? <OsConnectionCard /> : null}<IntegrationsSetup /></div>, team: <Team />, security: <AdminSettings />,
+    apps: <div className="space-y-6"><AppsSettings /><HubAccessCodes /><details className="rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold">Author codes and assignment history</summary><div className="mt-4"><CodesPool /></div></details></div>, codes: null, email: <EmailSettings />, "ugc-guidelines": <div className="space-y-4"><DraftRequiredToggle /><div className={card}><GuidelinesEditor /></div></div>, "post-descriptions": <PostDescriptionSettings />, notion: <NotionSettingsCard />, connections: <div className="space-y-4">{OS_UI_ENABLED ? <OsConnectionCard /> : null}<IntegrationsSetup /></div>, team: <Team />, security: <AdminSettings />,
   };
   return <div><SectionTabs base="/hub/settings" tabs={SETTINGS_TABS} current={t} />{body[t]}</div>;
 }

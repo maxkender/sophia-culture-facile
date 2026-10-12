@@ -91,3 +91,13 @@ export async function sendUgcAck(to: string, fullName: string, lang: "fr" | "en"
   const backup = await sendAppEmail({ to, subject, html, text, label: "ugc-ack", purpose: "transactional", idempotencyKey: `ugc-ack-${to}-${Date.now()}` });
   return { sent: backup.sent, provider: backup.sent ? "lovable" : null, messageId: null, note: null };
 }
+
+/** Short plain message to a creator (draft review outcome, etc.). */
+export async function sendCreatorNote(to: string, fullName: string, subject: string, paragraphs: string[], button?: { label: string; url: string }): Promise<EmailOutcome> {
+  const opts = { paragraphs, ...(button ? { buttonLabel: button.label, buttonUrl: button.url } : {}) };
+  const html = buildEmailHtml(opts); const text = buildEmailText(opts);
+  const brevo = await sendBrevoEmail({ to, toName: fullName, subject, html, text });
+  if (brevo.sent) return { sent: true, provider: "brevo", messageId: brevo.messageId ?? null, note: null };
+  const backup = await sendAppEmail({ to, subject, html, text, label: "ugc-draft", purpose: "transactional", idempotencyKey: `ugc-draft-${to}-${Date.now()}` });
+  return { sent: backup.sent, provider: backup.sent ? "lovable" : null, messageId: null, note: null };
+}
