@@ -1,3 +1,4 @@
+import { NotionSettingsCard } from "./NotionSync";
 import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -154,7 +155,7 @@ export function InfluencerSection({ section, id }: { section: string; id?: strin
 }
 
 /* ---------------- Settings ---------------- */
-export const SETTINGS_TABS: [string, string][] = [["apps", "Apps & store links"], ["codes", "Access codes"], ["email", "Email"], ["ugc-guidelines", "UGC guidelines"], ["post-descriptions", "Post descriptions"], ["connections", "Connections"], ["team", "Team & hiring managers"], ["security", "Security"]];
+export const SETTINGS_TABS: [string, string][] = [["apps", "Apps & store links"], ["codes", "Access codes"], ["email", "Email"], ["ugc-guidelines", "UGC guidelines"], ["post-descriptions", "Post descriptions"], ["notion", "Notion (UGC)"], ["connections", "Connections"], ["team", "Team & hiring managers"], ["security", "Security"]];
 
 const TRACKS = [["ugc", "UGC"], ["slideshow", "Slideshows"], ["influencer", "Influencers"]] as const;
 function Team({ track }: { track?: string } = {}) {
@@ -212,7 +213,7 @@ function EmailSettings() {
 export function HubSettings({ tab }: { tab?: string | undefined }) {
   const t = pick(SETTINGS_TABS, tab);
   const body: Record<string, ReactNode> = {
-    apps: <AppsSettings />, codes: <div className="space-y-6"><HubAccessCodes /><details className="rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold">Author codes and assignment history</summary><div className="mt-4"><CodesPool /></div></details></div>, email: <EmailSettings />, "ugc-guidelines": <GuidelinesEditor />, "post-descriptions": <PostDescriptionSettings />, connections: <div className="space-y-4">{OS_UI_ENABLED ? <OsConnectionCard /> : null}<IntegrationsSetup /></div>, team: <Team />, security: <AdminSettings />,
+    apps: <AppsSettings />, codes: <div className="space-y-6"><HubAccessCodes /><details className="rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold">Author codes and assignment history</summary><div className="mt-4"><CodesPool /></div></details></div>, email: <EmailSettings />, "ugc-guidelines": <GuidelinesEditor />, "post-descriptions": <PostDescriptionSettings />, notion: <NotionSettingsCard />, connections: <div className="space-y-4">{OS_UI_ENABLED ? <OsConnectionCard /> : null}<IntegrationsSetup /></div>, team: <Team />, security: <AdminSettings />,
   };
   return <div><SectionTabs base="/hub/settings" tabs={SETTINGS_TABS} current={t} />{body[t]}</div>;
 }
