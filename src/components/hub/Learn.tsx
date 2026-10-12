@@ -245,7 +245,7 @@ function BriefsArea({ sub }: { sub?: string | undefined }) {
   return (
     <div className="space-y-4">
       <div className="flex gap-1 overflow-x-auto">{BRIEF_SUBS.map(([k, l]) => <button key={k} type="button" onClick={() => setS(k)} className={cn("min-h-9 shrink-0 rounded-full border px-3 text-xs font-bold", s === k ? "border-brand-navy bg-brand-navy text-card" : "border-brand-line bg-card text-brand-navy")}>{l}</button>)}</div>
-      {s === "planner" ? <WeekPlanner /> : s === "scripts" ? <UgcBriefsGrid /> : s === "ops" ? <CreatorOps /> : <BriefsList />}
+      {s === "planner" ? <WeekPlanner /> : s === "scripts" ? <UgcBriefsGrid /> : s === "ops" ? <CreatorOps /> : <BriefsList formats={<Formats />} />}
     </div>
   );
 }
