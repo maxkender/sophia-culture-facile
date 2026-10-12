@@ -109,7 +109,7 @@ function CreatorPostsAndPay({ creatorId }: { creatorId: string }) {
     queryKey: ["admin-creator-posts-pay", creatorId],
     queryFn: async () => {
       const [p, pay] = await Promise.all([
-        supabase.from("creator_posts").select("id, url, platform, status, posted_on, created_at, views, amount_eur").eq("creator_id", creatorId).order("created_at", { ascending: false }).limit(100),
+        supabase.from("creator_posts").select("id, url, platform, status, posted_on, created_at, views").eq("creator_id", creatorId).order("created_at", { ascending: false }).limit(100),
         supabase.from("payout_items").select("id, amount, currency, status, paid_at, created_at").eq("creator_id", creatorId).order("created_at", { ascending: false }).limit(50),
       ]);
       return { posts: (p.data ?? []) as any[], pay: (pay.data ?? []) as any[] }; // eslint-disable-line @typescript-eslint/no-explicit-any
