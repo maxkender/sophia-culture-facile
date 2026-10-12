@@ -155,13 +155,18 @@ export async function classifyNotionFormat(a: Admin, ids: string[]) {
     if (!r.analysis) continue;
     const an = r.analysis;
     const prompt = `Pick the single best "Type de format" for this short video among exactly: ${NOTION_FORMATS.join(" | ")}.\nKind: ${r.kind}. Style: ${an.style}. Audio: ${an.audio} ${an.audio_note}. Hook: ${JSON.stringify(an.hook)}. Structure: ${JSON.stringify(an.structure).slice(0, 1500)}.`;
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST", headers: { Authorization: `Bearer ${key}`, "content-type": "application/json" },
-      body: JSON.stringify({ model: "google/gemini-2.5-flash-lite", messages: [{ role: "user", content: prompt }], response_format: { type: "json_schema", json_schema: { name: "f", strict: true, schema: { type: "object", additionalProperties: false, required: ["notion_format"], properties: { notion_format: { type: "string", enum: [...NOTION_FORMATS] } } } } } }),
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST", headers: { Authorization: `Bearer ${key}`, "content-type": "application/json", "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({ model: "openai/gpt-6-astra", reasoning: { effort: "low" }, store: false, stream: true, input: [{ role: "user", content: [{ type: "input_text", text: prompt }] }], text: { format: { type: "json_schema", name: "f", strict: true, schema: { type: "object", additionalProperties: false, required: ["notion_format"], properties: { notion_format: { type: "string", enum: [...NOTION_FORMATS] } } } } } }),
     });
-    if (!res.ok) throw new Error(`AI error ${res.status}`);
-    const j = await res.json();
-    const v = JSON.parse(j.choices?.[0]?.message?.content ?? "{}").notion_format;
+    if (!res.ok || !res.body) throw new Error(`AI error ${res.status}`);
+    const reader = res.body.getReader(); const dec = new TextDecoder(); let buf = ""; let txt = "";
+    for (;;) {
+      const { value, done: end } = await reader.read(); if (end) break;
+      buf += dec.decode(value, { stream: true }); let i: number;
+      while ((i = buf.indexOf("\n")) >= 0) { const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1); if (!line.startsWith("data:")) continue; try { const ev = JSON.parse(line.slice(5)); if (ev.type === "response.output_text.delta") txt += ev.delta ?? ""; } catch { /* skip */ } }
+    }
+    const v = (JSON.parse(txt || "{}") as { notion_format?: string }).notion_format ?? "";
     if ((NOTION_FORMATS as readonly string[]).includes(v)) { await a.from("inspirations").update({ notion_format: v, updated_at: new Date().toISOString() }).eq("id", r.id); done[r.id] = v; }
   }
   return done;
