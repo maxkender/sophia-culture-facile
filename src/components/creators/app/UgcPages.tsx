@@ -83,12 +83,9 @@ export function BriefLibraryPage() {
   const sel = "h-10 rounded-md border border-input bg-card px-3 text-sm";
   return (
     <div>
-      <PageTitle title={ct("Library")} lead={ct("Every brief you can use, with how it performs across the network, plus reference videos to study.")} />
-      <div className="mb-6 flex gap-2">
-        <Button variant={tab === "briefs" ? "default" : "outline"} onClick={() => setTab("briefs")}>{ct("Briefs")}</Button>
-        <Button variant={tab === "videos" ? "default" : "outline"} onClick={() => setTab("videos")}>{ct("Reference videos")}</Button>
-      </div>
-      {tab === "videos" ? <ReferenceLibrary /> : (
+      <PageTitle title={ct("Briefs")} lead={ct("The briefs published for you. Each one includes its reference video when there is one.")} />
+      {/* Standalone reference-video library is hidden for creators; references live inside each brief. */}
+      {tab === "videos" && false ? <ReferenceLibrary /> : (
         <>
           <div className="mb-6 flex flex-wrap gap-2">
             <select aria-label={ct("Format")} className={sel} value={f.format} onChange={(e) => setF({ ...f, format: e.target.value })}><option value="">{ct("All formats")}</option>{formats.map((x) => <option key={x} value={x}>{STYLE_LABEL[x]}</option>)}</select>
