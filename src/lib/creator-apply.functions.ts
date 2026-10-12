@@ -122,7 +122,7 @@ const slideSchema = z.object({
   deux_telephones: z.boolean(),
   langue: z.enum(["fr", "en", "es", "it", "pt", "de"]),
   q_country_now: z.string().trim().min(2).max(120),
-  q_hours_per_day: z.string().trim().min(1).max(120),
+  q_hours_per_day: z.string().trim().max(120).optional(), // retired question; old answers stay stored
   q_tiktok_daily: z.string().trim().min(1).max(120),
   q_previous_content: z.string().trim().min(2).max(2000),
 });
@@ -149,7 +149,7 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
       deux_telephones: data.deux_telephones,
       langue: data.langue,
       q_country_now: data.q_country_now,
-      q_hours_per_day: data.q_hours_per_day,
+      q_hours_per_day: data.q_hours_per_day || null,
       q_tiktok_daily: data.q_tiktok_daily,
       q_previous_content: data.q_previous_content,
     }).select("id").single();

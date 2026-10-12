@@ -72,7 +72,6 @@ export type CreatorFormCopy = {
     language: string;
     screening: string;
     qCountryNow: string;
-    qHours: string;
     qTiktok: string;
     qPrevious: string;
     screeningError: string;
@@ -150,12 +149,11 @@ export const CREATOR_FORMS: Record<Lang, CreatorFormCopy> = {
       referral: "How did you hear about us?",
       secondPhone: "Do you have a second phone you can use for filming? *",
       language: "Language for our emails",
-      screening: "Four quick questions",
+      screening: "Three quick questions",
       qCountryNow: "1. Which country do you live in right now? *",
-      qHours: "2. How many hours a day can you post? *",
-      qTiktok: "3. Do you already use TikTok daily? *",
-      qPrevious: "4. Tell us about any content you've posted before *",
-      screeningError: "Please answer the four questions.",
+      qTiktok: "2. Do you already use TikTok daily? *",
+      qPrevious: "3. Tell us about any content you've posted before *",
+      screeningError: "Please answer the three questions.",
     },
   },
   fr: {
@@ -228,12 +226,11 @@ export const CREATOR_FORMS: Record<Lang, CreatorFormCopy> = {
       referral: "Comment avez-vous entendu parler de nous ?",
       secondPhone: "Avez-vous un second téléphone utilisable pour filmer ? *",
       language: "Langue de nos e-mails",
-      screening: "Quatre questions rapides",
+      screening: "Trois questions rapides",
       qCountryNow: "1. Dans quel pays vivez-vous en ce moment ? *",
-      qHours: "2. Combien d'heures par jour pouvez-vous publier ? *",
-      qTiktok: "3. Utilisez-vous déjà TikTok tous les jours ? *",
-      qPrevious: "4. Parlez-nous des contenus que vous avez déjà publiés *",
-      screeningError: "Répondez aux quatre questions.",
+      qTiktok: "2. Utilisez-vous déjà TikTok tous les jours ? *",
+      qPrevious: "3. Parlez-nous des contenus que vous avez déjà publiés *",
+      screeningError: "Répondez aux trois questions.",
     },
   },
 };

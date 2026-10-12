@@ -41,7 +41,7 @@ export function scoreOf(a: App, hmCountries: Set<string>) {
     ["Adult", Boolean(a.is_adult)],
     ["Second phone", a.deux_telephones === true],
     ["Upwork", Boolean(a.has_upwork)],
-    ["4 answers", Boolean(a.q_country_now && a.q_hours_per_day && a.q_tiktok_daily && a.q_previous_content)],
+    ["3 answers", Boolean(a.q_country_now && a.q_tiktok_daily && a.q_previous_content)],
   ] as const;
   return { score: checks.filter(([, ok]) => ok).length, max: checks.length, checks };
 }
@@ -137,7 +137,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
         <p><b>Phone</b> {a.phone ?? "—"} · <b>Language</b> {a.langue ? a.langue.toUpperCase() : `${langOfCountry(a.country).toUpperCase()} (country default)`} · <b>Second phone</b> {a.deux_telephones == null ? "—" : a.deux_telephones ? "yes" : "no"}</p>
         <p><b>Upwork</b> {a.has_upwork ? (a.upwork_profile_url ? <a className="text-space-slides underline" href={a.upwork_profile_url} target="_blank" rel="noreferrer">profile</a> : "yes") : "no"} · <b>Zone</b> {a.zone ?? "country not open"}</p>
         <div className="border-t border-brand-line py-3 text-xs">
-          <p><b>Country now:</b> {a.q_country_now ?? "—"}</p><p><b>Hours/day:</b> {a.q_hours_per_day ?? "—"}</p><p><b>TikTok daily:</b> {a.q_tiktok_daily ?? "—"}</p><p><b>Previous content:</b> {a.q_previous_content ?? "—"}</p>
+          <p><b>Country now:</b> {a.q_country_now ?? "—"}</p>{a.q_hours_per_day ? <p><b>Hours/day:</b> {a.q_hours_per_day}</p> : null}<p><b>TikTok daily:</b> {a.q_tiktok_daily ?? "—"}</p><p><b>Previous content:</b> {a.q_previous_content ?? "—"}</p>
           {a.referral_source ? <p><b>Heard via:</b> {a.referral_source}</p> : null}
         </div>
         <p className="text-xs text-brand-navySoft"><b>Score {score.score}/5</b> · {score.checks.map(([l, ok]) => `${ok ? "✓" : "✗"} ${l}`).join(" · ")}</p>
