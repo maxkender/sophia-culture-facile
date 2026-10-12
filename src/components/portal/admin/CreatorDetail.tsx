@@ -36,7 +36,7 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
 
   return (
     <div>
-      <Link to={me.track === "ugc" ? "/hub/ugc/creators" : "/auteurs/admin/creators/ops"} search={me.track === "ugc" ? ({ view: "directory" } as never) : undefined} className="text-sm font-semibold text-portal-accent">← Creators</Link>
+      <Link to={me.track === "ugc" ? "/hub/ugc/creators" : "/auteurs/admin/creators/ops"} search={(me.track === "ugc" ? { view: "directory" } : {}) as never} className="text-sm font-semibold text-portal-accent">← Creators</Link>
       <div className="mb-6 mt-3 flex items-center gap-4">
         <PersonAvatar name={me.full_name} url={photos[creatorId]} size={64} />
         <div className="min-w-0">
