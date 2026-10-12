@@ -11,7 +11,6 @@ import { WeeklyBar } from "./WorkPages";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { myRunningMonth } from "@/lib/ugc-creator.functions";
-import { CreatorStatsStrip } from "./HubPages";
 import { supabase } from "@/integrations/supabase/client";
 import { FilesSection, type BriefAsset } from "@/components/hub/BriefPreview";
 import { creatorLocale, t as ct, L } from "@/i18n/creator-app";
@@ -73,7 +72,7 @@ export function CreatorHomePage() {
         ))}
       </ol>
       <div className="mb-6"><WeeklyBar /></div>
-      <CreatorStatsStrip />
+      {/* Stats strip (earned/streak/tier) hidden: no pay or gamification in the creator space. */}
       <p className="-mt-4 mb-6 text-xs text-brand-navySoft">{ct("Bookmark this page: sophia-culture.com/creators/login is where you sign in from now on.")}</p>
 
       {steps.resignPending && (

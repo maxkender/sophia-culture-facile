@@ -1,3 +1,4 @@
+import { creatorLang } from "@/i18n/creator-app";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -240,8 +241,10 @@ export function effortRates(me: Record<string, unknown>, tiers: TierRow[], appId
 }
 
 export function MyTerms({ tiers }: { tiers: TierRow[] }) {
-  const { me, posts, briefs } = useCreator();
+  const { me } = useCreator();
   const m = me as Record<string, unknown>;
+  if (!m["terms_visible"]) return null;
+  const ownText = (creatorLang() === "fr" ? (m["terms_text_fr"] ?? m["terms_text_en"]) : (m["terms_text_en"] ?? m["terms_text_fr"])) as string | null;
   const tier = String(m["tier"] ?? "trial");
   const appId = (m["fast_lane_app_id"] as string | null) ?? null;
   const t = tiers.find((x) => x.tier === tier && (!appId || x.app_id === appId)) ?? tiers.find((x) => x.tier === tier);
@@ -250,13 +253,14 @@ export function MyTerms({ tiers }: { tiers: TierRow[] }) {
   const perPost = num("per_post_override") ?? (t ? Number(t.per_post) : null);
   const rpm = num("rpm_override") ?? (t ? Number(t.cpm) : null);
   const cap = num("cap_override") ?? (t ? Number(t.cap_per_post) : null);
-  if (perPost == null) return null;
-  const fr = m["language"] !== "en";
+  const fr = creatorLang() === "fr";
+  if (perPost == null) return ownText ? <p className="mt-3 whitespace-pre-line text-sm text-brand-navy" data-testid="my-terms">{ownText}</p> : null;
   const eur = (n: number) => `${new Intl.NumberFormat(fr ? "fr-FR" : "en-GB", { maximumFractionDigits: 2 }).format(n)} €`;
   const target = num("posts_per_month") ?? 20;
   return (
     <div className="mt-3" data-testid="my-terms">
-      {own ? <p className="text-xs font-bold uppercase tracking-wide text-portal-accent">{fr ? ct("Tes conditions") : ct("Your terms")}</p> : null}
+      <p className="text-xs font-bold uppercase tracking-wide text-portal-accent">{fr ? "Tes conditions" : "Your terms"}</p>
+      {ownText ? <p className="mt-1 whitespace-pre-line text-sm text-brand-navy">{ownText}</p> : null}
       {num("fixed_monthly_override") ? <><p className="mt-1 text-sm text-brand-navy">
         <b>{eur(num("fixed_monthly_override")!)}</b> {fr ? `pour ${target} vidéos par mois` : `for ${target} videos a month`} · <b>{eur(rpm ?? 0)}</b> {fr ? "/ 1 000 vues" : "per 1,000 views"}
         {cap ? <> · {fr ? "jusqu'à" : "up to"} <b>{eur(cap)}</b> {fr ? "par post" : "per post"}</> : null}
@@ -267,14 +271,6 @@ export function MyTerms({ tiers }: { tiers: TierRow[] }) {
         {own ? <> · {fr ? "objectif" : "target"} <b>{target}</b> {fr ? "posts/mois" : "posts/month"}</> : null}
         {num("welcome_bonus") ? <> · {fr ? "bonus de bienvenue" : "welcome bonus"} <b>{eur(num("welcome_bonus")!)}</b></> : null}
       </p>}
-      {(() => {
-        const min = num("min_talking_head_per_month") ?? 0;
-        if (!min || num("fixed_monthly_override")) return null;
-        const month = new Date().toISOString().slice(0, 7);
-        const effortOf = (p: { effort?: string | null; brief_id?: string | null }) => p.effort ?? (briefs.find((b) => b.id === p.brief_id) as { effort?: string | null } | undefined)?.effort ?? "talking_head";
-        const done = posts.filter((p) => p.status !== "rejected" && String(p.posted_on ?? p.created_at).slice(0, 7) === month && effortOf(p as never) === "talking_head").length;
-        return <p className="mt-1 text-xs font-semibold text-brand-navy" data-testid="facecam-count">Face cam : {done}/{min}{done < min ? <span className="font-normal text-brand-navySoft"> · {fr ? `en dessous de ${min}, la part par post est au prorata` : `below ${min}, the per-post part is prorated`}</span> : null}</p>;
-      })()}
     </div>
   );
 }
