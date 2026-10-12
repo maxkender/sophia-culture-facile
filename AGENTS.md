@@ -1,4 +1,4 @@
-UGC creator acceptance and onboarding mutations use authenticated server functions; why: creator invitations, progress, and post ownership must be validated server-side.
+UGC acceptance/onboarding mutations use authenticated server functions to validate invitations, progress and post ownership.
 <!-- LOVABLE:BEGIN -->
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
