@@ -36,12 +36,14 @@ export function useSlideshowApps() {
 
 export function scoreOf(a: App, hmCountries: Set<string>) {
   const code = countryCodeOf(a.country);
+  const answered = [a.q_country_now, a.q_tiktok_daily, a.q_previous_content].filter((v) => v && String(v).trim()).length;
   const checks = [
     ["Zone + hiring manager", Boolean(a.zone) && Boolean(code && hmCountries.has(code))],
     ["Adult", Boolean(a.is_adult)],
     ["Second phone", a.deux_telephones === true],
     ["Upwork", Boolean(a.has_upwork)],
-    ["3 answers", Boolean(a.q_country_now && a.q_tiktok_daily && a.q_previous_content)],
+    // Screening answers are optional: never a penalty, shown as information only.
+    [`${answered}/3 answers`, true],
   ] as const;
   return { score: checks.filter(([, ok]) => ok).length, max: checks.length, checks };
 }
