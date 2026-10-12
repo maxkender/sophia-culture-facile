@@ -256,7 +256,7 @@ export function InspirationReference({ id }: { id: string }) {
 }
 
 function Drawer({ r, onChange }: { r: Insp; onChange: () => void }) {
-  const toRef = useServerFn(inspirationToReference); const retx = useServerFn(retranscribeInspiration); const [rtBusy, setRtBusy] = useState(false); const navigate = useNavigate();
+  const toRef = useServerFn(inspirationToReference); const retx = useServerFn(retranscribeInspiration); const [rtBusy, setRtBusy] = useState(false);
   const video = useRef<HTMLVideoElement>(null); const [t, setT] = useState(0); const [src, setSrc] = useState<string | null>(null);
   const [tags, setTags] = useState(r.tags.join(", "));
   useEffect(() => { setTags(r.tags.join(", ")); }, [r.id, r.tags]);
