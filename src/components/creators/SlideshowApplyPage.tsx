@@ -22,7 +22,7 @@ export function SlideshowApplyPage() {
   const privacyPath = useLocalePath("privacy");
   const { common, slideshow: copy } = CREATOR_FORMS[lang];
   const submitFn = useServerFn(submitSlideshowApplication);
-  const [f, setF] = useState({ full_name: "", email: "", phone: "", country: "", referral: "", upwork_url: "", q_country_now: "", q_hours: "", q_tiktok: "", q_previous: "" });
+  const [f, setF] = useState({ full_name: "", email: "", phone: "", country: "", referral: "", upwork_url: "", q_country_now: "", q_tiktok: "", q_previous: "" });
   const [phone2, setPhone2] = useState<"" | "yes" | "no">("");
   const [langue, setLangue] = useState<ApplicantLang | null>(null);
   const autoLang: ApplicantLang = f.country ? langOfCountry(f.country) : lang;
@@ -43,16 +43,8 @@ export function SlideshowApplyPage() {
       setError(common.requiredError);
       return;
     }
-    if (f.q_country_now.trim().length < 2 || !f.q_tiktok.trim() || f.q_previous.trim().length < 2) {
-      setError(copy.screeningError);
-      return;
-    }
     if (!isValidEmail(f.email)) {
       setError(common.emailError);
-      return;
-    }
-    if (f.phone.trim() && !isValidInternationalPhone(f.phone)) {
-      setError(common.phoneError);
       return;
     }
     if (upwork === "yes" && f.upwork_url.trim() && !isHttpUrl(f.upwork_url)) {
