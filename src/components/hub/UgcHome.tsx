@@ -12,7 +12,7 @@ export function UgcHome() {
       const ins = supabase.from("inspirations").select("id, app_id").eq("status", "analyzed").limit(2000);
       let used = supabase.from("briefs").select("inspiration_id").not("inspiration_id", "is", null);
       let pub = supabase.from("briefs").select("id", { count: "exact", head: true }).eq("status", "published").neq("brief_type", "format");
-      let posts = supabase.from("creator_posts").select("id", { count: "exact", head: true }).eq("status", "pending");
+      let posts = supabase.from("creator_posts").select("id, creators!inner(is_test)", { count: "exact", head: true }).eq("status", "pending").eq("creators.is_test", false);
       if (appId) { used = used.eq("app_id", appId); pub = pub.eq("app_id", appId); posts = posts.eq("app_id", appId); }
       const [i, u, p, q] = await Promise.all([ins, used, pub, posts]);
       const done = new Set((u.data ?? []).map((r) => r.inspiration_id as string));

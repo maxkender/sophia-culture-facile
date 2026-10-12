@@ -24,7 +24,7 @@ function usePosts(appId: string | null) {
   return useQuery({
     queryKey: ["hub", "ugc-posts", appId],
     queryFn: async () => {
-      let q = supabase.from("creator_posts").select("id, creator_id, url, platform, status, feedback, app_id, brief_id, submitted_at, created_at, guidelines_checked, validated_at, pay_status, views, views_frozen, pay_amount, pay_formula, pay_flag, cover_url, creators(full_name), briefs(title)").order("created_at", { ascending: false }).limit(500);
+      let q = supabase.from("creator_posts").select("id, creator_id, url, platform, status, feedback, app_id, brief_id, submitted_at, created_at, guidelines_checked, validated_at, pay_status, views, views_frozen, pay_amount, pay_formula, pay_flag, cover_url, creators!inner(full_name, is_test), briefs(title)").eq("creators.is_test", false).order("created_at", { ascending: false }).limit(500);
       if (appId) q = q.eq("app_id", appId);
       return ((await q).data ?? []) as unknown as Row[];
     },
@@ -114,7 +114,7 @@ export function ReadyForPayment() {
   const { data = [] } = useQuery({
     queryKey: ["hub", "ugc-ready", appId],
     queryFn: async () => {
-      let q = supabase.from("creator_posts").select("id, creator_id, url, pay_amount, pay_formula, views_frozen, platform, app_id, creators(full_name)").eq("pay_status", "ready");
+      let q = supabase.from("creator_posts").select("id, creator_id, url, pay_amount, pay_formula, views_frozen, platform, app_id, creators!inner(full_name, is_test)").eq("creators.is_test", false).eq("pay_status", "ready");
       if (appId) q = q.eq("app_id", appId);
       return ((await q).data ?? []) as unknown as { id: string; creator_id: string; url: string; pay_amount: number; pay_formula: string; views_frozen: number; platform: string; creators: { full_name: string } | null }[];
     },

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Banner, EmptyState, PageTitle, PortalCard } from "../ui";
 import { adminAssignCreatorCode, adminCreatorDetail, adminRevealCredentials } from "@/lib/creator-app.functions";
 import { AppEnrolment } from "./AppEnrolment";
+import { HandleLinksInline, PersonAvatar, useCreatorPhotos } from "@/components/hub/PersonAvatar";
+import { flag } from "@/components/hub/hub-data";
 import { UgcCreatorPanel } from "./UgcAdmin";
 import { creatorSteps, SETUP_GUIDE, WARMUP_DAYS } from "@/lib/creator-steps";
 
@@ -23,6 +25,7 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
     queryKey: ["admin-creator", creatorId],
     queryFn: async () => (await supabase.from("creators").select("*").eq("id", creatorId).maybeSingle()).data,
   });
+  const photos = useCreatorPhotos([creatorId]);
   const { data: detail } = useQuery({ queryKey: ["admin-creator-detail", creatorId], queryFn: () => detailFn({ data: { creatorId } }) });
   if (me === undefined || !detail) return <p className="text-sm text-brand-navySoft">Loading…</p>;
   if (!me) return <EmptyState title="Creator not found" />;
@@ -33,8 +36,15 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
 
   return (
     <div>
-      <Link to="/auteurs/admin/creators/ops" className="text-sm font-semibold text-portal-accent">← Creators</Link>
-      <div className="mt-3"><PageTitle title={me.full_name} lead={`${me.email} · ${me.country ?? "no country"} · ${me.track} · status ${me.status}`} /></div>
+      <Link to={me.track === "ugc" ? "/hub/ugc/creators" : "/auteurs/admin/creators/ops"} search={(me.track === "ugc" ? { view: "directory" } : {}) as never} className="text-sm font-semibold text-portal-accent">← Creators</Link>
+      <div className="mb-6 mt-3 flex items-center gap-4">
+        <PersonAvatar name={me.full_name} url={photos[creatorId]} size={64} />
+        <div className="min-w-0">
+          <h1 className="text-2xl font-extrabold text-brand-navy">{me.full_name} <span className="text-lg">{flag(me.country)}</span></h1>
+          <p className="text-sm text-brand-navySoft">{me.email_pending ? "email pending" : me.email}{me.phone ? ` · ${me.phone}` : ""} · {me.country ?? "no country"} · {["paused", "ended", "dormant"].includes(String(me.ugc_status ?? me.status)) ? "paused" : "active"}</p>
+          <HandleLinksInline tiktok={me.tiktok_handle} instagram={me.instagram_handle} />
+        </div>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <AppEnrolment kind="creator" personId={creatorId} />
@@ -70,20 +80,6 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
           ) : <p className="mt-2 text-sm text-brand-navySoft">Not registered yet.</p>}
         </PortalCard>
 
-        <PortalCard>
-          <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Account sub-steps</p>
-          <ul className="mt-2 space-y-1 text-sm">
-            {SETUP_GUIDE.map((g) => <li key={g.key}>{checks[g.key] ? "✓" : "○"} Step {g.key} {checks[g.key] ? <span className="text-brand-navySoft">· {fmt(checks[g.key])}</span> : null}</li>)}
-          </ul>
-        </PortalCard>
-
-        <PortalCard>
-          <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Warm-up</p>
-          <ul className="mt-2 space-y-1 text-sm">
-            {WARMUP_DAYS.map((d) => <li key={d.day}>{warm[String(d.day)] ? "✓" : "○"} 24-hour warm-up {warm[String(d.day)] ? <span className="text-brand-navySoft">· {fmt(warm[String(d.day)])}</span> : null}</li>)}
-          </ul>
-        </PortalCard>
-
         <PortalCard className="md:col-span-2">
           <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Sophia app access code</p>
           {me.access_code ? (
@@ -101,8 +97,35 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
           )}
         </PortalCard>
       </div>
-      {me.track === "ugc" && <UgcCreatorPanel creator={me} />}
+      {me.track === "ugc" ? <CreatorPostsAndPay creatorId={creatorId} /> : null}
+      {me.track === "ugc" && <details className="mt-6 rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold text-brand-navy">Pay settings & notes</summary><UgcCreatorPanel creator={me} /></details>}
       {!me.user_id && <div className="mt-6"><Banner tone="info" title="This creator has not created their account yet" /></div>}
+    </div>
+  );
+}
+
+function CreatorPostsAndPay({ creatorId }: { creatorId: string }) {
+  const { data } = useQuery({
+    queryKey: ["admin-creator-posts-pay", creatorId],
+    queryFn: async () => {
+      const [p, pay] = await Promise.all([
+        supabase.from("creator_posts").select("id, url, platform, status, posted_on, created_at, views").eq("creator_id", creatorId).order("created_at", { ascending: false }).limit(100),
+        supabase.from("payout_items").select("id, amount, currency, status, paid_at, created_at").eq("creator_id", creatorId).order("created_at", { ascending: false }).limit(50),
+      ]);
+      return { posts: (p.data ?? []) as any[], pay: (pay.data ?? []) as any[] }; // eslint-disable-line @typescript-eslint/no-explicit-any
+    },
+  });
+  const dd = (x?: string | null) => (x ? new Date(x).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—");
+  return (
+    <div className="mt-6 grid gap-4 md:grid-cols-2">
+      <PortalCard>
+        <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Posts</p>
+        {data?.posts.length ? <ul className="mt-2 divide-y divide-brand-line text-sm">{data.posts.map((p) => <li key={p.id} className="flex items-center gap-2 py-2"><a href={p.url} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate font-semibold text-portal-accent">{p.platform} · {dd(p.posted_on ?? p.created_at)}</a><span className="text-xs text-brand-navySoft">{Number(p.views ?? 0).toLocaleString()} views</span><span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-bold">{p.status}</span></li>)}</ul> : <p className="mt-2 text-sm text-brand-navySoft">No posts yet.</p>}
+      </PortalCard>
+      <PortalCard>
+        <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Payments</p>
+        {data?.pay.length ? <ul className="mt-2 divide-y divide-brand-line text-sm">{data.pay.map((x) => <li key={x.id} className="flex items-center gap-2 py-2"><span className="flex-1">{dd(x.paid_at ?? x.created_at)}</span><b>{Number(x.amount ?? 0).toLocaleString("fr-FR", { minimumFractionDigits: 2 })} {x.currency === "usd" ? "$" : "€"}</b><span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-bold">{x.status}</span></li>)}</ul> : <p className="mt-2 text-sm text-brand-navySoft">No payments yet.</p>}
+      </PortalCard>
     </div>
   );
 }

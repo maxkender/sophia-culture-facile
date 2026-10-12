@@ -1,0 +1,2 @@
+ALTER TABLE public.creators ADD COLUMN IF NOT EXISTS is_test boolean NOT NULL DEFAULT false;
+COMMENT ON COLUMN public.creators.is_test IS 'Test/owner accounts excluded from every admin list and count.';

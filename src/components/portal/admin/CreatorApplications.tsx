@@ -19,6 +19,7 @@ import { approveUgcApplication } from "@/lib/creator-onboarding.functions";
 import { rejectUgcApplication, resendWelcomeEmail } from "@/lib/ugc-admin.functions";
 import { getGuideForApplication, setApplicationZone } from "@/lib/slideshow-zones.functions";
 import { GUIDE_PDF_NAME, ZONE_BADGE } from "@/lib/slideshow-guide";
+import { HandleLinksInline, PersonAvatar } from "@/components/hub/PersonAvatar";
 import { SocialLinks, TalkingVideo, VideoStatusIcon } from "./ApplicationVideo";
 
 type UgcApplication = Database["public"]["Tables"]["creator_applications"]["Row"];
@@ -54,7 +55,7 @@ function LinkOut({ href, label }: { href: string | null; label: string }) {
   );
 }
 
-export function CreatorApplications({ track }: { track: Track }) {
+export function CreatorApplications({ track, simple = false, q = "" }: { track: Track; simple?: boolean; q?: string }) {
   const queryClient = useQueryClient();
   const { data: portal } = usePortalProfile();
   const profile = portal?.profile;
@@ -159,9 +160,10 @@ export function CreatorApplications({ track }: { track: Track }) {
 
   return (
     <div className="space-y-6">
-      <PageTitle title={track === "ugc" ? "UGC applications" : "Slideshow applications"} lead="These never mix with author applications." />
+      {!simple ? <PageTitle title={track === "ugc" ? "UGC applications" : "Slideshow applications"} lead="These never mix with author applications." /> : null}
 
-      <div className="flex flex-wrap items-center gap-3">
+      {simple ? <SimpleApplications rows={((data ?? []) as UgcApplication[]).filter((r) => !q || `${r.full_name} ${r.email} ${r.tiktok_url ?? ""} ${r.instagram_url ?? ""}`.toLowerCase().includes(q.toLowerCase()))} busy={busy} onOpen={(r) => setSelected(r)} onAccept={(r) => void decide(r.id, "approved")} /> : null}
+      <div className={simple ? "hidden" : "flex flex-wrap items-center gap-3"}>
         <Select value={status} onValueChange={setStatus}>
           <SelectTrigger className="w-44">
             <SelectValue />
@@ -186,7 +188,7 @@ export function CreatorApplications({ track }: { track: Track }) {
         )}
       </div>
 
-      <PortalCard className="overflow-hidden">
+      <PortalCard className={simple ? "hidden" : "overflow-hidden"}>
         {data?.length ? (
           <ul className="divide-y divide-brand-line">
             {data.map((row) => (
@@ -440,5 +442,26 @@ function ZonePanel({ app, onChange }: { app: SlideshowApplication; onChange: (ne
         </div>
       ) : null}
     </div>
+  );
+}
+
+function SimpleApplications({ rows, busy, onOpen, onAccept }: { rows: UgcApplication[]; busy: boolean; onOpen: (r: UgcApplication) => void; onAccept: (r: UgcApplication) => void }) {
+  const flagOf = (c: string | null) => { const x = (c ?? "").trim().toUpperCase(); return /^[A-Z]{2}$/.test(x) ? String.fromCodePoint(...[...x].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65)) : (c ?? ""); };
+  if (!rows.length) return <p className="p-5 text-sm text-brand-navySoft">No application waiting.</p>;
+  return (
+    <table className="w-full min-w-[720px] text-sm" data-testid="ugc-applications">
+      <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Applicant</th><th className="p-3">Accounts</th><th className="p-3">Applied on</th><th className="p-3"><span className="sr-only">Decision</span></th></tr></thead>
+      <tbody>{rows.map((r) => (
+        <tr key={r.id} onClick={() => onOpen(r)} className="cursor-pointer border-t border-brand-line hover:bg-portal-bg">
+          <td className="p-3"><span className="flex items-center gap-2"><PersonAvatar name={r.full_name} /><b className="text-brand-navy">{r.full_name}</b><span title={r.country ?? ""}>{flagOf(r.country)}</span></span></td>
+          <td className="p-3"><HandleLinksInline tiktok={r.tiktok_url} instagram={r.instagram_url} /></td>
+          <td className="p-3 text-brand-navySoft">{new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
+          <td className="p-3"><span className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+            <Button size="sm" disabled={busy} onClick={() => onAccept(r)}>Accept</Button>
+            <Button size="sm" variant="outline" disabled={busy} onClick={() => onOpen(r)}>Reject</Button>
+          </span></td>
+        </tr>
+      ))}</tbody>
+    </table>
   );
 }
