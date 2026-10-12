@@ -115,6 +115,7 @@ export function UgcCreatorPanel({ creator }: { creator: any }) {
     posts_per_month: creator.posts_per_month ?? "", required_platforms: creator.required_platforms ?? "both", ugc_status: creator.ugc_status ?? "trial",
     fixed_monthly_override: creator.fixed_monthly_override ?? "", per_post_override: creator.per_post_override ?? "", rpm_override: creator.rpm_override ?? "", cap_override: creator.cap_override ?? "",
     assigned_hm_id: creator.assigned_hm_id ?? "", admin_notes: creator.admin_notes ?? "",
+    terms_visible: Boolean(creator.terms_visible), terms_text_fr: creator.terms_text_fr ?? "", terms_text_en: creator.terms_text_en ?? "",
   });
   const [adj, setAdj] = useState({ amount: "", reason: "" });
   const [mp, setMp] = useState({ platform: "tiktok", url: "", posted_at: new Date().toISOString().slice(0, 10) });
@@ -148,10 +149,12 @@ export function UgcCreatorPanel({ creator }: { creator: any }) {
           <div><Label>Cap per post € (blank = tier)</Label><Input type="number" value={s.cap_override} onChange={(e) => setS({ ...s, cap_override: e.target.value })} /></div>
           <div><Label>Hiring manager</Label><select className={cn(sel, "w-full")} value={s.assigned_hm_id} onChange={(e) => setS({ ...s, assigned_hm_id: e.target.value })}><option value="">—</option>{hms.map((h: any) => <option key={h.id} value={h.id}>{h.full_name}</option>)}</select></div>
           <div className="sm:col-span-2"><Label>Notes</Label><Textarea rows={2} value={s.admin_notes} onChange={(e) => setS({ ...s, admin_notes: e.target.value })} /></div>
+          <label className="flex items-center gap-2 text-sm font-semibold sm:col-span-3"><input type="checkbox" checked={s.terms_visible} onChange={(e) => setS({ ...s, terms_visible: e.target.checked })} /> Show pay terms and amounts to this creator (off = no amount anywhere in their space)</label>
+          <div className="sm:col-span-3 grid gap-3 sm:grid-cols-2"><div><Label>Conditions (FR)</Label><Textarea rows={3} value={s.terms_text_fr} onChange={(e) => setS({ ...s, terms_text_fr: e.target.value })} /></div><div><Label>Conditions (EN)</Label><Textarea rows={3} value={s.terms_text_en} onChange={(e) => setS({ ...s, terms_text_en: e.target.value })} /></div></div>
         </div>
         <Button className="mt-3" onClick={async () => {
           try {
-            await save({ data: { creatorId: creator.id, posts_per_month: num(s.posts_per_month), required_platforms: s.required_platforms as any, ugc_status: s.ugc_status as any, fixed_monthly_override: num(s.fixed_monthly_override), per_post_override: num(s.per_post_override), rpm_override: num(s.rpm_override), cap_override: num(s.cap_override), assigned_hm_id: s.assigned_hm_id || null, admin_notes: s.admin_notes || null } });
+            await save({ data: { creatorId: creator.id, posts_per_month: num(s.posts_per_month), required_platforms: s.required_platforms as any, ugc_status: s.ugc_status as any, fixed_monthly_override: num(s.fixed_monthly_override), per_post_override: num(s.per_post_override), rpm_override: num(s.rpm_override), cap_override: num(s.cap_override), assigned_hm_id: s.assigned_hm_id || null, admin_notes: s.admin_notes || null, terms_visible: s.terms_visible, terms_text_fr: s.terms_text_fr || null, terms_text_en: s.terms_text_en || null } });
             toast.success("Settings saved."); refresh();
           } catch (e) { toast.error(errMsg(e)); }
         }}>Save settings</Button>
