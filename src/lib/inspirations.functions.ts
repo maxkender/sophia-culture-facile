@@ -77,10 +77,13 @@ export const retranscribeInspiration = createServerFn({ method: "POST" })
 
 export const deleteInspirations = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ ids: z.array(z.string().uuid()).min(1).max(500) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ ids: z.array(z.string().uuid()).min(1).max(500), archiveNotion: z.boolean().default(false) }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context as never);
     const a = await admin();
+    const { data: items } = await a.from("notion_items").select("notion_page_id").eq("kind", "video").in("inspiration_id", data.ids);
+    const { markNotionDeleted } = await import("./notion-sync.server");
+    await markNotionDeleted(a, (items ?? []).map((i: { notion_page_id: string }) => i.notion_page_id), "video", data.archiveNotion);
     const { data: rows } = await a.from("inspirations").select("video_path, cover_path").in("id", data.ids);
     const paths = (rows ?? []).flatMap((r: { video_path: string | null; cover_path: string | null }) => [r.video_path, r.cover_path]).filter(Boolean);
     if (paths.length) await a.storage.from("inspirations").remove(paths);

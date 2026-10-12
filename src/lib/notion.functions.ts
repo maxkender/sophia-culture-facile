@@ -86,3 +86,29 @@ export const accountAvatars = createServerFn({ method: "POST" })
     const { data: urls } = await (await admin()).storage.from("inspirations").createSignedUrls(data.paths, 3600);
     return Object.fromEntries((urls ?? []).filter((u: any) => u.signedUrl).map((u: any) => [u.path, u.signedUrl])) as Record<string, string>;
   });
+
+export const deleteInspirationAccounts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ ids: z.array(z.string().uuid()).min(1).max(500), archiveNotion: z.boolean().default(false) }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    const a = await admin();
+    const { data: rows } = await a.from("inspiration_accounts").select("notion_page_id, avatar_path").in("id", data.ids);
+    const list = (rows ?? []) as { notion_page_id: string | null; avatar_path: string | null }[];
+    const { markNotionDeleted } = await import("./notion-sync.server");
+    await markNotionDeleted(a, list.map((r) => r.notion_page_id ?? ""), "profile", data.archiveNotion);
+    const paths = list.map((r) => r.avatar_path).filter(Boolean) as string[];
+    if (paths.length) await a.storage.from("inspirations").remove(paths);
+    await a.from("inspiration_accounts").delete().in("id", data.ids);
+    return { deleted: data.ids.length };
+  });
+
+export const restoreNotionRow = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ pageId: z.string().min(10).max(80) }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    const { restoreNotionItem } = await import("./notion-sync.server");
+    await restoreNotionItem(await admin(), data.pageId);
+    return { ok: true };
+  });
