@@ -48,7 +48,7 @@ export function SnippetsLibrary() {
       <div className="flex flex-wrap gap-2">
         <input aria-label="Search" className={f} placeholder="Search" value={filter.q} onChange={(e) => setFilter({ ...filter, q: e.target.value })} />
         <select aria-label="Filter app" className={f} value={filter.app} onChange={(e) => setFilter({ ...filter, app: e.target.value })}><option value="all">All apps</option>{apps.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}<option value="both">Both only</option></select>
-        <select aria-label="Filter style" className={f} value={filter.style} onChange={(e) => setFilter({ ...filter, style: e.target.value })}><option value="all">All formats</option>{STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
+        <select aria-label="Filter format" className={f} value={filter.style} onChange={(e) => setFilter({ ...filter, style: e.target.value })}><option value="all">All formats</option>{STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
       </div>
       {!list.length ? <p className={cn(card, "text-sm text-brand-navySoft")}>Nothing here yet. Add your first {kind === "hook" ? "hook" : kind === "body" ? "body" : "CTA"} above.</p> : (
         <ul className="space-y-2">{list.map((s) => (

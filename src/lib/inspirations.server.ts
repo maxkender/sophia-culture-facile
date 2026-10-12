@@ -108,7 +108,7 @@ async function transcribe(buf: ArrayBuffer) {
 
 const S = { type: "string" } as const;
 const obj = (props: Record<string, unknown>) => ({ type: "object", additionalProperties: false, required: Object.keys(props), properties: props });
-const STYLE_ENUM = ["reaction_demo", "broll_stickers", "sole_footage", "talked_hook_demo", "educational", "slideshow", "other"];
+const STYLE_ENUM = ["reaction_demo", "broll_stickers", "sole_footage", "talked_hook_demo", "educational"];
 const analysisSchema = obj({
   style: { type: "string", enum: STYLE_ENUM }, style_confidence: { type: "number" },
   hook: obj({ verbatim: S, on_screen: S, visual: S }),
@@ -128,7 +128,7 @@ async function analyse(input: { caption: string; transcript: string; words: { t:
 Caption: ${input.caption || "(none)"}
 Transcript with timestamps: ${timed || "(no speech — no usable audio track; analyse from the cover image and caption, audio = none)"}
 
-The 5 UGC video formats (the style JSON key holds the format): reaction_demo = Reaction into demo (face reaction plan then phone/app demo); broll_stickers = B-roll + stickers storytelling, one visual per plan, talked; sole_footage = one single plan + music + text on screen, no talking; talked_hook_demo = talked personal-story hook then app demo; educational = face cam talking, teaching. Use slideshow for photo carousels, other if none fits.
+The 5 UGC video formats (the style JSON key holds the format): reaction_demo = Reaction into demo (face reaction plan then phone/app demo); broll_stickers = B-roll + stickers storytelling, one visual per plan, talked; sole_footage = one single plan + music + text on screen, no talking; talked_hook_demo = talked personal-story hook then app demo; educational = face cam talking, teaching. Choose the closest of these five Hub formats; carousel or other content kinds belong in kind/tags, never as additional formats.
 Apps: Sophia = 5-minute daily culture/general-knowledge courses instead of doom-scrolling. UnSwipe = keeps social apps without Reels/For You/Shorts, reduces screen time.
 Hook = first 3 seconds: verbatim from the transcript (empty if no speech) + what is on screen. Structure = plans with timecodes (seconds). why_it_works = exactly 3 short lines. score = virality /10. tags = 3-6 short lowercase tags. notion_format = the separate Notion classification among the 9 listed options; never confuse it with the five Hub video formats. Write analysis text in English; keep verbatim quotes in the original language.`;
   const content: unknown[] = [{ type: "input_text", text }];
