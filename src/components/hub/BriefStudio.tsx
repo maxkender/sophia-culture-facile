@@ -17,6 +17,7 @@ import { AssetUploader } from "./Assets";
 import { InspirationReference } from "./Inspiration";
 import { PostDescriptionFields } from "@/components/creators/PostDescription";
 import { GuidelinesList } from "@/components/creators/Guidelines";
+import { formatDefaults, useUgcFormats } from "@/lib/ugc-formats";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -50,6 +51,7 @@ function Chips({ items, onChange, tone }: { items: string[]; onChange: (v: strin
 
 export function BriefStudio({ briefId }: { briefId: string }) {
   const isNew = briefId === "new";
+  const { data: videoFormats = [] } = useUgcFormats();
   const { appId } = useAdminApp();
   const { data: apps = [] } = useApps();
   const qc = useQueryClient();
@@ -189,9 +191,9 @@ export function BriefStudio({ briefId }: { briefId: string }) {
   const sd = b.style_data ?? {};
   const setSd = (patch: Partial<StyleData>) => setB({ ...b, style_data: { ...sd, ...patch } });
   const stylePicker = (
-    <div className="grid gap-2 sm:grid-cols-5" role="radiogroup" aria-label="Style">{STYLES.map(([k, l, hint], i) => (
-      <button key={k} type="button" role="radio" aria-checked={b.style === k} onClick={() => setB({ ...b, style: k, style_data: styleDefaults(k, sd) })} className={cn("rounded-xl border p-2 text-left", b.style === k ? "border-portal-accent bg-portal-accent/10" : "")}>
-        <p className="text-xs font-extrabold text-portal-accent">Style {i + 1}</p><p className="text-sm font-bold leading-tight">{l}</p><p className="mt-1 text-[11px] text-brand-navySoft">{hint}</p></button>))}</div>
+    <div className="grid gap-2 sm:grid-cols-5" role="radiogroup" aria-label="Format">{STYLES.map(([k, l, hint], i) => (
+      <button key={k} type="button" role="radio" aria-checked={b.style === k} onClick={() => { const f = videoFormats.find((x) => x.key === k); if (f) setB({ ...b, style: k, style_data: formatDefaults(f, sd) }); }} disabled={!videoFormats.some((x) => x.key === k)} className={cn("rounded-xl border p-2 text-left", b.style === k ? "border-portal-accent bg-portal-accent/10" : "")}>
+        <p className="text-xs font-extrabold text-portal-accent">Format {i + 1}</p><p className="text-sm font-bold leading-tight">{videoFormats.find((x) => x.key === k)?.name_en ?? l}</p><p className="mt-1 text-[11px] text-brand-navySoft">{hint}</p></button>))}</div>
   );
   const basics = <>
     {stylePicker}
@@ -204,6 +206,8 @@ export function BriefStudio({ briefId }: { briefId: string }) {
       <label className="text-sm font-semibold">Duration target<select className={input} value={b.duration_target ?? "30s"} onChange={(e) => set("duration_target", e.target.value)}>{["7s", "10s", "15s", "20s", "30s", "45s", "60s"].map((d) => <option key={d}>{d}</option>)}</select></label>
     </div>
   </>;
+  const definition = videoFormats.find((x) => x.key === b.style);
+  const formatFields = definition?.structure.fields ?? [];
   const plans = sd.plans ?? [];
   const setPlan = (i: number, patch: Partial<Plan>) => setSd({ plans: plans.map((p, j) => (j === i ? { ...p, ...patch } : p)) });
   const movePlan = (i: number, dir: -1 | 1) => { const n = [...plans]; const j = i + dir; if (j < 0 || j >= n.length) return; [n[i], n[j]] = [n[j]!, n[i]!]; setSd({ plans: n }); };
@@ -211,7 +215,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
   const storyPlans = (
     <div className="space-y-3">{plans.map((p, i) => (
       <div key={i} className="space-y-2 rounded-xl border p-3" data-testid="studio-plan">
-        <div className="flex items-center gap-1"><p className="flex-1 text-sm font-extrabold">Plan {i + 1}</p>
+        <div className="flex items-center gap-1"><p className="flex-1 text-sm font-extrabold">{definition?.structure.shots[i]?.label || `Shot ${i + 1}`}</p>
           <Button type="button" size="icon" variant="ghost" aria-label="Move up" onClick={() => movePlan(i, -1)}><ArrowUp className="size-4" /></Button>
           <Button type="button" size="icon" variant="ghost" aria-label="Move down" onClick={() => movePlan(i, 1)}><ArrowDown className="size-4" /></Button>
           <Button type="button" size="icon" variant="ghost" aria-label="Remove plan" onClick={() => setSd({ plans: plans.filter((_, j) => j !== i) })}><Trash2 className="size-4" /></Button></div>
@@ -224,37 +228,17 @@ export function BriefStudio({ briefId }: { briefId: string }) {
       <Button type="button" size="sm" variant="outline" onClick={() => setSd({ plans: [...plans, blankPlan()] })}><Plus className="size-4" />Add a plan</Button>
     </div>
   );
-  const styleEditor: ReactNode = b.style === "reaction_demo" ? <>
-    <div className="space-y-2 rounded-xl border p-3"><p className="text-sm font-extrabold">Plan 1 · Face (camera on your face)</p>
-      {ta("La réaction à faire", plans[0]?.reaction ?? "", (x) => setPlan(0, { reaction: x }))}
-      {ta("Le texte à mettre", plans[0]?.on_screen ?? "", (x) => setPlan(0, { on_screen: x }), 1)}
-      <FmtPicker value={plans[0]?.fmt ?? { kind: "subtitle", note: "" }} onChange={(v) => setPlan(0, { fmt: v })} />
-      {ta("Ce qu'il faut dire", plans[0]?.say ?? "", (x) => setPlan(0, { say: x }))}</div>
-    <div className="space-y-2 rounded-xl border p-3"><p className="text-sm font-extrabold">Plan 2 · Téléphone / démo (camera on the phone)</p>
-      {ta("Ce qu'il faut faire (step by step in the app)", plans[1]?.do ?? "", (x) => setPlan(1, { do: x }), 4)}
-      {ta("Ce qu'il faut dire", plans[1]?.say ?? "", (x) => setPlan(1, { say: x }))}</div>
-    <label className="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked={sd.flips?.on ?? false} onChange={(e) => setSd({ flips: { on: e.target.checked, note: sd.flips?.note ?? "" } })} />Retournements de caméra (camera flips)</label>
-    {sd.flips?.on ? <input aria-label="Where the flips happen" className={input} placeholder="Where the flips happen" value={sd.flips.note} onChange={(e) => setSd({ flips: { on: true, note: e.target.value } })} /> : null}
-  </> : b.style === "broll_stickers" ? storyPlans : b.style === "sole_footage" && sd.sole ? (() => { const x = sd.sole; const up = (p: Partial<typeof x>) => setSd({ sole: { ...x, ...p } }); return <>
-    {ta("What is on the plan", x.what, (v) => up({ what: v }), 3)}
-    <label className="block text-xs font-semibold">Duration (seconds)<input type="number" min={1} max={60} className={input} value={x.duration_s ?? ""} onChange={(e) => up({ duration_s: e.target.value ? Number(e.target.value) : null })} /></label>
-    <div className="grid gap-2 sm:grid-cols-2"><label className="text-xs font-semibold">Music title<input className={input} value={x.music_title} onChange={(e) => up({ music_title: e.target.value })} /></label><label className="text-xs font-semibold">Music link<input className={input} value={x.music_link} onChange={(e) => up({ music_link: e.target.value })} placeholder="https://" /></label></div>
-    <PlanAssets single label="Or an audio file from the library" value={x.music_asset_id ? [{ asset_id: x.music_asset_id, when: "" }] : []} onChange={(v) => up({ music_asset_id: v[0]?.asset_id ?? null })} library={lib.filter((a) => a.kind === "audio")} />
-    {ta("Text to put on screen", x.text, (v) => up({ text: v }), 1)}
-    <FmtPicker value={x.fmt} onChange={(v) => up({ fmt: v })} />
-  </>; })() : b.style === "talked_hook_demo" && sd.demo ? (() => { const dm = sd.demo; const up = (p: Partial<typeof dm>) => setSd({ demo: { ...dm, ...p } }); return <>
+  const styleEditor: ReactNode = b.style ? <>
     {storyPlans}
-    <div className="space-y-2 rounded-xl border-2 border-portal-accent/30 p-3"><p className="text-sm font-extrabold">Demo plan</p>
-      <div className="flex gap-2">{([["filmed", "Demo filmed by the creator"], ["asset", "Demo = a screen recording"]] as const).map(([k, l]) => <button key={k} type="button" onClick={() => up({ mode: k })} className={cn("min-h-9 rounded-full border px-3 text-xs font-bold", dm.mode === k ? "border-brand-navy bg-brand-navy text-card" : "")}>{l}</button>)}</div>
-      {dm.mode === "filmed" ? ta("What to do", dm.do, (v) => up({ do: v }), 3) : <PlanAssets single label="Screen recording + when to show it" value={dm.asset ? [dm.asset] : []} onChange={(v) => up({ asset: v[0] ?? null })} library={lib.filter((a) => a.kind === "video" || a.folder === "screen_recordings")} />}
-      {ta(dm.mode === "asset" ? "What to say over it" : "What to say", dm.say, (v) => up({ say: v }))}
-    </div>
-  </>; })() : b.style === "educational" ? <>
-    {ta("The script (long, talked)", sd.script ?? "", (v) => setSd({ script: v }), 12)}
-    <p className="text-xs text-brand-navySoft">{words(sd.script)} words · line breaks are kept for the creator.</p>
-    <FmtPicker value={sd.script_fmt ?? { kind: "subtitle", note: "" }} onChange={(v) => setSd({ script_fmt: v })} />
-    <PlanAssets label="Assets to flash on screen (optional)" value={sd.flashes ?? []} onChange={(v) => setSd({ flashes: v })} library={lib} />
-  </> : <p className="text-sm text-brand-navySoft">Choose a style first.</p>;
+    {formatFields.includes("text_format") ? <FmtPicker value={sd.script_fmt ?? { kind: "subtitle", note: "" }} onChange={(v) => setSd({ script_fmt: v })} /> : null}
+    {formatFields.includes("reaction") ? ta("Reaction to perform", plans[0]?.reaction ?? "", (v) => setPlan(0, { reaction: v })) : null}
+    {formatFields.includes("camera_flips") ? <><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={sd.flips?.on ?? false} onChange={(e) => setSd({ flips: { on: e.target.checked, note: sd.flips?.note ?? "" } })} />Camera flips</label>{sd.flips?.on ? ta("Where the flips happen", sd.flips.note, (v) => setSd({ flips: { on: true, note: v } })) : null}</> : null}
+    {formatFields.includes("music") && sd.sole ? <><label className="block text-xs font-semibold">Music title<input className={input} value={sd.sole.music_title} onChange={(e) => setSd({ sole: { ...sd.sole, music_title: e.target.value } as NonNullable<StyleData["sole"]> })} /></label><label className="block text-xs font-semibold">Music link<input className={input} value={sd.sole.music_link} onChange={(e) => setSd({ sole: { ...sd.sole, music_link: e.target.value } as NonNullable<StyleData["sole"]> })} /></label><PlanAssets single label="Audio file" library={lib.filter((a) => a.kind === "audio")} value={sd.sole.music_asset_id ? [{ asset_id: sd.sole.music_asset_id, when: "" }] : []} onChange={(v) => setSd({ sole: { ...sd.sole, music_asset_id: v[0]?.asset_id ?? null } as NonNullable<StyleData["sole"]> })} /></> : null}
+    {formatFields.includes("duration") && sd.sole ? <label className="block text-xs font-semibold">Duration (seconds)<input type="number" min={1} max={60} className={input} value={sd.sole.duration_s ?? ""} onChange={(e) => setSd({ sole: { ...sd.sole, duration_s: Number(e.target.value) } as NonNullable<StyleData["sole"]> })} /></label> : null}
+    {formatFields.includes("script") ? ta("Spoken script", sd.script ?? "", (v) => setSd({ script: v }), 10) : null}
+    {formatFields.includes("flash_assets") ? <PlanAssets label="Assets to flash on screen" value={sd.flashes ?? []} onChange={(v) => setSd({ flashes: v })} library={lib} /> : null}
+    {formatFields.includes("demo") && sd.demo ? <section className="space-y-2 border-t pt-3"><h3 className="font-semibold">Demo</h3><label className="block text-xs font-semibold">Demo source<select className={input} value={sd.demo.mode} onChange={(e) => setSd({ demo: { ...sd.demo, mode: e.target.value as "filmed" | "asset" } as NonNullable<StyleData["demo"]> })}><option value="filmed">Filmed by creator</option><option value="asset">Screen recording</option></select></label>{sd.demo.mode === "asset" ? <PlanAssets single label="Screen recording" value={sd.demo.asset ? [sd.demo.asset] : []} onChange={(v) => setSd({ demo: { ...sd.demo, asset: v[0] ?? null } as NonNullable<StyleData["demo"]> })} library={lib} /> : ta("What to do", sd.demo.do, (v) => setSd({ demo: { ...sd.demo, do: v } as NonNullable<StyleData["demo"]> }))}{ta("What to say", sd.demo.say, (v) => setSd({ demo: { ...sd.demo, say: v } as NonNullable<StyleData["demo"]> }))}</section> : null}
+  </> : <p className="text-sm text-brand-navySoft">Choose a format first.</p>;
 
   const pay = rate(b.effort) != null ? `${eur(rate(b.effort)!)} / post` : null;
   const dirty = JSON.stringify(b) !== lastSaved.current;
@@ -282,14 +266,14 @@ export function BriefStudio({ briefId }: { briefId: string }) {
         <details className="relative"><summary className="flex h-9 cursor-pointer list-none items-center rounded-md border px-3 text-sm font-bold" aria-label="More actions">⋯</summary>
           <div className="absolute right-0 z-20 mt-1 w-48 rounded-xl border bg-card p-1 shadow-portal">
             <button type="button" className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-portal-bg" onClick={() => void duplicate()}>Duplicate</button>
-            {b.brief_type !== "format" ? <button type="button" className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-portal-bg" onClick={() => void saveAsFormat()}>Save as format</button> : null}
+
             <button type="button" className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-portal-bg" onClick={async () => { if (window.confirm("Archive this brief?")) { await save({ status: "archived" }); void navigate({ to: "/hub/ugc/briefs" }); } }}>Archive</button>
             {b.status !== "published" ? <button type="button" className="block w-full rounded-lg px-3 py-2 text-left text-sm text-portal-red hover:bg-portal-bg" onClick={() => void remove()}>Delete</button> : null}
           </div></details>
       </div>
       <div className={cn("grid gap-6", inspirationId && "lg:grid-cols-[1fr_380px]")}>
         <div className="min-w-0 space-y-4">
-          {sec("Title, app & style", <>
+          {sec("Title, app & format", <>
             <div className="grid gap-2 sm:grid-cols-[1fr_180px_140px]">
               <label className="text-sm font-semibold">Title (admin only)<input className={input} value={b.title} onChange={(e) => set("title", e.target.value)} /></label>
               <label className="text-sm font-semibold">App<select className={input} value={b.app_id} onChange={(e) => set("app_id", e.target.value)}>{apps.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</select></label>

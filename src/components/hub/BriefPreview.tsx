@@ -9,7 +9,9 @@ import { assetLinks } from "@/lib/brief-studio.functions";
 import { ROLE_LABEL, STYLE_LABEL, hasStyledContent, STYLE_NUM, TEXT_FORMATS, type AssetRef, type StudioBrief, type StyleData, type TextFormat } from "@/lib/brief-studio";
 import { PostThumb } from "./PostThumb";
 import { PostDescriptionBlock } from "@/components/creators/PostDescription";
-import { t as ct, L } from "@/i18n/creator-app";
+import { AboutFormat } from "@/components/creators/AboutFormat";
+import { useUgcFormats } from "@/lib/ugc-formats";
+import { creatorLang, t as ct, L } from "@/i18n/creator-app";
 
 export type BriefAsset = { id: string; kind: string; title: string; storage_path: string | null; url: string | null; text_content: string | null; thumbnail_url: string | null; role: string };
 export type BriefRef = { id: string; title: string | null; url: string; thumbnail_url?: string | null };
@@ -137,11 +139,14 @@ export function FilesSection({ assets, title }: { assets: BriefAsset[]; title?: 
 
 /** Exactly what the creator sees on /creators/app/briefs/<id>; the Studio renders it inside a phone frame. */
 export function BriefView({ b, assets, refs, pay }: { b: StudioBrief; assets: BriefAsset[]; refs: BriefRef[]; pay?: string | null }) {
+  const { data: formats = [] } = useUgcFormats();
+  const definition = formats.find((f) => f.key === b.style);
   const styled = Boolean(b.style) && hasStyledContent(b.style_data);
   const beats = styled ? [] : (b.beats ?? []).filter((x) => x?.trim());
   return (
     <div className="space-y-5">
-      {b.style ? <span className="inline-flex rounded-full bg-portal-accent/15 px-3 py-1 text-xs font-extrabold text-portal-accent" data-testid="style-badge">Style {STYLE_NUM[b.style]} · {STYLE_LABEL[b.style]}</span> : null}
+      {b.style ? <span className="inline-flex rounded-full bg-portal-accent/15 px-3 py-1 text-xs font-extrabold text-portal-accent" data-testid="style-badge">{L("Format:", "Format :")} {definition ? (creatorLang() === "fr" ? definition.name_fr : definition.name_en) : STYLE_LABEL[b.style]}</span> : null}
+      {b.style ? <AboutFormat formatKey={b.style} /> : null}
       <div className="rounded-2xl bg-brand-navy p-5 text-card">
         <div className="mb-3 flex flex-wrap gap-2 text-xs font-bold">
           {b.effort ? <span className="rounded-full bg-card/15 px-2.5 py-1">{EFFORT_FR[b.effort]}</span> : null}

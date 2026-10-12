@@ -14,6 +14,7 @@ import { PostThumb } from "./PostThumb";
 import { BriefsList } from "./BriefsList";
 import { AssetsLibrary } from "./Assets";
 import { SnippetsLibrary } from "./SnippetsLibrary";
+import { VideoFormats } from "./VideoFormats";
 import { UgcBriefsGrid, WeekPlanner } from "@/components/portal/admin/UgcAdmin";
 import { CreatorOps } from "@/components/portal/admin/CreatorOps";
 
@@ -290,9 +291,9 @@ export function Learn({ initialTab }: { initialTab?: string | undefined; sub?: s
   return (
     <div className="space-y-4">
       <div className="flex gap-2 overflow-x-auto" role="tablist">{TABS.map((t) => <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={cn("min-h-10 shrink-0 rounded-full px-4 text-sm font-bold", tab === t ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{t}</button>)}</div>
-      {tab === "Formats" ? <MyFormats /> : tab === "Hooks & CTAs" ? <SnippetsLibrary /> : <AssetsLibrary />}
+      {tab === "Formats" ? <VideoFormats /> : tab === "Hooks & CTAs" ? <SnippetsLibrary /> : <AssetsLibrary />}
     </div>
   );
 }
 // Dormant (hidden from Library): Formats editor, References, Guides, Briefs area.
-export const DormantLibrary = { Formats, References, Guides, BriefsArea };
+export const DormantLibrary = { Formats, MyFormats, References, Guides, BriefsArea };
