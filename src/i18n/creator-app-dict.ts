@@ -1959,5 +1959,8 @@ export const CREATOR_APP_DICT: Record<string, { fr: string; en: string }> = {
  "a. Create a new email address for Sophia": {"fr": "a. Crée une nouvelle adresse email pour Sophia", "en": "a. Create a new email address for Sophia"},
  "b. Create the TikTok account": {"fr": "b. Crée le compte TikTok", "en": "b. Create the TikTok account"},
  "c. Create the Instagram account": {"fr": "c. Crée le compte Instagram", "en": "c. Create the Instagram account"},
- "d. Confirm both accounts are public and registered": {"fr": "d. Confirme que les deux comptes sont publics et enregistrés", "en": "d. Confirm both accounts are public and registered"}
+ "d. Confirm both accounts are public and registered": {"fr": "d. Confirme que les deux comptes sont publics et enregistrés", "en": "d. Confirm both accounts are public and registered"},
+ "My apps & codes": {"fr": "Mes apps & codes", "en": "My apps & codes"},
+ "Workspace": {"fr": "Espace", "en": "Workspace"},
+ "The briefs published for you. Each one includes its reference video when there is one.": {"fr": "Les briefs publiés pour toi. Chacun inclut sa vidéo de référence quand il y en a une.", "en": "The briefs published for you. Each one includes its reference video when there is one."}
 };
