@@ -1,6 +1,6 @@
 import {
   BarChart3, Banknote, BookOpen, CalendarCheck, ClipboardList, ExternalLink, FileSignature, GraduationCap, Handshake, Home, Inbox, Lightbulb,
-  Map as MapIcon, Megaphone, MessageSquare, Percent, Shield, Star, Target, Users, type LucideIcon,
+  Map as MapIcon, Megaphone, MessageSquare, Percent, Settings, Shield, Star, Target, Users, type LucideIcon,
 } from "lucide-react";
 
 export type Space = "ugc" | "slideshows" | "influencers";
@@ -19,14 +19,13 @@ export type NavItem = { to: string; label: string; icon: LucideIcon; exact?: boo
 export const SPACE_NAV: Record<Space, NavItem[]> = {
   ugc: [
     { to: "/hub/ugc", label: "Home", icon: Home, exact: true, mobile: true, lead: "What needs you today" },
-    { to: "/hub/ugc/campaigns", label: "Campaigns", icon: Target, mobile: true, lead: "Campaigns, jobs, applicants and video reviews" },
-    { to: "/hub/ugc/creators", label: "Creators", icon: Users, mobile: true, lead: "Directory, applications, prospects and the fast lane" },
-    { to: "/hub/ugc/messages", label: "Messages", icon: MessageSquare, mobile: true, lead: "Conversations with applicants and creators" },
-    { to: "/hub/ugc/ads", label: "Ads", icon: Megaphone, lead: "Turn the best creator videos into paid ads" },
-    { to: "/hub/ugc/analytics", label: "Analytics", icon: BarChart3, lead: "Views, posts and cost" },
-    { to: "/hub/ugc/payouts", label: "Payouts", icon: Banknote, lead: "Monthly creator payouts through Stripe" },
-    { to: "/hub/ugc/library", label: "Library", icon: GraduationCap, lead: "Formats, briefs, files, references and templates" },
-    { to: "/hub/ugc/inspiration", label: "Inspiration", icon: Lightbulb, lead: "Imported TikToks and Reels, transcribed and analysed" },
+    { to: "/hub/ugc/inspiration", label: "Inspiration", icon: Lightbulb, mobile: true, lead: "Videos to learn from — one button makes a brief" },
+    { to: "/hub/ugc/briefs", label: "Briefs", icon: ClipboardList, mobile: true, lead: "The briefs you write for creators" },
+    { to: "/hub/ugc/library", label: "Library", icon: GraduationCap, lead: "Formats, files, hooks and CTAs" },
+    { to: "/hub/ugc/creators", label: "Creators", icon: Users, lead: "Applications and active creators" },
+    { to: "/hub/ugc/posts", label: "Posts", icon: Inbox, mobile: true, lead: "Validate posts, views at J+7, ready for payment" },
+    { to: "/hub/ugc/payouts", label: "Payouts", icon: Banknote, lead: "Approve ready payouts, then Stripe or export" },
+    { to: "/hub/settings", label: "Settings", icon: Settings, lead: "Shooting rules, descriptions, Notion, payments, team" },
   ],
   slideshows: [
     { to: "/hub/slideshows", label: "Home", icon: Home, exact: true, mobile: true, lead: "This week across every zone" },
