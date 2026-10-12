@@ -145,8 +145,8 @@ export const applyToJob = createServerFn({ method: "POST" })
     // Every UGC application waits for the owner's decision (Hub → UGC → Creators → Accept).
     // No creator, login, contract, code or welcome email here — only an acknowledgement.
     try {
-      const { sendUgcAck } = await import("./ugc-email.server");
-      await sendUgcAck(email, data.fullName, data.lang ?? (job.language === "fr" ? "fr" : "en"));
+      const { sendUgcAck, emailLang } = await import("./ugc-email.server");
+      await sendUgcAck(email, data.fullName, data.lang ?? emailLang(null, data.country));
     } catch { /* the application is saved either way */ }
     return { ok: true as const, accepted: false };
   });

@@ -104,6 +104,10 @@ export const submitUgcApplication = createServerFn({ method: "POST" })
       console.error("creator application insert failed", error.message);
       return { ok: false as const, reason: "server" as const };
     }
+    try {
+      const { sendUgcAck, emailLang } = await import("./ugc-email.server");
+      await sendUgcAck(email, data.full_name, emailLang(null, data.country.length === 2 ? data.country : null));
+    } catch { /* saved either way */ }
     return { ok: true as const };
   });
 
