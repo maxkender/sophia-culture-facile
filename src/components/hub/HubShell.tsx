@@ -20,9 +20,8 @@ import { lastSpace, SPACE_ACCENT, SPACE_HOME, SPACE_KEY, SPACE_LABEL, SPACE_NAV,
 
 type Item = NavItem;
 const SHARED_TITLES: Record<string, [string, string]> = {
-  "/hub/settings": ["Settings", "Apps, access codes, email, connections and team"],
+  "/hub/settings": ["Settings", "Shooting rules, descriptions, Notion, payments and team"],
   "/hub/ugc/creators": ["Creators", "Creator file"],
-  "/hub/ugc/referrals": ["Referrals", "Creators who bring other creators"],
 };
 
 function isActive(pathname: string, i: Item) {
@@ -177,8 +176,8 @@ export function HubShell({ children }: { children: ReactNode }) {
         </nav>
         <div className="space-y-1 border-t border-brand-line p-3">
           <AppSwitcher />
-          <button type="button" onClick={() => setSidekick(true)} className="flex min-h-10 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold text-brand-navy hover:bg-brand-navy/10"><Bot className="size-4" />Assistant</button>
-          <Link to="/hub/settings" className={cn("flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold", pathname.startsWith("/hub/settings") ? "bg-brand-navy text-card" : "text-brand-navy hover:bg-brand-navy/10")}><Settings className="size-4" />Settings</Link>
+          {space !== "ugc" ? <button type="button" onClick={() => setSidekick(true)} className="flex min-h-10 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold text-brand-navy hover:bg-brand-navy/10"><Bot className="size-4" />Assistant</button> : null}
+          {space !== "ugc" ? <Link to="/hub/settings" className={cn("flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold", pathname.startsWith("/hub/settings") ? "bg-brand-navy text-card" : "text-brand-navy hover:bg-brand-navy/10")}><Settings className="size-4" />Settings</Link> : null}
           <Link to="/auteurs/admin" className="flex min-h-10 items-center rounded-xl px-3 text-sm font-semibold text-portal-accent hover:bg-brand-navy/10">Passer à l'espace profs →</Link>
           <div className="flex items-center gap-2 px-1">
             <span className="flex size-8 items-center justify-center rounded-full bg-portal-accent text-xs font-bold text-card">{name.slice(0, 1)}</span>
@@ -201,17 +200,8 @@ export function HubShell({ children }: { children: ReactNode }) {
               <Search className="size-4" /> <span className="flex-1 text-left">Search Hub</span><span className="text-[10px] font-bold">⌘K</span>
             </button>
             <Button variant="ghost" size="icon" className="md:hidden" aria-label="Search" onClick={() => setSearch(true)}><Search className="size-5" /></Button>
-            {space === "ugc" ? <DropdownMenu>
-              <DropdownMenuTrigger asChild><Button size="icon" aria-label="Create"><Plus className="size-5" /></Button></DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/ugc/campaigns/create" })}>Campaign</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/ugc/campaigns", search: { tab: "jobs", newJob: 1 } as never })}>Job</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: "new" } })}>Brief</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/ugc/creators" })}>Invite creator</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/ugc/creators", search: { add: 1 } as never })}>Add validated creator</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu> : null}
-            <Button size="icon" variant="outline" aria-label="Open Assistant" title="Assistant" onClick={() => setSidekick(true)}><Bot className="size-4" /></Button>
+            {space === "ugc" ? <Button size="icon" aria-label="New brief" title="New brief" onClick={() => void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: "new" } })}><Plus className="size-5" /></Button>
+            : <Button size="icon" variant="outline" aria-label="Open Assistant" title="Assistant" onClick={() => setSidekick(true)}><Bot className="size-4" /></Button>}
             <NotificationBell profileId={profile.id} />
           </div>
         </header>
@@ -231,8 +221,8 @@ export function HubShell({ children }: { children: ReactNode }) {
           <DropdownMenuTrigger asChild><button type="button" className="flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold text-brand-navySoft"><MoreHorizontal className="size-5" />More</button></DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="top" className="w-56">
             {nav.filter((i) => !i.mobile).map((i) => <DropdownMenuItem key={i.label} onSelect={() => void navigate({ to: i.to } as never)}>{i.label}</DropdownMenuItem>)}
-            <DropdownMenuItem onSelect={() => setSidekick(true)}>Assistant</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/settings" })}>Settings</DropdownMenuItem>
+            {space !== "ugc" ? <DropdownMenuItem onSelect={() => setSidekick(true)}>Assistant</DropdownMenuItem> : null}
+            {space !== "ugc" ? <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/settings" })}>Settings</DropdownMenuItem> : null}
             <DropdownMenuItem onSelect={() => void navigate({ to: "/auteurs/admin" })}>Passer à l'espace profs →</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
