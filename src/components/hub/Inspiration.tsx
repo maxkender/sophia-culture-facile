@@ -22,7 +22,7 @@ import { deleteInspirations, importInspirations, inspirationToReference, process
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const f = "h-9 rounded-lg border bg-card px-2 text-sm";
-const ALL_STYLES: [string, string][] = [...STYLES.map(([k, l]) => [k, l] as [string, string]), ["slideshow", "Slideshow"], ["other", "Other"]];
+const ALL_STYLES: [string, string][] = STYLES.map(([k, l]) => [k, l]);
 const SLABEL: Record<string, string> = { ...STYLE_LABEL, slideshow: "Slideshow", other: "Other" };
 const STAGES = ["queued", "fetching", "transcribing", "analysing", "analyzed", "error"] as const;
 const STAGE_LABEL: Record<string, string> = { queued: "Queued", fetching: "Fetching", transcribing: "Transcribing", analysing: "Analysing", analyzed: "Done", error: "Error" };
@@ -188,7 +188,7 @@ function BulkBar({ ids, onDone }: { ids: string[]; onDone: () => void }) {
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-xl bg-muted/60 p-2 text-sm">
       <b className="px-1 text-brand-navy">{ids.length} selected</b>
-      <select aria-label="Approve style" className={f} defaultValue="" onChange={(e) => e.target.value && void upd({ approved_style: e.target.value === "proposed" ? null : e.target.value })}><option value="">Approve style…</option>{ALL_STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
+      <select aria-label="Approve format" className={f} defaultValue="" onChange={(e) => e.target.value && void upd({ approved_style: e.target.value === "proposed" ? null : e.target.value })}><option value="">Approve format…</option>{ALL_STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
       <select aria-label="Set app fit" className={f} defaultValue="" onChange={(e) => e.target.value && void upd({ app_fit: e.target.value })}><option value="">Set app fit…</option>{FIT.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
       <Button size="sm" variant="outline" onClick={async () => { const t = window.prompt("Tag to add"); if (!t) return; const { data } = await supabase.from("inspirations").select("id, tags").in("id", ids); for (const r of data ?? []) await supabase.from("inspirations").update({ tags: [...new Set([...(r.tags ?? []), t.trim().toLowerCase()])] }).eq("id", r.id); onDone(); }}>Add tag</Button>
       <Button size="sm" variant="outline" disabled={busy} onClick={async () => { setBusy(true); try { for (let i = 0; i < ids.length; i += 5) await proc({ data: { ids: ids.slice(i, i + 5), analyseOnly: true } }); toast.success("Analysis re-run"); } catch (e) { toast.error((e as Error).message); } setBusy(false); onDone(); }}>{busy ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}Re-run analysis</Button>
@@ -225,7 +225,10 @@ export function briefBlocker(r: Insp): string | null {
 }
 /** Creates ONE draft brief from the inspiration (never published) and returns its id. */
 export async function createBriefFromInspiration(r: Insp, appId: string): Promise<string> {
-  const d = draftFromInspiration(r, appId); const an = r.analysis; const st = an?.structure ?? [];
+  const d = draftFromInspiration(r, appId);
+  const { data: formatRow } = await supabase.from("ugc_formats").select("structure").eq("key", d.style).maybeSingle();
+  if (formatRow) { const structure = formatRow.structure as unknown as { shots: Plan[] }; const source = d.style_data.plans ?? []; d.style_data.plans = structure.shots.map((shot, i) => ({ ...shot, ...(source[i] ?? {}), assets: source[i]?.assets ?? [] })); }
+  const an = r.analysis; const st = an?.structure ?? [];
   const beats = st.map((s) => `${s.start_s.toFixed(1)}–${s.end_s.toFixed(1)} s · Seen: ${s.seen}${s.on_screen ? ` · On screen: ${s.on_screen}` : ""}${s.said ? ` · Said: « ${s.said} »` : ""}`);
   const pm = st.find((s) => /\b(app|phone|screen|écran|téléphone|sophia|unswipe)\b/i.test(`${s.seen} ${s.said}`));
   const hook = r.hook_text || an?.hook.on_screen || an?.hook.verbatim || "";
@@ -309,8 +312,8 @@ function Drawer({ r, onChange, onClose }: { r: Insp; onChange: () => void; onClo
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-2 text-xs">
-        <label className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 font-bold text-brand-navy">Style:
-          <select aria-label="Style" className="bg-transparent font-bold" value={styleOf(r) ?? ""} onChange={(e) => void upd({ approved_style: e.target.value || null })}><option value="">—</option>{ALL_STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+        <label className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 font-bold text-brand-navy">Format:
+          <select aria-label="Format" className="bg-transparent font-bold" value={styleOf(r) ?? ""} onChange={(e) => void upd({ approved_style: e.target.value || null })}><option value="">—</option>{ALL_STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
         <label className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 font-bold text-brand-navy">Notion format:
           <select aria-label="Notion format" className="bg-transparent font-bold" value={r.notion_format ?? ""} onChange={(e) => void upd({ notion_format: e.target.value || null })}><option value="">—</option>{NOTION_FORMATS.map((x) => <option key={x}>{x}</option>)}</select></label>
         {r.notion_page_id ? <a href={`https://www.notion.so/${r.notion_page_id.replace(/-/g, "")}`} target="_blank" rel="noreferrer" className="rounded-full bg-brand-navy px-2 py-1 font-bold text-card">From Notion ↗</a> : null}

@@ -48,7 +48,7 @@ export function SnippetsLibrary() {
       <div className="flex flex-wrap gap-2">
         <input aria-label="Search" className={f} placeholder="Search" value={filter.q} onChange={(e) => setFilter({ ...filter, q: e.target.value })} />
         <select aria-label="Filter app" className={f} value={filter.app} onChange={(e) => setFilter({ ...filter, app: e.target.value })}><option value="all">All apps</option>{apps.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}<option value="both">Both only</option></select>
-        <select aria-label="Filter style" className={f} value={filter.style} onChange={(e) => setFilter({ ...filter, style: e.target.value })}><option value="all">All styles</option>{STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
+        <select aria-label="Filter format" className={f} value={filter.style} onChange={(e) => setFilter({ ...filter, style: e.target.value })}><option value="all">All formats</option>{STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
       </div>
       {!list.length ? <p className={cn(card, "text-sm text-brand-navySoft")}>Nothing here yet. Add your first {kind === "hook" ? "hook" : kind === "body" ? "body" : "CTA"} above.</p> : (
         <ul className="space-y-2">{list.map((s) => (
@@ -56,7 +56,7 @@ export function SnippetsLibrary() {
             <div className="min-w-0 flex-1">
               <p className="font-bold text-brand-navy">{s.text}</p>
               {s.why ? <p className="text-sm text-brand-navySoft">{s.why}</p> : null}
-              <p className="mt-1 text-xs text-brand-navySoft">{appName(s.app_id)} · {s.language.toUpperCase()} · {s.styles.map((x) => STYLE_LABEL[x]).join(", ") || "All styles"}{s.tags.length ? ` · ${s.tags.join(", ")}` : ""} · used {s.usage_count}×</p>
+              <p className="mt-1 text-xs text-brand-navySoft">{appName(s.app_id)} · {s.language.toUpperCase()} · {s.styles.map((x) => STYLE_LABEL[x]).join(", ") || "All formats"}{s.tags.length ? ` · ${s.tags.join(", ")}` : ""} · used {s.usage_count}×</p>
             </div>
             <Button size="icon" variant="ghost" aria-label="Copy" onClick={async () => { try { await navigator.clipboard.writeText(s.text); toast.success("Copied"); } catch { toast.error("Copy failed."); } }}><Copy className="size-4" /></Button>
             <Button size="icon" variant="ghost" aria-label="Delete" onClick={async () => { if (window.confirm("Delete this snippet?")) { await supabase.from("brief_snippets").delete().eq("id", s.id); reload(); } }}><Trash2 className="size-4" /></Button>

@@ -108,7 +108,7 @@ async function transcribe(buf: ArrayBuffer) {
 
 const S = { type: "string" } as const;
 const obj = (props: Record<string, unknown>) => ({ type: "object", additionalProperties: false, required: Object.keys(props), properties: props });
-const STYLE_ENUM = ["reaction_demo", "broll_stickers", "sole_footage", "talked_hook_demo", "educational", "slideshow", "other"];
+const STYLE_ENUM = ["reaction_demo", "broll_stickers", "sole_footage", "talked_hook_demo", "educational"];
 const analysisSchema = obj({
   style: { type: "string", enum: STYLE_ENUM }, style_confidence: { type: "number" },
   hook: obj({ verbatim: S, on_screen: S, visual: S }),
@@ -121,16 +121,17 @@ const analysisSchema = obj({
 });
 export type InspirationAnalysis = { style: string; style_confidence: number; hook: { verbatim: string; on_screen: string; visual: string }; hook_type: string; structure: { start_s: number; end_s: number; seen: string; said: string; on_screen: string }[]; cta: string; on_screen_text_style: string; audio: string; audio_note: string; why_it_works: string[]; score: number; app_fit: string; tags: string[]; notion_format?: string };
 
-async function analyse(input: { caption: string; transcript: string; words: { t: string; s: number }[]; duration: number | null; coverUrl: string | null; platform: string; handle: string | null; kind: string }) {
+async function analyse(input: { caption: string; transcript: string; words: { t: string; s: number }[]; duration: number | null; coverUrl: string | null; platform: string; handle: string | null; kind: string; formatGuidance?: string }) {
   const key = process.env["LOVABLE_API_KEY"]; if (!key) throw new Error("The AI key is not configured.");
   const timed = input.words.length ? input.words.reduce<string[]>((acc, w, i) => { if (i % 12 === 0) acc.push(`[${w.s.toFixed(1)}s]`); acc.push(w.t); return acc; }, []).join(" ") : input.transcript;
   const text = `Analyse this ${input.platform} ${input.kind} by @${input.handle ?? "?"} (${input.duration ?? "?"} s).
 Caption: ${input.caption || "(none)"}
 Transcript with timestamps: ${timed || "(no speech — no usable audio track; analyse from the cover image and caption, audio = none)"}
 
-The 5 UGC styles: reaction_demo = Reaction into demo (face reaction plan then phone/app demo); broll_stickers = B-roll + stickers storytelling, one visual per plan, talked; sole_footage = one single plan + music + text on screen, no talking; talked_hook_demo = talked personal-story hook then app demo; educational = face cam talking, teaching. Use slideshow for photo carousels, other if none fits.
+The 5 UGC video formats (the style JSON key holds the format): reaction_demo = Reaction into demo (face reaction plan then phone/app demo); broll_stickers = B-roll + stickers storytelling, one visual per plan, talked; sole_footage = one single plan + music + text on screen, no talking; talked_hook_demo = talked personal-story hook then app demo; educational = face cam talking, teaching. Choose the closest of these five Hub formats; carousel or other content kinds belong in kind/tags, never as additional formats.
+Owner format guidance: ${input.formatGuidance ?? "Use the five definitions above."}
 Apps: Sophia = 5-minute daily culture/general-knowledge courses instead of doom-scrolling. UnSwipe = keeps social apps without Reels/For You/Shorts, reduces screen time.
-Hook = first 3 seconds: verbatim from the transcript (empty if no speech) + what is on screen. Structure = plans with timecodes (seconds). why_it_works = exactly 3 short lines. score = virality /10. tags = 3-6 short lowercase tags. notion_format = the single best-fitting format among the 9 listed options. Write analysis text in English; keep verbatim quotes in the original language.`;
+Hook = first 3 seconds: verbatim from the transcript (empty if no speech) + what is on screen. Structure = plans with timecodes (seconds). why_it_works = exactly 3 short lines. score = virality /10. tags = 3-6 short lowercase tags. notion_format = the separate Notion classification among the 9 listed options; never confuse it with the five Hub video formats. Write analysis text in English; keep verbatim quotes in the original language.`;
   const content: unknown[] = [{ type: "input_text", text }];
   if (input.coverUrl) content.push({ type: "input_image", image_url: input.coverUrl });
   const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
@@ -202,7 +203,8 @@ export async function processRow(a: Admin, id: string, from?: "analyse") {
       await set(a, id, { transcript: t.text, language: t.language, words: t.words, cost });
     }
     await set(a, id, { status: "analysing" });
-    const r = await analyse({ caption: row.caption ?? "", transcript: row.transcript ?? "", words: row.words ?? [], duration: row.duration_s, coverUrl: await signed(a, row.cover_path, 600), platform: row.platform, handle: row.author_handle, kind: row.kind });
+    const { data: formats } = await a.from("ugc_formats").select("key, name_en, description, structure, tips").order("sort_order");
+    const r = await analyse({ formatGuidance: JSON.stringify(formats ?? []), caption: row.caption ?? "", transcript: row.transcript ?? "", words: row.words ?? [], duration: row.duration_s, coverUrl: await signed(a, row.cover_path, 600), platform: row.platform, handle: row.author_handle, kind: row.kind });
     const an = r.analysis;
     cost["ai_input_tokens"] = r.usage.input_tokens; cost["ai_output_tokens"] = r.usage.output_tokens;
     await set(a, id, {

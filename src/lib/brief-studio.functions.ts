@@ -85,9 +85,11 @@ export const studioAi = createServerFn({ method: "POST" })
     let fmt = "";
     if (data.formatId) {
       const { data: f } = await a.from("briefs").select("title, hook_text, oral_hook, beats, product_moment, effort").eq("id", data.formatId).maybeSingle();
-      if (f) fmt = `Format to follow: ${f.title} — hook "${f.hook_text}" / oral "${f.oral_hook}" / beats ${(f.beats ?? []).join(" | ")} / product moment ${f.product_moment} / effort ${f.effort}`;
+      if (f) fmt = `Legacy template reference: ${f.title} — hook "${f.hook_text}" / oral "${f.oral_hook}" / beats ${(f.beats ?? []).join(" | ")} / product moment ${f.product_moment} / effort ${f.effort}`;
     }
-    const base = `You write short-form UGC video briefs (TikTok, Reels, Shorts) for ${app.name}. ${app.about} ${RULES}`;
+    const { data: formatDefinitions } = await a.from("ugc_formats").select("key, name_en, structure, tips").order("sort_order");
+    const formatGuidance = `Formats means only these five video formats, not saved brief templates: ${JSON.stringify(formatDefinitions ?? [])}. Preserve the chosen format (${b["style"] ?? "not yet selected"}) and its shot structure.`;
+    const base = `${formatGuidance} You write short-form UGC video briefs (TikTok, Reels, Shorts) for ${app.name}. ${app.about} ${RULES}`;
     const current = JSON.stringify({ hook_text: b["hook_text"], oral_hook: b["oral_hook"], hook_visual: b["hook_visual"], beats: b["beats"], title: b["title"] });
     if (data.mode === "hooks") {
       const r = await aiJson<{ hook_text: string; oral_hook: string; hook_visual: string }>(`${base} Write in French.`, [{ type: "input_text", text: `Suggest one strong hook set (on screen, oral first sentence, what we see on frame 1) for this brief.\n${fmt}\nBrief: ${current}\nIdea: ${data.idea ?? ""}` }], "hooks", obj({ hook_text: S, oral_hook: S, hook_visual: S }));

@@ -14,7 +14,7 @@ import { assetUploadSlot, briefFromVideo, metaAdsPrepare, studioAi } from "@/lib
 import { STUDIO_DRAFT_KEY, STYLES, STYLE_LABEL, STYLE_NUM, styleDefaults, type BriefStyle } from "@/lib/brief-studio";
 
 function StylePick({ value, onChange }: { value: BriefStyle | ""; onChange: (v: BriefStyle) => void }) {
-  return <div><p className="text-sm font-semibold">1. Style</p><div className="mt-1 flex flex-wrap gap-1.5">{STYLES.map(([k, l], i) => <button key={k} type="button" onClick={() => onChange(k)} className={cn("rounded-full border px-3 py-1 text-xs font-bold", value === k ? "border-portal-accent bg-portal-accent/10 text-portal-accent" : "")}>{i + 1}. {l}</button>)}</div></div>;
+  return <div><p className="text-sm font-semibold">1. Format</p><div className="mt-1 flex flex-wrap gap-1.5">{STYLES.map(([k, l], i) => <button key={k} type="button" onClick={() => onChange(k)} className={cn("rounded-full border px-3 py-1 text-xs font-bold", value === k ? "border-portal-accent bg-portal-accent/10 text-portal-accent" : "")}>{i + 1}. {l}</button>)}</div></div>;
 }
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -132,15 +132,15 @@ export function BriefsList({ formats, initialTab }: { formats?: ReactNode; initi
   const { data } = useQuery({
     queryKey: ["hub", "learn", "briefs", app],
     queryFn: async () => {
-      const [b, p, f] = await Promise.all([
+      const [b, p] = await Promise.all([
         supabase.from("briefs").select("id, title, hook_text, hook, brief_type, effort, status, audience, audience_efforts, score, drop_at, language, created_at, style, app_id, updated_at, inspiration_id, inspirations(cover_path, author_handle)").eq("app_id", app).neq("brief_type", "format").order("updated_at", { ascending: false }).limit(500),
         supabase.from("creator_posts").select("brief_id, views, posted_on").not("brief_id", "is", null),
-        supabase.from("briefs").select("id, title").eq("app_id", app).eq("brief_type", "format").order("sort_order"),
+
       ]);
       const stats: Record<string, { posts: number; v7: number[] }> = {};
       const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
       for (const r of p.data ?? []) { const x = (stats[r.brief_id!] ??= { posts: 0, v7: [] }); x.posts++; if (r.posted_on && r.posted_on <= weekAgo) x.v7.push(Number(r.views ?? 0)); }
-      return { rows: (b.data ?? []) as unknown as Row[], stats, formats: (f.data ?? []) as { id: string; title: string }[] };
+      return { rows: (b.data ?? []) as unknown as Row[], stats, formats: [] as { id: string; title: string }[] };
     },
   });
   const counts = useMemo(() => ({ ...Object.fromEntries(TABS.map(([k]) => [k, (data?.rows ?? []).filter((r) => inTab(k, r.status)).length])), formats: data?.formats.length ?? 0 }) as Record<string, number>, [data]);
@@ -182,13 +182,10 @@ export function BriefsList({ formats, initialTab }: { formats?: ReactNode; initi
           {menu ? <div className="absolute right-0 z-20 mt-1 w-56 rounded-xl border bg-card p-1 shadow-portal" role="menu">
             <Link role="menuitem" to="/hub/ugc/briefs/$briefId" params={{ briefId: "new" }} className="block rounded-lg px-3 py-2 text-sm font-semibold hover:bg-portal-bg">Blank</Link>
             <Link role="menuitem" to="/hub/ugc/inspiration" className="block rounded-lg px-3 py-2 text-sm font-semibold hover:bg-portal-bg">From an inspiration</Link>
-            <button role="menuitem" type="button" onClick={() => { setMenu(false); setPickFmt(true); }} className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-portal-bg">From a format</button>
+
           </div> : null}
         </div>
       </div>
-      {pickFmt ? <div className={cn(card, "space-y-2")}><div className="flex items-center justify-between"><b className="text-brand-navy">Pick a format to start from</b><Button size="sm" variant="ghost" onClick={() => setPickFmt(false)}>Cancel</Button></div>
-        <p className="text-xs text-brand-navySoft">It is copied as a draft; the format itself is not changed.</p>
-        {!(data?.formats ?? []).length ? <p className="text-sm text-brand-navySoft">No formats yet — save a brief as a format from the editor.</p> : null}<div className="grid max-h-80 gap-1 overflow-y-auto sm:grid-cols-2">{(data?.formats ?? []).map((f) => <button key={f.id} type="button" onClick={() => { setPickFmt(false); void copyBrief(f.id, true); }} className="rounded-lg border px-3 py-2 text-left text-sm hover:bg-portal-bg">{f.title}</button>)}</div></div> : null}
       <input aria-label="Search briefs" placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} className={cn(sel, "w-full sm:w-80")} />
       <div className="overflow-x-auto rounded-2xl bg-card shadow-portal">
         {rows.length ? <table className="w-full min-w-[560px] text-sm">

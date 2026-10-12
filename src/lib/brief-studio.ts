@@ -41,11 +41,11 @@ export const blankFmt = (): TextFormat => ({ kind: "subtitle", note: "" });
 export const blankPlan = (): Plan => ({ on_screen: "", fmt: blankFmt(), say: "", do: "", camera: "", reaction: "", assets: [] });
 export function styleDefaults(style: BriefStyle, d: StyleData = {}): StyleData {
   const plans = d.plans ?? [];
-  if (style === "reaction_demo") return { ...d, plans: [plans[0] ?? blankPlan(), plans[1] ?? blankPlan()].slice(0, 2), flips: d.flips ?? { on: false, note: "" } };
+  if (style === "reaction_demo") return { ...d, plans: plans.length ? plans : [blankPlan(), blankPlan()], flips: d.flips ?? { on: false, note: "" } };
   if (style === "broll_stickers") return { ...d, plans: plans.length ? plans : [blankPlan(), blankPlan(), blankPlan()] };
   if (style === "talked_hook_demo") return { ...d, plans: plans.length ? plans : [blankPlan(), blankPlan()], demo: d.demo ?? { mode: "filmed", do: "", say: "", asset: null } };
-  if (style === "sole_footage") return { ...d, sole: d.sole ?? { what: "", duration_s: 7, music_title: "", music_link: "", music_asset_id: null, text: "", fmt: { kind: "title", note: "" } } };
-  return { ...d, script: d.script ?? "", script_fmt: d.script_fmt ?? blankFmt(), flashes: d.flashes ?? [] };
+  if (style === "sole_footage") return { ...d, plans: plans.length ? plans : [{ ...blankPlan(), do: d.sole?.what ?? "", on_screen: d.sole?.text ?? "", fmt: d.sole?.fmt ?? { kind: "title", note: "" } }], sole: d.sole ?? { what: "", duration_s: 7, music_title: "", music_link: "", music_asset_id: null, text: "", fmt: { kind: "title", note: "" } } };
+  return { ...d, plans: plans.length ? plans : [blankPlan()], script: d.script ?? "", script_fmt: d.script_fmt ?? blankFmt(), flashes: d.flashes ?? [] };
 }
 /** Every asset id the style content points to (synced into brief_assets so creators can download them). */
 export function styleAssetIds(d: StyleData): string[] {
@@ -77,7 +77,7 @@ export const words = (s: string | null | undefined): number => (s ?? "").trim().
 export const scriptWords = (b: Pick<StudioBrief, "beats" | "oral_hook">) => b.beats.reduce((n, x) => n + words(x), 0);
 
 const filled = (x: string | null | undefined) => Boolean((x ?? "").trim());
-/** Per-style grid: only the fields that style needs count; the result is scaled to /10. */
+/** Per-format grid: only the fields that style needs count; the result is scaled to /10. */
 export function styleChecks(b: StudioBrief, assetCount: number): [string, boolean][] {
   const d = b.style_data ?? {}; const plans = d.plans ?? [];
   const common: [string, boolean][] = [
@@ -97,7 +97,7 @@ export function styleChecks(b: StudioBrief, assetCount: number): [string, boolea
     ],
     broll_stickers: [
       ["At least 3 plans", plans.length >= 3],
-      ["Every plan has on-screen text", plans.length > 0 && plans.every((p) => filled(p.on_screen))],
+      ["Every shot has on-screen text", plans.length > 0 && plans.every((p) => filled(p.on_screen))],
       ["Every plan has what to say", plans.length > 0 && plans.every((p) => filled(p.say))],
       ["At least one asset placed", plans.some((p) => p.assets.length > 0)],
       ["Every placed asset has a timing", plans.every((p) => p.assets.every((a) => filled(a.when)))],
@@ -111,7 +111,7 @@ export function styleChecks(b: StudioBrief, assetCount: number): [string, boolea
     talked_hook_demo: [
       ["At least 2 story plans", plans.length >= 2],
       ["Every plan has what to say", plans.length > 0 && plans.every((p) => filled(p.say))],
-      ["Every plan has on-screen text", plans.length > 0 && plans.every((p) => filled(p.on_screen))],
+      ["Every shot has on-screen text", plans.length > 0 && plans.every((p) => filled(p.on_screen))],
       ["Demo: what to do / which recording", d.demo?.mode === "asset" ? Boolean(d.demo.asset) : filled(d.demo?.do)],
       ["Demo: what to say", filled(d.demo?.say)],
     ],
@@ -124,7 +124,7 @@ export function styleChecks(b: StudioBrief, assetCount: number): [string, boolea
   return [...common, ...by[b.style as BriefStyle], ["At least 1 file or reference", assetCount >= 1]];
 }
 
-/** The /10 grid. Styled briefs use the per-style checks; older briefs keep the original 10 points. */
+/** The /10 grid. Styled briefs use the per-format checks; older briefs keep the original 10 points. */
 export function scoreBrief(b: StudioBrief, assetCount: number) {
   if (b.style) {
     const checks = styleChecks(b, assetCount);
