@@ -3,7 +3,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 /** Old "All existing tools" pages: each now lives in a Hub section; kept as permanent redirects. */
 const MOVED: Record<string, { to: string; search?: Record<string, string> }> = {
   overview: { to: "/hub/ugc/creators", search: { view: "overview" } },
-  "ugc-applications": { to: "/hub/ugc/creators", search: { view: "applications" } },
+  "ugc-applications": { to: "/hub/ugc/applications" },
   prospects: { to: "/hub/ugc/creators", search: { view: "prospects" } },
   compliance: { to: "/hub/ugc/creators", search: { view: "compliance" } },
   "slideshow-applications": { to: "/hub/slideshows/applications" },

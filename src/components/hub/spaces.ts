@@ -1,4 +1,4 @@
-import {
+import { UserPlus,
   BarChart3, Banknote, BookOpen, CalendarCheck, ClipboardList, ExternalLink, FileSignature, GraduationCap, Handshake, Home, Inbox, Lightbulb,
   Map as MapIcon, Megaphone, MessageSquare, Percent, Settings, Shield, Star, Target, Users, type LucideIcon,
 } from "lucide-react";
@@ -22,7 +22,8 @@ export const SPACE_NAV: Record<Space, NavItem[]> = {
     { to: "/hub/ugc/inspiration", label: "Inspiration", icon: Lightbulb, mobile: true, lead: "Videos to learn from — one button makes a brief" },
     { to: "/hub/ugc/briefs", label: "Briefs", icon: ClipboardList, mobile: true, lead: "The briefs you write for creators" },
     { to: "/hub/ugc/library", label: "Library", icon: GraduationCap, lead: "Formats, files, hooks and CTAs" },
-    { to: "/hub/ugc/creators", label: "Creators", icon: Users, lead: "Applications and active creators" },
+    { to: "/hub/ugc/applications", label: "Applications", icon: UserPlus, lead: "Pending UGC applications — accept or reject" },
+    { to: "/hub/ugc/creators", label: "Creators", icon: Users, lead: "Active creators" },
     { to: "/hub/ugc/posts", label: "Posts", icon: Inbox, mobile: true, lead: "Validate posts, views at J+7, ready for payment" },
     { to: "/hub/ugc/payouts", label: "Payouts", icon: Banknote, lead: "Approve ready payouts, then Stripe or export" },
     { to: "/hub/settings", label: "Settings", icon: Settings, lead: "Shooting rules, descriptions, Notion, payments, team" },
