@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -14,6 +14,7 @@ import { FmtPicker, PlanAssets, SnippetSlot, type LibAsset } from "./StylePicker
 import { STUDIO_DRAFT_KEY, ASSET_ROLES, BEAT_LABELS, DEFAULT_DO, DEFAULT_DONT, GESTURES, blankBrief, briefBody, scoreBrief, scriptWords, stepDone, words, type StudioBrief } from "@/lib/brief-studio";
 import { BriefView, toStudio, type BriefAsset } from "./BriefPreview";
 import { AssetUploader } from "./Assets";
+import { InspirationReference } from "./Inspiration";
 import { PostDescriptionFields } from "@/components/creators/PostDescription";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -99,6 +100,11 @@ export function BriefStudio({ briefId }: { briefId: string }) {
   const rate = (e: string | null) => { const t = side?.tier as Record<string, number> | null | undefined; return t && e ? Number(t[`per_post_${e}`] ?? 0) : null; };
   const grade = useMemo(() => (b ? scoreBrief(b, assets.length + (b.style ? styleAssetIds(b.style_data).length : 0) + refIds.length * (b.style ? 1 : 0)) : null), [b, assets.length, refIds.length]);
   const doneLegacy = b ? stepDone(b, assets.length) : [];
+  // Autosave every 10 s while editing a saved draft; never changes the status.
+  const bRef = useRef(b); bRef.current = b;
+  const lastSaved = useRef<string>(""); const saveRef = useRef<((p?: Partial<StudioBrief>, q?: boolean) => Promise<string | null>) | null>(null);
+  useEffect(() => { if (b?.id && !lastSaved.current) lastSaved.current = JSON.stringify(b); }, [b]);
+  useEffect(() => { const t = window.setInterval(() => { const x = bRef.current; if (x?.id && x.status === "draft" && JSON.stringify(x) !== lastSaved.current) void saveRef.current?.({}, true); }, 10_000); return () => window.clearInterval(t); }, []);
   if (!b || !grade) return <p className="p-6 text-sm text-brand-navySoft">Loading the brief…</p>;
   const set = <K extends keyof StudioBrief>(k: K, v: StudioBrief[K]) => setB({ ...b, [k]: v });
   const wc = scriptWords(b);
@@ -111,6 +117,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
 
   async function save(patch: Partial<StudioBrief> = {}, quiet = false): Promise<string | null> {
     const x = { ...b!, ...patch };
+    if (x.status === "published" && loaded?.row?.status !== "published" && !window.confirm("Publish to creators? This is the only step that makes the brief visible to creators.")) return null;
     if (x.status === "published" && grade!.score < 8 && !window.confirm(`Score ${grade!.score}/10 — publishing is allowed from 8. Publish anyway?`)) return null;
     const row = {
       app_id: x.app_id, title: x.title || x.hook_text || "Brief sans titre", brief_type: x.brief_type, effort: x.effort, format: x.effort, platform: x.platform, duration_target: x.duration_target,
@@ -132,11 +139,21 @@ export function BriefStudio({ briefId }: { briefId: string }) {
       const { error } = await supabase.from("brief_assets").insert(all.map((a, i) => ({ brief_id: id, asset_id: a.id, role: a.role, sort_order: i })));
       if (error) toast.error("Files could not be attached.");
     }
-    setB({ ...x, id });
+    setB((cur) => ({ ...(cur ?? x), ...patch, id })); lastSaved.current = JSON.stringify({ ...x, id });
+    if (x.status !== loaded?.row?.status) void qc.invalidateQueries({ queryKey: ["hub", "studio", briefId] });
     void qc.invalidateQueries({ queryKey: ["hub", "learn"] });
     if (!quiet) toast.success(x.status === "published" ? "Published" : "Saved");
     if (!b!.id) void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: id }, replace: true });
     return id;
+  }
+  saveRef.current = save;
+  async function remove() {
+    if (!b!.id) { void navigate({ to: "/hub/ugc/library" }); return; }
+    if (!window.confirm(`Delete “${b!.title || "this brief"}”? This cannot be undone.`)) return;
+    await supabase.from("brief_assets").delete().eq("brief_id", b!.id);
+    const { error } = await supabase.from("briefs").delete().eq("id", b!.id);
+    if (error) { toast.error("Could not delete the brief."); return; }
+    toast.success("Brief deleted"); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); void navigate({ to: "/hub/ugc/library", search: { tab: "briefs" } as never });
   }
 
   async function translate() {
@@ -295,7 +312,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
         <PostDescriptionFields value={b.style_data?.post_desc ?? {}} onChange={(v) => set("style_data", { ...(b.style_data ?? {}), post_desc: v })} /></div>
     </>],
     ["Publish", <>
-      <div className="flex flex-wrap gap-2">{([["draft", "Draft"], ["scheduled", "Monday drop"], ["published", "Published"]] as const).map(([k, l]) => <button key={k} type="button" onClick={() => setB({ ...b, status: k, drop_at: k === "scheduled" ? nextMonday() : b.drop_at })} className={cn("min-h-10 rounded-full border px-4 text-sm font-bold", b.status === k ? "border-brand-navy bg-brand-navy text-card" : "")}>{l}</button>)}</div>
+      <div className="flex flex-wrap gap-2">{([["draft", "Draft"], ["ready", "Ready"], ["scheduled", "Monday drop"], ["published", "Published"]] as const).map(([k, l]) => <button key={k} type="button" onClick={() => setB({ ...b, status: k, drop_at: k === "scheduled" ? nextMonday() : b.drop_at })} className={cn("min-h-10 rounded-full border px-4 text-sm font-bold", b.status === k ? "border-brand-navy bg-brand-navy text-card" : "")}>{l}</button>)}</div>
       {b.status === "scheduled" && b.drop_at ? <p className="text-xs text-brand-navySoft">Drops {new Date(b.drop_at).toLocaleString()}</p> : null}
       <label className="block text-sm font-semibold">Audience<select className={input} value={b.audience_efforts.length ? "effort" : b.audience} onChange={(e) => setB({ ...b, audience: e.target.value, audience_efforts: e.target.value === "effort" ? ["talking_head"] : [] })}><option value="all">All creators</option><option value="selected">Selected creators only (assign below)</option><option value="effort">By effort</option></select></label>
       {b.audience === "effort" || b.audience_efforts.length ? <div className="flex gap-2">{EFF.map(([k, l]) => <label key={k} className="flex items-center gap-1 text-sm"><input type="checkbox" checked={b.audience_efforts.includes(k)} onChange={(e) => set("audience_efforts", e.target.checked ? [...b.audience_efforts, k] : b.audience_efforts.filter((x) => x !== k))} />{l}</label>)}</div> : null}
@@ -305,7 +322,9 @@ export function BriefStudio({ briefId }: { briefId: string }) {
         <Button variant="outline" className="mt-1" disabled={!assign.creatorId} onClick={() => void assignTo()}>Assign</Button>
       </div>
       <div className="flex flex-wrap gap-2 pt-2">
-        <Button onClick={() => void save()}>{b.status === "published" ? "Publish" : b.status === "scheduled" ? "Schedule" : "Save draft"}</Button>
+        <Button onClick={() => void save()}>{b.status === "published" ? "Publish to creators" : b.status === "scheduled" ? "Schedule" : b.status === "ready" ? "Save (ready)" : "Save as draft"}</Button>
+        {b.status === "draft" ? <Button variant="outline" onClick={() => void save({ status: "ready" })}>Mark ready</Button> : null}
+        {b.status !== "published" ? <Button variant="ghost" className="text-portal-red" onClick={() => void remove()}>Delete</Button> : null}
         <Button variant="outline" disabled={busy === "translate"} onClick={() => void translate()}><Sparkles className="size-4" />{busy === "translate" ? "Translating…" : "Translate to EN"}</Button>
         <Button variant="outline" onClick={() => void duplicate()}>Duplicate</Button>
         <Button variant="ghost" onClick={async () => { if (window.confirm("Archive this brief?")) { await save({ status: "archived" }); void navigate({ to: "/hub/ugc/library" }); } }}>Archive</Button>
@@ -335,8 +354,9 @@ export function BriefStudio({ briefId }: { briefId: string }) {
         <span className="rounded-full bg-portal-bg px-3 py-1 text-sm font-bold" data-testid="studio-progress">{doneCount}/{steps.length}</span>
         {b.style ? <span className="rounded-full bg-portal-accent/15 px-3 py-1 text-xs font-extrabold text-portal-accent">Style {STYLES.findIndex(([k]) => k === b.style) + 1}</span> : null}
         <span title={grade.missing.join("\n")} data-testid="studio-score" className={cn("rounded-full px-3 py-1 text-sm font-extrabold", grade.score >= 8 ? "bg-portal-green/15 text-portal-green" : "bg-portal-amber/20 text-brand-navy")}>Score {grade.score}/10</span>
-        <Button onClick={() => void save()}>Save</Button>
+        <Button onClick={() => void save()}>{b.status === "draft" ? "Save as draft" : "Save"}</Button>
       </div>
+      {loaded?.row && (loaded.row as { inspiration_id?: string | null }).inspiration_id ? <InspirationReference id={(loaded.row as { inspiration_id: string }).inspiration_id} /> : null}
       {grade.missing.length ? <details className={cn(card, "py-3 text-sm")}><summary className="cursor-pointer font-bold text-brand-navy">{grade.score >= 8 ? "Ready to publish" : "Publishing is allowed from 8/10"} — {grade.missing.length} point{grade.missing.length > 1 ? "s" : ""} missing</summary><ul className="mt-2 list-disc pl-5 text-brand-navySoft">{grade.missing.map((m) => <li key={m}>{m}</li>)}</ul></details> : null}
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <aside className="lg:sticky lg:top-4 lg:self-start"><p className="mb-2 text-center text-xs font-bold uppercase tracking-wide text-brand-navySoft">Preview as creator</p>
