@@ -138,6 +138,7 @@ import { Route as AuthenticatedHubUgcInspirationRouteImport } from './routes/_au
 import { Route as AuthenticatedHubUgcLibraryRouteImport } from './routes/_authenticated/hub/ugc/library'
 import { Route as AuthenticatedHubUgcMessagesRouteImport } from './routes/_authenticated/hub/ugc/messages'
 import { Route as AuthenticatedHubUgcPayoutsRouteImport } from './routes/_authenticated/hub/ugc/payouts'
+import { Route as AuthenticatedHubUgcPostsRouteImport } from './routes/_authenticated/hub/ugc/posts'
 import { Route as AuthenticatedHubUgcReferralsRouteImport } from './routes/_authenticated/hub/ugc/referrals'
 import { Route as ApiPublicAppCoursesRouteImport } from './routes/api/public/app/courses'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
@@ -190,6 +191,8 @@ import { Route as AuthenticatedAuteursAdminDocumentsSlugRouteImport } from './ro
 import { Route as AuthenticatedAuteursAdminReviewIndexRouteImport } from './routes/_authenticated/auteurs/admin/review.index'
 import { Route as AuthenticatedAuteursAdminReviewCourseIdRouteImport } from './routes/_authenticated/auteurs/admin/review.$courseId'
 import { Route as AuthenticatedHubLearnBriefsBriefIdRouteImport } from './routes/_authenticated/hub/learn_.briefs.$briefId'
+import { Route as AuthenticatedHubUgcBriefsIndexRouteImport } from './routes/_authenticated/hub/ugc/briefs.index'
+import { Route as AuthenticatedHubUgcBriefsBriefIdRouteImport } from './routes/_authenticated/hub/ugc/briefs.$briefId'
 import { Route as AuthenticatedHubUgcCampaignsIndexRouteImport } from './routes/_authenticated/hub/ugc/campaigns.index'
 import { Route as AuthenticatedHubUgcCampaignsCreateRouteImport } from './routes/_authenticated/hub/ugc/campaigns.create'
 import { Route as AuthenticatedHubUgcCreatorsIndexRouteImport } from './routes/_authenticated/hub/ugc/creators.index'
@@ -893,6 +896,12 @@ const AuthenticatedHubUgcPayoutsRoute =
     path: '/ugc/payouts',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
+const AuthenticatedHubUgcPostsRoute =
+  AuthenticatedHubUgcPostsRouteImport.update({
+    id: '/ugc/posts',
+    path: '/ugc/posts',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
 const AuthenticatedHubUgcReferralsRoute =
   AuthenticatedHubUgcReferralsRouteImport.update({
     id: '/ugc/referrals',
@@ -1197,6 +1206,18 @@ const AuthenticatedHubLearnBriefsBriefIdRoute =
     path: '/learn/briefs/$briefId',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
+const AuthenticatedHubUgcBriefsIndexRoute =
+  AuthenticatedHubUgcBriefsIndexRouteImport.update({
+    id: '/ugc/briefs/',
+    path: '/ugc/briefs/',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
+const AuthenticatedHubUgcBriefsBriefIdRoute =
+  AuthenticatedHubUgcBriefsBriefIdRouteImport.update({
+    id: '/ugc/briefs/$briefId',
+    path: '/ugc/briefs/$briefId',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
 const AuthenticatedHubUgcCampaignsIndexRoute =
   AuthenticatedHubUgcCampaignsIndexRouteImport.update({
     id: '/ugc/campaigns/',
@@ -1409,6 +1430,7 @@ export interface FileRoutesByFullPath {
   '/hub/ugc/library': typeof AuthenticatedHubUgcLibraryRoute
   '/hub/ugc/messages': typeof AuthenticatedHubUgcMessagesRoute
   '/hub/ugc/payouts': typeof AuthenticatedHubUgcPayoutsRoute
+  '/hub/ugc/posts': typeof AuthenticatedHubUgcPostsRoute
   '/hub/ugc/referrals': typeof AuthenticatedHubUgcReferralsRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
@@ -1462,6 +1484,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/hub/learn/briefs/$briefId': typeof AuthenticatedHubLearnBriefsBriefIdRoute
+  '/hub/ugc/briefs/$briefId': typeof AuthenticatedHubUgcBriefsBriefIdRoute
   '/hub/ugc/campaigns/create': typeof AuthenticatedHubUgcCampaignsCreateRoute
   '/hub/ugc/creators/$creatorId': typeof AuthenticatedHubUgcCreatorsCreatorIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
@@ -1472,6 +1495,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/creators/': typeof AuthenticatedAuteursAdminCreatorsIndexRoute
   '/auteurs/admin/documents/': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
   '/auteurs/admin/review/': typeof AuthenticatedAuteursAdminReviewIndexRoute
+  '/hub/ugc/briefs/': typeof AuthenticatedHubUgcBriefsIndexRoute
   '/hub/ugc/campaigns/': typeof AuthenticatedHubUgcCampaignsIndexRoute
   '/hub/ugc/creators/': typeof AuthenticatedHubUgcCreatorsIndexRoute
   '/creators/influencer/app/deals/': typeof CreatorsInfluencerAppDealsIndexRoute
@@ -1603,6 +1627,7 @@ export interface FileRoutesByTo {
   '/hub/ugc/library': typeof AuthenticatedHubUgcLibraryRoute
   '/hub/ugc/messages': typeof AuthenticatedHubUgcMessagesRoute
   '/hub/ugc/payouts': typeof AuthenticatedHubUgcPayoutsRoute
+  '/hub/ugc/posts': typeof AuthenticatedHubUgcPostsRoute
   '/hub/ugc/referrals': typeof AuthenticatedHubUgcReferralsRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
@@ -1656,6 +1681,7 @@ export interface FileRoutesByTo {
   '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/hub/learn/briefs/$briefId': typeof AuthenticatedHubLearnBriefsBriefIdRoute
+  '/hub/ugc/briefs/$briefId': typeof AuthenticatedHubUgcBriefsBriefIdRoute
   '/hub/ugc/campaigns/create': typeof AuthenticatedHubUgcCampaignsCreateRoute
   '/hub/ugc/creators/$creatorId': typeof AuthenticatedHubUgcCreatorsCreatorIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
@@ -1666,6 +1692,7 @@ export interface FileRoutesByTo {
   '/auteurs/admin/creators': typeof AuthenticatedAuteursAdminCreatorsIndexRoute
   '/auteurs/admin/documents': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
   '/auteurs/admin/review': typeof AuthenticatedAuteursAdminReviewIndexRoute
+  '/hub/ugc/briefs': typeof AuthenticatedHubUgcBriefsIndexRoute
   '/hub/ugc/campaigns': typeof AuthenticatedHubUgcCampaignsIndexRoute
   '/hub/ugc/creators': typeof AuthenticatedHubUgcCreatorsIndexRoute
   '/creators/influencer/app/deals': typeof CreatorsInfluencerAppDealsIndexRoute
@@ -1802,6 +1829,7 @@ export interface FileRoutesById {
   '/_authenticated/hub/ugc/library': typeof AuthenticatedHubUgcLibraryRoute
   '/_authenticated/hub/ugc/messages': typeof AuthenticatedHubUgcMessagesRoute
   '/_authenticated/hub/ugc/payouts': typeof AuthenticatedHubUgcPayoutsRoute
+  '/_authenticated/hub/ugc/posts': typeof AuthenticatedHubUgcPostsRoute
   '/_authenticated/hub/ugc/referrals': typeof AuthenticatedHubUgcReferralsRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
@@ -1855,6 +1883,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
   '/_authenticated/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
   '/_authenticated/hub/learn_/briefs/$briefId': typeof AuthenticatedHubLearnBriefsBriefIdRoute
+  '/_authenticated/hub/ugc/briefs/$briefId': typeof AuthenticatedHubUgcBriefsBriefIdRoute
   '/_authenticated/hub/ugc/campaigns/create': typeof AuthenticatedHubUgcCampaignsCreateRoute
   '/_authenticated/hub/ugc/creators/$creatorId': typeof AuthenticatedHubUgcCreatorsCreatorIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
@@ -1865,6 +1894,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/creators/': typeof AuthenticatedAuteursAdminCreatorsIndexRoute
   '/_authenticated/auteurs/admin/documents/': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
   '/_authenticated/auteurs/admin/review/': typeof AuthenticatedAuteursAdminReviewIndexRoute
+  '/_authenticated/hub/ugc/briefs/': typeof AuthenticatedHubUgcBriefsIndexRoute
   '/_authenticated/hub/ugc/campaigns/': typeof AuthenticatedHubUgcCampaignsIndexRoute
   '/_authenticated/hub/ugc/creators/': typeof AuthenticatedHubUgcCreatorsIndexRoute
   '/creators/influencer/app/deals/': typeof CreatorsInfluencerAppDealsIndexRoute
@@ -2001,6 +2031,7 @@ export interface FileRouteTypes {
     | '/hub/ugc/library'
     | '/hub/ugc/messages'
     | '/hub/ugc/payouts'
+    | '/hub/ugc/posts'
     | '/hub/ugc/referrals'
     | '/api/public/app/courses'
     | '/api/public/stripe/webhook'
@@ -2054,6 +2085,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/hub/learn/briefs/$briefId'
+    | '/hub/ugc/briefs/$briefId'
     | '/hub/ugc/campaigns/create'
     | '/hub/ugc/creators/$creatorId'
     | '/api/public/app/courses/$slug'
@@ -2064,6 +2096,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/creators/'
     | '/auteurs/admin/documents/'
     | '/auteurs/admin/review/'
+    | '/hub/ugc/briefs/'
     | '/hub/ugc/campaigns/'
     | '/hub/ugc/creators/'
     | '/creators/influencer/app/deals/'
@@ -2195,6 +2228,7 @@ export interface FileRouteTypes {
     | '/hub/ugc/library'
     | '/hub/ugc/messages'
     | '/hub/ugc/payouts'
+    | '/hub/ugc/posts'
     | '/hub/ugc/referrals'
     | '/api/public/app/courses'
     | '/api/public/stripe/webhook'
@@ -2248,6 +2282,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/documents/$slug'
     | '/auteurs/admin/review/$courseId'
     | '/hub/learn/briefs/$briefId'
+    | '/hub/ugc/briefs/$briefId'
     | '/hub/ugc/campaigns/create'
     | '/hub/ugc/creators/$creatorId'
     | '/api/public/app/courses/$slug'
@@ -2258,6 +2293,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/creators'
     | '/auteurs/admin/documents'
     | '/auteurs/admin/review'
+    | '/hub/ugc/briefs'
     | '/hub/ugc/campaigns'
     | '/hub/ugc/creators'
     | '/creators/influencer/app/deals'
@@ -2393,6 +2429,7 @@ export interface FileRouteTypes {
     | '/_authenticated/hub/ugc/library'
     | '/_authenticated/hub/ugc/messages'
     | '/_authenticated/hub/ugc/payouts'
+    | '/_authenticated/hub/ugc/posts'
     | '/_authenticated/hub/ugc/referrals'
     | '/api/public/app/courses'
     | '/api/public/stripe/webhook'
@@ -2446,6 +2483,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/documents/$slug'
     | '/_authenticated/auteurs/admin/review/$courseId'
     | '/_authenticated/hub/learn_/briefs/$briefId'
+    | '/_authenticated/hub/ugc/briefs/$briefId'
     | '/_authenticated/hub/ugc/campaigns/create'
     | '/_authenticated/hub/ugc/creators/$creatorId'
     | '/api/public/app/courses/$slug'
@@ -2456,6 +2494,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/creators/'
     | '/_authenticated/auteurs/admin/documents/'
     | '/_authenticated/auteurs/admin/review/'
+    | '/_authenticated/hub/ugc/briefs/'
     | '/_authenticated/hub/ugc/campaigns/'
     | '/_authenticated/hub/ugc/creators/'
     | '/creators/influencer/app/deals/'
@@ -3461,6 +3500,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHubUgcPayoutsRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
+    '/_authenticated/hub/ugc/posts': {
+      id: '/_authenticated/hub/ugc/posts'
+      path: '/ugc/posts'
+      fullPath: '/hub/ugc/posts'
+      preLoaderRoute: typeof AuthenticatedHubUgcPostsRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
     '/_authenticated/hub/ugc/referrals': {
       id: '/_authenticated/hub/ugc/referrals'
       path: '/ugc/referrals'
@@ -3825,6 +3871,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHubLearnBriefsBriefIdRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
+    '/_authenticated/hub/ugc/briefs/': {
+      id: '/_authenticated/hub/ugc/briefs/'
+      path: '/ugc/briefs'
+      fullPath: '/hub/ugc/briefs/'
+      preLoaderRoute: typeof AuthenticatedHubUgcBriefsIndexRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/_authenticated/hub/ugc/briefs/$briefId': {
+      id: '/_authenticated/hub/ugc/briefs/$briefId'
+      path: '/ugc/briefs/$briefId'
+      fullPath: '/hub/ugc/briefs/$briefId'
+      preLoaderRoute: typeof AuthenticatedHubUgcBriefsBriefIdRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
     '/_authenticated/hub/ugc/campaigns/': {
       id: '/_authenticated/hub/ugc/campaigns/'
       path: '/ugc/campaigns'
@@ -3954,14 +4014,17 @@ interface AuthenticatedHubRouteRouteChildren {
   AuthenticatedHubUgcLibraryRoute: typeof AuthenticatedHubUgcLibraryRoute
   AuthenticatedHubUgcMessagesRoute: typeof AuthenticatedHubUgcMessagesRoute
   AuthenticatedHubUgcPayoutsRoute: typeof AuthenticatedHubUgcPayoutsRoute
+  AuthenticatedHubUgcPostsRoute: typeof AuthenticatedHubUgcPostsRoute
   AuthenticatedHubUgcReferralsRoute: typeof AuthenticatedHubUgcReferralsRoute
   AuthenticatedHubCampaignsIndexRoute: typeof AuthenticatedHubCampaignsIndexRoute
   AuthenticatedHubInfluencersIndexRoute: typeof AuthenticatedHubInfluencersIndexRoute
   AuthenticatedHubSlideshowsIndexRoute: typeof AuthenticatedHubSlideshowsIndexRoute
   AuthenticatedHubUgcIndexRoute: typeof AuthenticatedHubUgcIndexRoute
   AuthenticatedHubLearnBriefsBriefIdRoute: typeof AuthenticatedHubLearnBriefsBriefIdRoute
+  AuthenticatedHubUgcBriefsBriefIdRoute: typeof AuthenticatedHubUgcBriefsBriefIdRoute
   AuthenticatedHubUgcCampaignsCreateRoute: typeof AuthenticatedHubUgcCampaignsCreateRoute
   AuthenticatedHubUgcCreatorsCreatorIdRoute: typeof AuthenticatedHubUgcCreatorsCreatorIdRoute
+  AuthenticatedHubUgcBriefsIndexRoute: typeof AuthenticatedHubUgcBriefsIndexRoute
   AuthenticatedHubUgcCampaignsIndexRoute: typeof AuthenticatedHubUgcCampaignsIndexRoute
   AuthenticatedHubUgcCreatorsIndexRoute: typeof AuthenticatedHubUgcCreatorsIndexRoute
   AuthenticatedHubUgcLibraryBriefsBriefIdRoute: typeof AuthenticatedHubUgcLibraryBriefsBriefIdRoute
@@ -3991,6 +4054,7 @@ const AuthenticatedHubRouteRouteChildren: AuthenticatedHubRouteRouteChildren = {
   AuthenticatedHubUgcLibraryRoute: AuthenticatedHubUgcLibraryRoute,
   AuthenticatedHubUgcMessagesRoute: AuthenticatedHubUgcMessagesRoute,
   AuthenticatedHubUgcPayoutsRoute: AuthenticatedHubUgcPayoutsRoute,
+  AuthenticatedHubUgcPostsRoute: AuthenticatedHubUgcPostsRoute,
   AuthenticatedHubUgcReferralsRoute: AuthenticatedHubUgcReferralsRoute,
   AuthenticatedHubCampaignsIndexRoute: AuthenticatedHubCampaignsIndexRoute,
   AuthenticatedHubInfluencersIndexRoute: AuthenticatedHubInfluencersIndexRoute,
@@ -3998,10 +4062,12 @@ const AuthenticatedHubRouteRouteChildren: AuthenticatedHubRouteRouteChildren = {
   AuthenticatedHubUgcIndexRoute: AuthenticatedHubUgcIndexRoute,
   AuthenticatedHubLearnBriefsBriefIdRoute:
     AuthenticatedHubLearnBriefsBriefIdRoute,
+  AuthenticatedHubUgcBriefsBriefIdRoute: AuthenticatedHubUgcBriefsBriefIdRoute,
   AuthenticatedHubUgcCampaignsCreateRoute:
     AuthenticatedHubUgcCampaignsCreateRoute,
   AuthenticatedHubUgcCreatorsCreatorIdRoute:
     AuthenticatedHubUgcCreatorsCreatorIdRoute,
+  AuthenticatedHubUgcBriefsIndexRoute: AuthenticatedHubUgcBriefsIndexRoute,
   AuthenticatedHubUgcCampaignsIndexRoute:
     AuthenticatedHubUgcCampaignsIndexRoute,
   AuthenticatedHubUgcCreatorsIndexRoute: AuthenticatedHubUgcCreatorsIndexRoute,

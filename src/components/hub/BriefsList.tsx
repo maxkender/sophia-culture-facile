@@ -47,7 +47,7 @@ function QuickBrief({ app, onClose }: { app: string; onClose: () => void }) {
       <select aria-label="Format" value={fmt} onChange={(e) => setFmt(e.target.value)} className={cn(sel, "w-full")}><option value="">No format (free)</option>{formats.map((f) => <option key={f.id} value={f.id}>{f.title}</option>)}</select>
       <div className="flex gap-2"><Button disabled={busy || !style || idea.trim().length < 5} onClick={async () => {
         setBusy(true);
-        try { const r = await ai({ data: { mode: "quick", appId: app, idea, formatId: fmt || null } }); sessionStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify({ ...r.patch, app_id: app, parent_format_id: fmt || null, status: "draft", style, style_data: styleDefaults(style as BriefStyle, { body: (r.patch as { beats?: string[] }).beats?.[1] ?? "" }) })); void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: "new" } }); }
+        try { const r = await ai({ data: { mode: "quick", appId: app, idea, formatId: fmt || null } }); sessionStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify({ ...r.patch, app_id: app, parent_format_id: fmt || null, status: "draft", style, style_data: styleDefaults(style as BriefStyle, { body: (r.patch as { beats?: string[] }).beats?.[1] ?? "" }) })); void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: "new" } }); }
         catch (e) { toast.error((e as Error).message); } finally { setBusy(false); }
       }}><Sparkles className="size-4" />{busy ? "Writing…" : "Fill and open the Studio"}</Button><Button variant="ghost" onClick={onClose}>Cancel</Button></div>
     </div>
@@ -109,7 +109,7 @@ function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
       <textarea aria-label="Video links" rows={4} value={urls} onChange={(e) => setUrls(e.target.value)} placeholder="https://www.tiktok.com/@…/video/…" className="w-full rounded-xl border p-3 text-sm" />
       <input type="file" accept="video/*" aria-label="Video file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm" />
       <div className="flex gap-2"><Button disabled={busy || !style || (!urls.trim() && !file)} onClick={() => void go()}><Film className="size-4" />{busy ? step || `Analysing… ${done.length}` : "Analyse"}</Button><Button variant="ghost" onClick={onClose}>Close</Button></div>
-      {done.length ? <ul className="space-y-1 text-sm">{done.map((d, i) => <li key={i} className="rounded-lg bg-portal-bg p-2"><span className="break-all font-semibold">{d.label}</span> — {d.error ? <span className="text-portal-red">{d.error}</span> : <>score {d.score}/10 · {d.briefIds.map((id, j) => <Link key={id} to="/hub/ugc/library/briefs/$briefId" params={{ briefId: id }} className="ml-1 font-bold text-portal-accent">brief {j + 1}</Link>)}</>}</li>)}</ul> : null}
+      {done.length ? <ul className="space-y-1 text-sm">{done.map((d, i) => <li key={i} className="rounded-lg bg-portal-bg p-2"><span className="break-all font-semibold">{d.label}</span> — {d.error ? <span className="text-portal-red">{d.error}</span> : <>score {d.score}/10 · {d.briefIds.map((id, j) => <Link key={id} to="/hub/ugc/briefs/$briefId" params={{ briefId: id }} className="ml-1 font-bold text-portal-accent">brief {j + 1}</Link>)}</>}</li>)}</ul> : null}
     </div>
   );
 }
@@ -159,7 +159,7 @@ export function BriefsList({ formats, initialTab }: { formats?: ReactNode; initi
     const { data: ba } = await supabase.from("brief_assets").select("asset_id, role, sort_order").eq("brief_id", id);
     if (ba?.length) await supabase.from("brief_assets").insert(ba.map((x) => ({ ...x, brief_id: n.id })));
     reload();
-    if (fromFormat) void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: n.id } }); else toast.success("Duplicated as a draft");
+    if (fromFormat) void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: n.id } }); else toast.success("Duplicated as a draft");
   }
   async function patchOne(id: string, patch: Record<string, unknown>, label: string) {
     if (patch["status"] === "published" && !window.confirm("Publish to creators? This makes the brief visible to creators.")) return;
@@ -180,7 +180,7 @@ export function BriefsList({ formats, initialTab }: { formats?: ReactNode; initi
         <div className="relative ml-auto">
           <Button aria-expanded={menu} onClick={() => setMenu(!menu)}>New brief ▾</Button>
           {menu ? <div className="absolute right-0 z-20 mt-1 w-56 rounded-xl border bg-card p-1 shadow-portal" role="menu">
-            <Link role="menuitem" to="/hub/ugc/library/briefs/$briefId" params={{ briefId: "new" }} className="block rounded-lg px-3 py-2 text-sm font-semibold hover:bg-portal-bg">Blank</Link>
+            <Link role="menuitem" to="/hub/ugc/briefs/$briefId" params={{ briefId: "new" }} className="block rounded-lg px-3 py-2 text-sm font-semibold hover:bg-portal-bg">Blank</Link>
             <Link role="menuitem" to="/hub/ugc/inspiration" className="block rounded-lg px-3 py-2 text-sm font-semibold hover:bg-portal-bg">From an inspiration</Link>
             <button role="menuitem" type="button" onClick={() => { setMenu(false); setPickFmt(true); }} className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-portal-bg">From a format</button>
           </div> : null}
@@ -204,14 +204,14 @@ export function BriefsList({ formats, initialTab }: { formats?: ReactNode; initi
           <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Brief</th><th className="p-3">Status</th><th className="p-3">Score</th>{pub ? <><th className="p-3">Posts</th><th className="p-3">Avg views 7d</th></> : null}<th className="p-3">Last edited</th><th className="p-3"><span className="sr-only">Actions</span></th></tr></thead>
           <tbody>{rows.map((r) => { const s = data?.stats[r.id]; const avg = s?.v7.length ? Math.round(s.v7.reduce((a, b) => a + b, 0) / s.v7.length) : null; const isPub = r.status === "published" || r.status === "scheduled"; return (
             <tr key={r.id} className="border-t border-brand-line">
-              <td className="max-w-[380px] p-3"><div className="flex items-start gap-2">{r.inspirations?.cover_path && covers[r.inspirations.cover_path] ? <img src={covers[r.inspirations.cover_path]} alt="" className="h-10 w-7 shrink-0 rounded object-cover" loading="lazy" /> : null}<div className="min-w-0"><Link to="/hub/ugc/library/briefs/$briefId" params={{ briefId: r.id }} className="font-bold text-brand-navy hover:underline">{r.title || "Untitled"}</Link>
+              <td className="max-w-[380px] p-3"><div className="flex items-start gap-2">{r.inspirations?.cover_path && covers[r.inspirations.cover_path] ? <img src={covers[r.inspirations.cover_path]} alt="" className="h-10 w-7 shrink-0 rounded object-cover" loading="lazy" /> : null}<div className="min-w-0"><Link to="/hub/ugc/briefs/$briefId" params={{ briefId: r.id }} className="font-bold text-brand-navy hover:underline">{r.title || "Untitled"}</Link>
                 <div className="mt-1 flex flex-wrap gap-1"><span className={chip}>{appName(r.app_id)}</span>{r.style ? <span className={chip}>{STYLE_NUM[r.style]}. {STYLE_LABEL[r.style]}</span> : null}{r.language === "en" ? <span className={chip}>EN</span> : null}</div></div></div></td>
               <td className="p-3">{STATUS_LABEL[r.status] ?? r.status}</td>
               <td className="p-3">{r.score != null ? <span className={cn("rounded-full px-2 py-0.5 text-xs font-bold", r.score >= 8 ? "bg-portal-green/15 text-portal-green" : "bg-portal-amber/20")}>{r.score}/10</span> : "—"}</td>
               {pub ? <><td className="p-3">{s?.posts ?? 0}</td><td className="p-3">{avg != null ? avg.toLocaleString() : "—"}</td></> : null}
               <td className="whitespace-nowrap p-3 text-xs text-brand-navySoft">{new Date(r.updated_at ?? r.created_at).toLocaleDateString("en-GB")}</td>
               <td className="p-3"><select aria-label={`Actions for ${r.title}`} className={cn(sel, "h-8 w-12 text-xs")} value="" onChange={(e) => { const v = e.target.value;
-                if (v === "open") void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: r.id } });
+                if (v === "open") void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: r.id } });
                 else if (v === "dup") void copyBrief(r.id, false);
                 else if (v === "publish") void patchOne(r.id, { status: "published" }, "Published");
                 else if (v === "unpublish") void patchOne(r.id, { status: "ready", drop_at: null }, "Unpublished");

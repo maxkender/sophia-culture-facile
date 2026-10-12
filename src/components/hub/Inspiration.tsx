@@ -227,7 +227,7 @@ function CreateBriefButton({ r, compact }: { r: Insp; compact?: boolean }) {
   const navigate = useNavigate(); const qc = useQueryClient(); const [busy, setBusy] = useState(false);
   const [app, setApp] = useState<string>(r.app_id ?? (r.app_fit === "unswipe" ? UNSWIPE_ID : SOPHIA_APP_ID));
   const why = briefBlocker(r);
-  const go = async () => { setBusy(true); try { const id = await createBriefFromInspiration(r, app); toast.success("Draft brief created"); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: id } }); } catch (e) { toast.error((e as Error).message); } setBusy(false); };
+  const go = async () => { setBusy(true); try { const id = await createBriefFromInspiration(r, app); toast.success("Draft brief created"); void qc.invalidateQueries({ queryKey: ["hub", "learn"] }); void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: id } }); } catch (e) { toast.error((e as Error).message); } setBusy(false); };
   if (compact) return <button type="button" disabled={Boolean(why) || busy} title={why ?? "Create brief from this inspiration"} onClick={() => void go()} className="w-full border-t border-brand-line px-3 py-1.5 text-left text-[11px] font-bold text-portal-accent disabled:text-brand-navySoft">{why ?? "Create brief from this inspiration"}</button>;
   return <span className="inline-flex flex-wrap items-center gap-1">
     {!r.app_id ? <select aria-label="App for the brief" className={f} value={app} onChange={(e) => setApp(e.target.value)}><option value={SOPHIA_APP_ID}>Sophia</option><option value={UNSWIPE_ID}>UnSwipe</option></select> : null}

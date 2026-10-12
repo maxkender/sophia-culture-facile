@@ -143,7 +143,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
     if (x.status !== loaded?.row?.status) void qc.invalidateQueries({ queryKey: ["hub", "studio", briefId] });
     void qc.invalidateQueries({ queryKey: ["hub", "learn"] });
     if (!quiet) toast.success(x.status === "published" ? "Published" : "Saved");
-    if (!b!.id) void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: id }, replace: true });
+    if (!b!.id) void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: id }, replace: true });
     return id;
   }
   saveRef.current = save;
@@ -166,7 +166,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
       const { data, error } = await supabase.from("briefs").insert({ app_id: en.app_id, title: en.title, brief_type: en.brief_type, effort: en.effort, format: en.effort, platform: en.platform, duration_target: en.duration_target, hook_text: en.hook_text, hook: en.hook_text, hooks: [en.hook_text ?? ""], oral_hook: en.oral_hook, hook_visual: en.hook_visual, beats: en.beats, body: briefBody(en), product_second: en.product_second, product_gesture: en.product_gesture, product_moment: en.product_moment, say_name: en.say_name, rules_do: en.rules_do, rules_dont: en.rules_dont, rules_text: en.rules_text, status: "draft", language: "en", translation_of: id, reference_video_ids: refIds } as never).select("id").single();
       if (error || !data) throw new Error("The English version could not be saved.");
       if (assets.length) await supabase.from("brief_assets").insert(assets.map((a, i) => ({ brief_id: data.id, asset_id: a.id, role: a.role, sort_order: i })));
-      toast.success("English version saved as a draft", { action: { label: "Open", onClick: () => void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: data.id } }) } });
+      toast.success("English version saved as a draft", { action: { label: "Open", onClick: () => void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: data.id } }) } });
     } catch (e) { toast.error((e as Error).message); } finally { setBusy(null); }
   }
   async function duplicate() {
@@ -175,7 +175,7 @@ export function BriefStudio({ briefId }: { briefId: string }) {
     if (!src) return;
     const { id: _i, created_at: _c, ...rest } = src as Record<string, unknown>;
     const { data } = await supabase.from("briefs").insert({ ...rest, title: `${src.title} (copie)`, status: "draft" } as never).select("id").single();
-    if (data) { if (assets.length) await supabase.from("brief_assets").insert(assets.map((a, i) => ({ brief_id: data.id, asset_id: a.id, role: a.role, sort_order: i }))); toast.success("Duplicated"); setB(null); void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: data.id } }); }
+    if (data) { if (assets.length) await supabase.from("brief_assets").insert(assets.map((a, i) => ({ brief_id: data.id, asset_id: a.id, role: a.role, sort_order: i }))); toast.success("Duplicated"); setB(null); void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: data.id } }); }
   }
   async function assignTo() {
     const id = await save({}, true); if (!id || !assign.creatorId) return;
