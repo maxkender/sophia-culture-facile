@@ -30,6 +30,10 @@ export function friendlyCreatorError(error: unknown, lang: CreatorValidationLang
   const raw = error instanceof Error ? error.message : "";
   const message = raw.toLowerCase();
 
+  if (message.includes("wait for it to be validated")) return lang === "fr" ? "Envoie ton brouillon et attends sa validation avant de poster." : "Send your draft and wait for it to be validated before posting.";
+  if (message.includes("choose the brief")) return lang === "fr" ? "Choisis d’abord le brief de cette vidéo." : "Choose the brief of this video first.";
+  if (message.includes("starting with https")) return lang === "fr" ? "Colle le lien complet, qui commence par https://." : "Paste the full link, starting with https://.";
+  if (message.includes("add a video or a link")) return lang === "fr" ? "Ajoute une vidéo ou un lien." : "Add a video or a link.";
   if (message.includes("email") || message.includes("invalid_string")) {
     return lang === "fr"
       ? "Saisissez une adresse e-mail complète, par exemple nom@exemple.com."
