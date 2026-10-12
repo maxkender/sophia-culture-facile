@@ -65,8 +65,6 @@ export async function runNotionSync(a: Admin) {
     const filter = full ? undefined : { timestamp: "last_edited_time", last_edited_time: { on_or_after: new Date(new Date(cfg.notion_last_sync).getTime() - 3600_000).toISOString() } };
     do { const r = await notion(`/databases/${dbId}/query`, { method: "POST", body: { page_size: 100, ...(cursor ? { start_cursor: cursor } : {}), ...(filter ? { filter } : {}) } }); pages.push(...r.results); cursor = r.has_more ? r.next_cursor : undefined; } while (cursor);
     const { data: known } = await a.from("notion_items").select("notion_page_id, hub_status, inspiration_id, profile_status").in("notion_page_id", pages.map((p) => p.id).concat(["-"]));
-    const { data: setRow } = await a.from("ugc_settings").select("notion_videos_per_profile").eq("id", 1).maybeSingle();
-    const perProfile = setRow?.notion_videos_per_profile ?? 10;
     const byId = new Map<string, any>((known ?? []).map((k: any) => [k.notion_page_id, k]));
     const batchId = crypto.randomUUID();
     for (const page of pages) {
@@ -76,9 +74,8 @@ export async function runNotionSync(a: Admin) {
       try {
         if (c.kind === "profile") {
           out.profiles++;
-          const started = ["queued", "running", "done"].includes(prev?.profile_status ?? "");
-          await a.from("notion_items").upsert({ ...base, norm_key: null, inspiration_id: null, ...(started ? {} : { hub_status: "Profil — en file", error: null, profile_status: "queued", profile_target: perProfile }) });
-          if (!started) await a.rpc("inspiration_queue_arm");
+          await a.from("notion_items").upsert({ ...base, norm_key: null, inspiration_id: null, ...(prev?.hub_status === "Compte" ? {} : { hub_status: "Compte", pushed_at: null }) });
+          await upsertAccount(a, page.id, pr.lien, pr);
           continue;
         }
         if (c.kind === "other") {
@@ -164,73 +161,52 @@ function profileOf(url: string): { platform: "tiktok" | "instagram"; handle: str
   return null;
 }
 
-/** One profile per call: Apify recent videos → top N by views → normal Inspiration queue (dedup by norm_key). */
-export async function runProfileStep(a: Admin) {
-  await a.from("notion_items").update({ profile_status: "queued" }).eq("kind", "profile").eq("profile_status", "running").lt("profile_started_at", new Date(Date.now() - 15 * 60_000).toISOString());
-  const { count: running } = await a.from("notion_items").select("notion_page_id", { count: "exact", head: true }).eq("kind", "profile").eq("profile_status", "running");
-  if (running) return { skipped: "profile running" };
-  const { data: next } = await a.from("notion_items").select("notion_page_id, url, notion_props, profile_target, inspiration_ids").eq("kind", "profile").eq("profile_status", "queued").order("created_at").limit(1).maybeSingle();
-  if (!next) return { skipped: "no profile" };
-  const { data: claimed } = await a.from("notion_items").update({ profile_status: "running", profile_started_at: new Date().toISOString(), hub_status: "Profil — import en cours" }).eq("notion_page_id", next.notion_page_id).eq("profile_status", "queued").select("notion_page_id");
-  if (!claimed?.length) return { skipped: "lost claim" };
-  const target = Math.max(1, next.profile_target ?? 10);
-  const pr = profileOf(next.url ?? "");
+/** Accounts: profile metadata only (picture, name, followers) — never the videos. */
+export async function refreshAccount(a: Admin, id: string) {
+  const { data: acc } = await a.from("inspiration_accounts").select("*").eq("id", id).maybeSingle();
+  if (!acc) throw new Error("Account not found");
+  let display: string | null = null; let followers: number | null = null; let pic: string | null = null;
   try {
-    if (!pr) throw new Error("Lien de profil illisible");
-    const { apifyRun, INSPIRATION_ACTORS, enqueue } = await import("./inspirations.server");
-    const limit = Math.max(30, target * 3);
-    let vids: { url: string; views: number }[] = [];
-    if (pr.platform === "tiktok") {
-      const r = await apifyRun(INSPIRATION_ACTORS.tiktok, { profiles: [pr.handle], resultsPerPage: limit, shouldDownloadVideos: false, shouldDownloadCovers: false });
-      vids = r.items.filter((i) => i?.webVideoUrl && !i.error).map((i) => ({ url: i.webVideoUrl, views: Number(i.playCount ?? 0) }));
+    if (acc.platform === "tiktok") {
+      const r = await fetch(`https://www.tiktok.com/@${acc.handle}`, { headers: { "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36" } });
+      const html = await r.text();
+      const dec = (v?: string) => (v ? JSON.parse(`"${v}"`) as string : null);
+      display = dec(html.match(/"nickname":"((?:[^"\\]|\\.)*)"/)?.[1]);
+      pic = dec(html.match(/"avatarLarger":"((?:[^"\\]|\\.)*)"/)?.[1]);
+      const f = html.match(/"followerCount":(\d+)/)?.[1]; followers = f ? Number(f) : null;
     } else {
-      const purl = `https://www.instagram.com/${pr.handle}/`;
-      for (const resultsType of ["reels", "posts"]) {
-        const r = await apifyRun(INSPIRATION_ACTORS.instagram, { directUrls: [purl], resultsType, resultsLimit: limit, addParentData: false });
-        vids = r.items.filter((i) => i && !i.error && (i.shortCode || i.url) && (i.type === "Video" || i.videoUrl || i.productType === "clips"))
-          .map((i) => ({ url: i.url ?? `https://www.instagram.com/reel/${i.shortCode}/`, views: Number(i.videoPlayCount ?? i.videoViewCount ?? 0) }));
-        if (vids.length) break;
-      }
+      const { apifyRun } = await import("./inspirations.server");
+      const r = await apifyRun("apify~instagram-profile-scraper", { usernames: [acc.handle], resultsLimit: 1 });
+      const i = r.items[0];
+      if (i && !i.error) { display = i.fullName || null; pic = i.profilePicUrlHD || i.profilePicUrl || null; followers = i.followersCount ?? null; }
     }
-    if (!vids.length) throw new Error("Aucune vidéo trouvée (profil privé ou vide)");
-    const top = vids.sort((x, y) => y.views - x.views).slice(0, target);
-    const props = (next.notion_props ?? {}) as { app?: string[] };
-    const appId = props.app?.includes("Sophia") ? SOPHIA : props.app?.includes("UnSwipe") ? UNSWIPE : null;
-    const res = await enqueue(a, top.map((v) => v.url), appId, null, crypto.randomUUID());
-    for (const id of res.ids) {
-      const { data: ins } = await a.from("inspirations").select("tags, author_handle, notion_page_id").eq("id", id).maybeSingle();
-      await a.from("inspirations").update({ tags: [...new Set([...(ins?.tags ?? []), "from profile"])], author_handle: ins?.author_handle ?? pr.handle, ...(ins?.notion_page_id ? {} : { notion_page_id: next.notion_page_id }) }).eq("id", id);
+    let avatar_path = acc.avatar_path as string | null;
+    if (pic) {
+      const img = await fetch(pic, { headers: { "user-agent": "Mozilla/5.0" } });
+      if (img.ok) { avatar_path = `accounts/${acc.platform}/${acc.handle}.jpg`; await a.storage.from("inspirations").upload(avatar_path, await img.arrayBuffer(), { contentType: "image/jpeg", upsert: true }); }
     }
-    const ids = [...new Set([...(next.inspiration_ids ?? []), ...res.ids])];
-    await a.from("notion_items").update({ profile_status: "done", inspiration_ids: ids, imported_count: ids.length, hub_status: "Importé", error: null, pushed_at: null }).eq("notion_page_id", next.notion_page_id);
-    try { await setStatus(next.notion_page_id, "Importé"); } catch { /* push retries later */ }
-    return { profile: pr.handle, added: res.added, total: ids.length };
+    await a.from("inspiration_accounts").update({ display_name: display ?? acc.display_name, followers: followers ?? acc.followers, avatar_path, refreshed_at: new Date().toISOString(), error: display || pic ? null : "Profile details unavailable" }).eq("id", id);
   } catch (e) {
-    const msg = (e as Error).message.slice(0, 300);
-    await a.from("notion_items").update({ profile_status: "error", hub_status: "Erreur", error: msg }).eq("notion_page_id", next.notion_page_id);
-    try { await setStatus(next.notion_page_id, "Erreur"); } catch { /* ignore */ }
-    return { profile: pr?.handle, error: msg };
+    await a.from("inspiration_accounts").update({ refreshed_at: new Date().toISOString(), error: (e as Error).message.slice(0, 200) }).eq("id", id);
   }
 }
 
-/** Profile rows: write back once every imported video is finished. */
+export async function upsertAccount(a: Admin, pageId: string, url: string, pr: { notes: string; app: string[] }) {
+  const p = profileOf(url); if (!p) return;
+  const { data } = await a.from("inspiration_accounts").upsert({ notion_page_id: pageId, platform: p.platform, handle: p.handle.toLowerCase(), url: url.trim(), notes: pr.notes || null, app_ids: pr.app }, { onConflict: "platform,handle" }).select("id, refreshed_at").single();
+  if (data && !data.refreshed_at) await refreshAccount(a, data.id);
+}
+
+/** Profile rows: write back only Statut Hub = Compte and the Accounts tab link. */
 async function pushProfiles(a: Admin) {
-  const { data: items } = await a.from("notion_items").select("notion_page_id, url, pushed_at, inspiration_ids").eq("kind", "profile").eq("profile_status", "done");
+  const { data: items } = await a.from("notion_items").select("notion_page_id, hub_status").eq("kind", "profile").is("pushed_at", null);
   let pushed = 0; let errors = 0;
   for (const it of items ?? []) {
-    const ids: string[] = it.inspiration_ids ?? []; if (!ids.length) continue;
-    const { data: rows } = await a.from("inspirations").select("status, score, hook_text, updated_at").in("id", ids);
-    if (!rows?.length || rows.some((r: any) => !["analyzed", "error"].includes(r.status))) continue;
-    const latest = rows.reduce((m: string, r: any) => (r.updated_at > m ? r.updated_at : m), "");
-    if (it.pushed_at && new Date(it.pushed_at) >= new Date(latest)) continue;
-    const ok = rows.filter((r: any) => r.status === "analyzed").sort((x: any, y: any) => (y.score ?? 0) - (x.score ?? 0));
-    const best = ok[0]; const handle = profileOf(it.url ?? "")?.handle ?? "";
+    const link = { "Analyse Hub": { url: `${HUB_URL}?tab=accounts` } };
     try {
-      const props: Record<string, unknown> = best
-        ? { "Statut Hub": { select: { name: "Analysé" } }, ...(best.score != null ? { "Score /10": { number: best.score } } : {}), "Hook": { rich_text: best.hook_text ? [{ text: { content: String(best.hook_text).slice(0, 2000) } }] : [] }, "Analyse Hub": { url: `${HUB_URL}?author=${encodeURIComponent(handle)}` } }
-        : { "Statut Hub": { select: { name: "Erreur" } } };
-      await notion(`/pages/${it.notion_page_id}`, { method: "PATCH", body: { properties: props } });
-      await a.from("notion_items").update({ pushed_at: new Date().toISOString(), hub_status: best ? "Analysé" : "Erreur", error: best ? null : "Aucune vidéo analysable" }).eq("notion_page_id", it.notion_page_id);
+      try { await notion(`/pages/${it.notion_page_id}`, { method: "PATCH", body: { properties: { "Statut Hub": { select: { name: "Compte" } }, ...link } } }); }
+      catch { await notion(`/pages/${it.notion_page_id}`, { method: "PATCH", body: { properties: { "Statut Hub": { select: { name: "Profil (non importé)" } }, ...link } } }); }
+      await a.from("notion_items").update({ pushed_at: new Date().toISOString(), hub_status: "Compte", error: null }).eq("notion_page_id", it.notion_page_id);
       pushed++;
     } catch (e) { errors++; await a.from("notion_items").update({ error: (e as Error).message.slice(0, 300) }).eq("notion_page_id", it.notion_page_id); }
   }
