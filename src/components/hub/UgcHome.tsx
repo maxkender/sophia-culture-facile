@@ -13,22 +13,24 @@ export function UgcHome() {
       let used = supabase.from("briefs").select("inspiration_id").not("inspiration_id", "is", null);
       let pub = supabase.from("briefs").select("id", { count: "exact", head: true }).eq("status", "published").neq("brief_type", "format");
       let posts = supabase.from("creator_posts").select("id, creators!inner(is_test)", { count: "exact", head: true }).eq("status", "pending").eq("creators.is_test", false);
-      if (appId) { used = used.eq("app_id", appId); pub = pub.eq("app_id", appId); posts = posts.eq("app_id", appId); }
-      const [i, u, p, q] = await Promise.all([ins, used, pub, posts]);
+      let drafts = supabase.from("creator_drafts").select("id, creators!inner(is_test)", { count: "exact", head: true }).eq("status", "submitted").eq("creators.is_test", false);
+      if (appId) { used = used.eq("app_id", appId); pub = pub.eq("app_id", appId); posts = posts.eq("app_id", appId); drafts = drafts.eq("app_id", appId); }
+      const [i, u, p, q, dr] = await Promise.all([ins, used, pub, posts, drafts]);
       const done = new Set((u.data ?? []).map((r) => r.inspiration_id as string));
       const toReview = (i.data ?? []).filter((r) => (!appId || !r.app_id || r.app_id === appId) && !done.has(r.id)).length;
-      return { toReview, published: p.count ?? 0, toValidate: q.count ?? 0 };
+      return { toReview, published: p.count ?? 0, toValidate: q.count ?? 0, drafts: dr.count ?? 0 };
     },
   });
   const n = data;
   const next = !n ? null
+    : n.drafts ? { text: `Review ${n.drafts} draft${n.drafts > 1 ? "s" : ""} waiting for you.`, to: "/hub/ugc/posts" as const }
     : n.toValidate ? { text: `Validate ${n.toValidate} post${n.toValidate > 1 ? "s" : ""} waiting for you.`, to: "/hub/ugc/posts" as const }
     : n.toReview ? { text: `Open an inspiration and press “Make a brief”.`, to: "/hub/ugc/inspiration" as const }
     : n.published === 0 ? { text: "Write your first brief.", to: "/hub/ugc/briefs" as const }
     : { text: "Add new inspiration links.", to: "/hub/ugc/inspiration" as const };
   const big: [string, number | undefined, "/hub/ugc/inspiration" | "/hub/ugc/briefs" | "/hub/ugc/posts"][] = [
     ["Inspirations to review", n?.toReview, "/hub/ugc/inspiration"],
-    ["Briefs published", n?.published, "/hub/ugc/briefs"],
+    ["Drafts to review", n?.drafts, "/hub/ugc/posts"],
     ["Posts to validate", n?.toValidate, "/hub/ugc/posts"],
   ];
   return (
@@ -41,6 +43,7 @@ export function UgcHome() {
           </Link>
         ))}
       </div>
+      <p className="text-sm text-brand-navySoft"><Link to="/hub/ugc/briefs" className="hover:underline">{n?.published ?? "…"} briefs published</Link></p>
       {next ? <p className="rounded-2xl bg-card p-5 text-base text-brand-navy shadow-portal" data-testid="ugc-next-step"><b>Next step:</b> {next.text} <Link to={next.to} className="font-bold text-portal-accent underline">Go →</Link></p> : null}
     </div>
   );
