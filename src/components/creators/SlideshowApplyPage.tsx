@@ -12,7 +12,7 @@ import { CountrySelect } from "./CountrySelect";
 import { ApplyShell, Confirmation, FormSection, Honeypot, YesNo } from "./ApplyShell";
 import { useI18n, useLocalePath } from "@/i18n";
 import { CREATOR_FORMS } from "@/i18n/creator-forms";
-import { isHttpUrl, isValidEmail, isValidInternationalPhone } from "@/lib/creator-validation";
+import { isHttpUrl, isValidEmail } from "@/lib/creator-validation";
 import { APPLICANT_LANGS, langOfCountry, type ApplicantLang } from "@/config/countries";
 
 const LANG_NAMES: Record<ApplicantLang, string> = { fr: "Français", en: "English", es: "Español", it: "Italiano", pt: "Português", de: "Deutsch" };

@@ -111,7 +111,7 @@ const slideSchema = z.object({
   website: z.string().max(200).optional(),
   full_name: z.string().trim().min(2).max(120),
   email: z.string().trim().email("Enter a complete email address, for example name@example.com.").max(200),
-  phone: z.string().trim().max(40).refine((v) => v === "" || isValidInternationalPhone(v), "Enter a valid phone number with the country code.").optional(),
+  phone: z.string().trim().max(40).optional(), // optional, any format accepted
   country: z.string().trim().min(2).max(80),
   is_adult: z.literal(true),
   has_upwork: z.boolean(),
@@ -121,10 +121,10 @@ const slideSchema = z.object({
   app: z.string().regex(/^[a-z0-9-]{2,40}$/).optional(),
   deux_telephones: z.boolean(),
   langue: z.enum(["fr", "en", "es", "it", "pt", "de"]),
-  q_country_now: z.string().trim().min(2).max(120),
+  q_country_now: z.string().trim().max(120).optional(), // optional screening question
   q_hours_per_day: z.string().trim().max(120).optional(), // retired question; old answers stay stored
-  q_tiktok_daily: z.string().trim().min(1).max(120),
-  q_previous_content: z.string().trim().min(2).max(2000),
+  q_tiktok_daily: z.string().trim().max(120).optional(), // optional screening question
+  q_previous_content: z.string().trim().max(2000).optional(), // optional screening question
 });
 
 export const submitSlideshowApplication = createServerFn({ method: "POST" })
@@ -148,10 +148,10 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
       submit_ip_hash: hash,
       deux_telephones: data.deux_telephones,
       langue: data.langue,
-      q_country_now: data.q_country_now,
+      q_country_now: data.q_country_now || null,
       q_hours_per_day: data.q_hours_per_day || null,
-      q_tiktok_daily: data.q_tiktok_daily,
-      q_previous_content: data.q_previous_content,
+      q_tiktok_daily: data.q_tiktok_daily || null,
+      q_previous_content: data.q_previous_content || null,
     }).select("id").single();
     if (error) {
       console.error("slideshow application insert failed", error.message);
