@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { CampaignWizard } from "@/components/hub/CampaignWizard";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/** Hidden from the simplified UGC space (code kept dormant); old links land on UGC Home. */
 export const Route = createFileRoute("/_authenticated/hub/ugc/campaigns/create")({
-  head: () => ({ meta: [{ title: "Create campaign | Creator Hub" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: CampaignWizard,
+  beforeLoad: () => {
+    throw redirect({ to: "/hub/ugc", replace: true });
+  },
 });

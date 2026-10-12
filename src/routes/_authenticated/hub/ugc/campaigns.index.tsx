@@ -1,16 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Campaigns, type CampaignTab } from "@/components/hub/Campaigns";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-const TABS: CampaignTab[] = ["campaigns", "applicants", "requests", "jobs", "reviews", "challenges"];
-
+/** Hidden from the simplified UGC space (code kept dormant); old links land on UGC Home. */
 export const Route = createFileRoute("/_authenticated/hub/ugc/campaigns/")({
-  validateSearch: (s: Record<string, unknown>): { tab: CampaignTab; newJob?: number | undefined } => ({
-    tab: TABS.includes(s["tab"] as CampaignTab) ? (s["tab"] as CampaignTab) : "campaigns",
-    newJob: s["newJob"] ? 1 : undefined,
-  }),
-  head: () => ({ meta: [{ title: "Campaigns | Creator Hub" }, { name: "robots", content: "noindex, nofollow" }] }),
-  component: function CampaignsRoute() {
-    const { tab, newJob } = Route.useSearch();
-    return <Campaigns tab={tab} newJob={Boolean(newJob)} />;
+  beforeLoad: () => {
+    throw redirect({ to: "/hub/ugc", replace: true });
   },
 });

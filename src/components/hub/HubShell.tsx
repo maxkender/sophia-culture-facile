@@ -108,7 +108,7 @@ function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
 
 const BANNER_KEY = "sophia.hub.banner.dismissed";
 
-function SetupBanner() {
+export function SetupBanner() {
   const steps = useSetupChecklist();
   const [hidden, setHidden] = useState(true);
   useEffect(() => setHidden(window.localStorage.getItem(BANNER_KEY) === "1"), []);
