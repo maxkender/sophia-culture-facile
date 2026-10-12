@@ -2842,6 +2842,7 @@ export type Database = {
           instagram_handle: string | null
           invite_sent_at: string | null
           invite_token: string | null
+          is_test: boolean
           language: string | null
           last_post_at: string | null
           last_seen_at: string | null
@@ -2912,6 +2913,7 @@ export type Database = {
           instagram_handle?: string | null
           invite_sent_at?: string | null
           invite_token?: string | null
+          is_test?: boolean
           language?: string | null
           last_post_at?: string | null
           last_seen_at?: string | null
@@ -2982,6 +2984,7 @@ export type Database = {
           instagram_handle?: string | null
           invite_sent_at?: string | null
           invite_token?: string | null
+          is_test?: boolean
           language?: string | null
           last_post_at?: string | null
           last_seen_at?: string | null
