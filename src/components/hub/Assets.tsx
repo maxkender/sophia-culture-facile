@@ -69,7 +69,7 @@ export function AssetUploader({ appId, folder, onDone, compact = false, replaceI
   return (
     <div className="space-y-2">
       <label onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); void files(e.dataTransfer.files); }} className={cn("flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-brand-line text-center text-sm text-brand-navySoft hover:bg-portal-bg", compact ? "p-3" : "p-6")}>
-        <Upload className="size-5" /><span><b className="text-brand-navy">{replaceId ? "Upload the recording" : "Drop files or click"}</b> · videos up to 200 MB</span>
+        <Upload className="size-5" /><span><b className="text-brand-navy">{replaceId ? "Choose the new file" : "Drop files or click"}</b> · videos up to 200 MB</span>
         <input type="file" multiple={!replaceId} className="sr-only" aria-label={replaceId ? "Replace file" : "Upload files"} data-replace={replaceId ?? undefined} onChange={(e) => e.target.files && void files(e.target.files)} />
       </label>
       {Object.entries(progress).map(([n, p]) => <div key={n} className="text-xs"><span className="font-semibold">{n}</span><div className="mt-1 h-1.5 rounded-full bg-portal-bg"><div className="h-1.5 rounded-full bg-portal-accent" style={{ width: `${p}%` }} /></div></div>)}
