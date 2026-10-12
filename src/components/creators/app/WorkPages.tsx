@@ -22,6 +22,7 @@ import { GuidelinesBlock, GuidelinesChecklist, useGuidelines } from "../Guidelin
 import { parisWeekStart } from "@/lib/ugc-pay";
 import { CATEGORY_LEGEND, briefStatus, fileToBase64, useCreator, type CreatorData } from "./useCreator";
 import { creatorLocale, t as ct, L } from "@/i18n/creator-app";
+import { DraftBlock, useDraftRequired, useValidatedBriefs } from "./DraftBlock";
 
 type Post = CreatorData["posts"][number];
 type Ref = CreatorData["refs"][number];
@@ -51,6 +52,9 @@ export function LogPostForm({ briefId: initialBrief = "", onDone }: { briefId?: 
   const { data: guidelines = [] } = useGuidelines(appId);
   const urls = text.split(/[\s,]+/).map((u) => u.trim()).filter(Boolean);
   const allTicked = guidelines.every((g) => checked.includes(g.id));
+  const { data: draftRequired = true } = useDraftRequired();
+  const validated = useValidatedBriefs();
+  const locked = draftRequired && (!briefId || !validated.has(briefId));
   return (
     <div className="space-y-4">
       <div><Label htmlFor="links" className="text-base font-extrabold">{ct("Ajouter un lien")}</Label>
@@ -62,7 +66,8 @@ export function LogPostForm({ briefId: initialBrief = "", onDone }: { briefId?: 
         </select></div>
       {briefId ? <PostDescriptionBlock compact appId={appId} desc={(briefs.find((b) => b.id === briefId) as { style_data?: { post_desc?: PostDesc } } | undefined)?.style_data?.post_desc} briefLang={(briefs.find((b) => b.id === briefId) as { language?: string } | undefined)?.language} /> : null}
       <GuidelinesChecklist appId={appId} value={checked} onChange={setChecked} />
-      <Button size="lg" disabled={busy || !urls.length || !allTicked} title={!allTicked ? ct("Coche chaque consigne avant d’envoyer") : undefined} onClick={async () => {
+      {locked ? <p className="rounded-xl bg-portal-amber/15 p-3 text-sm font-semibold text-brand-navy" data-testid="link-locked">{!briefId ? L("Choose the brief of this video first.", "Choisis d’abord le brief de cette vidéo.") : L("Send your draft on the brief page and wait for it to be validated.", "Envoie ton brouillon sur la page du brief et attends sa validation.")}</p> : null}
+      <Button size="lg" disabled={busy || !urls.length || !allTicked || locked} title={!allTicked ? ct("Coche chaque consigne avant d’envoyer") : undefined} onClick={async () => {
         const bad = urls.find((u) => !isHttpUrl(u) || !u.startsWith("https://"));
         if (bad) return void toast.error(ct("Colle le lien complet, qui commence par https://."));
         setBusy(true);
@@ -187,6 +192,8 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
   });
   const [mode, setMode] = useState<"none" | "post" | "skip">("none");
   const [reason, setReason] = useState("");
+  const { data: draftRequired = true } = useDraftRequired();
+  const validated = useValidatedBriefs();
   useEffect(() => {
     if (!brief || d.reads.some((r) => r.brief_id === brief.id)) return;
     supabase.from("brief_reads").insert({ brief_id: brief.id, creator_id: d.me.id }).then(() => d.reload());
@@ -205,8 +212,9 @@ export function BriefDetailPage({ briefId }: { briefId: string }) {
       <div className="mb-4"><AppBadge appId={brief.app_id} className="text-sm" /></div>
       <PortalCard><BriefView b={toStudio(brief as Record<string, unknown>)} assets={files} refs={refs} pay={pay} /></PortalCard>
       <div className="mt-4"><GuidelinesBlock appId={brief.app_id} /></div>
+      <DraftBlock briefId={brief.id} />
       <div className="mt-8 flex flex-wrap gap-2">
-        <Button onClick={() => setMode(mode === "post" ? "none" : "post")}>J’ai posté : coller mon lien</Button>
+        <Button disabled={draftRequired && !validated.has(brief.id)} data-testid="paste-link" onClick={() => setMode(mode === "post" ? "none" : "post")}>{L("I posted: paste my link", "J’ai posté : coller mon lien")}</Button>
         {status !== "posted" && status !== "skipped" && <Button variant="outline" onClick={() => setMode(mode === "skip" ? "none" : "skip")}>{ct("Skip")}</Button>}
       </div>
       {mode === "post" && <PortalCard className="mt-4"><LogPostForm briefId={brief.id} onDone={() => setMode("none")} /></PortalCard>}
