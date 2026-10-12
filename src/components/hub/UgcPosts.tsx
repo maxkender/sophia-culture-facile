@@ -1,3 +1,4 @@
+import { TEST_CHIP, useShowTest } from "./show-test";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -17,15 +18,17 @@ const d = (iso: string | null | undefined) => (iso ? new Date(iso).toLocaleDateS
 type Row = {
   id: string; creator_id: string; url: string; platform: string; status: string; feedback: string | null; app_id: string; brief_id: string | null; submitted_at: string | null; created_at: string;
   guidelines_checked: string[]; validated_at: string | null; pay_status: string | null; views: number | null; views_frozen: number | null; pay_amount: number | null; pay_formula: string | null; pay_flag: string | null; cover_url: string | null;
-  creators: { full_name: string } | null; briefs: { title: string } | null;
+  creators: { full_name: string; is_test?: boolean } | null; briefs: { title: string } | null;
 };
 
 function usePosts(appId: string | null) {
+  const [showTest] = useShowTest();
   return useQuery({
-    queryKey: ["hub", "ugc-posts", appId],
+    queryKey: [...["hub", "ugc-posts", appId], showTest],
     queryFn: async () => {
-      let q = supabase.from("creator_posts").select("id, creator_id, url, platform, status, feedback, app_id, brief_id, submitted_at, created_at, guidelines_checked, validated_at, pay_status, views, views_frozen, pay_amount, pay_formula, pay_flag, cover_url, creators!inner(full_name, is_test), briefs(title)").eq("creators.is_test", false).order("created_at", { ascending: false }).limit(500);
+      let q = supabase.from("creator_posts").select("id, creator_id, url, platform, status, feedback, app_id, brief_id, submitted_at, created_at, guidelines_checked, validated_at, pay_status, views, views_frozen, pay_amount, pay_formula, pay_flag, cover_url, creators!inner(full_name, is_test), briefs(title)").order("created_at", { ascending: false }).limit(500);
       if (appId) q = q.eq("app_id", appId);
+      if (!showTest) q = q.eq("creators.is_test", false);
       return ((await q).data ?? []) as unknown as Row[];
     },
   });
@@ -71,7 +74,7 @@ export function UgcPosts() {
               <tr key={p.id} className="border-b align-top last:border-0" data-testid="post-admin-row">
                 {tab === "queue" ? <td className="p-3"><input type="checkbox" aria-label={`Select ${p.url}`} checked={sel.has(p.id)} onChange={(e) => { const n = new Set(sel); if (e.target.checked) n.add(p.id); else n.delete(p.id); setSel(n); }} /></td> : null}
                 <td className="p-3"><button type="button" onClick={() => setOpen(p)} className="flex items-center gap-2 text-left"><span className="block h-16 w-10 overflow-hidden rounded-md bg-muted">{p.cover_url ? <img src={p.cover_url} alt="" className="size-full object-cover" /> : <PostThumb url={p.url} className="size-full" />}</span><span><b className="capitalize">{p.platform}</b><span className="block max-w-44 truncate text-xs text-portal-accent">{p.url.replace(/^https:\/\/(www\.)?/, "")}</span></span></button></td>
-                <td className="py-3 pr-2"><b>{p.creators?.full_name ?? "deleted"}</b><div><AppBadge appId={p.app_id} /></div></td>
+                <td className="py-3 pr-2"><b>{p.creators?.full_name ?? "deleted"}</b>{p.creators?.is_test ? <span className={TEST_CHIP}>test</span> : null}<div><AppBadge appId={p.app_id} /></div></td>
                 <td className="py-3 pr-2">{p.briefs?.title ?? "—"}</td>
                 <td className="py-3 pr-2">{d(p.submitted_at ?? p.created_at)}</td>
                 {tab === "tracking" ? <>

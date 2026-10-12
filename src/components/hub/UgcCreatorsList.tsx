@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { AppBadge, useAdminApp } from "@/lib/apps";
 import { CreatorApplications } from "@/components/portal/admin/CreatorApplications";
 import { flag } from "./hub-data";
+import { TEST_CHIP, useShowTest } from "./show-test";
 import { HandleLinksInline, PersonAvatar, useCreatorPhotos } from "./PersonAvatar";
 
 function mondayParis() {
@@ -20,7 +21,7 @@ function useActiveCreators(appId: string | null) {
     queryKey: ["hub", "ugc-creators-simple", appId],
     queryFn: async () => {
       const [c, posts] = await Promise.all([
-        supabase.from("creators").select("id, full_name, country, status, ugc_status, email_pending, tiktok_handle, instagram_handle, creator_apps(app_id)").eq("track", "ugc").eq("is_test", false).neq("status", "pending").order("full_name").limit(1000),
+        supabase.from("creators").select("id, full_name, country, status, ugc_status, email_pending, is_test, tiktok_handle, instagram_handle, creator_apps(app_id)").eq("track", "ugc").neq("status", "pending").order("full_name").limit(1000),
         supabase.from("creator_posts").select("creator_id, posted_on, created_at, app_id").order("created_at", { ascending: false }).limit(5000),
       ]);
       const monday = mondayParis();
@@ -45,21 +46,22 @@ const isInactive = (c: { ugc_status?: unknown; status?: unknown }) => INACTIVE.i
 function ActiveCreators({ q }: { q: string }) {
   const { appId } = useAdminApp(); const navigate = useNavigate();
   const { data = [], isLoading } = useActiveCreators(appId);
-  const [showInactive, setShowInactive] = useState(false);
-  const rows = useMemo(() => data.filter((c) => !q || `${c.full_name} ${c.tiktok_handle ?? ""} ${c.instagram_handle ?? ""}`.toLowerCase().includes(q.toLowerCase())), [data, q]);
+  const [showInactive, setShowInactive] = useState(false); const [showTest, setShowTest] = useShowTest();
+  const rows = useMemo(() => data.filter((c) => (showTest || !c.is_test) && (!q || `${c.full_name} ${c.tiktok_handle ?? ""} ${c.instagram_handle ?? ""}`.toLowerCase().includes(q.toLowerCase()))), [data, q, showTest]);
   const active = rows.filter((c) => !isInactive(c));
   const inactive = rows.filter(isInactive);
   const shown = showInactive ? rows : active;
   const photos = useCreatorPhotos(shown.map((r) => r.id));
   if (isLoading) return <p className="p-5 text-sm text-brand-navySoft">Loading…</p>;
-  if (!shown.length) return <p className="p-5 text-sm text-brand-navySoft">No creators yet.</p>;
+  const testToggle = <label className="flex items-center justify-center gap-2 border-t border-brand-line p-3 text-xs text-brand-navySoft"><input type="checkbox" checked={showTest} onChange={(e) => setShowTest(e.target.checked)} />Show test accounts</label>;
+  if (!shown.length) return <><p className="p-5 text-sm text-brand-navySoft">No creators yet.</p>{testToggle}</>;
   return (
     <>
       <table className="w-full min-w-[720px] text-sm" data-testid="ugc-creators">
         <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Creator</th><th className="p-3">App</th><th className="p-3">Accounts</th><th className="p-3">Posts this week</th><th className="p-3">Last post</th><th className="p-3">Status</th></tr></thead>
         <tbody>{shown.map((c) => { const paused = isInactive(c); return (
           <tr key={c.id} onClick={() => void navigate({ to: "/hub/ugc/creators/$creatorId", params: { creatorId: c.id } })} className="cursor-pointer border-t border-brand-line hover:bg-portal-bg">
-            <td className="p-3"><span className="flex items-center gap-2"><PersonAvatar name={c.full_name} url={photos[c.id]} /><Link to="/hub/ugc/creators/$creatorId" params={{ creatorId: c.id }} className="font-bold text-brand-navy">{c.full_name}</Link><span title={c.country ?? ""}>{flag(c.country)}</span>{c.email_pending ? <span className="text-xs text-portal-amber">email pending</span> : null}</span></td>
+            <td className="p-3"><span className="flex items-center gap-2"><PersonAvatar name={c.full_name} url={photos[c.id]} /><Link to="/hub/ugc/creators/$creatorId" params={{ creatorId: c.id }} className="font-bold text-brand-navy">{c.full_name}</Link><span title={c.country ?? ""}>{flag(c.country)}</span>{c.email_pending ? <span className="text-xs text-portal-amber">email pending</span> : null}{c.is_test ? <span className={TEST_CHIP}>test</span> : null}</span></td>
             <td className="p-3"><span className="flex flex-wrap gap-1">{c.apps.map((a) => <AppBadge key={a} appId={a} />)}</span></td>
             <td className="p-3"><HandleLinksInline tiktok={c.tiktok_handle} instagram={c.instagram_handle} /></td>
             <td className="p-3">{c.s?.week ?? 0}</td>
@@ -72,6 +74,7 @@ function ActiveCreators({ q }: { q: string }) {
           {showInactive ? "Hide inactive" : `Inactive (${inactive.length})`}
         </button>
       ) : null}
+      {testToggle}
     </>
   );
 }
@@ -82,7 +85,7 @@ export function UgcCreatorsPage({ view }: { view: "applications" | "directory" }
   const [q, setQ] = useState(""); const [add, setAdd] = useState(false);
   const { data: active = [] } = useActiveCreators(appId);
   const { data: pending = 0 } = useQuery({ queryKey: ["portal", "admin", "creator-applications", "count", appId], queryFn: async () => { let x = supabase.from("creator_applications").select("id", { count: "exact", head: true }).eq("status", "pending"); if (appId) x = x.eq("app_id", appId); return (await x).count ?? 0; } });
-  const tabs: ["applications" | "directory", string][] = [["applications", `Applications (${pending})`], ["directory", `Creators (${active.filter((c) => !isInactive(c)).length})`]];
+  const tabs: ["applications" | "directory", string][] = [["applications", `Applications (${pending})`], ["directory", `Creators (${active.filter((c) => !c.is_test && !isInactive(c)).length})`]];
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
