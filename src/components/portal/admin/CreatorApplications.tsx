@@ -71,7 +71,9 @@ export function CreatorApplications({ track, simple = false, q = "" }: { track: 
   const resendWelcome = useServerFn(resendWelcomeEmail);
   const [notifyReject, setNotifyReject] = useState(false);
 
-  const { appId } = useAdminApp();
+  const { appId: switcherApp } = useAdminApp();
+  // The Hub UGC Applications page ignores the app switcher: every application, app shown as a chip.
+  const appId = simple ? null : switcherApp;
   const { data } = useQuery({
     queryKey: ["portal", "admin", "creator-applications", track, status, signedFilter, appId],
     queryFn: async () => {
@@ -162,6 +164,7 @@ export function CreatorApplications({ track, simple = false, q = "" }: { track: 
     <div className="space-y-6">
       {!simple ? <PageTitle title={track === "ugc" ? "UGC applications" : "Slideshow applications"} lead="These never mix with author applications." /> : null}
 
+      {simple ? <button type="button" onClick={() => setStatus(status === "rejected" ? "pending" : "rejected")} className="px-4 pt-3 text-xs font-semibold text-brand-navySoft underline hover:text-brand-navy">{status === "rejected" ? "← Back to pending applications" : "Rejected"}</button> : null}
       {simple ? <SimpleApplications rows={((data ?? []) as UgcApplication[]).filter((r) => !q || `${r.full_name} ${r.email} ${r.tiktok_url ?? ""} ${r.instagram_url ?? ""}`.toLowerCase().includes(q.toLowerCase()))} busy={busy} onOpen={(r) => setSelected(r)} onAccept={(r) => void decide(r.id, "approved")} /> : null}
       <div className={simple ? "hidden" : "flex flex-wrap items-center gap-3"}>
         <Select value={status} onValueChange={setStatus}>

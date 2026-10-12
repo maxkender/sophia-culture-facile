@@ -2,9 +2,8 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { AppBadge, useAdminApp } from "@/lib/apps";
+import { AppBadge } from "@/lib/apps";
 import { CreatorApplications } from "@/components/portal/admin/CreatorApplications";
 import { flag } from "./hub-data";
 import { TEST_CHIP, useShowTest } from "./show-test";
@@ -27,7 +26,6 @@ function useActiveCreators(appId: string | null) {
       const monday = mondayParis();
       const stats = new Map<string, { week: number; last: string | null }>();
       for (const p of posts.data ?? []) {
-        if (appId && p.app_id && p.app_id !== appId) continue;
         const day = (p.posted_on ?? p.created_at).slice(0, 10);
         const s = stats.get(p.creator_id) ?? { week: 0, last: null };
         if (day >= monday) s.week++;
@@ -35,7 +33,7 @@ function useActiveCreators(appId: string | null) {
         stats.set(p.creator_id, s);
       }
       return (c.data ?? []).map((x) => ({ ...x, apps: ((x.creator_apps ?? []) as { app_id: string }[]).map((a) => a.app_id), s: stats.get(x.id) }))
-        .filter((x) => !appId || x.apps.includes(appId));
+        ;
     },
   });
 }
@@ -44,8 +42,8 @@ const INACTIVE = ["paused", "ended", "dormant", "archived", "rejected"];
 const isInactive = (c: { ugc_status?: unknown; status?: unknown }) => INACTIVE.includes(String(c.ugc_status ?? c.status));
 
 function ActiveCreators({ q }: { q: string }) {
-  const { appId } = useAdminApp(); const navigate = useNavigate();
-  const { data = [], isLoading } = useActiveCreators(appId);
+  const navigate = useNavigate();
+  const { data = [], isLoading } = useActiveCreators(null);
   const [showInactive, setShowInactive] = useState(false); const [showTest, setShowTest] = useShowTest();
   const rows = useMemo(() => data.filter((c) => (showTest || !c.is_test) && (!q || `${c.full_name} ${c.tiktok_handle ?? ""} ${c.instagram_handle ?? ""}`.toLowerCase().includes(q.toLowerCase()))), [data, q, showTest]);
   const active = rows.filter((c) => !isInactive(c));
@@ -79,17 +77,16 @@ function ActiveCreators({ q }: { q: string }) {
   );
 }
 
-/** Hub → UGC → Creators: Applications · Creators, one search, one Add button. */
+/** Hub → UGC → Applications / Creators: two separate pages, both ignore the app switcher (app shown as a chip). */
 export function UgcCreatorsPage({ view }: { view: "applications" | "directory" }) {
-  const { appId } = useAdminApp();
-  const [q, setQ] = useState(""); const [add, setAdd] = useState(false);
-  const { data: active = [] } = useActiveCreators(appId);
-  const { data: pending = 0 } = useQuery({ queryKey: ["portal", "admin", "creator-applications", "count", appId], queryFn: async () => { let x = supabase.from("creator_applications").select("id", { count: "exact", head: true }).eq("status", "pending"); if (appId) x = x.eq("app_id", appId); return (await x).count ?? 0; } });
-  const tabs: ["applications" | "directory", string][] = [["applications", `Applications (${pending})`], ["directory", `Creators (${active.filter((c) => !c.is_test && !isInactive(c)).length})`]];
+  const [q, setQ] = useState("");
+  const { data: active = [] } = useActiveCreators(null);
+  const { data: pending = 0 } = useQuery({ queryKey: ["portal", "admin", "creator-applications", "count", "all"], queryFn: async () => (await supabase.from("creator_applications").select("id", { count: "exact", head: true }).eq("status", "pending")).count ?? 0 });
+  const title = view === "applications" ? `Applications (${pending})` : `Creators (${active.filter((c) => !c.is_test && !isInactive(c)).length})`;
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex gap-1" role="tablist">{tabs.map(([k, l]) => <Link key={k} to="/hub/ugc/creators" search={{ view: k }} role="tab" aria-selected={view === k} className={cn("min-h-9 rounded-full px-4 py-2 text-sm font-bold", view === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l}</Link>)}</div>
+        <h2 className="text-lg font-extrabold text-brand-navy">{title}</h2>
         <input aria-label="Search" placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} className="ml-auto h-9 w-full rounded-lg border bg-card px-3 text-sm sm:w-64" />
       </div>
       <div className="overflow-x-auto rounded-2xl bg-card shadow-portal">
