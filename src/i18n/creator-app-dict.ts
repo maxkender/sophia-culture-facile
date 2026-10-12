@@ -1,5 +1,7 @@
 /** Creator space strings (FR/EN), keyed by their source text. */
 export const CREATOR_APP_DICT: Record<string, { fr: string; en: string }> = {
+ "Your application is being reviewed": { "fr": "Ta candidature est en cours d’examen", "en": "Your application is being reviewed" },
+ "We'll get back to you by email.": { "fr": "On revient vers toi par email.", "en": "We'll get back to you by email." },
  ". Without it, the bonus for that post is zero.": {
   "fr": ". Sans ça, le bonus pour ce post est nul.",
   "en": ". Without it, the bonus for that post is zero."
