@@ -17,7 +17,7 @@ import { UgcBriefsGrid, WeekPlanner } from "@/components/portal/admin/UgcAdmin";
 import { CreatorOps } from "@/components/portal/admin/CreatorOps";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
-const TABS = ["Formats", "Briefs", "Hooks & CTAs", "Assets", "References", "Guides & rules", "Templates"] as const;
+const TABS = ["Briefs", "Hooks & CTAs", "Assets", "References", "Guides & rules", "Templates"] as const;
 
 
 type Fmt = { id: string; title: string; hook_text: string | null; oral_hook: string | null; beats: string[] | null; product_moment: string | null; variations: string | null; effort: string | null; status: string; pinned: boolean; sort_order: number | null; app_id: string };
@@ -240,22 +240,22 @@ function Templates() {
 }
 
 const BRIEF_SUBS = [["list", "All briefs"], ["planner", "Week planner"], ["scripts", "Scripts grid"], ["ops", "Posts & calls"]] as const;
-function BriefsArea({ sub }: { sub?: string | undefined }) {
+// Sub-tabs are hidden from Library (code kept; reachable only via ?sub=).
+function BriefsArea({ sub, initialTab }: { sub?: string | undefined; initialTab?: string | undefined }) {
   const [s, setS] = useState<string>(BRIEF_SUBS.some(([k]) => k === sub) ? sub! : "list");
   return (
     <div className="space-y-4">
-      <div className="flex gap-1 overflow-x-auto">{BRIEF_SUBS.map(([k, l]) => <button key={k} type="button" onClick={() => setS(k)} className={cn("min-h-9 shrink-0 rounded-full border px-3 text-xs font-bold", s === k ? "border-brand-navy bg-brand-navy text-card" : "border-brand-line bg-card text-brand-navy")}>{l}</button>)}</div>
-      {s === "planner" ? <WeekPlanner /> : s === "scripts" ? <UgcBriefsGrid /> : s === "ops" ? <CreatorOps /> : <BriefsList formats={<Formats />} />}
+      {s === "planner" ? <WeekPlanner /> : s === "scripts" ? <UgcBriefsGrid /> : s === "ops" ? <CreatorOps /> : <BriefsList formats={<Formats />} initialTab={initialTab} />}
     </div>
   );
 }
 
 export function Learn({ initialTab, sub }: { initialTab?: string | undefined; sub?: string | undefined } = {}) {
-  const [tab, setTab] = useState<(typeof TABS)[number]>(() => { const k = (initialTab ?? "").toLowerCase().replace(/[^a-z]/g, ""); return TABS.find((x) => x.toLowerCase().replace(/[^a-z]/g, "") === k || (k === "hooks" && x === "Hooks & CTAs")) ?? "Formats"; });
+  const [tab, setTab] = useState<(typeof TABS)[number]>(() => { const k = (initialTab ?? "").toLowerCase().replace(/[^a-z]/g, ""); return TABS.find((x) => x.toLowerCase().replace(/[^a-z]/g, "") === k || (k === "hooks" && x === "Hooks & CTAs")) ?? "Briefs"; });
   return (
     <div className="space-y-4">
       <div className="flex gap-2 overflow-x-auto">{TABS.map((t) => <button key={t} type="button" onClick={() => setTab(t)} className={cn("min-h-10 shrink-0 rounded-full px-4 text-sm font-bold", tab === t ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{t}</button>)}</div>
-      {tab === "Formats" ? <Formats /> : tab === "Briefs" ? <BriefsArea sub={sub} /> : tab === "Hooks & CTAs" ? <SnippetsLibrary /> : tab === "Assets" ? <AssetsLibrary /> : tab === "References" ? <References /> : tab === "Guides & rules" ? <Guides /> : <Templates />}
+      {tab === "Briefs" ? <BriefsArea sub={sub} initialTab={(initialTab ?? "").toLowerCase() === "formats" ? "formats" : undefined} /> : tab === "Hooks & CTAs" ? <SnippetsLibrary /> : tab === "Assets" ? <AssetsLibrary /> : tab === "References" ? <References /> : tab === "Guides & rules" ? <Guides /> : <Templates />}
     </div>
   );
 }

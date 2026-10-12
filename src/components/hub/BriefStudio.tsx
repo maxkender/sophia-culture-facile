@@ -354,7 +354,15 @@ export function BriefStudio({ briefId }: { briefId: string }) {
         <span className="rounded-full bg-portal-bg px-3 py-1 text-sm font-bold" data-testid="studio-progress">{doneCount}/{steps.length}</span>
         {b.style ? <span className="rounded-full bg-portal-accent/15 px-3 py-1 text-xs font-extrabold text-portal-accent">Style {STYLES.findIndex(([k]) => k === b.style) + 1}</span> : null}
         <span title={grade.missing.join("\n")} data-testid="studio-score" className={cn("rounded-full px-3 py-1 text-sm font-extrabold", grade.score >= 8 ? "bg-portal-green/15 text-portal-green" : "bg-portal-amber/20 text-brand-navy")}>Score {grade.score}/10</span>
-        <Button onClick={() => void save()}>{b.status === "draft" ? "Save as draft" : "Save"}</Button>
+        <Button variant="outline" onClick={() => void save()} title="Drafts also autosave every 10 s">Save</Button>
+        {b.status === "draft" ? <Button variant="outline" onClick={() => void save({ status: "ready" })}>Mark ready</Button> : null}
+        {b.status !== "published" && b.status !== "archived" ? <Button onClick={() => void save({ status: "published" })}>Publish</Button> : null}
+        <details className="relative"><summary className="flex h-9 cursor-pointer list-none items-center rounded-md border px-3 text-sm font-bold" aria-label="More actions">⋯</summary>
+          <div className="absolute right-0 z-20 mt-1 w-44 rounded-xl border bg-card p-1 shadow-portal">
+            <button type="button" className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-portal-bg" onClick={() => void duplicate()}>Duplicate</button>
+            <button type="button" className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-portal-bg" onClick={async () => { if (window.confirm("Archive this brief?")) { await save({ status: "archived" }); void navigate({ to: "/hub/ugc/library" }); } }}>Archive</button>
+            {b.status !== "published" ? <button type="button" className="block w-full rounded-lg px-3 py-2 text-left text-sm text-portal-red hover:bg-portal-bg" onClick={() => void remove()}>Delete</button> : null}
+          </div></details>
       </div>
       {loaded?.row && (loaded.row as { inspiration_id?: string | null }).inspiration_id ? <InspirationReference id={(loaded.row as { inspiration_id: string }).inspiration_id} /> : null}
       {grade.missing.length ? <details className={cn(card, "py-3 text-sm")}><summary className="cursor-pointer font-bold text-brand-navy">{grade.score >= 8 ? "Ready to publish" : "Publishing is allowed from 8/10"} — {grade.missing.length} point{grade.missing.length > 1 ? "s" : ""} missing</summary><ul className="mt-2 list-disc pl-5 text-brand-navySoft">{grade.missing.map((m) => <li key={m}>{m}</li>)}</ul></details> : null}
