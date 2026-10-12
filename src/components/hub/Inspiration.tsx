@@ -12,6 +12,8 @@ import { useAdminApp, SOPHIA_APP_ID } from "@/lib/apps";
 import { STYLES, STYLE_LABEL, blankBrief, blankFmt, scoreBrief, styleAssetIds, styleDefaults, type BriefStyle, type Plan, type StyleData } from "@/lib/brief-studio";
 import { backfillNotionFormat } from "@/lib/notion.functions";
 import { NotionItemsTab } from "./NotionSync";
+import { FromVideo } from "./BriefsList";
+import { notionSyncNow } from "@/lib/notion.functions";
 import { deleteInspirations, importInspirations, inspirationToReference, processInspirations, retryInspirationErrors, retranscribeInspiration } from "@/lib/inspirations.functions";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -58,7 +60,7 @@ export function Inspiration({ initialOpen }: { initialOpen?: string | undefined 
   const { data: all = [], isLoading } = useInspirations(); const { appId } = useAdminApp(); const qc = useQueryClient();
   const [flt, setFlt] = useState({ q: "", style: "all", fit: "all", lang: "all", platform: "all", hook: "all", minScore: 0, status: "all", tag: "", since: "" });
   const [sort, setSort] = useState<"date" | "views" | "score">("date");
-  const [sel, setSel] = useState<Set<string>>(new Set()); const [open, setOpen] = useState<string | null>(initialOpen ?? null); const [tab, setTab] = useState<"videos" | "notion">("videos");
+  const [sel, setSel] = useState<Set<string>>(new Set()); const [open, setOpen] = useState<string | null>(initialOpen ?? null); const [tab, setTab] = useState<"videos" | "notion">("videos"); const [adding, setAdding] = useState(false);
   const rows = useMemo(() => {
     const q = flt.q.toLowerCase();
     const out = all.filter((r) => (!appId || !r.app_id || r.app_id === appId)
@@ -79,30 +81,18 @@ export function Inspiration({ initialOpen }: { initialOpen?: string | undefined 
     <div className="space-y-5">
       <div className="flex gap-2" role="tablist">{([["videos", "Videos"], ["notion", "Notion"]] as const).map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cn("min-h-9 rounded-full px-4 text-sm font-bold", tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l}</button>)}</div>
       {tab === "notion" ? <NotionItemsTab onOpen={(id) => setOpen(id)} /> : <>
-      <ImportPanel rows={all} appId={appId} onDone={refresh} />
-      <div className={cn(card, "space-y-3")}>
-        <div className="flex flex-wrap gap-2">
-          <input aria-label="Search transcript or caption" placeholder="Search transcript, caption, handle…" value={flt.q} onChange={(e) => setFlt({ ...flt, q: e.target.value })} className={cn(f, "min-w-56 flex-1")} />
-          <select aria-label="Style" className={f} value={flt.style} onChange={(e) => setFlt({ ...flt, style: e.target.value })}><option value="all">All styles</option>{ALL_STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
-          <select aria-label="App fit" className={f} value={flt.fit} onChange={(e) => setFlt({ ...flt, fit: e.target.value })}><option value="all">Any app fit</option>{FIT.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
-          <select aria-label="Platform" className={f} value={flt.platform} onChange={(e) => setFlt({ ...flt, platform: e.target.value })}><option value="all">TikTok + Instagram</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option></select>
-          <select aria-label="Language" className={f} value={flt.lang} onChange={(e) => setFlt({ ...flt, lang: e.target.value })}><option value="all">Any language</option>{langs.map((l) => <option key={l}>{l}</option>)}</select>
-          <select aria-label="Hook type" className={f} value={flt.hook} onChange={(e) => setFlt({ ...flt, hook: e.target.value })}><option value="all">Any hook</option>{hooks.map((l) => <option key={l}>{l}</option>)}</select>
-          <select aria-label="Minimum score" className={f} value={flt.minScore} onChange={(e) => setFlt({ ...flt, minScore: Number(e.target.value) })}>{[0, 5, 6, 7, 8, 9].map((n) => <option key={n} value={n}>{n ? `Score ≥ ${n}` : "Any score"}</option>)}</select>
-          <select aria-label="Status" className={f} value={flt.status} onChange={(e) => setFlt({ ...flt, status: e.target.value })}><option value="all">Any status</option>{STAGES.map((s) => <option key={s} value={s}>{STAGE_LABEL[s]}</option>)}</select>
-          <input aria-label="Tag" placeholder="Tag" value={flt.tag} onChange={(e) => setFlt({ ...flt, tag: e.target.value })} className={cn(f, "w-28")} />
-          <input aria-label="Posted since" type="date" value={flt.since} onChange={(e) => setFlt({ ...flt, since: e.target.value })} className={f} />
-          <select aria-label="Sort" className={f} value={sort} onChange={(e) => setSort(e.target.value as never)}><option value="date">Newest</option><option value="views">Most views</option><option value="score">Best score</option></select>
-        </div>
-        {sel.size ? <BulkBar ids={[...sel]} onDone={() => { setSel(new Set()); refresh(); }} /> : null}
+      <div className="flex flex-wrap items-center gap-2">
+        <input aria-label="Search inspiration" placeholder="Search…" value={flt.q} onChange={(e) => setFlt({ ...flt, q: e.target.value })} className={cn(f, "min-w-0 flex-1 sm:max-w-80")} />
+        <Button onClick={() => setAdding(!adding)} aria-expanded={adding}><Upload className="size-4" />Add links</Button>
+        <SyncNotionButton onDone={refresh} />
       </div>
+      {adding ? <ImportPanel rows={all} appId={appId} onDone={refresh} /> : null}
       {isLoading ? <p className="text-sm text-brand-navySoft">Loading…</p> : !rows.length ? (
-        <div className={cn(card, "text-center text-sm text-brand-navySoft")}>{all.length ? "No inspiration matches these filters." : "No inspiration yet. Paste TikTok or Instagram links above to start."}</div>
+        <div className={cn(card, "text-center text-sm text-brand-navySoft")}>{all.length ? "Nothing matches this search." : "No inspiration yet — click Add links."}</div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {rows.map((r) => (
             <div key={r.id} className="group relative overflow-hidden rounded-2xl bg-card shadow-portal">
-              <input type="checkbox" aria-label={`Select ${r.author_handle ?? r.url}`} checked={sel.has(r.id)} onChange={(e) => { const n = new Set(sel); if (e.target.checked) n.add(r.id); else n.delete(r.id); setSel(n); }} className="absolute left-2 top-2 z-10 size-5" />
               <button type="button" onClick={() => setOpen(r.id)} className="block w-full text-left">
                 <div className="relative aspect-[9/14] bg-muted">
                   {r.cover_path && covers[r.cover_path] ? <img src={covers[r.cover_path]} alt="" loading="lazy" className="size-full object-cover" /> : <div className="flex size-full items-center justify-center text-xs text-brand-navySoft">{STAGE_LABEL[r.status] ?? r.status}</div>}
@@ -111,31 +101,39 @@ export function Inspiration({ initialOpen }: { initialOpen?: string | undefined 
                 </div>
                 <div className="space-y-1 p-3">
                   <p className="truncate text-sm font-bold text-brand-navy">@{r.author_handle ?? "…"} <span className="text-xs font-normal text-brand-navySoft">{r.platform === "tiktok" ? "TikTok" : "Instagram"}</span></p>
+                  {r.hook_text || r.analysis?.hook.verbatim ? <p className="line-clamp-2 text-xs text-brand-navy">« {r.hook_text || r.analysis?.hook.verbatim} »</p> : null}
                   <div className="flex flex-wrap gap-1">
                     {styleOf(r) ? <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-bold", r.approved_style ? "bg-space-ugc text-card" : "bg-space-ugc/10 text-space-ugc")}>{SLABEL[styleOf(r)!]}</span> : null}
-                    {r.app_fit ? <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold text-brand-navy">{FIT.find(([k]) => k === r.app_fit)?.[1]}</span> : null}
                     {r.notion_page_id ? <span className="rounded-full bg-brand-navy px-2 py-0.5 text-[10px] font-bold text-card" title="Imported from Notion">N · From Notion</span> : null}
                   </div>
                 </div>
               </button>
-              <CreateBriefButton r={r} compact />
             </div>
           ))}
         </div>
       )}
       </>}
       <Sheet open={Boolean(current)} onOpenChange={(o) => !o && setOpen(null)}>
-        <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">{current ? <Drawer r={current} onChange={refresh} /> : null}</SheetContent>
+        <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">{current ? <Drawer r={current} onChange={refresh} onClose={() => setOpen(null)} /> : null}</SheetContent>
       </Sheet>
     </div>
   );
+}
+
+function SyncNotionButton({ onDone }: { onDone: () => void }) {
+  const run = useServerFn(notionSyncNow); const [busy, setBusy] = useState(false);
+  return <Button variant="outline" disabled={busy} onClick={async () => {
+    setBusy(true);
+    try { const r = await run(); if (r["skipped"]) toast.message(String(r["skipped"])); else toast.success("Notion synced"); onDone(); }
+    catch (e) { toast.error((e as Error).message); } finally { setBusy(false); }
+  }}>{busy ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}Sync Notion</Button>;
 }
 
 function parseCsv(text: string) { return text.split(/\r?\n/).map((l) => l.split(/[,;\t]/).find((c) => /https?:\/\//.test(c)) ?? "").map((c) => c.trim().replace(/^"|"$/g, "")).filter(Boolean); }
 
 function ImportPanel({ rows, appId, onDone }: { rows: Insp[]; appId: string | null; onDone: () => void }) {
   const imp = useServerFn(importInspirations); const retry = useServerFn(retryInspirationErrors);
-  const [text, setText] = useState(""); const [busy, setBusy] = useState(false); const [app, setApp] = useState<string>(appId ?? SOPHIA_APP_ID);
+  const [text, setText] = useState(""); const [busy, setBusy] = useState(false); const [ads, setAds] = useState(false); const [app, setApp] = useState<string>(appId ?? SOPHIA_APP_ID);
   const batches = useMemo(() => {
     const m = new Map<string, Insp[]>(); for (const r of rows) { const k = r.batch_id ?? "none"; m.set(k, [...(m.get(k) ?? []), r]); }
     return [...m.entries()].slice(0, 5);
@@ -147,15 +145,17 @@ function ImportPanel({ rows, appId, onDone }: { rows: Insp[]; appId: string | nu
   }
   return (
     <div className={cn(card, "space-y-3")}>
-      <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-extrabold text-brand-navy">Import links</h3>
+      <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-extrabold text-brand-navy">Add links</h3>
         <select aria-label="App for this import" className={f} value={app} onChange={(e) => setApp(e.target.value)}><option value={SOPHIA_APP_ID}>For Sophia</option><option value="00000000-0000-4000-8000-000000000002">For UnSwipe</option></select></div>
       <p className="text-xs text-brand-navySoft">Paste TikTok and Instagram reel links, one per line (hundreds at a time), or upload a CSV with one column of links. Duplicates are skipped. Each video is downloaded, transcribed and analysed in the background, 5 at a time every minute.</p>
       <textarea aria-label="Links to import" rows={4} value={text} onChange={(e) => setText(e.target.value)} placeholder={"https://www.tiktok.com/@…/video/…\nhttps://www.instagram.com/reel/…"} className="w-full rounded-xl border p-3 text-sm" />
       <div className="flex flex-wrap gap-2">
         <Button disabled={busy || !text.trim()} onClick={() => void send(text.split(/\s+/))}>{busy ? <Loader2 className="size-4 animate-spin" /> : null}Import {text.split(/\s+/).filter((x) => /^https?:/.test(x)).length || ""} links</Button>
         <label className="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-md border px-3 text-sm font-semibold"><Upload className="size-4" />CSV<input type="file" accept=".csv,text/csv,.txt" className="sr-only" onChange={async (e) => { const fl = e.target.files?.[0]; if (fl) await send(parseCsv(await fl.text())); e.target.value = ""; }} /></label>
-        <Button variant="outline" onClick={async () => { const r = await retry({ data: { batchId: null } }); toast.success(`${r.requeued} re-queued`); onDone(); }}><RefreshCw className="size-4" />Retry errors</Button>
+        <Button variant="outline" onClick={() => setAds(!ads)} aria-expanded={ads}>From Ads Library</Button>
+        <Button variant="ghost" onClick={async () => { const r = await retry({ data: { batchId: null } }); toast.success(`${r.requeued} re-queued`); onDone(); }}><RefreshCw className="size-4" />Retry errors</Button>
       </div>
+      {ads ? <FromVideo app={app} onClose={() => setAds(false)} /> : null}
       {batches.length ? <div className="space-y-1.5">{batches.map(([id, list]) => {
         const c = Object.fromEntries(STAGES.map((s) => [s, list.filter((r) => r.status === s).length]));
         const cost = list.reduce((n, r) => n + costOf(r.cost), 0);
@@ -231,7 +231,7 @@ function CreateBriefButton({ r, compact }: { r: Insp; compact?: boolean }) {
   if (compact) return <button type="button" disabled={Boolean(why) || busy} title={why ?? "Create brief from this inspiration"} onClick={() => void go()} className="w-full border-t border-brand-line px-3 py-1.5 text-left text-[11px] font-bold text-portal-accent disabled:text-brand-navySoft">{why ?? "Create brief from this inspiration"}</button>;
   return <span className="inline-flex flex-wrap items-center gap-1">
     {!r.app_id ? <select aria-label="App for the brief" className={f} value={app} onChange={(e) => setApp(e.target.value)}><option value={SOPHIA_APP_ID}>Sophia</option><option value={UNSWIPE_ID}>UnSwipe</option></select> : null}
-    <Button size="sm" variant="outline" disabled={Boolean(why) || busy} title={why ?? undefined} onClick={() => void go()}>{busy ? <Loader2 className="size-4 animate-spin" /> : null}Create brief from this inspiration</Button>
+    <Button size="lg" className="text-base font-extrabold" disabled={Boolean(why) || busy} title={why ?? undefined} onClick={() => void go()} data-testid="make-brief">{busy ? <Loader2 className="size-4 animate-spin" /> : null}Make a brief</Button>
     {why ? <span className="text-xs text-brand-navySoft">{why}</span> : null}
   </span>;
 }
@@ -255,7 +255,8 @@ export function InspirationReference({ id }: { id: string }) {
   </details>;
 }
 
-function Drawer({ r, onChange }: { r: Insp; onChange: () => void }) {
+function Drawer({ r, onChange, onClose }: { r: Insp; onChange: () => void; onClose?: () => void }) {
+  const del = useServerFn(deleteInspirations);
   const toRef = useServerFn(inspirationToReference); const retx = useServerFn(retranscribeInspiration); const [rtBusy, setRtBusy] = useState(false);
   const video = useRef<HTMLVideoElement>(null); const [t, setT] = useState(0); const [src, setSrc] = useState<string | null>(null);
   const [tags, setTags] = useState(r.tags.join(", "));
@@ -279,25 +280,24 @@ function Drawer({ r, onChange }: { r: Insp; onChange: () => void }) {
       {r.status !== "analyzed" ? <p className={cn("rounded-lg p-2 text-sm", r.status === "error" ? "bg-destructive/10 text-destructive" : "bg-muted")}>{STAGE_LABEL[r.status]}{r.error ? ` — ${r.error}` : ""}{r.attempts ? ` (attempt ${r.attempts})` : ""}</p> : null}
       {r.video_path ? (src ? <video ref={video} src={src} controls playsInline onTimeUpdate={(e) => setT(e.currentTarget.currentTime)} className="mx-auto max-h-[60vh] rounded-xl bg-brand-navy" aria-label="Inspiration video" /> : <div className="flex h-60 items-center justify-center"><Loader2 className="size-5 animate-spin" /></div>) : null}
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-brand-navySoft"><span>{fmtN(r.views)} views</span><span>{fmtN(r.likes)} likes</span><span>{fmtN(r.comments)} comments</span><span>{fmtN(r.shares)} shares</span>{r.duration_s ? <span>{Math.round(r.duration_s)} s</span> : null}{r.posted_at ? <span>{r.posted_at.slice(0, 10)}</span> : null}{r.language ? <span>lang {r.language}</span> : null}
-        <a href={r.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-bold text-brand-blue">Source <ExternalLink className="size-3" /></a></div>
-      <div className="grid grid-cols-2 gap-2">
-        <label className="text-xs font-bold text-brand-navy">Style {r.approved_style ? "(approved)" : r.proposed_style ? `(proposed${r.style_confidence != null ? ` ${Math.round(r.style_confidence * 100)}%` : ""})` : ""}
-          <select aria-label="Approved style" className={cn(f, "mt-1 w-full")} value={styleOf(r) ?? ""} onChange={(e) => void upd({ approved_style: e.target.value || null })}><option value="">—</option>{ALL_STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
-        <label className="text-xs font-bold text-brand-navy">App fit<select aria-label="App fit for this video" className={cn(f, "mt-1 w-full")} value={r.app_fit ?? ""} onChange={(e) => void upd({ app_fit: e.target.value || null })}><option value="">—</option>{FIT.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
-        <label className="col-span-2 text-xs font-bold text-brand-navy">Tags<input aria-label="Tags" className={cn(f, "mt-1 w-full")} value={tags} onChange={(e) => setTags(e.target.value)} onBlur={() => void upd({ tags: tags.split(",").map((x) => x.trim().toLowerCase()).filter(Boolean) })} /></label>
+</div>
+      <div className="space-y-2 rounded-2xl bg-portal-bg p-3">
+        <CreateBriefButton r={r} />
+        <div className="flex flex-wrap gap-1">
+          <Button size="sm" variant="ghost" disabled={r.status !== "analyzed"} onClick={() => void saveHook()}>Hook → library</Button>
+          <Button size="sm" variant="ghost" disabled={rtBusy || !r.video_path} onClick={async () => { setRtBusy(true); try { await retx({ data: { id: r.id } }); toast.success("Re-transcribed"); onChange(); } catch (e) { toast.error((e as Error).message); } setRtBusy(false); }}>{rtBusy ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}Re-transcribe</Button>
+          <Button size="sm" variant="ghost" asChild><a href={r.url} target="_blank" rel="noreferrer"><ExternalLink className="size-4" />Open original</a></Button>
+          <Button size="sm" variant="ghost" className="text-destructive" onClick={async () => { if (!window.confirm("Delete this inspiration and its stored video?")) return; await del({ data: { ids: [r.id] } }); onClose?.(); onChange(); }}><Trash2 className="size-4" />Delete</Button>
+        </div>
       </div>
       <div className="flex flex-wrap items-center gap-2 text-xs">
+        <label className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 font-bold text-brand-navy">Style:
+          <select aria-label="Style" className="bg-transparent font-bold" value={styleOf(r) ?? ""} onChange={(e) => void upd({ approved_style: e.target.value || null })}><option value="">—</option>{ALL_STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
         <label className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 font-bold text-brand-navy">Notion format:
           <select aria-label="Notion format" className="bg-transparent font-bold" value={r.notion_format ?? ""} onChange={(e) => void upd({ notion_format: e.target.value || null })}><option value="">—</option>{NOTION_FORMATS.map((x) => <option key={x}>{x}</option>)}</select></label>
         {r.notion_page_id ? <a href={`https://www.notion.so/${r.notion_page_id.replace(/-/g, "")}`} target="_blank" rel="noreferrer" className="rounded-full bg-brand-navy px-2 py-1 font-bold text-card">From Notion ↗</a> : null}
       </div>
       {r.notion_notes ? <div className="rounded-lg bg-muted/60 p-2 text-sm"><p className="text-xs font-bold uppercase text-brand-navySoft">Notes (Notion)</p><p className="whitespace-pre-wrap">{r.notion_notes}</p></div> : null}
-      {r.status !== "analyzed" ? <CreateBriefButton r={r} /> : null}
-      {r.status === "analyzed" ? <div className="flex flex-wrap gap-2">
-        <Button size="sm" onClick={() => void saveHook()}>Save hook to Hooks library</Button>
-        <CreateBriefButton r={r} />
-        <Button size="sm" variant="outline" onClick={async () => { try { const x = await toRef({ data: { id: r.id } }); toast.success(x.existed ? "Already in Reference videos" : "Saved in Library → Reference videos"); onChange(); } catch (e) { toast.error((e as Error).message); } }}>{r.reference_id ? "In references ✓" : "Save as reference"}</Button>
-      </div> : null}
       {r.analysis ? <div className="space-y-3 text-sm text-brand-navy">
         <div><p className="text-xs font-bold uppercase text-brand-navySoft">Hook · {r.hook_type}</p><p className="font-semibold">« {r.analysis.hook.verbatim || "—"} »</p><p className="text-xs">On screen: {r.analysis.hook.on_screen || "—"} · Seen: {r.analysis.hook.visual}</p></div>
         <div><p className="text-xs font-bold uppercase text-brand-navySoft">Structure</p><ol className="space-y-1">{r.analysis.structure.map((s, i) => <li key={i}><button type="button" onClick={() => seek(s.start_s)} className="mr-2 rounded bg-muted px-1.5 font-mono text-xs font-bold text-brand-blue">{s.start_s.toFixed(1)}s</button>{s.seen}{s.said ? <span className="text-brand-navySoft"> — « {s.said} »</span> : null}{s.on_screen ? <span className="text-xs"> [{s.on_screen}]</span> : null}</li>)}</ol></div>
@@ -305,10 +305,10 @@ function Drawer({ r, onChange }: { r: Insp; onChange: () => void }) {
         <p><b>Text on screen:</b> {r.analysis.on_screen_text_style} · <b>Audio:</b> {r.analysis.audio} {r.analysis.audio_note}</p>
         <div><p className="text-xs font-bold uppercase text-brand-navySoft">Why it works · {r.score}/10</p><ul className="list-disc pl-5">{r.analysis.why_it_works.map((w, i) => <li key={i}>{w}</li>)}</ul></div>
       </div> : null}
-      {r.video_path || words.length || r.transcript != null ? <div><div className="flex items-center justify-between"><p className="text-xs font-bold uppercase text-brand-navySoft">Transcript</p><Button size="sm" variant="ghost" disabled={rtBusy} onClick={async () => { setRtBusy(true); try { await retx({ data: { id: r.id } }); toast.success("Re-transcribed"); onChange(); } catch (e) { toast.error((e as Error).message); } setRtBusy(false); }}>{rtBusy ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}Re-transcribe</Button></div>
+      {r.video_path || words.length || r.transcript != null ? <div><p className="text-xs font-bold uppercase text-brand-navySoft">Transcript</p>
         {words.length ? <p className="text-sm leading-relaxed" data-testid="transcript">{words.map((w, i) => <span key={i} onClick={() => seek(w.s)} className={cn("cursor-pointer rounded", t >= w.s && t < w.e + 0.05 ? "bg-space-ugc text-card" : "")}>{w.t} </span>)}</p> : r.transcript != null ? <p className="text-sm text-brand-navySoft">{r.transcript || "No speech in this video."}</p> : null}</div> : null}
       {r.caption ? <p className="text-xs text-brand-navySoft"><b>Caption:</b> {r.caption}</p> : null}
-      <p className="text-xs text-brand-navySoft">Cost: Apify ${Number(c["apify_usd"] ?? 0).toFixed(4)} · ElevenLabs {Number(c["stt_minutes"] ?? 0)} min (${Number(c["stt_usd"] ?? 0).toFixed(4)}) · AI {Number(c["ai_input_tokens"] ?? 0)}+{Number(c["ai_output_tokens"] ?? 0)} tokens</p>
+      <p className="hidden">Cost: Apify ${Number(c["apify_usd"] ?? 0).toFixed(4)} · ElevenLabs {Number(c["stt_minutes"] ?? 0)} min (${Number(c["stt_usd"] ?? 0).toFixed(4)}) · AI {Number(c["ai_input_tokens"] ?? 0)}+{Number(c["ai_output_tokens"] ?? 0)} tokens</p>
     </div>
   );
 }
