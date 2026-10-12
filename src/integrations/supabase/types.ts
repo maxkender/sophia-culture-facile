@@ -984,6 +984,7 @@ export type Database = {
           hook_visual: string | null
           hooks: string[]
           id: string
+          inspiration_id: string | null
           language: string
           must_mention: string | null
           oral_hook: string | null
@@ -1009,6 +1010,7 @@ export type Database = {
           tags: string[]
           title: string
           translation_of: string | null
+          updated_at: string
           variations: string | null
         }
         Insert: {
@@ -1034,6 +1036,7 @@ export type Database = {
           hook_visual?: string | null
           hooks?: string[]
           id?: string
+          inspiration_id?: string | null
           language?: string
           must_mention?: string | null
           oral_hook?: string | null
@@ -1059,6 +1062,7 @@ export type Database = {
           tags?: string[]
           title: string
           translation_of?: string | null
+          updated_at?: string
           variations?: string | null
         }
         Update: {
@@ -1084,6 +1088,7 @@ export type Database = {
           hook_visual?: string | null
           hooks?: string[]
           id?: string
+          inspiration_id?: string | null
           language?: string
           must_mention?: string | null
           oral_hook?: string | null
@@ -1109,6 +1114,7 @@ export type Database = {
           tags?: string[]
           title?: string
           translation_of?: string | null
+          updated_at?: string
           variations?: string | null
         }
         Relationships: [
@@ -1131,6 +1137,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "briefs_inspiration_id_fkey"
+            columns: ["inspiration_id"]
+            isOneToOne: false
+            referencedRelation: "inspirations"
             referencedColumns: ["id"]
           },
           {
@@ -4497,6 +4510,9 @@ export type Database = {
           likes: number | null
           next_try_at: string
           norm_key: string
+          notion_format: string | null
+          notion_notes: string | null
+          notion_page_id: string | null
           platform: string
           posted_at: string | null
           proposed_style: string | null
@@ -4538,6 +4554,9 @@ export type Database = {
           likes?: number | null
           next_try_at?: string
           norm_key: string
+          notion_format?: string | null
+          notion_notes?: string | null
+          notion_page_id?: string | null
           platform: string
           posted_at?: string | null
           proposed_style?: string | null
@@ -4579,6 +4598,9 @@ export type Database = {
           likes?: number | null
           next_try_at?: string
           norm_key?: string
+          notion_format?: string | null
+          notion_notes?: string | null
+          notion_page_id?: string | null
           platform?: string
           posted_at?: string | null
           proposed_style?: string | null
@@ -4928,6 +4950,59 @@ export type Database = {
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notion_items: {
+        Row: {
+          created_at: string
+          error: string | null
+          hub_status: string | null
+          inspiration_id: string | null
+          kind: string
+          norm_key: string | null
+          notion_last_edited: string | null
+          notion_page_id: string
+          notion_props: Json
+          pushed_at: string | null
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          hub_status?: string | null
+          inspiration_id?: string | null
+          kind?: string
+          norm_key?: string | null
+          notion_last_edited?: string | null
+          notion_page_id: string
+          notion_props?: Json
+          pushed_at?: string | null
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          hub_status?: string | null
+          inspiration_id?: string | null
+          kind?: string
+          norm_key?: string | null
+          notion_last_edited?: string | null
+          notion_page_id?: string
+          notion_props?: Json
+          pushed_at?: string | null
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notion_items_inspiration_id_fkey"
+            columns: ["inspiration_id"]
+            isOneToOne: false
+            referencedRelation: "inspirations"
             referencedColumns: ["id"]
           },
         ]
@@ -6250,6 +6325,11 @@ export type Database = {
           id: number
           min_payout: number
           monthly_budget_cap: number | null
+          notion_auto: boolean
+          notion_database_id: string
+          notion_last_error: string | null
+          notion_last_full_sync: string | null
+          notion_last_sync: string | null
           payday_day: number
           posts_per_profile_call: number
           streak30_bonus: number
@@ -6269,6 +6349,11 @@ export type Database = {
           id?: number
           min_payout?: number
           monthly_budget_cap?: number | null
+          notion_auto?: boolean
+          notion_database_id?: string
+          notion_last_error?: string | null
+          notion_last_full_sync?: string | null
+          notion_last_sync?: string | null
           payday_day?: number
           posts_per_profile_call?: number
           streak30_bonus?: number
@@ -6288,6 +6373,11 @@ export type Database = {
           id?: number
           min_payout?: number
           monthly_budget_cap?: number | null
+          notion_auto?: boolean
+          notion_database_id?: string
+          notion_last_error?: string | null
+          notion_last_full_sync?: string | null
+          notion_last_sync?: string | null
           payday_day?: number
           posts_per_profile_call?: number
           streak30_bonus?: number
