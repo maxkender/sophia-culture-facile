@@ -248,7 +248,7 @@ export async function classifyNotionFormat(a: Admin, ids: string[]) {
   for (const r of rows ?? []) {
     if (!r.analysis) continue;
     const an = r.analysis;
-    const prompt = `Pick the single best "Type de format" for this short video among exactly: ${NOTION_FORMATS.join(" | ")}.\nKind: ${r.kind}. Style: ${an.style}. Audio: ${an.audio} ${an.audio_note}. Hook: ${JSON.stringify(an.hook)}. Structure: ${JSON.stringify(an.structure).slice(0, 1500)}.`;
+    const prompt = `Pick the single best "Type de format" for this short video among exactly: ${NOTION_FORMATS.join(" | ")}.\nKind: ${r.kind}. Hub video format: ${an.style}. Audio: ${an.audio} ${an.audio_note}. Hook: ${JSON.stringify(an.hook)}. Structure: ${JSON.stringify(an.structure).slice(0, 1500)}.`;
     const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST", headers: { Authorization: `Bearer ${key}`, "content-type": "application/json", "X-Lovable-AIG-SDK": "fetch" },
       body: JSON.stringify({ model: "openai/gpt-6-astra", reasoning: { effort: "low" }, store: false, stream: true, input: [{ role: "user", content: [{ type: "input_text", text: prompt }] }], text: { format: { type: "json_schema", name: "f", strict: true, schema: { type: "object", additionalProperties: false, required: ["notion_format"], properties: { notion_format: { type: "string", enum: [...NOTION_FORMATS] } } } } } }),

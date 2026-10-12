@@ -85,45 +85,17 @@ export function LogPostForm({ briefId: initialBrief = "", onDone }: { briefId?: 
 }
 
 /* ---------- Briefs ---------- */
+import { AboutFormat } from "@/components/creators/AboutFormat";
+import { formatText, useUgcFormats } from "@/lib/ugc-formats";
+import { creatorLang } from "@/i18n/creator-app";
 import { AssignedBriefs } from "./UgcPages";
 import { PostDescriptionBlock, type PostDesc } from "@/components/creators/PostDescription";
 
 function FormatsTab() {
-  const d = useCreator();
-  const { data } = useHubExtras();
-  const formats = d.briefs.filter((b) => (b as { brief_type?: string }).brief_type === "format")
-    .sort((a, b) => Number((b as { pinned?: boolean }).pinned) - Number((a as { pinned?: boolean }).pinned) || Number((a as { sort_order?: number }).sort_order ?? 99) - Number((b as { sort_order?: number }).sort_order ?? 99));
-  const fr = (d.me as { language?: string }).language !== "en";
-  const eur = (n: number) => `${new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2, minimumFractionDigits: n % 1 ? 2 : 0 }).format(n)} €`;
-  const label = { pov: "POV", reaction: fr ? "Réaction" : "Reaction", talking_head: ct("Face cam") } as Record<string, string>;
-  return (
-    <div>
-      <p className="mb-4 rounded-2xl bg-portal-accent/10 px-4 py-3 text-sm font-bold text-brand-navy">{fr ? ct("Choisis 3 formats, refais-les 20 fois.") : ct("Pick 3 formats, redo them 20 times.")}</p>
-      {formats.length === 0 ? <EmptyState title={fr ? ct("Pas encore de formats") : ct("No formats yet")} text="" /> : (
-        <div className="grid gap-4 md:grid-cols-2" data-testid="formats-grid">
-          {formats.map((f) => {
-            const x = f as typeof f & { effort?: string; hook_text?: string; beats?: string[] };
-            const rates = effortRates(d.me as never, (data?.tiers ?? []) as never, f.app_id);
-            const rate = rates[(x.effort ?? "talking_head") as keyof typeof rates];
-            return (
-              <Link key={f.id} to="/creators/app/briefs/$briefId" params={{ briefId: f.id }} className="block">
-                <PortalCard className="h-full transition hover:ring-2 hover:ring-portal-accent/30">
-                  <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
-                    <span className="rounded-full bg-portal-bg px-2 py-0.5">{label[x.effort ?? "talking_head"]}</span>
-                    <span className="rounded-full bg-portal-green/15 px-2 py-0.5 text-portal-green" data-testid="pay-badge">{eur(rate)} + {fr ? "vues" : "views"}</span>
-                    <AppBadge appId={f.app_id} />
-                  </div>
-                  <p className="mt-3 text-xl font-extrabold leading-tight text-brand-navy">{x.hook_text ?? f.hook}</p>
-                  <p className="mt-1 text-sm text-brand-navySoft">{ct(f.title)}</p>
-                  {x.beats?.length ? <ol className="mt-2 list-decimal pl-5 text-xs text-brand-navySoft">{x.beats.map((b, i) => <li key={i}>{b}</li>)}</ol> : null}
-                </PortalCard>
-              </Link>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
+  const { data: formats = [], isLoading } = useUgcFormats();
+  const lang = creatorLang();
+  if (isLoading) return <p>{L("Loading…", "Chargement…")}</p>;
+  return <div className="grid gap-4 md:grid-cols-2" data-testid="formats-grid">{formats.map((f) => <article key={f.id} className="space-y-3 rounded-lg border bg-card p-4"><h2 className="text-base font-bold">{f.sort_order}. {lang === "fr" ? f.name_fr : f.name_en}</h2><p className="text-sm text-muted-foreground">{formatText(f.description, lang)}</p><p className="whitespace-pre-wrap text-sm">{formatText(f.tips, lang)}</p><AboutFormat formatKey={f.key} /></article>)}</div>;
 }
 
 export function BriefsPage() {
@@ -136,7 +108,7 @@ export function BriefsPage() {
           <button key={k} type="button" aria-pressed={tab === k} onClick={() => setTab(k)} className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-bold ${tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy"}`}>{l}</button>
         ))}
       </div>
-      {tab === "formats" ? <><PageTitle title={ct("Formats")} lead={ct("Repeatable video mechanics. The pay per post depends on the format.")} /><FormatsTab /></> : tab === "refs" ? (
+      {tab === "formats" ? <><PageTitle title={ct("Formats")}  /><FormatsTab /></> : tab === "refs" ? (
         <><PageTitle title={ct("Reference videos")} lead={ct("Videos that worked. Use them as inspiration.")} /><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{d.refs.map((r) => <RefCard key={r.id} r={r} />)}</div></>
       ) : <FactBriefs />}
     </div>

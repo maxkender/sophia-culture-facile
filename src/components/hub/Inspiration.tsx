@@ -309,8 +309,8 @@ function Drawer({ r, onChange, onClose }: { r: Insp; onChange: () => void; onClo
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-2 text-xs">
-        <label className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 font-bold text-brand-navy">Style:
-          <select aria-label="Style" className="bg-transparent font-bold" value={styleOf(r) ?? ""} onChange={(e) => void upd({ approved_style: e.target.value || null })}><option value="">—</option>{ALL_STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+        <label className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 font-bold text-brand-navy">Format:
+          <select aria-label="Format" className="bg-transparent font-bold" value={styleOf(r) ?? ""} onChange={(e) => void upd({ approved_style: e.target.value || null })}><option value="">—</option>{ALL_STYLES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
         <label className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 font-bold text-brand-navy">Notion format:
           <select aria-label="Notion format" className="bg-transparent font-bold" value={r.notion_format ?? ""} onChange={(e) => void upd({ notion_format: e.target.value || null })}><option value="">—</option>{NOTION_FORMATS.map((x) => <option key={x}>{x}</option>)}</select></label>
         {r.notion_page_id ? <a href={`https://www.notion.so/${r.notion_page_id.replace(/-/g, "")}`} target="_blank" rel="noreferrer" className="rounded-full bg-brand-navy px-2 py-1 font-bold text-card">From Notion ↗</a> : null}

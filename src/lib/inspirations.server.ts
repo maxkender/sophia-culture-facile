@@ -128,9 +128,9 @@ async function analyse(input: { caption: string; transcript: string; words: { t:
 Caption: ${input.caption || "(none)"}
 Transcript with timestamps: ${timed || "(no speech — no usable audio track; analyse from the cover image and caption, audio = none)"}
 
-The 5 UGC styles: reaction_demo = Reaction into demo (face reaction plan then phone/app demo); broll_stickers = B-roll + stickers storytelling, one visual per plan, talked; sole_footage = one single plan + music + text on screen, no talking; talked_hook_demo = talked personal-story hook then app demo; educational = face cam talking, teaching. Use slideshow for photo carousels, other if none fits.
+The 5 UGC video formats (the style JSON key holds the format): reaction_demo = Reaction into demo (face reaction plan then phone/app demo); broll_stickers = B-roll + stickers storytelling, one visual per plan, talked; sole_footage = one single plan + music + text on screen, no talking; talked_hook_demo = talked personal-story hook then app demo; educational = face cam talking, teaching. Use slideshow for photo carousels, other if none fits.
 Apps: Sophia = 5-minute daily culture/general-knowledge courses instead of doom-scrolling. UnSwipe = keeps social apps without Reels/For You/Shorts, reduces screen time.
-Hook = first 3 seconds: verbatim from the transcript (empty if no speech) + what is on screen. Structure = plans with timecodes (seconds). why_it_works = exactly 3 short lines. score = virality /10. tags = 3-6 short lowercase tags. notion_format = the single best-fitting format among the 9 listed options. Write analysis text in English; keep verbatim quotes in the original language.`;
+Hook = first 3 seconds: verbatim from the transcript (empty if no speech) + what is on screen. Structure = plans with timecodes (seconds). why_it_works = exactly 3 short lines. score = virality /10. tags = 3-6 short lowercase tags. notion_format = the separate Notion classification among the 9 listed options; never confuse it with the five Hub video formats. Write analysis text in English; keep verbatim quotes in the original language.`;
   const content: unknown[] = [{ type: "input_text", text }];
   if (input.coverUrl) content.push({ type: "input_image", image_url: input.coverUrl });
   const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {

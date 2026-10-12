@@ -59,21 +59,12 @@ export function StyledPlans({ b, assets }: { b: StudioBrief; assets: BriefAsset[
   const list = (rs: AssetRef[]) => (rs.length ? <ul className="space-y-1">{rs.map((r, i) => <AssetLine key={`${r.asset_id}-${i}`} r={r} assets={assets} />)}</ul> : null);
   const cta = d.cta?.trim() ? <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy"><b>{ct("CTA :")}</b> {d.cta}</p> : null;
   const body = d.body?.trim() ? <p className="rounded-xl bg-portal-bg p-3 text-sm text-brand-navy"><b>{ct("Le fond :")}</b> {d.body}</p> : null;
-  if (b.style === "reaction_demo") return <div className="space-y-3">{body}
-    <PlanCard n={1} label={L("Face (camera on your face)", "Face (caméra sur ton visage)")}>{plans[0]?.reaction ? <p>😮 <b>{ct("Réaction :")}</b> {plans[0].reaction}</p> : null}<OnScreen text={plans[0]?.on_screen ?? ""} fmt={plans[0]?.fmt} /><Say t={plans[0]?.say ?? ""} />{list(plans[0]?.assets ?? [])}</PlanCard>
-    <PlanCard n={2} label={L("Phone / demo (camera on the phone)", "Téléphone / démo (caméra sur le téléphone)")}><Do t={plans[1]?.do ?? ""} /><Say t={plans[1]?.say ?? ""} />{list(plans[1]?.assets ?? [])}</PlanCard>
-    {d.flips?.on ? <p className="rounded-xl border-2 border-dashed border-portal-accent/40 p-3 text-sm">🔄 <b>{ct("Retournements de caméra :")}</b> {d.flips.note}</p> : null}{cta}</div>;
-  if (b.style === "sole_footage") { const x = d.sole; return <div className="space-y-3">{body}
-    <PlanCard n={1} label={`${L("The shot", "Le plan")}${x?.duration_s ? ` · ${x.duration_s} s` : ""}`}>{x?.what ? <p className="whitespace-pre-wrap">🎬 {x.what}</p> : null}<OnScreen text={x?.text ?? ""} fmt={x?.fmt} />
-      {x?.music_title || x?.music_link ? <p>🎵 <b>{ct("Musique :")}</b> {x.music_title}{x.music_link ? <> · <a href={x.music_link} target="_blank" rel="noreferrer" className="font-bold text-portal-accent underline">{ct("Ouvrir la musique")}</a></> : null}</p> : null}
-      {x?.music_asset_id ? list([{ asset_id: x.music_asset_id, when: "" }]) : null}</PlanCard>{cta}</div>; }
-  if (b.style === "educational") return <div className="space-y-3">
-    <p className="rounded-xl bg-portal-bg p-3 text-sm">{ct("🪑 Face cam, assis·e, un carnet dans le cadre au début.")}</p>{body}
-    {d.script_fmt && d.script_fmt.kind !== "none" ? <OnScreen text="" fmt={d.script_fmt} /> : null}
-    <section className="rounded-2xl border-2 border-brand-line p-4"><p className="mb-2 text-sm font-extrabold uppercase text-brand-navySoft">{ct("Le script")}</p><p className="whitespace-pre-wrap text-base leading-relaxed text-brand-navy" data-testid="edu-script">{d.script}</p></section>
-    {d.flashes?.length ? <section><p className="mb-1 text-sm font-extrabold text-brand-navy">{ct("À afficher à l'écran")}</p>{list(d.flashes)}</section> : null}{cta}</div>;
+
   return <div className="space-y-3">{body}
-    {plans.map((p, i) => <PlanCard key={i} n={i + 1} label={`Plan ${i + 1}`}><OnScreen text={p.on_screen} fmt={p.fmt} /><Say t={p.say} /><Do t={p.do} />{p.camera ? <p>🎥 <b>{ct("Caméra :")}</b> {p.camera}</p> : null}{list(p.assets)}</PlanCard>)}
+    {plans.map((p, i) => <PlanCard key={i} n={i + 1} label={`Plan ${i + 1}`}>{p.reaction ? <p><b>{ct("Réaction :")}</b> {p.reaction}</p> : null}<OnScreen text={p.on_screen} fmt={p.fmt} /><Say t={p.say} /><Do t={p.do} />{p.camera ? <p>🎥 <b>{ct("Caméra :")}</b> {p.camera}</p> : null}{list(p.assets)}</PlanCard>)}
+    {b.style === "sole_footage" && d.sole ? <section className="space-y-2 text-sm">{!plans.length ? <><Do t={d.sole.what} /><OnScreen text={d.sole.text} fmt={d.sole.fmt} /></> : null}{d.sole.duration_s ? <p>{d.sole.duration_s} s</p> : null}{d.sole.music_title ? <p>🎵 {d.sole.music_title}</p> : null}{d.sole.music_link ? <a href={d.sole.music_link} target="_blank" rel="noreferrer" className="text-portal-accent underline">{ct("Ouvrir la musique")}</a> : null}{d.sole.music_asset_id ? list([{ asset_id: d.sole.music_asset_id, when: "" }]) : null}</section> : null}
+    {b.style === "educational" ? <><p className="whitespace-pre-wrap text-sm">{d.script}</p>{list(d.flashes ?? [])}</> : null}
+    {d.flips?.on ? <p className="text-sm">{ct("Retournements de caméra :")} {d.flips.note}</p> : null}
     {b.style === "talked_hook_demo" && d.demo ? <PlanCard n={plans.length + 1} label={d.demo.mode === "asset" ? ct("Démo (enregistrement d'écran fourni)") : ct("Démo (filmée par toi)")}>
       {d.demo.mode === "asset" && d.demo.asset ? list([d.demo.asset]) : <Do t={d.demo.do} />}<Say t={d.demo.say} /></PlanCard> : null}{cta}</div>;
 }

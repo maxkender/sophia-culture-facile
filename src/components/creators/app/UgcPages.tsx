@@ -1,3 +1,4 @@
+import { STYLE_LABEL } from "@/lib/brief-studio";
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -73,10 +74,10 @@ export function BriefLibraryPage() {
   const [tab, setTab] = useState<"briefs" | "videos">("briefs");
   const [f, setF] = useState({ format: "", platform: "", difficulty: "", tag: "", peers: false });
   const briefs = d.briefs as any[];
-  const formats = [...new Set(briefs.map((b) => b.format).filter(Boolean))];
+  const formats = [...new Set(briefs.map((b) => b.style).filter(Boolean))];
   const tags = [...new Set(briefs.flatMap((b) => b.tags ?? []))];
   const list = useMemo(() => briefs
-    .filter((b) => (!f.format || b.format === f.format) && (!f.platform || b.platform === f.platform || b.platform === "both") && (!f.difficulty || String(b.difficulty) === f.difficulty) && (!f.tag || (b.tags ?? []).includes(f.tag)))
+    .filter((b) => (!f.format || b.style === f.format) && (!f.platform || b.platform === f.platform || b.platform === "both") && (!f.difficulty || String(b.difficulty) === f.difficulty) && (!f.tag || (b.tags ?? []).includes(f.tag)))
     .filter((b) => !f.peers || (data?.stats[b.id]?.peerPosts ?? 0) > 0)
     .sort((x, y) => (f.peers ? (data?.stats[y.id]?.peerAvg ?? 0) - (data?.stats[x.id]?.peerAvg ?? 0) : (data?.stats[y.id]?.avg ?? 0) - (data?.stats[x.id]?.avg ?? 0))), [briefs, f, data]);
   const sel = "h-10 rounded-md border border-input bg-card px-3 text-sm";
@@ -90,10 +91,10 @@ export function BriefLibraryPage() {
       {tab === "videos" ? <ReferenceLibrary /> : (
         <>
           <div className="mb-6 flex flex-wrap gap-2">
-            <select aria-label={ct("Format")} className={sel} value={f.format} onChange={(e) => setF({ ...f, format: e.target.value })}><option value="">{ct("All formats")}</option>{formats.map((x) => <option key={x}>{x}</option>)}</select>
+            <select aria-label={ct("Format")} className={sel} value={f.format} onChange={(e) => setF({ ...f, format: e.target.value })}><option value="">{ct("All formats")}</option>{formats.map((x) => <option key={x} value={x}>{STYLE_LABEL[x]}</option>)}</select>
             <select aria-label={ct("Platform")} className={sel} value={f.platform} onChange={(e) => setF({ ...f, platform: e.target.value })}><option value="">{ct("All platforms")}</option><option value="tiktok">{ct("TikTok")}</option><option value="instagram">{ct("Instagram")}</option></select>
             <select aria-label={ct("Difficulty")} className={sel} value={f.difficulty} onChange={(e) => setF({ ...f, difficulty: e.target.value })}><option value="">{ct("Any difficulty")}</option><option value="1">{ct("Easy")}</option><option value="2">{ct("Medium")}</option><option value="3">{ct("Hard")}</option></select>
-            <select aria-label={ct("Tag")} className={sel} value={f.tag} onChange={(e) => setF({ ...f, tag: e.target.value })}><option value="">{ct("All tags")}</option>{tags.map((x) => <option key={x}>{x}</option>)}</select>
+            <select aria-label={ct("Tag")} className={sel} value={f.tag} onChange={(e) => setF({ ...f, tag: e.target.value })}><option value="">{ct("All tags")}</option>{tags.map((x) => <option key={x} value={x}>{STYLE_LABEL[x]}</option>)}</select>
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={f.peers} onChange={(e) => setF({ ...f, peers: e.target.checked })} /> {ct("Worked well for people like me")}</label>
           </div>
           {list.length === 0 ? <EmptyState title={ct("No brief matches")} /> : (
@@ -105,7 +106,7 @@ export function BriefLibraryPage() {
                     <PortalCard className="h-full p-4 transition hover:ring-2 hover:ring-portal-accent/30">
                       <p className="text-lg font-extrabold text-brand-navy">{ct(b.title)}</p>
                       {b.hook && <p className="mt-1 text-sm text-brand-navySoft">{b.hook}</p>}
-                      <p className="mt-2 text-xs text-brand-navySoft">{[b.format, b.platform === "both" ? ct("TikTok + Instagram") : b.platform, ["", "Easy", "Medium", "Hard"][b.difficulty ?? 1], ...(b.tags ?? [])].filter(Boolean).join(" · ")}</p>
+                      <p className="mt-2 text-xs text-brand-navySoft">{[STYLE_LABEL[b.style], b.platform === "both" ? ct("TikTok + Instagram") : b.platform, ["", "Easy", "Medium", "Hard"][b.difficulty ?? 1], ...(b.tags ?? [])].filter(Boolean).join(" · ")}</p>
                       <p className="mt-3 text-sm font-bold text-brand-navy">{s?.posts ? `${n(s.avg)} avg views at 7 days · ${s.posts} post${s.posts > 1 ? "s" : ""}` : ct("Not posted yet")}</p>
                       {f.peers && s?.peerPosts ? <p className="text-xs text-brand-navySoft">{n(s.peerAvg)} avg for creators at your level</p> : null}
                     </PortalCard>

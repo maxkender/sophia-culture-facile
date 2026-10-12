@@ -70,7 +70,7 @@ export function SnippetSlot({ kind, label, value, onChange, appId, style, langua
     const { error } = await supabase.from("brief_snippets").insert({ kind, text: value.trim(), app_id: appId, language, styles: style ? [style] : [] } as never);
     if (error) toast.error("Could not save to the library."); else { toast.success("Saved to the library"); void qc.invalidateQueries({ queryKey: ["hub", "snippets"] }); }
   }
-  const row = (s: Snip) => <button type="button" key={s.id} onClick={() => void use(s)} className="block w-full rounded-lg border bg-card p-2 text-left text-sm hover:border-portal-accent"><p className="font-semibold text-brand-navy">{s.text}</p>{s.why ? <p className="text-xs text-brand-navySoft">{s.why}</p> : null}<p className="text-[10px] text-brand-navySoft">{s.styles.map((x) => STYLE_LABEL[x]).join(" · ") || "All styles"} · used {s.usage_count}×</p></button>;
+  const row = (s: Snip) => <button type="button" key={s.id} onClick={() => void use(s)} className="block w-full rounded-lg border bg-card p-2 text-left text-sm hover:border-portal-accent"><p className="font-semibold text-brand-navy">{s.text}</p>{s.why ? <p className="text-xs text-brand-navySoft">{s.why}</p> : null}<p className="text-[10px] text-brand-navySoft">{s.styles.map((x) => STYLE_LABEL[x]).join(" · ") || "All formats"} · used {s.usage_count}×</p></button>;
   return (
     <div>
       <label className="block text-sm font-semibold">{label}<textarea rows={rows} className={cn(field, "py-2")} value={value} onChange={(e) => onChange(e.target.value)} /></label>
@@ -81,9 +81,9 @@ export function SnippetSlot({ kind, label, value, onChange, appId, style, langua
       </div>
       {open !== "none" ? (
         <div className="mt-2 space-y-1.5 rounded-xl border bg-portal-bg p-2" data-testid={`snippets-${kind}`}>
-          {open === "pick" ? <div className="flex gap-2"><input aria-label="Search snippets" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search" className="h-9 flex-1 rounded-lg border px-2 text-sm" /><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={fit} onChange={(e) => setFit(e.target.checked)} />This app + style</label></div> : null}
+          {open === "pick" ? <div className="flex gap-2"><input aria-label="Search snippets" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search" className="h-9 flex-1 rounded-lg border px-2 text-sm" /><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={fit} onChange={(e) => setFit(e.target.checked)} />This app + format</label></div> : null}
           {(open === "pick" ? shown : random).map(row)}
-          {!(open === "pick" ? shown : random).length ? <p className="text-xs text-brand-navySoft">Nothing in the library yet for this app and style. Add some in Library → Hooks &amp; CTAs.</p> : null}
+          {!(open === "pick" ? shown : random).length ? <p className="text-xs text-brand-navySoft">Nothing in the library yet for this app and format. Add some in Library → Hooks &amp; CTAs.</p> : null}
         </div>
       ) : null}
     </div>
