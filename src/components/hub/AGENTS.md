@@ -1,0 +1,2 @@
+- Notion Inspiration sync lives in src/lib/notion-sync.server.ts (pull + push, behind /api/public/cron/ugc/notion-sync and notionSyncNow); it only writes the Hub-owned Notion properties and reuses the Inspiration enqueue/normalise path; why: one ingest pipeline and the owner's Notion data stays his.
+- Briefs move draft → ready → published → archived; only an explicit confirmed publish makes a brief visible (RLS: creators read status='published'); why: nothing reaches creators by accident.
