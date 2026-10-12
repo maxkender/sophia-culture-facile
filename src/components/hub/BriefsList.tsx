@@ -115,150 +115,116 @@ function FromVideo({ app, onClose }: { app: string; onClose: () => void }) {
 }
 
 type Row = { id: string; title: string; hook_text: string | null; hook: string | null; brief_type: string; effort: string | null; status: string; audience: string; audience_efforts: string[]; score: number | null; drop_at: string | null; language: string; created_at: string; style: string | null; app_id: string; updated_at: string | null; inspiration_id: string | null; inspirations: { cover_path: string | null; author_handle: string | null } | null };
-const TABS = [["formats", "Formats"], ["draft", "Drafts"], ["ready", "Ready"], ["published", "Published"], ["archived", "Archived"]] as const;
-const inTab = (t: string, s: string) => (t === "published" ? s === "published" || s === "scheduled" : s === t);
+const TABS = [["formats", "Formats"], ["mine", "My briefs"], ["published", "Published"], ["archived", "Archived"]] as const;
+const inTab = (t: string, s: string) => (t === "published" ? s === "published" || s === "scheduled" : t === "mine" ? s === "draft" || s === "ready" : s === t);
+const STATUS_LABEL: Record<string, string> = { draft: "Draft", ready: "Ready", published: "Published", scheduled: "Scheduled", archived: "Archived" };
+export { QuickBrief, FromVideo };
 
-export function BriefsList({ formats }: { formats?: ReactNode } = {}) {
+export function BriefsList({ formats, initialTab }: { formats?: ReactNode; initialTab?: string } = {}) {
   const { appId } = useAdminApp();
   const app = appId ?? SOPHIA_APP_ID;
-  const qc = useQueryClient();
-  const gen = useServerFn(generateBriefsFromCourses);
-  const [panel, setPanel] = useState<"none" | "quick" | "video">("none");
-  const [n, setN] = useState(3);
-  const [busy, setBusy] = useState(false);
-  const [picked, setPicked] = useState<string[]>([]);
-  const [f, setF] = useState({ type: "all", effort: "all", status: "all", audience: "all", style: "all" });
-  const [tab, setTab] = useState<string>("draft"); const [q, setQ] = useState(""); const [appF, setAppF] = useState<string>(appId ?? "all"); const [lang, setLang] = useState("all");
-  const { data: apps = [] } = useApps(); const navigate = useNavigate();
+  const qc = useQueryClient(); const navigate = useNavigate();
+  const { data: apps = [] } = useApps();
   const appName = (id: string) => (apps as { id: string; name: string }[]).find((a) => a.id === id)?.name ?? "—";
-  const [more, setMore] = useState(false);
-  const [assignTo, setAssignTo] = useState("");
+  const [tab, setTab] = useState<string>(initialTab === "formats" ? "formats" : "mine");
+  const [q, setQ] = useState(""); const [style, setStyle] = useState("all"); const [lang, setLang] = useState("all");
+  const [menu, setMenu] = useState(false); const [filterOpen, setFilterOpen] = useState(false); const [pickFmt, setPickFmt] = useState(false);
   const { data } = useQuery({
     queryKey: ["hub", "learn", "briefs", app],
     queryFn: async () => {
-      const [b, p, a, c] = await Promise.all([
-        supabase.from("briefs").select("id, title, hook_text, hook, brief_type, effort, status, audience, audience_efforts, score, drop_at, language, created_at, style, app_id, updated_at, inspiration_id, inspirations(cover_path, author_handle)").neq("brief_type", "format").order("created_at", { ascending: false }).limit(500),
+      const [b, p, f] = await Promise.all([
+        supabase.from("briefs").select("id, title, hook_text, hook, brief_type, effort, status, audience, audience_efforts, score, drop_at, language, created_at, style, app_id, updated_at, inspiration_id, inspirations(cover_path, author_handle)").eq("app_id", app).neq("brief_type", "format").order("updated_at", { ascending: false }).limit(500),
         supabase.from("creator_posts").select("brief_id, views, posted_on").not("brief_id", "is", null),
-        supabase.from("brief_assets").select("brief_id"),
-        supabase.from("creators").select("id, full_name, creator_apps!inner(app_id)").eq("creator_apps.app_id", app).order("full_name").limit(500),
+        supabase.from("briefs").select("id, title").eq("app_id", app).eq("brief_type", "format").order("sort_order"),
       ]);
-      const stats: Record<string, { posts: number; v7: number[]; assets: number }> = {};
-      const s = (id: string) => (stats[id] ??= { posts: 0, v7: [], assets: 0 });
+      const stats: Record<string, { posts: number; v7: number[] }> = {};
       const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
-      for (const r of p.data ?? []) { const x = s(r.brief_id!); x.posts++; if (r.posted_on && r.posted_on <= weekAgo) x.v7.push(Number(r.views ?? 0)); }
-      for (const r of a.data ?? []) s(r.brief_id).assets++;
-      return { rows: (b.data ?? []) as unknown as Row[], stats, creators: c.data ?? [] };
+      for (const r of p.data ?? []) { const x = (stats[r.brief_id!] ??= { posts: 0, v7: [] }); x.posts++; if (r.posted_on && r.posted_on <= weekAgo) x.v7.push(Number(r.views ?? 0)); }
+      return { rows: (b.data ?? []) as unknown as Row[], stats, formats: (f.data ?? []) as { id: string; title: string }[] };
     },
   });
-  const counts = useMemo(() => Object.fromEntries(TABS.map(([k]) => [k, (data?.rows ?? []).filter((r) => inTab(k, r.status)).length])), [data]);
-  const rows = useMemo(() => (data?.rows ?? []).filter((r) => inTab(tab, r.status) && (appF === "all" || r.app_id === appF) && (lang === "all" || r.language === lang)
-    && (!q || `${r.title} ${r.hook_text ?? ""}`.toLowerCase().includes(q.toLowerCase())) &&
-    (f.style === "all" || (f.style === "none" ? !r.style : r.style === f.style)) && (f.type === "all" || (f.type === "variant" ? false : r.brief_type === f.type)) && (f.effort === "all" || r.effort === f.effort) && (f.status === "all" || r.status === f.status)
-    && (f.audience === "all" || (f.audience === "effort" ? r.audience_efforts?.length : r.audience === f.audience && !r.audience_efforts?.length))), [data, f, tab, appF, lang, q]);
-  const coverPaths = (data?.rows ?? []).map((r) => r.inspirations?.cover_path).filter(Boolean) as string[];
+  const counts = useMemo(() => ({ ...Object.fromEntries(TABS.map(([k]) => [k, (data?.rows ?? []).filter((r) => inTab(k, r.status)).length])), formats: data?.formats.length ?? 0 }) as Record<string, number>, [data]);
+  const rows = useMemo(() => (data?.rows ?? []).filter((r) => inTab(tab, r.status) && (lang === "all" || r.language === lang)
+    && (style === "all" || (style === "none" ? !r.style : r.style === style))
+    && (!q || `${r.title} ${r.hook_text ?? ""}`.toLowerCase().includes(q.toLowerCase()))), [data, tab, lang, style, q]);
+  const coverPaths = rows.map((r) => r.inspirations?.cover_path).filter(Boolean) as string[];
   const { data: covers = {} } = useQuery({ queryKey: ["hub", "brief-covers", coverPaths.join("|")], enabled: coverPaths.length > 0, staleTime: 50 * 60_000, queryFn: async () => Object.fromEntries(((await supabase.storage.from("inspirations").createSignedUrls(coverPaths, 3600)).data ?? []).map((d) => [d.path, d.signedUrl])) as Record<string, string> });
-  async function duplicate(id: string) {
+  const reload = () => void qc.invalidateQueries({ queryKey: ["hub", "learn"] });
+  async function copyBrief(id: string, fromFormat: boolean) {
     const { data: src } = await supabase.from("briefs").select("*").eq("id", id).single(); if (!src) return;
     const { id: _id, created_at: _c, updated_at: _u, ...rest } = src as Record<string, unknown>; void _id; void _c; void _u;
-    const { data: n, error } = await supabase.from("briefs").insert({ ...rest, title: `Copy of ${String(src.title)}`, status: "draft", drop_at: null } as never).select("id").single();
+    const extra = fromFormat ? { brief_type: "precise", parent_format_id: id, pinned: false, title: String(src.title) } : { title: `Copy of ${String(src.title)}` };
+    const { data: n, error } = await supabase.from("briefs").insert({ ...rest, ...extra, status: "draft", drop_at: null } as never).select("id").single();
     if (error || !n) { toast.error("Could not duplicate."); return; }
     const { data: ba } = await supabase.from("brief_assets").select("asset_id, role, sort_order").eq("brief_id", id);
     if (ba?.length) await supabase.from("brief_assets").insert(ba.map((x) => ({ ...x, brief_id: n.id })));
-    toast.success("Duplicated as a draft"); reload();
+    reload();
+    if (fromFormat) void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: n.id } }); else toast.success("Duplicated as a draft");
   }
-  async function patchOne(id: string, patch: Record<string, unknown>, label: string) { const { error } = await supabase.from("briefs").update(patch as never).eq("id", id); if (error) toast.error("Could not update."); else { toast.success(label); reload(); } }
+  async function patchOne(id: string, patch: Record<string, unknown>, label: string) {
+    if (patch["status"] === "published" && !window.confirm("Publish to creators? This makes the brief visible to creators.")) return;
+    const { error } = await supabase.from("briefs").update(patch as never).eq("id", id); if (error) toast.error("Could not update."); else { toast.success(label); reload(); }
+  }
   async function removeOne(r: Row) {
     if (r.status === "published" || r.status === "scheduled") { toast.error("Archive a published brief instead of deleting it."); return; }
     if (!window.confirm(`Delete “${r.title}”? This cannot be undone.`)) return;
     await supabase.from("brief_assets").delete().eq("brief_id", r.id);
     const { error } = await supabase.from("briefs").delete().eq("id", r.id); if (error) toast.error("Could not delete."); else { toast.success("Deleted"); reload(); }
   }
-  const reload = () => void qc.invalidateQueries({ queryKey: ["hub", "learn"] });
-  async function bulk(patch: Record<string, unknown>, label: string) {
-    if (patch["status"] === "published" && !window.confirm(`Publish ${picked.length} brief(s) to creators? This makes them visible to creators.`)) return;
-    const low = (data?.rows ?? []).filter((r) => picked.includes(r.id) && patch["status"] === "published" && (r.score ?? 0) < 8);
-    if (low.length && !window.confirm(`${low.length} selected brief(s) score under 8/10. Publish anyway?`)) return;
-    const { error } = await supabase.from("briefs").update(patch as never).in("id", picked);
-    if (error) toast.error("Could not update."); else { toast.success(`${picked.length} ${label}`); setPicked([]); reload(); }
-  }
-  async function bulkAssign() {
-    if (!assignTo) return;
-    const { error } = await supabase.from("brief_assignments").insert(picked.map((id) => ({ brief_id: id, creator_id: assignTo, published_at: new Date().toISOString() })));
-    if (error) toast.error("Could not assign."); else { toast.success(`${picked.length} assigned`); setPicked([]); }
-  }
+  const pub = tab === "published"; const filtered = style !== "all" || lang !== "all";
+  const chip = "rounded bg-portal-bg px-1.5 py-0.5 text-[10px] font-bold text-brand-navySoft";
   return (
     <div className="space-y-4">
-      <div className={cn(card, "flex flex-wrap items-end gap-2")}>
-        <Button asChild><Link to="/hub/ugc/library/briefs/$briefId" params={{ briefId: "new" }}>New brief</Link></Button>
-        <Button variant="outline" onClick={() => setPanel(panel === "quick" ? "none" : "quick")}><Zap className="size-4" />Brief rapide</Button>
-        <Button variant="outline" onClick={() => setPanel(panel === "video" ? "none" : "video")}><Film className="size-4" />Brief depuis une vidéo</Button>
-        <div className="relative ml-auto"><Button variant="ghost" size="sm" aria-expanded={more} onClick={() => setMore(!more)}>More ▾</Button>
-          {more ? <div className="absolute right-0 z-20 mt-1 flex w-72 flex-wrap items-end gap-2 rounded-xl border bg-card p-3 shadow-portal"><p className="w-full text-xs text-brand-navySoft">Creates drafts only, from Sophia courses.</p>
-        <label className="text-xs font-semibold text-brand-navySoft">Courses<input type="number" min={1} max={20} value={n} onChange={(e) => setN(Math.min(20, Math.max(1, Number(e.target.value))))} className="mt-1 block h-9 w-16 rounded-lg border px-2" /></label>
-        <Button variant="outline" disabled={busy} onClick={async () => {
-          setBusy(true);
-          try { const r = await gen({ data: { count: n, appId: app, language: "fr" } }); toast[r.errors.length ? "warning" : "success"](`${r.created} draft briefs from ${r.courses} courses${r.errors.length ? ` — ${r.errors[0]}` : ""}`); reload(); }
-          catch (e) { toast.error((e as Error).message); } finally { setBusy(false); }
-        }}><Sparkles className="size-4" />{busy ? "Writing…" : "Generate from courses"}</Button>
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex gap-1.5 overflow-x-auto" role="tablist" aria-label="Briefs">{TABS.map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cn("min-h-9 shrink-0 rounded-full px-4 text-sm font-bold", tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l} ({counts[k] ?? 0})</button>)}</div>
+        <div className="relative ml-auto">
+          <Button aria-expanded={menu} onClick={() => setMenu(!menu)}>New brief ▾</Button>
+          {menu ? <div className="absolute right-0 z-20 mt-1 w-56 rounded-xl border bg-card p-1 shadow-portal" role="menu">
+            <Link role="menuitem" to="/hub/ugc/library/briefs/$briefId" params={{ briefId: "new" }} className="block rounded-lg px-3 py-2 text-sm font-semibold hover:bg-portal-bg">Blank</Link>
+            <Link role="menuitem" to="/hub/ugc/inspiration" className="block rounded-lg px-3 py-2 text-sm font-semibold hover:bg-portal-bg">From an inspiration</Link>
+            <button role="menuitem" type="button" onClick={() => { setMenu(false); setPickFmt(true); }} className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-portal-bg">From a format</button>
           </div> : null}
         </div>
       </div>
-      {panel === "quick" ? <QuickBrief app={app} onClose={() => setPanel("none")} /> : panel === "video" ? <FromVideo app={app} onClose={() => setPanel("none")} /> : null}
-      <div className="flex gap-1.5 overflow-x-auto" role="tablist" aria-label="Brief status">{TABS.map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => { setTab(k); setPicked([]); }} className={cn("min-h-9 shrink-0 rounded-full px-4 text-sm font-bold", tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l}{k !== "formats" ? ` · ${counts[k] ?? 0}` : ""}</button>)}</div>
+      {pickFmt ? <div className={cn(card, "space-y-2")}><div className="flex items-center justify-between"><b className="text-brand-navy">Pick a format to start from</b><Button size="sm" variant="ghost" onClick={() => setPickFmt(false)}>Cancel</Button></div>
+        <p className="text-xs text-brand-navySoft">It is copied as a draft; the format itself is not changed.</p>
+        <div className="grid max-h-80 gap-1 overflow-y-auto sm:grid-cols-2">{(data?.formats ?? []).map((f) => <button key={f.id} type="button" onClick={() => { setPickFmt(false); void copyBrief(f.id, true); }} className="rounded-lg border px-3 py-2 text-left text-sm hover:bg-portal-bg">{f.title}</button>)}</div></div> : null}
       {tab === "formats" ? formats ?? null : <>
-      <div className="flex flex-wrap gap-2">
-        <input aria-label="Search briefs" placeholder="Search title or hook…" value={q} onChange={(e) => setQ(e.target.value)} className={cn(sel, "min-w-48 flex-1")} />
-        <select aria-label="App" className={sel} value={appF} onChange={(e) => setAppF(e.target.value)}><option value="all">All apps</option>{(apps as { id: string; name: string }[]).map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</select>
-        <select aria-label="Language" className={sel} value={lang} onChange={(e) => setLang(e.target.value)}><option value="all">All languages</option><option value="fr">FR</option><option value="en">EN</option></select>
-      </div>
-      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Style">{[["all", "All"], ...STYLES.map(([k, l], i) => [k, `${i + 1}. ${l}`]), ["none", "No style"]].map(([k, l]) => <button key={k} type="button" onClick={() => setF({ ...f, style: k! })} className={cn("min-h-8 rounded-full px-3 text-xs font-bold", f.style === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l}</button>)}</div>
-      <div className="flex flex-wrap gap-2">
-        <select aria-label="Type" className={sel} value={f.type} onChange={(e) => setF({ ...f, type: e.target.value })}><option value="all">All types</option><option value="precise">Précis</option></select>
-        <select aria-label="Effort" className={sel} value={f.effort} onChange={(e) => setF({ ...f, effort: e.target.value })}><option value="all">All efforts</option>{Object.entries(EFF).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
-        <select aria-label="Audience" className={sel} value={f.audience} onChange={(e) => setF({ ...f, audience: e.target.value })}><option value="all">All audiences</option><option value="selected">Selected creators</option><option value="effort">By effort</option></select>
-      </div>
-      {picked.length ? (
-        <div className={cn(card, "flex flex-wrap items-center gap-2 py-3")}>
-          <b className="text-sm">{picked.length} selected</b>
-          <Button size="sm" onClick={() => void bulk({ status: "published" }, "published")}>Publish</Button>
-          <Button size="sm" variant="outline" onClick={() => void bulk({ status: "scheduled", drop_at: nextMonday() }, "scheduled for Monday")}>Schedule Monday</Button>
-          <Button size="sm" variant="outline" onClick={() => void bulk({ status: "archived" }, "archived")}>Archive</Button>
-          <select aria-label="Assign to" className={sel} value={assignTo} onChange={(e) => setAssignTo(e.target.value)}><option value="">Assign to…</option>{(data?.creators ?? []).map((c) => <option key={c.id} value={c.id}>{c.full_name}</option>)}</select>
-          <Button size="sm" variant="outline" disabled={!assignTo} onClick={() => void bulkAssign()}>Assign</Button>
+      <div className="flex gap-2">
+        <input aria-label="Search briefs" placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} className={cn(sel, "min-w-0 flex-1")} />
+        <div className="relative"><Button variant="outline" size="sm" className="h-9" aria-expanded={filterOpen} onClick={() => setFilterOpen(!filterOpen)}>Filter{filtered ? " •" : ""}</Button>
+          {filterOpen ? <div className="absolute right-0 z-20 mt-1 w-64 space-y-2 rounded-xl border bg-card p-3 shadow-portal">
+            <label className="block text-xs font-semibold">Style<select className={cn(sel, "mt-1 w-full")} value={style} onChange={(e) => setStyle(e.target.value)}><option value="all">All styles</option>{STYLES.map(([k, l], i) => <option key={k} value={k}>{i + 1}. {l}</option>)}<option value="none">No style</option></select></label>
+            <label className="block text-xs font-semibold">Language<select className={cn(sel, "mt-1 w-full")} value={lang} onChange={(e) => setLang(e.target.value)}><option value="all">All</option><option value="fr">FR</option><option value="en">EN</option></select></label>
+          </div> : null}
         </div>
-      ) : null}
+      </div>
       <div className="overflow-x-auto rounded-2xl bg-card shadow-portal">
-        <table className="w-full min-w-[760px] text-sm">
-          <thead className="text-left text-xs uppercase text-brand-navySoft"><tr>
-            <th className="p-3"><input type="checkbox" aria-label="Select all" checked={rows.length > 0 && picked.length === rows.length} onChange={(e) => setPicked(e.target.checked ? rows.map((r) => r.id) : [])} /></th>
-            <th className="p-3">Brief</th><th className="p-3">Style</th><th className="p-3">Score</th><th className="p-3">Effort</th><th className="p-3">Status</th><th className="p-3">Posts</th><th className="p-3">Avg views 7 d</th><th className="p-3">Files</th><th className="p-3">App · edited</th><th className="p-3">Actions</th>
-          </tr></thead>
-          <tbody>{(f.style === "all" ? [...STYLES.map(([k]) => k as string), ""].map((k) => ({ k, list: rows.filter((r) => (r.style ?? "") === k) })).filter((g) => g.list.length) : [{ k: "-", list: rows }]).flatMap((g) => [
-            ...(g.k !== "-" ? [<tr key={`g-${g.k}`} className="bg-portal-bg"><td colSpan={11} className="px-3 py-2 text-xs font-extrabold uppercase tracking-wide text-brand-navySoft">{g.k ? `Style ${STYLE_NUM[g.k]} · ${STYLE_LABEL[g.k]}` : "No style yet"} · {g.list.length}</td></tr>] : []),
-            ...g.list.map((r) => { const s = data?.stats[r.id]; const avg = s?.v7.length ? Math.round(s.v7.reduce((a, b) => a + b, 0) / s.v7.length) : null; return (
+        {rows.length ? <table className="w-full min-w-[560px] text-sm">
+          <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Brief</th><th className="p-3">Status</th><th className="p-3">Score</th>{pub ? <><th className="p-3">Posts</th><th className="p-3">Avg views 7d</th></> : null}<th className="p-3">Last edited</th><th className="p-3"><span className="sr-only">Actions</span></th></tr></thead>
+          <tbody>{rows.map((r) => { const s = data?.stats[r.id]; const avg = s?.v7.length ? Math.round(s.v7.reduce((a, b) => a + b, 0) / s.v7.length) : null; const isPub = r.status === "published" || r.status === "scheduled"; return (
             <tr key={r.id} className="border-t border-brand-line">
-              <td className="p-3"><input type="checkbox" aria-label={`Select ${r.title}`} checked={picked.includes(r.id)} onChange={(e) => setPicked((x) => (e.target.checked ? [...x, r.id] : x.filter((y) => y !== r.id)))} /></td>
-              <td className="max-w-[340px] p-3"><div className="flex items-start gap-2">{r.inspirations?.cover_path && covers[r.inspirations.cover_path] ? <img src={covers[r.inspirations.cover_path]} alt={`Inspiration @${r.inspirations.author_handle ?? ""}`} className="h-12 w-8 shrink-0 rounded object-cover" loading="lazy" /> : null}<div className="min-w-0"><Link to="/hub/ugc/library/briefs/$briefId" params={{ briefId: r.id }} className="font-bold text-brand-navy hover:underline">{r.title}</Link>{r.language === "en" ? <span className="ml-1 rounded bg-portal-bg px-1 text-[10px] font-bold">EN</span> : null}<p className="truncate text-xs text-brand-navySoft">{r.hook_text ?? r.hook}</p></div></div></td>
-              <td className="p-3 text-xs">{r.style ? `${STYLE_NUM[r.style]}. ${STYLE_LABEL[r.style]}` : "—"}</td>
+              <td className="max-w-[380px] p-3"><div className="flex items-start gap-2">{r.inspirations?.cover_path && covers[r.inspirations.cover_path] ? <img src={covers[r.inspirations.cover_path]} alt="" className="h-10 w-7 shrink-0 rounded object-cover" loading="lazy" /> : null}<div className="min-w-0"><Link to="/hub/ugc/library/briefs/$briefId" params={{ briefId: r.id }} className="font-bold text-brand-navy hover:underline">{r.title || "Untitled"}</Link>
+                <div className="mt-1 flex flex-wrap gap-1"><span className={chip}>{appName(r.app_id)}</span>{r.style ? <span className={chip}>{STYLE_NUM[r.style]}. {STYLE_LABEL[r.style]}</span> : null}{r.language === "en" ? <span className={chip}>EN</span> : null}</div></div></div></td>
+              <td className="p-3">{STATUS_LABEL[r.status] ?? r.status}</td>
               <td className="p-3">{r.score != null ? <span className={cn("rounded-full px-2 py-0.5 text-xs font-bold", r.score >= 8 ? "bg-portal-green/15 text-portal-green" : "bg-portal-amber/20")}>{r.score}/10</span> : "—"}</td>
-              <td className="p-3">{EFF[r.effort ?? ""] ?? "—"}</td>
-              <td className="p-3">{r.status}{r.status === "scheduled" && r.drop_at ? <span className="block text-xs text-brand-navySoft">{new Date(r.drop_at).toLocaleDateString()}</span> : null}</td>
-              <td className="p-3">{s?.posts ?? 0}</td><td className="p-3">{avg != null ? avg.toLocaleString() : "—"}</td><td className="p-3">{s?.assets ?? 0}</td>
-              <td className="whitespace-nowrap p-3 text-xs">{appName(r.app_id)}<span className="block text-brand-navySoft">{new Date(r.updated_at ?? r.created_at).toLocaleDateString("en-GB")}</span></td>
-              <td className="p-3"><select aria-label={`Actions for ${r.title}`} className={cn(sel, "h-8 text-xs")} value="" onChange={(e) => { const v = e.target.value; e.target.value = "";
+              {pub ? <><td className="p-3">{s?.posts ?? 0}</td><td className="p-3">{avg != null ? avg.toLocaleString() : "—"}</td></> : null}
+              <td className="whitespace-nowrap p-3 text-xs text-brand-navySoft">{new Date(r.updated_at ?? r.created_at).toLocaleDateString("en-GB")}</td>
+              <td className="p-3"><select aria-label={`Actions for ${r.title}`} className={cn(sel, "h-8 w-12 text-xs")} value="" onChange={(e) => { const v = e.target.value;
                 if (v === "open") void navigate({ to: "/hub/ugc/library/briefs/$briefId", params: { briefId: r.id } });
-                else if (v === "dup") void duplicate(r.id); else if (v === "archive") void patchOne(r.id, { status: "archived" }, "Archived");
-                else if (v === "ready") void patchOne(r.id, { status: "ready" }, "Marked ready"); else if (v === "draft") void patchOne(r.id, { status: "draft" }, "Back to draft");
-                else if (v === "delete") void removeOne(r); else if (v.startsWith("app:")) void patchOne(r.id, { app_id: v.slice(4) }, "App changed"); }}>
+                else if (v === "dup") void copyBrief(r.id, false);
+                else if (v === "publish") void patchOne(r.id, { status: "published" }, "Published");
+                else if (v === "unpublish") void patchOne(r.id, { status: "ready", drop_at: null }, "Unpublished");
+                else if (v === "archive") void patchOne(r.id, { status: "archived" }, "Archived");
+                else if (v === "restore") void patchOne(r.id, { status: "draft" }, "Back in My briefs");
+                else if (v === "delete") void removeOne(r); }}>
                 <option value="">⋯</option><option value="open">Open</option><option value="dup">Duplicate</option>
-                {r.status === "draft" ? <option value="ready">Mark ready</option> : null}{r.status === "archived" || r.status === "ready" ? <option value="draft">Back to draft</option> : null}
+                {isPub ? <option value="unpublish">Unpublish</option> : r.status !== "archived" ? <option value="publish">Publish…</option> : <option value="restore">Restore</option>}
                 {r.status !== "archived" ? <option value="archive">Archive</option> : null}
-                {(apps as { id: string; name: string }[]).filter((a) => a.id !== r.app_id).map((a) => <option key={a.id} value={`app:${a.id}`}>Move to {a.name}</option>)}
-                {r.status !== "published" && r.status !== "scheduled" ? <option value="delete">Delete…</option> : null}
+                {!isPub ? <option value="delete">Delete…</option> : null}
               </select></td>
-            </tr>); })])}</tbody>
-        </table>
-        {!rows.length ? <p className="p-5 text-sm text-brand-navySoft">{tab === "draft" ? "No drafts. Create a brief or start from an inspiration." : "No briefs here."}</p> : null}
+            </tr>); })}</tbody>
+        </table> : <p className="p-5 text-sm text-brand-navySoft">{tab === "mine" ? "No briefs yet — click New brief." : tab === "published" ? "No published briefs yet." : "No archived briefs."}</p>}
       </div>
       </>}
     </div>
