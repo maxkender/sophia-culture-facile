@@ -4585,6 +4585,7 @@ export type Database = {
           language: string | null
           likes: number | null
           next_try_at: string
+          no_audio: boolean
           norm_key: string
           notion_format: string | null
           notion_notes: string | null
@@ -4629,6 +4630,7 @@ export type Database = {
           language?: string | null
           likes?: number | null
           next_try_at?: string
+          no_audio?: boolean
           norm_key: string
           notion_format?: string | null
           notion_notes?: string | null
@@ -4673,6 +4675,7 @@ export type Database = {
           language?: string | null
           likes?: number | null
           next_try_at?: string
+          no_audio?: boolean
           norm_key?: string
           notion_format?: string | null
           notion_notes?: string | null
@@ -5035,12 +5038,17 @@ export type Database = {
           created_at: string
           error: string | null
           hub_status: string | null
+          imported_count: number
           inspiration_id: string | null
+          inspiration_ids: string[]
           kind: string
           norm_key: string | null
           notion_last_edited: string | null
           notion_page_id: string
           notion_props: Json
+          profile_started_at: string | null
+          profile_status: string | null
+          profile_target: number | null
           pushed_at: string | null
           updated_at: string
           url: string | null
@@ -5049,12 +5057,17 @@ export type Database = {
           created_at?: string
           error?: string | null
           hub_status?: string | null
+          imported_count?: number
           inspiration_id?: string | null
+          inspiration_ids?: string[]
           kind?: string
           norm_key?: string | null
           notion_last_edited?: string | null
           notion_page_id: string
           notion_props?: Json
+          profile_started_at?: string | null
+          profile_status?: string | null
+          profile_target?: number | null
           pushed_at?: string | null
           updated_at?: string
           url?: string | null
@@ -5063,12 +5076,17 @@ export type Database = {
           created_at?: string
           error?: string | null
           hub_status?: string | null
+          imported_count?: number
           inspiration_id?: string | null
+          inspiration_ids?: string[]
           kind?: string
           norm_key?: string | null
           notion_last_edited?: string | null
           notion_page_id?: string
           notion_props?: Json
+          profile_started_at?: string | null
+          profile_status?: string | null
+          profile_target?: number | null
           pushed_at?: string | null
           updated_at?: string
           url?: string | null
@@ -6407,6 +6425,7 @@ export type Database = {
           notion_last_error: string | null
           notion_last_full_sync: string | null
           notion_last_sync: string | null
+          notion_videos_per_profile: number
           payday_day: number
           posts_per_profile_call: number
           streak30_bonus: number
@@ -6432,6 +6451,7 @@ export type Database = {
           notion_last_error?: string | null
           notion_last_full_sync?: string | null
           notion_last_sync?: string | null
+          notion_videos_per_profile?: number
           payday_day?: number
           posts_per_profile_call?: number
           streak30_bonus?: number
@@ -6457,6 +6477,7 @@ export type Database = {
           notion_last_error?: string | null
           notion_last_full_sync?: string | null
           notion_last_sync?: string | null
+          notion_videos_per_profile?: number
           payday_day?: number
           posts_per_profile_call?: number
           streak30_bonus?: number

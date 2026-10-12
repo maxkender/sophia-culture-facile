@@ -56,9 +56,9 @@ function useCovers(rows: Insp[]) {
   });
 }
 
-export function Inspiration({ initialOpen }: { initialOpen?: string | undefined } = {}) {
+export function Inspiration({ initialOpen, initialAuthor }: { initialOpen?: string | undefined; initialAuthor?: string | undefined } = {}) {
   const { data: all = [], isLoading } = useInspirations(); const { appId } = useAdminApp(); const qc = useQueryClient();
-  const [flt, setFlt] = useState({ q: "", style: "all", fit: "all", lang: "all", platform: "all", hook: "all", minScore: 0, status: "all", tag: "", since: "" });
+  const [flt, setFlt] = useState({ q: initialAuthor ?? "", style: "all", fit: "all", lang: "all", platform: "all", hook: "all", minScore: 0, status: "all", tag: "", since: "" });
   const [sort, setSort] = useState<"date" | "views" | "score">("date");
   const [sel, setSel] = useState<Set<string>>(new Set()); const [open, setOpen] = useState<string | null>(initialOpen ?? null); const [tab, setTab] = useState<"videos" | "notion">("videos"); const [adding, setAdding] = useState(false);
   const rows = useMemo(() => {
