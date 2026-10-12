@@ -99,18 +99,17 @@ function FormatsTab() {
 }
 
 export function BriefsPage() {
-  const [tab, setTab] = useState<"formats" | "briefs" | "refs">("formats");
-  const d = useCreator();
+  // Standalone reference videos are hidden for creators (references live inside each brief); RefCard stays dormant.
+  const [tab, setTab] = useState<"formats" | "briefs">("briefs");
+  void RefCard;
   return (
     <div>
       <div className="mb-5 flex gap-2 overflow-x-auto">
-        {([["formats", "Formats"], ["briefs", "Briefs"], ["refs", ct("Reference videos")]] as const).map(([k, l]) => (
-          <button key={k} type="button" aria-pressed={tab === k} onClick={() => setTab(k)} className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-bold ${tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy"}`}>{l}</button>
+        {([["briefs", "Briefs"], ["formats", "Formats"]] as const).map(([k, l]) => (
+          <button key={k} type="button" aria-pressed={tab === k} onClick={() => setTab(k)} className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-bold ${tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy"}`}>{ct(l)}</button>
         ))}
       </div>
-      {tab === "formats" ? <><PageTitle title={ct("Formats")}  /><FormatsTab /></> : tab === "refs" ? (
-        <><PageTitle title={ct("Reference videos")} lead={ct("Videos that worked. Use them as inspiration.")} /><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{d.refs.map((r) => <RefCard key={r.id} r={r} />)}</div></>
-      ) : <FactBriefs />}
+      {tab === "formats" ? <><PageTitle title={ct("Formats")}  /><FormatsTab /></> : <FactBriefs />}
     </div>
   );
 }
