@@ -1,4 +1,3 @@
-import { creatorLang } from "@/i18n/creator-app";
 import { termsVisible } from "@/lib/creator-terms";
 import { AppBadge, PlatformBadge, platformName, useApps } from "@/lib/apps";
 import { useEffect, useMemo, useState } from "react";
