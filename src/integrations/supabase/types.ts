@@ -6374,6 +6374,45 @@ export type Database = {
           },
         ]
       }
+      ugc_formats: {
+        Row: {
+          description: string
+          example_inspiration_ids: string[]
+          id: string
+          key: string
+          name_en: string
+          name_fr: string
+          sort_order: number
+          structure: Json
+          tips: string
+          when_to_use: string
+        }
+        Insert: {
+          description?: string
+          example_inspiration_ids?: string[]
+          id?: string
+          key: string
+          name_en: string
+          name_fr: string
+          sort_order?: number
+          structure?: Json
+          tips?: string
+          when_to_use?: string
+        }
+        Update: {
+          description?: string
+          example_inspiration_ids?: string[]
+          id?: string
+          key?: string
+          name_en?: string
+          name_fr?: string
+          sort_order?: number
+          structure?: Json
+          tips?: string
+          when_to_use?: string
+        }
+        Relationships: []
+      }
       ugc_guidelines: {
         Row: {
           active: boolean
