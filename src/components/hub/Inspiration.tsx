@@ -127,7 +127,6 @@ export function Inspiration({ initialOpen, initialAuthor, initialTab }: { initia
   );
 }
 
-const UNSWIPE_ID = "00000000-0000-4000-8000-000000000002";
 
 function SyncNotionButton({ onDone }: { onDone: () => void }) {
   const run = useServerFn(notionSyncNow); const [busy, setBusy] = useState(false);
