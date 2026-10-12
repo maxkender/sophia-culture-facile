@@ -64,12 +64,13 @@ export async function runNotionSync(a: Admin) {
     const pages: any[] = []; let cursor: string | undefined;
     const filter = full ? undefined : { timestamp: "last_edited_time", last_edited_time: { on_or_after: new Date(new Date(cfg.notion_last_sync).getTime() - 3600_000).toISOString() } };
     do { const r = await notion(`/databases/${dbId}/query`, { method: "POST", body: { page_size: 100, ...(cursor ? { start_cursor: cursor } : {}), ...(filter ? { filter } : {}) } }); pages.push(...r.results); cursor = r.has_more ? r.next_cursor : undefined; } while (cursor);
-    const { data: known } = await a.from("notion_items").select("notion_page_id, hub_status, inspiration_id, profile_status").in("notion_page_id", pages.map((p) => p.id).concat(["-"]));
+    const { data: known } = await a.from("notion_items").select("notion_page_id, hub_status, inspiration_id, profile_status, deleted_at").in("notion_page_id", pages.map((p) => p.id).concat(["-"]));
     const byId = new Map<string, any>((known ?? []).map((k: any) => [k.notion_page_id, k]));
     const batchId = crypto.randomUUID();
     for (const page of pages) {
       out.pulled++;
       const pr = readProps(page); const c = classifyLink(pr.lien); const prev = byId.get(page.id);
+      if (prev?.deleted_at) continue; // deleted in Hub: never re-import
       const base = { notion_page_id: page.id, url: pr.lien || null, notion_props: pr, notion_last_edited: page.last_edited_time, kind: c.kind };
       try {
         if (c.kind === "profile") {
@@ -199,7 +200,7 @@ export async function upsertAccount(a: Admin, pageId: string, url: string, pr: {
 
 /** Profile rows: write back only Statut Hub = Compte and the Accounts tab link. */
 async function pushProfiles(a: Admin) {
-  const { data: items } = await a.from("notion_items").select("notion_page_id, hub_status").eq("kind", "profile").is("pushed_at", null);
+  const { data: items } = await a.from("notion_items").select("notion_page_id, hub_status").eq("kind", "profile").is("pushed_at", null).is("deleted_at", null);
   let pushed = 0; let errors = 0;
   for (const it of items ?? []) {
     const link = { "Analyse Hub": { url: `${HUB_URL}?tab=accounts` } };
@@ -211,6 +212,32 @@ async function pushProfiles(a: Admin) {
     } catch (e) { errors++; await a.from("notion_items").update({ error: (e as Error).message.slice(0, 300) }).eq("notion_page_id", it.notion_page_id); }
   }
   return { pushed, errors };
+}
+
+/** Deleting in Hub: flag the Notion rows so sync never re-imports them; optional recoverable archive. */
+export async function markNotionDeleted(a: Admin, pageIds: string[], kind: "video" | "profile", archive: boolean) {
+  const ids = [...new Set(pageIds.filter(Boolean))]; if (!ids.length) return { notion: 0 };
+  await a.from("notion_items").update({ deleted_at: new Date().toISOString(), deleted_kind: kind, hub_status: "Supprimé du Hub", error: null }).in("notion_page_id", ids);
+  if (!process.env["NOTION_TOKEN"]) return { notion: 0 };
+  let n = 0;
+  for (const id of ids) {
+    try {
+      try { await notion(`/pages/${id}`, { method: "PATCH", body: { properties: { "Statut Hub": { select: { name: "Supprimé du Hub" } } } } }); } catch { /* keep previous status */ }
+      if (archive) await notion(`/pages/${id}`, { method: "PATCH", body: { archived: true } });
+      n++;
+    } catch (e) { await a.from("notion_items").update({ error: (e as Error).message.slice(0, 300) }).eq("notion_page_id", id); }
+  }
+  return { notion: n };
+}
+
+/** Undo a Hub delete: unarchive the Notion page if needed and let the next full sync re-import it. */
+export async function restoreNotionItem(a: Admin, pageId: string) {
+  if (process.env["NOTION_TOKEN"]) {
+    try { await notion(`/pages/${pageId}`, { method: "PATCH", body: { archived: false } }); } catch { /* not archived */ }
+    try { await setStatus(pageId, "Importé"); } catch { /* ignore */ }
+  }
+  await a.from("notion_items").update({ deleted_at: null, deleted_kind: null, hub_status: null, pushed_at: null, error: null }).eq("notion_page_id", pageId);
+  await a.from("ugc_settings").update({ notion_last_full_sync: null }).eq("id", 1);
 }
 
 /** Cheap classification of an existing analysis into one of the 9 Notion formats (no transcription). */

@@ -5084,6 +5084,8 @@ export type Database = {
       notion_items: {
         Row: {
           created_at: string
+          deleted_at: string | null
+          deleted_kind: string | null
           error: string | null
           hub_status: string | null
           imported_count: number
@@ -5103,6 +5105,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
+          deleted_kind?: string | null
           error?: string | null
           hub_status?: string | null
           imported_count?: number
@@ -5122,6 +5126,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
+          deleted_kind?: string | null
           error?: string | null
           hub_status?: string | null
           imported_count?: number
