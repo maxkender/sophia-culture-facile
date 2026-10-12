@@ -14,13 +14,13 @@ UGC creator acceptance and onboarding mutations use authenticated server functio
 - Creator Account Agreement lives in `documents` (slug `creator-agreement`); the slideshow variant is derived in code by dropping clause 5 and renumbering — keep one text, never two.
 - Public creator application forms use distinct localized routes (`/fr/candidature-*`, `/en/*-application`); legacy `/creators/*/apply` paths only detect language and redirect.
 - Authors admin uses ADMIN_AUTHOR_NAV only; creator tracks use /hub, with reciprocal sidebar-bottom links and 301s from old creator-admin URLs; why: keep spaces separate.
-- Prospects grid prefs and saved views live in admin_ui_prefs (per user); why: choices must follow the admin across devices.
+- Prospects grid prefs/views live in admin_ui_prefs; why: follow the admin across devices.
 
 - Space routing is decided by src/lib/account-role.ts (admin > author > creator > none) in the /auteurs gate, the creator space and both login pages; why: one shared login must never show a person the wrong space.
 
 - Slideshow pay zones: country_zones/pay_zones drive slideshow_applications.zone by trigger; the guide is merged server-side (slideshow-zones.functions.ts) so no other zone figures reach the client. UGC never uses zones.
 - Creator-facing forms use the shared creator-validation utility before showing failures; why: raw validation, database, or payment-provider errors must never reach creators.
-- Creator Hub scheduled work (daily post detection, dormancy, brief drop, budget cap, referrals) lives in src/lib/hub-automation.server.ts behind /api/public/cron/ugc/$job with job_locks leases; why: one authenticated entry point and no overlapping runs.
+- Hub scheduled jobs live in src/lib/hub-automation.server.ts behind /api/public/cron/ugc/$job with job_locks leases; why: one authenticated entry point and no overlapping runs.
 - Sidekick (src/lib/sidekick.functions.ts) answers only through whitelisted tools scoped to the selected app, never arbitrary SQL; all are read-only except create_fast_lane, which reuses the fast-lane server helper; why: numbers must come from real data and admins must not leak data across apps.
 - UGC applications never auto-accept: public forms only insert a pending creator_applications row + acknowledgement email; creator, login, code and welcome email are created only by admin Accept (ugc-accept.server.ts). Fast lane (fast-lane.functions.ts, FAST_LANE_ENABLED=false) and its /j page (kept in /dormant) are switched off; why: the owner validates every applicant himself.
 - Brief assets live in public.assets + private bucket creator-assets; creators get files only through signed links from assetLinks (RLS-checked); why: files stay private and app-scoped.
@@ -36,4 +36,4 @@ UGC creator acceptance and onboarding mutations use authenticated server functio
 
 - Slideshows uses its own PosterGuideEditor with poster labels and zone merge fields; why: keep author editing pages unchanged.
 
-- UGC draft review lives in creator_drafts + src/lib/ugc-drafts.functions.ts; creators only insert 'submitted' rows, admins review via reviewDraft, and submitPostLinks requires a validated draft per brief when ugc_settings.draft_required is on; why: the owner approves every video before it is posted.
+- UGC drafts: creators insert only 'submitted' creator_drafts rows; admins review (ugc-drafts.functions.ts); post links need a validated draft when draft_required; why: owner approves every video.
