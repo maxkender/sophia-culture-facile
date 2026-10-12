@@ -76,3 +76,18 @@ export async function sendTemplated(admin: Admin, key: EmailKey, to: string, ful
   if (backup.sent) return { sent: true, provider: "lovable", messageId: null, note: `${why} — sent through the backup sender` };
   return { sent: false, provider: null, messageId: null, note: `Email not sent: ${why}` };
 }
+
+/** Acknowledgement after a public UGC application. No link, no account: the owner decides later. */
+export async function sendUgcAck(to: string, fullName: string, lang: "fr" | "en"): Promise<EmailOutcome> {
+  const first = fullName.split(/\s+/)[0] || "";
+  const fr = lang === "fr";
+  const subject = fr ? "Candidature reçue" : "Application received";
+  const opts = { paragraphs: fr
+    ? [`Salut ${first},`, "Candidature reçue, on revient vers toi.", "— L’équipe créateurs Sophia"]
+    : [`Hi ${first || "there"},`, "Application received, we'll get back to you.", "— The Sophia creator team"] };
+  const html = buildEmailHtml(opts); const text = buildEmailText(opts);
+  const brevo = await sendBrevoEmail({ to, toName: fullName, subject, html, text });
+  if (brevo.sent) return { sent: true, provider: "brevo", messageId: brevo.messageId ?? null, note: null };
+  const backup = await sendAppEmail({ to, subject, html, text, label: "ugc-ack", purpose: "transactional", idempotencyKey: `ugc-ack-${to}-${Date.now()}` });
+  return { sent: backup.sent, provider: backup.sent ? "lovable" : null, messageId: null, note: null };
+}

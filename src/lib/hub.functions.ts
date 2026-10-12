@@ -99,6 +99,7 @@ const applySchema = z.object({
   userAgent: z.string().max(400).optional(),
   website: z.string().max(200).optional(),
   quick: z.boolean().optional(),
+  lang: z.enum(["fr", "en"]).optional(),
   device: z.enum(["ios", "android"]).optional(),
   src: z.string().trim().max(60).optional(),
   ref: z.string().trim().regex(/^@?[A-Za-z0-9._]{1,40}$/).optional().or(z.literal("")),
@@ -141,21 +142,13 @@ export const applyToJob = createServerFn({ method: "POST" })
     const { data: ja } = await a.from("job_applications").insert({ job_id: job.id, application_id: app.id, answers: { ...data.answers, followers_tiktok: followers.tiktok != null ? String(followers.tiktok) : "", followers_instagram: followers.instagram != null ? String(followers.instagram) : "" } }).select("id").single();
     if (data.inviteToken) await a.from("job_invites").update({ accepted_at: new Date().toISOString() }).eq("token", data.inviteToken).eq("job_id", job.id);
 
-    if (!job.open) return { ok: true as const, accepted: false };
-
-    // Open job: contract signed in the flow, accepted at once, onboarding starts.
-    const { data: doc } = await a.from("documents").select("current_version, published").eq("slug", "creator-agreement").maybeSingle();
-    if (!doc?.published || !data.signedName || data.signedName.length < 2 || String(doc.current_version) !== data.documentVersion) {
-      return { ok: false as const, reason: "Please type your full name to sign the agreement (the page may need a reload if a new version was published)." };
-    }
-    const acc = await (await import("./ugc-accept.server")).acceptApplication(a, app.id, data.origin, null, `Auto-accepted from open job ${job.slug}`);
-    const { ip, ua } = reqMeta(data.userAgent);
-    const { data: existing } = await a.from("creator_signatures").select("id").eq("creator_id", acc.creatorId).maybeSingle();
-    if (!existing) await a.from("creator_signatures").insert({ creator_id: acc.creatorId, variant: "ugc", document_version: String(doc.current_version), signed_name: data.signedName, signature_ip: ip, user_agent: ua });
-    await a.from("creator_apps").upsert({ creator_id: acc.creatorId, app_id: job.app_id, status: "active" }, { onConflict: "creator_id,app_id" }); await (await import("./access-codes.server")).assignAppCode(a, acc.creatorId, job.app_id);
-    if (data.device) await a.from("creators").update({ platform: data.device }).eq("id", acc.creatorId);
-    await a.from("job_applications").update({ status: "accepted", creator_id: acc.creatorId, contract_signed_at: new Date().toISOString(), decided_at: new Date().toISOString() }).eq("id", ja?.id);
-    return { ok: true as const, accepted: true, emailSent: acc.emailSent };
+    // Every UGC application waits for the owner's decision (Hub → UGC → Creators → Accept).
+    // No creator, login, contract, code or welcome email here — only an acknowledgement.
+    try {
+      const { sendUgcAck, emailLang } = await import("./ugc-email.server");
+      await sendUgcAck(email, data.fullName, data.lang ?? emailLang(null, data.country));
+    } catch { /* the application is saved either way */ }
+    return { ok: true as const, accepted: false };
   });
 
 /* ---------------- admin: decisions + invites ---------------- */

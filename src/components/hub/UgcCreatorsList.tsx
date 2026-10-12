@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AppBadge, useAdminApp } from "@/lib/apps";
 import { CreatorApplications } from "@/components/portal/admin/CreatorApplications";
-import { AddValidatedCreator } from "./FastLane";
 import { flag } from "./hub-data";
 import { HandleLinksInline, PersonAvatar, useCreatorPhotos } from "./PersonAvatar";
 
@@ -21,7 +20,7 @@ function useActiveCreators(appId: string | null) {
     queryKey: ["hub", "ugc-creators-simple", appId],
     queryFn: async () => {
       const [c, posts] = await Promise.all([
-        supabase.from("creators").select("id, full_name, country, status, ugc_status, email_pending, tiktok_handle, instagram_handle, creator_apps(app_id)").eq("track", "ugc").eq("is_test", false).order("full_name").limit(1000),
+        supabase.from("creators").select("id, full_name, country, status, ugc_status, email_pending, tiktok_handle, instagram_handle, creator_apps(app_id)").eq("track", "ugc").eq("is_test", false).neq("status", "pending").order("full_name").limit(1000),
         supabase.from("creator_posts").select("creator_id, posted_on, created_at, app_id").order("created_at", { ascending: false }).limit(5000),
       ]);
       const monday = mondayParis();
@@ -89,12 +88,10 @@ export function UgcCreatorsPage({ view }: { view: "applications" | "directory" }
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex gap-1" role="tablist">{tabs.map(([k, l]) => <Link key={k} to="/hub/ugc/creators" search={{ view: k }} role="tab" aria-selected={view === k} className={cn("min-h-9 rounded-full px-4 py-2 text-sm font-bold", view === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l}</Link>)}</div>
         <input aria-label="Search" placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} className="ml-auto h-9 w-full rounded-lg border bg-card px-3 text-sm sm:w-64" />
-        <Button size="sm" variant="outline" onClick={() => setAdd(true)}>Add creator</Button>
       </div>
       <div className="overflow-x-auto rounded-2xl bg-card shadow-portal">
         {view === "applications" ? <CreatorApplications key="ugc" track="ugc" simple q={q} /> : <ActiveCreators q={q} />}
       </div>
-      <AddValidatedCreator open={add} onOpenChange={setAdd} />
     </div>
   );
 }

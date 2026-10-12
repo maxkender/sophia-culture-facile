@@ -15,7 +15,7 @@ const label = "block text-sm font-semibold text-brand-navy";
 export function JobApply({ slug, open, items, prefill, inviteToken }: { slug: string; open: boolean; items: Item[]; prefill?: { email: string; name: string } | undefined; inviteToken?: string | undefined }) {
   const apply = useServerFn(applyToJob);
   const agreementFn = useServerFn(getAgreementForJob);
-  const { data: agreement } = useQuery({ queryKey: ["job-agreement"], enabled: open, queryFn: () => agreementFn() });
+  const { data: agreement } = useQuery({ queryKey: ["job-agreement"], enabled: false, queryFn: () => agreementFn() });
   const [f, setF] = useState({ fullName: prefill?.name ?? "", email: prefill?.email ?? "", phone: "", country: "FR", age: "", occupation: "", tiktok: "", instagram: "", videoUrl: "", website: "" });
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [step, setStep] = useState<"form" | "sign" | "done">("form");
@@ -56,7 +56,7 @@ export function JobApply({ slug, open, items, prefill, inviteToken }: { slug: st
     <div className="rounded-2xl bg-card p-6 text-center shadow-portal">
       <CheckCircle2 className="mx-auto size-10 text-portal-green" />
       <p className="mt-3 text-lg font-extrabold text-brand-navy">{accepted ? "You're in!" : "Application sent"}</p>
-      <p className="mt-1 text-sm text-brand-navySoft">{accepted ? "Your agreement is signed. Check your email: the link inside lets you create your password and start onboarding." : "The team will review it and reply by email."}</p>
+      <p className="mt-1 text-sm text-brand-navySoft">{accepted ? "Your agreement is signed. Check your email: the link inside lets you create your password and start onboarding." : "Application received, we'll get back to you."}</p>
     </div>
   );
 
@@ -70,7 +70,7 @@ export function JobApply({ slug, open, items, prefill, inviteToken }: { slug: st
   );
 
   return (
-    <form className="space-y-4 rounded-2xl bg-card p-5 shadow-portal" onSubmit={(e) => { e.preventDefault(); const err = check(); if (err) { setError(err); return; } if (open && agreement) setStep("sign"); else void submit(); }} noValidate>
+    <form className="space-y-4 rounded-2xl bg-card p-5 shadow-portal" onSubmit={(e) => { e.preventDefault(); const err = check(); if (err) { setError(err); return; } void submit(); }} noValidate>
       <h2 className="text-lg font-extrabold text-brand-navy">Apply</h2>
       <input type="text" name="website" value={f.website} onChange={set("website")} className="hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" />
       <div className="grid gap-3 sm:grid-cols-2">
@@ -92,7 +92,7 @@ export function JobApply({ slug, open, items, prefill, inviteToken }: { slug: st
         </label>
       ))}
       {error ? <p role="alert" className="rounded-xl bg-portal-red/10 p-3 text-sm text-portal-red">{error}</p> : null}
-      <Button type="submit" size="lg" disabled={busy} className="w-full bg-brand-navy">{busy ? "Sending…" : open ? "Continue to the agreement" : "Send my application"}</Button>
+      <Button type="submit" size="lg" disabled={busy} className="w-full bg-brand-navy">{busy ? "Sending…" : "Send my application"}</Button>
     </form>
   );
 }

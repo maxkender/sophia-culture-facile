@@ -7,6 +7,9 @@ type Admin = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 const originSchema = z.string().url().max(300).refine((v) => { const u = new URL(v); return u.protocol === "https:" || u.hostname === "localhost"; });
 const num = z.number().min(0).max(100000).nullable();
+/** Dormant: the owner validates every applicant himself (Hub → UGC → Creators → Applications). */
+const FAST_LANE_ENABLED = false;
+
 export const paySchema = z.object({
   tier: z.enum(["trial", "active", "pro"]), perPost: num, rpm: num, cap: num,
   postsPerMonth: z.number().int().min(1).max(500).nullable(), platforms: z.enum(["tiktok", "instagram", "both"]),
@@ -37,6 +40,7 @@ export const createFastLane = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ appId: z.string().uuid(), jobId: z.string().uuid().nullable(), pay: paySchema, people: z.array(personSchema).min(1).max(200), origin: originSchema }).parse(d))
   .handler(async ({ data, context }) => {
+    if (!FAST_LANE_ENABLED) throw new Error("Fast lane is switched off: every creator is accepted from Applications.");
     await assertAdmin(context as never);
     const a = await adminClient();
     const { createFastLaneOne } = await import("./fast-lane.server");
@@ -52,6 +56,7 @@ export const regenerateFastLane = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ creatorId: z.string().uuid(), origin: originSchema }).parse(d))
   .handler(async ({ data, context }) => {
+    if (!FAST_LANE_ENABLED) throw new Error("Fast lane is switched off: every creator is accepted from Applications.");
     await assertAdmin(context as never);
     const a = await adminClient();
     const { newToken, fastLink } = await import("./fast-lane.server");
@@ -65,6 +70,7 @@ export const emailFastLane = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ creatorId: z.string().uuid(), origin: originSchema }).parse(d))
   .handler(async ({ data, context }) => {
+    if (!FAST_LANE_ENABLED) throw new Error("Fast lane is switched off: every creator is accepted from Applications.");
     await assertAdmin(context as never);
     return (await import("./fast-lane.server")).sendFastLaneEmail(await adminClient(), data.creatorId, data.origin);
   });
@@ -100,6 +106,7 @@ function stateOf(c: any): "ok" | "used" | "expired" | "invalid" {
 export const resolveFastLane = createServerFn({ method: "GET" })
   .inputValidator((t: unknown) => token.parse(t))
   .handler(async ({ data }) => {
+    if (!FAST_LANE_ENABLED) throw new Error("Fast lane is switched off: every creator is accepted from Applications.");
     const a = await adminClient();
     const c = await loadByToken(a, data);
     const state = stateOf(c);
@@ -132,6 +139,7 @@ export const resolveFastLane = createServerFn({ method: "GET" })
 export const enterFastLane = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ token, signedName: z.string().trim().min(2).max(160), accepted: z.literal(true), email: z.string().trim().email().max(200).optional(), documentVersion: z.string().max(10), userAgent: z.string().max(400).optional() }).parse(d))
   .handler(async ({ data }) => {
+    if (!FAST_LANE_ENABLED) throw new Error("Fast lane is switched off: every creator is accepted from Applications.");
     const a = await adminClient();
     let c = await loadByToken(a, data.token);
     const state = stateOf(c);

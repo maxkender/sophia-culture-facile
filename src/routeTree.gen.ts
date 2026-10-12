@@ -54,7 +54,6 @@ import { Route as FrSophiaCultureGeneraleRouteImport } from './routes/fr/sophia-
 import { Route as FrTelechargerRouteImport } from './routes/fr/telecharger'
 import { Route as GoHandleRouteImport } from './routes/go.$handle'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
-import { Route as JTokenRouteImport } from './routes/j.$token'
 import { Route as JobsSlugRouteImport } from './routes/jobs.$slug'
 import { Route as PayoutTokenRouteImport } from './routes/payout.$token'
 import { Route as AuthenticatedAuteursIndexRouteImport } from './routes/_authenticated/auteurs/index'
@@ -434,11 +433,6 @@ const GoHandleRoute = GoHandleRouteImport.update({
 const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
   path: '/invite/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JTokenRoute = JTokenRouteImport.update({
-  id: '/j/$token',
-  path: '/j/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JobsSlugRoute = JobsSlugRouteImport.update({
@@ -1348,7 +1342,6 @@ export interface FileRoutesByFullPath {
   '/fr/telecharger': typeof FrTelechargerRoute
   '/go/$handle': typeof GoHandleRoute
   '/invite/$token': typeof InviteTokenRoute
-  '/j/$token': typeof JTokenRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/payout/$token': typeof PayoutTokenRoute
   '/cours/': typeof CoursIndexRoute
@@ -1546,7 +1539,6 @@ export interface FileRoutesByTo {
   '/fr/telecharger': typeof FrTelechargerRoute
   '/go/$handle': typeof GoHandleRoute
   '/invite/$token': typeof InviteTokenRoute
-  '/j/$token': typeof JTokenRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/payout/$token': typeof PayoutTokenRoute
   '/cours': typeof CoursIndexRoute
@@ -1747,7 +1739,6 @@ export interface FileRoutesById {
   '/fr/telecharger': typeof FrTelechargerRoute
   '/go/$handle': typeof GoHandleRoute
   '/invite/$token': typeof InviteTokenRoute
-  '/j/$token': typeof JTokenRoute
   '/jobs/$slug': typeof JobsSlugRoute
   '/payout/$token': typeof PayoutTokenRoute
   '/cours/': typeof CoursIndexRoute
@@ -1949,7 +1940,6 @@ export interface FileRouteTypes {
     | '/fr/telecharger'
     | '/go/$handle'
     | '/invite/$token'
-    | '/j/$token'
     | '/jobs/$slug'
     | '/payout/$token'
     | '/cours/'
@@ -2147,7 +2137,6 @@ export interface FileRouteTypes {
     | '/fr/telecharger'
     | '/go/$handle'
     | '/invite/$token'
-    | '/j/$token'
     | '/jobs/$slug'
     | '/payout/$token'
     | '/cours'
@@ -2347,7 +2336,6 @@ export interface FileRouteTypes {
     | '/fr/telecharger'
     | '/go/$handle'
     | '/invite/$token'
-    | '/j/$token'
     | '/jobs/$slug'
     | '/payout/$token'
     | '/cours/'
@@ -2548,7 +2536,6 @@ export interface RootRouteChildren {
   FrTelechargerRoute: typeof FrTelechargerRoute
   GoHandleRoute: typeof GoHandleRoute
   InviteTokenRoute: typeof InviteTokenRoute
-  JTokenRoute: typeof JTokenRoute
   JobsSlugRoute: typeof JobsSlugRoute
   PayoutTokenRoute: typeof PayoutTokenRoute
   CoursIndexRoute: typeof CoursIndexRoute
@@ -2910,13 +2897,6 @@ declare module '@tanstack/react-router' {
       path: '/invite/$token'
       fullPath: '/invite/$token'
       preLoaderRoute: typeof InviteTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/j/$token': {
-      id: '/j/$token'
-      path: '/j/$token'
-      fullPath: '/j/$token'
-      preLoaderRoute: typeof JTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jobs/$slug': {
@@ -4362,7 +4342,6 @@ const rootRouteChildren: RootRouteChildren = {
   FrTelechargerRoute: FrTelechargerRoute,
   GoHandleRoute: GoHandleRoute,
   InviteTokenRoute: InviteTokenRoute,
-  JTokenRoute: JTokenRoute,
   JobsSlugRoute: JobsSlugRoute,
   PayoutTokenRoute: PayoutTokenRoute,
   CoursIndexRoute: CoursIndexRoute,

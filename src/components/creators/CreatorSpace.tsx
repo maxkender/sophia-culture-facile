@@ -114,7 +114,19 @@ function Workspace() {
     if (role === undefined || role === "creator") return <p className="p-6 text-sm">{ct("Loading…")}</p>;
     return <NotSetUp loginTo="/creators/login" />;
   }
+  if ((data as { me?: { status?: string | null } }).me?.status === "pending") return <UnderReview />;
   return <CreatorShell><Outlet /></CreatorShell>;
+}
+
+/** Applicants the owner has not accepted yet: nothing but this message. */
+function UnderReview() {
+  return (
+    <main className="mx-auto max-w-md p-8 text-center">
+      <p className="text-2xl font-extrabold text-brand-navy">{ct("Your application is being reviewed")}</p>
+      <p className="mt-2 text-brand-navySoft">{ct("We'll get back to you by email.")}</p>
+      <button type="button" onClick={() => void supabase.auth.signOut()} className="mt-6 text-sm font-semibold text-brand-navySoft underline">{ct("Sign out")}</button>
+    </main>
+  );
 }
 
 export function CreatorSpace() {
