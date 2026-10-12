@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, Trash2, Upload } from "lucide-react";
+import { Download, MoreHorizontal, Trash2, Upload } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -38,12 +39,14 @@ export function AssetUploader({ appId, folder, onDone, compact = false, replaceI
       x.send(f);
     });
     const kind = kindOf(f);
+    const old = replaceId ? (await supabase.from("assets").select("storage_path").eq("id", replaceId).maybeSingle()).data?.storage_path : null;
     const fold = folder ?? folderFor(kind);
     const row = { app_id: appId, kind, folder: fold, storage_path: path, title: f.name.replace(/\.[^.]+$/, ""), role_default: FOLDER_ROLE[fold] ?? "reference_video", size_bytes: f.size, mime: f.type || null, status: "ready" };
     const res = replaceId
-      ? await supabase.from("assets").update({ ...row, title: undefined } as never).eq("id", replaceId).select("*").single()
+      ? await supabase.from("assets").update({ ...row, title: undefined, folder: undefined, role_default: undefined, thumbnail_url: null } as never).eq("id", replaceId).select("*").single()
       : await supabase.from("assets").insert(row as never).select("*").single();
     if (res.error || !res.data) throw new Error("save");
+    if (old && old !== path) await supabase.storage.from("creator-assets").remove([old]);
     setProgress((p) => { const n = { ...p }; delete n[f.name]; return n; });
     onDone?.({ ...(res.data as unknown as BriefAsset), role: res.data.role_default });
   }
@@ -66,8 +69,8 @@ export function AssetUploader({ appId, folder, onDone, compact = false, replaceI
   return (
     <div className="space-y-2">
       <label onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); void files(e.dataTransfer.files); }} className={cn("flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-brand-line text-center text-sm text-brand-navySoft hover:bg-portal-bg", compact ? "p-3" : "p-6")}>
-        <Upload className="size-5" /><span><b className="text-brand-navy">{replaceId ? "Upload the recording" : "Drop files or click"}</b> · videos up to 200 MB</span>
-        <input type="file" multiple={!replaceId} className="sr-only" aria-label="Upload files" onChange={(e) => e.target.files && void files(e.target.files)} />
+        <Upload className="size-5" /><span><b className="text-brand-navy">{replaceId ? "Choose the new file" : "Drop files or click"}</b> · videos up to 200 MB</span>
+        <input type="file" multiple={!replaceId} className="sr-only" aria-label={replaceId ? "Replace file" : "Upload files"} data-replace={replaceId ?? undefined} onChange={(e) => e.target.files && void files(e.target.files)} />
       </label>
       {Object.entries(progress).map(([n, p]) => <div key={n} className="text-xs"><span className="font-semibold">{n}</span><div className="mt-1 h-1.5 rounded-full bg-portal-bg"><div className="h-1.5 rounded-full bg-portal-accent" style={{ width: `${p}%` }} /></div></div>)}
       {!replaceId ? <div className="flex gap-2"><input aria-label="Asset link" value={link} onChange={(e) => setLink(e.target.value)} placeholder="Or paste a TikTok / Instagram / Drive / YouTube link" className="h-9 flex-1 rounded-lg border px-2 text-sm" /><Button size="sm" variant="outline" onClick={() => void addLink()}>Add link</Button></div> : null}
@@ -87,6 +90,24 @@ export function AssetsLibrary() {
   const [sel, setSel] = useState<string[]>([]);
   const [preview, setPreview] = useState<{ id: string; url: string } | null>(null);
   const [text, setText] = useState({ title: "", body: "" });
+  const [editing, setEditing] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState<string | null>(null);
+  const [replacing, setReplacing] = useState<string | null>(null);
+  const label = (k: string) => FOLDERS.find(([f]) => f === k)?.[1] ?? k;
+  async function move(ids: string[], to: string) {
+    const prev = (data?.rows ?? []).filter((r) => ids.includes(r.id) && r.folder !== to).map((r) => ({ id: r.id, folder: r.folder }));
+    if (!prev.length) return;
+    const { error } = await supabase.from("assets").update({ folder: to }).in("id", prev.map((x) => x.id));
+    if (error) { toast.error("Could not move."); return; }
+    setSel([]); reload();
+    toast.success(`Moved to ${label(to)}`, { action: { label: "Undo", onClick: async () => { for (const x of prev) await supabase.from("assets").update({ folder: x.folder }).eq("id", x.id); reload(); } } });
+  }
+  async function rename(r: Row, v: string) {
+    setEditing(null); const t = v.trim().replace(/\.[a-z0-9]{2,4}$/i, "");
+    if (!t || t === r.title) return;
+    const { error } = await supabase.from("assets").update({ title: t }).eq("id", r.id);
+    if (error) toast.error("Could not rename."); else { toast.success("Renamed"); reload(); }
+  }
   const { data } = useQuery({
     queryKey: ["hub", "assets", app],
     queryFn: async () => {
@@ -145,7 +166,7 @@ export function AssetsLibrary() {
   }
   return (
     <div className="space-y-4">
-      <div className="flex gap-1 overflow-x-auto">{FOLDERS.map(([k, l]) => <button key={k} type="button" onClick={() => setFolder(k)} className={cn("min-h-9 shrink-0 rounded-full px-3 text-xs font-bold", folder === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l} {(data?.rows ?? []).filter((r) => r.folder === k).length}</button>)}</div>
+      <div className="flex gap-1 overflow-x-auto">{FOLDERS.map(([k, l]) => <button key={k} type="button" onClick={() => setFolder(k)} onDragOver={(e) => { if (e.dataTransfer.types.includes("application/x-asset")) { e.preventDefault(); setDragOver(k); } }} onDragLeave={() => setDragOver(null)} onDrop={(e) => { const raw = e.dataTransfer.getData("application/x-asset"); setDragOver(null); if (!raw) return; e.preventDefault(); void move(JSON.parse(raw) as string[], k); }} className={cn("min-h-9 shrink-0 rounded-full px-3 text-xs font-bold transition", folder === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy", dragOver === k && "ring-2 ring-portal-accent scale-105")}>{l} {(data?.rows ?? []).filter((r) => r.folder === k).length}</button>)}</div>
       <div className={cn(card, "space-y-3")}>
         {folder === "captions" ? (
           <form className="grid gap-2 sm:grid-cols-[200px_1fr_auto]" onSubmit={async (e) => { e.preventDefault(); if (!text.body.trim()) return; await supabase.from("assets").insert({ app_id: app, kind: "text", folder: "captions", title: text.title || "Texte", text_content: text.body, role_default: "caption_text" }); setText({ title: "", body: "" }); reload(); }}>
@@ -154,20 +175,21 @@ export function AssetsLibrary() {
             <Button type="submit">Add text</Button>
           </form>
         ) : <AssetUploader appId={app} folder={folder} onDone={reload} />}
-        <div className="flex flex-wrap gap-2"><input aria-label="Search assets" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or tag" className="h-9 flex-1 rounded-lg border px-2 text-sm" /><Button size="sm" variant="outline" disabled={!sel.length} onClick={() => void bulkTag()}>Tag selected ({sel.length})</Button><Button size="sm" variant="outline" onClick={() => void downloadFolder()}><Download className="size-3.5" />Download folder</Button></div>
+        <div className="flex flex-wrap gap-2"><input aria-label="Search assets" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or tag" className="h-9 flex-1 rounded-lg border px-2 text-sm" /><Button size="sm" variant="outline" disabled={!sel.length} onClick={() => void bulkTag()}>Tag selected ({sel.length})</Button><DropdownMenu><DropdownMenuTrigger asChild><Button size="sm" variant="outline" disabled={!sel.length}>Move selected</Button></DropdownMenuTrigger><DropdownMenuContent>{FOLDERS.map(([k, l]) => <DropdownMenuItem key={k} onSelect={() => void move(sel, k)}>{l}</DropdownMenuItem>)}</DropdownMenuContent></DropdownMenu><Button size="sm" variant="outline" onClick={() => void downloadFolder()}><Download className="size-3.5" />Download folder</Button></div>
         {q ? <p className="text-xs text-brand-navySoft">Searching all folders.</p> : null}
       </div>
       {!rows.length ? <p className={cn(card, "text-sm text-brand-navySoft")}>Nothing in this folder yet.</p> : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{rows.map((r) => (
-          <div key={r.id} className={cn(card, "space-y-2 p-3", r.status === "to_upload" && "border-2 border-dashed border-portal-amber")} data-testid="asset-card">
+          <div key={r.id} draggable={editing !== r.id} onDragStart={(e) => { const ids = sel.includes(r.id) ? sel : [r.id]; e.dataTransfer.setData("application/x-asset", JSON.stringify(ids)); e.dataTransfer.effectAllowed = "move"; }} className={cn(card, "space-y-2 p-3", r.status === "to_upload" && "border-2 border-dashed border-portal-amber")} data-testid="asset-card">
             <div className="flex items-start gap-2">
               <input type="checkbox" aria-label={`Select ${r.title}`} checked={sel.includes(r.id)} onChange={(e) => setSel((s) => (e.target.checked ? [...s, r.id] : s.filter((x) => x !== r.id)))} className="mt-1" />
               <div className="min-w-0 flex-1">
-                <input aria-label="Rename" title="Click to rename (the file itself is not moved)" defaultValue={r.title} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== r.title) void supabase.from("assets").update({ title: v }).eq("id", r.id).then(({ error }) => { if (error) toast.error("Could not rename."); else { toast.success("Renamed"); reload(); } }); }} className="h-8 w-full rounded-lg border-transparent px-1 text-sm font-bold hover:border-input" />
+                {editing === r.id ? <input aria-label="Rename" autoFocus defaultValue={r.title} onKeyDown={(e) => { if (e.key === "Enter") void rename(r, e.currentTarget.value); if (e.key === "Escape") setEditing(null); }} onBlur={(e) => void rename(r, e.target.value)} className="h-8 w-full rounded-lg border px-1 text-sm font-bold" /> : <button type="button" title="Click to rename" onClick={() => setEditing(r.id)} className="block h-8 w-full truncate rounded-lg px-1 text-left text-sm font-bold text-brand-navy hover:bg-portal-bg">{r.title}</button>}
                 <p className="px-1 text-xs text-brand-navySoft">{r.status === "to_upload" ? "À filmer" : r.kind}{r.size_bytes ? ` · ${(r.size_bytes / 1048576).toFixed(1)} MB` : ""} · used in {data?.used[r.id] ?? 0} briefs</p>
                 {data?.where[r.id]?.length ? <p className="px-1 text-[11px] text-brand-navySoft">{data.where[r.id]!.map((w) => `${w.title}${w.plans.length ? ` (${w.plans.join(", ")})` : ""}`).join(" · ")}</p> : null}
               </div>
             </div>
+            {replacing === r.id ? <div className="space-y-1"><AssetUploader appId={app} folder={r.folder} replaceId={r.id} compact onDone={() => { setReplacing(null); setThumbs((t) => { const n = { ...t }; delete n[r.id]; return n; }); if (preview?.id === r.id) setPreview(null); reload(); }} /><button type="button" className="text-xs text-brand-navySoft" onClick={() => setReplacing(null)}>Cancel</button></div> : null}
             {r.status === "to_upload" ? <>
               <p className="rounded-lg bg-portal-amber/15 p-2 text-sm text-brand-navy"><b>Shot to record:</b> {r.shot_note}</p>
               <AssetUploader appId={app} folder={r.folder} replaceId={r.id} onDone={reload} compact />
@@ -180,7 +202,13 @@ export function AssetsLibrary() {
             <div className="flex gap-1">
               {r.status === "ready" && r.kind !== "text" ? <Button size="sm" variant="outline" onClick={() => void open(r)}>{r.kind === "link" ? "Open" : "Preview"}</Button> : null}
               {r.storage_path ? <Button size="sm" variant="outline" onClick={async () => { const u = (await links({ data: { ids: [r.id] } })).urls[r.id]; if (u) window.location.href = u; }}><Download className="size-3.5" />Download</Button> : null}
-              <Button size="sm" variant="ghost" aria-label="Delete" className="ml-auto" disabled={Boolean(data?.used[r.id])} title={data?.used[r.id] ? "Used in briefs" : undefined} onClick={() => void remove(r)}><Trash2 className="size-4" /></Button>
+              <DropdownMenu><DropdownMenuTrigger asChild><Button size="sm" variant="ghost" aria-label="More" className="ml-auto"><MoreHorizontal className="size-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => setEditing(r.id)}>Rename</DropdownMenuItem>
+                <DropdownMenuSub><DropdownMenuSubTrigger>Move to…</DropdownMenuSubTrigger><DropdownMenuSubContent>{FOLDERS.filter(([k]) => k !== r.folder).map(([k, l]) => <DropdownMenuItem key={k} onSelect={() => void move([r.id], k)}>{l}</DropdownMenuItem>)}</DropdownMenuSubContent></DropdownMenuSub>
+                {r.kind !== "link" && r.kind !== "text" ? <DropdownMenuItem onSelect={() => setReplacing(r.id)}>Replace</DropdownMenuItem> : null}
+                <DropdownMenuItem disabled={Boolean(data?.used[r.id])} onSelect={() => void remove(r)}>Delete</DropdownMenuItem>
+              </DropdownMenuContent></DropdownMenu>
+              <Button size="sm" variant="ghost" aria-label="Delete" disabled={Boolean(data?.used[r.id])} title={data?.used[r.id] ? "Used in briefs" : undefined} onClick={() => void remove(r)}><Trash2 className="size-4" /></Button>
             </div>
           </div>
         ))}</div>
