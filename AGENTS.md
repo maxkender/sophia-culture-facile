@@ -35,3 +35,5 @@ UGC creator acceptance and onboarding mutations use authenticated server functio
 - UGC programme overview uses UgcOverview, never the legacy mixed CreatorsDashboard; why: author-side legacy code remains untouched and slideshow/influencer counts stay outside UGC.
 
 - Slideshows uses its own PosterGuideEditor with poster labels and zone merge fields; why: keep author editing pages unchanged.
+
+- UGC draft review lives in creator_drafts + src/lib/ugc-drafts.functions.ts; creators only insert 'submitted' rows, admins review via reviewDraft, and submitPostLinks requires a validated draft per brief when ugc_settings.draft_required is on; why: the owner approves every video before it is posted.
