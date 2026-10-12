@@ -288,3 +288,27 @@ export const adminAssignCreatorCode = createServerFn({ method: "POST" })
     await supabaseAdmin.from("activity_log").insert({ actor_id: admin.id, entity: "creator", entity_id: data.creatorId, action: "access_code_assigned", comment: data.platform });
     return { ok: true as const };
   });
+
+/** "My apps & codes": every active app the creator is enrolled in, with their store codes (handed out through assignAppCode, app-scoped). */
+export const getMyAppsCodes = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const me = await myCreator(context.supabase, context.userId);
+    if (me.status === "pending") return [];
+    const { supabaseAdmin: a } = await import("@/integrations/supabase/client.server");
+    const { assignAppCode } = await import("./access-codes.server");
+    const { data: enr } = await a.from("creator_apps").select("app_id, apps(id, name, logo_path, app_store_url, play_store_url, taap_url, active)").eq("creator_id", me.id).eq("status", "active");
+    const out = [];
+    for (const e of (enr ?? []) as any[]) { // eslint-disable-line @typescript-eslint/no-explicit-any
+      const app = e.apps; if (!app?.active) continue;
+      let { data: codes } = await a.from("access_codes").select("code, redeem_url, platform").eq("assigned_creator_id", me.id).eq("app_id", app.id);
+      if (!codes?.length) {
+        await assignAppCode(a, me.id, app.id);
+        codes = (await a.from("access_codes").select("code, redeem_url, platform").eq("assigned_creator_id", me.id).eq("app_id", app.id)).data;
+      }
+      const list = (codes ?? []) as { code: string; redeem_url: string | null; platform: string }[];
+      if (!list.length && app.id === "00000000-0000-4000-8000-000000000001" && me.access_code) list.push({ code: me.access_code, redeem_url: me.access_redeem_url, platform: me.platform ?? "ios" });
+      out.push({ id: app.id as string, name: app.name as string, appStore: app.app_store_url as string | null, playStore: app.play_store_url as string | null, codes: list });
+    }
+    return out;
+  });

@@ -32,7 +32,7 @@ export const CREATOR_NAV: { heading: string; items: Item[] }[] = [
       { to: "/creators/app/posts", label: "My posts", icon: Video, badge: "posts", gate: "steps" },
       { to: "/creators/app/library", label: "Library", icon: Library, gate: "steps" },
       { to: "/creators/app/earnings", label: "Payouts", icon: Banknote, gate: "payouts" },
-      { to: "/creators/app/account", label: "My apps & codes", icon: Smartphone },
+      { to: "/creators/app/apps", label: "My apps & codes", icon: Smartphone },
       { to: "/creators/app/profile", label: "Profile", icon: UserCircle },
     ],
   },
