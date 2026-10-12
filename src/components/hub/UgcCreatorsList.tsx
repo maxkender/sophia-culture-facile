@@ -20,7 +20,7 @@ function useActiveCreators(appId: string | null) {
     queryKey: ["hub", "ugc-creators-simple", appId],
     queryFn: async () => {
       const [c, posts] = await Promise.all([
-        supabase.from("creators").select("id, full_name, country, status, ugc_status, email_pending, tiktok_handle, instagram_handle, creator_apps(app_id)").eq("track", "ugc").eq("is_test", false).order("full_name").limit(1000),
+        supabase.from("creators").select("id, full_name, country, status, ugc_status, email_pending, tiktok_handle, instagram_handle, creator_apps(app_id)").eq("track", "ugc").eq("is_test", false).neq("status", "pending").order("full_name").limit(1000),
         supabase.from("creator_posts").select("creator_id, posted_on, created_at, app_id").order("created_at", { ascending: false }).limit(5000),
       ]);
       const monday = mondayParis();

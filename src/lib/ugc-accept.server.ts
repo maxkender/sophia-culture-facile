@@ -9,7 +9,7 @@ function randomToken() {
 export async function acceptApplication(supabaseAdmin: Admin, applicationId: string, origin: string, decidedBy: string | null, notes?: string | null) {
     const { data: application } = await supabaseAdmin
       .from("creator_applications")
-      .select("id, full_name, email, country, status, created_creator_id, ref_handle")
+      .select("id, full_name, email, country, status, created_creator_id, ref_handle, app_id")
       .eq("id", applicationId)
       .maybeSingle();
     if (!application) throw new Error("Application not found.");
@@ -41,6 +41,7 @@ export async function acceptApplication(supabaseAdmin: Admin, applicationId: str
           email: application.email.toLowerCase(),
           country: application.country,
           status: "onboarding",
+          ugc_status: "active",
           invite_token: inviteToken,
         })
         .select("id")
@@ -48,7 +49,7 @@ export async function acceptApplication(supabaseAdmin: Admin, applicationId: str
       if (error || !creator) throw new Error("The creator account could not be prepared.");
       creatorId = creator.id;
     } else {
-      await supabaseAdmin.from("creators").update({ invite_token: inviteToken, status: "onboarding" }).eq("id", creatorId);
+      await supabaseAdmin.from("creators").update({ invite_token: inviteToken, status: "onboarding", ugc_status: "active" }).eq("id", creatorId);
     }
 
     await supabaseAdmin
@@ -61,6 +62,10 @@ export async function acceptApplication(supabaseAdmin: Admin, applicationId: str
         created_creator_id: creatorId,
       })
       .eq("id", application.id);
+
+    // The creator works on the app they applied for; a waiting enrolment becomes active only now.
+    const appOf = (application as { app_id?: string | null }).app_id ?? "00000000-0000-4000-8000-000000000001";
+    await supabaseAdmin.from("creator_apps").upsert({ creator_id: creatorId, app_id: appOf, status: "active" }, { onConflict: "creator_id,app_id" });
 
     // Affiliates: link the referrer named in ?ref=<handle> (never self-referral).
     const ref = String((application as { ref_handle?: string | null }).ref_handle ?? "").trim().replace(/^@/, "").toLowerCase();

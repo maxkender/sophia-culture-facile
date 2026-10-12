@@ -77,7 +77,7 @@ function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
     enabled: open,
     queryFn: async () => {
       const [c, p, b, j, s, inf, d] = await Promise.all([
-        supabase.from("creators").select("id, full_name").eq("track", "ugc").eq("is_test", false).limit(500),
+        supabase.from("creators").select("id, full_name").eq("track", "ugc").eq("is_test", false).neq("status", "pending").limit(500),
         supabase.from("creator_posts").select("id, url").order("created_at", { ascending: false }).limit(200),
         supabase.from("briefs").select("id, title").limit(300),
         supabase.from("jobs").select("id, title").limit(200),
