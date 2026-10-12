@@ -55,14 +55,10 @@ export function CreatorStatsStrip() {
       </div>
       <PortalCard className="p-4">
         <div className="flex items-center justify-between gap-2">
-          <span className="rounded-full bg-portal-accent/10 px-3 py-1 text-xs font-bold text-portal-accent">{TIER_LABEL[tier]} tier</span>
+          <span />
           {nextPayout ? <span className="text-xs text-brand-navySoft">{ct("Next payout:")} <b>{fmtMoney(Number(nextPayout.amount ?? 0))}</b> ({nextPayout.period})</span> : null}
         </div>
         <MyTerms tiers={data?.tiers ?? []} />
-        {tier !== "pro" ? <>
-          <div className="mt-3 h-2 rounded-full bg-brand-line"><div className="h-2 rounded-full bg-portal-accent" style={{ width: `${Math.min(100, (last30 / ACTIVE_POSTS) * 100)}%` }} /></div>
-          <p className="mt-1 text-xs text-brand-navySoft">{tier === "trial" ? L(`${Math.min(last30, ACTIVE_POSTS)}/${ACTIVE_POSTS} approved posts in 30 days to reach Active`, `${Math.min(last30, ACTIVE_POSTS)}/${ACTIVE_POSTS} posts validés en 30 jours pour passer Active`) : ct("Stay in the top 10% of views this month to reach Pro")}</p>
-        </> : <p className="mt-2 text-xs text-brand-navySoft">{ct("You're in the top tier. Keep it up!")}</p>}
         {data?.awards.length ? <div className="mt-3 flex flex-wrap gap-2">{data.awards.map((a) => <span key={a.kind + a.period} className="inline-flex items-center gap-1 rounded-full bg-portal-amber/15 px-2.5 py-1 text-xs font-bold text-brand-navy"><Award className="size-3" />{AWARD_LABEL[a.kind] ?? a.kind}</span>)}</div> : null}
         {streak >= 3 ? <p className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-portal-amber"><Flame className="size-3.5" />{streak}-day streak</p> : null}
       </PortalCard>

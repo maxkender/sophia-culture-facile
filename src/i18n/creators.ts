@@ -58,7 +58,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         title: "UGC creator",
         lines: [
           "You appear on camera. You set up a new account that belongs to Sophia and post videos there, five times a week, from our daily briefs.",
-          "Paid per video: a fixed fee plus a bonus that grows with views. The best-paid track, and the most demanding.",
+          "Short videos filmed from our briefs. We select candidates ourselves; pay is discussed after acceptance.",
           "Requires an iPhone, being comfortable on camera, and posting consistently.",
         ],
         cta: "Apply as a UGC creator",
@@ -74,12 +74,12 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       },
     },
     ugc: {
-      metaTitle: "Become a Sophia UGC creator: paid per video",
+      metaTitle: "Become a Sophia UGC creator: apply",
       metaDescription:
-        "Post short videos on a Sophia TikTok account you run. Daily briefs, a hiring manager for your country, and a fee for every video.",
+        "Apply to film short videos about Sophia from our briefs. We review every application ourselves.",
       heroTitle: "Create content for Sophia",
       heroSubtitle:
-        "Post about an app that makes people smarter. Daily briefs, a team behind you, and a fee for every video.",
+        "Post about an app that makes people smarter, from our briefs, with a team behind you.",
       cta: "Apply now (2 minutes)",
       replyLine: "We reply to every application within five days.",
       aboutTitle: "About Sophia",
@@ -88,7 +88,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       doingTitle: "What you will be doing",
       doing: [
         "You set up a new TikTok account for Sophia, following our instructions, and post short videos there at least five times a week. The account belongs to Sophia; you run it. We send you daily briefs and inspiration so you never start from a blank page.",
-        "You are paid per video: a fixed fee for each one, plus a bonus when it performs. We explain the exact figures at the interview.",
+        "Pay is discussed with you after acceptance.",
         "You work with a hiring manager for your country who answers your questions, reviews your videos and helps you get better.",
       ],
       whoTitle: "Who we are looking for",
@@ -152,7 +152,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
         title: "Créateur UGC",
         lines: [
           "Vous apparaissez à l'écran. Vous créez un nouveau compte qui appartient à Sophia et vous y publiez des vidéos, cinq fois par semaine, à partir de nos briefs quotidiens.",
-          "Payé à la vidéo : un montant fixe, plus un bonus qui augmente avec les vues. La formule la mieux rémunérée, et la plus exigeante.",
+          "De courtes vidéos tournées à partir de nos briefs. Nous sélectionnons les candidats ; la rémunération est discutée après acceptation.",
           "Il faut un iPhone, être à l'aise face caméra et publier avec régularité.",
         ],
         cta: "Postuler comme créateur UGC",
@@ -168,12 +168,12 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       },
     },
     ugc: {
-      metaTitle: "Devenir créateur UGC pour Sophia : payé à la vidéo",
+      metaTitle: "Devenir créateur UGC pour Sophia : candidater",
       metaDescription:
-        "Publiez de courtes vidéos sur un compte TikTok Sophia que vous animez. Des briefs chaque jour, un responsable pour votre pays et une rémunération pour chaque vidéo.",
+        "Candidatez pour tourner de courtes vidéos sur Sophia à partir de nos briefs. Nous étudions chaque candidature nous-mêmes.",
       heroTitle: "Créez du contenu pour Sophia",
       heroSubtitle:
-        "Parlez d'une appli qui rend les gens plus cultivés. Des briefs chaque jour, une équipe derrière vous, et une rémunération pour chaque vidéo.",
+        "Parlez d'une appli qui rend les gens plus cultivés, à partir de nos briefs, avec une équipe derrière vous.",
       cta: "Postuler (2 minutes)",
       replyLine: "Nous répondons à chaque candidature sous cinq jours.",
       aboutTitle: "Sophia en deux mots",
@@ -182,7 +182,7 @@ export const CREATORS: Record<Lang, CreatorsCopy> = {
       doingTitle: "Ce que vous ferez",
       doing: [
         "Vous créez un nouveau compte TikTok pour Sophia, en suivant nos consignes, et vous y publiez de courtes vidéos au moins cinq fois par semaine. Le compte appartient à Sophia ; c'est vous qui l'animez. Nous vous envoyons des briefs et des idées chaque jour : vous ne partez jamais d'une page blanche.",
-        "Vous êtes payé à la vidéo : un montant fixe pour chacune, plus un bonus quand elle marche bien. Nous détaillons les chiffres exacts lors de l'entretien.",
+        "La rémunération est discutée avec vous après acceptation.",
         "Vous travaillez avec un responsable pour votre pays, qui répond à vos questions, relit vos vidéos et vous aide à progresser.",
       ],
       whoTitle: "Qui nous cherchons",

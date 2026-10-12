@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, Trophy } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Faq } from "@/components/site/Faq";
 import { CreatorAgreementForm } from "@/components/creators/CreatorAgreementForm";
 import { parseBlocks } from "@/lib/documents";
 import { creatorAgreementBlocks } from "@/lib/creator-agreement";
@@ -17,44 +15,26 @@ const JOB = "sophia-ugc-fr";
 
 const COPY = {
   fr: {
-    hero: "Jusqu'à 150 € par vidéo", sub: "Payé aux vues. Sans plafond de gains. Tu postes, on paie le 5.", cta: "Commencer — 60 secondes",
-    rules: ["Tu postes 20 vidéos par mois sur un compte TikTok/Instagram qu'on crée pour toi", "2 € par 1 000 vues, jusqu'à 150 € par vidéo, + 1 € par vidéo dès 20 vidéos/mois", "Aucune sélection : tu t'inscris, tu postes 3 vidéos en 72 h, tu es dedans"],
-    board: "Top créateurs ce mois", boardEmpty: "Les premiers créateurs démarrent cette semaine", views: "vues", posts: "vidéos",
-    tiers: "Les paliers", perPost: "Par vidéo", cpm: "Par 1 000 vues", cap: "Plafond par vidéo",
-    form: "Inscris-toi en 60 secondes", first: "Prénom", email: "Email", country: "Pays (2 lettres)", adult: "J'ai 18 ans ou plus", phone: "Mon téléphone", tiktok: "Ton TikTok perso (optionnel)", go: "Continuer vers le contrat",
-    signLead: "Dernière étape : signe le contrat et tu commences tout de suite.", back: "← Retour", done: "Tu es dedans !", doneText: "Ton contrat est signé. Regarde tes emails : le lien te permet de créer ton mot de passe et de commencer.",
-    errName: "Écris ton prénom.", errEmail: "Cette adresse email ne semble pas correcte. Vérifie la faute de frappe, ex. prenom@gmail.com.", errAdult: "Tu dois avoir 18 ans ou plus.", errCountry: "Indique ton pays en 2 lettres, ex. FR.", errGeneric: "L'inscription n'a pas pu être envoyée. Vérifie tes infos et réessaie.",
-    faqTitle: "Questions fréquentes",
-    faq: [
-      ["Je suis payé comment, et quand ?", "Le 5 de chaque mois, par virement via Stripe, pour les vidéos du mois précédent : 2 € par 1 000 vues (jusqu'à 150 € par vidéo), plus 1 € par vidéo dès 20 vidéos dans le mois. Minimum 20 € ; en dessous, c'est reporté."],
-      ["Il me faut des abonnés ?", "Non. On crée le compte pour toi, il démarre à zéro. Ce qui compte, ce sont les vues de chaque vidéo."],
-      ["À qui appartient le compte ?", "À Sophia. Tu le gères et tu choisis le nom. Si tu arrêtes, le compte reste à Sophia et tu gardes tout ce que tu as gagné."],
-      ["Je poste quoi ?", "Des vidéos face caméra de 20 à 40 secondes. On te donne chaque semaine des briefs avec des hooks et des scripts tirés des cours Sophia, tu les dis avec tes mots."],
-      ["Je peux arrêter ?", "Oui, quand tu veux. Tu es payé pour tout ce qui a été posté et validé."],
-      ["C'est légal, c'est déclaré ?", "Oui. Tu signes un contrat, chaque paiement est tracé. Tu déclares tes revenus selon ton statut (par exemple micro-entrepreneur en France)."],
-    ],
+    hero: "Deviens créateur UGC", go: "Postuler",
+    pitch: {
+      sophia: "Sophia, c'est la culture générale en 5 minutes par jour, à la place du scroll. En tant que créateur UGC, tu tournes de courtes vidéos à partir de nos briefs pour faire découvrir l'app. On étudie chaque candidature et on revient vers toi.",
+      unswipe: "UnSwipe garde tes réseaux sociaux sans les Reels ni le fil « Pour toi », pour passer moins de temps sur ton écran. En tant que créateur UGC, tu tournes de courtes vidéos à partir de nos briefs pour faire découvrir l'app. On étudie chaque candidature et on revient vers toi.",
+    },
+    form: "Ta candidature", first: "Prénom", email: "Email", country: "Pays (2 lettres)", adult: "J'ai 18 ans ou plus", phone: "Mon téléphone", tiktok: "Ton TikTok perso (optionnel)",
+    signLead: "Dernière étape : lis et signe le contrat.", back: "← Retour", done: "Candidature envoyée", doneText: "Ton contrat est signé. Regarde tes emails : le lien te permet de créer ton mot de passe.",
+    errName: "Écris ton prénom.", errEmail: "Cette adresse email ne semble pas correcte. Vérifie la faute de frappe, ex. prenom@gmail.com.", errAdult: "Tu dois avoir 18 ans ou plus.", errCountry: "Indique ton pays en 2 lettres, ex. FR.", errGeneric: "La candidature n'a pas pu être envoyée. Vérifie tes infos et réessaie.",
   },
   en: {
-    hero: "Up to €150 per video", sub: "Paid on views. No cap on earnings. You post, we pay on the 5th.", cta: "Start — 60 seconds",
-    rules: ["You post 20 videos a month on a TikTok/Instagram account we create for you", "€2 per 1,000 views, up to €150 per video, + €1 per video once you reach 20 videos/month", "No selection: sign up, post 3 videos within 72 h, you're in"],
-    board: "Top creators this month", boardEmpty: "The first creators start this week", views: "views", posts: "videos",
-    tiers: "Tiers", perPost: "Per video", cpm: "Per 1,000 views", cap: "Cap per video",
-    form: "Sign up in 60 seconds", first: "First name", email: "Email", country: "Country (2 letters)", adult: "I am 18 or older", phone: "My phone", tiktok: "Your personal TikTok (optional)", go: "Continue to the agreement",
-    signLead: "Last step: sign the agreement and you start right away.", back: "← Back", done: "You're in!", doneText: "Your agreement is signed. Check your email: the link lets you create your password and get started.",
-    errName: "Please enter your first name.", errEmail: "This email address doesn't look right. Check for a typo, e.g. name@gmail.com.", errAdult: "You need to be 18 or older.", errCountry: "Enter your country as 2 letters, e.g. GB.", errGeneric: "Your sign-up could not be sent. Please check your details and try again.",
-    faqTitle: "Frequently asked questions",
-    faq: [
-      ["How and when am I paid?", "On the 5th of each month, by bank transfer through Stripe, for the previous month's videos: €2 per 1,000 views (up to €150 per video), plus €1 per video once you post 20 in the month. Minimum €20; below that it rolls over."],
-      ["Do I need followers?", "No. We create the account for you and it starts from zero. What counts is the views on each video."],
-      ["Who owns the account?", "Sophia does. You run it and choose the name. If you stop, the account stays with Sophia and you keep everything you earned."],
-      ["What do I post?", "Face-to-camera videos of 20 to 40 seconds. Every week you get briefs with hooks and scripts drawn from Sophia courses; you say them in your own words."],
-      ["Can I stop?", "Yes, whenever you want. You are paid for everything posted and approved."],
-      ["Is it legal and declared?", "Yes. You sign an agreement and every payment is recorded. You declare the income according to your own tax status."],
-    ],
+    hero: "Become a UGC creator", go: "Apply",
+    pitch: {
+      sophia: "Sophia is general knowledge in 5 minutes a day, instead of scrolling. As a UGC creator, you film short videos from our briefs to introduce people to the app. We review every application and get back to you.",
+      unswipe: "UnSwipe keeps your social apps without Reels or the For You feed, so you spend less time on your screen. As a UGC creator, you film short videos from our briefs to introduce people to the app. We review every application and get back to you.",
+    },
+    form: "Your application", first: "First name", email: "Email", country: "Country (2 letters)", adult: "I am 18 or older", phone: "My phone", tiktok: "Your personal TikTok (optional)",
+    signLead: "Last step: read and sign the agreement.", back: "← Back", done: "Application sent", doneText: "Your agreement is signed. Check your email: the link lets you create your password.",
+    errName: "Please enter your first name.", errEmail: "This email address doesn't look right. Check for a typo, e.g. name@gmail.com.", errAdult: "You need to be 18 or older.", errCountry: "Enter your country as 2 letters, e.g. GB.", errGeneric: "Your application could not be sent. Please check your details and try again.",
   },
 } as const;
-
-const money = (n: number, lang: string) => new Intl.NumberFormat(lang === "fr" ? "fr-FR" : "en-GB", { style: "currency", currency: "EUR", maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
 
 const BRANDS = {
   sophia: { id: SOPHIA, job: JOB, name: "Sophia", tagline: null as string | null },
@@ -65,14 +45,10 @@ export function UgcEarnPage({ app }: { app?: "unswipe" } = {}) {
   const { lang } = useI18n();
   const brand = BRANDS[app ?? "sophia"];
   const base = COPY[lang === "fr" ? "fr" : "en"];
-  const t = (app === "unswipe"
-    ? JSON.parse(JSON.stringify(base).replace(/des cours Sophia/g, "de la vraie vie sans Reels").replace(/from Sophia courses/g, "from real life without Reels").replace(/Sophia/g, "UnSwipe").replace(/Face-to-camera videos/g, "POV, reaction or face-cam videos").replace(/Des vidéos face caméra/g, "Des vidéos POV, réaction ou face caméra"))
-    : base) as typeof base;
+  const t = base;
   const apply = useServerFn(applyToJob);
   const agreementFn = useServerFn(getAgreementForJob);
   const { data: agreement } = useQuery({ queryKey: ["job-agreement"], queryFn: () => agreementFn() });
-  const { data: tiers = [] } = useQuery({ queryKey: ["public-tiers", brand.id], queryFn: async () => (await supabase.from("ugc_tiers").select("tier, label, per_post, cpm, cap_per_post").eq("app_id", brand.id)).data ?? [] });
-  const { data: board = [] } = useQuery({ queryKey: ["public-board", brand.id], queryFn: async () => ((await supabase.rpc("leaderboard_month", { _app: brand.id })).data ?? []) as { rank: number; pseudonym: string; earnings: number; views: number; posts: number }[] });
   const [f, setF] = useState({ first: "", email: "", country: lang === "fr" ? "FR" : "", adult: false, device: "ios" as "ios" | "android", tiktok: "", website: "" });
   const [meta, setMeta] = useState({ src: "", ref: "" });
   const [step, setStep] = useState<"form" | "sign" | "done">("form");
@@ -102,37 +78,7 @@ export function UgcEarnPage({ app }: { app?: "unswipe" } = {}) {
       {brand.tagline && <p className="bg-brand-navy px-4 py-2 text-center text-sm font-bold text-card">{brand.name} · {brand.tagline}</p>}
       <section className="mx-auto w-full max-w-3xl px-5 pb-8 pt-10 text-center sm:pt-16">
         <h1 className="text-[44px] font-extrabold leading-[1.05] tracking-tight text-brand-navy sm:text-[64px]">{t.hero}</h1>
-        <p className="mx-auto mt-4 max-w-xl text-lg text-brand-navySoft">{t.sub}</p>
-        <Button asChild variant="pill" size="pill" className="mt-7"><a href="#join">{t.cta}</a></Button>
-      </section>
-
-      <section className="mx-auto grid w-full max-w-5xl gap-4 px-5 pb-10 md:grid-cols-3">
-        {t.rules.map((r, i) => (
-          <div key={r} className="rounded-3xl bg-card p-6 shadow-card">
-            <span className="flex size-9 items-center justify-center rounded-full bg-brand-navy text-sm font-bold text-brand-onNavy">{i + 1}</span>
-            <p className="mt-4 text-[17px] font-semibold leading-snug text-brand-navy">{r}</p>
-          </div>
-        ))}
-      </section>
-
-      <section className="mx-auto grid w-full max-w-5xl gap-4 px-5 pb-10 md:grid-cols-2">
-        <div className="rounded-3xl bg-card p-6 shadow-card">
-          <h2 className="flex items-center gap-2 text-xl font-extrabold text-brand-navy"><Trophy className="size-5" />{t.board}</h2>
-          {board.length === 0 ? <p className="mt-3 text-brand-navySoft">{t.boardEmpty}</p> : (
-            <ol className="mt-4 space-y-2">{board.slice(0, 10).map((r) => (
-              <li key={r.rank} className="flex items-center gap-3 text-[15px]"><span className="w-6 font-extrabold text-brand-navy">{r.rank}</span><span className="flex-1 font-semibold">{r.pseudonym}</span><span className="text-sm text-brand-navySoft">{Number(r.views).toLocaleString()} {t.views} · {r.posts} {t.posts}</span><b className="w-20 text-right text-brand-navy">{money(Number(r.earnings), lang)}</b></li>
-            ))}</ol>
-          )}
-        </div>
-        <div className="rounded-3xl bg-card p-6 shadow-card">
-          <h2 className="text-xl font-extrabold text-brand-navy">{t.tiers}</h2>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-left text-[15px]">
-              <thead><tr className="text-xs uppercase text-brand-navySoft"><th className="pb-2"> </th><th className="pb-2">{t.perPost}</th><th className="pb-2">{t.cpm}</th><th className="pb-2">{t.cap}</th></tr></thead>
-              <tbody>{["trial", "active", "pro"].map((k) => { const r = tiers.find((x) => x.tier === k); return r ? <tr key={k} className="border-t border-brand-line"><td className="py-2 font-bold capitalize">{r.label ?? k}</td><td>{money(Number(r.per_post), lang)}</td><td>{money(Number(r.cpm), lang)}</td><td>{money(Number(r.cap_per_post), lang)}</td></tr> : null; })}</tbody>
-            </table>
-          </div>
-        </div>
+        <p className="mx-auto mt-4 max-w-xl text-lg text-brand-navySoft">{t.pitch[app ?? "sophia"]}</p>
       </section>
 
       <section id="join" className="mx-auto w-full max-w-xl scroll-mt-24 px-5 pb-12">
@@ -165,10 +111,6 @@ export function UgcEarnPage({ app }: { app?: "unswipe" } = {}) {
         )}
       </section>
 
-      <section className="mx-auto w-full max-w-3xl px-5 pb-20">
-        <h2 className="mb-4 text-2xl font-extrabold text-brand-navy">{t.faqTitle}</h2>
-        <Faq items={t.faq.map(([question, answer]) => ({ question, answer }))} />
-      </section>
     </Shell>
   );
 }
