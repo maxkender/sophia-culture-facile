@@ -505,6 +505,13 @@
       "when": 1791926017148,
       "tag": "0071_stop_creator_nurture_sequence",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1791926937098,
+      "tag": "0072_creators_read_ugc_agreement",
+      "breakpoints": true
     }
   ]
 }

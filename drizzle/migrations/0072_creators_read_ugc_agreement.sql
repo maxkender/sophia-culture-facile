@@ -1,0 +1,2 @@
+CREATE POLICY "Creators read UGC agreement" ON public.documents FOR SELECT TO authenticated
+USING (slug IN ('ugc-agreement','ugc-agreement-fr') AND EXISTS (SELECT 1 FROM public.creators c WHERE c.user_id = auth.uid()));
