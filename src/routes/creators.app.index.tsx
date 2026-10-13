@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CreatorHomePage } from "@/components/creators/app/HomePage";
+import { UgcHome as CreatorHomePage } from "@/components/creators/app/Onboarding";
 
 export const Route = createFileRoute("/creators/app/")({
   head: () => ({ meta: [

@@ -135,6 +135,7 @@ async function remind(admin: Admin, c: any, kind: "d3" | "d7") {
 
 /** Daily: 72h without a post → dormant + reminders at day 3 and day 7; 14 days → accounts back to the pool with a password-rotation task. */
 export async function runDormancy(admin: Admin) {
+  return { disabled: true }; // No automatic emails (owner decision). Code below is dormant.
   return withLock(admin, "dormancy", 15, async () => {
     const { data: creators } = await admin.from("creators").select("id, full_name, email, language, country, tiktok_handle, instagram_handle, onboarding_completed_at, dormant_at, dormancy_reminders, ugc_status")
       .eq("track", "ugc").not("onboarding_completed_at", "is", null).limit(500);
@@ -174,6 +175,7 @@ export async function runDormancy(admin: Admin) {
 
 /** Monday 09:00 Paris: publish briefs scheduled for the drop and notify enrolled creators. */
 export async function runBriefDrop(admin: Admin) {
+  return { disabled: true }; // No automatic emails (owner decision). Code below is dormant.
   return withLock(admin, "brief-drop", 10, async () => {
     const { data: due } = await admin.from("briefs").select("id, title, app_id").eq("status", "scheduled").lte("drop_at", new Date().toISOString()).limit(100);
     let notified = 0;
@@ -206,6 +208,7 @@ export async function referralAdjustments(admin: Admin, p: string, rows: { creat
 
 /** Daily 09:00 Paris: nurture emails (J0/J+2/J+7) for sign-ups who have not created their account yet. Texts come from saved_templates (nurture-<step>-<lang>). */
 export async function runNurture(admin: Admin, origin = "https://sophia-culture.com") {
+  return { disabled: true }; // No automatic emails (owner decision). Code below is dormant.
   return withLock(admin, "nurture", 15, async () => {
     const { data: due } = await admin.from("creator_email_sequence").select("id, step, creator_id, creators(id, full_name, email, country, user_id, invite_token, social_account_created_at, status)")
       .is("sent_at", null).lte("scheduled_at", new Date().toISOString()).limit(200);

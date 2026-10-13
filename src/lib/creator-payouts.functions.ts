@@ -43,6 +43,7 @@ export const generatePayoutBatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ period: z.string().regex(/^\d{4}-\d{2}$/) }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const { supabase, userId } = context as any;
     await requireAdmin(supabase, userId);
     const [y = 0, m = 1] = data.period.split("-").map(Number);
@@ -100,6 +101,7 @@ export const generatePayoutBatch = createServerFn({ method: "POST" })
 export const startStripeOnboarding = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const { supabase, userId } = context as any;
     const { data: creator } = await supabase.from("creators").select("*").eq("user_id", userId).maybeSingle();
     if (!creator) throw new Error("Not a creator");
@@ -139,6 +141,7 @@ export const startStripeOnboarding = createServerFn({ method: "POST" })
 export const syncStripeStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const { supabase, userId } = context as any;
     const { data: creator } = await supabase.from("creators").select("id").eq("user_id", userId).maybeSingle();
     if (!creator) throw new Error("Not a creator");
@@ -157,6 +160,7 @@ export const payPayoutBatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ batchId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const { supabase, userId } = context as any;
     await requireAdmin(supabase, userId);
     const { data: batch } = await supabase.from("payout_batches").select("*").eq("id", data.batchId).single();

@@ -22,7 +22,7 @@ export async function loadCreator() {
     supabase.from("reference_videos").select("*").eq("active", true).order("pinned", { ascending: false }).order("created_at", { ascending: false }),
     supabase.from("creator_payout_profiles").select("*").eq("creator_id", me.id).maybeSingle(),
     supabase.from("payout_items").select("*, payout_batches(period, status, paid_at)").eq("creator_id", me.id).order("created_at", { ascending: false }),
-    supabase.from("creator_signatures").select("signed_at, variant, document_version").eq("creator_id", me.id).maybeSingle(),
+    supabase.from("creator_signatures").select("id, signed_at, variant, document_version, document_slug, contract_lang").eq("creator_id", me.id).in("document_slug", ["ugc-agreement", "ugc-agreement-fr"]).order("signed_at", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("creator_notifications").select("*").order("created_at", { ascending: false }).limit(30),
     supabase.from("creator_messages").select("id, from_admin, read_at, post_id").eq("creator_id", me.id),
     supabase.from("documents").select("current_version").eq("slug", "creator-rules").maybeSingle(),

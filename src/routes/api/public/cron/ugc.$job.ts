@@ -17,6 +17,8 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
           const parisHour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Paris", hour: "2-digit", hour12: false }).format(new Date()));
           if (parisHour !== Number(wantHour)) return Response.json({ skipped: "not the Paris hour" });
         }
+        // No automatic emails, no pay jobs: these entry points are switched off for good (cron rows deactivated too).
+        if (["nurture", "dormancy", "brief-drop", "planner-reminder", "monthly", "tiers", "compliance", "daily-detect", "budget"].includes(params.job)) return Response.json({ skipped: "disabled" });
         try {
           if (params.job === "compliance" || params.job === "d7") {
             if (!process.env["APIFY_TOKEN"]) return Response.json({ skipped: "APIFY_TOKEN missing" });

@@ -67,7 +67,21 @@ export const decidePosts = createServerFn({ method: "POST" })
     const patch = data.decision === "approve" ? { status: "approved", validated_at: now, validated_by: me, feedback: null } : { status: "rejected", feedback: data.reason, validated_by: me };
     const { data: rows, error } = await a.from("creator_posts").update(patch).in("id", data.ids).eq("status", "pending").select("id, creator_id");
     if (error) throw new Error("That could not be saved.");
-    if (data.decision === "reject") await a.from("creator_notifications").insert((rows ?? []).map((r: { creator_id: string }) => ({ creator_id: r.creator_id, body: `Un lien a été refusé : ${data.reason}` })));
+    // One in-app note + one email per creator, in their language, because the admin clicked.
+    const ids = [...new Set((rows ?? []).map((r: { creator_id: string }) => r.creator_id))];
+    const { data: people } = ids.length ? await a.from("creators").select("id, full_name, email, email_pending, language, country").in("id", ids) : { data: [] };
+    const { emailLang, sendCreatorNote } = await import("./ugc-email.server");
+    for (const c of (people ?? []) as { id: string; full_name: string; email: string; email_pending: boolean | null; language: string | null; country: string | null }[]) {
+      const fr = emailLang(c.language, c.country) === "fr";
+      const ok = data.decision === "approve";
+      const line = ok ? (fr ? "Ton post a été validé ✅. Les vues seront relevées 7 jours après la validation." : "Your post was validated ✅. Views are recorded 7 days after validation.")
+        : (fr ? `Ton lien a été refusé : ${data.reason}` : `Your link was refused: ${data.reason}`);
+      await a.from("creator_notifications").insert({ creator_id: c.id, body: line });
+      if (c.email && !c.email_pending) {
+        const first = String(c.full_name ?? "").split(/\s+/)[0] || "";
+        await sendCreatorNote(c.email, c.full_name ?? "", ok ? (fr ? "Post validé ✅" : "Post validated ✅") : (fr ? "Lien refusé" : "Link refused"), [fr ? `Salut ${first},` : `Hi ${first || "there"},`, line, fr ? "— L’équipe créateurs Sophia" : "— The Sophia creator team"]).catch(() => null);
+      }
+    }
     return { updated: (rows ?? []).length };
   });
 
@@ -76,6 +90,7 @@ export const simulateJ7 = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ postId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     await assertAdmin(context as never);
     const a = await admin(); const { trackValidated, freezeDue } = await import("./ugc-j7.server");
     const t = await trackValidated(a, [data.postId]).catch((e: Error) => ({ tracked: 0, usd: 0, error: e.message }));
@@ -87,6 +102,7 @@ export const approveReadyPayout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ creatorId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const me = await assertAdmin(context as never);
     const { approveReady } = await import("./ugc-j7.server");
     return approveReady(await admin(), data.creatorId, me);

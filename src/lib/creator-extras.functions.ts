@@ -86,6 +86,7 @@ export const savePayoutFallback = createServerFn({ method: "POST" })
     email: z.string().trim().email("Enter a complete email address, for example name@example.com.").max(255),
   }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const me = await myCreator(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const patch = { method: data.method, wise_email: data.method === "wise" ? data.email : null, paypal_email: data.method === "paypal" ? data.email : null };

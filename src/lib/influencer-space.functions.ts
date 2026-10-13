@@ -125,6 +125,7 @@ export const saveInfluencerPayout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => payoutSchema.parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const inf = await me(context as Ctx);
     const db = await admin();
     const { method, ...details } = data;
@@ -148,6 +149,7 @@ async function stripe() {
 export const startInfluencerStripe = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const inf = await me(context as Ctx);
     const s = await stripe();
     const db = await admin();
@@ -171,6 +173,7 @@ export const startInfluencerStripe = createServerFn({ method: "POST" })
 export const syncInfluencerStripe = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const inf = await me(context as Ctx);
     if (!inf.stripe_account_id) return { onboarded: false };
     const s = await stripe();

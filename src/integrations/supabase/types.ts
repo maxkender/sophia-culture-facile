@@ -2680,7 +2680,10 @@ export type Database = {
       }
       creator_signatures: {
         Row: {
+          contract_lang: string | null
+          contract_snapshot: string | null
           creator_id: string | null
+          document_slug: string
           document_version: string
           id: string
           signature_ip: string | null
@@ -2691,7 +2694,10 @@ export type Database = {
           variant: string
         }
         Insert: {
+          contract_lang?: string | null
+          contract_snapshot?: string | null
           creator_id?: string | null
+          document_slug?: string
           document_version: string
           id?: string
           signature_ip?: string | null
@@ -2702,7 +2708,10 @@ export type Database = {
           variant: string
         }
         Update: {
+          contract_lang?: string | null
+          contract_snapshot?: string | null
           creator_id?: string | null
+          document_slug?: string
           document_version?: string
           id?: string
           signature_ip?: string | null
@@ -2716,7 +2725,7 @@ export type Database = {
           {
             foreignKeyName: "creator_signatures_creator_id_fkey"
             columns: ["creator_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "creators"
             referencedColumns: ["id"]
           },
@@ -2911,6 +2920,7 @@ export type Database = {
           fixed_monthly_override: number | null
           full_name: string
           guide_read_at: string | null
+          guidelines_accepted_at: string | null
           id: string
           instagram_handle: string | null
           invite_sent_at: string | null
@@ -2985,6 +2995,7 @@ export type Database = {
           fixed_monthly_override?: number | null
           full_name: string
           guide_read_at?: string | null
+          guidelines_accepted_at?: string | null
           id?: string
           instagram_handle?: string | null
           invite_sent_at?: string | null
@@ -3059,6 +3070,7 @@ export type Database = {
           fixed_monthly_override?: number | null
           full_name?: string
           guide_read_at?: string | null
+          guidelines_accepted_at?: string | null
           id?: string
           instagram_handle?: string | null
           invite_sent_at?: string | null

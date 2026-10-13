@@ -246,6 +246,7 @@ export const previewUgcMonth = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => periodSchema.parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     await adminId(context);
     const { previewMonth } = await import("./ugc-month.server");
     return previewMonth(await db(), data.period);
@@ -255,6 +256,7 @@ export const generateUgcMonth = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => periodSchema.parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const me = await adminId(context);
     const { generateMonth } = await import("./ugc-month.server");
     return generateMonth(await db(), data.period, me);
@@ -264,6 +266,7 @@ export const addPayoutAdjustment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ creatorId: z.string().uuid(), period: z.string().regex(/^\d{4}-\d{2}$/), amount: z.number().min(-100000).max(100000), reason: z.string().trim().min(2).max(500) }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const me = await adminId(context);
     const a = await db();
     await a.from("payout_adjustments").insert({ creator_id: data.creatorId, period: data.period, amount: data.amount, reason: data.reason, created_by: me });
@@ -277,6 +280,7 @@ export const saveRateCardAndDefaults = createServerFn({ method: "POST" })
     effective_from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), default_posts_per_month: z.number().int().min(1).max(200), payday_day: z.number().int().min(1).max(28),
   }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     await adminId(context);
     const a = await db();
     const { default_posts_per_month, payday_day, ...card } = data;

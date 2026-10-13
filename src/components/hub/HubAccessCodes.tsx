@@ -52,7 +52,7 @@ export function HubAccessCodes() {
       <div className="overflow-x-auto rounded-2xl bg-card shadow-portal">
         <table className="w-full min-w-[480px] text-sm" data-testid="codes-per-app">
           <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">App</th><th className="p-3">Platform</th><th className="p-3">Available</th><th className="p-3">Assigned</th></tr></thead>
-          <tbody>{counts.map((r) => <tr key={`${r.appId}-${r.platform}`} className="border-t border-brand-line"><td className="p-3 font-bold">{r.app}</td><td className="p-3">{r.platform === "ios" ? "iOS" : "Android"}</td><td className="p-3">{r.available.toLocaleString()}</td><td className="p-3">{r.assigned.toLocaleString()}</td></tr>)}</tbody>
+          <tbody>{counts.map((r) => <tr key={`${r.appId}-${r.platform}`} className="border-t border-brand-line"><td className="p-3 font-bold">{r.app}</td><td className="p-3">{r.platform === "ios" ? "iOS" : "Android"}</td><td className="p-3">{r.available.toLocaleString()}{r.available < 20 ? <span className="ml-2 rounded-full bg-portal-amber/20 px-2 py-0.5 text-xs font-bold text-brand-navy" data-testid="codes-low">Low: under 20 left — import more</span> : null}</td><td className="p-3">{r.assigned.toLocaleString()}</td></tr>)}</tbody>
         </table>
       </div>
       <div className={`${card} space-y-3`}>

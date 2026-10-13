@@ -15,14 +15,16 @@ export function UgcHome() {
       let posts = supabase.from("creator_posts").select("id, creators!inner(is_test)", { count: "exact", head: true }).eq("status", "pending").eq("creators.is_test", false);
       let drafts = supabase.from("creator_drafts").select("id, creators!inner(is_test)", { count: "exact", head: true }).eq("status", "submitted").eq("creators.is_test", false);
       if (appId) { used = used.eq("app_id", appId); pub = pub.eq("app_id", appId); posts = posts.eq("app_id", appId); drafts = drafts.eq("app_id", appId); }
-      const [i, u, p, q, dr] = await Promise.all([ins, used, pub, posts, drafts]);
+      const apps = supabase.from("creator_applications").select("id", { count: "exact", head: true }).eq("status", "pending");
+      const [i, u, p, q, dr, ap] = await Promise.all([ins, used, pub, posts, drafts, apps]);
       const done = new Set((u.data ?? []).map((r) => r.inspiration_id as string));
       const toReview = (i.data ?? []).filter((r) => (!appId || !r.app_id || r.app_id === appId) && !done.has(r.id)).length;
-      return { toReview, published: p.count ?? 0, toValidate: q.count ?? 0, drafts: dr.count ?? 0 };
+      return { toReview, published: p.count ?? 0, toValidate: q.count ?? 0, drafts: dr.count ?? 0, applications: ap.count ?? 0 };
     },
   });
   const n = data;
   const next = !n ? null
+    : n.applications ? { text: `${n.applications} application${n.applications > 1 ? "s" : ""} waiting — accept or reject.`, to: "/hub/ugc/applications" as const }
     : n.drafts ? { text: `Review ${n.drafts} draft${n.drafts > 1 ? "s" : ""} waiting for you.`, to: "/hub/ugc/posts" as const }
     : n.toValidate ? { text: `Validate ${n.toValidate} post${n.toValidate > 1 ? "s" : ""} waiting for you.`, to: "/hub/ugc/posts" as const }
     : n.toReview ? { text: `Open an inspiration and press “Make a brief”.`, to: "/hub/ugc/inspiration" as const }

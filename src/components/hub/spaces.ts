@@ -3,6 +3,7 @@ import { UserPlus,
   Map as MapIcon, Megaphone, MessageSquare, Percent, Settings, Shield, Star, Target, Users, type LucideIcon,
 } from "lucide-react";
 
+// Payouts entries are hidden while payments are off (hub_settings.payments_enabled); routes redirect home.
 export type Space = "ugc" | "slideshows" | "influencers";
 export const SPACES: Space[] = ["ugc", "slideshows", "influencers"];
 export const SPACE_LABEL: Record<Space, string> = { ugc: "UGC", slideshows: "Slideshows", influencers: "Influencers" };
@@ -24,9 +25,8 @@ export const SPACE_NAV: Record<Space, NavItem[]> = {
     { to: "/hub/ugc/library", label: "Library", icon: GraduationCap, lead: "Formats, files, hooks and CTAs" },
     { to: "/hub/ugc/applications", label: "Applications", icon: UserPlus, lead: "Pending UGC applications — accept or reject" },
     { to: "/hub/ugc/creators", label: "Creators", icon: Users, lead: "Active creators" },
-    { to: "/hub/ugc/posts", label: "Posts", icon: Inbox, mobile: true, lead: "Validate posts, views at J+7, ready for payment" },
-    { to: "/hub/ugc/payouts", label: "Payouts", icon: Banknote, lead: "Approve ready payouts, then Stripe or export" },
-    { to: "/hub/settings", label: "Settings", icon: Settings, lead: "Shooting rules, descriptions, Notion, payments, team" },
+    { to: "/hub/ugc/posts", label: "Posts", icon: Inbox, mobile: true, lead: "Validate drafts and posts; views are recorded at J+7" },
+    { to: "/hub/settings", label: "Settings", icon: Settings, lead: "Shooting rules, descriptions, emails, apps & codes, Notion, team" },
   ],
   slideshows: [
     { to: "/hub/slideshows", label: "Home", icon: Home, exact: true, mobile: true, lead: "This week across every zone" },
@@ -34,7 +34,6 @@ export const SPACE_NAV: Record<Space, NavItem[]> = {
     { to: "/hub/slideshows/posters", label: "Posters", icon: Users, mobile: true, lead: "Signed posters, start Monday and manual checklist" },
     { to: "/hub/slideshows/managers", label: "Hiring managers & zones", icon: MapIcon, lead: "Who looks after which zone" },
     { to: "/hub/slideshows/rates", label: "Rates", icon: Percent, lead: "Weekly pay per zone and country map" },
-    { to: "/hub/slideshows/payouts", label: "Payouts", icon: Banknote, mobile: true, lead: "Weekly poster payouts" },
     { to: "/hub/slideshows/guide", label: "Guide & templates", icon: BookOpen, lead: "Poster Guide and email texts" },
     { to: "/hub/slideshows/platform", label: "Old platform", icon: ExternalLink, lead: "The previous slideshow platform" },
   ],
@@ -47,7 +46,6 @@ export const SPACE_NAV: Record<Space, NavItem[]> = {
     { to: "/hub/influencers/messages", label: "Messages", icon: MessageSquare, mobile: true, lead: "Conversations with influencers" },
     { to: "/hub/influencers/attribution", label: "Attribution", icon: CalendarCheck, lead: "Attribution and performance" },
     { to: "/hub/influencers/settings", label: "Rights & settings", icon: Shield, lead: "Usage rights, defaults and master agreement" },
-    { to: "/hub/influencers/payouts", label: "Payouts", icon: FileSignature, lead: "Influencer invoices and payouts" },
   ],
 };
 

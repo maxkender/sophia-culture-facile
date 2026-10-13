@@ -148,6 +148,7 @@ export const sendPayoutLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ applicationId: id }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     await assertAdmin(context);
     const a = await admin();
     const { randomToken, payoutLink } = await import("./slideshows.server");
@@ -164,6 +165,7 @@ export const buildWeekNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ lundi: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional() }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     await assertAdmin(context);
     const { buildWeek } = await import("./slideshows.server");
     return buildWeek(await admin(), data.lundi);
@@ -174,6 +176,7 @@ export const approveWeek = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ lundi: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const me = await assertAdmin(context);
     const a = await admin();
     const { MIN_PAYOUT } = await import("./slideshows.server");
@@ -192,6 +195,7 @@ export const payWeekStripe = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ lundi: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     await assertAdmin(context);
     const a = await admin();
     const { stripeClient } = await import("./slideshows.server");
@@ -215,6 +219,7 @@ export const markWeekPaid = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ ids: z.array(id).min(1) }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     await assertAdmin(context);
     await (await admin()).from("slideshow_payouts").update({ status: "paid", paid_at: new Date().toISOString() }).in("id", data.ids).eq("status", "approved");
     return { ok: true };
@@ -231,6 +236,7 @@ async function byToken(a: any, token: string) {
 export const getPosterPayout = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => tok.parse(d))
   .handler(async ({ data }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const a = await admin();
     const p = await byToken(a, data.token);
     if (!p) return { state: "invalid" as const };
@@ -249,6 +255,7 @@ export const getPosterPayout = createServerFn({ method: "POST" })
 export const savePosterPayout = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => tok.extend({ method: z.enum(["paypal", "wise"]), email: z.string().trim().email().max(200) }).parse(d))
   .handler(async ({ data }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const a = await admin();
     const p = await byToken(a, data.token);
     if (!p) throw new Error("This link has expired. Ask us for a new one.");
@@ -259,6 +266,7 @@ export const savePosterPayout = createServerFn({ method: "POST" })
 export const startPosterStripe = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => tok.parse(d))
   .handler(async ({ data }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     const a = await admin();
     const p = await byToken(a, data.token);
     if (!p) throw new Error("This link has expired. Ask us for a new one.");
