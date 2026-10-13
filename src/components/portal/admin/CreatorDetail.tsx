@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Banner, EmptyState, PageTitle, PortalCard } from "../ui";
 import { adminAssignCreatorCode, adminCreatorDetail, adminRevealCredentials } from "@/lib/creator-app.functions";
+import { adminResendCreatorInvite } from "@/lib/ugc-admin.functions";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AppEnrolment } from "./AppEnrolment";
 import { HandleLinksInline, PersonAvatar, useCreatorPhotos } from "@/components/hub/PersonAvatar";
 import { flag } from "@/components/hub/hub-data";
@@ -20,6 +22,7 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
   const detailFn = useServerFn(adminCreatorDetail);
   const revealFn = useServerFn(adminRevealCredentials);
   const assignFn = useServerFn(adminAssignCreatorCode);
+  const resendFn = useServerFn(adminResendCreatorInvite);
   const [creds, setCreds] = useState<{ handle: string; email: string; password: string } | null>(null);
   const { data: me } = useQuery({
     queryKey: ["admin-creator", creatorId],
@@ -44,6 +47,17 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
           <p className="text-sm text-brand-navySoft">{me.email_pending ? "email pending" : me.email}{me.phone ? ` · ${me.phone}` : ""} · {me.country ?? "no country"} · {["paused", "ended", "dormant"].includes(String(me.ugc_status ?? me.status)) ? "paused" : "active"}</p>
           <HandleLinksInline tiktok={me.tiktok_handle} instagram={me.instagram_handle} />
         </div>
+        {me.track === "ugc" ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild><Button variant="ghost" size="sm" className="ml-auto" aria-label="More actions">⋯</Button></DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={async () => {
+                try { const r = await resendFn({ data: { creatorId, origin: window.location.origin } }); if (r.sent) toast.success(`Invitation sent to ${me.email}`); else toast.error("The email could not be sent. Try again later."); }
+                catch { toast.error("The invitation could not be resent."); }
+              }}>Resend invitation</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
