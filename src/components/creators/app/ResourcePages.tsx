@@ -419,7 +419,7 @@ function SetPasswordCard() {
   return (
     <PortalCard className="mb-6">
       <h2 className="text-lg font-extrabold text-brand-navy">{ct("Définir un mot de passe")}</h2>
-      <p className="mt-1 text-sm text-brand-navySoft">{ct("Optional. You can always sign in with an email link instead.")}</p>
+      <p className="mt-1 text-sm text-brand-navySoft">{L("Change the password you sign in with. Forgot it? Use “Forgot password?” on the sign-in page.", "Change le mot de passe de connexion. Oublié ? Utilise « Mot de passe oublié ? » sur la page de connexion.")}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         <Input type="password" aria-label={ct("New password")} placeholder="New password (8+ characters)" className="max-w-xs" value={pw} onChange={(e) => setPw(e.target.value)} />
         <Button disabled={busy} onClick={async () => {
