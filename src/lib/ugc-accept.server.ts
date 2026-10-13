@@ -93,3 +93,36 @@ export async function acceptApplication(supabaseAdmin: Admin, applicationId: str
 
     return { ok: true as const, creatorId, inviteUrl, emailSent: send.sent, emailReason: send.note ?? null, emailProvider: send.provider };
 }
+
+/** Admin "Add creator": same onboarding as Accept, for creators recruited outside the site (no application row). */
+export async function inviteCreatorDirect(supabaseAdmin: Admin, input: { firstName: string; lastName: string; email: string; country: string | null; language: "fr" | "en"; tiktok: string | null; instagram: string | null; appIds: string[] }, origin: string) {
+  const email = input.email.trim().toLowerCase();
+  const { data: clash } = await supabaseAdmin.from("creators").select("id").eq("track", "ugc").ilike("email", email).maybeSingle();
+  if (clash) return { ok: false as const, error: "A creator with this email already exists.", creatorId: clash.id as string };
+  const inviteToken = randomToken();
+  const { data: creator, error } = await supabaseAdmin.from("creators").insert({
+    track: "ugc", full_name: `${input.firstName.trim()} ${input.lastName.trim()}`.trim(), email, country: input.country,
+    language: input.language, tiktok_handle: input.tiktok, instagram_handle: input.instagram,
+    status: "onboarding", ugc_status: "active", is_test: false, terms_visible: false, invite_token: inviteToken,
+  }).select("id").single();
+  if (error || !creator) return { ok: false as const, error: "The creator could not be created." };
+  const creatorId = creator.id as string;
+  const { data: activeApps } = await supabaseAdmin.from("apps").select("id").eq("active", true);
+  const apps = input.appIds.length ? input.appIds : ((activeApps ?? []) as { id: string }[]).map((a) => a.id);
+  if (apps.length) await supabaseAdmin.from("creator_apps").upsert(apps.map((app_id) => ({ creator_id: creatorId, app_id, status: "active" })), { onConflict: "creator_id,app_id" });
+  const { assignAppCode } = await import("./access-codes.server");
+  for (const appId of apps.length ? apps : [null]) await assignAppCode(supabaseAdmin, creatorId, appId);
+  const send = await sendCreatorInvite(supabaseAdmin, creatorId, origin);
+  return { ok: true as const, creatorId, emailSent: send.sent, emailReason: send.note ?? null };
+}
+
+/** (Re)sends the welcome email with the password link, in the creator's language. */
+export async function sendCreatorInvite(supabaseAdmin: Admin, creatorId: string, origin: string) {
+  const { data: c } = await supabaseAdmin.from("creators").select("id, full_name, email, country, language, invite_token").eq("id", creatorId).maybeSingle();
+  if (!c) throw new Error("Creator not found.");
+  let token = c.invite_token as string | null;
+  if (!token) { token = randomToken(); await supabaseAdmin.from("creators").update({ invite_token: token }).eq("id", creatorId); }
+  const url = `${origin.replace(/\/$/, "")}/creators/invite?token=${encodeURIComponent(token)}&email=${encodeURIComponent(c.email)}`;
+  const { sendTemplated, emailLang } = await import("./ugc-email.server");
+  return sendTemplated(supabaseAdmin, "ugc-welcome", String(c.email).toLowerCase(), c.full_name, url, emailLang(c.language, c.country));
+}
