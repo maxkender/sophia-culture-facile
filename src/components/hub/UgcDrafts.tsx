@@ -102,7 +102,7 @@ function DraftReview({ d, onDone }: { d: DraftRow; onDone: () => void }) {
         <aside className="rounded-xl bg-portal-bg p-3 text-sm">
           <p className="text-xs font-bold uppercase text-brand-navySoft">Brief</p>
           <p className="font-extrabold text-brand-navy">{d.briefs?.title}</p>
-          {d.briefs?.style ? <p className="mt-1 text-xs text-brand-navySoft">Style: {d.briefs.style.replace(/_/g, " ")}</p> : null}
+          {d.briefs?.style ? <p className="mt-1 text-xs text-brand-navySoft">Format: {d.briefs.style.replace(/_/g, " ")}</p> : null}
           {d.briefs?.hook ? <p className="mt-2 text-brand-navy">“{d.briefs.hook}”</p> : null}
         </aside>
       </div>

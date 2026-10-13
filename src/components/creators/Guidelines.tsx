@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SOPHIA_APP_ID } from "@/lib/apps";
-import { t as ct } from "@/i18n/creator-app";
+import { t as ct, L, creatorLang } from "@/i18n/creator-app";
 
 /* "Consignes de tournage": one editable list shown on the creator Rules page, on every brief and as the submit checklist. */
 export type Guideline = { id: string; sort_order: number; title_fr: string; title_en: string; body_fr: string; body_en: string; image_data: string | null; app_id: string | null; active: boolean };
@@ -44,9 +44,9 @@ export function GuidelinesBlock({ appId }: { appId?: string | null }) {
   return (
     <div className="rounded-2xl border border-brand-line bg-card" data-testid="guidelines-block">
       <button type="button" aria-expanded={open} onClick={() => setOpen(!open)} className="flex w-full items-center justify-between gap-2 p-4 text-left font-extrabold text-brand-navy">
-        Consignes de tournage ({data.length})<ChevronDown className={cn("size-4 transition", open && "rotate-180")} />
+        {L("Shooting guidelines", "Consignes de tournage")} ({data.length})<ChevronDown className={cn("size-4 transition", open && "rotate-180")} />
       </button>
-      {open ? <div className="border-t border-brand-line p-4"><ol className="space-y-3">{data.map((g) => <GuidelineItem key={g.id} g={g} />)}</ol></div> : null}
+      {open ? <div className="border-t border-brand-line p-4"><ol className="space-y-3">{data.map((g) => <GuidelineItem key={g.id} g={g} en={creatorLang() === "en"} />)}</ol></div> : null}
     </div>
   );
 }
@@ -57,11 +57,11 @@ export function GuidelinesChecklist({ appId, value, onChange }: { appId?: string
   if (!data.length) return null;
   return (
     <fieldset className="space-y-2" data-testid="guidelines-checklist">
-      <legend className="mb-1 text-sm font-bold text-brand-navy">Consignes respectées ({value.filter((v) => data.some((g) => g.id === v)).length}/{data.length})</legend>
+      <legend className="mb-1 text-sm font-bold text-brand-navy">{L("Guidelines followed", "Consignes respectées")} ({value.filter((v) => data.some((g) => g.id === v)).length}/{data.length})</legend>
       {data.map((g) => (
         <label key={g.id} className="flex items-start gap-2 text-sm">
           <input type="checkbox" className="mt-1" checked={value.includes(g.id)} onChange={(e) => onChange(e.target.checked ? [...value, g.id] : value.filter((x) => x !== g.id))} />
-          <span><b>{g.title_fr}</b>{g.body_fr ? <span className="text-brand-navySoft"> — {g.body_fr}</span> : null}</span>
+          {(() => { const en = creatorLang() === "en"; const ti = en ? g.title_en || g.title_fr : g.title_fr; const bo = en ? g.body_en || g.body_fr : g.body_fr; return <span><b>{ti}</b>{bo ? <span className="text-brand-navySoft"> — {bo}</span> : null}</span>; })()}
         </label>
       ))}
     </fieldset>

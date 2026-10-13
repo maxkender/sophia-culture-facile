@@ -217,9 +217,10 @@ export function CreatorShell({ children }: { children: ReactNode }) {
             <CreatorBell />
           </div>
         </header>
-        <main className="safe-bottom mx-auto w-full min-w-0 max-w-5xl px-4 pb-24 pt-8 sm:px-6 sm:py-10 lg:pb-10">{gate ?? children}</main>
+        <main className={cn("mx-auto w-full min-w-0 max-w-5xl px-4 pt-8 sm:px-6 sm:py-10 lg:pb-10", gate ? "pb-[calc(2.5rem+env(safe-area-inset-bottom))]" : "pb-[calc(7rem+env(safe-area-inset-bottom))]")}>{gate ?? children}</main>
       </div>
-      <nav aria-label={ct("Creator mobile")} className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-brand-line bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
+      {/* Contract and guidelines are mandatory steps: no bottom menu there, so their buttons are never covered. */}
+      <nav aria-label={ct("Creator mobile")} className={cn("fixed inset-x-0 bottom-0 z-40 grid-cols-5 border-t border-brand-line bg-card pb-[env(safe-area-inset-bottom)] lg:hidden", gate ? "hidden" : "grid")}>
         {([["/creators/app", "Home", Home], ["/creators/app/briefs", "Briefs", Clapperboard], ["/creators/app/posts", "My posts", Video], ["/creators/app/apps", "Codes", Smartphone], ["/creators/app/profile", "Profile", UserCircle]] as const).map(([to, l, Icon]) => {
           const on = to === "/creators/app" ? pathname === to : pathname.startsWith(to);
           return <Link key={to} to={to} className={cn("flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold", on ? "text-portal-accent" : "text-brand-navySoft")}><Icon className="size-5" />{ct(l)}</Link>;
@@ -230,28 +231,15 @@ export function CreatorShell({ children }: { children: ReactNode }) {
   );
 }
 
-/** Wraps pages that stay locked until onboarding steps 1–3 (or step 4 for Earnings) are done. */
+/** Pages open once the UGC contract is signed and the shooting guidelines accepted (the shell gate shows those screens). Payouts stay off. */
 export function Locked({ gate, children }: { gate: "steps" | "payouts"; children: ReactNode }) {
   const { steps } = useCreator();
-  const missing = !steps.rules
-    ? { n: 1, label: ct("Read the rules"), to: "/creators/app/rules" }
-    : !steps.signed
-      ? { n: 2, label: ct("Sign the Creator Account Agreement"), to: "/creators/app/contract" }
-      : !steps.account
-        ? { n: 3, label: ct("Set up your Sophia account"), to: "/creators/app/account" }
-        : gate === "payouts" && !steps.payouts
-          ? { n: 4, label: ct("Set up payouts"), to: "/creators/app/profile" }
-          : null;
-  if (!missing) return <>{children}</>;
+  if (gate === "steps" && steps.unlocked) return <>{children}</>;
   return (
     <div className="rounded-portal border border-portal-amber/40 bg-portal-amber/10 p-6">
-      <p className="flex items-center gap-2 text-base font-extrabold text-brand-navy"><Lock className="size-4" /> {ct("This page is locked")}</p>
-      <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">
-        {gate === "payouts"
-          ? ct("Earnings open once onboarding steps 1 to 3 are done and your payout details are set up (step 4).")
-          : ct("Briefs, the library, your posts and calls open once the first three onboarding steps are done: rules, agreement and account setup.")}
-      </p>
-      <Button asChild className="mt-4"><Link to={missing.to}>{L("Go to step", "Aller à l’étape")} {missing.n} : {ct(missing.label)}</Link></Button>
+      <p className="flex items-center gap-2 text-base font-extrabold text-brand-navy"><Lock className="size-4" /> {L("This page is locked", "Cette page est verrouillée")}</p>
+      <p className="mt-2 text-sm leading-relaxed text-brand-navySoft">{L("It opens once your contract is signed and the shooting guidelines are accepted.", "Elle s’ouvre une fois ton contrat signé et les consignes de tournage acceptées.")}</p>
+      <Button asChild className="mt-4"><Link to="/creators/app">{L("Back to Home", "Retour à l’accueil")}</Link></Button>
     </div>
   );
 }

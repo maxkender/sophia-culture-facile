@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { WARMUP_REQUIRED } from "./creator-steps";
 
 /* UGC loop: creator submits links → admin validates → tracked → J+7 freeze → Ready → approved into a payout. */
 type Sb = any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -19,9 +18,9 @@ export const submitPostLinks = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: me } = await context.supabase.from("creators").select("*").eq("user_id", context.userId).maybeSingle();
     if (!me) throw new Error("Creator account not found.");
-    const { data: sig } = await context.supabase.from("creator_signatures").select("id").eq("creator_id", me.id).maybeSingle();
-    const warm = (me.warmup ?? {}) as Record<string, string>;
-    if (!me.rules_accepted_at || !sig || !me.social_account_created_at || WARMUP_REQUIRED.some((x) => !warm[String(x)])) throw new Error("Finish onboarding steps 1 to 3 before adding links.");
+    // Same two steps as the creator space: UGC contract signed + shooting guidelines accepted.
+    const { data: sig } = await context.supabase.from("creator_signatures").select("id").eq("creator_id", me.id).in("document_slug", ["ugc-agreement", "ugc-agreement-fr"]).limit(1).maybeSingle();
+    if (!sig || !me.guidelines_accepted_at) throw new Error("Sign your contract and accept the shooting guidelines before adding links.");
     let appId: string | null = null;
     if (data.briefId) {
       const { data: b } = await context.supabase.from("briefs").select("id, app_id").eq("id", data.briefId).maybeSingle();

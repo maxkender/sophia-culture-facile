@@ -60,7 +60,7 @@ export function friendlyCreatorError(error: unknown, lang: CreatorValidationLang
   if (raw && !message.includes("zod") && !message.includes("invalid_type") && !message.includes("validation")) {
     const safeMessages = [
       "Enter the account password.", "Register the account first.", "Brief not found.", "Post not found.",
-      "Views can be reported 7 days after posting.", "Finish onboarding steps 1 to 3 before logging posts.",
+      "Views can be reported 7 days after posting.", "Finish onboarding steps 1 to 3 before logging posts.", "Sign your contract and accept the shooting guidelines before logging posts.", "Sign your contract and accept the shooting guidelines before adding links.",
       "The date cannot be in the future.", "The screenshot could not be uploaded.", "The photo could not be uploaded.",
       "The account could not be saved.", "The post could not be logged.",
     ];

@@ -10,12 +10,15 @@ import { EMAIL_DEFAULTS, EMAIL_DEFAULTS_FR } from "./ugc-email-texts";
 export { EMAIL_DEFAULTS, EMAIL_DEFAULTS_FR };
 
 const FR_COUNTRIES = new Set(["FR", "BE", "CH", "LU", "MC", "CA", "SN", "CI", "MA", "TN", "DZ", "CM", "RE", "GP", "MQ", "GF", "YT", "PF", "NC"]);
+const FR_COUNTRY_NAMES = new Set(["FRANCE", "BELGIQUE", "BELGIUM", "SUISSE", "SWITZERLAND", "LUXEMBOURG", "MONACO", "SÉNÉGAL", "SENEGAL", "CÔTE D’IVOIRE", "CÔTE D'IVOIRE", "IVORY COAST", "MAROC", "MOROCCO", "TUNISIE", "TUNISIA", "ALGÉRIE", "ALGERIA", "CAMEROUN", "CAMEROON", "LA RÉUNION", "RÉUNION", "GUADELOUPE", "MARTINIQUE", "GUYANE", "MAYOTTE"]);
 /** French creators get French emails: explicit language first, then country. */
 export function emailLang(language?: string | null, country?: string | null): "fr" | "en" {
   const l = (language ?? "").toLowerCase();
   if (l.startsWith("fr")) return "fr";
   if (l.startsWith("en")) return "en";
-  return country && FR_COUNTRIES.has(country.toUpperCase()) ? "fr" : "en";
+  // Forms store either a code ("FR") or a name ("France"): accept both.
+  const c = (country ?? "").trim().toUpperCase();
+  return c && (FR_COUNTRIES.has(c) || FR_COUNTRY_NAMES.has(c)) ? "fr" : "en";
 }
 
 export type EmailKey = keyof typeof EMAIL_DEFAULTS;

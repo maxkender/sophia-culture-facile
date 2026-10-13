@@ -653,6 +653,14 @@ export const CREATOR_APP_DICT: Record<string, { fr: string; en: string }> = {
   "fr": "Fin qui boucle ou pose une question",
   "en": "Ending that loops or asks a question"
  },
+ "Sign your contract and accept the shooting guidelines before logging posts.": {
+  "fr": "Signe ton contrat et accepte les consignes de tournage avant d’enregistrer des posts.",
+  "en": "Sign your contract and accept the shooting guidelines before logging posts."
+ },
+ "Sign your contract and accept the shooting guidelines before adding links.": {
+  "fr": "Signe ton contrat et accepte les consignes de tournage avant d’ajouter des liens.",
+  "en": "Sign your contract and accept the shooting guidelines before adding links."
+ },
  "Finish onboarding steps 1 to 3 before logging posts.": {
   "fr": "Termine les étapes 1 à 3 du parcours de démarrage avant d’enregistrer des posts.",
   "en": "Finish onboarding steps 1 to 3 before logging posts."
