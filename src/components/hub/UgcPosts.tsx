@@ -84,7 +84,7 @@ export function UgcPosts() {
                 <td className="p-3 text-right">
                   {tab === "queue" ? (reasonFor === p.id ? (
                     <div className="ml-auto flex max-w-72 flex-col gap-1"><input aria-label="Refusal reason" autoFocus value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason sent to the creator" className="h-9 rounded-lg border px-2 text-sm" /><div className="flex justify-end gap-1"><Button size="sm" variant="ghost" onClick={() => setReasonFor(null)}>Cancel</Button><Button size="sm" variant="destructive" disabled={reason.trim().length < 3} onClick={() => void run([p.id], "reject", reason.trim())}>Refuse</Button></div></div>
-                  ) : <div className="flex justify-end gap-1"><Button size="sm" onClick={() => void run([p.id], "approve")}>Valider</Button><Button size="sm" variant="outline" onClick={() => { setReasonFor(p.id); setReason(""); }}>Refuser</Button></div>)
+                  ) : <div className="flex justify-end gap-1"><Button size="sm" onClick={() => void run([p.id], "approve")}>Validate</Button><Button size="sm" variant="outline" onClick={() => { setReasonFor(p.id); setReason(""); }}>Refuse</Button></div>)
                   : tab === "refused" ? <span className="text-xs">{p.feedback}</span>
                   : null}
                 </td>

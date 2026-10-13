@@ -343,7 +343,7 @@ export function PostsPage({ refId }: { refId?: string | undefined }) {
                   <span className="flex min-w-0 flex-wrap items-center gap-2"><PlatformBadge platform={p.platform} /><a href={p.url} target="_blank" rel="noopener noreferrer" className="truncate font-bold text-portal-accent hover:underline">{p.url.replace(/^https:\/\/(www\.)?/, "").slice(0, 48)}</a></span>
                   <span className={cn("rounded-full px-3 py-1 text-xs font-bold", st.tone)}>{ct(st.label)}</span>
                 </div>
-                <p className="mt-1 text-sm text-brand-navySoft">{brief ? `Brief : ${ct(brief.title)}` : ct("Sans brief")} · envoyé le {fmtDate((p as LoopPost).submitted_at ?? p.created_at)}{st.detail ? ` · ${st.detail}` : ""}</p>
+                <p className="mt-1 text-sm text-brand-navySoft">{brief ? `${L("Brief:", "Brief :")} ${ct(brief.title)}` : ct("Sans brief")} · {L("sent on", "envoyé le")} {fmtDate((p as LoopPost).submitted_at ?? p.created_at)}{st.detail ? ` · ${st.detail}` : ""}</p>
                 {p.status === "flagged" && p.feedback ? <div className="mt-3 rounded-xl bg-portal-amber/10 p-3 text-sm"><p>{p.feedback}</p><FeedbackReply post={p} /></div> : null}
               </PortalCard>
             );

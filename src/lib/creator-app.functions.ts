@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { WARMUP_REQUIRED } from "./creator-steps";
 import { isValidInternationalPhone } from "./creator-validation";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -220,10 +219,8 @@ export const logPostChecked = createServerFn({ method: "POST" })
   }).parse(input))
   .handler(async ({ data, context }) => {
     const me = await myCreator(context.supabase, context.userId);
-    const { data: sig } = await context.supabase.from("creator_signatures").select("id").eq("creator_id", me.id).maybeSingle();
-    const warm = (me.warmup ?? {}) as Record<string, string>;
-    if (!me.rules_accepted_at || !sig || !me.social_account_created_at || WARMUP_REQUIRED.some((d) => !warm[String(d)]))
-      throw new Error("Finish onboarding steps 1 to 3 before logging posts.");
+    const { data: sig } = await context.supabase.from("creator_signatures").select("id").eq("creator_id", me.id).in("document_slug", ["ugc-agreement", "ugc-agreement-fr"]).limit(1).maybeSingle();
+    if (!sig || !me.guidelines_accepted_at) throw new Error("Sign your contract and accept the shooting guidelines before logging posts.");
     const today = new Date().toISOString().slice(0, 10);
     if (data.postedOn > today) throw new Error("The date cannot be in the future.");
     if (data.briefId) {
