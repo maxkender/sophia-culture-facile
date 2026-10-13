@@ -307,3 +307,39 @@ export const publishWeek = createServerFn({ method: "POST" })
     await a.from("activity_log").insert({ actor_id: me, entity: "week", entity_id: me, action: "week_published", comment: `${data.weekStart}: ${rows.length} assignments, ${notes.length} creators` });
     return { assignments: rows.length, creators: notes.length };
   });
+
+/* ---------- Add creator (outside recruits) ---------- */
+export const adminInviteCreator = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    firstName: z.string().trim().min(1, "First name is required").max(80),
+    lastName: z.string().trim().min(1, "Last name is required").max(80),
+    email: z.string().trim().email("Enter a valid email").max(200),
+    country: z.string().trim().max(80).nullable(),
+    language: z.enum(["fr", "en"]),
+    tiktok: z.string().trim().max(100).nullable(),
+    instagram: z.string().trim().max(100).nullable(),
+    appIds: z.array(z.string().uuid()).max(20),
+    origin: z.string().url(),
+  }).parse(d))
+  .handler(async ({ data, context }) => {
+    const me = await adminId(context);
+    const a = await db();
+    const clean = (h: string | null) => (h ? h.replace(/^@/, "").trim() || null : null);
+    const { inviteCreatorDirect } = await import("./ugc-accept.server");
+    const r = await inviteCreatorDirect(a, { ...data, country: data.country || null, tiktok: clean(data.tiktok), instagram: clean(data.instagram) }, data.origin);
+    if (r.ok) await a.from("activity_log").insert({ actor_id: me, entity: "creator", entity_id: r.creatorId, action: "creator_invited", comment: data.email });
+    return r;
+  });
+
+export const adminResendCreatorInvite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ creatorId: z.string().uuid(), origin: z.string().url() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const me = await adminId(context);
+    const a = await db();
+    const { sendCreatorInvite } = await import("./ugc-accept.server");
+    const r = await sendCreatorInvite(a, data.creatorId, data.origin);
+    await a.from("activity_log").insert({ actor_id: me, entity: "creator", entity_id: data.creatorId, action: "invite_resent" });
+    return { sent: r.sent, note: r.note ?? null };
+  });
