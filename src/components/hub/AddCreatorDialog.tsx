@@ -24,9 +24,9 @@ export function AddCreatorDialog() {
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value });
 
   async function submit() {
-    if (!f.firstName.trim() || !f.lastName.trim()) return toast.error("Enter first and last name.");
-    if (!/^\S+@\S+\.\S+$/.test(f.email.trim())) return toast.error("Enter a valid email.");
-    if (!appIds.length) return toast.error("Pick at least one app.");
+    if (!f.firstName.trim() || !f.lastName.trim()) { toast.error("Enter first and last name."); return; }
+    if (!/^\S+@\S+\.\S+$/.test(f.email.trim())) { toast.error("Enter a valid email."); return; }
+    if (!appIds.length) { toast.error("Pick at least one app."); return; }
     setBusy(true);
     try {
       const r = await invite({ data: { ...f, country: f.country || null, tiktok: f.tiktok || null, instagram: f.instagram || null, appIds, origin: window.location.origin } });
