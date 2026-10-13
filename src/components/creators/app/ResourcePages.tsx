@@ -314,14 +314,14 @@ export function ProfilePage() {
   const qc = useQueryClient();
   return (
     <div>
-      <PageTitle title={ct("Profile")} lead={ct("Your details, your Sophia app access, the creators Slack and your payout details.")} />
+      <PageTitle title={ct("Profile")} lead={L("Check your details and language here. Your signed contract is below.", "Vérifie ici tes infos et ta langue. Ton contrat signé est en bas.")} />
       <PortalCard className="mb-6 flex flex-wrap items-center justify-between gap-3"><p className="font-extrabold text-brand-navy">{ct("Language of your space")}</p><CreatorLangSwitch /></PortalCard>
       <SetPasswordCard />
       <PortalCard>
         <div className="grid gap-4 sm:grid-cols-2">
           <div><Label>{ct("Name")}</Label><Input value={me.full_name} readOnly /></div>
           <div><Label>{ct("Email")}</Label><Input value={me.email} readOnly /></div>
-          <div><Label>{ct("Country")}</Label><CountrySelect value={country} onChange={setCountry} lang="en" labels={{ select: ct("Choose a country"), search: "Search…", empty: ct("No country found") }} /></div>
+          <div><Label>{ct("Country")}</Label><CountrySelect value={country} onChange={setCountry} lang={L("en", "fr") as "fr" | "en"} labels={{ select: ct("Choose a country"), search: L("Search…", "Rechercher…"), empty: ct("No country found") }} /></div>
            <div><Label>{ct("Phone")}</Label><Input type="tel" placeholder="+44 7700 900123" value={phone} onChange={(e) => setPhone(e.target.value)} /><p className="mt-1 text-xs text-brand-navySoft">{ct("Include the country code.")}</p></div>
           <div><Label>{ct("Phone type")}</Label>
             <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={platform} onChange={(e) => setPlatform(e.target.value as typeof platform)}>
@@ -344,7 +344,11 @@ export function ProfilePage() {
       </PortalCard>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <AccessCodeCard />
+        <PortalCard>
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">{L("My contract", "Mon contrat")}</p>
+          <p className="mt-2 text-sm text-brand-navySoft">{L("Read or print the agreement you signed.", "Lis ou imprime le contrat que tu as signé.")}</p>
+          <Button asChild className="mt-4" variant="outline"><Link to="/creators/app/contract">{L("View my contract", "Voir mon contrat")}</Link></Button>
+        </PortalCard>
         <PortalCard>
           <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">{ct("Creators Slack")}</p>
           <p className="mt-2 text-sm text-brand-navySoft">{ct("Optional, useful for quick questions and to meet the other creators. The invitation does not expire.")}</p>
@@ -352,7 +356,6 @@ export function ProfilePage() {
         </PortalCard>
       </div>
 
-      <div id="payouts" className="mt-10"><PayoutDetails /></div>
     </div>
   );
 }

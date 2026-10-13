@@ -74,15 +74,6 @@ export function SignIn({ invite, invitedEmail, standalone = false }: { invite: s
         }}>{ct("Forgot password?")}</button>
       )}
       <Button className="w-full" disabled={busy} onClick={go}>{mode === "up" ? ct("Create account") : ct("Sign in")}</Button>
-      {mode === "in" && (linkSent
-        ? <p className="rounded-xl bg-portal-green/10 p-3 text-sm text-brand-navy">Lien envoyé : regarde ta boîte mail (et les spams). / Link sent: check your inbox.</p>
-        : <Button variant="outline" className="w-full" disabled={busy} onClick={async () => {
-            if (!/^\S+@\S+\.\S+$/.test(email.trim())) { toast.error(ct("Entre ton email d'abord. / Enter your email first.")); return; }
-            setBusy(true);
-            try { await sendLink({ data: { email: email.trim(), origin: window.location.origin, lang: navigator.language.toLowerCase().startsWith("fr") ? "fr" : "en" } }); setLinkSent(true); }
-            catch { toast.error(ct("Le lien n'a pas pu être envoyé. Réessaie. / The link could not be sent.")); }
-            setBusy(false);
-          }}>{ct("Recevoir un lien de connexion par email")}</Button>)}
       <button className="text-xs text-brand-navySoft underline" onClick={() => setMode(mode === "up" ? "in" : "up")}>
         {mode === "up" ? ct("I already have an account") : ct("I have an invite, create my account")}
       </button>

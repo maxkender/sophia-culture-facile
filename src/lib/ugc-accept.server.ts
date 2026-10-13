@@ -85,11 +85,7 @@ export async function acceptApplication(supabaseAdmin: Admin, applicationId: str
       ...(send.sent ? { acceptance_email_sent_at: new Date().toISOString() } : {}),
       welcome_email_provider: send.provider, welcome_email_message_id: send.messageId, welcome_email_error: send.note,
     }).eq("id", application.id);
-    // J. hand out the store code of each app the creator works on (Sophia by default), never another app's code.
-    const { assignAppCode } = await import("./access-codes.server");
-    const { data: enrolled } = await supabaseAdmin.from("creator_apps").select("app_id").eq("creator_id", creatorId).eq("status", "active");
-    const appIds = (enrolled ?? []).map((e: { app_id: string }) => e.app_id);
-    for (const appId of appIds.length ? appIds : [null]) await assignAppCode(supabaseAdmin, creatorId, appId);
+    // Store codes are drawn by the creator on demand in "My apps & codes", never at acceptance.
 
     return { ok: true as const, creatorId, inviteUrl, emailSent: send.sent, emailReason: send.note ?? null, emailProvider: send.provider };
 }
@@ -110,8 +106,6 @@ export async function inviteCreatorDirect(supabaseAdmin: Admin, input: { firstNa
   const { data: activeApps } = await supabaseAdmin.from("apps").select("id").eq("active", true);
   const apps = input.appIds.length ? input.appIds : ((activeApps ?? []) as { id: string }[]).map((a) => a.id);
   if (apps.length) await supabaseAdmin.from("creator_apps").upsert(apps.map((app_id) => ({ creator_id: creatorId, app_id, status: "active" })), { onConflict: "creator_id,app_id" });
-  const { assignAppCode } = await import("./access-codes.server");
-  for (const appId of apps.length ? apps : [null]) await assignAppCode(supabaseAdmin, creatorId, appId);
   const send = await sendCreatorInvite(supabaseAdmin, creatorId, origin);
   return { ok: true as const, creatorId, emailSent: send.sent, emailReason: send.note ?? null };
 }

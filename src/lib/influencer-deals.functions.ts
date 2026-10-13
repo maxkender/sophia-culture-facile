@@ -467,6 +467,7 @@ export const markPayoutPaid = createServerFn({ method: "POST" })
     z.object({ itemIds: z.array(z.string().uuid()).min(1).max(100), paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), reference: z.string().trim().min(1).max(200) }).parse(d),
   )
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     await adminProfile(context as Ctx);
     const a = await db();
     const { data: items } = await a.from("influencer_payout_items").select("id, invoice_id, status").in("id", data.itemIds);

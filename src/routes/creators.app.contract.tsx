@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ContractPage } from "@/components/creators/app/ResourcePages";
+import { UgcContractScreen as ContractPage } from "@/components/creators/app/Onboarding";
 
 export const Route = createFileRoute("/creators/app/contract")({
   head: () => ({ meta: [

@@ -54,11 +54,12 @@ export function UgcPosts() {
     try { const r = await decide({ data: { ids, decision, ...(why ? { reason: why } : {}) } }); toast.success(`${r.updated} ${decision === "approve" ? "validated" : "refused"}`); setReasonFor(null); setReason(""); reload(); }
     catch (e) { toast.error((e as Error).message); }
   }
-  const stage = (p: Row) => p.pay_status === "ready" ? "Ready for payment" : p.pay_status === "no_data" ? "No view data at J+7" : p.pay_status === "approved" ? "In a payout" : p.pay_status === "paid" ? "Paid" : `Tracking · J+7 on ${d(p.validated_at ? new Date(new Date(p.validated_at).getTime() + 7 * 86400000).toISOString() : null)}`;
+  // No money: Validated → Views recorded at J+7.
+  const stage = (p: Row) => p.pay_status === "no_data" ? "No view data at J+7" : p.views_frozen != null ? "Views recorded (J+7)" : `Validated · views recorded on ${d(p.validated_at ? new Date(new Date(p.validated_at).getTime() + 7 * 86400000).toISOString() : null)}`;
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        {([["queue", `To validate ${queue.length}`], ["tracking", `Validated & tracking ${tracking.length}`], ["refused", `Refused ${refused.length}`]] as const).map(([k, l]) => (
+        {([["queue", `To validate ${queue.length}`], ["tracking", `Validated ${tracking.length}`], ["refused", `Refused ${refused.length}`]] as const).map(([k, l]) => (
           <button key={k} type="button" aria-pressed={tab === k} onClick={() => { setTab(k); setSel(new Set()); }} className={cn("min-h-9 rounded-full px-4 text-sm font-bold", tab === k ? "bg-brand-navy text-card" : "bg-card text-brand-navy")}>{l}</button>
         ))}
         {tab === "queue" && sel.size ? <Button size="sm" className="ml-auto" onClick={() => void run([...sel], "approve")}>Validate {sel.size} selected</Button> : null}
@@ -68,7 +69,7 @@ export function UgcPosts() {
           <table className="w-full min-w-[900px] text-sm" data-testid="posts-table">
             <thead><tr className="border-b text-left text-xs text-brand-navySoft">
               {tab === "queue" ? <th className="p-3"><input type="checkbox" aria-label="Select all" checked={sel.size === rows.length} onChange={(e) => setSel(e.target.checked ? new Set(rows.map((r) => r.id)) : new Set())} /></th> : null}
-              <th className="p-3">Video</th><th>Creator</th><th>Brief</th><th>Submitted</th>{tab === "tracking" ? <><th>Status</th><th>Pay</th></> : <th>Guidelines</th>}<th className="p-3 text-right">{tab === "refused" ? "Reason" : ""}</th>
+              <th className="p-3">Video</th><th>Creator</th><th>Brief</th><th>Submitted</th>{tab === "tracking" ? <th>Status</th> : <th>Guidelines</th>}<th className="p-3 text-right">{tab === "refused" ? "Reason" : ""}</th>
             </tr></thead>
             <tbody>{rows.map((p) => (
               <tr key={p.id} className="border-b align-top last:border-0" data-testid="post-admin-row">
@@ -78,15 +79,14 @@ export function UgcPosts() {
                 <td className="py-3 pr-2">{p.briefs?.title ?? "—"}</td>
                 <td className="py-3 pr-2">{d(p.submitted_at ?? p.created_at)}</td>
                 {tab === "tracking" ? <>
-                  <td className="py-3 pr-2"><span className={cn("rounded-full px-2 py-0.5 text-xs font-bold", p.pay_status === "ready" ? "bg-portal-green/15 text-portal-green" : p.pay_status === "no_data" ? "bg-portal-amber/20 text-brand-navy" : "bg-muted")}>{stage(p)}</span><div className="mt-1 text-xs text-brand-navySoft">{(p.views_frozen ?? p.views) != null ? `${Number(p.views_frozen ?? p.views).toLocaleString("en-GB")} views${p.views_frozen != null ? " (frozen)" : " so far"}` : "no views yet"}</div>{p.pay_flag ? <div className="text-xs text-portal-amber">{p.pay_flag}</div> : null}</td>
-                  <td className="py-3 pr-2"><b>{p.pay_amount != null ? eurFr(p.pay_amount) : "—"}</b>{p.pay_formula ? <div className="max-w-64 text-xs text-brand-navySoft" data-testid="pay-formula">{p.pay_formula}</div> : null}</td>
+                  <td className="py-3 pr-2"><span className={cn("rounded-full px-2 py-0.5 text-xs font-bold", p.views_frozen != null ? "bg-portal-green/15 text-portal-green" : p.pay_status === "no_data" ? "bg-portal-amber/20 text-brand-navy" : "bg-muted")}>{stage(p)}</span><div className="mt-1 text-xs text-brand-navySoft">{(p.views_frozen ?? p.views) != null ? `${Number(p.views_frozen ?? p.views).toLocaleString("en-GB")} views${p.views_frozen != null ? " (frozen)" : " so far"}` : "no views yet"}</div>{p.pay_flag ? <div className="text-xs text-portal-amber">{p.pay_flag}</div> : null}</td>
                 </> : <td className="py-3 pr-2">{gCount ? `${(p.guidelines_checked ?? []).length}/${gCount} ticked` : "—"}</td>}
                 <td className="p-3 text-right">
                   {tab === "queue" ? (reasonFor === p.id ? (
                     <div className="ml-auto flex max-w-72 flex-col gap-1"><input aria-label="Refusal reason" autoFocus value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason sent to the creator" className="h-9 rounded-lg border px-2 text-sm" /><div className="flex justify-end gap-1"><Button size="sm" variant="ghost" onClick={() => setReasonFor(null)}>Cancel</Button><Button size="sm" variant="destructive" disabled={reason.trim().length < 3} onClick={() => void run([p.id], "reject", reason.trim())}>Refuse</Button></div></div>
                   ) : <div className="flex justify-end gap-1"><Button size="sm" onClick={() => void run([p.id], "approve")}>Valider</Button><Button size="sm" variant="outline" onClick={() => { setReasonFor(p.id); setReason(""); }}>Refuser</Button></div>)
                   : tab === "refused" ? <span className="text-xs">{p.feedback}</span>
-                  : p.pay_status === "tracking" ? <Button size="sm" variant="outline" disabled={busy === p.id} title="Admin test switch: refresh views now and freeze as if J+7 had passed" onClick={async () => { setBusy(p.id); try { const r = await sim({ data: { postId: p.id } }); toast.success(r.ready ? "Frozen: ready for payment" : "Frozen: no view data, flagged"); reload(); } catch (e) { toast.error((e as Error).message); } setBusy(null); }}><FlaskConical className="size-4" />Simulate J+7</Button> : null}
+                  : null}
                 </td>
               </tr>
             ))}</tbody>

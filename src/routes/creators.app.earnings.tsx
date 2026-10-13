@@ -1,6 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { UgcEarningsPage as EarningsPage } from "@/components/creators/app/UgcPages";
-import { Locked } from "@/components/creators/app/CreatorShell";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/creators/app/earnings")({
   head: () => ({ meta: [
@@ -12,5 +10,6 @@ export const Route = createFileRoute("/creators/app/earnings")({
     { name: "twitter:card", content: "summary" },
     { name: "robots", content: "noindex, nofollow" },
   ] }),
-  component: () => <Locked gate="payouts"><EarningsPage /></Locked>,
+  // Payments are off: the page is gone, old links go home.
+  beforeLoad: () => { throw redirect({ to: "/creators/app", replace: true }); },
 });

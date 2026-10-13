@@ -6,36 +6,8 @@ export const SLACK_URL = "https://join.slack.com/t/ugc-vikstudios/shared_invite/
 
 type Admin = any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-export const EMAIL_DEFAULTS = {
-  "ugc-welcome": {
-    subject: "You're in — your Sophia creator space",
-    intro: "Hi {first_name},\n\nWelcome to the Sophia creator team. Your private creator space is ready: open the button below and create your password with this email address.",
-    instructions: "Do these three things first:\n1. Read the rules and sign the Creator Account Agreement.\n2. Create the Sophia email, TikTok and Instagram accounts and register them in your space.\n3. Do the 24-hour warm-up and set up your payouts.\n\nJoin the team Slack too — the link is below.\n\nReply to this email if anything is unclear.",
-    button_label: "Open my creator space",
-  },
-  "ugc-decline": {
-    subject: "Your Sophia creator application",
-    intro: "Hi {first_name},\n\nThank you for applying to create for Sophia and for the time you put into your video.",
-    instructions: "We are not taking your application further this time. This is not a judgement of you: we look for a very specific style and we receive many more applications than we have places.\n\nWe wish you all the best, and you are welcome to apply again in a few months.",
-    button_label: "",
-  },
-} as const;
-
-/** French versions used for French-speaking creators (language fr, or a French-speaking country). */
-export const EMAIL_DEFAULTS_FR = {
-  "ugc-welcome": {
-    subject: "C’est validé — ton espace créateur Sophia",
-    intro: "Salut {first_name},\n\nBienvenue dans l’équipe créateurs Sophia. Ton espace créateur privé est prêt : clique sur le bouton ci-dessous et crée ton mot de passe avec cette adresse email.",
-    instructions: "Commence par ces trois choses :\n1. Lis les règles et signe le contrat de compte créateur.\n2. Crée l’email Sophia et les comptes TikTok et Instagram, puis enregistre-les dans ton espace.\n3. Fais l’échauffement de 24 heures et configure tes paiements.\n\nRejoins aussi le Slack de l’équipe — le lien est juste en dessous.\n\nRéponds à cet email si quelque chose n’est pas clair.",
-    button_label: "Ouvrir mon espace créateur",
-  },
-  "ugc-decline": {
-    subject: "Ta candidature créateur Sophia",
-    intro: "Salut {first_name},\n\nMerci d’avoir candidaté pour créer pour Sophia et pour le temps passé sur ta vidéo.",
-    instructions: "On ne retient pas ta candidature cette fois-ci. Ce n’est pas un jugement sur toi : on cherche un style très précis et on reçoit beaucoup plus de candidatures que de places.\n\nOn te souhaite le meilleur, et tu peux candidater à nouveau dans quelques mois.",
-    button_label: "",
-  },
-} as const;
+import { EMAIL_DEFAULTS, EMAIL_DEFAULTS_FR } from "./ugc-email-texts";
+export { EMAIL_DEFAULTS, EMAIL_DEFAULTS_FR };
 
 const FR_COUNTRIES = new Set(["FR", "BE", "CH", "LU", "MC", "CA", "SN", "CI", "MA", "TN", "DZ", "CM", "RE", "GP", "MQ", "GF", "YT", "PF", "NC"]);
 /** French creators get French emails: explicit language first, then country. */
@@ -57,14 +29,15 @@ export type EmailOutcome = { sent: boolean; provider: "brevo" | "lovable" | null
 
 export async function sendTemplated(admin: Admin, key: EmailKey, to: string, fullName: string, buttonUrl?: string, lang: "fr" | "en" = "en"): Promise<EmailOutcome> {
   // The admin-edited template is the English one; French creators get the French version.
-  const t = lang === "fr" ? EMAIL_DEFAULTS_FR[key] : await loadTemplate(admin, key);
+  // Texts live in code (FR + EN) so they can never carry amounts or old onboarding steps.
+  void admin;
+  const t = lang === "fr" ? EMAIL_DEFAULTS_FR[key] : EMAIL_DEFAULTS[key];
   const fields = { first_name: fullName.split(/\s+/)[0] || (lang === "fr" ? "" : "there"), full_name: fullName, invite_url: buttonUrl ?? "" };
   const split = (s: string) => replaceMergeFields(s, fields).split(/\n/).map((l) => l.trim()).filter(Boolean);
   const paragraphs = [...split(t.intro), ...split(t.instructions)];
   const opts = {
     paragraphs,
     ...(buttonUrl && t.button_label ? { buttonLabel: t.button_label, buttonUrl } : {}),
-    ...(key === "ugc-welcome" ? { linkSection: (lang === "fr" ? { text: "Rejoins le Slack de l’équipe :", url: SLACK_URL, linkLabel: "Rejoindre le Slack" } : { text: "Join the team Slack:", url: SLACK_URL, linkLabel: "Join our Slack" }) } : {}),
   };
   const subject = replaceMergeFields(t.subject, fields).slice(0, 160);
   const html = buildEmailHtml(opts);

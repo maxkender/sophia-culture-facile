@@ -251,10 +251,11 @@ export const adminCreatorDetail = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: account }, { data: sig }, { data: payout }] = await Promise.all([
       supabaseAdmin.from("creator_social_accounts").select("app_id, handle, account_email, phone, device, registered_at").eq("creator_id", data.creatorId),
-      supabaseAdmin.from("creator_signatures").select("signed_at, variant, document_version, signed_name").eq("creator_id", data.creatorId).maybeSingle(),
+      supabaseAdmin.from("creator_signatures").select("signed_at, variant, document_version, signed_name, document_slug, contract_lang, contract_snapshot").eq("creator_id", data.creatorId).in("document_slug", ["ugc-agreement", "ugc-agreement-fr"]).order("signed_at", { ascending: false }).limit(1).maybeSingle(),
       supabaseAdmin.from("creator_payout_profiles").select("method, stripe_onboarded, wise_email, paypal_email").eq("creator_id", data.creatorId).maybeSingle(),
     ]);
-    return { account: account?.find((a) => a.app_id === "00000000-0000-4000-8000-000000000001") ?? account?.[0] ?? null, accounts: account ?? [], signature: sig ?? null, payout: payout ?? null };
+    const { data: codes } = await supabaseAdmin.from("access_codes").select("code, platform, app_id, assigned_at").eq("assigned_creator_id", data.creatorId).order("assigned_at");
+    return { account: account?.find((a) => a.app_id === "00000000-0000-4000-8000-000000000001") ?? account?.[0] ?? null, accounts: account ?? [], signature: sig ?? null, payout: payout ?? null, codes: codes ?? [] };
   });
 
 export const adminRevealCredentials = createServerFn({ method: "POST" })
@@ -289,26 +290,41 @@ export const adminAssignCreatorCode = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
-/** "My apps & codes": every active app the creator is enrolled in, with their store codes (handed out through assignAppCode, app-scoped). */
+/** "My apps & codes": one card per active app; per platform that has codes for that app, the creator's code or a draw button. */
 export const getMyAppsCodes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const me = await myCreator(context.supabase, context.userId);
     if (me.status === "pending") return [];
     const { supabaseAdmin: a } = await import("@/integrations/supabase/client.server");
-    const { assignAppCode } = await import("./access-codes.server");
     const { data: enr } = await a.from("creator_apps").select("app_id, apps(id, name, logo_path, app_store_url, play_store_url, taap_url, active)").eq("creator_id", me.id).eq("status", "active");
     const out = [];
     for (const e of (enr ?? []) as any[]) { // eslint-disable-line @typescript-eslint/no-explicit-any
       const app = e.apps; if (!app?.active) continue;
-      let { data: codes } = await a.from("access_codes").select("code, redeem_url, platform").eq("assigned_creator_id", me.id).eq("app_id", app.id);
-      if (!codes?.length) {
-        await assignAppCode(a, me.id, app.id);
-        codes = (await a.from("access_codes").select("code, redeem_url, platform").eq("assigned_creator_id", me.id).eq("app_id", app.id)).data;
+      const { data: codes } = await a.from("access_codes").select("code, redeem_url, platform").eq("assigned_creator_id", me.id).eq("app_id", app.id);
+      const platforms: { platform: "ios" | "android"; code: { code: string; redeem_url: string | null } | null }[] = [];
+      for (const p of ["ios", "android"] as const) {
+        const mine = (codes ?? []).find((c: { platform: string }) => c.platform === p) as { code: string; redeem_url: string | null } | undefined;
+        if (mine) { platforms.push({ platform: p, code: mine }); continue; }
+        const { count } = await a.from("access_codes").select("id", { count: "exact", head: true }).eq("app_id", app.id).eq("platform", p);
+        if ((count ?? 0) > 0) platforms.push({ platform: p, code: null });
       }
-      const list = (codes ?? []) as { code: string; redeem_url: string | null; platform: string }[];
-      if (!list.length && app.id === "00000000-0000-4000-8000-000000000001" && me.access_code) list.push({ code: me.access_code, redeem_url: me.access_redeem_url, platform: me.platform ?? "ios" });
-      out.push({ id: app.id as string, name: app.name as string, appStore: app.app_store_url as string | null, playStore: app.play_store_url as string | null, codes: list });
+      out.push({ id: app.id as string, name: app.name as string, appStore: app.app_store_url as string | null, playStore: app.play_store_url as string | null, platforms });
     }
     return out;
+  });
+
+/** Creator clicks "Get my iOS / Android code": draws one from that app's pool (max 1 per app per platform). */
+export const drawMyCode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ appId: z.string().uuid(), platform: z.enum(["ios", "android"]) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const me = await myCreator(context.supabase, context.userId);
+    if (me.status === "pending") throw new Error("Not available yet.");
+    const { supabaseAdmin: a } = await import("@/integrations/supabase/client.server");
+    const { data: enr } = await a.from("creator_apps").select("app_id").eq("creator_id", me.id).eq("app_id", data.appId).eq("status", "active").maybeSingle();
+    if (!enr) throw new Error("Not available yet.");
+    const { assignAppCode } = await import("./access-codes.server");
+    const r = await assignAppCode(a, me.id, data.appId, data.platform);
+    return { ok: Boolean(r.ok), empty: !r.ok };
   });

@@ -491,6 +491,27 @@
       "when": 1791816408449,
       "tag": "0069_assets_generic_folder",
       "breakpoints": true
+    },
+    {
+      "idx": 70,
+      "version": "7",
+      "when": 1791925802104,
+      "tag": "0070_ugc_contract_and_guidelines",
+      "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1791926017148,
+      "tag": "0071_stop_creator_nurture_sequence",
+      "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1791926937098,
+      "tag": "0072_creators_read_ugc_agreement",
+      "breakpoints": true
     }
   ]
 }

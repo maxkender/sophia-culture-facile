@@ -156,3 +156,51 @@ export const generateSigningLink = createServerFn({ method: "POST" })
       .eq("id", data.applicationId);
     return { token };
   });
+
+/* ---------- UGC Creator Agreement (ugc-agreement / ugc-agreement-fr) ---------- */
+export const UGC_AGREEMENT_SLUGS = ["ugc-agreement", "ugc-agreement-fr"] as const;
+
+export const signUgcAgreement = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    signedName: z.string().trim().min(2).max(160),
+    lang: z.enum(["fr", "en"]),
+    accepted: z.literal(true),
+    userAgent: z.string().max(400).optional(),
+  }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as any;
+    const { data: creator } = await supabase.from("creators").select("id, track, status, country, email").eq("user_id", userId).maybeSingle();
+    if (!creator || creator.track !== "ugc") throw new Error("Not a UGC creator");
+    if (creator.status === "pending") throw new Error("Your application is still being reviewed.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const slug = data.lang === "fr" ? "ugc-agreement-fr" : "ugc-agreement";
+    const { data: doc } = await supabaseAdmin.from("documents").select("title, content, current_version, published").eq("slug", slug).maybeSingle();
+    if (!doc?.published) throw new Error("The agreement is not published yet.");
+    const { data: existing } = await supabaseAdmin.from("creator_signatures").select("id").eq("creator_id", creator.id).in("document_slug", UGC_AGREEMENT_SLUGS as unknown as string[]).limit(1);
+    if (existing?.length) return { alreadySigned: true };
+    const { parseBlocks, applyMerge, documentPlainText } = await import("./documents");
+    const blocks = applyMerge(parseBlocks(doc.content), { legal_name: data.signedName, country: creator.country, email: creator.email } as never);
+    const { ip, ua } = requestMeta(data.userAgent);
+    const now = new Date().toISOString();
+    const snapshot = `${documentPlainText(doc.title, blocks)}\n\n${data.lang === "fr" ? "Signé par" : "Signed by"}: ${data.signedName}\n${data.lang === "fr" ? "Date" : "Date"}: ${now}\n${data.lang === "fr" ? "Version" : "Version"}: ${doc.current_version} (${data.lang.toUpperCase()})`;
+    const { error } = await supabaseAdmin.from("creator_signatures").insert({
+      creator_id: creator.id, variant: "ugc", document_version: String(doc.current_version), document_slug: slug, contract_lang: data.lang,
+      contract_snapshot: snapshot, signed_name: data.signedName, signature_ip: ip, user_agent: ua, signed_at: now,
+    });
+    if (error) throw new Error("The signature could not be recorded.");
+    await supabaseAdmin.from("creators").update({ resign_required_at: null }).eq("id", creator.id);
+    return { alreadySigned: false };
+  });
+
+/** First-login step after the contract: "Got it" on the shooting guidelines. */
+export const acceptUgcGuidelines = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context as any;
+    const { data: creator } = await supabase.from("creators").select("id").eq("user_id", userId).maybeSingle();
+    if (!creator) throw new Error("Not a creator");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("creators").update({ guidelines_accepted_at: new Date().toISOString() }).eq("id", creator.id);
+    return { ok: true };
+  });

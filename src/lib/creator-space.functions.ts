@@ -19,7 +19,7 @@ export const claimCreatorInvite = createServerFn({ method: "POST" })
     if (row.email.toLowerCase() !== email) return { ok: false, error: "Sign in with the email this invite was sent to." };
     const { error } = await supabaseAdmin
       .from("creators")
-      .update({ user_id: context.userId, status: "onboarding" })
+      .update({ user_id: context.userId })
       .eq("id", row.id);
     if (error) return { ok: false, error: "Could not activate your account." };
     return { ok: true, error: null };
@@ -37,11 +37,12 @@ export const linkCreatorByEmail = createServerFn({ method: "POST" })
       .select("id")
       .ilike("email", email)
       .is("user_id", null)
+      .neq("status", "pending") // pending applicants stay pending until an admin clicks Accept
       .maybeSingle();
     if (!row) return { ok: false, error: null };
     const { error } = await supabaseAdmin
       .from("creators")
-      .update({ user_id: context.userId, status: "onboarding" })
+      .update({ user_id: context.userId })
       .eq("id", row.id)
       .is("user_id", null);
     if (error) return { ok: false, error: "Could not activate your account." };

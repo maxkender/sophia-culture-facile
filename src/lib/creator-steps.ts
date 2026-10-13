@@ -27,21 +27,19 @@ export const ACCOUNT_SUBSTEPS: { key: string; title: string; text: string }[] = 
 export const SETUP_GUIDE = ACCOUNT_SUBSTEPS.map((s) => ({ key: s.key, text: s.title }));
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type CreatorLike = { rules_accepted_at?: string | null; social_account_created_at?: string | null; accounts_confirmed_at?: string | null; warmup?: any; slack_joined_at?: string | null; resign_required_at?: string | null };
+type CreatorLike = { guidelines_accepted_at?: string | null; rules_accepted_at?: string | null; social_account_created_at?: string | null; accounts_confirmed_at?: string | null; warmup?: any; slack_joined_at?: string | null; resign_required_at?: string | null };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PayoutLike = { stripe_onboarded?: boolean; method?: string | null; wise_email?: string | null; paypal_email?: string | null; bank_iban?: string | null } | null | undefined;
 
-export function creatorSteps(me: CreatorLike, signed: boolean, payout: PayoutLike, signedVersion?: number | string | null) {
+/**
+ * UGC onboarding = sign the UGC Creator Agreement (ugc-agreement / -fr), then "Got it" on the shooting guidelines.
+ * `signed` must be computed from a UGC-agreement signature only (old Creator Account Agreement rows no longer count).
+ */
+export function creatorSteps(me: CreatorLike, signed: boolean, _payout?: PayoutLike, _signedVersion?: number | string | null) {
   const warm = (me.warmup ?? {}) as Record<string, string>;
   const warmDone = WARMUP_REQUIRED.every((d) => Boolean(warm[String(d)]));
-  const rules = Boolean(me.rules_accepted_at);
-  const resignPending = Boolean(me.resign_required_at) && Number(signedVersion ?? 0) < 3;
-  const sig = signed && !resignPending;
+  const rules = Boolean(me.guidelines_accepted_at);
   const accounts = Boolean(me.accounts_confirmed_at ?? me.social_account_created_at);
-  const account = accounts && warmDone;
-  const payouts = Boolean(payout?.stripe_onboarded) || Boolean((payout?.method === "wise" && payout.wise_email) || (payout?.method === "paypal" && payout.paypal_email) || (payout?.method === "bank" && payout.bank_iban));
-  const slack = Boolean(me.slack_joined_at);
-  const list = [rules, sig, accounts, warmDone, payouts, slack];
-  const count = list.filter(Boolean).length;
-  return { rules, signed: sig, resignPending, accounts, warmDone, account, payouts, slack, count, total: 6, unlocked: list.every(Boolean) };
+  const list = [signed, rules];
+  return { rules, signed, resignPending: false, accounts, warmDone, account: accounts && warmDone, payouts: false, slack: Boolean(me.slack_joined_at), count: list.filter(Boolean).length, total: 2, unlocked: list.every(Boolean) };
 }

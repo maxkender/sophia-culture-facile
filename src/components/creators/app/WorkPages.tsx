@@ -296,19 +296,16 @@ function FeedbackReply({ post }: { post: Post }) {
 
 const eurFr = (n: unknown) => `${Number(n ?? 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
 type LoopPost = Post & { pay_status?: string | null; views_frozen?: number | null; pay_amount?: number | null; validated_at?: string | null; submitted_at?: string | null; payout_item_id?: string | null };
-/** Envoyé → Validé (or Refusé) → Vues à J+7 → Prêt pour paiement → Payé le … */
+/** Envoyé → Validé (or Refusé) → Vues relevées à J+7. No amounts. */
 export function postStage(p: Post, paidAt?: string | null): { label: string; tone: string; detail?: string | undefined } {
   const x = p as LoopPost;
-  const money = termsVisible();
   const v = (n: number | null | undefined) => Number(n ?? 0).toLocaleString(creatorLang() === "fr" ? "fr-FR" : "en-GB");
-  const amt = (n: unknown) => (money ? `: ${eurFr(n)}` : "");
   const views = L(`views at day 7: ${v(x.views_frozen)}`, `vues à J+7 : ${v(x.views_frozen)}`);
   if (p.status === "rejected") return { label: L("Refused", "Refusé"), tone: "bg-portal-red/10 text-portal-red", detail: p.feedback ? L(`Reason: ${p.feedback}`, `Raison : ${p.feedback}`) : undefined };
   if (p.status === "pending" || p.status === "flagged") return { label: L("Sent", "Envoyé"), tone: "bg-brand-surfaceStrong text-brand-navySoft", detail: L("waiting for validation", "en attente de validation") };
-  if (x.pay_status === "paid") return { label: paidAt ? L(`Paid on ${fmtDate(paidAt)}`, `Payé le ${fmtDate(paidAt)}`) : L("Paid", "Payé"), tone: "bg-portal-green/15 text-portal-green", detail: money ? `${eurFr(x.pay_amount)} · ${views}` : views };
-  if (x.pay_status === "approved") return { label: L(`Payment in progress${amt(x.pay_amount)}`, `Paiement en cours${amt(x.pay_amount)}`), tone: "bg-portal-green/10 text-portal-green", detail: views };
-  if (x.pay_status === "ready") return { label: L(`Ready for payment${amt(x.pay_amount)}`, `Prêt pour paiement${amt(x.pay_amount)}`), tone: "bg-portal-green/10 text-portal-green", detail: views };
-  if (x.pay_status === "no_data") return { label: L("Validated · views not found", "Validé · vues introuvables"), tone: "bg-portal-amber/15 text-portal-amber", detail: L("the team is checking the link before paying", "l’équipe vérifie le lien avant de payer") };
+  // No money in the creator space: after J+7 the post only shows its recorded views.
+  if (x.views_frozen != null || ["paid", "approved", "ready", "views_recorded"].includes(String(x.pay_status))) return { label: L("Views recorded (day 7)", "Vues relevées (J+7)"), tone: "bg-portal-green/10 text-portal-green", detail: views };
+  if (x.pay_status === "no_data") return { label: L("Validated · views not found", "Validé · vues introuvables"), tone: "bg-portal-amber/15 text-portal-amber", detail: L("the team is checking the link", "l’équipe vérifie le lien") };
   const j7 = x.validated_at ? new Date(new Date(x.validated_at).getTime() + 7 * 86400000).toISOString() : null;
   return { label: L("Validated", "Validé"), tone: "bg-portal-accent/10 text-portal-accent", detail: `${p.views != null ? L(`${v(p.views)} views so far · `, `${v(p.views)} vues pour l’instant · `) : ""}${L(`views counted on ${j7 ? fmtDate(j7) : "—"} (day 7)`, `vues comptées le ${j7 ? fmtDate(j7) : "—"} (J+7)`)}` };
 }
@@ -320,7 +317,7 @@ export function WeeklyBar() {
   const done = posts.filter((p) => p.status !== "rejected" && ((p as LoopPost).submitted_at ?? p.created_at) >= start).length;
   return (
     <PortalCard className="p-4">
-      <div data-testid="weekly-bar" className="flex items-baseline justify-between"><p className="text-lg font-extrabold text-brand-navy">{done} / {target} cette semaine</p><p className="text-xs text-brand-navySoft">{ct("du lundi au dimanche")}</p></div>
+      <div data-testid="weekly-bar" className="flex items-baseline justify-between"><p className="text-lg font-extrabold text-brand-navy">{done} / {target} {L("this week", "cette semaine")}</p><p className="text-xs text-brand-navySoft">{L("Monday to Sunday", "du lundi au dimanche")}</p></div>
       <div className="mt-2 h-3 rounded-full bg-brand-line"><div className="h-3 rounded-full bg-portal-accent transition-all" style={{ width: `${Math.min(100, (done / target) * 100)}%` }} /></div>
     </PortalCard>
   );

@@ -79,6 +79,7 @@ export const saveCreatorPay = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ creatorId: z.string().uuid(), pay: paySchema }).parse(d))
   .handler(async ({ data, context }) => {
+    await (await import("./payments-gate.server")).assertPaymentsOn();
     await assertAdmin(context as never);
     const { payColumns } = await import("./fast-lane.server");
     const a = await adminClient();
@@ -202,6 +203,8 @@ export const enterFastLane = createServerFn({ method: "POST" })
 export const requestLoginLink = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ email: z.string().trim().email().max(200), origin: originSchema, lang: z.enum(["fr", "en"]).default("fr") }).parse(d))
   .handler(async ({ data }) => {
+    // Switched off: only the password-reset email may be sent for sign-in help.
+    if (data.email) return { ok: true as const };
     const a = await adminClient();
     const email = data.email.toLowerCase();
     const [{ data: c }, { data: p }] = await Promise.all([

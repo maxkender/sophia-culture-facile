@@ -61,6 +61,8 @@ export async function freezeDue(a: Admin, opts: { postId?: string; force?: boole
   if (!opts.force) q = q.lte("validated_at", new Date(Date.now() - 7 * DAY).toISOString());
   const { data: rows } = await q.limit(500);
   let ready = 0, flagged = 0;
+  // Payments off: J+7 only records the views, never an amount.
+  const payOn = await (await import("./payments-gate.server")).paymentsEnabled();
   for (const p of rows ?? []) {
     let views: number | null = p.views == null ? null : Number(p.views);
     if (views == null) {
@@ -71,6 +73,7 @@ export async function freezeDue(a: Admin, opts: { postId?: string; force?: boole
     if (views == null) {
       await a.from("creator_posts").update({ pay_status: "no_data", pay_flag: "No view data at J+7 — check the link or enter views by hand", frozen_at: now }).eq("id", p.id); flagged++; continue;
     }
+    if (!payOn) { await a.from("creator_posts").update({ pay_status: "views_recorded", views_frozen: views, frozen_at: now, pay_flag: null }).eq("id", p.id); ready++; continue; }
     const price = await priceFor(a, p, views);
     if (price.amount == null) { await a.from("creator_posts").update({ pay_status: "no_data", pay_flag: price.formula, views_frozen: views, frozen_at: now }).eq("id", p.id); flagged++; continue; }
     await a.from("creator_posts").update({ pay_status: "ready", views_frozen: views, frozen_at: now, pay_amount: price.amount, pay_formula: price.formula, pay_flag: null }).eq("id", p.id); ready++;

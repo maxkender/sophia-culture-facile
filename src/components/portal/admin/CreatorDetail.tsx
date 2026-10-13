@@ -17,6 +17,15 @@ import { creatorSteps, SETUP_GUIDE, WARMUP_DAYS } from "@/lib/creator-steps";
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—");
 
+/** Opens the signed contract snapshot in a printable window (Print → Save as PDF). */
+export function printContract(text: string) {
+  const w = window.open("", "_blank");
+  if (!w) return;
+  const esc = text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  w.document.write(`<!doctype html><title>Contract</title><pre style="white-space:pre-wrap;font:14px/1.5 Georgia,serif;max-width:720px;margin:40px auto">${esc}</pre>`);
+  w.document.close(); w.focus(); w.print();
+}
+
 export function CreatorDetail({ creatorId }: { creatorId: string }) {
   const qc = useQueryClient();
   const detailFn = useServerFn(adminCreatorDetail);
@@ -33,7 +42,7 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
   if (me === undefined || !detail) return <p className="text-sm text-brand-navySoft">Loading…</p>;
   if (!me) return <EmptyState title="Creator not found" />;
   const steps = creatorSteps(me, Boolean(detail.signature), detail.payout, detail.signature?.document_version);
-  const current = !steps.rules ? "Step 1: read the rules" : !steps.signed ? (steps.resignPending ? "Step 2: re-sign agreement v3" : "Step 2: sign the agreement") : !steps.accounts ? "Step 3: create accounts" : !steps.warmDone ? "Step 4: warm-up" : !steps.payouts ? "Step 5: payouts" : !steps.slack ? "Step 6: Slack" : "Onboarding complete";
+  const current = !steps.signed ? "Step 1: sign the UGC contract" : !steps.rules ? "Step 2: read the shooting guidelines" : "Onboarding complete";
   const warm = (me.warmup ?? {}) as Record<string, string>;
   const checks = (me.setup_guide_checks ?? {}) as Record<string, string>;
 
@@ -64,13 +73,14 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
         <AppEnrolment kind="creator" personId={creatorId} />
         <PortalCard>
           <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Onboarding</p>
-          <p className="mt-1 text-2xl font-extrabold text-brand-navy">{steps.count}/6</p>
+          <p className="mt-1 text-2xl font-extrabold text-brand-navy">{steps.count}/2</p>
           <p className="text-sm text-brand-navySoft">{current}</p>
           <dl className="mt-4 space-y-1 text-sm">
             <div className="flex items-center gap-2"><dt className="text-brand-navySoft">Status:</dt><dd className="flex gap-1">{(["active", "paused"] as const).map((s) => { const paused = ["paused", "ended", "dormant", "archived", "rejected"].includes(String(me.ugc_status ?? me.status)); const current = paused ? "paused" : "active"; return <button key={s} type="button" disabled={current === s} onClick={async () => { const { error } = await supabase.from("creators").update({ ugc_status: s }).eq("id", creatorId); if (error) toast.error("Could not save"); else { toast.success(s === "paused" ? "Creator paused" : "Creator active"); void qc.invalidateQueries({ queryKey: ["admin-creator", creatorId] }); } }} className={current === s ? "rounded-full bg-brand-navy px-3 py-1 text-xs font-bold text-card" : "rounded-full bg-muted px-3 py-1 text-xs font-bold text-brand-navySoft hover:text-brand-navy"}>{s === "active" ? "Active" : "Paused"}</button>; })}</dd></div>
-            <div><dt className="inline text-brand-navySoft">Rules accepted: </dt><dd className="inline font-semibold">{fmt(me.rules_accepted_at)}{me.rules_version ? ` (v${me.rules_version})` : ""}</dd></div>
-            <div><dt className="inline text-brand-navySoft">Agreement signed: </dt><dd className="inline font-semibold">{detail.signature ? `${fmt(detail.signature.signed_at)} · ${detail.signature.variant} variant · v${detail.signature.document_version}` : "—"}</dd></div>
-            <div><dt className="inline text-brand-navySoft">Payouts: </dt><dd className="inline font-semibold">{detail.payout?.stripe_onboarded ? "Stripe connected" : detail.payout?.method === "wise" || detail.payout?.method === "paypal" ? `${detail.payout.method} · ${detail.payout.wise_email ?? detail.payout.paypal_email}` : "not set up"}</dd></div>
+            <div data-testid="contract-status"><dt className="inline text-brand-navySoft">Contract: </dt><dd className="inline font-semibold">{detail.signature ? `Contrat signé le ${new Date(detail.signature.signed_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} (v${detail.signature.document_version}, ${(detail.signature.contract_lang ?? "en").toUpperCase()})` : "Pas encore signé"}</dd>
+              {detail.signature?.contract_snapshot ? <button type="button" className="ml-2 text-xs font-semibold text-portal-accent underline" onClick={() => printContract(detail.signature!.contract_snapshot!)}>View / print</button> : null}</div>
+            <div><dt className="inline text-brand-navySoft">Shooting guidelines: </dt><dd className="inline font-semibold">{me.guidelines_accepted_at ? fmt(me.guidelines_accepted_at) : "not yet"}</dd></div>
+            <div><dt className="inline text-brand-navySoft">App codes: </dt><dd className="inline font-semibold">{detail.codes.length ? detail.codes.map((c) => `${c.app_id === "00000000-0000-4000-8000-000000000002" ? "UnSwipe" : "Sophia"} ${c.platform === "android" ? "Android" : "iOS"}: ${c.code}`).join(" · ") : "none drawn yet"}</dd></div>
             <div className="flex items-center gap-2"><dt className="text-brand-navySoft"><label htmlFor="weekly-target">Weekly target (Mon→Sun):</label></dt><dd><input id="weekly-target" type="number" min={0} max={50} defaultValue={me.weekly_target ?? 5} className="h-8 w-16 rounded-lg border px-2 text-sm font-semibold" onBlur={async (e) => { const v = Math.max(0, Math.min(50, Number(e.target.value) || 0)); if (v === me.weekly_target) return; const { error } = await supabase.from("creators").update({ weekly_target: v }).eq("id", creatorId); if (error) toast.error("Could not save"); else { toast.success("Weekly target saved"); void qc.invalidateQueries({ queryKey: ["admin-creator", creatorId] }); } }} /> posts</dd></div>
           </dl>
         </PortalCard>
@@ -95,25 +105,8 @@ export function CreatorDetail({ creatorId }: { creatorId: string }) {
           ) : <p className="mt-2 text-sm text-brand-navySoft">Not registered yet.</p>}
         </PortalCard>
 
-        <PortalCard className="md:col-span-2">
-          <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Sophia app access code</p>
-          {me.access_code ? (
-            <p className="mt-2 font-mono text-lg font-bold text-brand-navy">{me.access_code} <span className="text-sm font-normal text-brand-navySoft">({me.platform})</span></p>
-          ) : (
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <p className="text-sm text-brand-navySoft">No code yet. Assign a real one from the pool{me.platform ? ` (creator uses ${me.platform === "ios" ? "iPhone" : "Android"})` : " (creator has not chosen a phone type)"}:</p>
-              {(["ios", "android"] as const).map((p) => (
-                <Button key={p} size="sm" variant={me.platform === p ? "default" : "outline"} onClick={async () => {
-                  try { await assignFn({ data: { creatorId, platform: p } }); toast.success("Code assigned."); qc.invalidateQueries({ queryKey: ["admin-creator", creatorId] }); }
-                  catch (e: any) { toast.error(e?.message ?? "Could not assign."); }
-                }}>Assign {p === "ios" ? "Apple" : "Google"} code</Button>
-              ))}
-            </div>
-          )}
-        </PortalCard>
       </div>
       {me.track === "ugc" ? <CreatorPostsAndPay creatorId={creatorId} /> : null}
-      {me.track === "ugc" && <details className="mt-6 rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold text-brand-navy">Pay settings & notes</summary><UgcCreatorPanel creator={me} /></details>}
       {!me.user_id && <div className="mt-6"><Banner tone="info" title="This creator has not created their account yet" /></div>}
     </div>
   );
@@ -125,7 +118,7 @@ function CreatorPostsAndPay({ creatorId }: { creatorId: string }) {
     queryFn: async () => {
       const [p, pay] = await Promise.all([
         supabase.from("creator_posts").select("id, url, platform, status, posted_on, created_at, views").eq("creator_id", creatorId).order("created_at", { ascending: false }).limit(100),
-        supabase.from("payout_items").select("id, amount, currency, status, paid_at, created_at").eq("creator_id", creatorId).order("created_at", { ascending: false }).limit(50),
+        Promise.resolve({ data: [] }),
       ]);
       return { posts: (p.data ?? []) as any[], pay: (pay.data ?? []) as any[] }; // eslint-disable-line @typescript-eslint/no-explicit-any
     },
@@ -136,10 +129,6 @@ function CreatorPostsAndPay({ creatorId }: { creatorId: string }) {
       <PortalCard>
         <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Posts</p>
         {data?.posts.length ? <ul className="mt-2 divide-y divide-brand-line text-sm">{data.posts.map((p) => <li key={p.id} className="flex items-center gap-2 py-2"><a href={p.url} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate font-semibold text-portal-accent">{p.platform} · {dd(p.posted_on ?? p.created_at)}</a><span className="text-xs text-brand-navySoft">{Number(p.views ?? 0).toLocaleString()} views</span><span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-bold">{p.status}</span></li>)}</ul> : <p className="mt-2 text-sm text-brand-navySoft">No posts yet.</p>}
-      </PortalCard>
-      <PortalCard>
-        <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Payments</p>
-        {data?.pay.length ? <ul className="mt-2 divide-y divide-brand-line text-sm">{data.pay.map((x) => <li key={x.id} className="flex items-center gap-2 py-2"><span className="flex-1">{dd(x.paid_at ?? x.created_at)}</span><b>{Number(x.amount ?? 0).toLocaleString("fr-FR", { minimumFractionDigits: 2 })} {x.currency === "usd" ? "$" : "€"}</b><span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-bold">{x.status}</span></li>)}</ul> : <p className="mt-2 text-sm text-brand-navySoft">No payments yet.</p>}
       </PortalCard>
     </div>
   );

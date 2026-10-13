@@ -1,3 +1,4 @@
+import { UGC_EMAIL_CATALOG } from "@/lib/ugc-email-texts";
 import { DraftRequiredToggle } from "./UgcDrafts";
 import { NotionSettingsCard } from "./NotionSync";
 import { useState, type ReactNode } from "react";
@@ -122,7 +123,7 @@ export function SlideshowSection({ section, id }: { section: string; id?: string
     case "posters": return <Posters />;
     case "managers": return <div className="space-y-6"><SlideshowAssign /><Team track="slideshow" /></div>;
     case "rates": return <PayZonesSettings />;
-    case "payouts": return <SlidesPayouts />;
+    case "payouts": return <PaymentsOff />;
     case "guide": return (
       <div className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
@@ -151,13 +152,18 @@ export function InfluencerSection({ section, id }: { section: string; id?: strin
     case "messages": return <InfluencerInbox />;
     case "attribution": return <InfluencerPerformance />;
     case "settings": return <div className="space-y-6"><InfluencerSettingsAdmin /><DocumentEditor slug={"influencer-agreement" as never} /></div>;
-    case "payouts": return <InfluencerPayoutsAdmin />;
+    case "payouts": return <PaymentsOff />;
     default: return <p className={cn(card, "text-sm")}>This page does not exist. <Link to="/hub/influencers" className="font-bold underline">Influencers home</Link></p>;
   }
 }
 
+/** Payments are switched off (hub_settings.payments_enabled = false); payout screens stay dormant. */
+export function PaymentsOff() {
+  return <p className={cn(card, "text-sm text-brand-navySoft")}>Payments are off for now. Nothing is paid and no payout is prepared.</p>;
+}
+
 /* ---------------- Settings ---------------- */
-export const SETTINGS_TABS: [string, string][] = [["ugc-guidelines", "Shooting rules"], ["post-descriptions", "Post descriptions"], ["notion", "Notion"], ["connections", "Payments"], ["email", "Emails & team"], ["apps", "Apps & codes"], ["security", "Security"]];
+export const SETTINGS_TABS: [string, string][] = [["ugc-guidelines", "Shooting rules"], ["post-descriptions", "Post descriptions"], ["notion", "Notion"], ["email", "Emails & team"], ["apps", "Apps & codes"], ["security", "Security"]];
 
 const TRACKS = [["ugc", "UGC"], ["slideshow", "Slideshows"], ["influencer", "Influencers"]] as const;
 function Team({ track }: { track?: string } = {}) {
@@ -200,13 +206,21 @@ function Team({ track }: { track?: string } = {}) {
 }
 
 function EmailSettings() {
+  const [lang, setLang] = useState<"fr" | "en">("fr");
   return (
     <div className="space-y-4">
       <div className={cn(card, "space-y-2 text-sm")}>
-        <h3 className="font-extrabold text-brand-navy">Emails to creators</h3>
-        <p className="text-brand-navySoft">Acceptance, welcome and follow-up emails are sent through Brevo from the verified sophia-culture.com address. Subjects and texts are edited below.</p>
+        <div className="flex items-center gap-2"><h3 className="font-extrabold text-brand-navy">Emails to creators</h3>
+          <span className="ml-auto flex gap-1">{(["fr", "en"] as const).map((l) => <Button key={l} size="sm" variant={lang === l ? "default" : "outline"} onClick={() => setLang(l)}>{l.toUpperCase()}</Button>)}</span></div>
+        <p className="text-brand-navySoft">These are the only emails that exist. Each is sent only when someone clicks something; nothing is sent automatically.</p>
       </div>
-      <Templates />
+      {UGC_EMAIL_CATALOG.map((e) => (
+        <div key={e.key} className={cn(card, "space-y-1 text-sm")} data-testid={`email-${e.key}`}>
+          <p className="text-xs font-bold uppercase text-brand-navySoft">{e.when}</p>
+          <p className="font-bold text-brand-navy">{e[lang].subject}</p>
+          <p className="whitespace-pre-line text-brand-navySoft">{e[lang].body}</p>
+        </div>
+      ))}
       <Team />
     </div>
   );
