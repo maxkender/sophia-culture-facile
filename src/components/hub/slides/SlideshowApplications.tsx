@@ -198,12 +198,6 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
         {channel === "upwork" && ["contract_signed", "os_created", "started"].includes(a.status) ? (
           <p className="text-xs text-brand-navySoft">Paid on Upwork — no payment step on this site, and excluded from the weekly payouts below.</p>
         ) : null}
-        {channel === "ruul" && ["os_created", "started"].includes(a.status) && a.payout_method ? (
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span>Payout: {a.payout_method}</span>
-            <Button size="sm" variant="outline" disabled={busy} onClick={() => void run(() => payLink({ data: { applicationId: a.id } }), "Payout link emailed")}>{a.payout_token ? "Resend payout link" : "Send payout link"}</Button>
-          </div>
-        ) : null}
         {!decided ? (
           <div className="flex flex-wrap gap-2">
             <Button size="sm" onClick={() => setMode(mode === "accept" ? "none" : "accept")}>Accept</Button>
