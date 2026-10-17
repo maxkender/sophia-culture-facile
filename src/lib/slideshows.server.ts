@@ -90,9 +90,11 @@ export async function createPosterInOs(admin: Admin, applicationId: string) {
   // The OS returns password: null when the poster already existed and already logged in — no logins email then.
   if (typeof r.password === "string" && r.password) {
     const l = pickLang(a.langue);
+    const { data: pz } = await admin.from("pay_zones").select("weekly_amount, first_week_amount").eq("zone", a.zone).maybeSingle();
     await posterEmails.logins(a.email, a.full_name, l, {
       osUrl: (await setting(admin, "os_app_url")) ?? "https://sophia-marketing-orga.vercel.app",
       login: r.email_os, password: r.password, slack: await setting(admin, "slideshow_slack_invite_url"), monday: a.start_monday, ruulEmail: a.ruul_email || a.email,
+      weekly: pz?.weekly_amount != null ? Number(pz.weekly_amount) : null, first: pz?.first_week_amount != null ? Number(pz.first_week_amount) : null,
     });
     await tick(admin, a.id, "logins_sent", "Sophia OS");
   }
