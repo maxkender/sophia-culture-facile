@@ -102,6 +102,11 @@ export function SlideshowApplyPage() {
 
   return (
     <ApplyShell title={copy.title} lead={copy.lead}>
+      {payRange ? (
+        <p className="mt-6 rounded-xl border border-brand-line bg-card px-4 py-3 text-sm font-semibold text-brand-navy">
+          {copy.paidLine(payRange.min, payRange.max)}
+        </p>
+      ) : null}
       <form data-funnel="apply" data-track="slideshow" onFocusCapture={(e) => { const f = e.currentTarget; if (!f.dataset["started"]) { f.dataset["started"] = "1"; trackFunnel("apply_started", { track: "slideshow" }); } }} onSubmit={onSubmit} className="relative mt-10 grid gap-8 rounded-2xl border border-brand-line bg-card p-6" noValidate>
         <Honeypot value={honey} onChange={setHoney} />
         <FormSection title={copy.about}>
