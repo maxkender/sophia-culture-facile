@@ -96,9 +96,9 @@ export const acceptPoster = createServerFn({ method: "POST" })
     }).eq("id", app.id);
     await stamp(a, app.id, "accepted", me.name);
     const site = process.env["SITE_URL"] ?? "https://sophia-culture.com";
-    const { data: zr } = await a.from("pay_zones").select("weekly_amount").eq("zone", data.zone).maybeSingle();
+    const { data: zr } = await a.from("pay_zones").select("weekly_amount, first_week_amount").eq("zone", data.zone).maybeSingle();
     const guideUrl = (await a.from("hub_settings").select("value").eq("key", "slideshow_poster_guide_url").maybeSingle()).data?.value ?? null;
-    const sent = await posterEmails.accepted(app.email, app.full_name, data.langue, monday, `${site}/creators/sign/${token}`, zr?.weekly_amount != null ? Number(zr.weekly_amount) : null, guideUrl);
+    const sent = await posterEmails.accepted(app.email, app.full_name, data.langue, monday, `${site}/creators/sign/${token}`, zr?.weekly_amount != null ? Number(zr.weekly_amount) : null, zr?.first_week_amount != null ? Number(zr.first_week_amount) : null, guideUrl);
     return { ok: true, startMonday: monday, emailed: sent.sent, reason: sent.reason ?? null };
   });
 
