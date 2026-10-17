@@ -11,6 +11,11 @@ const hi: Record<L, (n: string) => string> = {
   fr: (n) => `Bonjour ${n},`, en: (n) => `Hi ${n},`, es: (n) => `Hola ${n}:`, it: (n) => `Ciao ${n},`, pt: (n) => `Olá ${n},`, de: (n) => `Hallo ${n},`,
 };
 
+/** Link label for the Slack invite (same labels as the logins email bullet). */
+const SLACK_LABEL: Record<L, string> = { fr: "Rejoindre Slack", en: "Join Slack", es: "Unirse a Slack", it: "Entra su Slack", pt: "Entrar no Slack", de: "Slack beitreten" };
+/** Trailing words after the #ruul-cohort mention in the money-questions line (kept after the link). */
+const MONEY_TAIL: Record<L, string> = { fr: ", jamais dans le salon.", en: ", never in the channel.", es: ", nunca en el canal.", it: ", mai nel canale.", pt: ", nunca no canal.", de: ", nie in den Kanal." };
+
 const T = {
   ack: {
     subject: { fr: "Merci pour votre candidature", en: "Thanks for applying", es: "Gracias por tu candidatura", it: "Grazie per la candidatura", pt: "Obrigado pela candidatura", de: "Danke für deine Bewerbung" },
@@ -130,9 +135,9 @@ const T = {
   },
 };
 
-async function send(to: string, name: string, subject: string, paragraphs: string[], button?: { label: string; url: string }, bullets?: string[], section?: EmailSection): Promise<BrevoResult> {
-  const html = buildEmailHtml({ paragraphs, ...(bullets ? { bullets } : {}), ...(section ? { section } : {}), ...(button ? { buttonLabel: button.label, buttonUrl: button.url } : {}) });
-  const text = [...paragraphs, ...(bullets ?? []), ...(section ? emailSectionText(section) : []), ...(button ? [`${button.label}: ${button.url}`] : [])].join("\n\n");
+async function send(to: string, name: string, subject: string, paragraphs: string[], button?: { label: string; url: string }, bullets?: string[], section?: EmailSection, extraLink?: { label: string; url: string }, postParagraphs?: string[]): Promise<BrevoResult> {
+  const html = buildEmailHtml({ paragraphs, ...(bullets ? { bullets } : {}), ...(extraLink ? { extraLink } : {}), ...(postParagraphs?.length ? { postParagraphs } : {}), ...(section ? { section } : {}), ...(button ? { buttonLabel: button.label, buttonUrl: button.url } : {}) });
+  const text = [...paragraphs, ...(bullets ?? []), ...(extraLink ? [`${extraLink.label}: ${extraLink.url}`] : []), ...(postParagraphs ?? []), ...(section ? emailSectionText(section) : []), ...(button ? [`${button.label}: ${button.url}`] : [])].join("\n\n");
   return sendBrevoEmail({ to, toName: name, subject, html, text });
 }
 const first = (n: string) => n.trim().split(/\s+/)[0] ?? n;
@@ -151,12 +156,13 @@ export const posterEmails = {
   /** kind: "open" (country open in the OS and payable by Ruul), "closed" (today's text), "neutral" (OS unreachable). */
   ack: (to: string, name: string, l: L, kind: "open" | "closed" | "neutral" = "closed") =>
     send(to, name, T.ack.subject[l], [hi[l](first(name)), kind === "open" ? T.ackOpen[l] : kind === "neutral" ? T.ackNeutral[l] : T.ack.body[l]]),
-  accepted: (to: string, name: string, l: L, monday: string, link: string, weeklyAmount: number | null, firstWeekAmount: number | null, guideUrl: string | null) => {
+  accepted: (to: string, name: string, l: L, monday: string, link: string, weeklyAmount: number | null, firstWeekAmount: number | null, guideUrl: string | null, slackUrl: string | null) => {
     const t = T.accepted;
     const amount = weeklyAmount != null ? String(weeklyAmount) : "—";
     const firstAmt = firstWeekAmount != null ? String(firstWeekAmount) : "—";
-    const paragraphs = [hi[l](first(name)), t.start[l](formatMonday(monday, l), formatSigningFriday(monday, l)), `${t.howTitle[l]}:`, ...t.how[l](amount, firstAmt).map((b) => `• ${b}`), ...(guideUrl ? [`${t.guide[l]} ${guideUrl}`] : [])];
-    return send(to, name, t.subject[l], paragraphs, { label: t.button[l], url: link });
+    const paragraphs = [hi[l](first(name)), t.start[l](formatMonday(monday, l), formatSigningFriday(monday, l)), `${t.howTitle[l]}:`, ...t.how[l](amount, firstAmt).map((b) => `• ${b}`)];
+    // Slack invite link sits right after the #welcome / #ruul-cohort bullet; the Poster Guide line follows it.
+    return send(to, name, t.subject[l], paragraphs, { label: t.button[l], url: link }, undefined, undefined, slackUrl ? { label: SLACK_LABEL[l], url: slackUrl } : undefined, guideUrl ? [`${t.guide[l]} ${guideUrl}`] : undefined);
   },
   rejected: (to: string, name: string, l: L, reason: string | null) =>
     send(to, name, T.rejected.subject[l], [hi[l](first(name)), T.rejected.body[l], ...(reason ? [`${T.rejected.reason[l]} ${reason}`] : [])]),
@@ -167,9 +173,17 @@ export const posterEmails = {
     sunday.setUTCDate(sunday.getUTCDate() + 6);
     const w = o.weekly != null ? String(o.weekly) : "—";
     const f = o.first != null ? String(o.first) : "—";
+    const sec = T.paySection[l](o.ruulEmail, formatMonday(o.monday, l), w, f, formatMonday(sunday.toISOString().slice(0, 10), l));
+    // The money-questions line ends on #ruul-cohort; the Slack invite link follows it (tail kept after the link).
+    if (o.slack) {
+      const tail = MONEY_TAIL[l];
+      const i = sec.closing.length - 1;
+      const last = sec.closing[i];
+      if (typeof last === "string" && last.endsWith(tail)) sec.closing[i] = { text: last.slice(0, -tail.length), link: { label: SLACK_LABEL[l], url: o.slack }, tail };
+    }
     return send(to, name, T.logins.subject[l], [hi[l](first(name)), x[0]!, x[5]!], { label: "Sophia OS", url: o.osUrl }, [
       `${x[1]}: ${o.login}`, `${x[2]}: ${o.password}`, ...(o.slack ? [`${x[3]}: ${o.slack}`] : []), T.cohort[l], `${x[4]}: ${formatMonday(o.monday, l)}`,
-    ], T.paySection[l](o.ruulEmail, formatMonday(o.monday, l), w, f, formatMonday(sunday.toISOString().slice(0, 10), l)));
+    ], sec);
   },
   ruul: (to: string, name: string, l: L, ruulEmail: string, monday: string) =>
     send(to, name, T.ruul.subject[l], [hi[l](first(name)), T.ruul.body[l](ruulEmail, formatMonday(monday, l))]),
