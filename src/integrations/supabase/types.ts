@@ -6027,7 +6027,9 @@ export type Database = {
           os_created_at: string | null
           os_email: string | null
           os_error: string | null
+          os_langue: string | null
           os_profile_id: string | null
+          payout_channel: string | null
           payout_method: string | null
           payout_token: string | null
           payout_token_expires_at: string | null
@@ -6041,6 +6043,8 @@ export type Database = {
           referral_source: string | null
           rejected_reason: string | null
           rejection_reason: string | null
+          ruul_added_at: string | null
+          ruul_email: string | null
           signing_token: string | null
           signing_token_created_at: string | null
           start_monday: string | null
@@ -6090,7 +6094,9 @@ export type Database = {
           os_created_at?: string | null
           os_email?: string | null
           os_error?: string | null
+          os_langue?: string | null
           os_profile_id?: string | null
+          payout_channel?: string | null
           payout_method?: string | null
           payout_token?: string | null
           payout_token_expires_at?: string | null
@@ -6104,6 +6110,8 @@ export type Database = {
           referral_source?: string | null
           rejected_reason?: string | null
           rejection_reason?: string | null
+          ruul_added_at?: string | null
+          ruul_email?: string | null
           signing_token?: string | null
           signing_token_created_at?: string | null
           start_monday?: string | null
@@ -6153,7 +6161,9 @@ export type Database = {
           os_created_at?: string | null
           os_email?: string | null
           os_error?: string | null
+          os_langue?: string | null
           os_profile_id?: string | null
+          payout_channel?: string | null
           payout_method?: string | null
           payout_token?: string | null
           payout_token_expires_at?: string | null
@@ -6167,6 +6177,8 @@ export type Database = {
           referral_source?: string | null
           rejected_reason?: string | null
           rejection_reason?: string | null
+          ruul_added_at?: string | null
+          ruul_email?: string | null
           signing_token?: string | null
           signing_token_created_at?: string | null
           start_monday?: string | null
@@ -6252,6 +6264,7 @@ export type Database = {
           prevus: number | null
           publies: number | null
           rate: number | null
+          ruul_ref: string | null
           skip_reason: string | null
           status: string
           stripe_transfer_id: string | null
@@ -6274,6 +6287,7 @@ export type Database = {
           prevus?: number | null
           publies?: number | null
           rate?: number | null
+          ruul_ref?: string | null
           skip_reason?: string | null
           status?: string
           stripe_transfer_id?: string | null
@@ -6296,6 +6310,7 @@ export type Database = {
           prevus?: number | null
           publies?: number | null
           rate?: number | null
+          ruul_ref?: string | null
           skip_reason?: string | null
           status?: string
           stripe_transfer_id?: string | null
