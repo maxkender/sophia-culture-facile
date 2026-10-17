@@ -135,9 +135,9 @@ const T = {
   },
 };
 
-async function send(to: string, name: string, subject: string, paragraphs: string[], button?: { label: string; url: string }, bullets?: string[], section?: EmailSection): Promise<BrevoResult> {
-  const html = buildEmailHtml({ paragraphs, ...(bullets ? { bullets } : {}), ...(section ? { section } : {}), ...(button ? { buttonLabel: button.label, buttonUrl: button.url } : {}) });
-  const text = [...paragraphs, ...(bullets ?? []), ...(section ? emailSectionText(section) : []), ...(button ? [`${button.label}: ${button.url}`] : [])].join("\n\n");
+async function send(to: string, name: string, subject: string, paragraphs: string[], button?: { label: string; url: string }, bullets?: string[], section?: EmailSection, extraLink?: { label: string; url: string }): Promise<BrevoResult> {
+  const html = buildEmailHtml({ paragraphs, ...(bullets ? { bullets } : {}), ...(extraLink ? { extraLink } : {}), ...(section ? { section } : {}), ...(button ? { buttonLabel: button.label, buttonUrl: button.url } : {}) });
+  const text = [...paragraphs, ...(bullets ?? []), ...(extraLink ? [`${extraLink.label}: ${extraLink.url}`] : []), ...(section ? emailSectionText(section) : []), ...(button ? [`${button.label}: ${button.url}`] : [])].join("\n\n");
   return sendBrevoEmail({ to, toName: name, subject, html, text });
 }
 const first = (n: string) => n.trim().split(/\s+/)[0] ?? n;
@@ -156,12 +156,12 @@ export const posterEmails = {
   /** kind: "open" (country open in the OS and payable by Ruul), "closed" (today's text), "neutral" (OS unreachable). */
   ack: (to: string, name: string, l: L, kind: "open" | "closed" | "neutral" = "closed") =>
     send(to, name, T.ack.subject[l], [hi[l](first(name)), kind === "open" ? T.ackOpen[l] : kind === "neutral" ? T.ackNeutral[l] : T.ack.body[l]]),
-  accepted: (to: string, name: string, l: L, monday: string, link: string, weeklyAmount: number | null, firstWeekAmount: number | null, guideUrl: string | null) => {
+  accepted: (to: string, name: string, l: L, monday: string, link: string, weeklyAmount: number | null, firstWeekAmount: number | null, guideUrl: string | null, slackUrl: string | null) => {
     const t = T.accepted;
     const amount = weeklyAmount != null ? String(weeklyAmount) : "—";
     const firstAmt = firstWeekAmount != null ? String(firstWeekAmount) : "—";
     const paragraphs = [hi[l](first(name)), t.start[l](formatMonday(monday, l), formatSigningFriday(monday, l)), `${t.howTitle[l]}:`, ...t.how[l](amount, firstAmt).map((b) => `• ${b}`), ...(guideUrl ? [`${t.guide[l]} ${guideUrl}`] : [])];
-    return send(to, name, t.subject[l], paragraphs, { label: t.button[l], url: link });
+    return send(to, name, t.subject[l], paragraphs, { label: t.button[l], url: link }, undefined, undefined, slackUrl ? { label: SLACK_LABEL[l], url: slackUrl } : undefined);
   },
   rejected: (to: string, name: string, l: L, reason: string | null) =>
     send(to, name, T.rejected.subject[l], [hi[l](first(name)), T.rejected.body[l], ...(reason ? [`${T.rejected.reason[l]} ${reason}`] : [])]),
