@@ -236,7 +236,6 @@ export const approveWeek = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ lundi: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).parse(d))
   .handler(async ({ data, context }) => {
-    await (await import("./payments-gate.server")).assertPaymentsOn();
     const me = await assertAdmin(context);
     const a = await admin();
     const { MIN_PAYOUT } = await import("./slideshows.server");
