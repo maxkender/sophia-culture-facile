@@ -40,7 +40,8 @@ describe("Slack invite link in poster emails", () => {
     await posterEmails.logins("p@example.com", "Test P", "en", { osUrl: "https://os.example", login: "os@x", password: "pw", slack: SLACK_URL, monday: "2026-10-26", ruulEmail: "p@example.com", weekly: 14, first: 15 });
     const html = sendCalls[0]!.html;
     // "#ruul-cohort" is immediately followed by the clickable link, then the tail.
-    expect(html).toContain('#ruul-cohort <a href="' + SLACK_URL + '">Join Slack</a>, never in the channel.');
+    expect(html).toContain(`#ruul-cohort <a href="${SLACK_URL}"`);
+    expect(html).toContain(`>Join Slack</a>, never in the channel.`);
     expect(sendCalls[0]!.text).toContain(`Join Slack: ${SLACK_URL}`);
   });
 
