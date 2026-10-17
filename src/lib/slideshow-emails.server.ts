@@ -172,9 +172,17 @@ export const posterEmails = {
     sunday.setUTCDate(sunday.getUTCDate() + 6);
     const w = o.weekly != null ? String(o.weekly) : "—";
     const f = o.first != null ? String(o.first) : "—";
+    const sec = T.paySection[l](o.ruulEmail, formatMonday(o.monday, l), w, f, formatMonday(sunday.toISOString().slice(0, 10), l));
+    // The money-questions line ends on #ruul-cohort; the Slack invite link follows it (tail kept after the link).
+    if (o.slack) {
+      const tail = MONEY_TAIL[l];
+      const i = sec.closing.length - 1;
+      const last = sec.closing[i];
+      if (typeof last === "string" && last.endsWith(tail)) sec.closing[i] = { text: last.slice(0, -tail.length), link: { label: SLACK_LABEL[l], url: o.slack }, tail };
+    }
     return send(to, name, T.logins.subject[l], [hi[l](first(name)), x[0]!, x[5]!], { label: "Sophia OS", url: o.osUrl }, [
       `${x[1]}: ${o.login}`, `${x[2]}: ${o.password}`, ...(o.slack ? [`${x[3]}: ${o.slack}`] : []), T.cohort[l], `${x[4]}: ${formatMonday(o.monday, l)}`,
-    ], T.paySection[l](o.ruulEmail, formatMonday(o.monday, l), w, f, formatMonday(sunday.toISOString().slice(0, 10), l)));
+    ], sec);
   },
   ruul: (to: string, name: string, l: L, ruulEmail: string, monday: string) =>
     send(to, name, T.ruul.subject[l], [hi[l](first(name)), T.ruul.body[l](ruulEmail, formatMonday(monday, l))]),
