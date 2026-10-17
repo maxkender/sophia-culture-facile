@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ZONE_BADGE } from "@/lib/slideshow-guide";
 import { APPLICANT_LANGS, countryCodeOf, langOfCountry, type ApplicantLang } from "@/config/countries";
-import { acceptPoster, keepWarm, markRuulAdded, osZones, rejectPoster, retryOs, saveRuulEmail, tickStep } from "@/lib/slideshows.functions";
+import { osIdentities, acceptPoster, keepWarm, markRuulAdded, osZones, rejectPoster, retryOs, saveRuulEmail, tickStep } from "@/lib/slideshows.functions";
 import { RUUL_BLOCKED } from "@/lib/ruul";
 import { STATUS_LABEL, useOsStatus , OS_UI_ENABLED } from "./useOs";
 
@@ -51,12 +51,26 @@ export function scoreOf(a: App, hmCountries: Set<string>) {
 
 const fmt = (d?: string | null) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "");
 
+/** Posters created in the OS and not yet added in Ruul: they need the legal name from the OS. */
+export const needsLegalName = (a: App) => ["os_created", "started"].includes(a.status) && Boolean(a.os_email || (a as Record<string, unknown>)["os_created_at"]) && !(a as Record<string, unknown>)["ruul_added_at"];
+
+export function useLegalNames(apps: App[]) {
+  const fn = useServerFn(osIdentities);
+  const ids = apps.filter(needsLegalName).map((a) => a.id).sort();
+  return useQuery({
+    queryKey: ["hub", "slides", "identites", ids.join(",")],
+    queryFn: async () => new Map((await fn({ data: { hubIds: ids } })).rows.map((r) => [r.hub_id, r] as const)),
+    enabled: ids.length > 0, staleTime: 60_000, retry: false,
+  });
+}
+
 export function SlideshowApplications({ focusId }: { focusId?: string | undefined }) {
   const { data } = useSlideshowApps();
   const os = useOsStatus();
   const [f, setF] = useState({ country: "all", zone: "all", upwork: "all", phone: "all", status: focusId ? "all" : "pending" });
   const [open, setOpen] = useState<string | null>(focusId ?? null);
   const apps = data?.apps ?? [];
+  const { data: legal } = useLegalNames(apps);
   const countries = useMemo(() => [...new Set(apps.map((a) => a.country))].sort(), [apps]);
   const rows = apps.filter((a) =>
     (f.country === "all" || a.country === f.country) && (f.zone === "all" || (f.zone === "none" ? !a.zone : a.zone === f.zone))
@@ -100,7 +114,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
                 <span className="rounded-full bg-space-slides/10 px-2 py-0.5 text-xs font-bold text-space-slides">Score {s.score}/{s.max}</span>
                 <span className="text-xs">{STATUS_LABEL[a.status] ?? a.status}</span>
               </Button>
-              {isOpen ? <PosterCard a={a} score={s} zones={data?.zones ?? []} /> : null}
+              {isOpen ? <PosterCard a={a} score={s} zones={data?.zones ?? []} legal={needsLegalName(a) ? (legal?.get(a.id) ?? null) : undefined} /> : null}
             </li>); })}</ul>
         </section>
       ))}
@@ -114,7 +128,7 @@ const STEPS: [string, string, string | null][] = [
   ["logins_sent", "Logins sent", null], ["slack_added", "Added to Slack · by hand", null], ["hm_notified", "Hiring manager notified", "hm_notified_at"], ["warmup", "Warm-up done", null], ["started", "Started Monday", "started_at"], ["dropped", "Dropped", "dropped_at"],
 ];
 
-export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<typeof scoreOf>; zones: { zone: string; weekly_amount: number | null; first_week_amount: number | null }[] }) {
+export function PosterCard({ a, score, zones, legal }: { a: App; legal?: { prenom_legal: string; nom_legal: string } | null | undefined; score: ReturnType<typeof scoreOf>; zones: { zone: string; weekly_amount: number | null; first_week_amount: number | null }[] }) {
   const qc = useQueryClient();
   const accept = useServerFn(acceptPoster); const reject = useServerFn(rejectPoster); const warm = useServerFn(keepWarm);
   const tick = useServerFn(tickStep); const retry = useServerFn(retryOs);
@@ -177,7 +191,8 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
           <div className="space-y-2 rounded-xl border border-brand-line bg-card p-3 text-sm" data-testid="ruul-box">
             <p className="font-bold text-brand-navy">Add to Ruul <span className="ml-1 rounded-full bg-portal-bg px-2 py-0.5 text-xs font-semibold">{(a as Record<string, unknown>)["ruul_added_at"] ? "added" : "to add"}</span></p>
             <p className="text-xs text-brand-navySoft">Ruul sends no invitation: add the poster in Ruul's "New Contractor" form with these exact values. The poster then creates his Ruul account with the same email.</p>
-            {([["First name", a.full_name.trim().split(/\s+/)[0] ?? ""], ["Last name", a.full_name.trim().split(/\s+/).slice(1).join(" ")], ["Country", a.country]] as const).map(([l, v]) => (
+            {legal === null ? <p className="text-xs font-semibold text-portal-amber">Waiting for the legal name (asked in the Sophia OS onboarding)</p> : null}
+            {([...(legal === null ? [] : [["First name", legal ? legal.prenom_legal : (a.full_name.trim().split(/\s+/)[0] ?? "")], ["Last name", legal ? legal.nom_legal : a.full_name.trim().split(/\s+/).slice(1).join(" ")]] as const), ["Country", a.country]] as const).map(([l, v]) => (
               <p key={l} className="flex items-center gap-2 text-xs"><b className="w-20">{l}</b><span className="flex-1 break-all">{v || "—"}</span><Button size="sm" variant="ghost" onClick={() => { void navigator.clipboard.writeText(v); toast.success("Copied"); }}>Copy</Button></p>
             ))}
             <p className="flex items-center gap-2 text-xs"><b className="w-20">Email</b>
