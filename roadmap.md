@@ -15,3 +15,6 @@
 - [x] Slideshow form: remove Upwork question (has_upwork nullable)
 - [x] Slideshow acknowledgement email depends on country open/closed/OS unreachable
 - [x] Ruul cohort: logins email Getting paid + #ruul-cohort, Added in Ruul records only, notify owner/Slack, card "Cohort"
+
+# Slideshow signature start Monday (Oct 17)
+- [ ] Recompute Monday at signature, update six acceptance texts, verify date tests and publish; no real signing or email.

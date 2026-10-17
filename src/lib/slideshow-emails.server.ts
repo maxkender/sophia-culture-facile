@@ -57,7 +57,14 @@ const T = {
   },
   accepted: {
     subject: { fr: "Vous êtes accepté·e — signez votre contrat", en: "You're accepted — sign your contract", es: "Has sido aceptado/a — firma tu contrato", it: "Sei stato accettato — firma il contratto", pt: "Foste aceite — assina o teu contrato", de: "Du bist angenommen — unterschreibe deinen Vertrag" },
-    start: { fr: (d: string) => `Bonne nouvelle : votre candidature est acceptée. Vous commencez le lundi ${d}.`, en: (d: string) => `Good news: your application is accepted. You start on Monday ${d}.`, es: (d: string) => `Buenas noticias: tu candidatura ha sido aceptada. Empiezas el lunes ${d}.`, it: (d: string) => `Buone notizie: la tua candidatura è accettata. Inizi lunedì ${d}.`, pt: (d: string) => `Boas notícias: a tua candidatura foi aceite. Começas na segunda-feira ${d}.`, de: (d: string) => `Gute Nachricht: deine Bewerbung ist angenommen. Du startest am Montag, ${d}.` },
+    start: {
+      fr: (d: string, f: string) => `Bonne nouvelle : votre candidature est acceptée. Signez votre contrat d'ici le ${f} pour commencer le lundi ${d}. Si vous signez plus tard, vous commencerez le premier lundi au moins 3 jours après votre signature.`,
+      en: (d: string, f: string) => `Good news: your application is accepted. Sign your contract by ${f} to start on Monday ${d}. If you sign later, you start on the first Monday at least 3 days after you sign.`,
+      es: (d: string, f: string) => `Buenas noticias: tu candidatura ha sido aceptada. Firma tu contrato antes del ${f} para empezar el lunes ${d}. Si firmas más tarde, empezarás el primer lunes al menos 3 días después de tu firma.`,
+      it: (d: string, f: string) => `Buone notizie: la tua candidatura è accettata. Firma il contratto entro ${f} per iniziare lunedì ${d}. Se firmi più tardi, inizierai il primo lunedì almeno 3 giorni dopo la firma.`,
+      pt: (d: string, f: string) => `Boas notícias: a tua candidatura foi aceite. Assina o teu contrato até ${f} para começares na segunda-feira ${d}. Se assinares mais tarde, começas na primeira segunda-feira pelo menos 3 dias depois da tua assinatura.`,
+      de: (d: string, f: string) => `Gute Nachricht: deine Bewerbung ist angenommen. Unterschreibe deinen Vertrag bis ${f}, um am Montag, ${d} zu starten. Wenn du später unterschreibst, startest du am ersten Montag, der mindestens 3 Tage nach deiner Unterschrift liegt.`,
+    },
     howTitle: { fr: "Comment ça marche", en: "How it works", es: "Cómo funciona", it: "Come funziona", pt: "Como funciona", de: "So funktioniert es" },
     how: {
       fr: (amount: string) => ["Vous créez un compte TikTok sur votre téléphone, avec l'identité que nous vous donnons.", "Chaque jour, 7 jours sur 7, vous publiez les 2 slideshows préparés pour vous dans votre tableau de bord.", "Avant votre premier lundi, vous chauffez le compte : vous utilisez TikTok normalement, sans publier.", `Vous êtes payé·e chaque semaine via Ruul : ${amount} USD par semaine.`, "Sur Slack, vous rejoignez les salons #welcome et #ruul-cohort : posez toutes vos questions dans #ruul-cohort."],
@@ -134,6 +141,12 @@ export function formatMonday(d: string, lang: L) {
   return new Intl.DateTimeFormat(lang, { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${d}T12:00:00Z`));
 }
 
+export function formatSigningFriday(monday: string, lang: L) {
+  const friday = new Date(`${monday}T00:00:00Z`);
+  friday.setUTCDate(friday.getUTCDate() - 3);
+  return new Intl.DateTimeFormat(lang, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(friday);
+}
+
 export const posterEmails = {
   /** kind: "open" (country open in the OS and payable by Ruul), "closed" (today's text), "neutral" (OS unreachable). */
   ack: (to: string, name: string, l: L, kind: "open" | "closed" | "neutral" = "closed") =>
@@ -141,7 +154,7 @@ export const posterEmails = {
   accepted: (to: string, name: string, l: L, monday: string, link: string, weeklyAmount: number | null, guideUrl: string | null) => {
     const t = T.accepted;
     const amount = weeklyAmount != null ? String(weeklyAmount) : "—";
-    const paragraphs = [hi[l](first(name)), t.start[l](formatMonday(monday, l)), `${t.howTitle[l]}:`, ...t.how[l](amount).map((b) => `• ${b}`), ...(guideUrl ? [`${t.guide[l]} ${guideUrl}`] : [])];
+    const paragraphs = [hi[l](first(name)), t.start[l](formatMonday(monday, l), formatSigningFriday(monday, l)), `${t.howTitle[l]}:`, ...t.how[l](amount).map((b) => `• ${b}`), ...(guideUrl ? [`${t.guide[l]} ${guideUrl}`] : [])];
     return send(to, name, t.subject[l], paragraphs, { label: t.button[l], url: link });
   },
   rejected: (to: string, name: string, l: L, reason: string | null) =>

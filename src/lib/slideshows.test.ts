@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 vi.mock("./os-bridge.server", () => ({ callOs: vi.fn() }));
 vi.mock("./slideshow-emails.server", () => ({ pickLang: vi.fn(), posterEmails: {} }));
 vi.mock("./brevo.server", () => ({ sendBrevoEmail: vi.fn() }));
-import { buildWeek } from "./slideshows.server";
+import { buildWeek, nextStartMonday, startMondayAtSignature } from "./slideshows.server";
 function fixture(existing = false, future = false) {
   const writes: Record<string, unknown>[] = [];
   const sb = { from: (table: string) => {
@@ -26,4 +26,21 @@ describe("manual slideshow week", () => {
   });
   it("does not overwrite an edited existing draft", async () => { const { sb, writes } = fixture(true); await buildWeek(sb, "2026-10-05"); expect(writes).toHaveLength(0); });
   it("does not prepare pay before the poster starts", async () => { const { sb, writes } = fixture(false, true); await buildWeek(sb, "2026-10-05"); expect(writes).toHaveLength(0); });
+});
+
+
+describe("slideshow start Monday at signature (UTC)", () => {
+  it("accepts Saturday 17 October with a stored Monday of 26 October", () => {
+    expect(nextStartMonday(new Date("2026-10-17T15:51:00Z"))).toBe("2026-10-26");
+  });
+  it.each([
+    ["2026-10-23", "2026-10-26"],
+    ["2026-10-24", "2026-11-02"],
+    ["2026-10-26", "2026-11-02"],
+  ])("signing on %s starts on %s", (signed, expected) => {
+    expect(startMondayAtSignature("2026-10-26", new Date(`${signed}T23:59:59Z`))).toBe(expected);
+  });
+  it("never moves a later stored Monday forward", () => {
+    expect(startMondayAtSignature("2026-11-09", new Date("2026-10-23T00:00:00Z"))).toBe("2026-11-09");
+  });
 });

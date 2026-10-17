@@ -105,7 +105,7 @@ export const signWithToken = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: app } = await supabaseAdmin
       .from("slideshow_applications")
-      .select("id, status")
+      .select("id, status, start_monday, timeline")
       .eq("signing_token", data.token)
       .maybeSingle();
     if (!app || !["approved", "accepted"].includes(app.status)) throw new Error("This link is no longer valid.");
@@ -121,15 +121,23 @@ export const signWithToken = createServerFn({ method: "POST" })
       user_agent: ua,
     });
     if (error) throw new Error("This agreement has already been signed.");
-    await supabaseAdmin
+    const { startMondayAtSignature } = await import("./slideshows.server");
+    const signedAt = new Date();
+    const now = signedAt.toISOString();
+    const { error: updateError } = await supabaseAdmin
       .from("slideshow_applications")
-      .update({ signing_token: null, guide_token: data.token, agreement_signed_at: new Date().toISOString() })
+      .update({
+        signing_token: null, guide_token: data.token, agreement_signed_at: now,
+        start_monday: startMondayAtSignature(app.start_monday, signedAt),
+        ...(app.status === "accepted" ? {
+          status: "contract_signed", contract_signed_at: now,
+          timeline: { ...((app.timeline as object) ?? {}), contract_signed: { at: now, by: "Poster" } },
+        } : {}),
+      })
       .eq("id", app.id);
+    if (updateError) throw new Error("The signature could not be recorded.");
     if (app.status === "accepted") {
       // New flow: contract signed → create the poster in the OS (failures stay on the card with Retry).
-      const now = new Date().toISOString();
-      const { data: cur } = await supabaseAdmin.from("slideshow_applications").select("timeline").eq("id", app.id).maybeSingle();
-      await supabaseAdmin.from("slideshow_applications").update({ status: "contract_signed", contract_signed_at: now, timeline: { ...((cur?.timeline as object) ?? {}), contract_signed: { at: now, by: "Poster" } } }).eq("id", app.id);
       // OS link is live: create the poster right after the signature. A failure must never block signing —
       // the error stays on the card with the Retry button.
       try {
