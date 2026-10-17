@@ -18,3 +18,7 @@
 
 # Slideshow signature start Monday (Oct 17)
 - [x] Recompute Monday at signature, update six acceptance texts, verify date tests and request publication; no real signing or email.
+
+# Slideshow Monday payments (Oct 17)
+- [x] Update six-language acceptance/logins payment wording and first payment (+7 days); 18 mocked tests pass, no sends; rates, Slack links and forms preserved.
+- [ ] Publish Monday-payment update.

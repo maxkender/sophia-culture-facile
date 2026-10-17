@@ -3,7 +3,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 // Date formatting and email building only: no email transport is ever called.
 const sendCalls: { html: string; text: string; subject: string; to: string }[] = [];
 vi.mock("./brevo.server", () => ({ sendBrevoEmail: vi.fn(async (o: any) => { sendCalls.push(o); return { sent: true }; }) }));
-import { formatSigningFriday, posterEmails } from "./slideshow-emails.server";
+import { firstPaymentMonday, formatSigningFriday, posterEmails } from "./slideshow-emails.server";
 
 beforeEach(() => { sendCalls.length = 0; });
 
@@ -49,5 +49,14 @@ describe("Slack invite link in poster emails", () => {
     await posterEmails.logins("p@example.com", "Test P", "en", { osUrl: "https://os.example", login: "os@x", password: "pw", slack: null, monday: "2026-10-26", ruulEmail: "p@example.com", weekly: 14, first: 15 });
     expect(sendCalls[0]!.html).toContain("never in the channel.");
     expect(sendCalls[0]!.html).not.toContain("join.slack.com");
+  });
+});
+
+ describe("first slideshow payment after the completed posting week", () => {
+  it.each([
+    ["2026-10-26", "2026-11-02"],
+    ["2026-12-28", "2027-01-04"],
+  ])("starts %s and first pays %s (seven days later)", (start, payment) => {
+    expect(firstPaymentMonday(start)).toBe(payment);
   });
 });
