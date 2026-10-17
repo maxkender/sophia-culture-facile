@@ -512,6 +512,13 @@
       "when": 1791926937098,
       "tag": "0072_creators_read_ugc_agreement",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1792250378115,
+      "tag": "0073_slideshow_has_upwork_nullable",
+      "breakpoints": true
     }
   ]
 }
