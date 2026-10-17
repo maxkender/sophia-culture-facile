@@ -67,7 +67,7 @@ export function SlidesPayouts() {
         <Button disabled={busy || !data.some((r) => r.status === "draft")} onClick={() => void go(() => approve({ data: { lundi } }), (r) => `${r.approved} approved, ${r.carried} carried over (under $20)`)}>Approve week</Button>
         <span className="ml-auto text-sm">Total <b>${total.toFixed(2)}</b></span>
       </div>
-      <p className="text-xs text-brand-navySoft">Ruul posters only — Upwork posters are paid on Upwork and never appear here. Build by hand for posters who have started. Confirm attendance and edit the amount before approving. Amount = zone weekly rate (+$1 the first week); missed posts do not reduce pay. Minimum payout $20: a smaller total carries over to the next week. Currency USD.</p>
+      <p className="text-xs text-brand-navySoft">Every started poster is paid through Ruul. Build by hand for posters who have started. Confirm attendance and edit the amount before approving. Amount = zone weekly rate (+$1 the first week); missed posts do not reduce pay. Minimum payout $20: a smaller total carries over to the next week. Currency USD.</p>
       {!os.data?.connected ? <OsNotConnected what="Post counts for payouts" /> : null}
 
       <div className="space-y-2 rounded-2xl bg-card p-4 shadow-portal" data-testid="ruul-export">

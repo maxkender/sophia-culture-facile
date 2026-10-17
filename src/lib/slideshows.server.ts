@@ -92,7 +92,7 @@ export async function createPosterInOs(admin: Admin, applicationId: string) {
     await tick(admin, a.id, "logins_sent", "Sophia OS");
   }
   if (!r.existed || !a.os_created_at) {
-    await notifyManager(admin, { name: a.full_name, country: a.country, monday: a.start_monday, managerEmail: r.manager?.email ?? null, upwork: a.has_upwork ? (a.upwork_profile_url || "link not given") : null });
+    await notifyManager(admin, { name: a.full_name, country: a.country, monday: a.start_monday, managerEmail: r.manager?.email ?? null });
     await admin.from("slideshow_applications").update({ hm_notified_at: new Date().toISOString() }).eq("id", a.id);
     await tick(admin, a.id, "hm_notified", "Sophia OS");
   }
@@ -101,7 +101,7 @@ export async function createPosterInOs(admin: Admin, applicationId: string) {
 
 async function notifyManager(admin: Admin, o: { name: string; country: string; monday: string; managerEmail: string | null; upwork?: string | null }) {
   const date = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${o.monday}T12:00:00Z`));
-  const text = `New poster from the site in your zone: ${o.name}, ${o.country}, starts Monday ${date}. Logins sent. Add them to your zone channel.${o.upwork ? ` Has Upwork: ${o.upwork} — send them the Upwork offer.` : ""}`;
+  const text = `New poster from the site in your zone: ${o.name}, ${o.country}, starts Monday ${date}. Logins sent. Add them to your zone channel.`;
   const hook = process.env["SLACK_WEBHOOK_URL"];
   if (hook) {
     const res = await fetch(hook, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) }).catch(() => null);
@@ -139,7 +139,7 @@ export async function refreshSnapshots(admin: Admin) {
 
 export const MIN_PAYOUT = 20;
 
-/** Explicit admin action: prepare editable weekly rows, using cached counts when available; never call the OS. Ruul posters only — Upwork posters are paid on Upwork. */
+/** Explicit admin action: prepare editable weekly rows, using cached counts when available; never call the OS. Every started poster is paid through Ruul. */
 export async function buildWeek(admin: Admin, lundi = addDays(mondayOf(), -7)) {
   const [{ data: posters }, { data: zones }] = await Promise.all([
     admin.from("slideshow_applications").select("id, zone, start_monday, os_profile_id, payout_channel").eq("status", "started"),
@@ -148,7 +148,6 @@ export async function buildWeek(admin: Admin, lundi = addDays(mondayOf(), -7)) {
   const rate: Record<string, number> = Object.fromEntries((zones ?? []).map((z: any) => [z.zone, Number(z.weekly_amount ?? 0)]));
   let built = 0, skipped = 0;
   for (const p of posters ?? []) {
-    if ((p.payout_channel ?? "ruul") !== "ruul") continue; // Upwork posters are paid on Upwork, never here.
     const { data: existing } = await admin.from("slideshow_payouts").select("id, status").eq("application_id", p.id).eq("week_start", lundi).maybeSingle();
     if (p.start_monday && p.start_monday > lundi) continue;
     if (existing) continue;
