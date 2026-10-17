@@ -30,11 +30,11 @@ export function replaceMergeFields(text: string, fields: Record<string, string>)
 }
 
 /** Renders a simple branded email: optional paragraphs and bullets, then one primary button. */
-export type EmailSection = { heading: string; intro: string; beforeList: string; steps: { text: string; link?: { label: string; url: string } }[]; note: string; closing: string[] };
+export type EmailSection = { heading: string; intro: string; beforeList: string; steps: { text: string; link?: { label: string; url: string } }[]; note: string; closing: (string | { text: string; link: { label: string; url: string }; tail?: string })[] };
 
 /** Plain-text version of a section, same order as the HTML. */
 export function emailSectionText(sec: EmailSection): string[] {
-  return [sec.heading.toUpperCase(), sec.intro, sec.beforeList, sec.steps.map((st, i) => `${i + 1}. ${st.text}${st.link ? `\n   ${st.link.label}: ${st.link.url}` : ""}`).join("\n"), `! ${sec.note}`, ...sec.closing];
+  return [sec.heading.toUpperCase(), sec.intro, sec.beforeList, sec.steps.map((st, i) => `${i + 1}. ${st.text}${st.link ? `\n   ${st.link.label}: ${st.link.url}` : ""}`).join("\n"), `! ${sec.note}`, ...sec.closing.map((c) => (typeof c === "string" ? c : `${c.text} ${c.link.label}: ${c.link.url}${c.tail ?? ""}`))];
 }
 
 export function buildEmailHtml(options: {
