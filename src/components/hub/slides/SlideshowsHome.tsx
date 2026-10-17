@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
-import { useSlideshowApps } from "./SlideshowApplications";
+import { needsLegalName, useLegalNames, useSlideshowApps } from "./SlideshowApplications";
 import { STATUS_LABEL, useOsStatus , OS_UI_ENABLED } from "./useOs";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +12,9 @@ export function SlideshowsHome() {
   const { data } = useSlideshowApps();
   const os = useOsStatus();
   const apps = data?.apps ?? [];
+  const { data: legal } = useLegalNames(apps);
+  const inOs = apps.filter(needsLegalName);
+  const ready = inOs.filter((a) => legal?.has(a.id)).length;
   const n = (s: string) => apps.filter((a) => a.status === s).length;
   const now = new Date();
   const parisDay = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
@@ -29,7 +32,7 @@ export function SlideshowsHome() {
     ["Starting next Monday", apps.filter((a) => a.start_monday === nextMonday && ["accepted", "contract_signed", "os_created"].includes(a.status)).length, "/hub/slideshows/posters"],
     ["Posters started", n("started"), "/hub/slideshows/posters"],
     ["Payouts to approve", payouts, "/hub/slideshows/payouts"],
-    ["To add in Ruul", ruulToAdd, "/hub/slideshows/applications"],
+    [`To add in Ruul · ${ready} ready · ${inOs.length - ready} waiting for name`, ruulToAdd, "/hub/slideshows/applications"],
   ];
   const byZone = ["A", "B", "C"].map((z) => [z, apps.filter((a) => a.zone === z && a.status === "pending").length] as const);
   return (
