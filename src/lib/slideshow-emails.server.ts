@@ -104,16 +104,22 @@ export function formatMonday(d: string, lang: L) {
 
 export const posterEmails = {
   ack: (to: string, name: string, l: L) => send(to, name, T.ack.subject[l], [hi[l](first(name)), T.ack.body[l]]),
-  accepted: (to: string, name: string, l: L, monday: string, link: string) =>
-    send(to, name, T.accepted.subject[l], [hi[l](first(name)), ...T.accepted.body[l](formatMonday(monday, l))], { label: T.accepted.button[l], url: link }),
+  accepted: (to: string, name: string, l: L, monday: string, link: string, weeklyAmount: number | null, guideUrl: string | null) => {
+    const t = T.accepted;
+    const amount = weeklyAmount != null ? String(weeklyAmount) : "—";
+    const paragraphs = [hi[l](first(name)), t.start[l](formatMonday(monday, l)), `${t.howTitle[l]}:`, ...t.how[l](amount).map((b) => `• ${b}`), ...(guideUrl ? [`${t.guide[l]} ${guideUrl}`] : [])];
+    return send(to, name, t.subject[l], paragraphs, { label: t.button[l], url: link });
+  },
   rejected: (to: string, name: string, l: L, reason: string | null) =>
     send(to, name, T.rejected.subject[l], [hi[l](first(name)), T.rejected.body[l], ...(reason ? [`${T.rejected.reason[l]} ${reason}`] : [])]),
   expired: (to: string, name: string, l: L) => send(to, name, T.expired.subject[l], [hi[l](first(name)), T.expired.body[l]]),
-  logins: (to: string, name: string, l: L, o: { osUrl: string; login: string; password: string; slack: string | null; guide: string | null; monday: string }) => {
+  logins: (to: string, name: string, l: L, o: { osUrl: string; login: string; password: string; slack: string | null; monday: string }) => {
     const x = T.logins.lines[l];
-    return send(to, name, T.logins.subject[l], [hi[l](first(name)), x[0]!, x[6]!], { label: "Sophia OS", url: o.osUrl }, [
-      `${x[1]}: ${o.login}`, `${x[2]}: ${o.password}`, ...(o.slack ? [`${x[3]}: ${o.slack}`] : []), ...(o.guide ? [`${x[4]}: ${o.guide}`] : []), `${x[5]}: ${formatMonday(o.monday, l)}`,
+    return send(to, name, T.logins.subject[l], [hi[l](first(name)), x[0]!, x[5]!], { label: "Sophia OS", url: o.osUrl }, [
+      `${x[1]}: ${o.login}`, `${x[2]}: ${o.password}`, ...(o.slack ? [`${x[3]}: ${o.slack}`] : []), `${x[4]}: ${formatMonday(o.monday, l)}`,
     ]);
   },
+  ruul: (to: string, name: string, l: L, ruulEmail: string, monday: string) =>
+    send(to, name, T.ruul.subject[l], [hi[l](first(name)), T.ruul.body[l](ruulEmail, formatMonday(monday, l))]),
   payout: (to: string, name: string, l: L, link: string) => send(to, name, T.payout.subject[l], [hi[l](first(name)), T.payout.body[l]], { label: T.payout.button[l], url: link }),
 };
