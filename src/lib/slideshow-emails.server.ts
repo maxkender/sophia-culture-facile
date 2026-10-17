@@ -25,14 +25,17 @@ const T = {
   },
   accepted: {
     subject: { fr: "Vous êtes accepté·e — signez votre contrat", en: "You're accepted — sign your contract", es: "Has sido aceptado/a — firma tu contrato", it: "Sei stato accettato — firma il contratto", pt: "Foste aceite — assina o teu contrato", de: "Du bist angenommen — unterschreibe deinen Vertrag" },
-    body: {
-      fr: (d: string) => [`Bonne nouvelle : votre candidature est acceptée. Vous commencez le lundi ${d}.`, "La suite : 1) signez le contrat ci-dessous ; 2) vous recevez vos identifiants ; 3) vous chauffez le compte avant dimanche ; 4) premiers posts lundi."],
-      en: (d: string) => [`Good news: your application is accepted. You start on Monday ${d}.`, "What happens next: 1) sign the contract below; 2) you receive your logins; 3) you warm up the account before Sunday; 4) first posts on Monday."],
-      es: (d: string) => [`Buenas noticias: tu candidatura ha sido aceptada. Empiezas el lunes ${d}.`, "Lo siguiente: 1) firma el contrato abajo; 2) recibes tus accesos; 3) calientas la cuenta antes del domingo; 4) primeras publicaciones el lunes."],
-      it: (d: string) => [`Buone notizie: la tua candidatura è accettata. Inizi lunedì ${d}.`, "Prossimi passi: 1) firma il contratto qui sotto; 2) ricevi le credenziali; 3) scaldi l'account prima di domenica; 4) primi post lunedì."],
-      pt: (d: string) => [`Boas notícias: a tua candidatura foi aceite. Começas na segunda-feira ${d}.`, "A seguir: 1) assina o contrato abaixo; 2) recebes os teus acessos; 3) aqueces a conta antes de domingo; 4) primeiras publicações na segunda."],
-      de: (d: string) => [`Gute Nachricht: deine Bewerbung ist angenommen. Du startest am Montag, ${d}.`, "So geht es weiter: 1) unterschreibe unten den Vertrag; 2) du bekommst deine Zugangsdaten; 3) du wärmst den Account vor Sonntag auf; 4) erste Posts am Montag."],
+    start: { fr: (d: string) => `Bonne nouvelle : votre candidature est acceptée. Vous commencez le lundi ${d}.`, en: (d: string) => `Good news: your application is accepted. You start on Monday ${d}.`, es: (d: string) => `Buenas noticias: tu candidatura ha sido aceptada. Empiezas el lunes ${d}.`, it: (d: string) => `Buone notizie: la tua candidatura è accettata. Inizi lunedì ${d}.`, pt: (d: string) => `Boas notícias: a tua candidatura foi aceite. Começas na segunda-feira ${d}.`, de: (d: string) => `Gute Nachricht: deine Bewerbung ist angenommen. Du startest am Montag, ${d}.` },
+    howTitle: { fr: "Comment ça marche", en: "How it works", es: "Cómo funciona", it: "Come funziona", pt: "Como funciona", de: "So funktioniert es" },
+    how: {
+      fr: (amount: string) => ["Vous créez un compte TikTok sur votre téléphone, avec l'identité que nous vous donnons.", "Chaque jour, 7 jours sur 7, vous publiez les 2 slideshows préparés pour vous dans votre tableau de bord.", "Avant votre premier lundi, vous chauffez le compte : vous utilisez TikTok normalement, sans publier.", `Vous êtes payé·e chaque semaine : ${amount} USD par semaine.`, "Votre hiring manager vous suit sur Slack, où passent questions et retours."],
+      en: (amount: string) => ["You create a TikTok account on your phone, with the identity we give you.", "Every day, 7 days a week, you post the 2 slideshows prepared for you in your dashboard.", "Before your first Monday, you warm up the account: use TikTok normally, without posting.", `You are paid every week: ${amount} USD per week.`, "Your hiring manager follows you on Slack, where questions and feedback go."],
+      es: (amount: string) => ["Creas una cuenta de TikTok en tu teléfono, con la identidad que te damos.", "Cada día, 7 días a la semana, publicas los 2 slideshows preparados para ti en tu panel.", "Antes de tu primer lunes, calientas la cuenta: usas TikTok con normalidad, sin publicar.", `Cobras cada semana: ${amount} USD por semana.`, "Tu hiring manager te sigue en Slack, donde van las preguntas y los comentarios."],
+      it: (amount: string) => ["Crei un account TikTok sul tuo telefono, con l'identità che ti diamo noi.", "Ogni giorno, 7 giorni su 7, pubblichi i 2 slideshow preparati per te nella tua dashboard.", "Prima del tuo primo lunedì, scaldi l'account: usi TikTok normalmente, senza pubblicare.", `Vieni pagato ogni settimana: ${amount} USD a settimana.`, "Il tuo hiring manager ti segue su Slack, dove passano domande e feedback."],
+      pt: (amount: string) => ["Crias uma conta TikTok no teu telemóvel, com a identidade que te damos.", "Todos os dias, 7 dias por semana, publicas os 2 slideshows preparados para ti no teu painel.", "Antes da tua primeira segunda-feira, aqueces a conta: usas o TikTok normalmente, sem publicar.", `Recebes todas as semanas: ${amount} USD por semana.`, "O teu hiring manager acompanha-te no Slack, onde vão as perguntas e o feedback."],
+      de: (amount: string) => ["Du erstellst auf deinem Handy einen TikTok-Account mit der Identität, die wir dir geben.", "Jeden Tag, 7 Tage die Woche, postest du die 2 Slideshows, die in deinem Dashboard für dich vorbereitet sind.", "Vor deinem ersten Montag wärmst du den Account auf: Nutze TikTok ganz normal, ohne zu posten.", `Du wirst jede Woche bezahlt: ${amount} USD pro Woche.`, "Dein Hiring Manager begleitet dich auf Slack, wo Fragen und Feedback laufen."],
     },
+    guide: { fr: "Lisez le Poster Guide avant de signer :", en: "Read the Poster Guide before you sign:", es: "Lee la Guía del poster antes de firmar:", it: "Leggi la Guida del poster prima di firmare:", pt: "Lê o Guia do poster antes de assinares:", de: "Lies den Poster-Guide, bevor du unterschreibst:" },
     button: { fr: "Signer le contrat", en: "Sign the contract", es: "Firmar el contrato", it: "Firma il contratto", pt: "Assinar o contrato", de: "Vertrag unterschreiben" },
   },
   rejected: {
@@ -58,12 +61,23 @@ const T = {
   logins: {
     subject: { fr: "Vos identifiants Sophia OS", en: "Your Sophia OS logins", es: "Tus accesos a Sophia OS", it: "Le tue credenziali Sophia OS", pt: "Os teus acessos ao Sophia OS", de: "Deine Sophia-OS-Zugangsdaten" },
     lines: {
-      fr: ["Votre compte est prêt.", "Identifiant", "Mot de passe temporaire (à changer à la première connexion)", "Rejoindre Slack", "Guide du posteur", "Début", "Règle de chauffe : utilisez le compte normalement chaque jour jusqu'à dimanche (regarder, liker, suivre), sans publier. Premiers posts lundi."],
-      en: ["Your account is ready.", "Login", "Temporary password (change it at first login)", "Join Slack", "Poster Guide", "Start", "Warm-up rule: use the account normally every day until Sunday (watch, like, follow) without posting. First posts on Monday."],
-      es: ["Tu cuenta está lista.", "Usuario", "Contraseña temporal (cámbiala al primer acceso)", "Unirse a Slack", "Guía del poster", "Inicio", "Regla de calentamiento: usa la cuenta con normalidad cada día hasta el domingo (ver, dar like, seguir) sin publicar. Primeras publicaciones el lunes."],
-      it: ["Il tuo account è pronto.", "Login", "Password temporanea (da cambiare al primo accesso)", "Entra su Slack", "Guida del poster", "Inizio", "Regola di riscaldamento: usa l'account normalmente ogni giorno fino a domenica (guarda, metti like, segui) senza pubblicare. Primi post lunedì."],
-      pt: ["A tua conta está pronta.", "Login", "Palavra-passe temporária (muda-a no primeiro acesso)", "Entrar no Slack", "Guia do poster", "Início", "Regra de aquecimento: usa a conta normalmente todos os dias até domingo (ver, gostar, seguir) sem publicar. Primeiras publicações na segunda."],
-      de: ["Dein Account ist bereit.", "Login", "Temporäres Passwort (beim ersten Login ändern)", "Slack beitreten", "Poster-Guide", "Start", "Aufwärm-Regel: nutze den Account bis Sonntag jeden Tag normal (ansehen, liken, folgen), ohne zu posten. Erste Posts am Montag."],
+      fr: ["Votre compte est prêt.", "Identifiant", "Mot de passe", "Rejoindre Slack", "Début", "Connectez-vous à Sophia OS et appuyez tout de suite sur « Commencer ma chauffe ». Jusqu'à dimanche, utilisez le compte normalement chaque jour (regarder, liker, suivre), sans publier. Vos premiers posts arrivent lundi."],
+      en: ["Your account is ready.", "Login", "Password", "Join Slack", "Start", "Log in to Sophia OS and press \"Start my warm-up\" right away. Until Sunday, use the account normally every day (watch, like, follow) without posting. Your first posts arrive on Monday."],
+      es: ["Tu cuenta está lista.", "Usuario", "Contraseña", "Unirse a Slack", "Inicio", "Entra en Sophia OS y pulsa \"Empezar mi calentamiento\" enseguida. Hasta el domingo, usa la cuenta con normalidad cada día (ver, dar like, seguir) sin publicar. Tus primeras publicaciones llegan el lunes."],
+      it: ["Il tuo account è pronto.", "Login", "Password", "Entra su Slack", "Inizio", "Accedi a Sophia OS e premi subito \"Inizia il mio riscaldamento\". Fino a domenica, usa l'account normalmente ogni giorno (guarda, metti like, segui) senza pubblicare. I tuoi primi post arrivano lunedì."],
+      pt: ["A tua conta está pronta.", "Login", "Palavra-passe", "Entrar no Slack", "Início", "Entra no Sophia OS e carrega já em \"Começar o meu aquecimento\". Até domingo, usa a conta normalmente todos os dias (ver, gostar, seguir) sem publicar. As tuas primeiras publicações chegam na segunda."],
+      de: ["Dein Account ist bereit.", "Login", "Passwort", "Slack beitreten", "Start", "Melde dich bei Sophia OS an und drücke sofort \"Mein Aufwärmen starten\". Bis Sonntag nutzt du den Account jeden Tag ganz normal (ansehen, liken, folgen), ohne zu posten. Deine ersten Posts kommen am Montag."],
+    },
+  },
+  ruul: {
+    subject: { fr: "Comment vous êtes payé·e", en: "Getting paid", es: "Cómo cobras", it: "Come vieni pagato", pt: "Como recebes", de: "So wirst du bezahlt" },
+    body: {
+      fr: (email: string, d: string) => `Nous vous payons chaque semaine via Ruul (ruul.io), notre partenaire de paiement. Créez votre compte freelancer gratuit sur ruul.io avec exactement cette adresse email : ${email}. Ce doit être la même adresse, sinon nous ne pouvons pas vous payer. Complétez ensuite la vérification d'identité (pièce d'identité + selfie, environ 10 minutes) et ajoutez votre compte bancaire, avant le lundi ${d}.`,
+      en: (email: string, d: string) => `We pay you every week through Ruul (ruul.io), our payment partner. Create your free freelancer account on ruul.io with exactly this email address: ${email}. It must be the same address, otherwise we cannot pay you. Then complete the identity check (ID + selfie, about 10 minutes) and add your bank account, before Monday ${d}.`,
+      es: (email: string, d: string) => `Te pagamos cada semana a través de Ruul (ruul.io), nuestro socio de pagos. Crea tu cuenta gratuita de freelancer en ruul.io con exactamente esta dirección de email: ${email}. Debe ser la misma dirección, de lo contrario no podemos pagarte. Después completa la verificación de identidad (documento + selfie, unos 10 minutos) y añade tu cuenta bancaria, antes del lunes ${d}.`,
+      it: (email: string, d: string) => `Ti paghiamo ogni settimana tramite Ruul (ruul.io), il nostro partner di pagamento. Crea il tuo account freelancer gratuito su ruul.io con esattamente questo indirizzo email: ${email}. Deve essere lo stesso indirizzo, altrimenti non possiamo pagarti. Poi completa la verifica dell'identità (documento + selfie, circa 10 minuti) e aggiungi il tuo conto bancario, prima di lunedì ${d}.`,
+      pt: (email: string, d: string) => `Pagamos-te todas as semanas através da Ruul (ruul.io), o nosso parceiro de pagamentos. Cria a tua conta freelancer gratuita em ruul.io com exatamente este endereço de email: ${email}. Tem de ser o mesmo endereço, caso contrário não conseguimos pagar-te. Depois completa a verificação de identidade (documento + selfie, cerca de 10 minutos) e adiciona a tua conta bancária, antes de segunda-feira ${d}.`,
+      de: (email: string, d: string) => `Wir bezahlen dich jede Woche über Ruul (ruul.io), unseren Zahlungspartner. Erstelle dein kostenloses Freelancer-Konto auf ruul.io mit genau dieser E-Mail-Adresse: ${email}. Es muss dieselbe Adresse sein, sonst können wir dich nicht bezahlen. Schließe dann die Identitätsprüfung ab (Ausweis + Selfie, ca. 10 Minuten) und füge dein Bankkonto hinzu, vor Montag, ${d}.`,
     },
   },
   payout: {
@@ -90,16 +104,22 @@ export function formatMonday(d: string, lang: L) {
 
 export const posterEmails = {
   ack: (to: string, name: string, l: L) => send(to, name, T.ack.subject[l], [hi[l](first(name)), T.ack.body[l]]),
-  accepted: (to: string, name: string, l: L, monday: string, link: string) =>
-    send(to, name, T.accepted.subject[l], [hi[l](first(name)), ...T.accepted.body[l](formatMonday(monday, l))], { label: T.accepted.button[l], url: link }),
+  accepted: (to: string, name: string, l: L, monday: string, link: string, weeklyAmount: number | null, guideUrl: string | null) => {
+    const t = T.accepted;
+    const amount = weeklyAmount != null ? String(weeklyAmount) : "—";
+    const paragraphs = [hi[l](first(name)), t.start[l](formatMonday(monday, l)), `${t.howTitle[l]}:`, ...t.how[l](amount).map((b) => `• ${b}`), ...(guideUrl ? [`${t.guide[l]} ${guideUrl}`] : [])];
+    return send(to, name, t.subject[l], paragraphs, { label: t.button[l], url: link });
+  },
   rejected: (to: string, name: string, l: L, reason: string | null) =>
     send(to, name, T.rejected.subject[l], [hi[l](first(name)), T.rejected.body[l], ...(reason ? [`${T.rejected.reason[l]} ${reason}`] : [])]),
   expired: (to: string, name: string, l: L) => send(to, name, T.expired.subject[l], [hi[l](first(name)), T.expired.body[l]]),
-  logins: (to: string, name: string, l: L, o: { osUrl: string; login: string; password: string; slack: string | null; guide: string | null; monday: string }) => {
+  logins: (to: string, name: string, l: L, o: { osUrl: string; login: string; password: string; slack: string | null; monday: string }) => {
     const x = T.logins.lines[l];
-    return send(to, name, T.logins.subject[l], [hi[l](first(name)), x[0]!, x[6]!], { label: "Sophia OS", url: o.osUrl }, [
-      `${x[1]}: ${o.login}`, `${x[2]}: ${o.password}`, ...(o.slack ? [`${x[3]}: ${o.slack}`] : []), ...(o.guide ? [`${x[4]}: ${o.guide}`] : []), `${x[5]}: ${formatMonday(o.monday, l)}`,
+    return send(to, name, T.logins.subject[l], [hi[l](first(name)), x[0]!, x[5]!], { label: "Sophia OS", url: o.osUrl }, [
+      `${x[1]}: ${o.login}`, `${x[2]}: ${o.password}`, ...(o.slack ? [`${x[3]}: ${o.slack}`] : []), `${x[4]}: ${formatMonday(o.monday, l)}`,
     ]);
   },
+  ruul: (to: string, name: string, l: L, ruulEmail: string, monday: string) =>
+    send(to, name, T.ruul.subject[l], [hi[l](first(name)), T.ruul.body[l](ruulEmail, formatMonday(monday, l))]),
   payout: (to: string, name: string, l: L, link: string) => send(to, name, T.payout.subject[l], [hi[l](first(name)), T.payout.body[l]], { label: T.payout.button[l], url: link }),
 };

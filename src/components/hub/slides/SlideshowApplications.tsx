@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ZONE_BADGE } from "@/lib/slideshow-guide";
 import { APPLICANT_LANGS, countryCodeOf, langOfCountry, type ApplicantLang } from "@/config/countries";
-import { acceptPoster, keepWarm, rejectPoster, retryOs, sendPayoutLink, tickStep } from "@/lib/slideshows.functions";
+import { acceptPoster, keepWarm, markRuulAdded, osZones, rejectPoster, retryOs, saveRuulEmail, setPayoutChannel, tickStep } from "@/lib/slideshows.functions";
+import { RUUL_BLOCKED } from "@/lib/ruul";
 import { STATUS_LABEL, useOsStatus , OS_UI_ENABLED } from "./useOs";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -109,14 +110,16 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
 }
 
 const STEPS: [string, string, string | null][] = [
-  ["accepted", "Accepted", "accepted_at"], ["contract_signed", "Contract signed", "contract_signed_at"], ["os_created", "OS account created · by hand", "os_created_at"],
-  ["logins_sent", "Logins sent · by hand", null], ["slack_added", "Added to Slack · by hand", null], ["hm_notified", "Hiring manager notified", "hm_notified_at"], ["warmup", "Warm-up done", null], ["started", "Started Monday", "started_at"], ["dropped", "Dropped", "dropped_at"],
+  ["accepted", "Accepted", "accepted_at"], ["contract_signed", "Contract signed", "contract_signed_at"], ["os_created", "OS account created", "os_created_at"],
+  ["logins_sent", "Logins sent", null], ["slack_added", "Added to Slack · by hand", null], ["hm_notified", "Hiring manager notified", "hm_notified_at"], ["warmup", "Warm-up done", null], ["started", "Started Monday", "started_at"], ["dropped", "Dropped", "dropped_at"],
 ];
 
 export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<typeof scoreOf>; zones: { zone: string; weekly_amount: number | null; first_week_amount: number | null }[] }) {
   const qc = useQueryClient();
   const accept = useServerFn(acceptPoster); const reject = useServerFn(rejectPoster); const warm = useServerFn(keepWarm);
-  const tick = useServerFn(tickStep); const retry = useServerFn(retryOs); const payLink = useServerFn(sendPayoutLink);
+  const tick = useServerFn(tickStep); const retry = useServerFn(retryOs);
+  const setChannel = useServerFn(setPayoutChannel); const saveRuul = useServerFn(saveRuulEmail); const ruulAdded = useServerFn(markRuulAdded);
+  const { data: osZoneData } = useQuery({ queryKey: ["hub", "os-zones"], queryFn: () => osZones(), staleTime: 10 * 60_000, retry: false });
   const [mode, setMode] = useState<"none" | "accept" | "reject">("none");
   const [apps, setApps] = useState<string[]>(["sophia"]);
   const [zone, setZone] = useState<string>(a.zone ?? "");
@@ -132,6 +135,13 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
   const z = zones.find((x) => x.zone === zone);
   const tl = (a.timeline ?? {}) as unknown as Record<string, { at: string; by: string }>;
   const decided = !["pending", "pool"].includes(a.status);
+  // Accept gates: the OS zone must be open, and Ruul must be able to pay the country.
+  const iso = countryCodeOf(a.country);
+  const channel = (a as Record<string, unknown>)["payout_channel"] as string | null ?? (a.has_upwork ? "upwork" : "ruul");
+  const closedZone = osZoneData?.ok && iso ? osZoneData.fermes.find((f) => f.pays_code === iso) : undefined;
+  const zoneBlocked = Boolean(osZoneData?.ok && iso && !osZoneData.ouverts.some((o) => o.pays_code === iso));
+  const ruulBlocked = channel === "ruul" && Boolean(iso && RUUL_BLOCKED.includes(iso));
+  const acceptBlock = ruulBlocked ? "Country not supported by Ruul" : zoneBlocked ? (closedZone?.raison ? `Zone not in the OS yet — ${closedZone.raison}` : "Zone not in the OS yet") : null;
   return (
     <div className="space-y-4 bg-portal-bg/50 px-4 pb-4 pt-2" data-testid="poster-card">
       <div className="space-y-2 text-sm">
@@ -145,14 +155,20 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
         <p className="text-xs text-brand-navySoft"><b>Score {score.score}/5</b> · {score.checks.map(([l, ok]) => `${ok ? "✓" : "✗"} ${l}`).join(" · ")}</p>
         {a.start_monday ? <p><b>Start Monday</b> {fmt(a.start_monday)} · <b>Apps</b> {(a.applications ?? []).join(", ") || "—"}</p> : null}
         {a.manager_name ? <p><b>Hiring manager</b> {a.manager_name} {a.manager_email ? `· ${a.manager_email}` : ""}</p> : null}
-        {a.os_email ? <p><b>OS login</b> {a.os_email}</p> : null}
+        {a.os_email ? <p><b>OS login</b> {a.os_email}{(a as Record<string, unknown>)["os_langue"] ? ` · posting language ${String((a as Record<string, unknown>)["os_langue"]).toUpperCase()}` : ""}</p> : null}
         {a.rejected_reason ? <p><b>Reason</b> {a.rejected_reason}</p> : null}
+        <p className="flex flex-wrap items-center gap-2"><b>Paid via</b>
+          <select aria-label="Payout channel" className={sel} value={channel} disabled={busy} onChange={(e) => void run(() => setChannel({ data: { applicationId: a.id, channel: e.target.value as "upwork" | "ruul" } }), "Payout channel updated")}>
+            <option value="ruul">Ruul</option><option value="upwork">Upwork</option>
+          </select>
+          {channel === "ruul" ? <span className="text-xs text-brand-navySoft">Ruul: {(a as Record<string, unknown>)["ruul_added_at"] ? "added" : "to add"}</span> : <span className="text-xs text-brand-navySoft">paid on Upwork — nothing to do here</span>}
+        </p>
       </div>
       <div className="space-y-3">
         <ul className="space-y-1 border-t border-brand-line py-3 text-sm">
           {STEPS.map(([k, l, col]) => { const at = (col && ((a as unknown as Record<string, string | null>)[col])) || tl[k]?.at; return (
             <li key={k} className="flex items-center gap-2">
-              <input type="checkbox" aria-label={l} checked={Boolean(at)} disabled={busy || ["accepted", "contract_signed"].includes(k) || (["os_created", "logins_sent", "slack_added", "hm_notified", "warmup", "started"].includes(k) && !["contract_signed", "os_created", "started", "dropped"].includes(a.status))} onChange={(e) => void run(() => tick({ data: { applicationId: a.id, step: k as never, done: e.target.checked } }), "Updated")} />
+              <input type="checkbox" aria-label={l} checked={Boolean(at)} disabled={busy || ["accepted", "contract_signed", "logins_sent", "hm_notified"].includes(k) || (["os_created", "slack_added", "warmup", "started"].includes(k) && !["contract_signed", "os_created", "started", "dropped"].includes(a.status))} onChange={(e) => void run(() => tick({ data: { applicationId: a.id, step: k as never, done: e.target.checked } }), "Updated")} />
               <span className="flex-1">{l}{k === "started" && a.start_monday ? ` · ${fmt(a.start_monday)}` : ""}</span><span className="text-xs text-brand-navySoft">{at ? `${fmt(at)}${tl[k]?.by ? ` · ${tl[k]?.by}` : ""}` : ""}</span>
             </li>); })}
         </ul>
@@ -162,15 +178,30 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
             <Button size="sm" className="mt-2" disabled={busy} onClick={() => void run(() => retry({ data: { applicationId: a.id } }), "OS account created")}>Retry</Button>
           </div>
         ) : null}
-        {["os_created", "started"].includes(a.status) ? (
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span>{a.payout_method ? `Payout: ${a.payout_method}${a.payout_method === "stripe" && !a.stripe_onboarded ? " (setup not finished)" : ""}` : <b className="text-portal-amber">Payout method missing</b>}</span>
-            <Button size="sm" variant="outline" disabled={busy} onClick={() => void run(() => payLink({ data: { applicationId: a.id } }), "Payout link emailed")}>{a.payout_token ? "Resend payout link" : "Send payout link"}</Button>
+        {channel === "ruul" && ["contract_signed", "os_created", "started"].includes(a.status) ? (
+          <div className="space-y-2 rounded-xl border border-brand-line bg-card p-3 text-sm" data-testid="ruul-box">
+            <p className="font-bold text-brand-navy">Add to Ruul <span className="ml-1 rounded-full bg-portal-bg px-2 py-0.5 text-xs font-semibold">{(a as Record<string, unknown>)["ruul_added_at"] ? "added" : "to add"}</span></p>
+            <p className="text-xs text-brand-navySoft">Ruul sends no invitation: add the poster in Ruul's "New Contractor" form with these exact values. The poster then creates his Ruul account with the same email.</p>
+            {([["First name", a.full_name.trim().split(/\s+/)[0] ?? ""], ["Last name", a.full_name.trim().split(/\s+/).slice(1).join(" ")], ["Country", a.country]] as const).map(([l, v]) => (
+              <p key={l} className="flex items-center gap-2 text-xs"><b className="w-20">{l}</b><span className="flex-1 break-all">{v || "—"}</span><Button size="sm" variant="ghost" onClick={() => { void navigator.clipboard.writeText(v); toast.success("Copied"); }}>Copy</Button></p>
+            ))}
+            <p className="flex items-center gap-2 text-xs"><b className="w-20">Email</b>
+              <input aria-label="Ruul email" defaultValue={((a as Record<string, unknown>)["ruul_email"] as string | null) ?? a.email} onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== (((a as Record<string, unknown>)["ruul_email"] as string | null) ?? a.email)) void run(() => saveRuul({ data: { applicationId: a.id, email: v } }), "Ruul email saved"); }} className="h-8 min-w-0 flex-1 rounded border px-2" />
+              <Button size="sm" variant="ghost" onClick={(e) => { const input = (e.currentTarget.parentElement?.querySelector("input") as HTMLInputElement | null); void navigator.clipboard.writeText(input?.value ?? a.email); toast.success("Copied"); }}>Copy</Button>
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button size="sm" disabled={busy} onClick={() => void run(() => ruulAdded({ data: { applicationId: a.id } }), (a as Record<string, unknown>)["ruul_added_at"] ? "Ruul email re-sent" : "Marked as added in Ruul, email sent")}>{(a as Record<string, unknown>)["ruul_added_at"] ? "Resend the email" : "Added in Ruul"}</Button>
+              {(a as Record<string, unknown>)["ruul_added_at"] ? <span className="text-xs text-brand-navySoft">Added {fmt((a as Record<string, unknown>)["ruul_added_at"] as string)}</span> : null}
+            </div>
           </div>
         ) : null}
+        {channel === "upwork" && ["contract_signed", "os_created", "started"].includes(a.status) ? (
+          <p className="text-xs text-brand-navySoft">Paid on Upwork — no payment step on this site, and excluded from the weekly payouts below.</p>
+        ) : null}
         {!decided ? (
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" onClick={() => setMode(mode === "accept" ? "none" : "accept")}>Accept</Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="sm" disabled={Boolean(acceptBlock)} title={acceptBlock ?? undefined} onClick={() => setMode(mode === "accept" ? "none" : "accept")}>Accept</Button>
+            {acceptBlock ? <span className="text-xs font-semibold text-portal-amber">{acceptBlock}</span> : null}
             <Button size="sm" variant="outline" onClick={() => setMode(mode === "reject" ? "none" : "reject")}>Reject</Button>
             {a.status === "pending" ? <Button size="sm" variant="ghost" disabled={busy} onClick={() => void run(() => warm({ data: { applicationId: a.id } }), "Kept warm (no email)")}>Keep warm</Button> : null}
           </div>
@@ -185,7 +216,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
               {z ? <span className="text-xs">${Number(z.weekly_amount)}/week · first week ${Number(z.first_week_amount)}</span> : null}
             </div>
             {!a.zone ? <p className="text-xs text-portal-amber">This country is not open: picking a zone sets it by hand.</p> : null}
-            <p className="text-xs text-brand-navySoft">Only Confirm acceptance sends the contract email. After signing, account creation, logins, Slack and the start are handled by hand.</p>
+            <p className="text-xs text-brand-navySoft">Only Confirm acceptance sends the contract email. After signing, the OS account is created and the logins are emailed automatically; Slack is added by hand.</p>
             <Button size="sm" disabled={busy || !zone || !apps.length} onClick={() => void run(() => accept({ data: { applicationId: a.id, apps: apps as ("sophia" | "unswipe")[], zone: zone as "A", langue } }), "Accepted, email sent")}>Confirm acceptance</Button>
           </div>
         ) : null}

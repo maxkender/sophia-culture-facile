@@ -123,7 +123,7 @@ export function SlideshowSection({ section, id }: { section: string; id?: string
     case "posters": return <Posters />;
     case "managers": return <div className="space-y-6"><SlideshowAssign /><Team track="slideshow" /></div>;
     case "rates": return <PayZonesSettings />;
-    case "payouts": return <PaymentsOff />;
+    case "payouts": return <SlidesPayouts />;
     case "guide": return (
       <div className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
@@ -163,7 +163,7 @@ export function PaymentsOff() {
 }
 
 /* ---------------- Settings ---------------- */
-export const SETTINGS_TABS: [string, string][] = [["ugc-guidelines", "Shooting rules"], ["post-descriptions", "Post descriptions"], ["notion", "Notion"], ["email", "Emails & team"], ["apps", "Apps & codes"], ["security", "Security"]];
+export const SETTINGS_TABS: [string, string][] = [["ugc-guidelines", "Shooting rules"], ["post-descriptions", "Post descriptions"], ["notion", "Notion"], ["email", "Emails & team"], ["apps", "Apps & codes"], ["connections", "Connections"], ["security", "Security"]];
 
 const TRACKS = [["ugc", "UGC"], ["slideshow", "Slideshows"], ["influencer", "Influencers"]] as const;
 function Team({ track }: { track?: string } = {}) {

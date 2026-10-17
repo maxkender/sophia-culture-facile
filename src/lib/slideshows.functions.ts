@@ -70,22 +70,83 @@ export const acceptPoster = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const me = await assertAdmin(context);
     const a = await admin();
-    const { nextStartMonday, randomToken } = await import("./slideshows.server");
+    const { nextStartMonday, randomToken, getOsZones, RUUL_BLOCKED } = await import("./slideshows.server");
     const { posterEmails } = await import("./slideshow-emails.server");
+    const { countryCodeOf } = await import("@/config/countries");
     const { data: app } = await a.from("slideshow_applications").select("*").eq("id", data.applicationId).maybeSingle();
     if (!app) throw new Error("Application not found");
     if (!["pending", "pool"].includes(app.status)) throw new Error("This application was already decided.");
+    const code = countryCodeOf(app.country);
+    // Server-side gates: the OS zone must be open, and Ruul must be able to pay the country.
+    if (process.env["OS_HUB_SECRET"]) {
+      const z = await getOsZones(a);
+      if (z.ok) {
+        const closed = z.fermes.find((f) => f.pays_code === code);
+        if (code && !z.ouverts.some((o) => o.pays_code === code)) throw new Error(closed?.raison ? `Zone not in the OS yet — ${closed.raison}` : "Zone not in the OS yet (no HM for this country)");
+      }
+    }
+    const channel = app.has_upwork ? "upwork" : "ruul";
+    if (channel === "ruul" && code && RUUL_BLOCKED.includes(code)) throw new Error("Country not supported by Ruul");
     const monday = nextStartMonday();
     const token = randomToken();
     await a.from("slideshow_applications").update({
       status: "accepted", accepted_at: new Date().toISOString(), decided_at: new Date().toISOString(), decided_by: me.id,
-      applications: data.apps, langue: data.langue, start_monday: monday, signing_token: token, signing_token_created_at: new Date().toISOString(),
+      applications: data.apps, langue: data.langue, start_monday: monday, signing_token: token, signing_token_created_at: new Date().toISOString(), payout_channel: channel,
       ...(data.zone !== app.zone ? { zone: data.zone, zone_override: true, zone_note: `Set at acceptance by ${me.name}` } : {}),
     }).eq("id", app.id);
     await stamp(a, app.id, "accepted", me.name);
     const site = process.env["SITE_URL"] ?? "https://sophia-culture.com";
-    const sent = await posterEmails.accepted(app.email, app.full_name, data.langue, monday, `${site}/creators/sign/${token}`);
+    const { data: zr } = await a.from("pay_zones").select("weekly_amount").eq("zone", data.zone).maybeSingle();
+    const guideUrl = (await a.from("hub_settings").select("value").eq("key", "slideshow_poster_guide_url").maybeSingle()).data?.value ?? null;
+    const sent = await posterEmails.accepted(app.email, app.full_name, data.langue, monday, `${site}/creators/sign/${token}`, zr?.weekly_amount != null ? Number(zr.weekly_amount) : null, guideUrl);
     return { ok: true, startMonday: monday, emailed: sent.sent, reason: sent.reason ?? null };
+  });
+
+/** OS zones for the Accept button (cached 10 min server-side). */
+export const osZones = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    if (!process.env["OS_HUB_SECRET"]) return { ok: false as const, ouverts: [], fermes: [] };
+    const { getOsZones } = await import("./slideshows.server");
+    return getOsZones(await admin());
+  });
+
+/** Admin edits the payout channel (upwork | ruul) on the card. */
+export const setPayoutChannel = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ applicationId: id, channel: z.enum(["upwork", "ruul"]) }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    await (await admin()).from("slideshow_applications").update({ payout_channel: data.channel }).eq("id", data.applicationId);
+    return { ok: true };
+  });
+
+/** Admin edits the email used for the Ruul account. */
+export const saveRuulEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ applicationId: id, email: z.string().trim().email().max(200) }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    await (await admin()).from("slideshow_applications").update({ ruul_email: data.email.toLowerCase() }).eq("id", data.applicationId);
+    return { ok: true };
+  });
+
+/** "Added in Ruul" / "Resend": stamps ruul_added_at (first time) and emails the Ruul signup instructions. */
+export const markRuulAdded = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ applicationId: id }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const a = await admin();
+    const { posterEmails, pickLang } = await import("./slideshow-emails.server");
+    const { data: app } = await a.from("slideshow_applications").select("id, email, full_name, langue, start_monday, ruul_email, ruul_added_at, payout_channel").eq("id", data.applicationId).maybeSingle();
+    if (!app) throw new Error("Not found");
+    if ((app.payout_channel ?? "ruul") !== "ruul") throw new Error("This poster is paid on Upwork.");
+    const ruulEmail = app.ruul_email ?? app.email;
+    if (!app.ruul_added_at) await a.from("slideshow_applications").update({ ruul_added_at: new Date().toISOString() }).eq("id", app.id);
+    const sent = await posterEmails.ruul(app.email, app.full_name, pickLang(app.langue), ruulEmail, app.start_monday ?? new Date().toISOString().slice(0, 10));
+    return { ok: true, emailed: sent.sent };
   });
 
 export const rejectPoster = createServerFn({ method: "POST" })
@@ -165,7 +226,6 @@ export const buildWeekNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ lundi: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    await (await import("./payments-gate.server")).assertPaymentsOn();
     await assertAdmin(context);
     const { buildWeek } = await import("./slideshows.server");
     return buildWeek(await admin(), data.lundi);
@@ -176,7 +236,6 @@ export const approveWeek = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ lundi: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).parse(d))
   .handler(async ({ data, context }) => {
-    await (await import("./payments-gate.server")).assertPaymentsOn();
     const me = await assertAdmin(context);
     const a = await admin();
     const { MIN_PAYOUT } = await import("./slideshows.server");
@@ -217,11 +276,10 @@ export const payWeekStripe = createServerFn({ method: "POST" })
 
 export const markWeekPaid = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ ids: z.array(id).min(1) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ ids: z.array(id).min(1), ruulRef: z.string().trim().max(120).optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    await (await import("./payments-gate.server")).assertPaymentsOn();
     await assertAdmin(context);
-    await (await admin()).from("slideshow_payouts").update({ status: "paid", paid_at: new Date().toISOString() }).in("id", data.ids).eq("status", "approved");
+    await (await admin()).from("slideshow_payouts").update({ status: "paid", paid_at: new Date().toISOString(), ...(data.ruulRef ? { ruul_ref: data.ruulRef } : {}) }).in("id", data.ids).eq("status", "approved");
     return { ok: true };
   });
 

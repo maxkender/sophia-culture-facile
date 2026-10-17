@@ -11,7 +11,7 @@ export async function osBaseUrl(admin: Admin): Promise<string> {
 }
 
 export function osConfigured(): boolean {
-  return false;
+  return Boolean(process.env["OS_HUB_SECRET"]);
 }
 
 /** POST {base}/functions/v1/hub-posteurs with 3 tries and backoff; every call is logged in os_calls. */

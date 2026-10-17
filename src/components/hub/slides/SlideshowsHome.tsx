@@ -20,6 +20,8 @@ export function SlideshowsHome() {
   const next = new Date(week); next.setUTCDate(next.getUTCDate() + 7);
   const nextMonday = next.toISOString().slice(0, 10);
   const { data: payouts = 0 } = useQuery({ queryKey: ["hub", "slides", "payouts-to-approve"], queryFn: async () => (await supabase.from("slideshow_payouts").select("id", { count: "exact", head: true }).eq("status", "draft")).count ?? 0 });
+  const { data: ruulToAdd = 0 } = useQuery({ queryKey: ["hub", "slides", "ruul-to-add"], queryFn: async () => (await (supabase.from("slideshow_applications") as any).select("id", { count: "exact", head: true }).eq("payout_channel", "ruul").is("ruul_added_at", null).in("status", ["contract_signed", "os_created", "started"])).count ?? 0 });
+  const { data: slackUrl } = useQuery({ queryKey: ["hub", "setting", "slideshow_slack_invite_url"], queryFn: async () => (await supabase.from("hub_settings").select("value").eq("key", "slideshow_slack_invite_url").maybeSingle()).data?.value ?? null });
   const notOpen = apps.filter((a) => a.status === "pending" && !a.zone).length;
   const tiles: [string, number, string][] = [
     ["Pending applications", n("pending"), "/hub/slideshows/applications"],
@@ -27,10 +29,12 @@ export function SlideshowsHome() {
     ["Starting next Monday", apps.filter((a) => a.start_monday === nextMonday && ["accepted", "contract_signed", "os_created"].includes(a.status)).length, "/hub/slideshows/posters"],
     ["Posters started", n("started"), "/hub/slideshows/posters"],
     ["Payouts to approve", payouts, "/hub/slideshows/payouts"],
+    ["To add in Ruul", ruulToAdd, "/hub/slideshows/applications"],
   ];
   const byZone = ["A", "B", "C"].map((z) => [z, apps.filter((a) => a.zone === z && a.status === "pending").length] as const);
   return (
     <div className="space-y-5">
+      {!slackUrl ? <p className="rounded-2xl border border-portal-amber/40 bg-portal-amber/10 p-3 text-sm font-semibold text-portal-amber">The Slack invite link (slideshow_slack_invite_url) is empty — new posters get no Slack link in their logins email. Fill it in Slideshows → Guide & templates.</p> : null}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         {tiles.map(([l, v, to]) => (
           <Link key={l} to={to as never} className={cn(card, "block hover:ring-2 hover:ring-space-slides/30")}>
