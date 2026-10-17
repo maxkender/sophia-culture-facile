@@ -32,6 +32,34 @@ export function randomToken(bytes = 24) {
   return Array.from(crypto.getRandomValues(new Uint8Array(bytes)), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+/** Countries Ruul cannot pay (ISO codes). Kept in one place; checked on Accept, client and server side. */
+export const RUUL_BLOCKED = ["AF", "BY", "BW", "BI", "CF", "CU", "CD", "ER", "EE", "GW", "IR", "IQ", "CI", "KZ", "LB", "LY", "MM", "KP", "RU", "SO", "SS", "SD", "SY", "VE", "YE", "ZW"];
+
+/** OS refusal codes → plain words for the poster card. */
+export function osErrorInWords(error: string, langue?: string | null): string {
+  if (error.includes("zone_non_ouverte")) return "Zone not in the OS yet (no HM for this country)";
+  if (error.includes("langue_non_geree")) return `The HM for this country does not handle ${langue ?? "this language"} yet`;
+  if (error.includes("creation_en_cours")) return "Creation in progress, retry in 5 minutes";
+  return error;
+}
+
+/** OS `zones` action, cached 10 minutes in hub_settings. */
+export async function getOsZones(admin: Admin): Promise<{ ok: boolean; ouverts: { pays_code: string }[]; fermes: { pays_code: string; raison?: string }[]; error?: string }> {
+  const { data: cached } = await admin.from("hub_settings").select("value, updated_at").eq("key", "os_zones_cache").maybeSingle();
+  if (cached?.value && cached.updated_at && Date.now() - new Date(cached.updated_at).getTime() < 10 * 60_000) {
+    try { const p = JSON.parse(cached.value); return { ok: true, ouverts: p.ouverts ?? [], fermes: p.fermes ?? [] }; } catch { /* refetch */ }
+  }
+  const r = await callOs<{ ouverts: { pays_code: string }[]; fermes: { pays_code: string; raison?: string }[] }>(admin, "zones", {});
+  if (!r.ok) return { ok: false, ouverts: [], fermes: [], error: r.error };
+  await admin.from("hub_settings").upsert({ key: "os_zones_cache", value: JSON.stringify({ ouverts: r.ouverts ?? [], fermes: r.fermes ?? [] }), updated_at: new Date().toISOString() });
+  return { ok: true, ouverts: r.ouverts ?? [], fermes: r.fermes ?? [] };
+}
+
+async function tick(admin: Admin, appId: string, key: string, by: string) {
+  const { data } = await admin.from("slideshow_applications").select("timeline").eq("id", appId).maybeSingle();
+  await admin.from("slideshow_applications").update({ timeline: { ...(data?.timeline ?? {}), [key]: { at: new Date().toISOString(), by } } }).eq("id", appId);
+}
+
 /** Called once the contract is signed (and from Retry). Never emails the poster unless the OS call succeeded. */
 export async function createPosterInOs(admin: Admin, applicationId: string) {
   const { data: a } = await admin.from("slideshow_applications").select("*").eq("id", applicationId).maybeSingle();
@@ -39,34 +67,41 @@ export async function createPosterInOs(admin: Admin, applicationId: string) {
   if (!["contract_signed", "os_created"].includes(a.status)) return { ok: false, error: "The contract is not signed yet." };
   const [prenom, ...rest] = String(a.full_name).trim().split(/\s+/);
   const code = countryCodeOf(a.country);
-  const r = await callOs<{ profile_id: string; email_os: string; password: string; manager: { id: string; prenom: string; nom: string; email: string } | null; existed: boolean }>(admin, "creer_posteur", {
+  const r = await callOs<{ profile_id: string; email_os: string; password: string | null; langue?: string | null; manager: { id: string; prenom: string; nom: string; email: string } | null; existed: boolean; deja_connecte?: boolean }>(admin, "creer_posteur", {
     hub_id: a.id, prenom, nom: rest.join(" "), email_perso: a.email, telephone: a.phone, pays_code: code, pays_nom: a.country,
     langue: a.langue ?? "en", zone_paiement: a.zone, applications: a.applications ?? [], deux_telephones: Boolean(a.deux_telephones), source: "site", start_monday: a.start_monday,
   });
   if (!r.ok) {
-    await admin.from("slideshow_applications").update({ os_error: r.error }).eq("id", a.id);
-    return { ok: false, error: r.error };
+    const friendly = osErrorInWords(r.error, a.langue);
+    await admin.from("slideshow_applications").update({ os_error: friendly }).eq("id", a.id);
+    return { ok: false, error: friendly };
   }
   const managerName = r.manager ? `${r.manager.prenom} ${r.manager.nom}`.trim() : null;
   await admin.from("slideshow_applications").update({
     status: "os_created", os_created_at: new Date().toISOString(), os_profile_id: r.profile_id, os_email: r.email_os, os_error: null,
-    manager_name: managerName, manager_email: r.manager?.email ?? null,
+    os_langue: r.langue ?? null, manager_name: managerName, manager_email: r.manager?.email ?? null,
   }).eq("id", a.id);
-  if (!r.existed || !a.os_created_at) {
+  await tick(admin, a.id, "os_created", "Sophia OS");
+  // The OS returns password: null when the poster already existed and already logged in — no logins email then.
+  if (typeof r.password === "string" && r.password) {
     const l = pickLang(a.langue);
     await posterEmails.logins(a.email, a.full_name, l, {
       osUrl: (await setting(admin, "os_app_url")) ?? "https://sophia-marketing-orga.vercel.app",
-      login: r.email_os, password: r.password, slack: await setting(admin, "slideshow_slack_invite_url"), guide: await setting(admin, "slideshow_poster_guide_url"), monday: a.start_monday,
+      login: r.email_os, password: r.password, slack: await setting(admin, "slideshow_slack_invite_url"), monday: a.start_monday,
     });
-    await notifyManager(admin, { name: a.full_name, country: a.country, monday: a.start_monday, managerEmail: r.manager?.email ?? null });
+    await tick(admin, a.id, "logins_sent", "Sophia OS");
+  }
+  if (!r.existed || !a.os_created_at) {
+    await notifyManager(admin, { name: a.full_name, country: a.country, monday: a.start_monday, managerEmail: r.manager?.email ?? null, upwork: a.has_upwork ? (a.upwork_profile_url || "link not given") : null });
     await admin.from("slideshow_applications").update({ hm_notified_at: new Date().toISOString() }).eq("id", a.id);
+    await tick(admin, a.id, "hm_notified", "Sophia OS");
   }
   return { ok: true };
 }
 
-async function notifyManager(admin: Admin, o: { name: string; country: string; monday: string; managerEmail: string | null }) {
+async function notifyManager(admin: Admin, o: { name: string; country: string; monday: string; managerEmail: string | null; upwork?: string | null }) {
   const date = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${o.monday}T12:00:00Z`));
-  const text = `New poster from the site in your zone: ${o.name}, ${o.country}, starts Monday ${date}. Logins sent. Add them to your zone channel.`;
+  const text = `New poster from the site in your zone: ${o.name}, ${o.country}, starts Monday ${date}. Logins sent. Add them to your zone channel.${o.upwork ? ` Has Upwork: ${o.upwork} — send them the Upwork offer.` : ""}`;
   const hook = process.env["SLACK_WEBHOOK_URL"];
   if (hook) {
     const res = await fetch(hook, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) }).catch(() => null);
