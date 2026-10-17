@@ -6017,7 +6017,7 @@ export type Database = {
           guide_opened_at: string | null
           guide_token: string | null
           guide_zone_shown: string | null
-          has_upwork: boolean
+          has_upwork: boolean | null
           hm_notified_at: string | null
           id: string
           is_adult: boolean
@@ -6084,7 +6084,7 @@ export type Database = {
           guide_opened_at?: string | null
           guide_token?: string | null
           guide_zone_shown?: string | null
-          has_upwork?: boolean
+          has_upwork?: boolean | null
           hm_notified_at?: string | null
           id?: string
           is_adult: boolean
@@ -6151,7 +6151,7 @@ export type Database = {
           guide_opened_at?: string | null
           guide_token?: string | null
           guide_zone_shown?: string | null
-          has_upwork?: boolean
+          has_upwork?: boolean | null
           hm_notified_at?: string | null
           id?: string
           is_adult?: boolean
