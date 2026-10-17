@@ -123,7 +123,7 @@ const slideSchema = z.object({
   referral_source: z.string().trim().max(1000).optional(),
   consent: z.literal(true),
   app: z.string().regex(/^[a-z0-9-]{2,40}$/).optional(),
-  deux_telephones: z.boolean(),
+  deux_telephones: z.boolean().optional(),
   langue: z.enum(["fr", "en", "es", "it", "pt", "de"]),
   q_country_now: z.string().trim().max(120).optional(), // optional screening question
   q_hours_per_day: z.string().trim().max(120).optional(), // retired question; old answers stay stored
@@ -150,7 +150,7 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
       upwork_profile_url: data.has_upwork ? data.upwork_profile_url || null : null,
       referral_source: data.referral_source || null,
       submit_ip_hash: hash,
-      deux_telephones: data.deux_telephones,
+      deux_telephones: data.deux_telephones ?? null,
       langue: data.langue,
       q_country_now: data.q_country_now || null,
       q_hours_per_day: data.q_hours_per_day || null,
