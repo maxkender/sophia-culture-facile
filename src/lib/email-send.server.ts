@@ -43,6 +43,7 @@ export function buildEmailHtml(options: {
   buttonLabel?: string;
   buttonUrl?: string;
   extraLink?: { label: string; url: string };
+  postParagraphs?: string[];
   linkSection?: { text: string; url: string; linkLabel: string };
   section?: EmailSection;
 }): string {
@@ -56,6 +57,7 @@ export function buildEmailHtml(options: {
   const extraLink = options.extraLink
     ? `<p style="margin:0 0 16px;"><a href="${escapeAttribute(options.extraLink.url)}" style="color:#1f3a5f;font-weight:600;">${escapeHtml(options.extraLink.label)}</a></p>`
     : "";
+  const postParagraphs = (options.postParagraphs ?? []).map((p) => `<p style="margin:0 0 16px;">${escapeHtml(p)}</p>`).join("");
   const button = buttonLabel && buttonUrl
     ? `<p style="margin:24px 0;"><a href="${escapeAttribute(buttonUrl)}" style="display:inline-block;background:#1f3a5f;color:#ffffff;text-decoration:none;font-weight:600;padding:12px 24px;border-radius:8px;">${escapeHtml(buttonLabel)}</a></p><p style="margin:0;font-size:13px;color:#555555;word-break:break-all;">${escapeHtml(buttonUrl)}</p>`
     : "";
