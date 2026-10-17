@@ -139,12 +139,10 @@ export const markRuulAdded = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const a = await admin();
-    const { posterEmails, pickLang } = await import("./slideshow-emails.server");
-    const { data: app } = await a.from("slideshow_applications").select("id, email, full_name, langue, start_monday, ruul_email, ruul_added_at, payout_channel").eq("id", data.applicationId).maybeSingle();
+    const { data: app } = await a.from("slideshow_applications").select("id, ruul_added_at").eq("id", data.applicationId).maybeSingle();
     if (!app) throw new Error("Not found");
-    const ruulEmail = app.ruul_email ?? app.email;
+    // Records only; the Ruul instructions go in the logins email.
     if (!app.ruul_added_at) await a.from("slideshow_applications").update({ ruul_added_at: new Date().toISOString() }).eq("id", app.id);
-    void posterEmails; void pickLang; void ruulEmail; // Ruul instructions now go in the logins email.
     return { ok: true };
   });
 
