@@ -22,8 +22,7 @@ export function SlideshowApplyPage() {
   const privacyPath = useLocalePath("privacy");
   const { common, slideshow: copy } = CREATOR_FORMS[lang];
   const submitFn = useServerFn(submitSlideshowApplication);
-  const [f, setF] = useState({ full_name: "", email: "", phone: "", country: "", referral: "", upwork_url: "", q_country_now: "", q_tiktok: "", q_previous: "" });
-  const [phone2, setPhone2] = useState<"" | "yes" | "no">("");
+  const [f, setF] = useState({ full_name: "", email: "", country: "", referral: "", upwork_url: "" });
   const [langue, setLangue] = useState<ApplicantLang | null>(null);
   const autoLang: ApplicantLang = f.country ? langOfCountry(f.country) : lang;
   const [adult, setAdult] = useState<"" | "yes" | "no">("");
@@ -39,7 +38,7 @@ export function SlideshowApplyPage() {
     e.preventDefault();
     setError(null);
     if (adult === "no") return;
-    if (!f.full_name.trim() || !f.email.trim() || !f.country || !adult || !upwork || !phone2) {
+    if (!f.full_name.trim() || !f.email.trim() || !f.country || !adult || !upwork) {
       setError(common.requiredError);
       return;
     }
@@ -62,18 +61,13 @@ export function SlideshowApplyPage() {
           website: honey,
           full_name: f.full_name,
           email: f.email,
-          phone: f.phone,
           country: f.country,
           is_adult: true,
           has_upwork: upwork === "yes",
           upwork_profile_url: upwork === "yes" ? f.upwork_url : "",
           referral_source: f.referral,
           consent: true,
-          deux_telephones: phone2 === "yes",
           langue: langue ?? autoLang,
-          q_country_now: f.q_country_now,
-          q_tiktok_daily: f.q_tiktok,
-          q_previous_content: f.q_previous,
         },
       });
       if (!res.ok) {
@@ -117,11 +111,6 @@ export function SlideshowApplyPage() {
             <p id="email-help" className="text-xs text-brand-navySoft">{lang === "fr" ? "Exemple : nom@exemple.com" : "Example: name@example.com"}</p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">{common.phone} <span className="font-normal text-brand-navySoft">{lang === "fr" ? "(facultatif)" : "(optional)"}</span></Label>
-            <Input id="phone" type="tel" className="h-11" placeholder="+33 6 12 34 56 78" autoComplete="tel" aria-describedby="phone-help" value={f.phone} onChange={(e) => set("phone", e.target.value)} />
-            <p id="phone-help" className="text-xs text-brand-navySoft">{lang === "fr" ? "Incluez l’indicatif du pays, par exemple +33." : "Include the country code, for example +44."}</p>
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="country">{common.country}</Label>
             <CountrySelect id="country" value={f.country} onChange={(v) => set("country", v)} lang={lang} labels={{ select: common.selectCountry, search: common.searchCountry, empty: common.noCountry }} />
           </div>
@@ -142,10 +131,6 @@ export function SlideshowApplyPage() {
             ) : null}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone2">{copy.secondPhone}</Label>
-            <YesNo id="phone2" value={phone2} onChange={setPhone2} yes={common.yes} no={common.no} />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="langue">{copy.language}</Label>
             <select id="langue" value={langue ?? autoLang} onChange={(e) => setLangue(e.target.value as ApplicantLang)} className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm">
               {APPLICANT_LANGS.map((l) => <option key={l} value={l}>{LANG_NAMES[l]}</option>)}
@@ -154,20 +139,6 @@ export function SlideshowApplyPage() {
           <div className="space-y-2">
             <Label htmlFor="referral">{copy.referral}</Label>
             <Textarea id="referral" rows={2} value={f.referral} onChange={(e) => set("referral", e.target.value)} />
-          </div>
-        </FormSection>
-        <FormSection title={copy.screening}>
-          <div className="space-y-2">
-            <Label htmlFor="q1">{copy.qCountryNow}</Label>
-            <Input id="q1" className="h-11" value={f.q_country_now} onChange={(e) => set("q_country_now", e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="q3">{copy.qTiktok}</Label>
-            <Input id="q3" className="h-11" value={f.q_tiktok} onChange={(e) => set("q_tiktok", e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="q4">{copy.qPrevious}</Label>
-            <Textarea id="q4" rows={3} value={f.q_previous} onChange={(e) => set("q_previous", e.target.value)} />
           </div>
         </FormSection>
         <FormSection title={common.consent}>
