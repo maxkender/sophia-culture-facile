@@ -22,11 +22,10 @@ export function SlideshowApplyPage() {
   const privacyPath = useLocalePath("privacy");
   const { common, slideshow: copy } = CREATOR_FORMS[lang];
   const submitFn = useServerFn(submitSlideshowApplication);
-  const [f, setF] = useState({ full_name: "", email: "", country: "", referral: "", upwork_url: "" });
+  const [f, setF] = useState({ full_name: "", email: "", country: "", referral: "" });
   const [langue, setLangue] = useState<ApplicantLang | null>(null);
   const autoLang: ApplicantLang = f.country ? langOfCountry(f.country) : lang;
   const [adult, setAdult] = useState<"" | "yes" | "no">("");
-  const [upwork, setUpwork] = useState<"" | "yes" | "no">("");
   const [consent, setConsent] = useState(false);
   const [honey, setHoney] = useState("");
   const [busy, setBusy] = useState(false);
@@ -38,16 +37,12 @@ export function SlideshowApplyPage() {
     e.preventDefault();
     setError(null);
     if (adult === "no") return;
-    if (!f.full_name.trim() || !f.email.trim() || !f.country || !adult || !upwork) {
+    if (!f.full_name.trim() || !f.email.trim() || !f.country || !adult) {
       setError(common.requiredError);
       return;
     }
     if (!isValidEmail(f.email)) {
       setError(common.emailError);
-      return;
-    }
-    if (upwork === "yes" && f.upwork_url.trim() && !isHttpUrl(f.upwork_url)) {
-      setError(lang === "fr" ? "Saisissez un lien Upwork complet commençant par https://." : "Enter a complete Upwork link beginning with https://.");
       return;
     }
     if (!consent) {
@@ -63,8 +58,6 @@ export function SlideshowApplyPage() {
           email: f.email,
           country: f.country,
           is_adult: true,
-          has_upwork: upwork === "yes",
-          upwork_profile_url: upwork === "yes" ? f.upwork_url : "",
           referral_source: f.referral,
           consent: true,
           langue: langue ?? autoLang,
@@ -121,13 +114,6 @@ export function SlideshowApplyPage() {
               <p role="alert" className="text-sm font-semibold text-portal-red">
                 {copy.underage}
               </p>
-            ) : null}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="upwork">{copy.upwork}</Label>
-            <YesNo id="upwork" value={upwork} onChange={setUpwork} yes={common.yes} no={common.no} />
-            {upwork === "yes" ? (
-              <Input type="url" className="h-11" aria-label={copy.upworkLink} placeholder={copy.upworkLink} value={f.upwork_url} onChange={(e) => set("upwork_url", e.target.value)} />
             ) : null}
           </div>
           <div className="space-y-2">
