@@ -58,8 +58,8 @@ describe("signature persists the start before OS creation (mocked only)", () => 
     fake.app = { id: "poster", status: "accepted", start_monday: "2026-10-26", timeline: {} };
     fake.writes = [];
     fake.os.mockReset().mockImplementation(async () => {
-      expect(fake.app.start_monday).toBe(expected);
-      expect(fake.app.status).toBe("contract_signed");
+      expect(fake.app["start_monday"]).toBe(expected);
+      expect(fake.app["status"]).toBe("contract_signed");
     });
     await signWithToken({ data: { token: "test-token-no-real-contract", signedName: "Test Poster", documentVersion: "1" } });
     expect(fake.writes).toHaveLength(1);

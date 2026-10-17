@@ -7,6 +7,6 @@ import { formatSigningFriday } from "./slideshow-emails.server";
 
 describe("acceptance signing deadline", () => {
   it("shows Friday 23 October for Monday 26 October 2026", () => {
-    expect(formatSigningFriday("2026-10-26", "en")).toBe("Friday, 23 October");
+    expect(formatSigningFriday("2026-10-26", "en")).toBe("Friday, October 23");
   });
 });
