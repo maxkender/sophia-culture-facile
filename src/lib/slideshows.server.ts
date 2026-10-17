@@ -32,8 +32,8 @@ export function randomToken(bytes = 24) {
   return Array.from(crypto.getRandomValues(new Uint8Array(bytes)), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-/** Countries Ruul cannot pay (ISO codes). Kept in one place; checked on Accept, client and server side. */
-export const RUUL_BLOCKED = ["AF", "BY", "BW", "BI", "CF", "CU", "CD", "ER", "EE", "GW", "IR", "IQ", "CI", "KZ", "LB", "LY", "MM", "KP", "RU", "SO", "SS", "SD", "SY", "VE", "YE", "ZW"];
+import { RUUL_BLOCKED } from "./ruul";
+export { RUUL_BLOCKED };
 
 /** OS refusal codes → plain words for the poster card. */
 export function osErrorInWords(error: string, langue?: string | null): string {
