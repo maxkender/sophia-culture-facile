@@ -15,6 +15,11 @@ export function nextStartMonday(now = new Date()): string {
   while (d.getUTCDay() !== 1) d.setUTCDate(d.getUTCDate() + 1);
   return day(d);
 }
+/** Signing can defer the accepted Monday, but must never bring it forward. */
+export function startMondayAtSignature(stored: string | null, now = new Date()): string {
+  const next = nextStartMonday(now);
+  return stored && stored > next ? stored : next;
+}
 /** Monday of the week containing `d` (UTC). */
 export function mondayOf(d = new Date()): string {
   const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
