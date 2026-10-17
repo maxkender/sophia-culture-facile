@@ -85,8 +85,8 @@ export const acceptPoster = createServerFn({ method: "POST" })
         if (code && !z.ouverts.some((o) => o.pays_code === code)) throw new Error(closed?.raison ? `Zone not in the OS yet — ${closed.raison}` : "Zone not in the OS yet (no HM for this country)");
       }
     }
-    const channel = app.has_upwork ? "upwork" : "ruul";
-    if (channel === "ruul" && code && RUUL_BLOCKED.includes(code)) throw new Error("Country not supported by Ruul");
+    const channel = "ruul";
+    if (code && RUUL_BLOCKED.includes(code)) throw new Error("Country not supported by Ruul");
     const monday = nextStartMonday();
     const token = randomToken();
     await a.from("slideshow_applications").update({
@@ -142,7 +142,6 @@ export const markRuulAdded = createServerFn({ method: "POST" })
     const { posterEmails, pickLang } = await import("./slideshow-emails.server");
     const { data: app } = await a.from("slideshow_applications").select("id, email, full_name, langue, start_monday, ruul_email, ruul_added_at, payout_channel").eq("id", data.applicationId).maybeSingle();
     if (!app) throw new Error("Not found");
-    if ((app.payout_channel ?? "ruul") !== "ruul") throw new Error("This poster is paid on Upwork.");
     const ruulEmail = app.ruul_email ?? app.email;
     if (!app.ruul_added_at) await a.from("slideshow_applications").update({ ruul_added_at: new Date().toISOString() }).eq("id", app.id);
     const sent = await posterEmails.ruul(app.email, app.full_name, pickLang(app.langue), ruulEmail, app.start_monday ?? new Date().toISOString().slice(0, 10));

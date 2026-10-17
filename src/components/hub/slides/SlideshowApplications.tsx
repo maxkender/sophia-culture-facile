@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ZONE_BADGE } from "@/lib/slideshow-guide";
 import { APPLICANT_LANGS, countryCodeOf, langOfCountry, type ApplicantLang } from "@/config/countries";
-import { acceptPoster, keepWarm, markRuulAdded, osZones, rejectPoster, retryOs, saveRuulEmail, setPayoutChannel, tickStep } from "@/lib/slideshows.functions";
+import { acceptPoster, keepWarm, markRuulAdded, osZones, rejectPoster, retryOs, saveRuulEmail, tickStep } from "@/lib/slideshows.functions";
 import { RUUL_BLOCKED } from "@/lib/ruul";
 import { STATUS_LABEL, useOsStatus , OS_UI_ENABLED } from "./useOs";
 
@@ -118,7 +118,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
   const qc = useQueryClient();
   const accept = useServerFn(acceptPoster); const reject = useServerFn(rejectPoster); const warm = useServerFn(keepWarm);
   const tick = useServerFn(tickStep); const retry = useServerFn(retryOs);
-  const setChannel = useServerFn(setPayoutChannel); const saveRuul = useServerFn(saveRuulEmail); const ruulAdded = useServerFn(markRuulAdded);
+  const saveRuul = useServerFn(saveRuulEmail); const ruulAdded = useServerFn(markRuulAdded);
   const { data: osZoneData } = useQuery({ queryKey: ["hub", "os-zones"], queryFn: () => osZones(), staleTime: 10 * 60_000, retry: false });
   const [mode, setMode] = useState<"none" | "accept" | "reject">("none");
   const [apps, setApps] = useState<string[]>(["sophia"]);
@@ -137,10 +137,10 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
   const decided = !["pending", "pool"].includes(a.status);
   // Accept gates: the OS zone must be open, and Ruul must be able to pay the country.
   const iso = countryCodeOf(a.country);
-  const channel = (a as Record<string, unknown>)["payout_channel"] as string | null ?? (a.has_upwork ? "upwork" : "ruul");
+
   const closedZone = osZoneData?.ok && iso ? osZoneData.fermes.find((f) => f.pays_code === iso) : undefined;
   const zoneBlocked = Boolean(osZoneData?.ok && iso && !osZoneData.ouverts.some((o) => o.pays_code === iso));
-  const ruulBlocked = channel === "ruul" && Boolean(iso && RUUL_BLOCKED.includes(iso));
+  const ruulBlocked = Boolean(iso && RUUL_BLOCKED.includes(iso));
   const acceptBlock = ruulBlocked ? "Country not supported by Ruul" : zoneBlocked ? (closedZone?.raison ? `Zone not in the OS yet — ${closedZone.raison}` : "Zone not in the OS yet") : null;
   return (
     <div className="space-y-4 bg-portal-bg/50 px-4 pb-4 pt-2" data-testid="poster-card">
@@ -157,12 +157,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
         {a.manager_name ? <p><b>Hiring manager</b> {a.manager_name} {a.manager_email ? `· ${a.manager_email}` : ""}</p> : null}
         {a.os_email ? <p><b>OS login</b> {a.os_email}{(a as Record<string, unknown>)["os_langue"] ? ` · posting language ${String((a as Record<string, unknown>)["os_langue"]).toUpperCase()}` : ""}</p> : null}
         {a.rejected_reason ? <p><b>Reason</b> {a.rejected_reason}</p> : null}
-        <p className="flex flex-wrap items-center gap-2"><b>Paid via</b>
-          <select aria-label="Payout channel" className={sel} value={channel} disabled={busy} onChange={(e) => void run(() => setChannel({ data: { applicationId: a.id, channel: e.target.value as "upwork" | "ruul" } }), "Payout channel updated")}>
-            <option value="ruul">Ruul</option><option value="upwork">Upwork</option>
-          </select>
-          {channel === "ruul" ? <span className="text-xs text-brand-navySoft">Ruul: {(a as Record<string, unknown>)["ruul_added_at"] ? "added" : "to add"}</span> : <span className="text-xs text-brand-navySoft">paid on Upwork — nothing to do here</span>}
-        </p>
+        <p className="text-xs text-brand-navySoft"><b>Paid via</b> Ruul · {(a as Record<string, unknown>)["ruul_added_at"] ? "added" : "to add"}</p>
       </div>
       <div className="space-y-3">
         <ul className="space-y-1 border-t border-brand-line py-3 text-sm">
@@ -178,7 +173,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
             <Button size="sm" className="mt-2" disabled={busy} onClick={() => void run(() => retry({ data: { applicationId: a.id } }), "OS account created")}>Retry</Button>
           </div>
         ) : null}
-        {channel === "ruul" && ["contract_signed", "os_created", "started"].includes(a.status) ? (
+        {["contract_signed", "os_created", "started"].includes(a.status) ? (
           <div className="space-y-2 rounded-xl border border-brand-line bg-card p-3 text-sm" data-testid="ruul-box">
             <p className="font-bold text-brand-navy">Add to Ruul <span className="ml-1 rounded-full bg-portal-bg px-2 py-0.5 text-xs font-semibold">{(a as Record<string, unknown>)["ruul_added_at"] ? "added" : "to add"}</span></p>
             <p className="text-xs text-brand-navySoft">Ruul sends no invitation: add the poster in Ruul's "New Contractor" form with these exact values. The poster then creates his Ruul account with the same email.</p>
@@ -194,9 +189,6 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
               {(a as Record<string, unknown>)["ruul_added_at"] ? <span className="text-xs text-brand-navySoft">Added {fmt((a as Record<string, unknown>)["ruul_added_at"] as string)}</span> : null}
             </div>
           </div>
-        ) : null}
-        {channel === "upwork" && ["contract_signed", "os_created", "started"].includes(a.status) ? (
-          <p className="text-xs text-brand-navySoft">Paid on Upwork — no payment step on this site, and excluded from the weekly payouts below.</p>
         ) : null}
         {!decided ? (
           <div className="flex flex-wrap items-center gap-2">
