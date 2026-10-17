@@ -110,14 +110,14 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
 }
 
 const STEPS: [string, string, string | null][] = [
-  ["accepted", "Accepted", "accepted_at"], ["contract_signed", "Contract signed", "contract_signed_at"], ["os_created", "OS account created · by hand", "os_created_at"],
-  ["logins_sent", "Logins sent · by hand", null], ["slack_added", "Added to Slack · by hand", null], ["hm_notified", "Hiring manager notified", "hm_notified_at"], ["warmup", "Warm-up done", null], ["started", "Started Monday", "started_at"], ["dropped", "Dropped", "dropped_at"],
+  ["accepted", "Accepted", "accepted_at"], ["contract_signed", "Contract signed", "contract_signed_at"], ["os_created", "OS account created", "os_created_at"],
+  ["logins_sent", "Logins sent", null], ["slack_added", "Added to Slack · by hand", null], ["hm_notified", "Hiring manager notified", "hm_notified_at"], ["warmup", "Warm-up done", null], ["started", "Started Monday", "started_at"], ["dropped", "Dropped", "dropped_at"],
 ];
 
 export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<typeof scoreOf>; zones: { zone: string; weekly_amount: number | null; first_week_amount: number | null }[] }) {
   const qc = useQueryClient();
   const accept = useServerFn(acceptPoster); const reject = useServerFn(rejectPoster); const warm = useServerFn(keepWarm);
-  const tick = useServerFn(tickStep); const retry = useServerFn(retryOs); const payLink = useServerFn(sendPayoutLink);
+  const tick = useServerFn(tickStep); const retry = useServerFn(retryOs);
   const setChannel = useServerFn(setPayoutChannel); const saveRuul = useServerFn(saveRuulEmail); const ruulAdded = useServerFn(markRuulAdded);
   const { data: osZoneData } = useQuery({ queryKey: ["hub", "os-zones"], queryFn: () => osZones(), staleTime: 10 * 60_000, retry: false });
   const [mode, setMode] = useState<"none" | "accept" | "reject">("none");
