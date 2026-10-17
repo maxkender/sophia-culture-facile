@@ -20,7 +20,7 @@ export function SlideshowsHome() {
   const next = new Date(week); next.setUTCDate(next.getUTCDate() + 7);
   const nextMonday = next.toISOString().slice(0, 10);
   const { data: payouts = 0 } = useQuery({ queryKey: ["hub", "slides", "payouts-to-approve"], queryFn: async () => (await supabase.from("slideshow_payouts").select("id", { count: "exact", head: true }).eq("status", "draft")).count ?? 0 });
-  const { data: ruulToAdd = 0 } = useQuery({ queryKey: ["hub", "slides", "ruul-to-add"], queryFn: async () => (await supabase.from("slideshow_applications").select("id", { count: "exact", head: true }).eq("payout_channel", "ruul").is("ruul_added_at", null).in("status", ["contract_signed", "os_created", "started"])).count ?? 0 });
+  const { data: ruulToAdd = 0 } = useQuery({ queryKey: ["hub", "slides", "ruul-to-add"], queryFn: async () => (await (supabase.from("slideshow_applications") as any).select("id", { count: "exact", head: true }).eq("payout_channel", "ruul").is("ruul_added_at", null).in("status", ["contract_signed", "os_created", "started"])).count ?? 0 });
   const { data: slackUrl } = useQuery({ queryKey: ["hub", "setting", "slideshow_slack_invite_url"], queryFn: async () => (await supabase.from("hub_settings").select("value").eq("key", "slideshow_slack_invite_url").maybeSingle()).data?.value ?? null });
   const notOpen = apps.filter((a) => a.status === "pending" && !a.zone).length;
   const tiles: [string, number, string][] = [

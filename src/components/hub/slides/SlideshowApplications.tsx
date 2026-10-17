@@ -137,7 +137,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
   const decided = !["pending", "pool"].includes(a.status);
   // Accept gates: the OS zone must be open, and Ruul must be able to pay the country.
   const iso = countryCodeOf(a.country);
-  const channel = (a as Record<string, unknown>).payout_channel as string | null ?? (a.has_upwork ? "upwork" : "ruul");
+  const channel = (a as Record<string, unknown>)["payout_channel"] as string | null ?? (a.has_upwork ? "upwork" : "ruul");
   const closedZone = osZoneData?.ok && iso ? osZoneData.fermes.find((f) => f.pays_code === iso) : undefined;
   const zoneBlocked = Boolean(osZoneData?.ok && iso && !osZoneData.ouverts.some((o) => o.pays_code === iso));
   const ruulBlocked = channel === "ruul" && Boolean(iso && RUUL_BLOCKED.includes(iso));
@@ -155,13 +155,13 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
         <p className="text-xs text-brand-navySoft"><b>Score {score.score}/5</b> · {score.checks.map(([l, ok]) => `${ok ? "✓" : "✗"} ${l}`).join(" · ")}</p>
         {a.start_monday ? <p><b>Start Monday</b> {fmt(a.start_monday)} · <b>Apps</b> {(a.applications ?? []).join(", ") || "—"}</p> : null}
         {a.manager_name ? <p><b>Hiring manager</b> {a.manager_name} {a.manager_email ? `· ${a.manager_email}` : ""}</p> : null}
-        {a.os_email ? <p><b>OS login</b> {a.os_email}{(a as Record<string, unknown>).os_langue ? ` · posting language ${String((a as Record<string, unknown>).os_langue).toUpperCase()}` : ""}</p> : null}
+        {a.os_email ? <p><b>OS login</b> {a.os_email}{(a as Record<string, unknown>)["os_langue"] ? ` · posting language ${String((a as Record<string, unknown>)["os_langue"]).toUpperCase()}` : ""}</p> : null}
         {a.rejected_reason ? <p><b>Reason</b> {a.rejected_reason}</p> : null}
         <p className="flex flex-wrap items-center gap-2"><b>Paid via</b>
           <select aria-label="Payout channel" className={sel} value={channel} disabled={busy} onChange={(e) => void run(() => setChannel({ data: { applicationId: a.id, channel: e.target.value as "upwork" | "ruul" } }), "Payout channel updated")}>
             <option value="ruul">Ruul</option><option value="upwork">Upwork</option>
           </select>
-          {channel === "ruul" ? <span className="text-xs text-brand-navySoft">Ruul: {(a as Record<string, unknown>).ruul_added_at ? "added" : "to add"}</span> : <span className="text-xs text-brand-navySoft">paid on Upwork — nothing to do here</span>}
+          {channel === "ruul" ? <span className="text-xs text-brand-navySoft">Ruul: {(a as Record<string, unknown>)["ruul_added_at"] ? "added" : "to add"}</span> : <span className="text-xs text-brand-navySoft">paid on Upwork — nothing to do here</span>}
         </p>
       </div>
       <div className="space-y-3">
@@ -180,18 +180,18 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
         ) : null}
         {channel === "ruul" && ["contract_signed", "os_created", "started"].includes(a.status) ? (
           <div className="space-y-2 rounded-xl border border-brand-line bg-card p-3 text-sm" data-testid="ruul-box">
-            <p className="font-bold text-brand-navy">Add to Ruul <span className="ml-1 rounded-full bg-portal-bg px-2 py-0.5 text-xs font-semibold">{(a as Record<string, unknown>).ruul_added_at ? "added" : "to add"}</span></p>
+            <p className="font-bold text-brand-navy">Add to Ruul <span className="ml-1 rounded-full bg-portal-bg px-2 py-0.5 text-xs font-semibold">{(a as Record<string, unknown>)["ruul_added_at"] ? "added" : "to add"}</span></p>
             <p className="text-xs text-brand-navySoft">Ruul sends no invitation: add the poster in Ruul's "New Contractor" form with these exact values. The poster then creates his Ruul account with the same email.</p>
             {([["First name", a.full_name.trim().split(/\s+/)[0] ?? ""], ["Last name", a.full_name.trim().split(/\s+/).slice(1).join(" ")], ["Country", a.country]] as const).map(([l, v]) => (
               <p key={l} className="flex items-center gap-2 text-xs"><b className="w-20">{l}</b><span className="flex-1 break-all">{v || "—"}</span><Button size="sm" variant="ghost" onClick={() => { void navigator.clipboard.writeText(v); toast.success("Copied"); }}>Copy</Button></p>
             ))}
             <p className="flex items-center gap-2 text-xs"><b className="w-20">Email</b>
-              <input aria-label="Ruul email" defaultValue={((a as Record<string, unknown>).ruul_email as string | null) ?? a.email} onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== (((a as Record<string, unknown>).ruul_email as string | null) ?? a.email)) void run(() => saveRuul({ data: { applicationId: a.id, email: v } }), "Ruul email saved"); }} className="h-8 min-w-0 flex-1 rounded border px-2" />
+              <input aria-label="Ruul email" defaultValue={((a as Record<string, unknown>)["ruul_email"] as string | null) ?? a.email} onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== (((a as Record<string, unknown>)["ruul_email"] as string | null) ?? a.email)) void run(() => saveRuul({ data: { applicationId: a.id, email: v } }), "Ruul email saved"); }} className="h-8 min-w-0 flex-1 rounded border px-2" />
               <Button size="sm" variant="ghost" onClick={(e) => { const input = (e.currentTarget.parentElement?.querySelector("input") as HTMLInputElement | null); void navigator.clipboard.writeText(input?.value ?? a.email); toast.success("Copied"); }}>Copy</Button>
             </p>
             <div className="flex flex-wrap items-center gap-2">
-              <Button size="sm" disabled={busy} onClick={() => void run(() => ruulAdded({ data: { applicationId: a.id } }), (a as Record<string, unknown>).ruul_added_at ? "Ruul email re-sent" : "Marked as added in Ruul, email sent")}>{(a as Record<string, unknown>).ruul_added_at ? "Resend the email" : "Added in Ruul"}</Button>
-              {(a as Record<string, unknown>).ruul_added_at ? <span className="text-xs text-brand-navySoft">Added {fmt((a as Record<string, unknown>).ruul_added_at as string)}</span> : null}
+              <Button size="sm" disabled={busy} onClick={() => void run(() => ruulAdded({ data: { applicationId: a.id } }), (a as Record<string, unknown>)["ruul_added_at"] ? "Ruul email re-sent" : "Marked as added in Ruul, email sent")}>{(a as Record<string, unknown>)["ruul_added_at"] ? "Resend the email" : "Added in Ruul"}</Button>
+              {(a as Record<string, unknown>)["ruul_added_at"] ? <span className="text-xs text-brand-navySoft">Added {fmt((a as Record<string, unknown>)["ruul_added_at"] as string)}</span> : null}
             </div>
           </div>
         ) : null}
