@@ -199,8 +199,9 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
           <p className="text-xs text-brand-navySoft">Paid on Upwork — no payment step on this site, and excluded from the weekly payouts below.</p>
         ) : null}
         {!decided ? (
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" onClick={() => setMode(mode === "accept" ? "none" : "accept")}>Accept</Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="sm" disabled={Boolean(acceptBlock)} title={acceptBlock ?? undefined} onClick={() => setMode(mode === "accept" ? "none" : "accept")}>Accept</Button>
+            {acceptBlock ? <span className="text-xs font-semibold text-portal-amber">{acceptBlock}</span> : null}
             <Button size="sm" variant="outline" onClick={() => setMode(mode === "reject" ? "none" : "reject")}>Reject</Button>
             {a.status === "pending" ? <Button size="sm" variant="ghost" disabled={busy} onClick={() => void run(() => warm({ data: { applicationId: a.id } }), "Kept warm (no email)")}>Keep warm</Button> : null}
           </div>
@@ -215,7 +216,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
               {z ? <span className="text-xs">${Number(z.weekly_amount)}/week · first week ${Number(z.first_week_amount)}</span> : null}
             </div>
             {!a.zone ? <p className="text-xs text-portal-amber">This country is not open: picking a zone sets it by hand.</p> : null}
-            <p className="text-xs text-brand-navySoft">Only Confirm acceptance sends the contract email. After signing, account creation, logins, Slack and the start are handled by hand.</p>
+            <p className="text-xs text-brand-navySoft">Only Confirm acceptance sends the contract email. After signing, the OS account is created and the logins are emailed automatically; Slack is added by hand.</p>
             <Button size="sm" disabled={busy || !zone || !apps.length} onClick={() => void run(() => accept({ data: { applicationId: a.id, apps: apps as ("sophia" | "unswipe")[], zone: zone as "A", langue } }), "Accepted, email sent")}>Confirm acceptance</Button>
           </div>
         ) : null}
