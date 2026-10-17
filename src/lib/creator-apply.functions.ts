@@ -118,7 +118,7 @@ const slideSchema = z.object({
   phone: z.string().trim().max(40).optional(), // optional, any format accepted
   country: z.string().trim().min(2).max(80),
   is_adult: z.literal(true),
-  has_upwork: z.boolean(),
+  has_upwork: z.boolean().optional(),
   upwork_profile_url: optUrl,
   referral_source: z.string().trim().max(1000).optional(),
   consent: z.literal(true),
@@ -146,7 +146,7 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
       phone: data.phone || null,
       country: data.country,
       is_adult: true,
-      has_upwork: data.has_upwork,
+      has_upwork: data.has_upwork ?? null,
       upwork_profile_url: data.has_upwork ? data.upwork_profile_url || null : null,
       referral_source: data.referral_source || null,
       submit_ip_hash: hash,
