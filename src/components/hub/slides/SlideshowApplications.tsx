@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ZONE_BADGE } from "@/lib/slideshow-guide";
 import { APPLICANT_LANGS, countryCodeOf, langOfCountry, type ApplicantLang } from "@/config/countries";
-import { acceptPoster, keepWarm, markRuulAdded, osZones, rejectPoster, retryOs, saveRuulEmail, sendPayoutLink, setPayoutChannel, tickStep } from "@/lib/slideshows.functions";
+import { acceptPoster, keepWarm, markRuulAdded, osZones, rejectPoster, retryOs, saveRuulEmail, setPayoutChannel, tickStep } from "@/lib/slideshows.functions";
 import { RUUL_BLOCKED } from "@/lib/ruul";
 import { STATUS_LABEL, useOsStatus , OS_UI_ENABLED } from "./useOs";
 
