@@ -12,6 +12,6 @@
 - [ ] Full FR/EN string sweep of every creator page/email
 - [ ] Stripe end-to-end loop — waits on STRIPE_WEBHOOK_SECRET + webhook endpoint, and test vs live mode decision
 - [ ] Phone QA FR/EN signed in — waits on test-account sign-in approval
-- [ ] Slideshow form: remove Upwork question (has_upwork nullable)
-- [ ] Slideshow acknowledgement email depends on country open/closed/OS unreachable
-- [ ] Ruul cohort: logins email Getting paid + #ruul-cohort, Added in Ruul records only, notify owner/Slack, card "Cohort"
+- [x] Slideshow form: remove Upwork question (has_upwork nullable)
+- [x] Slideshow acknowledgement email depends on country open/closed/OS unreachable
+- [x] Ruul cohort: logins email Getting paid + #ruul-cohort, Added in Ruul records only, notify owner/Slack, card "Cohort"
