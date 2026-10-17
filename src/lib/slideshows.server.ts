@@ -139,15 +139,16 @@ export async function refreshSnapshots(admin: Admin) {
 
 export const MIN_PAYOUT = 20;
 
-/** Explicit admin action: prepare editable weekly rows, using cached counts when available; never call the OS. */
+/** Explicit admin action: prepare editable weekly rows, using cached counts when available; never call the OS. Ruul posters only — Upwork posters are paid on Upwork. */
 export async function buildWeek(admin: Admin, lundi = addDays(mondayOf(), -7)) {
   const [{ data: posters }, { data: zones }] = await Promise.all([
-    admin.from("slideshow_applications").select("id, zone, start_monday, os_profile_id").eq("status", "started"),
+    admin.from("slideshow_applications").select("id, zone, start_monday, os_profile_id, payout_channel").eq("status", "started"),
     admin.from("pay_zones").select("zone, weekly_amount"),
   ]);
   const rate: Record<string, number> = Object.fromEntries((zones ?? []).map((z: any) => [z.zone, Number(z.weekly_amount ?? 0)]));
   let built = 0, skipped = 0;
   for (const p of posters ?? []) {
+    if ((p.payout_channel ?? "ruul") !== "ruul") continue; // Upwork posters are paid on Upwork, never here.
     const { data: existing } = await admin.from("slideshow_payouts").select("id, status").eq("application_id", p.id).eq("week_start", lundi).maybeSingle();
     if (p.start_monday && p.start_monday > lundi) continue;
     if (existing) continue;
@@ -158,7 +159,8 @@ export async function buildWeek(admin: Admin, lundi = addDays(mondayOf(), -7)) {
     const base = rate[p.zone] ?? 0;
     const row: Record<string, unknown> = { application_id: p.id, week_start: lundi, zone: p.zone, rate: base, first_week: first };
     const missed = Number(snap?.manques ?? 0);
-    const suggested = Math.max(0, base + (first ? 1 : 0) - Math.max(0, missed - 1));
+    // Owner decision 17/10: pay does NOT depend on missed posts. Counts stay on the row for information only.
+    const suggested = Math.max(0, base + (first ? 1 : 0));
     Object.assign(row, { status: "draft", skip_reason: null, prevus: snap?.prevus ?? null, publies: snap?.publies ?? null, manques: snap ? missed : null, suggested, amount: suggested, carried_in: carriedIn, ...(!snap ? { note: "Manual week — confirm attendance and adjust amount before approval" } : {}) });
     built++;
     await admin.from("slideshow_payouts").upsert(row, { onConflict: "application_id,week_start" });
