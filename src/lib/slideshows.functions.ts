@@ -102,6 +102,20 @@ export const acceptPoster = createServerFn({ method: "POST" })
     return { ok: true, startMonday: monday, emailed: sent.sent, reason: sent.reason ?? null };
   });
 
+/** Legal names typed by posters in the Sophia OS onboarding (Ruul checks them against the ID). */
+export const osIdentities = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ hubIds: z.array(id).max(500) }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    if (!data.hubIds.length || !process.env["OS_HUB_SECRET"]) return { rows: [] as { hub_id: string; prenom_legal: string; nom_legal: string }[] };
+    const { callOs } = await import("./os-bridge.server");
+    const r = await callOs<{ rows?: { hub_id: string; prenom_legal: string | null; nom_legal: string | null }[] }>(await admin(), "identites", { hub_ids: data.hubIds });
+    // "action inconnue" (OS not updated yet) or any failure: everyone stays waiting for the legal name.
+    if (!r.ok) return { rows: [] };
+    return { rows: (r.rows ?? []).filter((x) => x.prenom_legal && x.nom_legal).map((x) => ({ hub_id: x.hub_id, prenom_legal: String(x.prenom_legal), nom_legal: String(x.nom_legal) })) };
+  });
+
 /** OS zones for the Accept button (cached 10 min server-side). */
 export const osZones = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
