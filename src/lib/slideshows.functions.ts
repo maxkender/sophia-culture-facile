@@ -226,7 +226,6 @@ export const buildWeekNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ lundi: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    await (await import("./payments-gate.server")).assertPaymentsOn();
     await assertAdmin(context);
     const { buildWeek } = await import("./slideshows.server");
     return buildWeek(await admin(), data.lundi);
@@ -278,11 +277,10 @@ export const payWeekStripe = createServerFn({ method: "POST" })
 
 export const markWeekPaid = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ ids: z.array(id).min(1) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ ids: z.array(id).min(1), ruulRef: z.string().trim().max(120).optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    await (await import("./payments-gate.server")).assertPaymentsOn();
     await assertAdmin(context);
-    await (await admin()).from("slideshow_payouts").update({ status: "paid", paid_at: new Date().toISOString() }).in("id", data.ids).eq("status", "approved");
+    await (await admin()).from("slideshow_payouts").update({ status: "paid", paid_at: new Date().toISOString(), ...(data.ruulRef ? { ruul_ref: data.ruulRef } : {}) }).in("id", data.ids).eq("status", "approved");
     return { ok: true };
   });
 
