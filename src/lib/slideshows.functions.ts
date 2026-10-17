@@ -144,8 +144,8 @@ export const markRuulAdded = createServerFn({ method: "POST" })
     if (!app) throw new Error("Not found");
     const ruulEmail = app.ruul_email ?? app.email;
     if (!app.ruul_added_at) await a.from("slideshow_applications").update({ ruul_added_at: new Date().toISOString() }).eq("id", app.id);
-    const sent = await posterEmails.ruul(app.email, app.full_name, pickLang(app.langue), ruulEmail, app.start_monday ?? new Date().toISOString().slice(0, 10));
-    return { ok: true, emailed: sent.sent };
+    void posterEmails; void pickLang; void ruulEmail; // Ruul instructions now go in the logins email.
+    return { ok: true };
   });
 
 export const rejectPoster = createServerFn({ method: "POST" })

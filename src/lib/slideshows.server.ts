@@ -87,27 +87,28 @@ export async function createPosterInOs(admin: Admin, applicationId: string) {
     const l = pickLang(a.langue);
     await posterEmails.logins(a.email, a.full_name, l, {
       osUrl: (await setting(admin, "os_app_url")) ?? "https://sophia-marketing-orga.vercel.app",
-      login: r.email_os, password: r.password, slack: await setting(admin, "slideshow_slack_invite_url"), monday: a.start_monday,
+      login: r.email_os, password: r.password, slack: await setting(admin, "slideshow_slack_invite_url"), monday: a.start_monday, ruulEmail: a.ruul_email || a.email,
     });
     await tick(admin, a.id, "logins_sent", "Sophia OS");
   }
   if (!r.existed || !a.os_created_at) {
-    await notifyManager(admin, { name: a.full_name, country: a.country, monday: a.start_monday, managerEmail: r.manager?.email ?? null });
+    await notifyManager(admin, { name: a.full_name, country: a.country, monday: a.start_monday, managerEmail: null });
     await admin.from("slideshow_applications").update({ hm_notified_at: new Date().toISOString() }).eq("id", a.id);
     await tick(admin, a.id, "hm_notified", "Sophia OS");
   }
   return { ok: true };
 }
 
-async function notifyManager(admin: Admin, o: { name: string; country: string; monday: string; managerEmail: string | null; upwork?: string | null }) {
+/** Site posters have no hiring manager (OS "RUUL cohort" profile has no mailbox): Slack webhook, else email the owner. */
+async function notifyManager(admin: Admin, o: { name: string; country: string; monday: string; managerEmail?: string | null }) {
   const date = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${o.monday}T12:00:00Z`));
-  const text = `New poster from the site in your zone: ${o.name}, ${o.country}, starts Monday ${date}. Logins sent. Add them to your zone channel.`;
+  const text = `New Ruul poster: ${o.name}, ${o.country}, starts Monday ${date}. Add them in Ruul and to #ruul-cohort.`;
   const hook = process.env["SLACK_WEBHOOK_URL"];
   if (hook) {
     const res = await fetch(hook, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) }).catch(() => null);
     if (res?.ok) return;
   }
-  if (o.managerEmail) await sendBrevoEmail({ to: o.managerEmail, subject: `New poster: ${o.name}`, html: `<p>${text}</p>`, text });
+  await sendBrevoEmail({ to: "maximilien@vikstudios.com", subject: `New Ruul poster: ${o.name}`, html: `<p>${text}</p>`, text });
   void admin;
 }
 

@@ -164,7 +164,15 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
     // The one automatic email: an acknowledgement in the applicant's language. Nothing else is sent by itself.
     try {
       const { posterEmails } = await import("./slideshow-emails.server");
-      const r = await posterEmails.ack(email, data.full_name, data.langue);
+      let kind: "open" | "closed" | "neutral" = "neutral";
+      try {
+        const { getOsZones } = await import("./slideshows.server");
+        const { RUUL_BLOCKED } = await import("./ruul");
+        const { countryCodeOf } = await import("@/config/countries");
+        const z = process.env["OS_HUB_SECRET"] ? await getOsZones(supabaseAdmin) : { ok: false, ouverts: [] as { pays_code: string }[] };
+        if (z.ok) { const code = countryCodeOf(data.country); kind = code && z.ouverts.some((o) => o.pays_code === code) && !RUUL_BLOCKED.includes(code) ? "open" : "closed"; }
+      } catch { kind = "neutral"; }
+      const r = await posterEmails.ack(email, data.full_name, data.langue, kind);
       if (r.sent) await supabaseAdmin.from("slideshow_applications").update({ ack_sent_at: new Date().toISOString() }).eq("id", inserted.id);
     } catch { /* the application is saved either way */ }
     return { ok: true as const };

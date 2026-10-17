@@ -23,6 +23,38 @@ const T = {
       de: "Danke! Wir öffnen Plätze Land für Land, Woche für Woche. Wenn dein Land öffnet, schreiben wir dir hier.",
     },
   },
+  ackOpen: {
+    fr: "Merci ! Votre candidature est bien reçue. Votre pays est ouvert : nous l'étudions et revenons vers vous ici très vite.",
+    en: "Thanks! Your application is in. Your country is open: we're reviewing it and will get back to you here shortly.",
+    es: "¡Gracias! Hemos recibido tu candidatura. Tu país está abierto: la estamos revisando y te responderemos aquí muy pronto.",
+    it: "Grazie! La tua candidatura è arrivata. Il tuo paese è aperto: la stiamo esaminando e ti risponderemo qui a breve.",
+    pt: "Obrigado! A tua candidatura foi recebida. O teu país está aberto: estamos a analisá-la e respondemos-te aqui em breve.",
+    de: "Danke! Deine Bewerbung ist angekommen. Dein Land ist offen: Wir prüfen sie und melden uns hier in Kürze bei dir.",
+  },
+  ackNeutral: {
+    fr: "Merci ! Votre candidature est bien reçue. Nous étudions chaque candidature et revenons vers vous ici.",
+    en: "Thanks! Your application is in. We review every application and will get back to you here.",
+    es: "¡Gracias! Hemos recibido tu candidatura. Revisamos cada candidatura y te responderemos aquí.",
+    it: "Grazie! La tua candidatura è arrivata. Esaminiamo ogni candidatura e ti risponderemo qui.",
+    pt: "Obrigado! A tua candidatura foi recebida. Analisamos cada candidatura e respondemos-te aqui.",
+    de: "Danke! Deine Bewerbung ist angekommen. Wir prüfen jede Bewerbung und melden uns hier bei dir.",
+  },
+  pay: {
+    fr: (e: string, d: string) => `Nous vous payons chaque semaine via Ruul (ruul.io), notre partenaire de paiement. Avant le lundi ${d} : créez votre compte freelancer gratuit sur ruul.io avec exactement cette adresse email : ${e}. Complétez ensuite la vérification d'identité (pièce d'identité + selfie, environ 10 minutes) et ajoutez votre compte bancaire. Rien à envoyer : vous êtes payé·e chaque lundi pour la semaine précédente.`,
+    en: (e: string, d: string) => `We pay you every week through Ruul (ruul.io), our payment partner. Before Monday ${d}: create your free freelancer account on ruul.io with exactly this email address: ${e}. Then complete the identity check (ID + selfie, about 10 minutes) and add your bank account. Nothing to submit: you are paid every Monday for the week before.`,
+    es: (e: string, d: string) => `Te pagamos cada semana a través de Ruul (ruul.io), nuestro socio de pagos. Antes del lunes ${d}: crea tu cuenta gratuita de freelancer en ruul.io con exactamente esta dirección de email: ${e}. Después completa la verificación de identidad (documento + selfie, unos 10 minutos) y añade tu cuenta bancaria. Nada que enviar: cobras cada lunes por la semana anterior.`,
+    it: (e: string, d: string) => `Ti paghiamo ogni settimana tramite Ruul (ruul.io), il nostro partner di pagamento. Prima di lunedì ${d}: crea il tuo account freelancer gratuito su ruul.io con esattamente questo indirizzo email: ${e}. Poi completa la verifica dell'identità (documento + selfie, circa 10 minuti) e aggiungi il tuo conto bancario. Niente da inviare: vieni pagato ogni lunedì per la settimana precedente.`,
+    pt: (e: string, d: string) => `Pagamos-te todas as semanas através da Ruul (ruul.io), o nosso parceiro de pagamentos. Antes de segunda-feira ${d}: cria a tua conta freelancer gratuita em ruul.io com exatamente este endereço de email: ${e}. Depois completa a verificação de identidade (documento + selfie, cerca de 10 minutos) e adiciona a tua conta bancária. Nada a enviar: recebes todas as segundas-feiras pela semana anterior.`,
+    de: (e: string, d: string) => `Wir bezahlen dich jede Woche über Ruul (ruul.io), unseren Zahlungspartner. Vor Montag, ${d}: Erstelle dein kostenloses Freelancer-Konto auf ruul.io mit genau dieser E-Mail-Adresse: ${e}. Schließe dann die Identitätsprüfung ab (Ausweis + Selfie, ca. 10 Minuten) und füge dein Bankkonto hinzu. Nichts einzureichen: Du wirst jeden Montag für die Vorwoche bezahlt.`,
+  },
+  cohort: {
+    fr: "Une fois dans Slack, votre canal est #ruul-cohort : posez-y toutes vos questions.",
+    en: "Once in Slack, your channel is #ruul-cohort: ask all your questions there.",
+    es: "Una vez en Slack, tu canal es #ruul-cohort: haz allí todas tus preguntas.",
+    it: "Una volta su Slack, il tuo canale è #ruul-cohort: fai lì tutte le tue domande.",
+    pt: "Já no Slack, o teu canal é #ruul-cohort: faz lá todas as tuas perguntas.",
+    de: "Sobald du in Slack bist, ist dein Kanal #ruul-cohort: Stell dort alle deine Fragen.",
+  },
   accepted: {
     subject: { fr: "Vous êtes accepté·e — signez votre contrat", en: "You're accepted — sign your contract", es: "Has sido aceptado/a — firma tu contrato", it: "Sei stato accettato — firma il contratto", pt: "Foste aceite — assina o teu contrato", de: "Du bist angenommen — unterschreibe deinen Vertrag" },
     start: { fr: (d: string) => `Bonne nouvelle : votre candidature est acceptée. Vous commencez le lundi ${d}.`, en: (d: string) => `Good news: your application is accepted. You start on Monday ${d}.`, es: (d: string) => `Buenas noticias: tu candidatura ha sido aceptada. Empiezas el lunes ${d}.`, it: (d: string) => `Buone notizie: la tua candidatura è accettata. Inizi lunedì ${d}.`, pt: (d: string) => `Boas notícias: a tua candidatura foi aceite. Começas na segunda-feira ${d}.`, de: (d: string) => `Gute Nachricht: deine Bewerbung ist angenommen. Du startest am Montag, ${d}.` },
@@ -103,7 +135,9 @@ export function formatMonday(d: string, lang: L) {
 }
 
 export const posterEmails = {
-  ack: (to: string, name: string, l: L) => send(to, name, T.ack.subject[l], [hi[l](first(name)), T.ack.body[l]]),
+  /** kind: "open" (country open in the OS and payable by Ruul), "closed" (today's text), "neutral" (OS unreachable). */
+  ack: (to: string, name: string, l: L, kind: "open" | "closed" | "neutral" = "closed") =>
+    send(to, name, T.ack.subject[l], [hi[l](first(name)), kind === "open" ? T.ackOpen[l] : kind === "neutral" ? T.ackNeutral[l] : T.ack.body[l]]),
   accepted: (to: string, name: string, l: L, monday: string, link: string, weeklyAmount: number | null, guideUrl: string | null) => {
     const t = T.accepted;
     const amount = weeklyAmount != null ? String(weeklyAmount) : "—";
@@ -113,10 +147,10 @@ export const posterEmails = {
   rejected: (to: string, name: string, l: L, reason: string | null) =>
     send(to, name, T.rejected.subject[l], [hi[l](first(name)), T.rejected.body[l], ...(reason ? [`${T.rejected.reason[l]} ${reason}`] : [])]),
   expired: (to: string, name: string, l: L) => send(to, name, T.expired.subject[l], [hi[l](first(name)), T.expired.body[l]]),
-  logins: (to: string, name: string, l: L, o: { osUrl: string; login: string; password: string; slack: string | null; monday: string }) => {
+  logins: (to: string, name: string, l: L, o: { osUrl: string; login: string; password: string; slack: string | null; monday: string; ruulEmail: string }) => {
     const x = T.logins.lines[l];
-    return send(to, name, T.logins.subject[l], [hi[l](first(name)), x[0]!, x[5]!], { label: "Sophia OS", url: o.osUrl }, [
-      `${x[1]}: ${o.login}`, `${x[2]}: ${o.password}`, ...(o.slack ? [`${x[3]}: ${o.slack}`] : []), `${x[4]}: ${formatMonday(o.monday, l)}`,
+    return send(to, name, T.logins.subject[l], [hi[l](first(name)), x[0]!, x[5]!, T.pay[l](o.ruulEmail, formatMonday(o.monday, l))], { label: "Sophia OS", url: o.osUrl }, [
+      `${x[1]}: ${o.login}`, `${x[2]}: ${o.password}`, ...(o.slack ? [`${x[3]}: ${o.slack}`] : []), T.cohort[l], `${x[4]}: ${formatMonday(o.monday, l)}`,
     ]);
   },
   ruul: (to: string, name: string, l: L, ruulEmail: string, monday: string) =>

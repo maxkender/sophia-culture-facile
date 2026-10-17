@@ -154,7 +154,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
         </div>
         <p className="text-xs text-brand-navySoft"><b>Score {score.score}/5</b> · {score.checks.map(([l, ok]) => `${ok ? "✓" : "✗"} ${l}`).join(" · ")}</p>
         {a.start_monday ? <p><b>Start Monday</b> {fmt(a.start_monday)} · <b>Apps</b> {(a.applications ?? []).join(", ") || "—"}</p> : null}
-        {a.manager_name ? <p><b>Hiring manager</b> {a.manager_name} {a.manager_email ? `· ${a.manager_email}` : ""}</p> : null}
+        {a.manager_name ? <p><b>Cohort</b> {a.manager_name}</p> : null}
         {a.os_email ? <p><b>OS login</b> {a.os_email}{(a as Record<string, unknown>)["os_langue"] ? ` · posting language ${String((a as Record<string, unknown>)["os_langue"]).toUpperCase()}` : ""}</p> : null}
         {a.rejected_reason ? <p><b>Reason</b> {a.rejected_reason}</p> : null}
         <p className="text-xs text-brand-navySoft"><b>Paid via</b> Ruul · {(a as Record<string, unknown>)["ruul_added_at"] ? "added" : "to add"}</p>
@@ -185,7 +185,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
               <Button size="sm" variant="ghost" onClick={(e) => { const input = (e.currentTarget.parentElement?.querySelector("input") as HTMLInputElement | null); void navigator.clipboard.writeText(input?.value ?? a.email); toast.success("Copied"); }}>Copy</Button>
             </p>
             <div className="flex flex-wrap items-center gap-2">
-              <Button size="sm" disabled={busy} onClick={() => void run(() => ruulAdded({ data: { applicationId: a.id } }), (a as Record<string, unknown>)["ruul_added_at"] ? "Ruul email re-sent" : "Marked as added in Ruul, email sent")}>{(a as Record<string, unknown>)["ruul_added_at"] ? "Resend the email" : "Added in Ruul"}</Button>
+              <Button size="sm" disabled={busy} onClick={() => void run(() => ruulAdded({ data: { applicationId: a.id } }), "Marked as added in Ruul")} className={(a as Record<string, unknown>)["ruul_added_at"] ? "hidden" : ""}>Added in Ruul</Button>
               {(a as Record<string, unknown>)["ruul_added_at"] ? <span className="text-xs text-brand-navySoft">Added {fmt((a as Record<string, unknown>)["ruul_added_at"] as string)}</span> : null}
             </div>
           </div>
