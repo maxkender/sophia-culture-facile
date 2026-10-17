@@ -20,4 +20,5 @@
 - [x] Recompute Monday at signature, update six acceptance texts, verify date tests and request publication; no real signing or email.
 
 # Slideshow Monday payments (Oct 17)
-- [ ] Update six-language acceptance/logins payment wording and first payment (+7 days), test without sending, and publish; preserve rates, Slack links and forms.
+- [x] Update six-language acceptance/logins payment wording and first payment (+7 days); 18 mocked tests pass, no sends; rates, Slack links and forms preserved.
+- [ ] Publish Monday-payment update.
