@@ -71,7 +71,7 @@ export function buildEmailHtml(options: {
   return `<!doctype html><html><body style="margin:0;padding:0;background:#f5f5f2;">
 <div style="max-width:560px;margin:0 auto;padding:32px 24px;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;font-size:15px;line-height:1.6;">
 <p style="margin:0 0 24px;font-weight:700;letter-spacing:0.02em;">Sophia</p>
-${body}${list}${extraLink}${section}${button}${linkSection}
+${body}${list}${extraLink}${postParagraphs}${section}${button}${linkSection}
 <p style="margin:24px 0 0;font-size:12px;color:#888888;">Sophia — apprendre la culture facilement. sophia-culture.com</p>
 </div></body></html>`;
 }
@@ -82,11 +82,13 @@ export function buildEmailText(options: {
   buttonLabel?: string;
   buttonUrl?: string;
   extraLink?: { label: string; url: string };
+  postParagraphs?: string[];
   linkSection?: { text: string; url: string; linkLabel: string };
 }): string {
   const parts = [...options.paragraphs];
   if (options.bullets?.length) parts.push("", ...options.bullets.map((b) => `- ${b}`));
   if (options.extraLink) parts.push("", `${options.extraLink.label}: ${options.extraLink.url}`);
+  if (options.postParagraphs?.length) parts.push("", ...options.postParagraphs);
   if (options.buttonUrl) parts.push("", options.buttonLabel ?? "Open the link:", options.buttonUrl);
   if (options.linkSection) parts.push("", options.linkSection.text, options.linkSection.url);
   return parts.join("\n\n");
