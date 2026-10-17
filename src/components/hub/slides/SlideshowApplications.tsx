@@ -118,7 +118,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
   const qc = useQueryClient();
   const accept = useServerFn(acceptPoster); const reject = useServerFn(rejectPoster); const warm = useServerFn(keepWarm);
   const tick = useServerFn(tickStep); const retry = useServerFn(retryOs);
-  const setChannel = useServerFn(setPayoutChannel); const saveRuul = useServerFn(saveRuulEmail); const ruulAdded = useServerFn(markRuulAdded);
+  const saveRuul = useServerFn(saveRuulEmail); const ruulAdded = useServerFn(markRuulAdded);
   const { data: osZoneData } = useQuery({ queryKey: ["hub", "os-zones"], queryFn: () => osZones(), staleTime: 10 * 60_000, retry: false });
   const [mode, setMode] = useState<"none" | "accept" | "reject">("none");
   const [apps, setApps] = useState<string[]>(["sophia"]);
@@ -140,7 +140,7 @@ export function PosterCard({ a, score, zones }: { a: App; score: ReturnType<type
 
   const closedZone = osZoneData?.ok && iso ? osZoneData.fermes.find((f) => f.pays_code === iso) : undefined;
   const zoneBlocked = Boolean(osZoneData?.ok && iso && !osZoneData.ouverts.some((o) => o.pays_code === iso));
-  const ruulBlocked = channel === "ruul" && Boolean(iso && RUUL_BLOCKED.includes(iso));
+  const ruulBlocked = Boolean(iso && RUUL_BLOCKED.includes(iso));
   const acceptBlock = ruulBlocked ? "Country not supported by Ruul" : zoneBlocked ? (closedZone?.raison ? `Zone not in the OS yet — ${closedZone.raison}` : "Zone not in the OS yet") : null;
   return (
     <div className="space-y-4 bg-portal-bg/50 px-4 pb-4 pt-2" data-testid="poster-card">
