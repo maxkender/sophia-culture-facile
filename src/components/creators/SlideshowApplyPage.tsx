@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { CountrySelect } from "./CountrySelect";
 import { ApplyShell, Confirmation, FormSection, Honeypot, YesNo } from "./ApplyShell";
 import { useI18n, useLocalePath } from "@/i18n";
@@ -22,7 +21,7 @@ export function SlideshowApplyPage() {
   const privacyPath = useLocalePath("privacy");
   const { common, slideshow: copy } = CREATOR_FORMS[lang];
   const submitFn = useServerFn(submitSlideshowApplication);
-  const [f, setF] = useState({ full_name: "", email: "", country: "", referral: "" });
+  const [f, setF] = useState({ full_name: "", email: "", country: "" });
   const [langue, setLangue] = useState<ApplicantLang | null>(null);
   const autoLang: ApplicantLang = f.country ? langOfCountry(f.country) : lang;
   const [adult, setAdult] = useState<"" | "yes" | "no">("");
@@ -58,7 +57,6 @@ export function SlideshowApplyPage() {
           email: f.email,
           country: f.country,
           is_adult: true,
-          referral_source: f.referral,
           consent: true,
           langue: langue ?? autoLang,
         },
@@ -121,10 +119,6 @@ export function SlideshowApplyPage() {
             <select id="langue" value={langue ?? autoLang} onChange={(e) => setLangue(e.target.value as ApplicantLang)} className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm">
               {APPLICANT_LANGS.map((l) => <option key={l} value={l}>{LANG_NAMES[l]}</option>)}
             </select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="referral">{copy.referral}</Label>
-            <Textarea id="referral" rows={2} value={f.referral} onChange={(e) => set("referral", e.target.value)} />
           </div>
         </FormSection>
         <FormSection title={common.consent}>
