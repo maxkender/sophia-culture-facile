@@ -1,8 +1,9 @@
 import { trackFunnel } from "@/lib/funnel-events";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { submitSlideshowApplication } from "@/lib/creator-apply.functions";
+import { getSlideshowPayInfo } from "@/lib/slideshow-zones.functions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,18 @@ export function SlideshowApplyPage() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const set = (k: keyof typeof f, v: string) => setF((c) => ({ ...c, [k]: v }));
+  const [payRange, setPayRange] = useState<{ min: number; max: number } | null>(null);
+  const [countryPay, setCountryPay] = useState<{ weekly: number; first: number } | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    getSlideshowPayInfo({ data: { country: f.country || undefined } }).then((r) => {
+      if (!live) return;
+      setPayRange(r.range);
+      setCountryPay(r.country);
+    }).catch(() => {});
+    return () => { live = false; };
+  }, [f.country]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -104,6 +117,9 @@ export function SlideshowApplyPage() {
           <div className="space-y-2">
             <Label htmlFor="country">{common.country}</Label>
             <CountrySelect id="country" value={f.country} onChange={(v) => set("country", v)} lang={lang} labels={{ select: common.selectCountry, search: common.searchCountry, empty: common.noCountry }} />
+            {countryPay ? (
+              <p className="text-sm font-semibold text-brand-navy">{copy.countryPay(countryPay.weekly, countryPay.first)}</p>
+            ) : null}
           </div>
           <div className="space-y-2">
             <Label htmlFor="adult">{copy.adult}</Label>
