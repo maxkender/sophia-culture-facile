@@ -30,7 +30,7 @@ vi.mock("@/integrations/supabase/client.server", () => ({
       const chain = {
         select: () => chain,
         eq: () => chain,
-        maybeSingle: async () => ({ data: table === "documents" ? { published: true, current_version: "1" } : fake.app }),
+        maybeSingle: async () => ({ data: table === "documents" ? { published: true, current_version: "1" } : { ...fake.app } }),
         insert: async () => ({ error: null }),
         update: (values: Record<string, unknown>) => {
           fake.writes.push(values);
