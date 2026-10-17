@@ -11,6 +11,11 @@ const hi: Record<L, (n: string) => string> = {
   fr: (n) => `Bonjour ${n},`, en: (n) => `Hi ${n},`, es: (n) => `Hola ${n}:`, it: (n) => `Ciao ${n},`, pt: (n) => `Olá ${n},`, de: (n) => `Hallo ${n},`,
 };
 
+/** Link label for the Slack invite (same labels as the logins email bullet). */
+const SLACK_LABEL: Record<L, string> = { fr: "Rejoindre Slack", en: "Join Slack", es: "Unirse a Slack", it: "Entra su Slack", pt: "Entrar no Slack", de: "Slack beitreten" };
+/** Trailing words after the #ruul-cohort mention in the money-questions line (kept after the link). */
+const MONEY_TAIL: Record<L, string> = { fr: ", jamais dans le salon.", en: ", never in the channel.", es: ", nunca en el canal.", it: ", mai nel canale.", pt: ", nunca no canal.", de: ", nie in den Kanal." };
+
 const T = {
   ack: {
     subject: { fr: "Merci pour votre candidature", en: "Thanks for applying", es: "Gracias por tu candidatura", it: "Grazie per la candidatura", pt: "Obrigado pela candidatura", de: "Danke für deine Bewerbung" },
