@@ -42,6 +42,25 @@ export const getGuideByToken = createServerFn({ method: "POST" })
     return { state: "ready" as const, title: guide.title, version: guide.version, blocks: guide.blocks };
   });
 
+// Public: pay range and, for a country, its zone amounts. Returns amounts only — never zone names or other data.
+export const getSlideshowPayInfo = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({ country: z.string().max(100).optional() }).parse(d ?? {}))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: zones } = await supabaseAdmin.from("pay_zones").select("zone, weekly_amount, first_week_amount");
+    const amounts = (zones ?? [])
+      .map((z: any) => ({ zone: z.zone as string, weekly: Number(z.weekly_amount), first: Number(z.first_week_amount) }))
+      .filter((z) => z.weekly > 0);
+    const range = amounts.length ? { min: Math.min(...amounts.map((a) => a.weekly)), max: Math.max(...amounts.map((a) => a.weekly)) } : null;
+    let country: { weekly: number; first: number } | null = null;
+    if (data.country) {
+      const { data: zone } = await supabaseAdmin.rpc("lookup_country_zone", { _country: data.country });
+      const row = amounts.find((a) => a.zone === zone);
+      if (row) country = { weekly: row.weekly, first: row.first };
+    }
+    return { range, country };
+  });
+
 async function assertAdmin(context: any) {
   const { data: me } = await context.supabase.from("profiles").select("id, role").eq("user_id", context.userId).maybeSingle();
   if (me?.role !== "admin") throw new Error("Forbidden");
