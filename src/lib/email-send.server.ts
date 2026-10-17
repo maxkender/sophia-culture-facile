@@ -79,10 +79,12 @@ export function buildEmailText(options: {
   bullets?: string[];
   buttonLabel?: string;
   buttonUrl?: string;
+  extraLink?: { label: string; url: string };
   linkSection?: { text: string; url: string; linkLabel: string };
 }): string {
   const parts = [...options.paragraphs];
   if (options.bullets?.length) parts.push("", ...options.bullets.map((b) => `- ${b}`));
+  if (options.extraLink) parts.push("", `${options.extraLink.label}: ${options.extraLink.url}`);
   if (options.buttonUrl) parts.push("", options.buttonLabel ?? "Open the link:", options.buttonUrl);
   if (options.linkSection) parts.push("", options.linkSection.text, options.linkSection.url);
   return parts.join("\n\n");
