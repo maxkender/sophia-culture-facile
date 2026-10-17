@@ -67,7 +67,6 @@ export type CreatorFormCopy = {
     underage: string;
     upwork: string;
     upworkLink: string;
-    referral: string;
     secondPhone: string;
     language: string;
     screening: string;
@@ -146,7 +145,6 @@ export const CREATOR_FORMS: Record<Lang, CreatorFormCopy> = {
       underage: "You need to be at least 18 to apply.",
       upwork: "Do you have an Upwork account? *",
       upworkLink: "Your Upwork profile link (optional)",
-      referral: "How did you hear about us?",
       secondPhone: "Do you have a second phone you can use for filming? *",
       language: "Language for our emails",
       screening: "Three quick questions",
@@ -223,7 +221,6 @@ export const CREATOR_FORMS: Record<Lang, CreatorFormCopy> = {
       underage: "Vous devez avoir au moins 18 ans pour postuler.",
       upwork: "Avez-vous un compte Upwork ? *",
       upworkLink: "Lien de votre profil Upwork (facultatif)",
-      referral: "Comment avez-vous entendu parler de nous ?",
       secondPhone: "Avez-vous un second téléphone utilisable pour filmer ? *",
       language: "Langue de nos e-mails",
       screening: "Trois questions rapides",
