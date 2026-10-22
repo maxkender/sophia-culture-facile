@@ -70,6 +70,25 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             const { expirePool } = await import("@/lib/slideshows.server");
             return Response.json(await expirePool(a));
           }
+          if (params.job === "slides-os-retry") {
+            const { createPosterInOs } = await import("@/lib/slideshows.server");
+            const { data: rows, error } = await a.from("slideshow_applications").select("id")
+              .eq("status", "contract_signed").not("agreement_signed_at", "is", null).not("os_error", "is", null)
+              .order("agreement_signed_at", { ascending: true }).limit(20);
+            if (error) return Response.json({ error: error.message }, { status: 500 });
+            let created = 0;
+            const failed: { id: string; error: string }[] = [];
+            for (const row of (rows ?? []) as { id: string }[]) {
+              try {
+                const r = await createPosterInOs(a, row.id);
+                if (r.ok) created++;
+                else failed.push({ id: row.id, error: r.error ?? "Unknown error" });
+              } catch (e) {
+                failed.push({ id: row.id, error: (e as Error).message });
+              }
+            }
+            return Response.json({ ok: true, tried: (rows ?? []).length, created, failed });
+          }
           if (["slides-snapshots", "slides-week"].includes(params.job)) return Response.json({ skipped: "Slideshows is manual; OS integration is dormant" });
           if (params.job === "slides-snapshots") {
             const { refreshSnapshots } = await import("@/lib/slideshows.server");
