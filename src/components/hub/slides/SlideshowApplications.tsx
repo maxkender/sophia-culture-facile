@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ZONE_BADGE } from "@/lib/slideshow-guide";
 import { APPLICANT_LANGS, countryCodeOf, langOfCountry, type ApplicantLang } from "@/config/countries";
-import { osIdentities, acceptPoster, keepWarm, markRuulAdded, osZones, rejectPoster, retryOs, saveRuulEmail, tickStep } from "@/lib/slideshows.functions";
+import { osIdentities, acceptPoster, acceptPostersBulk, keepWarm, markRuulAdded, osZones, rejectPoster, retryOs, saveRuulEmail, tickStep } from "@/lib/slideshows.functions";
 import { RUUL_BLOCKED } from "@/lib/ruul";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { STATUS_LABEL, useOsStatus , OS_UI_ENABLED } from "./useOs";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
@@ -41,7 +42,6 @@ export function scoreOf(a: App, hmCountries: Set<string>) {
   const checks = [
     ["Zone + hiring manager", Boolean(a.zone) && Boolean(code && hmCountries.has(code))],
     ["Adult", Boolean(a.is_adult)],
-    ["Second phone", a.deux_telephones === true],
     ["Upwork", Boolean(a.has_upwork)],
     // Screening answers are optional: never a penalty, shown as information only.
     [`${answered}/3 answers`, true],
@@ -74,7 +74,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
   const countries = useMemo(() => [...new Set(apps.map((a) => a.country))].sort(), [apps]);
   const rows = apps.filter((a) =>
     (f.country === "all" || a.country === f.country) && (f.zone === "all" || (f.zone === "none" ? !a.zone : a.zone === f.zone))
-    && (f.upwork === "all" || String(Boolean(a.has_upwork)) === f.upwork) && (f.phone === "all" || String(a.deux_telephones === true) === f.phone)
+    && (f.upwork === "all" || String(Boolean(a.has_upwork)) === f.upwork)
     && (f.status === "all" || statusInTab(a.status, f.status)));
   const groups = useMemo(() => {
     const m = new Map<string, App[]>();
@@ -94,7 +94,6 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
         <select aria-label="Country" className={sel} value={f.country} onChange={(e) => setF({ ...f, country: e.target.value })}><option value="all">All countries</option>{countries.map((c) => <option key={c}>{c}</option>)}</select>
         <select aria-label="Zone" className={sel} value={f.zone} onChange={(e) => setF({ ...f, zone: e.target.value })}><option value="all">All zones</option><option value="A">Zone A</option><option value="B">Zone B</option><option value="C">Zone C</option><option value="none">Country not open</option></select>
         <select aria-label="Upwork" className={sel} value={f.upwork} onChange={(e) => setF({ ...f, upwork: e.target.value })}><option value="all">Upwork: any</option><option value="true">Has Upwork</option><option value="false">No Upwork</option></select>
-        <select aria-label="Second phone" className={sel} value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })}><option value="all">Second phone: any</option><option value="true">Has second phone</option><option value="false">No second phone</option></select>
         <span className="ml-auto text-sm text-brand-navySoft"><b className="text-brand-navy">{rows.length}</b> shown · {apps.filter((a) => a.status === "pending").length} pending</span>
       </div>
       {OS_UI_ENABLED && !os.data?.connected ? <p className="text-xs text-brand-navySoft">Active posters per country: OS not connected yet — add OS_HUB_SECRET in Settings → Secrets.</p> : null}
@@ -104,7 +103,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
             <h3 className="font-extrabold text-brand-navy">{country}</h3>
             {list[0]?.zone ? <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold", ZONE_BADGE[list[0].zone])}>Zone {list[0].zone}</span> : <span className="rounded-full bg-portal-red/10 px-2 py-0.5 text-[11px] font-bold text-portal-red">Country not open</span>}
             {counts(list).map(([s, n]) => <span key={s} className="rounded-full bg-portal-bg px-2 py-0.5 text-[11px] font-semibold">{STATUS_LABEL[s] ?? s} {n}</span>)}
-            
+            <AcceptAllButton country={country} pending={apps.filter((a) => a.country === country && a.status === "pending")} />
           </header>
           <ul>{list.map((a) => { const s = scoreOf(a, data?.hmCountries ?? new Set<string>()); const isOpen = open === a.id; return (
             <li key={a.id} className="border-t border-brand-line first:border-t-0">
@@ -160,7 +159,7 @@ export function PosterCard({ a, score, zones, legal }: { a: App; legal?: { preno
     <div className="space-y-4 bg-portal-bg/50 px-4 pb-4 pt-2" data-testid="poster-card">
       <div className="space-y-2 text-sm">
         <p><b>Country</b> {a.country} · <b>Age 18+</b> {a.is_adult ? "OK" : "Not confirmed"}</p>
-        <p>{a.phone ? <><b>Phone</b> {a.phone} · </> : null}<b>Language</b> {a.langue ? a.langue.toUpperCase() : `${langOfCountry(a.country).toUpperCase()} (country default)`}{a.deux_telephones == null ? null : <> · <b>Second phone</b> {a.deux_telephones ? "yes" : "no"}</>}</p>
+        <p>{a.phone ? <><b>Phone</b> {a.phone} · </> : null}<b>Language</b> {a.langue ? a.langue.toUpperCase() : `${langOfCountry(a.country).toUpperCase()} (country default)`}</p>
         <p>{a.has_upwork == null ? null : <><b>Upwork</b> {a.has_upwork ? (a.upwork_profile_url ? <a className="text-space-slides underline" href={a.upwork_profile_url} target="_blank" rel="noreferrer">profile</a> : "yes") : "no"} · </>}<b>Zone</b> {a.zone ?? "country not open"}</p>
         <div className="border-t border-brand-line py-3 text-xs">
           {a.q_country_now ? <p><b>Country now:</b> {a.q_country_now}</p> : null}{a.q_hours_per_day ? <p><b>Hours/day:</b> {a.q_hours_per_day}</p> : null}{a.q_tiktok_daily ? <p><b>TikTok daily:</b> {a.q_tiktok_daily}</p> : null}{a.q_previous_content ? <p><b>Previous content:</b> {a.q_previous_content}</p> : null}
@@ -235,5 +234,54 @@ export function PosterCard({ a, score, zones, legal }: { a: App; legal?: { preno
         ) : null}
       </div>
     </div>
+  );
+}
+
+type BulkOut = { accepted: { id: string; name: string; start_monday: string }[]; skipped: { id: string; name: string; reason: string }[]; failed: { id: string; error: string }[] };
+
+/** "Accept all (N)" for one country's pending applications; shown only when the country is open in the OS zones. */
+function AcceptAllButton({ country, pending }: { country: string; pending: App[] }) {
+  const qc = useQueryClient();
+  const bulk = useServerFn(acceptPostersBulk);
+  const { data: z } = useQuery({ queryKey: ["hub", "os-zones"], queryFn: () => osZones(), staleTime: 10 * 60_000, retry: false });
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [res, setRes] = useState<BulkOut | null>(null);
+  const iso = countryCodeOf(country);
+  const isOpen = Boolean(z?.ok && iso && z.ouverts.some((o) => o.pays_code === iso));
+  if (!pending.length || !isOpen) return null;
+  const nameOf = (id: string) => pending.find((p) => p.id === id)?.full_name ?? id;
+  async function go() {
+    setBusy(true);
+    try { setRes(await bulk({ data: { applicationIds: pending.map((p) => p.id) } }) as BulkOut); void qc.invalidateQueries({ queryKey: ["hub", "slides"] }); }
+    catch (e) { toast.error((e as Error).message); } finally { setBusy(false); }
+  }
+  return (
+    <>
+      <Button size="sm" className="ml-auto" onClick={(e) => { e.stopPropagation(); setRes(null); setOpen(true); }}>Accept all ({pending.length})</Button>
+      <Dialog open={open} onOpenChange={(v) => { if (!busy) setOpen(v); }}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{res ? `Accept all — ${country}: summary` : `Accept all pending applications from ${country}?`}</DialogTitle>
+            <DialogDescription>{res ? "Each one went through the same acceptance as the single Accept button." : "Each one is accepted like the single Accept button: start Monday, contract link and acceptance email in their language. Possible duplicates and refused applications are skipped."}</DialogDescription>
+          </DialogHeader>
+          {res ? (
+            <div className="space-y-3 text-sm">
+              <div><p className="font-bold">Accepted · {res.accepted.length}</p><ul className="list-disc pl-5">{res.accepted.map((r) => <li key={r.id}>{r.name} — starts {r.start_monday}</li>)}</ul></div>
+              <div><p className="font-bold">Skipped · {res.skipped.length}</p><ul className="list-disc pl-5">{res.skipped.map((r) => <li key={r.id}>{r.name} — {r.reason}</li>)}</ul></div>
+              <div><p className="font-bold">Failed · {res.failed.length}</p><ul className="list-disc pl-5">{res.failed.map((r) => <li key={r.id}>{nameOf(r.id)} — {r.error}</li>)}</ul></div>
+            </div>
+          ) : (
+            <ul className="list-disc pl-5 text-sm">{pending.map((p) => <li key={p.id}>{p.full_name} <span className="text-brand-navySoft">({p.email})</span></li>)}</ul>
+          )}
+          <DialogFooter>
+            {res ? <Button onClick={() => setOpen(false)}>Close</Button> : <>
+              <Button variant="ghost" disabled={busy} onClick={() => setOpen(false)}>Cancel</Button>
+              <Button disabled={busy} onClick={() => void go()}>{busy ? "Accepting…" : `Accept ${pending.length}`}</Button>
+            </>}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

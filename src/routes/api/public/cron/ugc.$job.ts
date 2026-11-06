@@ -89,6 +89,24 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             }
             return Response.json({ ok: true, tried: (rows ?? []).length, created, failed });
           }
+          if (params.job === "slides-accept") {
+            const { z } = await import("zod");
+            const parsed = z.object({
+              application_ids: z.array(z.string().uuid()).min(1).max(50).optional(),
+              country: z.string().trim().min(1).max(100).optional(),
+              dry_run: z.boolean().optional(),
+            }).refine((b) => Boolean(b.application_ids) !== Boolean(b.country), "Send exactly one of application_ids or country")
+              .safeParse(await request.json().catch(() => null));
+            if (!parsed.success) return Response.json({ ok: false, error: parsed.error.issues[0]?.message ?? "Invalid body" }, { status: 400 });
+            const b = parsed.data;
+            let q = a.from("slideshow_applications").select("id").eq("status", "pending").order("created_at", { ascending: true }).limit(50);
+            q = b.application_ids ? q.in("id", b.application_ids) : q.ilike("country", b.country!);
+            const { data: rows, error } = await q;
+            if (error) return Response.json({ ok: false, error: error.message }, { status: 500 });
+            const { acceptMany } = await import("@/lib/slideshow-accept.server");
+            // decided_by is a profile id: left null, the timeline records who decided.
+            return Response.json(await acceptMany(a, (rows ?? []).map((r: { id: string }) => r.id), { id: null, name: "Claude (on admin request)" }, b.dry_run === true));
+          }
           if (["slides-snapshots", "slides-week"].includes(params.job)) return Response.json({ skipped: "Slideshows is manual; OS integration is dormant" });
           if (params.job === "slides-snapshots") {
             const { refreshSnapshots } = await import("@/lib/slideshows.server");
