@@ -74,7 +74,7 @@ export const docButton =
   "inline-flex h-9 items-center gap-1 rounded-[6px] bg-doc-button px-4 text-[15px] font-medium text-doc-paper transition-opacity hover:opacity-85 disabled:opacity-40";
 
 function H2({ children }: { children: ReactNode }) {
-  return <h2 className="mb-3 text-xl font-semibold">{children}</h2>;
+  return <h2 className="mb-3 font-doc text-xl font-semibold">{children}</h2>;
 }
 function Sec({ children }: { children: ReactNode }) {
   return <section className="space-y-4 border-t border-doc-line pt-7">{children}</section>;
@@ -112,7 +112,7 @@ export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
   return (
     <DocShell>
       <DocAvatar app={app} />
-      <h1 className="mt-6 text-[30px] font-bold leading-tight md:text-[40px]">
+      <h1 className="mt-6 font-doc text-[30px] font-bold leading-tight md:text-[40px]">
         {fr ? `Candidature créateur de slideshows ${name}` : `${name} Slideshow Creator Application`}
       </h1>
       <div className="mt-6 space-y-7 text-[17px] leading-[1.6]">

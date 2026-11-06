@@ -99,7 +99,7 @@ export function SlideshowApplyPage() {
     <>
       <DocAvatar app={appSlug ?? undefined} />
       <a href={landing} className="mt-6 inline-block text-[14px] text-doc-muted hover:text-doc-ink">{lang === "fr" ? "← Retour" : "← Back"}</a>
-      <h1 className="mt-2 text-[30px] font-bold leading-tight md:text-[40px]">{copy.title}</h1>
+      <h1 className="mt-2 font-doc text-[30px] font-bold leading-tight md:text-[40px]">{copy.title}</h1>
     </>
   );
   const label = "block text-[16px] font-semibold";
@@ -126,34 +126,34 @@ export function SlideshowApplyPage() {
       </div>
       <form data-funnel="apply" data-track="slideshow" onFocusCapture={(e) => { const f = e.currentTarget; if (!f.dataset["started"]) { f.dataset["started"] = "1"; trackFunnel("apply_started", { track: "slideshow" }); } }} onSubmit={onSubmit} className="relative mt-8 space-y-8 border-t border-doc-line pt-7" noValidate>
         <Honeypot value={honey} onChange={setHoney} />
-        <h2 className="text-xl font-semibold">{copy.about}</h2>
+        <h2 className="font-doc text-xl font-semibold">{copy.about}</h2>
         <div className="space-y-2">
-          <label htmlFor="full_name" className={label}>{common.fullName}{req}</label>
+          <label htmlFor="full_name" className={label}>{strip(common.fullName)}{req}</label>
           <input id="full_name" className={field} autoComplete="name" value={f.full_name} onChange={(e) => set("full_name", e.target.value)} />
         </div>
         <div className="space-y-2">
-          <label htmlFor="email" className={label}>{common.email}{req}</label>
+          <label htmlFor="email" className={label}>{strip(common.email)}{req}</label>
           <input id="email" type="email" className={field} autoComplete="email" aria-describedby="email-help" value={f.email} onChange={(e) => set("email", e.target.value)} />
           <p id="email-help" className="text-[13px] text-doc-muted">{lang === "fr" ? "Exemple : nom@exemple.com" : "Example: name@example.com"}</p>
         </div>
         <div className="space-y-2">
-          <label htmlFor="country" className={label}>{common.country}{req}</label>
+          <label htmlFor="country" className={label}>{strip(common.country)}{req}</label>
           <div className="max-w-[360px] [&_button[role=combobox]]:h-9 [&_button[role=combobox]]:rounded-[6px] [&_button[role=combobox]]:border-doc-field [&_button[role=combobox]]:bg-doc-paper [&_button[role=combobox]]:text-[15px] [&_button[role=combobox]]:text-doc-ink [&_button[role=combobox]]:shadow-none">
             <CountrySelect id="country" value={f.country} onChange={(v) => set("country", v)} lang={lang} labels={{ select: common.selectCountry, search: common.searchCountry, empty: common.noCountry }} />
           </div>
           {countryPay ? <p className="text-[15px]">{copy.countryPay(countryPay.weekly, countryPay.first)}</p> : null}
         </div>
         <div className="space-y-2">
-          <p id="adult-label" className={label}>{copy.adult}{req}</p>
+          <p id="adult-label" className={label}>{strip(copy.adult)}{req}</p>
           <Choices labelledBy="adult-label" value={adult} onChange={(v) => setAdult(v as "yes" | "no")} options={[{ v: "yes", l: common.yes }, { v: "no", l: common.no }]} />
           {adult === "no" ? <p role="alert" className="text-[15px] font-semibold text-doc-error">{copy.underage}</p> : null}
         </div>
         <div className="space-y-2">
-          <p id="langue-label" className={label}>{copy.language}{req}</p>
+          <p id="langue-label" className={label}>{strip(copy.language)}{req}</p>
           <Choices labelledBy="langue-label" value={langue ?? autoLang} onChange={(v) => setLangue(v as ApplicantLang)} options={APPLICANT_LANGS.map((l) => ({ v: l, l: LANG_NAMES[l] }))} />
         </div>
         <div className="space-y-3 border-t border-doc-line pt-7">
-          <h2 className="text-xl font-semibold">{common.consent}</h2>
+          <h2 className="font-doc text-xl font-semibold">{strip(common.consent)}</h2>
           <label className="flex items-start gap-3 text-[15px] leading-[1.6]">
             <Checkbox checked={consent} onCheckedChange={(v) => setConsent(v === true)} className="mt-1 rounded-[4px] border-doc-field" />
             <span>
@@ -174,6 +174,8 @@ export function SlideshowApplyPage() {
     </DocShell>
   );
 }
+
+const strip = (t: string) => t.replace(/\s*\*\s*$/, "");
 
 function Choices({ labelledBy, value, onChange, options }: { labelledBy: string; value: string; onChange: (v: string) => void; options: { v: string; l: string }[] }) {
   return (
