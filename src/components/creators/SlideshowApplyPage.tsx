@@ -28,6 +28,8 @@ export function SlideshowApplyPage() {
   const [langue, setLangue] = useState<ApplicantLang | null>(null);
   const autoLang: ApplicantLang = f.country ? langOfCountry(f.country) : (APPLICANT_LANGS.find((l) => l === pageLang.code.slice(0, 2).toLowerCase()) ?? "en");
   const [adult, setAdult] = useState<"" | "yes" | "no">("");
+  const [referred, setReferred] = useState<"" | "yes" | "no">("");
+  const [referralName, setReferralName] = useState("");
   const [consent, setConsent] = useState(false);
   const [honey, setHoney] = useState("");
   const [busy, setBusy] = useState(false);
@@ -51,8 +53,12 @@ export function SlideshowApplyPage() {
     e.preventDefault();
     setError(null);
     if (adult === "no") return;
-    if (!f.full_name.trim() || !f.email.trim() || !f.country || !adult) {
+    if (!f.full_name.trim() || !f.email.trim() || !f.country || !adult || !referred) {
       setError(t.requiredError);
+      return;
+    }
+    if (referred === "yes" && !referralName.trim()) {
+      setError(t.referralNameError);
       return;
     }
     if (!isValidEmail(f.email)) {
@@ -74,6 +80,8 @@ export function SlideshowApplyPage() {
           is_adult: true,
           consent: true,
           langue: langue ?? autoLang,
+          referred: referred === "yes",
+          ...(referred === "yes" ? { referral_name: referralName.trim().slice(0, 120) } : {}),
         },
       });
       if (!res.ok) {
@@ -150,6 +158,18 @@ export function SlideshowApplyPage() {
           <p id="adult-label" className={label}>{t.adult}{req}</p>
           <Choices labelledBy="adult-label" value={adult} onChange={(v) => setAdult(v as "yes" | "no")} options={[{ v: "yes", l: t.yes }, { v: "no", l: t.no }]} />
           {adult === "no" ? <p role="alert" className="text-[15px] font-semibold text-doc-error">{t.underage}</p> : null}
+        </div>
+        <div className="space-y-2">
+          <p id="referral-label" className={label}>{t.referralQuestion}{req}</p>
+          <Choices labelledBy="referral-label" value={referred} onChange={(v) => { setReferred(v as "yes" | "no"); if (v === "no") setReferralName(""); }} options={[{ v: "yes", l: t.yes }, { v: "no", l: t.no }]} />
+          <div className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${referred === "yes" ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`} aria-hidden={referred !== "yes"}>
+            <div className="overflow-hidden">
+              <div className="space-y-2 pt-3">
+                <label htmlFor="referral_name" className={label}>{t.referralName}{req}</label>
+                <input id="referral_name" className={field} autoComplete="off" maxLength={120} tabIndex={referred === "yes" ? 0 : -1} value={referralName} onChange={(e) => setReferralName(e.target.value)} />
+              </div>
+            </div>
+          </div>
         </div>
         <div className="space-y-2">
           <p id="langue-label" className={label}>{t.emailLanguage}{req}</p>

@@ -6040,7 +6040,9 @@ export type Database = {
           q_hours_per_day: string | null
           q_previous_content: string | null
           q_tiktok_daily: string | null
+          referral_name: string | null
           referral_source: string | null
+          referred: boolean | null
           rejected_reason: string | null
           rejection_reason: string | null
           ruul_added_at: string | null
@@ -6107,7 +6109,9 @@ export type Database = {
           q_hours_per_day?: string | null
           q_previous_content?: string | null
           q_tiktok_daily?: string | null
+          referral_name?: string | null
           referral_source?: string | null
+          referred?: boolean | null
           rejected_reason?: string | null
           rejection_reason?: string | null
           ruul_added_at?: string | null
@@ -6174,7 +6178,9 @@ export type Database = {
           q_hours_per_day?: string | null
           q_previous_content?: string | null
           q_tiktok_daily?: string | null
+          referral_name?: string | null
           referral_source?: string | null
+          referred?: boolean | null
           rejected_reason?: string | null
           rejection_reason?: string | null
           ruul_added_at?: string | null
