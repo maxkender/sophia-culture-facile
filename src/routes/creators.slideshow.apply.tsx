@@ -2,9 +2,9 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { detectLangInBrowser } from "@/lib/detect-lang";
 
 export const Route = createFileRoute("/creators/slideshow/apply")({
-  beforeLoad: () => {
+  beforeLoad: ({ location }) => {
     const lang = typeof document === "undefined" ? "en" : detectLangInBrowser();
-    throw redirect({ to: lang === "fr" ? "/fr/candidature-slideshow" : "/en/slideshow-application", replace: true });
+    throw redirect({ href: (lang === "fr" ? "/fr/candidature-slideshow" : "/en/slideshow-application") + (location.searchStr ?? ""), replace: true });
   },
   component: () => null,
 });
