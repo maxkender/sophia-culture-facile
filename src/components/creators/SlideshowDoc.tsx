@@ -44,6 +44,8 @@ export function DocAvatar({ app }: { app?: string | undefined }) {
     <div className="flex size-[72px] items-center justify-center overflow-hidden rounded-full bg-doc-avatar text-doc-paper md:size-24">
       {a?.logo_path ? (
         <img src={a.logo_path} alt={a.name} className="size-full object-cover" />
+      ) : a ? (
+        <span className="text-[32px] font-bold md:text-[40px]">{a.name.charAt(0)}</span>
       ) : (
         <LogoMark className="doc-logo-white h-9 w-auto md:h-12" label="Sophia" />
       )}
@@ -56,7 +58,7 @@ export function DocShell({ children }: { children: ReactNode }) {
   const privacyPath = useLocalePath("privacy");
   const legalPath = useLocalePath("legal");
   return (
-    <div lang={lang} className="relative flex min-h-screen flex-col overflow-x-hidden bg-doc-paper font-doc text-doc-ink antialiased">
+    <div lang={lang} className="relative flex min-h-screen flex-col overflow-x-hidden bg-doc-paper font-doc tracking-tight text-doc-ink antialiased">
       <DocLangSwitch />
       <main className="mx-auto w-full max-w-[700px] flex-1 px-4 pb-16 pt-8 md:pt-16">{children}</main>
       <footer className="mx-auto w-full max-w-[700px] px-4 pb-8 text-[13px] text-doc-muted">
@@ -74,7 +76,7 @@ export const docButton =
   "inline-flex h-9 items-center gap-1 rounded-[6px] bg-doc-button px-4 text-[15px] font-medium text-doc-paper transition-opacity hover:opacity-85 disabled:opacity-40";
 
 function H2({ children }: { children: ReactNode }) {
-  return <h2 className="mb-3 font-doc text-xl font-semibold">{children}</h2>;
+  return <h2 className="mb-3 font-doc tracking-tight text-xl font-semibold">{children}</h2>;
 }
 function Sec({ children }: { children: ReactNode }) {
   return <section className="space-y-4 border-t border-doc-line pt-7">{children}</section>;
@@ -112,7 +114,7 @@ export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
   return (
     <DocShell>
       <DocAvatar app={app} />
-      <h1 className="mt-6 font-doc text-[30px] font-bold leading-tight md:text-[40px]">
+      <h1 className="mt-6 font-doc tracking-tight text-[30px] font-bold leading-tight md:text-[40px]">
         {fr ? `Candidature créateur de slideshows ${name}` : `${name} Slideshow Creator Application`}
       </h1>
       <div className="mt-6 space-y-7 text-[17px] leading-[1.6]">
