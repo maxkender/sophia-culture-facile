@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   BLOCK_LABEL,
   DOCUMENT_LABEL,
@@ -49,7 +55,11 @@ function PublishState({ published }: { published: boolean }) {
 }
 
 /** Wraps the current selection of a field in ** or * markers. */
-function wrapSelection(element: HTMLTextAreaElement | HTMLInputElement, marker: string, apply: (value: string) => void) {
+function wrapSelection(
+  element: HTMLTextAreaElement | HTMLInputElement,
+  marker: string,
+  apply: (value: string) => void,
+) {
   const { selectionStart, selectionEnd, value } = element;
   if (selectionStart === null || selectionEnd === null || selectionStart === selectionEnd) return;
   const next =
@@ -95,12 +105,24 @@ function MarkedField({
           <Italic className="size-4" />
         </Button>
       </div>
-      <Textarea id={id} ref={ref} rows={rows} value={value} onChange={(event) => onChange(event.target.value)} />
+      <Textarea
+        id={id}
+        ref={ref}
+        rows={rows}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      />
     </div>
   );
 }
 
-function BlockFields({ block, onChange }: { block: DocBlock; onChange: (block: DocBlock) => void }) {
+function BlockFields({
+  block,
+  onChange,
+}: {
+  block: DocBlock;
+  onChange: (block: DocBlock) => void;
+}) {
   switch (block.type) {
     case "heading":
       return (
@@ -122,7 +144,11 @@ function BlockFields({ block, onChange }: { block: DocBlock; onChange: (block: D
           </div>
           <div className="space-y-1">
             <Label>Text</Label>
-            <Input className="h-11" value={block.text} onChange={(event) => onChange({ ...block, text: event.target.value })} />
+            <Input
+              className="h-11"
+              value={block.text}
+              onChange={(event) => onChange({ ...block, text: event.target.value })}
+            />
           </div>
         </div>
       );
@@ -147,7 +173,9 @@ function BlockFields({ block, onChange }: { block: DocBlock; onChange: (block: D
                 variant="ghost"
                 size="icon"
                 aria-label="Remove bullet"
-                onClick={() => onChange({ ...block, items: block.items.filter((_, i) => i !== index) })}
+                onClick={() =>
+                  onChange({ ...block, items: block.items.filter((_, i) => i !== index) })
+                }
               >
                 <Trash2 className="size-4" />
               </Button>
@@ -206,7 +234,9 @@ function BlockFields({ block, onChange }: { block: DocBlock; onChange: (block: D
                 variant="ghost"
                 size="icon"
                 aria-label="Remove row"
-                onClick={() => onChange({ ...block, rows: block.rows.filter((_, i) => i !== rowIndex) })}
+                onClick={() =>
+                  onChange({ ...block, rows: block.rows.filter((_, i) => i !== rowIndex) })
+                }
               >
                 <Trash2 className="size-4" />
               </Button>
@@ -229,7 +259,12 @@ function BlockFields({ block, onChange }: { block: DocBlock; onChange: (block: D
           <div className="grid gap-3 md:grid-cols-[180px_1fr]">
             <div className="space-y-1">
               <Label>Colour</Label>
-              <Select value={block.tone} onValueChange={(value) => onChange({ ...block, tone: value === "red" ? "red" : "blue" })}>
+              <Select
+                value={block.tone}
+                onValueChange={(value) =>
+                  onChange({ ...block, tone: value === "red" ? "red" : "blue" })
+                }
+              >
                 <SelectTrigger className="h-11">
                   <SelectValue />
                 </SelectTrigger>
@@ -241,10 +276,18 @@ function BlockFields({ block, onChange }: { block: DocBlock; onChange: (block: D
             </div>
             <div className="space-y-1">
               <Label>Title</Label>
-              <Input className="h-11" value={block.title} onChange={(event) => onChange({ ...block, title: event.target.value })} />
+              <Input
+                className="h-11"
+                value={block.title}
+                onChange={(event) => onChange({ ...block, title: event.target.value })}
+              />
             </div>
           </div>
-          <MarkedField value={block.body} onChange={(body) => onChange({ ...block, body })} rows={5} />
+          <MarkedField
+            value={block.body}
+            onChange={(body) => onChange({ ...block, body })}
+            rows={5}
+          />
         </div>
       );
     default:
@@ -264,7 +307,11 @@ export function PosterGuideEditor() {
   const [note, setNote] = useState("");
   const [newType, setNewType] = useState<DocBlock["type"]>("paragraph");
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
-  const [viewing, setViewing] = useState<{ version: number; title: string; blocks: DocBlock[] } | null>(null);
+  const [viewing, setViewing] = useState<{
+    version: number;
+    title: string;
+    blocks: DocBlock[];
+  } | null>(null);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
 
@@ -272,11 +319,16 @@ export function PosterGuideEditor() {
     if (!doc) return;
     setPublishing(true);
     try {
-      const { error } = await supabase.from("documents").update({ published: value }).eq("id", doc.row.id);
+      const { error } = await supabase
+        .from("documents")
+        .update({ published: value })
+        .eq("id", doc.row.id);
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["portal", "document", slug] });
       await queryClient.invalidateQueries({ queryKey: ["portal", "documents"] });
-      toast.success(value ? "Published. Posters can now read it." : "Back to draft. Posters cannot read it.");
+      toast.success(
+        value ? "Published. Posters can now read it." : "Back to draft. Posters cannot read it.",
+      );
     } catch {
       toast.error("The visibility could not be changed.");
     } finally {
@@ -343,7 +395,9 @@ export function PosterGuideEditor() {
         .eq("id", doc.row.id);
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["portal", "document", slug] });
-      await queryClient.invalidateQueries({ queryKey: ["portal", "document-versions", doc.row.id] });
+      await queryClient.invalidateQueries({
+        queryKey: ["portal", "document-versions", doc.row.id],
+      });
       setNote("");
       setLoadedFor(null);
       toast.success(`Saved as version ${version}. Nothing was overwritten.`);
@@ -359,24 +413,38 @@ export function PosterGuideEditor() {
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-brand-line pb-3">
-        <div><h2 className="font-semibold">Poster Guide</h2><p className="crm-count">{subtitle}</p></div>
-          <div className="flex flex-wrap items-center gap-2">
-            <PublishState published={doc.row.published} />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                downloadDocumentPdf({ slug, title, subtitle, version: doc.row.current_version, blocks })
-              }
-            >
-              <Download className="size-4" />
-              Download PDF
-            </Button>
-            <Button type="button" size="sm" disabled={saving} onClick={() => save(blocks, title, note)}>
-              {saving ? "Saving…" : "Save new version"}
-            </Button>
-          </div>
+        <div>
+          <h2 className="font-semibold">Poster Guide</h2>
+          <p className="crm-count">{subtitle}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <PublishState published={doc.row.published} />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              downloadDocumentPdf({
+                slug,
+                title,
+                subtitle,
+                version: doc.row.current_version,
+                blocks,
+              })
+            }
+          >
+            <Download className="size-4" />
+            Download PDF
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            disabled={saving}
+            onClick={() => save(blocks, title, note)}
+          >
+            {saving ? "Saving…" : "Save new version"}
+          </Button>
+        </div>
       </div>
 
       <div className="mb-6">
@@ -405,16 +473,28 @@ export function PosterGuideEditor() {
           <PortalCard className="space-y-3">
             <div className="space-y-1">
               <Label htmlFor="doc-title">Document title</Label>
-              <Input id="doc-title" className="h-11" value={title} onChange={(event) => setTitle(event.target.value)} />
+              <Input
+                id="doc-title"
+                className="h-11"
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+              />
             </div>
             <div className="space-y-1">
               <Label htmlFor="doc-note">Note for the version history (optional)</Label>
-              <Input id="doc-note" className="h-11" value={note} onChange={(event) => setNote(event.target.value)} />
+              <Input
+                id="doc-note"
+                className="h-11"
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+              />
             </div>
           </PortalCard>
 
           <PortalCard className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Merge fields</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">
+              Merge fields
+            </p>
             <div className="flex flex-wrap gap-2 pt-1">
               {["weekly_amount", "first_week_amount", "posts_per_day"].map((token) => (
                 <code
@@ -428,12 +508,26 @@ export function PosterGuideEditor() {
           {blocks.map((block, index) => (
             <PortalCard key={index} className="space-y-3">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">{BLOCK_LABEL[block.type]}</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">
+                  {BLOCK_LABEL[block.type]}
+                </p>
                 <div className="flex gap-1">
-                  <Button type="button" variant="ghost" size="icon" aria-label="Move up" onClick={() => move(index, -1)}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Move up"
+                    onClick={() => move(index, -1)}
+                  >
                     <ArrowUp className="size-4" />
                   </Button>
-                  <Button type="button" variant="ghost" size="icon" aria-label="Move down" onClick={() => move(index, 1)}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Move down"
+                    onClick={() => move(index, 1)}
+                  >
                     <ArrowDown className="size-4" />
                   </Button>
                   <Button
@@ -454,7 +548,10 @@ export function PosterGuideEditor() {
           <PortalCard className="flex flex-wrap items-end gap-3">
             <div className="space-y-1">
               <Label htmlFor="new-block">Add a block</Label>
-              <Select value={newType} onValueChange={(value) => setNewType(value as DocBlock["type"])}>
+              <Select
+                value={newType}
+                onValueChange={(value) => setNewType(value as DocBlock["type"])}
+              >
                 <SelectTrigger id="new-block" className="h-11 w-48">
                   <SelectValue />
                 </SelectTrigger>
@@ -481,8 +578,12 @@ export function PosterGuideEditor() {
 
         <div className="space-y-6">
           <PortalCard>
-            <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Live preview — poster guide</p>
-            <h2 className="mt-3 text-2xl font-extrabold text-brand-navy">{title.replace(/creator/gi, "Poster")}</h2>
+            <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">
+              Live preview — poster guide
+            </p>
+            <h2 className="mt-3 text-2xl font-extrabold text-brand-navy">
+              {title.replace(/creator/gi, "Poster")}
+            </h2>
             <DocumentBody blocks={blocks} className="mt-6" />
           </PortalCard>
 
@@ -490,7 +591,10 @@ export function PosterGuideEditor() {
             <h2 className="text-lg font-extrabold text-brand-navy">Version history</h2>
             <ul className="mt-4 divide-y divide-brand-line">
               {versions.map((entry) => (
-                <li key={entry.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                <li
+                  key={entry.id}
+                  className="flex flex-wrap items-center justify-between gap-3 py-3"
+                >
                   <div>
                     <p className="text-sm font-bold text-brand-navy">
                       Version {entry.version}
@@ -507,7 +611,11 @@ export function PosterGuideEditor() {
                       variant="ghost"
                       size="pillSm"
                       onClick={() =>
-                        setViewing({ version: entry.version, title: entry.title, blocks: parseBlocks(entry.content) })
+                        setViewing({
+                          version: entry.version,
+                          title: entry.title,
+                          blocks: parseBlocks(entry.content),
+                        })
                       }
                     >
                       View
@@ -522,7 +630,11 @@ export function PosterGuideEditor() {
                           const restored = parseBlocks(entry.content);
                           setBlocks(restored);
                           setTitle(entry.title);
-                          void save(restored, entry.title, `Restored from version ${entry.version}`);
+                          void save(
+                            restored,
+                            entry.title,
+                            `Restored from version ${entry.version}`,
+                          );
                         }}
                       >
                         Restore
@@ -540,7 +652,12 @@ export function PosterGuideEditor() {
                 <h2 className="text-lg font-extrabold text-brand-navy">
                   Version {viewing.version} — {viewing.title}
                 </h2>
-                <Button type="button" variant="ghost" size="pillSm" onClick={() => setViewing(null)}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="pillSm"
+                  onClick={() => setViewing(null)}
+                >
                   Close
                 </Button>
               </div>
