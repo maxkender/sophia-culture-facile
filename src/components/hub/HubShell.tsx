@@ -192,7 +192,7 @@ export function HubShell({ children }: { children: ReactNode }) {
             <div className="lg:hidden"><SpaceSwitcher space={space} /></div>
             <div className="min-w-0 flex-1">
               <h1 className="truncate text-lg font-extrabold text-brand-navy">{title}</h1>
-              <p className="hidden truncate text-xs text-brand-navySoft sm:block">{lead}</p>
+              {space !== "slideshows" ? <p className="hidden truncate text-xs text-brand-navySoft sm:block">{lead}</p> : null}
             </div>
             <button type="button" onClick={() => setSearch(true)} className="hidden min-h-10 w-72 items-center gap-2 rounded-full border border-brand-line bg-portal-bg px-4 text-sm text-brand-navySoft md:flex">
               <Search className="size-4" /> <span className="flex-1 text-left">Search Hub</span><span className="text-[10px] font-bold">⌘K</span>
@@ -203,7 +203,7 @@ export function HubShell({ children }: { children: ReactNode }) {
             <NotificationBell profileId={profile.id} />
           </div>
         </header>
-        <main className="safe-bottom mx-auto w-full min-w-0 max-w-7xl px-4 py-6 sm:px-6">{children}</main>
+        <main className={cn("safe-bottom mx-auto w-full min-w-0 max-w-7xl px-4 py-6 sm:px-6", space === "slideshows" && "slides-crm")}>{children}</main>
       </div>
 
       <nav aria-label="Hub mobile" className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-brand-line bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">

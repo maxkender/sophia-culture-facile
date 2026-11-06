@@ -42,7 +42,7 @@ export { RUUL_BLOCKED };
 
 /** OS refusal codes → plain words for the poster card. */
 export function osErrorInWords(error: string, langue?: string | null): string {
-  if (error.includes("zone_non_ouverte")) return "Zone not in the OS yet (no HM for this country)";
+  if (error.includes("zone_non_ouverte")) return "Closed in OS";
   if (error.includes("langue_non_geree")) return `The HM for this country does not handle ${langue ?? "this language"} yet`;
   if (error.includes("creation_en_cours")) return "Creation in progress, retry in 5 minutes";
   return error;

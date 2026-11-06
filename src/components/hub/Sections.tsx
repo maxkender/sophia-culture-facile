@@ -57,62 +57,19 @@ function useAdmins() {
   });
 }
 
-function SlideshowAssign() {
-  const { appId } = useAdminApp();
-  const qc = useQueryClient();
-  const { data: team } = useAdmins();
-  const [onlyOpen, setOnlyOpen] = useState(true);
-  const { data = [] } = useQuery({
-    queryKey: ["hub", "slideshow-assign", appId],
-    queryFn: async () => {
-      let q = supabase.from("slideshow_applications").select("id, full_name, country, zone, zone_override, status, assigned_hm_id, created_at, app_id").order("created_at", { ascending: false });
-      if (appId) q = q.eq("app_id", appId);
-      return (await q).data ?? [];
-    },
-  });
-  const hmIds = new Set((team?.hms ?? []).filter((h) => h.active).map((h) => h.profile_id));
-  const choices = (team?.admins ?? []).filter((a) => hmIds.size === 0 || hmIds.has(a.id));
-  const rows = data.filter((r) => !onlyOpen || r.status === "pending");
-  async function assign(id: string, hm: string) {
-    const { error } = await supabase.from("slideshow_applications").update({ assigned_hm_id: hm || null }).eq("id", id);
-    if (error) toast.error("Could not assign."); else { toast.success(hm ? "Hiring manager assigned" : "Unassigned"); void qc.invalidateQueries({ queryKey: ["hub", "slideshow-assign"] }); }
-  }
-  return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-3">
-        <p className="text-sm text-brand-navySoft"><b className="text-brand-navy">{data.filter((r) => r.status === "pending").length}</b> pending · {data.filter((r) => !r.assigned_hm_id && r.status === "pending").length} without a hiring manager</p>
-        <label className="ml-auto flex items-center gap-2 text-sm"><input type="checkbox" checked={onlyOpen} onChange={(e) => setOnlyOpen(e.target.checked)} />Pending only</label>
-      </div>
-      <div className="overflow-x-auto rounded-2xl bg-card shadow-portal">
-        <table className="w-full min-w-[640px] text-sm" data-testid="slideshow-assign">
-          <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Poster</th><th className="p-3">Country</th><th className="p-3">Zone</th><th className="p-3">Status</th><th className="p-3">Hiring manager</th></tr></thead>
-          <tbody>{rows.map((r) => (
-            <tr key={r.id} className="border-t border-brand-line">
-              <td className="p-3 font-bold text-brand-navy"><AppBadge appId={r.app_id} /> {r.full_name}</td>
-              <td className="p-3">{r.country}</td>
-              <td className="p-3">{r.zone ?? <span className="text-portal-red">none</span>}</td>
-              <td className="p-3">{r.status}</td>
-              <td className="p-3"><select aria-label={`Hiring manager for ${r.full_name}`} value={r.assigned_hm_id ?? ""} onChange={(e) => void assign(r.id, e.target.value)} className="h-9 rounded-lg border px-2"><option value="">—</option>{choices.map((a) => <option key={a.id} value={a.id}>{a.full_name ?? a.email}</option>)}</select></td>
-            </tr>
-          ))}</tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
 
-function SettingLink({ k, label, help }: { k: string; label: string; help: string }) {
+function SettingLink({ k, label, help, compact = false }: { k: string; label: string; help: string; compact?: boolean }) {
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["hub", "setting", k], queryFn: async () => (await supabase.from("hub_settings").select("value").eq("key", k).maybeSingle()).data?.value ?? "" });
   const [v, setV] = useState<string | null>(null);
   const val = v ?? data ?? "";
+  const [editing, setEditing] = useState(false);
   return (
-    <div className={cn(card, "space-y-3")}>
-      <h3 className="font-extrabold text-brand-navy">{label}</h3>
-      <p className="text-sm text-brand-navySoft">{help}</p>
-      {data ? <a href={data} target="_blank" rel="noreferrer" className="inline-flex font-bold text-portal-accent">Open {label.toLowerCase()} ↗</a> : <p className="text-sm text-portal-amber">No link saved yet.</p>}
-      <div className="flex gap-2"><input aria-label={label} value={val} onChange={(e) => setV(e.target.value)} placeholder="https://…" className="h-10 flex-1 rounded-lg border px-3 text-sm" />
-        <Button onClick={async () => { if (val && !/^https:\/\//.test(val)) { toast.error("Use a full link starting with https://"); return; } const { error } = await supabase.from("hub_settings").upsert({ key: k, value: val || null, updated_at: new Date().toISOString() }); if (error) toast.error("Could not save."); else { toast.success("Saved"); void qc.invalidateQueries({ queryKey: ["hub", "setting", k] }); } }}>Save</Button></div>
+    <div className={compact ? "space-y-2 border-b border-brand-line py-2 text-sm" : cn(card, "space-y-3")}>
+      <div className={compact ? "crm-setting-line flex items-center gap-2" : "flex flex-wrap items-center gap-2"}><span className="font-medium">{label}:</span>{data ? <a href={data} target="_blank" rel="noreferrer" className="max-w-full truncate text-portal-accent underline">{compact ? data : `Open ${label.toLowerCase()} ↗`}</a> : <span className="text-brand-navySoft">—</span>}{compact ? <><span>·</span><Button variant="link" size="sm" className="h-auto p-0" onClick={() => setEditing(!editing)}>edit</Button></> : null}</div>
+      {!compact ? <p className="text-sm text-brand-navySoft">{help}</p> : null}
+      {(!compact || editing) ? <div className="flex gap-2"><input aria-label={label} value={val} onChange={(e) => setV(e.target.value)} placeholder="https://…" className="h-10 flex-1 rounded-lg border px-3 text-sm" />
+        <Button onClick={async () => { if (val && !/^https:\/\//.test(val)) { toast.error("Use a full link starting with https://"); return; } const { error } = await supabase.from("hub_settings").upsert({ key: k, value: val || null, updated_at: new Date().toISOString() }); if (error) toast.error("Could not save."); else { toast.success("Saved"); void qc.invalidateQueries({ queryKey: ["hub", "setting", k] }); } }}>Save</Button></div> : null}
     </div>
   );
 }
@@ -121,19 +78,18 @@ export function SlideshowSection({ section, id }: { section: string; id?: string
   switch (section) {
     case "applications": return <SlideshowApplications focusId={id} />;
     case "posters": return <Posters />;
-    case "managers": return <div className="space-y-6"><SlideshowAssign /><Team track="slideshow" /></div>;
-    case "rates": return <PayZonesSettings />;
+    case "rates": return <PayZonesSettings compact />;
     case "payouts": return <SlidesPayouts />;
     case "guide": return (
       <div className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-2">
-          <SettingLink k="slideshow_poster_guide_url" label="Poster Guide link" help="Shared with new posters by hand with their logins." />
-          <SettingLink k="slideshow_slack_invite_url" label="Slack invite link" help="Shared with new posters by hand with their logins." />
+        <div className="space-y-2">
+          <SettingLink compact k="slideshow_poster_guide_url" label="Poster Guide link" help="Shared with new posters by hand with their logins." />
+          <SettingLink compact k="slideshow_slack_invite_url" label="Slack invite link" help="Shared with new posters by hand with their logins." />
         </div>
+        <SettingLink compact k="slideshow_platform_url" label="Old platform" help="" />
         <PosterGuideEditor />
       </div>
     );
-    case "platform": return <SettingLink k="slideshow_platform_url" label="Old slideshow platform" help="Where posters used to work. Kept here so the team can still open it." />;
     default: return <p className={cn(card, "text-sm")}>This page does not exist. <Link to="/hub/slideshows" className="font-bold underline">Slideshows home</Link></p>;
   }
 }

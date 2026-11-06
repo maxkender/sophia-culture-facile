@@ -23,7 +23,7 @@ export function refusalReason(app: any, zones: Zones): string | null {
   const code = countryCodeOf(app.country);
   if (zones?.ok && code && !zones.ouverts.some((o) => o.pays_code === code)) {
     const closed = zones.fermes.find((f) => f.pays_code === code);
-    return closed?.raison ? `Zone not in the OS yet — ${closed.raison}` : "Zone not in the OS yet (no HM for this country)";
+    return closed?.raison ? `Closed in OS — ${closed.raison}` : "Closed in OS";
   }
   if (code && RUUL_BLOCKED.includes(code)) return "Country not supported by Ruul";
   return null;

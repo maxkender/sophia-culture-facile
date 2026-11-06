@@ -1,12 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { cn } from "@/lib/utils";
 import { needsLegalName, useLegalNames, useSlideshowApps } from "./SlideshowApplications";
-import { STATUS_LABEL, useOsStatus , OS_UI_ENABLED } from "./useOs";
+import { useOsStatus, OS_UI_ENABLED } from "./useOs";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { osZones } from "@/lib/slideshows.functions";
+import { countryCodeOf } from "@/config/countries";
 import { OsNotConnected } from "./Posters";
-
-const card = "rounded-2xl bg-card p-5 shadow-portal";
 
 export function SlideshowsHome() {
   const { data } = useSlideshowApps();
@@ -15,43 +14,133 @@ export function SlideshowsHome() {
   const { data: legal } = useLegalNames(apps);
   const inOs = apps.filter(needsLegalName);
   const ready = inOs.filter((a) => legal?.has(a.id)).length;
-  const n = (s: string) => apps.filter((a) => a.status === s).length;
   const now = new Date();
-  const parisDay = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
-  const day = new Date(`${parisDay}T12:00:00Z`);
-  const week = new Date(day); week.setUTCDate(week.getUTCDate() - ((week.getUTCDay() + 6) % 7));
-  const next = new Date(week); next.setUTCDate(next.getUTCDate() + 7);
+  const day = new Date(
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Paris",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(now) + "T12:00:00Z",
+  );
+  const week = new Date(day);
+  week.setUTCDate(week.getUTCDate() - ((week.getUTCDay() + 6) % 7));
+  const next = new Date(week);
+  next.setUTCDate(next.getUTCDate() + 7);
   const nextMonday = next.toISOString().slice(0, 10);
-  const { data: payouts = 0 } = useQuery({ queryKey: ["hub", "slides", "payouts-to-approve"], queryFn: async () => (await supabase.from("slideshow_payouts").select("id", { count: "exact", head: true }).eq("status", "draft")).count ?? 0 });
-  const { data: ruulToAdd = 0 } = useQuery({ queryKey: ["hub", "slides", "ruul-to-add"], queryFn: async () => (await (supabase.from("slideshow_applications") as any).select("id", { count: "exact", head: true }).is("ruul_added_at", null).in("status", ["contract_signed", "os_created", "started"])).count ?? 0 });
-  const { data: slackUrl } = useQuery({ queryKey: ["hub", "setting", "slideshow_slack_invite_url"], queryFn: async () => (await supabase.from("hub_settings").select("value").eq("key", "slideshow_slack_invite_url").maybeSingle()).data?.value ?? null });
-  const notOpen = apps.filter((a) => a.status === "pending" && !a.zone).length;
+  const { data: payouts = [] } = useQuery({
+    queryKey: ["hub", "slides", "payouts-to-approve"],
+    queryFn: async () =>
+      (await supabase.from("slideshow_payouts").select("id,week_start").eq("status", "draft"))
+        .data ?? [],
+  });
+  const { data: slackUrl, isPending: slackLoading } = useQuery({
+    queryKey: ["hub", "setting", "slideshow_slack_invite_url"],
+    queryFn: async () =>
+      (
+        await supabase
+          .from("hub_settings")
+          .select("value")
+          .eq("key", "slideshow_slack_invite_url")
+          .maybeSingle()
+      ).data?.value ?? null,
+  });
+  const { data: zones } = useQuery({
+    queryKey: ["hub", "os-zones"],
+    queryFn: () => osZones(),
+    staleTime: 600000,
+    retry: false,
+  });
+  const pending = apps.filter((a) => a.status === "pending");
+  const openPending = pending.filter(
+    (a) => zones?.ok && zones.ouverts.some((z) => z.pays_code === countryCodeOf(a.country)),
+  ).length;
+  const ruulToAdd = apps.filter(
+    (a) => !a.ruul_added_at && ["contract_signed", "os_created", "started"].includes(a.status),
+  ).length;
   const tiles: [string, number, string][] = [
-    ["Pending applications", n("pending"), "/hub/slideshows/applications"],
-    ["Accepted this week", apps.filter((a) => a.accepted_at && a.accepted_at >= week.toISOString()).length, "/hub/slideshows/applications"],
-    ["Starting next Monday", apps.filter((a) => a.start_monday === nextMonday && ["accepted", "contract_signed", "os_created"].includes(a.status)).length, "/hub/slideshows/posters"],
-    ["Posters started", n("started"), "/hub/slideshows/posters"],
-    ["Payouts to approve", payouts, "/hub/slideshows/payouts"],
-    [`To add in Ruul · ${ready} ready · ${inOs.length - ready} waiting for name`, ruulToAdd, "/hub/slideshows/applications"],
+    ["Pending", pending.length, "applications"],
+    [
+      "Starting next Monday",
+      apps.filter(
+        (a) =>
+          a.start_monday === nextMonday &&
+          ["accepted", "contract_signed", "os_created"].includes(a.status),
+      ).length,
+      "posters",
+    ],
+    ["Started", apps.filter((a) => a.status === "started").length, "posters"],
+    ["Payouts to approve", payouts.length, "payouts"],
+    ["To add in Ruul", ruulToAdd, "applications"],
   ];
-  const byZone = ["A", "B", "C"].map((z) => [z, apps.filter((a) => a.zone === z && a.status === "pending").length] as const);
+  const tasks: [string, string][] = [];
+  if (openPending)
+    tasks.push([`${openPending} pending in open countries → Applications`, "applications"]);
+  if (inOs.length - ready)
+    tasks.push([
+      `${inOs.length - ready} posters waiting for their legal name → Posters`,
+      "posters",
+    ]);
+  if (ready) tasks.push([`${ready} posters ready to add in Ruul → Posters`, "posters"]);
+  for (const start of [...new Set(payouts.map((p) => p.week_start))]) {
+    const d = new Date(start + "T00:00:00Z");
+    d.setUTCDate(d.getUTCDate() + 3 - ((d.getUTCDay() + 6) % 7));
+    const first = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
+    const wn =
+      1 +
+      Math.round(
+        ((d.getTime() - first.getTime()) / 86400000 - 3 + ((first.getUTCDay() + 6) % 7)) / 7,
+      );
+    tasks.push([`Payouts of week ${wn} to approve → Payouts`, "payouts"]);
+  }
   return (
     <div className="space-y-5">
-      {!slackUrl ? <p className="rounded-2xl border border-portal-amber/40 bg-portal-amber/10 p-3 text-sm font-semibold text-portal-amber">The Slack invite link (slideshow_slack_invite_url) is empty — new posters get no Slack link in their logins email. Fill it in Slideshows → Guide & templates.</p> : null}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        {tiles.map(([l, v, to]) => (
-          <Link key={l} to={to as never} className={cn(card, "block hover:ring-2 hover:ring-space-slides/30")}>
-            <p className="text-xs font-semibold uppercase text-brand-navySoft">{l}</p><p className="mt-1 text-3xl font-extrabold text-brand-navy">{v}</p>
+      <p className="crm-count">
+        {apps.length} applications · {tiles[2]?.[1] ?? 0} started
+      </p>
+      {!slackLoading && !slackUrl ? (
+        <p className="rounded-lg border border-portal-amber/40 bg-portal-amber/10 p-3 text-xs text-portal-amber">
+          Slack invite link is empty.{" "}
+          <Link to="/hub/slideshows/$section" params={{ section: "guide" }} className="underline">
+            Guide & links
+          </Link>
+        </p>
+      ) : null}
+      <div className="crm-counters grid grid-cols-5 divide-x divide-brand-line border-y border-brand-line bg-card">
+        {tiles.map(([label, count, section]) => (
+          <Link
+            key={label}
+            to="/hub/slideshows/$section"
+            params={{ section }}
+            className="min-w-0 px-2 py-3 sm:px-4"
+          >
+            <span className="block text-[10px] leading-tight text-brand-navySoft sm:text-xs">
+              {label}
+            </span>
+            <span className="mt-2 block text-xl font-semibold text-brand-navy">{count}</span>
           </Link>
         ))}
       </div>
-      <div className={card}>
-        <h3 className="font-extrabold text-brand-navy">Pending by zone</h3>
-        <div className="mt-2 flex flex-wrap gap-2 text-sm">{byZone.map(([z, v]) => <span key={z} className="rounded-full bg-space-slides/10 px-3 py-1 font-semibold text-space-slides">Zone {z}: {v}</span>)}<span className="rounded-full bg-portal-red/10 px-3 py-1 font-semibold text-portal-red">Country not open: {notOpen}</span></div>
-        <p className="mt-3 text-sm text-brand-navySoft">Applications never trigger anything by themselves: open Applications and pick posters one by one when a country needs them.</p>
-      </div>
-      {!OS_UI_ENABLED ? null : !os.data?.connected ? <OsNotConnected what="Sophia OS" /> : <p className="text-sm text-brand-navySoft">OS connected · last sync {os.data.lastSync ? new Date(os.data.lastSync).toLocaleString("en-GB") : "never"}</p>}
-      <p className="text-xs text-brand-navySoft">Statuses: {Object.values(STATUS_LABEL).join(" · ")}</p>
+      <section>
+        <h2 className="mb-2 font-semibold">To do</h2>
+        <ul className="crm-tasks divide-y divide-brand-line border-y border-brand-line">
+          {tasks.map(([label, section]) => (
+            <li key={label}>
+              <Link
+                to="/hub/slideshows/$section"
+                params={{ section }}
+                className="block py-3 text-sm text-brand-navy"
+              >
+                {label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        {!tasks.length ? (
+          <p className="py-3 text-sm text-brand-navySoft">Nothing waiting.</p>
+        ) : null}
+      </section>
+      {OS_UI_ENABLED && !os.data?.connected ? <OsNotConnected what="Sophia OS" /> : null}
     </div>
   );
 }

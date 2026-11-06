@@ -271,6 +271,31 @@
 
 .doc-logo-white path { fill: currentColor; }
 
+/* Scoped to the slideshow operational space; public pages and other tracks stay unchanged. */
+.slides-crm { min-width: 0; }
+.slides-crm .shadow-portal { box-shadow: none; }
+.slides-crm .rounded-2xl, .slides-crm .rounded-xl { border-radius: 8px; }
+.slides-crm table th, .slides-crm table td { padding: 8px 12px; }
+.slides-crm table th { height: 40px; font-weight: 500; text-transform: none; }
+.slides-crm table tr { border-color: var(--brand-line); }
+.slides-crm table tbody tr { height: 40px; }
+.slides-crm table tbody tr:hover { background: var(--brand-surface); }
+.slides-crm .crm-table { max-width: 100%; overflow-x: auto; border: 1px solid var(--brand-line); border-radius: 8px; background: var(--card); }
+.slides-crm .crm-table table { width: 100%; font-size: 14px; }
+.slides-crm .crm-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.slides-crm .crm-search { height: 36px; width: 220px; max-width: 100%; border: 1px solid var(--brand-line); border-radius: 6px; padding: 0 10px; background: var(--card); font-size: 14px; }
+.slides-crm h2 { font-size: 16px; letter-spacing: 0; }
+.slides-crm .crm-count { font-size: 12px; color: var(--brand-navy-soft); }
+.slides-crm main, .slides-crm .crm-toolbar > * { min-width: 0; }
+.slides-crm .crm-counters > a { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; }
+.slides-crm .crm-tasks a { display: block; }
+.slides-crm .crm-setting-line { flex-wrap: nowrap; }
+.slides-crm .crm-setting-line > a { display: block; flex: 1; min-width: 0; min-height: 0; }
+.slides-crm .crm-setting-line > span { flex-shrink: 0; }
+.slides-crm [data-testid="slides-rates"] { min-width: 1000px; table-layout: fixed; }
+.slides-crm [data-testid="slides-rates"] th:first-child { width: 70px; }
+.slides-crm [data-testid="slides-rates"] th:nth-child(2) { width: 320px; }
+
 .doc-mascot {
   position: relative;
   float: right;
@@ -319,4 +344,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .doc-mascot img { animation: none; }
+}
+@media (min-width: 768px) {
+  .slides-crm table td button { height: 24px; min-height: 24px; }
 }
