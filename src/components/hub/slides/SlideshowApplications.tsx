@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { Country, DetailSheet, shortDate, StatusPill } from "./Crm";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
@@ -17,8 +17,8 @@ import { STATUS_LABEL, useOsStatus , OS_UI_ENABLED } from "./useOs";
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const sel = "h-9 rounded-lg border border-brand-line bg-card px-2 text-sm";
 type App = Database["public"]["Tables"]["slideshow_applications"]["Row"];
-export const APPLICATION_TABS = [["pending", "Pending"], ["accepted", "Accepted"], ["contract_signed", "Contract signed"], ["started", "Started"], ["pool", "Pool"], ["rejected", "Rejected"], ["expired", "Expired"]] as const;
-export const statusInTab = (status: string, tab: string) => tab === "contract_signed" ? ["contract_signed", "os_created"].includes(status) : tab === "accepted" ? ["accepted", "approved"].includes(status) : tab === "started" ? ["started", "dropped"].includes(status) : status === tab;
+export const APPLICATION_TABS = [["pending", "Pending"], ["accepted", "Accepted"], ["contract_signed", "Signed"], ["os_created", "In OS"], ["started", "Started"], ["rejected", "Refused"], ["all", "All"]] as const;
+export const statusInTab = (status: string, tab: string) => tab === "all" ? true : tab === "contract_signed" ? status === "contract_signed" : tab === "accepted" ? ["accepted", "approved"].includes(status) : tab === "started" ? ["started", "dropped"].includes(status) : status === tab;
 
 export function useSlideshowApps() {
   return useQuery({
@@ -66,60 +66,49 @@ export function useLegalNames(apps: App[]) {
 
 export function SlideshowApplications({ focusId }: { focusId?: string | undefined }) {
   const { data } = useSlideshowApps();
-  const os = useOsStatus();
-  const [f, setF] = useState({ country: "all", zone: "all", upwork: "all", phone: "all", status: focusId ? "all" : "pending" });
+  const qc = useQueryClient();
+  const reject = useServerFn(rejectPoster);
+  const [country, setCountry] = useState("all");
+  const [status, setStatus] = useState(focusId ? "all" : "pending");
+  const [search, setSearch] = useState("");
   const [open, setOpen] = useState<string | null>(focusId ?? null);
+  const [mode, setMode] = useState<"none" | "accept" | "reject">("none");
+  const [checked, setChecked] = useState<string[]>([]);
+  const [refuseOpen, setRefuseOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [summary, setSummary] = useState("");
   const apps = data?.apps ?? [];
   const { data: legal } = useLegalNames(apps);
+  const { data: zones } = useQuery({ queryKey: ["hub", "os-zones"], queryFn: () => osZones(), staleTime: 600000, retry: false });
   const countries = useMemo(() => [...new Set(apps.map((a) => a.country))].sort(), [apps]);
-  const rows = apps.filter((a) =>
-    (f.country === "all" || a.country === f.country) && (f.zone === "all" || (f.zone === "none" ? !a.zone : a.zone === f.zone))
-    && (f.upwork === "all" || String(Boolean(a.has_upwork)) === f.upwork)
-    && (f.status === "all" || statusInTab(a.status, f.status)));
-  const groups = useMemo(() => {
-    const m = new Map<string, App[]>();
-    for (const a of rows) m.set(a.country, [...(m.get(a.country) ?? []), a]);
-    return [...m.entries()].sort((x, y) => y[1].length - x[1].length);
-  }, [rows]);
-  const counts = (list: App[]) => Object.entries(list.reduce<Record<string, number>>((m, a) => ({ ...m, [a.status]: (m[a.status] ?? 0) + 1 }), {}));
-
-  return (
-    <div className="space-y-4">
-      <p className="text-sm font-semibold text-brand-navy">Candidatures posteurs slideshow — tu choisis qui tu acceptes, rien ne part tout seul</p>
-      <div role="tablist" aria-label="Application status" className="flex flex-wrap gap-1 border-b border-brand-line pb-2">{APPLICATION_TABS.map(([key, label]) => <Button key={key} role="tab" aria-selected={f.status === key} variant={f.status === key ? "default" : "ghost"} size="sm" onClick={() => setF({ ...f, status: key })}>{label} · {apps.filter((a) => statusInTab(a.status, key)).length}</Button>)}</div>
-      <div className="flex flex-wrap items-center gap-2 py-3">
-        <select aria-label="Status" className={sel} value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })}>
-          <option value="all">All statuses</option>{Object.entries(STATUS_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
-        </select>
-        <select aria-label="Country" className={sel} value={f.country} onChange={(e) => setF({ ...f, country: e.target.value })}><option value="all">All countries</option>{countries.map((c) => <option key={c}>{c}</option>)}</select>
-        <select aria-label="Zone" className={sel} value={f.zone} onChange={(e) => setF({ ...f, zone: e.target.value })}><option value="all">All zones</option><option value="A">Zone A</option><option value="B">Zone B</option><option value="C">Zone C</option><option value="none">Country not open</option></select>
-        <select aria-label="Upwork" className={sel} value={f.upwork} onChange={(e) => setF({ ...f, upwork: e.target.value })}><option value="all">Upwork: any</option><option value="true">Has Upwork</option><option value="false">No Upwork</option></select>
-        <span className="ml-auto text-sm text-brand-navySoft"><b className="text-brand-navy">{rows.length}</b> shown · {apps.filter((a) => a.status === "pending").length} pending</span>
-      </div>
-      {OS_UI_ENABLED && !os.data?.connected ? <p className="text-xs text-brand-navySoft">Active posters per country: OS not connected yet — add OS_HUB_SECRET in Settings → Secrets.</p> : null}
-      {groups.map(([country, list]) => (
-        <section key={country} className="overflow-hidden rounded-2xl bg-card shadow-portal" data-testid="slides-country">
-          <header className="flex flex-wrap items-center gap-2 border-b border-brand-line px-4 py-3">
-            <h3 className="font-extrabold text-brand-navy">{country}</h3>
-            {list[0]?.zone ? <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold", ZONE_BADGE[list[0].zone])}>Zone {list[0].zone}</span> : <span className="rounded-full bg-portal-red/10 px-2 py-0.5 text-[11px] font-bold text-portal-red">Country not open</span>}
-            {counts(list).map(([s, n]) => <span key={s} className="rounded-full bg-portal-bg px-2 py-0.5 text-[11px] font-semibold">{STATUS_LABEL[s] ?? s} {n}</span>)}
-            <AcceptAllButton country={country} pending={apps.filter((a) => a.country === country && a.status === "pending")} />
-          </header>
-          <ul>{list.map((a) => { const s = scoreOf(a, data?.hmCountries ?? new Set<string>()); const isOpen = open === a.id; return (
-            <li key={a.id} className="border-t border-brand-line first:border-t-0">
-              <Button variant="ghost" onClick={() => setOpen(isOpen ? null : a.id)} aria-expanded={isOpen} className="h-auto min-h-14 w-full flex-wrap justify-start gap-3 rounded-none px-4 py-3 text-left text-sm hover:bg-portal-bg">
-                {isOpen ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
-                <span className="min-w-0 flex-1 font-bold text-brand-navy">{a.full_name}<span className="block break-all whitespace-normal text-xs font-normal text-brand-navySoft">{a.email} · applied {fmt(a.created_at)}</span></span>
-                <span className="rounded-full bg-space-slides/10 px-2 py-0.5 text-xs font-bold text-space-slides">Score {s.score}/{s.max}</span>
-                <span className="text-xs">{STATUS_LABEL[a.status] ?? a.status}</span>
-              </Button>
-              {isOpen ? <PosterCard a={a} score={s} zones={data?.zones ?? []} legal={needsLegalName(a) ? (legal?.get(a.id) ?? null) : undefined} /> : null}
-            </li>); })}</ul>
-        </section>
-      ))}
-      {!groups.length ? <p className={cn(card, "text-sm text-brand-navySoft")}>No application matches.</p> : null}
+  const rows = apps.filter((a) => (country === "all" || a.country === country) && statusInTab(a.status, status) && `${a.full_name} ${a.email} ${a.country}`.toLowerCase().includes(search.toLowerCase()));
+  const selected = apps.filter((a) => checked.includes(a.id));
+  const active = apps.find((a) => a.id === open);
+  const isClosed = (a: App) => Boolean(zones?.ok && countryCodeOf(a.country) && !zones.ouverts.some((z) => z.pays_code === countryCodeOf(a.country)));
+  const show = (a: App, action: "none" | "accept" | "reject" = "none") => { setOpen(a.id); setMode(action); };
+  async function refuseSelected() {
+    setBusy(true); let refused = 0; let skipped = 0; let failed = 0;
+    for (const a of selected) {
+      if (!["pending", "pool"].includes(a.status)) { skipped++; continue; }
+      try { await reject({ data: { applicationId: a.id, reason } }); refused++; } catch { failed++; }
+    }
+    setSummary(`${refused} refused · ${skipped} skipped · ${failed} failed`); setBusy(false);
+    void qc.invalidateQueries({ queryKey: ["hub", "slides"] }); setChecked([]);
+  }
+  return <div className="space-y-3">
+    <p className="crm-count">{rows.length} applications · {apps.filter((a) => a.status === "pending").length} pending</p>
+    <div className="crm-toolbar">
+      <input aria-label="Search applications" placeholder="Search name or email" className="crm-search" value={search} onChange={(e) => setSearch(e.target.value)} />
+      <select aria-label="Country" className={sel} value={country} onChange={(e) => setCountry(e.target.value)}><option value="all">All countries</option>{countries.map((c) => <option key={c}>{c}</option>)}</select>
+      <div className="ml-auto">{country !== "all" ? <AcceptAllButton country={country} pending={apps.filter((a) => a.country === country && a.status === "pending")} /> : null}</div>
     </div>
-  );
+    <div role="tablist" aria-label="Application status" className="flex flex-wrap gap-1">{APPLICATION_TABS.map(([key,label]) => <Button key={key} size="sm" variant={status === key ? "secondary" : "ghost"} role="tab" aria-selected={status === key} onClick={() => setStatus(key)}>{label} <span className="text-brand-navySoft">{apps.filter((a) => statusInTab(a.status,key)).length}</span></Button>)}</div>
+    {selected.length ? <div className="crm-toolbar border-y border-brand-line py-2"><span className="text-sm">{selected.length} selected</span><AcceptAllButton country="selected applications" pending={selected} label="Accept" selection /><Button size="sm" variant="outline" onClick={() => { setSummary(""); setRefuseOpen(true); }}>Refuse</Button><Button size="sm" variant="ghost" onClick={() => setChecked([])}>Clear</Button></div> : null}
+    <div className="crm-table"><table className="min-w-[920px] text-left" data-testid="slides-applications-table"><thead className="text-xs text-brand-navySoft"><tr><th><input type="checkbox" aria-label="Select all shown" checked={rows.length > 0 && rows.every((a) => checked.includes(a.id))} onChange={(e) => setChecked(e.target.checked ? rows.map((a) => a.id) : [])} /></th><th>Name</th><th>Country</th><th>Zone</th><th>Status</th><th>Applied</th><th>Start Monday</th><th>Actions</th></tr></thead><tbody>{rows.map((a) => <tr key={a.id} className="cursor-pointer border-t border-brand-line" onClick={() => show(a)}><td onClick={(e) => e.stopPropagation()}><input type="checkbox" aria-label={`Select ${a.full_name}`} checked={checked.includes(a.id)} onChange={(e) => setChecked(e.target.checked ? [...checked,a.id] : checked.filter((id) => id !== a.id))} /></td><td><Button variant="link" className="h-auto p-0 text-sm font-medium text-brand-navy" onClick={() => show(a)}>{a.full_name}</Button></td><td><Country country={a.country} />{isClosed(a) ? <span className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">Closed in OS</span> : null}</td><td>{a.zone ?? "—"}</td><td><StatusPill status={a.status} /></td><td className="whitespace-nowrap">{shortDate(a.created_at)}</td><td className="whitespace-nowrap">{shortDate(a.start_monday)}</td><td onClick={(e) => e.stopPropagation()}>{["pending","pool"].includes(a.status) ? <div className="flex gap-1"><Button size="sm" variant="ghost" disabled={isClosed(a) || Boolean(countryCodeOf(a.country) && RUUL_BLOCKED.includes(countryCodeOf(a.country) ?? ""))} onClick={() => show(a,"accept")}>Accept</Button><Button size="sm" variant="ghost" onClick={() => show(a,"reject")}>Refuse</Button></div> : null}</td></tr>)}</tbody></table>{!rows.length ? <p className="p-4 text-sm text-brand-navySoft">No applications.</p> : null}</div>
+    <DetailSheet open={Boolean(active)} onClose={() => setOpen(null)} title={active?.full_name ?? "Application"} description={active?.email ?? ""}>{active ? <PosterCard key={`${active.id}-${mode}`} a={active} initialMode={mode} score={scoreOf(active,data?.hmCountries ?? new Set())} zones={data?.zones ?? []} legal={needsLegalName(active) ? legal?.get(active.id) ?? null : undefined} /> : null}</DetailSheet>
+    <Dialog open={refuseOpen} onOpenChange={(v) => { if (!busy) setRefuseOpen(v); }}><DialogContent><DialogHeader><DialogTitle>Refuse {selected.length} applications?</DialogTitle><DialogDescription>{selected.map((a) => a.full_name).join(", ")}</DialogDescription></DialogHeader>{summary ? <p className="text-sm">{summary}</p> : <textarea aria-label="Refusal reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason" className="w-full rounded-lg border p-2" />}<DialogFooter><Button variant="ghost" disabled={busy} onClick={() => setRefuseOpen(false)}>Close</Button>{!summary ? <Button variant="destructive" disabled={busy} onClick={() => void refuseSelected()}>Confirm refusal</Button> : null}</DialogFooter></DialogContent></Dialog>
+  </div>;
 }
 
 const STEPS: [string, string, string | null][] = [
@@ -127,13 +116,13 @@ const STEPS: [string, string, string | null][] = [
   ["logins_sent", "Logins sent", null], ["slack_added", "Added to Slack · by hand", null], ["hm_notified", "Hiring manager notified", "hm_notified_at"], ["warmup", "Warm-up done", null], ["started", "Started Monday", "started_at"], ["dropped", "Dropped", "dropped_at"],
 ];
 
-export function PosterCard({ a, score, zones, legal }: { a: App; legal?: { prenom_legal: string; nom_legal: string } | null | undefined; score: ReturnType<typeof scoreOf>; zones: { zone: string; weekly_amount: number | null; first_week_amount: number | null }[] }) {
+export function PosterCard({ a, score, zones, legal, initialMode = "none" }: { initialMode?: "none" | "accept" | "reject"; a: App; legal?: { prenom_legal: string; nom_legal: string } | null | undefined; score: ReturnType<typeof scoreOf>; zones: { zone: string; weekly_amount: number | null; first_week_amount: number | null }[] }) {
   const qc = useQueryClient();
   const accept = useServerFn(acceptPoster); const reject = useServerFn(rejectPoster); const warm = useServerFn(keepWarm);
   const tick = useServerFn(tickStep); const retry = useServerFn(retryOs);
   const saveRuul = useServerFn(saveRuulEmail); const ruulAdded = useServerFn(markRuulAdded);
   const { data: osZoneData } = useQuery({ queryKey: ["hub", "os-zones"], queryFn: () => osZones(), staleTime: 10 * 60_000, retry: false });
-  const [mode, setMode] = useState<"none" | "accept" | "reject">("none");
+  const [mode, setMode] = useState<"none" | "accept" | "reject">(initialMode);
   const [apps, setApps] = useState<string[]>(["sophia"]);
   const [zone, setZone] = useState<string>(a.zone ?? "");
   const [langue, setLangue] = useState<ApplicantLang>((a.langue as ApplicantLang | null) ?? langOfCountry(a.country));
@@ -154,9 +143,9 @@ export function PosterCard({ a, score, zones, legal }: { a: App; legal?: { preno
   const closedZone = osZoneData?.ok && iso ? osZoneData.fermes.find((f) => f.pays_code === iso) : undefined;
   const zoneBlocked = Boolean(osZoneData?.ok && iso && !osZoneData.ouverts.some((o) => o.pays_code === iso));
   const ruulBlocked = Boolean(iso && RUUL_BLOCKED.includes(iso));
-  const acceptBlock = ruulBlocked ? "Country not supported by Ruul" : zoneBlocked ? (closedZone?.raison ? `Zone not in the OS yet — ${closedZone.raison}` : "Zone not in the OS yet") : null;
+  const acceptBlock = ruulBlocked ? "Country not supported by Ruul" : zoneBlocked ? (closedZone?.raison ? `Closed in OS — ${closedZone.raison}` : "Closed in OS") : null;
   return (
-    <div className="space-y-4 bg-portal-bg/50 px-4 pb-4 pt-2" data-testid="poster-card">
+    <div className="space-y-4 pb-4" data-testid="poster-card">
       <div className="space-y-2 text-sm">
         <p><b>Country</b> {a.country} · <b>Age 18+</b> {a.is_adult ? "OK" : "Not confirmed"}</p>
         <p>{a.phone ? <><b>Phone</b> {a.phone} · </> : null}<b>Language</b> {a.langue ? a.langue.toUpperCase() : `${langOfCountry(a.country).toUpperCase()} (country default)`}</p>
@@ -165,7 +154,6 @@ export function PosterCard({ a, score, zones, legal }: { a: App; legal?: { preno
           {a.q_country_now ? <p><b>Country now:</b> {a.q_country_now}</p> : null}{a.q_hours_per_day ? <p><b>Hours/day:</b> {a.q_hours_per_day}</p> : null}{a.q_tiktok_daily ? <p><b>TikTok daily:</b> {a.q_tiktok_daily}</p> : null}{a.q_previous_content ? <p><b>Previous content:</b> {a.q_previous_content}</p> : null}
           {a.referral_source ? <p><b>Heard via:</b> {a.referral_source}</p> : null}
         </div>
-        <p className="text-xs text-brand-navySoft"><b>Score {score.score}/5</b> · {score.checks.map(([l, ok]) => `${ok ? "✓" : "✗"} ${l}`).join(" · ")}</p>
         {a.start_monday ? <p><b>Start Monday</b> {fmt(a.start_monday)} · <b>Apps</b> {(a.applications ?? []).join(", ") || "—"}</p> : null}
         {a.manager_name ? <p><b>Cohort</b> {a.manager_name}</p> : null}
         {a.os_email ? <p><b>OS login</b> {a.os_email}{(a as Record<string, unknown>)["os_langue"] ? ` · posting language ${String((a as Record<string, unknown>)["os_langue"]).toUpperCase()}` : ""}</p> : null}
@@ -208,7 +196,7 @@ export function PosterCard({ a, score, zones, legal }: { a: App; legal?: { preno
           <div className="flex flex-wrap items-center gap-2">
             <Button size="sm" disabled={Boolean(acceptBlock)} title={acceptBlock ?? undefined} onClick={() => setMode(mode === "accept" ? "none" : "accept")}>Accept</Button>
             {acceptBlock ? <span className="text-xs font-semibold text-portal-amber">{acceptBlock}</span> : null}
-            <Button size="sm" variant="outline" onClick={() => setMode(mode === "reject" ? "none" : "reject")}>Reject</Button>
+            <Button size="sm" variant="outline" onClick={() => setMode(mode === "reject" ? "none" : "reject")}>Refuse</Button>
             {a.status === "pending" ? <Button size="sm" variant="ghost" disabled={busy} onClick={() => void run(() => warm({ data: { applicationId: a.id } }), "Kept warm (no email)")}>Keep warm</Button> : null}
           </div>
         ) : null}
@@ -222,14 +210,13 @@ export function PosterCard({ a, score, zones, legal }: { a: App; legal?: { preno
               {z ? <span className="text-xs">${Number(z.weekly_amount)}/week · first week ${Number(z.first_week_amount)}</span> : null}
             </div>
             {!a.zone ? <p className="text-xs text-portal-amber">This country is not open: picking a zone sets it by hand.</p> : null}
-            <p className="text-xs text-brand-navySoft">Only Confirm acceptance sends the contract email. After signing, the OS account is created and the logins are emailed automatically; Slack is added by hand.</p>
             <Button size="sm" disabled={busy || !zone || !apps.length} onClick={() => void run(() => accept({ data: { applicationId: a.id, apps: apps as ("sophia" | "unswipe")[], zone: zone as "A", langue } }), "Accepted, email sent")}>Confirm acceptance</Button>
           </div>
         ) : null}
         {mode === "reject" ? (
           <div className="space-y-2 border-t border-brand-line py-3 text-sm">
             <textarea aria-label="Reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (sent to the applicant in their language)" className="w-full rounded-lg border p-2" />
-            <Button size="sm" variant="destructive" disabled={busy} onClick={() => void run(() => reject({ data: { applicationId: a.id, reason } }), "Rejected, email sent")}>Reject and email</Button>
+            <Button size="sm" variant="destructive" disabled={busy} onClick={() => void run(() => reject({ data: { applicationId: a.id, reason } }), "Rejected, email sent")}>Confirm refusal</Button>
           </div>
         ) : null}
       </div>
@@ -240,7 +227,7 @@ export function PosterCard({ a, score, zones, legal }: { a: App; legal?: { preno
 type BulkOut = { accepted: { id: string; name: string; start_monday: string }[]; skipped: { id: string; name: string; reason: string }[]; failed: { id: string; error: string }[] };
 
 /** "Accept all (N)" for one country's pending applications; shown only when the country is open in the OS zones. */
-function AcceptAllButton({ country, pending }: { country: string; pending: App[] }) {
+function AcceptAllButton({ country, pending, label, selection = false }: { country: string; pending: App[]; label?: string; selection?: boolean }) {
   const qc = useQueryClient();
   const bulk = useServerFn(acceptPostersBulk);
   const { data: z } = useQuery({ queryKey: ["hub", "os-zones"], queryFn: () => osZones(), staleTime: 10 * 60_000, retry: false });
@@ -249,7 +236,7 @@ function AcceptAllButton({ country, pending }: { country: string; pending: App[]
   const [res, setRes] = useState<BulkOut | null>(null);
   const iso = countryCodeOf(country);
   const isOpen = Boolean(z?.ok && iso && z.ouverts.some((o) => o.pays_code === iso));
-  if (!pending.length || !isOpen) return null;
+  if (!pending.length || (!selection && !isOpen)) return null;
   const nameOf = (id: string) => pending.find((p) => p.id === id)?.full_name ?? id;
   async function go() {
     setBusy(true);
@@ -258,7 +245,7 @@ function AcceptAllButton({ country, pending }: { country: string; pending: App[]
   }
   return (
     <>
-      <Button size="sm" className="ml-auto" onClick={(e) => { e.stopPropagation(); setRes(null); setOpen(true); }}>Accept all ({pending.length})</Button>
+      <Button size="sm" className="ml-auto" onClick={(e) => { e.stopPropagation(); setRes(null); setOpen(true); }}>{label ?? `Accept all (${pending.length})`}</Button>
       <Dialog open={open} onOpenChange={(v) => { if (!busy) setOpen(v); }}>
         <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader>
