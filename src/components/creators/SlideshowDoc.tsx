@@ -1,6 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { LogoMark } from "@/components/site/Logo";
+import { Logo, LogoMark } from "@/components/site/Logo";
+import sophiaPlush from "@/assets/sophia-plush.png.asset.json";
 import { useI18n, useLocalePath } from "@/i18n";
 import { CONTACT_EMAIL } from "@/config/links";
 import { useApps } from "@/lib/apps";
@@ -40,6 +41,9 @@ function DocLangSwitch() {
 export function DocAvatar({ app }: { app?: string | undefined }) {
   const { data: apps = [] } = useApps();
   const a = app && app !== "sophia" ? apps.find((x) => x.slug === app) : undefined;
+  if (!app || app === "sophia") {
+    return <div className="h-16"><Logo className="h-16 gap-3 [&>svg:first-child]:h-16 [&>svg:last-child]:h-11" /></div>;
+  }
   return (
     <div className="flex size-[72px] items-center justify-center overflow-hidden rounded-full bg-doc-avatar text-doc-paper md:size-24">
       {a?.logo_path ? (
@@ -101,45 +105,63 @@ export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
   const b = (s: string) => <strong className="font-semibold">{s}</strong>;
   const about = isSophia
     ? fr
-      ? "Sophia est une application mobile qui aide à apprendre quelque chose de nouveau chaque jour : histoire, sciences, art, psychologie et bien plus. Elle est éditée par Vik Studios SAS, une société française."
-      : "Sophia is a mobile learning app that helps people learn something new every day: history, science, art, psychology and more. It is published by Vik Studios SAS, a French company."
+      ? "Sophia est une application mobile qui aide à apprendre quelque chose de nouveau chaque jour : histoire, mythologie, art, littérature, sciences et monde d'aujourd'hui. Elle est éditée par Vik Studios SAS, une société française."
+      : "Sophia is a mobile learning app that helps people learn something new every day: history, mythology, art, literature, science and today's world. It is published by Vik Studios SAS, a French company."
     : `${name}${a?.tagline ? ` (${a.tagline})` : ""}${a?.short_description ? `${fr ? " : " : ": "}${a.short_description}` : ""} ${fr ? `${name} est éditée par Vik Studios SAS, une société française.` : `${name} is published by Vik Studios SAS, a French company.`}`;
   const crit = fr
     ? ["Vous avez au moins 18 ans", "Vous avez un smartphone et une connexion internet fiable", "Vous pouvez publier 2 slideshows par jour, 7 jours sur 7", "Vous ne travaillez pas actuellement pour une application concurrente", "Vous acceptez de signer un court contrat avant de commencer"]
     : ["You are at least 18 years old", "You have a smartphone and a reliable internet connection", "You can post 2 slideshows a day, 7 days a week", "You don't currently work for a competing app", "You agree to sign a short agreement before you start"];
   const why = fr
-    ? ["Un montant fixe chaque semaine : aucun objectif d'abonnés ni de vues.", "Tout est préparé pour vous : vous n'avez jamais à trouver d'idées.", ...(isSophia ? ["Nos slideshows font des centaines de milliers de vues ; certains ont dépassé le million."] : []), "Vous travaillez d'où vous voulez, au moment qui vous arrange dans la journée."]
-    : ["A fixed amount every week: no follower or view target.", "Everything is prepared for you: you never have to find ideas.", ...(isSophia ? ["Our slideshows reach hundreds of thousands of views; some have passed 1 million."] : []), "You work from anywhere, whenever suits you during the day."];
+    ? ["Un montant fixe chaque semaine : aucun objectif d'abonnés ni de vues.", "Tout est préparé pour vous : vous n'avez jamais à trouver d'idées.", ...(isSophia ? ["Nos slideshows font des centaines de milliers de vues ; certains ont dépassé le million de vues."] : []), "Vous travaillez d'où vous voulez, au moment qui vous arrange dans la journée."]
+    : ["A fixed amount every week: no follower or view target.", "Everything is prepared for you: you never have to find ideas.", ...(isSophia ? ["Our slideshows reach hundreds of thousands of views; some have passed 1 million views."] : []), "You work from anywhere, whenever suits you during the day."];
+  const highlightedPhrases = fr
+    ? ["Pas de caméra, pas d'expérience nécessaire.", `${min} à ${max} $ par semaine`, "moins de 30 minutes par jour", "Un montant fixe chaque semaine", "certains ont dépassé le million de vues"]
+    : ["No camera, no experience needed.", `$${min} to $${max} a week`, "under 30 minutes a day", "A fixed amount every week", "some have passed 1 million views"];
+  const highlight = (text: string): ReactNode => {
+    if (!isSophia) return text;
+    const phrase = highlightedPhrases.find((p) => text.includes(p));
+    if (!phrase) return text;
+    const start = text.indexOf(phrase);
+    return <>{text.slice(0, start)}<mark className="rounded-[3px] bg-doc-highlight px-[2px] text-inherit">{phrase}</mark>{text.slice(start + phrase.length)}</>;
+  };
+  const stats = fr
+    ? [["500 000+", "utilisateurs"], ["4,8★", "sur l'App Store"], ["n°3", "en Éducation sur l'App Store (France, 2026)"], ["240+", "leçons dans 6 matières"]]
+    : [["500,000+", "users"], ["4.8★", "on the App Store"], ["#3", "in Education on the App Store (France, 2026)"], ["240+", "lessons in 6 subjects"]];
 
   return (
     <DocShell>
       <DocAvatar app={app} />
+      <div className="flow-root">
+      {isSophia ? <img src={sophiaPlush.url} alt={fr ? "Sophia, notre mascotte hibou" : "Sophia, our owl mascot"} width={768} height={768} className="float-right ml-6 mt-6 hidden w-[220px] rounded-2xl md:block" /> : null}
       <h1 className="mt-6 font-doc tracking-tight text-[30px] font-bold leading-tight md:text-[40px]">
         {fr ? `Candidature créateur de slideshows ${name}` : `${name} Slideshow Creator Application`}
       </h1>
-      <div className="mt-6 space-y-7 text-[17px] leading-[1.6]">
-        <div className="space-y-4">
+      {isSophia ? <img src={sophiaPlush.url} alt={fr ? "Sophia, notre mascotte hibou" : "Sophia, our owl mascot"} width={768} height={768} className="mx-auto mt-5 block w-[180px] rounded-2xl md:hidden" /> : null}
+        <div className="mt-6 space-y-4 text-[17px] leading-[1.6]">
           {fr ? (
-            <p>En tant que {b("créateur de slideshows")}, vous publiez 2 slideshows par jour sur un compte TikTok pour {b(name)}, depuis votre téléphone. Tout est préparé pour vous : les slides, la légende et la musique. Vous assemblez et vous publiez. Pas de caméra, pas d'expérience nécessaire.</p>
+            <p>En tant que {b("créateur de slideshows")}, vous publiez 2 slideshows par jour sur un compte TikTok pour {b(name)}, depuis votre téléphone. Tout est préparé pour vous : les slides, la légende et la musique. Vous assemblez et vous publiez. {highlight("Pas de caméra, pas d'expérience nécessaire.")}</p>
           ) : (
-            <p>As a {b("slideshow creator")}, you post 2 slideshows a day on a TikTok account for {b(name)}, from your phone. Everything is prepared for you: the slides, the caption and the music. You assemble and publish. No camera, no experience needed.</p>
+            <p>As a {b("slideshow creator")}, you post 2 slideshows a day on a TikTok account for {b(name)}, from your phone. Everything is prepared for you: the slides, the caption and the music. You assemble and publish. {highlight("No camera, no experience needed.")}</p>
           )}
           {fr ? (
-            <p>Vous êtes payé·e {b("chaque lundi")} : un montant fixe de {b(`${min} à ${max} $ par semaine`)} selon votre pays (1 $ de plus la première semaine), via Ruul.</p>
+            <p>Vous êtes payé·e {b("chaque lundi")} : un montant fixe de <strong className="font-semibold">{highlight(`${min} à ${max} $ par semaine`)}</strong> selon votre pays (1 $ de plus la première semaine), via Ruul.</p>
           ) : (
-            <p>You are paid {b("every Monday")}: a fixed amount of {b(`$${min} to $${max} a week`)} depending on your country ($1 extra your first week), through Ruul.</p>
+            <p>You are paid {b("every Monday")}: a fixed amount of <strong className="font-semibold">{highlight(`$${min} to $${max} a week`)}</strong> depending on your country ($1 extra your first week), through Ruul.</p>
           )}
           <p>{b(fr ? "Nous répondons par email, dans votre langue." : "We reply by email, in your language.")} {fr ? "Nous ouvrons les places pays par pays." : "We open places country by country."}</p>
         </div>
+      </div>
+      <div className="mt-7 space-y-7 text-[17px] leading-[1.6]">
+        {isSophia ? <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">{stats.map(([number, label]) => <div key={number} className="rounded-lg bg-doc-callout p-3"><dt className="text-[24px] font-bold leading-tight">{number}</dt><dd className="mt-2 text-[13px] leading-[1.5] text-doc-muted">{label}</dd></div>)}</dl> : null}
         <Sec>
           <H2>{fr ? "Qui sommes-nous" : "About us"}</H2>
           <p>{about}</p>
-          {isSophia ? <p>{fr ? "Nos slideshows sont publiés dans de nombreuses langues, et certains ont dépassé le million de vues." : "Our slideshows are posted in many languages, and some have passed 1 million views."}</p> : null}
+          {isSophia ? <p>{highlight(fr ? "Nos slideshows sont publiés dans de nombreuses langues, et certains ont dépassé le million de vues." : "Our slideshows are posted in many languages, and some have passed 1 million views.")}</p> : null}
         </Sec>
         <Sec>
           <H2>{fr ? "Ce que vous ferez" : "What you'll be doing"}</H2>
           <p>{fr ? `Nous vous donnons une identité TikTok (nom, photo, bio). Vous créez le compte sur votre téléphone et vous le chauffez quelques jours, exactement comme nous vous l'indiquons. Le compte appartient à ${name} ; c'est vous qui le faites vivre.` : `We give you a TikTok identity (name, photo, bio). You create the account on your phone and warm it up for a few days, exactly as we tell you. The account belongs to ${name}; you run it.`}</p>
-          <p>{fr ? "Ensuite, chaque jour, 2 slideshows vous attendent dans votre espace. Vous les publiez sur TikTok et vous collez les liens. C'est tout : moins de 30 minutes par jour." : "Then, every day, 2 slideshows are waiting for you in your dashboard. You post them on TikTok and paste the links. That's it: under 30 minutes a day."}</p>
+          <p>{highlight(fr ? "Ensuite, chaque jour, 2 slideshows vous attendent dans votre espace. Vous les publiez sur TikTok et vous collez les liens. C'est tout : moins de 30 minutes par jour." : "Then, every day, 2 slideshows are waiting for you in your dashboard. You post them on TikTok and paste the links. That's it: under 30 minutes a day.")}</p>
           <p>{fr ? "Une question ? Notre équipe vous répond sur Slack." : "Questions? Our team answers you on Slack."}</p>
         </Sec>
         <Sec>
@@ -153,7 +175,7 @@ export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
         </Sec>
         <Sec>
           <H2>{fr ? `Pourquoi ${name} ?` : `Why ${name}?`}</H2>
-          {why.map((w) => <p key={w}>{w}</p>)}
+          {why.map((w) => <p key={w}>{highlight(w)}</p>)}
         </Sec>
         <div className="border-t border-doc-line pt-7">
           <p>{fr ? "Une minute, pas de vidéo." : "One minute, no video needed."}</p>

@@ -1,3 +1,6 @@
+# Sophia slideshow presentation (Nov 6)
+- [x] Sophia-only colored logo, plush, stats, subject copy and marker highlights; desktop/390px checks. Not published.
+
 # UGC additions (Oct 12)
 - [ ] Replace saved-format UI with five editable video format definitions; update admin/creator terminology, QA and publish
 - [x] Notion ↔ Inspiration sync (settings card, Notion tab, cron every 10 min, classifier tests)
