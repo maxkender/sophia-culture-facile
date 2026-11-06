@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { approveWeek, buildWeekNow, markWeekPaid } from "@/lib/slideshows.functions";
 import { RUUL_HEADERS, RUUL_HELPERS, RUUL_MAX_ROWS, RUUL_MIN_EUR, RUUL_SHEET } from "@/lib/ruul";
 import { useOsStatus } from "./useOs";
+import { StatusPill } from "./Crm";
 import { OsNotConnected } from "./Posters";
 
 const lastMonday = () => { const d = new Date(); const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); x.setUTCDate(x.getUTCDate() - ((x.getUTCDay() + 6) % 7) - 7); return x.toISOString().slice(0, 10); };
@@ -25,6 +26,8 @@ export function SlidesPayouts() {
   const build = useServerFn(buildWeekNow); const approve = useServerFn(approveWeek); const mark = useServerFn(markWeekPaid);
   const [lundi, setLundi] = useState(lastMonday());
   const [busy, setBusy] = useState(false);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
   const [ruulRef, setRuulRef] = useState("");
   const [includeNotAdded, setIncludeNotAdded] = useState<string[]>([]);
   const { data = [] } = useQuery({
@@ -48,7 +51,8 @@ export function SlidesPayouts() {
     if (inFile.length > RUUL_MAX_ROWS) { toast.error(`Too many rows — Ruul takes at most ${RUUL_MAX_ROWS} per file.`); return; }
     const XLSX = await import("xlsx");
     const rows = inFile.map((r) => {
-      const p = r.slideshow_applications!;
+      const p = r.slideshow_applications;
+      if (!p) return [];
       const parts = p.full_name.trim().split(/\s+/);
       const net = Math.max(1, Number(r.amount ?? 0) + Number(r.carried_in ?? 0));
       return [p.ruul_email ?? p.email, parts[0] ?? "", parts.slice(1).join(" "), `Sophia slideshow posts — week of ${lundi}`, Number(net.toFixed(2)), "USD"];
@@ -61,16 +65,16 @@ export function SlidesPayouts() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-end gap-2 rounded-2xl bg-card p-4 shadow-portal">
+      <p className="crm-count">{data.length} payouts · USD ${total.toFixed(2)}</p>
+      <div className="crm-toolbar">
         <label className="text-xs font-semibold text-brand-navySoft">Week starting (Monday)<input type="date" value={lundi} onChange={(e) => setLundi(e.target.value)} className="mt-1 block h-9 rounded-lg border px-2 text-sm" /></label>
         <Button variant="outline" disabled={busy} onClick={() => void go(() => build({ data: { lundi } }), (r) => `${r.built} built, ${r.skipped} skipped`)}>Build this week</Button>
         <Button disabled={busy || !data.some((r) => r.status === "draft")} onClick={() => void go(() => approve({ data: { lundi } }), (r) => `${r.approved} approved, ${r.carried} carried over (under $20)`)}>Approve week</Button>
         <span className="ml-auto text-sm">Total <b>${total.toFixed(2)}</b></span>
       </div>
-      <p className="text-xs text-brand-navySoft">Every started poster is paid through Ruul. Build by hand for posters who have started. Confirm attendance and edit the amount before approving. Amount = zone weekly rate (+$1 the first week); missed posts do not reduce pay. Minimum payout $20: a smaller total carries over to the next week. Currency USD.</p>
       {!os.data?.connected ? <OsNotConnected what="Post counts for payouts" /> : null}
 
-      <div className="space-y-2 rounded-2xl bg-card p-4 shadow-portal" data-testid="ruul-export">
+      <div className="space-y-2 border-y border-brand-line py-3" data-testid="ruul-export">
         <div className="flex flex-wrap items-center gap-3">
           <p className="text-sm font-bold text-brand-navy">Ruul file · {inFile.length} poster{inFile.length === 1 ? "" : "s"} · total ${fileTotal.toFixed(2)}</p>
           <Button size="sm" disabled={!inFile.length} onClick={() => void downloadRuul()}>Download Ruul file</Button>
@@ -91,10 +95,11 @@ export function SlidesPayouts() {
         ) : null}
       </div>
 
-      <div className="overflow-x-auto rounded-2xl bg-card shadow-portal">
+      <div className="crm-toolbar"><input aria-label="Search payouts" className="crm-search" placeholder="Search posters" value={search} onChange={(e) => setSearch(e.target.value)} />{["all","draft","approved","paid","skipped"].map((v) => <Button key={v} size="sm" variant={status === v ? "secondary" : "ghost"} onClick={() => setStatus(v)}>{v === "all" ? "All" : v}</Button>)}</div>
+      <div className="crm-table">
         <table className="w-full min-w-[860px] text-sm" data-testid="slides-payouts">
           <thead className="text-left text-xs uppercase text-brand-navySoft"><tr><th className="p-3">Poster</th><th className="p-3">Zone</th><th className="p-3">Zone rate</th><th className="p-3">First week</th><th className="p-3">Posts</th><th className="p-3">Missed</th><th className="p-3">Suggested</th><th className="p-3">Amount</th><th className="p-3">Carried in</th><th className="p-3">Note</th><th className="p-3">Status</th></tr></thead>
-          <tbody>{data.map((r) => { const p = r.slideshow_applications; return (
+          <tbody>{data.filter((r) => (status === "all" || r.status === status) && `${r.slideshow_applications?.full_name ?? ""} ${r.slideshow_applications?.email ?? ""}`.toLowerCase().includes(search.toLowerCase())).map((r) => { const p = r.slideshow_applications; return (
             <tr key={r.id} className={cn("border-t border-brand-line", r.status === "skipped" && "text-brand-navySoft")}>
               <td className="p-3 font-bold">{p?.full_name}{!p?.ruul_added_at && r.status !== "paid" ? <span className="block text-xs font-normal text-portal-amber">Not added in Ruul yet</span> : null}</td>
               <td className="p-3">{r.zone}{r.first_week ? " · 1st week" : ""}</td>
@@ -104,10 +109,10 @@ export function SlidesPayouts() {
               <td className="p-3">{r.status === "draft" ? <input type="number" step="0.5" min="0" aria-label={`Amount for ${p?.full_name}`} defaultValue={Number(r.amount ?? 0)} onBlur={(e) => { const v = Number(e.target.value); if (v !== Number(r.amount)) void saveRow(r.id, { amount: v }); }} className="h-8 w-20 rounded border px-2" /> : r.amount != null ? `$${Number(r.amount)}` : "—"}</td>
               <td className="p-3">{Number(r.carried_in) ? `$${Number(r.carried_in)}` : "—"}</td>
               <td className="p-3">{r.status === "draft" ? <input aria-label={`Note for ${p?.full_name}`} defaultValue={r.note ?? ""} onBlur={(e) => { if (e.target.value !== (r.note ?? "")) void saveRow(r.id, { note: e.target.value }); }} className="h-8 w-40 rounded border px-2" /> : r.note ?? ""}</td>
-              <td className="p-3">{r.status === "skipped" ? <span title={r.skip_reason ?? ""}>Skipped — {r.skip_reason}</span> : r.status === "paid" ? `paid${r.ruul_ref ? ` · Ruul ${r.ruul_ref}` : ""}` : r.status}</td>
+              <td className="p-3">{r.status === "skipped" ? <span title={r.skip_reason ?? ""}>Skipped — {r.skip_reason}</span> : r.status === "paid" ? `paid${r.ruul_ref ? ` · Ruul ${r.ruul_ref}` : ""}` : <StatusPill status={r.status} />}</td>
             </tr>); })}</tbody>
         </table>
-        {!data.length ? <p className="p-5 text-sm text-brand-navySoft">No lines for this week yet. Click Build this week to prepare editable rows for Ruul posters at status "Started". Nothing is paid automatically — you upload the file in Ruul yourself.</p> : null}
+        {!data.length ? <p className="p-5 text-sm text-brand-navySoft">No payouts for this week.</p> : null}
       </div>
     </div>
   );
