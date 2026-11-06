@@ -1,7 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { Logo, LogoMark } from "@/components/site/Logo";
-import sophiaPlush from "@/assets/sophia-plush.png.asset.json";
+import sophiaPlush from "@/assets/sophia-plush-cutout.png.asset.json";
 import { useI18n, useLocalePath } from "@/i18n";
 import { CONTACT_EMAIL } from "@/config/links";
 import { useApps } from "@/lib/apps";
@@ -112,11 +112,11 @@ export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
     ? ["Vous avez au moins 18 ans", "Vous avez un smartphone et une connexion internet fiable", "Vous pouvez publier 2 slideshows par jour, 7 jours sur 7", "Vous ne travaillez pas actuellement pour une application concurrente", "Vous acceptez de signer un court contrat avant de commencer"]
     : ["You are at least 18 years old", "You have a smartphone and a reliable internet connection", "You can post 2 slideshows a day, 7 days a week", "You don't currently work for a competing app", "You agree to sign a short agreement before you start"];
   const why = fr
-    ? ["Un montant fixe chaque semaine : aucun objectif d'abonnés ni de vues.", "Tout est préparé pour vous : vous n'avez jamais à trouver d'idées.", ...(isSophia ? ["Nos slideshows font des centaines de milliers de vues ; certains ont dépassé le million de vues."] : []), "Vous travaillez d'où vous voulez, au moment qui vous arrange dans la journée."]
-    : ["A fixed amount every week: no follower or view target.", "Everything is prepared for you: you never have to find ideas.", ...(isSophia ? ["Our slideshows reach hundreds of thousands of views; some have passed 1 million views."] : []), "You work from anywhere, whenever suits you during the day."];
+    ? ["Un montant fixe chaque semaine : aucun objectif d'abonnés ni de vues.", "Tout est préparé pour vous : vous n'avez jamais à trouver d'idées.", "Vous travaillez d'où vous voulez, au moment qui vous arrange dans la journée."]
+    : ["A fixed amount every week: no follower or view target.", "Everything is prepared for you: you never have to find ideas.", "You work from anywhere, whenever suits you during the day."];
   const highlightedPhrases = fr
-    ? ["Pas de caméra, pas d'expérience nécessaire.", `${min} à ${max} $ par semaine`, "moins de 30 minutes par jour", "Un montant fixe chaque semaine", "certains ont dépassé le million de vues"]
-    : ["No camera, no experience needed.", `$${min} to $${max} a week`, "under 30 minutes a day", "A fixed amount every week", "some have passed 1 million views"];
+    ? ["Pas de caméra, pas d'expérience nécessaire.", `${min} à ${max} $ par semaine`, "moins de 30 minutes par jour", "Un montant fixe chaque semaine"]
+    : ["No camera, no experience needed.", `$${min} to $${max} a week`, "under 30 minutes a day", "A fixed amount every week"];
   const highlight = (text: string): ReactNode => {
     if (!isSophia) return text;
     const phrase = highlightedPhrases.find((p) => text.includes(p));
@@ -131,12 +131,11 @@ export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
   return (
     <DocShell>
       <DocAvatar app={app} />
-      <div className="flow-root">
-      {isSophia ? <img src={sophiaPlush.url} alt={fr ? "Sophia, notre mascotte hibou" : "Sophia, our owl mascot"} width={768} height={768} className="float-right ml-6 mt-6 hidden w-[220px] rounded-2xl md:block" /> : null}
+      <div className="relative flow-root">
+      {isSophia ? <div className="doc-mascot"><img src={sophiaPlush.url} alt={fr ? "Sophia, notre mascotte hibou" : "Sophia, our owl mascot"} width={440} height={621} /></div> : null}
       <h1 className="mt-6 font-doc tracking-tight text-[30px] font-bold leading-tight md:text-[40px]">
         {fr ? `Candidature créateur de slideshows ${name}` : `${name} Slideshow Creator Application`}
       </h1>
-      {isSophia ? <img src={sophiaPlush.url} alt={fr ? "Sophia, notre mascotte hibou" : "Sophia, our owl mascot"} width={768} height={768} className="mx-auto mt-5 block w-[180px] rounded-2xl md:hidden" /> : null}
         <div className="mt-6 space-y-4 text-[17px] leading-[1.6]">
           {fr ? (
             <p>En tant que {b("créateur de slideshows")}, vous publiez 2 slideshows par jour sur un compte TikTok pour {b(name)}, depuis votre téléphone. Tout est préparé pour vous : les slides, la légende et la musique. Vous assemblez et vous publiez. {highlight("Pas de caméra, pas d'expérience nécessaire.")}</p>
@@ -148,7 +147,7 @@ export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
           ) : (
             <p>You are paid {b("every Monday")}: a fixed amount of <strong className="font-semibold">{highlight(`$${min} to $${max} a week`)}</strong> depending on your country ($1 extra your first week), through Ruul.</p>
           )}
-          <p>{b(fr ? "Nous répondons par email, dans votre langue." : "We reply by email, in your language.")} {fr ? "Nous ouvrons les places pays par pays." : "We open places country by country."}</p>
+          {!isSophia ? <p>{b(fr ? "Nous répondons par email, dans votre langue." : "We reply by email, in your language.")} {fr ? "Nous ouvrons les places pays par pays." : "We open places country by country."}</p> : null}
         </div>
       </div>
       <div className="mt-7 space-y-7 text-[17px] leading-[1.6]">
@@ -156,7 +155,6 @@ export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
         <Sec>
           <H2>{fr ? "Qui sommes-nous" : "About us"}</H2>
           <p>{about}</p>
-          {isSophia ? <p>{highlight(fr ? "Nos slideshows sont publiés dans de nombreuses langues, et certains ont dépassé le million de vues." : "Our slideshows are posted in many languages, and some have passed 1 million views.")}</p> : null}
         </Sec>
         <Sec>
           <H2>{fr ? "Ce que vous ferez" : "What you'll be doing"}</H2>
