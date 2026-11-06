@@ -1,0 +1,2 @@
+ALTER TABLE public.slideshow_applications ADD COLUMN IF NOT EXISTS referred boolean, ADD COLUMN IF NOT EXISTS referral_name text;
+ALTER TABLE public.slideshow_applications ADD CONSTRAINT slideshow_applications_referral_name_len CHECK (referral_name IS NULL OR char_length(referral_name) <= 120);
