@@ -84,6 +84,16 @@ export const acceptPostersBulk = createServerFn({ method: "POST" })
     return acceptMany(await admin(), data.applicationIds, { id: me.id, name: me.name });
   });
 
+/** Accept all valid: dry run lists valid/skipped; otherwise accepts up to `limit` (oldest first) and returns `remaining`. */
+export const acceptAllValid = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ dryRun: z.boolean(), limit: z.number().int().min(1).max(50).default(50) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const me = await assertAdmin(context);
+    const { acceptAllValidRun } = await import("./slideshow-accept.server");
+    return acceptAllValidRun(await admin(), { id: me.id, name: me.name }, data.dryRun, data.limit) as Promise<any>;
+  });
+
 /** Legal names typed by posters in the Sophia OS onboarding (Ruul checks them against the ID). */
 export const osIdentities = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

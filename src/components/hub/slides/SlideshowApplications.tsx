@@ -18,6 +18,7 @@ import {
   osIdentities,
   acceptPoster,
   acceptPostersBulk,
+  acceptAllValid,
   keepWarm,
   markRuulAdded,
   osZones,
@@ -159,6 +160,20 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
       countryCodeOf(a.country) &&
       !zones.ouverts.some((z) => z.pays_code === countryCodeOf(a.country)),
     );
+  const langOff = (a: App) => {
+    const iso = countryCodeOf(a.country);
+    const o = zones?.ok && iso ? zones.ouverts.find((z) => z.pays_code === iso) : undefined;
+    return Boolean(o && (o as { langue_os?: boolean }).langue_os !== true);
+  };
+  const validCount = apps.filter(
+    (a) =>
+      ["pending", "pool"].includes(a.status) &&
+      !isClosed(a) &&
+      Boolean(zones?.ok && countryCodeOf(a.country)) &&
+      !langOff(a) &&
+      !RUUL_BLOCKED.includes(countryCodeOf(a.country) ?? "") &&
+      Boolean(a.zone),
+  ).length;
   const show = (a: App, action: "none" | "accept" | "reject" = "none") => {
     setOpen(a.id);
     setMode(action);
@@ -209,7 +224,8 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
             <option key={c}>{c}</option>
           ))}
         </select>
-        <div className="ml-auto">
+        <div className="ml-auto flex gap-2">
+          <AcceptAllValidButton n={validCount} />
           {country !== "all" ? (
             <AcceptAllButton
               country={country}
@@ -313,6 +329,10 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
                   {isClosed(a) ? (
                     <span className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">
                       Closed in OS
+                    </span>
+                  ) : langOff(a) ? (
+                    <span className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">
+                      Language not in OS
                     </span>
                   ) : null}
                 </td>
@@ -1061,6 +1081,105 @@ function AcceptAllButton({
                 </Button>
               </>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+type ValidRow = { id: string; name: string; country: string };
+type SkipRow = ValidRow & { reason: string };
+
+/** "Accept all valid (n)": dry run → grouped confirmation → batches of 50 through the shared acceptance path. */
+function AcceptAllValidButton({ n }: { n: number }) {
+  const qc = useQueryClient();
+  const run = useServerFn(acceptAllValid);
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [plan, setPlan] = useState<{ valid: ValidRow[]; skipped: SkipRow[] } | null>(null);
+  const [progress, setProgress] = useState("");
+  async function preview() {
+    setBusy(true);
+    try {
+      const r = await run({ data: { dryRun: true, limit: 50 } });
+      setPlan({ valid: r.valid ?? [], skipped: r.skipped ?? [] });
+      setProgress("");
+      setOpen(true);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function confirm() {
+    if (!plan) return;
+    setBusy(true);
+    const total = plan.valid.length;
+    let accepted = 0;
+    let failed = 0;
+    let skipped = 0;
+    try {
+      for (let guard = 0; guard < 100; guard++) {
+        const r = await run({ data: { dryRun: false, limit: 50 } });
+        accepted += r.accepted?.length ?? 0;
+        failed += r.failed?.length ?? 0;
+        skipped = r.skipped?.length ?? 0;
+        setProgress(`Accepted ${accepted} / ${total}…`);
+        if (!r.remaining || (r.accepted?.length ?? 0) === 0) break;
+      }
+      toast.success(`${accepted} accepted · ${skipped} skipped · ${failed} failed`);
+      setOpen(false);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+      void qc.invalidateQueries({ queryKey: ["hub", "slides"] });
+    }
+  }
+  const groups = new Map<string, ValidRow[]>();
+  for (const v of plan?.valid ?? []) groups.set(v.country, [...(groups.get(v.country) ?? []), v]);
+  return (
+    <>
+      <Button size="sm" disabled={n === 0 || busy} onClick={() => void preview()}>
+        {busy && !open ? "Checking…" : `Accept all valid (${n})`}
+      </Button>
+      <Dialog open={open} onOpenChange={(v) => !busy && setOpen(v)}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Accept {plan?.valid.length ?? 0} applications?</DialogTitle>
+            <DialogDescription>
+              Each one goes through the single Accept path: start Monday, contract link and acceptance email.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-1 text-sm">
+            {[...groups.entries()].sort((x, y) => y[1].length - x[1].length).map(([c, list]) => (
+              <details key={c}>
+                <summary className="cursor-pointer">
+                  <Country country={c} /> <span className="font-medium">{list.length}</span>
+                </summary>
+                <p className="pl-5 text-xs text-brand-navySoft">{list.map((l) => l.name).join(", ")}</p>
+              </details>
+            ))}
+          </div>
+          {plan?.skipped.length ? (
+            <details className="text-sm">
+              <summary className="cursor-pointer font-medium">Skipped: {plan.skipped.length}</summary>
+              <ul className="list-disc pl-5 text-xs text-brand-navySoft">
+                {plan.skipped.map((s) => (
+                  <li key={s.id}>{s.name} ({s.country}) — {s.reason}</li>
+                ))}
+              </ul>
+            </details>
+          ) : null}
+          {progress ? <p className="text-sm">{progress}</p> : null}
+          <DialogFooter>
+            <Button variant="ghost" disabled={busy} onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button disabled={busy || !plan?.valid.length} onClick={() => void confirm()}>
+              {busy ? "Accepting…" : `Accept ${plan?.valid.length ?? 0}`}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

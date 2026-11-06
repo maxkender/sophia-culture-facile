@@ -94,11 +94,19 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             const parsed = z.object({
               application_ids: z.array(z.string().uuid()).min(1).max(50).optional(),
               country: z.string().trim().min(1).max(100).optional(),
+              all_valid: z.literal(true).optional(),
               dry_run: z.boolean().optional(),
-            }).refine((b) => Boolean(b.application_ids) !== Boolean(b.country), "Send exactly one of application_ids or country")
+            }).refine((b) => [b.application_ids, b.country, b.all_valid].filter(Boolean).length === 1, "Send exactly one of application_ids, country or all_valid")
               .safeParse(await request.json().catch(() => null));
             if (!parsed.success) return Response.json({ ok: false, error: parsed.error.issues[0]?.message ?? "Invalid body" }, { status: 400 });
             const b = parsed.data;
+            if (b.all_valid) {
+              const { acceptAllValidRun } = await import("@/lib/slideshow-accept.server");
+              const r: any = await acceptAllValidRun(a, { id: null, name: "Claude (on admin request)" }, b.dry_run === true, 50);
+              // Same shape as other slides-accept calls: accepted / skipped / failed (+ remaining).
+              if (b.dry_run === true) return Response.json({ ok: true, dry_run: true, accepted: r.valid.slice(0, 50), skipped: r.skipped, failed: [], remaining: r.valid.length });
+              return Response.json(r);
+            }
             let q = a.from("slideshow_applications").select("id, country").eq("status", "pending").order("created_at", { ascending: true });
             if (b.application_ids) q = q.in("id", b.application_ids);
             const { data: all, error } = await q;

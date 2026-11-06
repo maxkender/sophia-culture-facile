@@ -99,3 +99,46 @@ export async function acceptMany(a: Admin, ids: string[], by: AcceptBy, dryRun =
   }
   return out;
 }
+
+/** VALID for "Accept all valid": acceptable, OS publishes in the country's language, not a duplicate, has a pay zone. Null = valid. */
+export function validReason(app: any, zones: Zones, duplicate: string | null = null): string | null {
+  const refused = refusalReason(app, zones);
+  if (refused) return refused;
+  const code = countryCodeOf(app.country);
+  const entry = zones?.ok && code ? zones.ouverts.find((o) => o.pays_code === code) : undefined;
+  if (!entry) return "Closed in OS";
+  if (entry.langue_os !== true) return "Language not in the OS";
+  if (duplicate) return duplicate;
+  if (!defaultsFor(app).zone) return "No pay zone for this country";
+  return null;
+}
+
+export type ValidSelection = { valid: { id: string; name: string; country: string }[]; skipped: { id: string; name: string; country: string; reason: string }[] };
+
+/** All pending/pool applications split into valid (oldest first) and skipped with reason. Duplicates checked in one query. */
+export async function selectAllValid(a: Admin, zones?: Zones): Promise<ValidSelection> {
+  const z = zones === undefined ? await loadZones(a) : zones;
+  const { data: pending } = await a.from("slideshow_applications").select("*").in("status", ["pending", "pool"]).order("created_at", { ascending: true }).limit(2000);
+  const { data: active } = await a.from("slideshow_applications").select("id, email, phone").not("status", "in", `(${INACTIVE.join(",")})`).limit(5000);
+  const out: ValidSelection = { valid: [], skipped: [] };
+  for (const app of pending ?? []) {
+    const email = String(app.email ?? "").trim().toLowerCase();
+    const phone = digits(app.phone);
+    const dup = (active ?? []).some((r: any) => r.id !== app.id && ((email && String(r.email ?? "").trim().toLowerCase() === email) || (phone.length >= 6 && digits(r.phone) === phone)))
+      ? "Possible duplicate (same email or phone as another active application)" : null;
+    const reason = validReason(app, z, dup);
+    const row = { id: app.id as string, name: app.full_name as string, country: app.country as string };
+    if (reason) out.skipped.push({ ...row, reason }); else out.valid.push(row);
+  }
+  return out;
+}
+
+/** Accept up to `limit` valid applications through acceptMany; returns the bulk result plus valid ones left. */
+export async function acceptAllValidRun(a: Admin, by: AcceptBy, dryRun: boolean, limit = 50) {
+  const zones = await loadZones(a);
+  const sel = await selectAllValid(a, zones);
+  if (dryRun) return { ok: true as const, dry_run: true, ...sel, remaining: sel.valid.length };
+  const batch = sel.valid.slice(0, limit);
+  const r = await acceptMany(a, batch.map((v) => v.id), by);
+  return { ...r, skipped: [...sel.skipped.map(({ id, name, reason }) => ({ id, name, reason })), ...r.skipped], remaining: Math.max(0, sel.valid.length - batch.length) };
+}
