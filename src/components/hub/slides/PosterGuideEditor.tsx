@@ -23,7 +23,13 @@ import { formatDateTime } from "@/lib/portal";
 import { DocumentBody } from "@/components/portal/DocumentBody";
 import { usePortalProfile } from "@/components/portal/usePortal";
 import { useDocument, useDocumentVersions } from "@/components/portal/useDocuments";
-import { Banner, PageTitle, PortalCard } from "@/components/portal/ui";
+import { Banner } from "@/components/portal/ui";
+import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
+
+function PortalCard({ children, className }: { children: ReactNode; className?: string }) {
+  return <section className={cn("border-b border-brand-line py-4", className)}>{children}</section>;
+}
 
 const BLOCK_TYPES: DocBlock["type"][] = ["heading", "paragraph", "bullets", "table", "callout"];
 
@@ -352,16 +358,14 @@ export function PosterGuideEditor() {
 
   return (
     <div>
-      <PageTitle
-        title="Poster Guide"
-        lead="Posters read this after signing. Use {weekly_amount}, {first_week_amount} and {posts_per_day}; each person sees only their own zone figures."
-        action={
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-brand-line pb-3">
+        <div><h2 className="font-semibold">Poster Guide</h2><p className="crm-count">{subtitle}</p></div>
           <div className="flex flex-wrap items-center gap-2">
             <PublishState published={doc.row.published} />
             <Button
               type="button"
-              variant="pillSecondary"
-              size="pillSm"
+              variant="outline"
+              size="sm"
               onClick={() =>
                 downloadDocumentPdf({ slug, title, subtitle, version: doc.row.current_version, blocks })
               }
@@ -369,23 +373,17 @@ export function PosterGuideEditor() {
               <Download className="size-4" />
               Download PDF
             </Button>
-            <Button type="button" variant="pill" size="pillSm" disabled={saving} onClick={() => save(blocks, title, note)}>
+            <Button type="button" size="sm" disabled={saving} onClick={() => save(blocks, title, note)}>
               {saving ? "Saving…" : "Save new version"}
             </Button>
           </div>
-        }
-      />
+      </div>
 
       <div className="mb-6">
         <PortalCard className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="flex items-center gap-3 text-sm font-bold text-brand-navy">
               Visibility <PublishState published={doc.row.published} />
-            </p>
-            <p className="mt-1 text-sm text-brand-navySoft">
-              {doc.row.published
-                ? "Posters can read this guide after signing their contract."
-                : "Draft. This guide is not available to posters."}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -413,17 +411,10 @@ export function PosterGuideEditor() {
               <Label htmlFor="doc-note">Note for the version history (optional)</Label>
               <Input id="doc-note" className="h-11" value={note} onChange={(event) => setNote(event.target.value)} />
             </div>
-            <p className="text-xs text-brand-navySoft">
-              {subtitle}. Saving writes a new version and leaves every earlier one intact.
-            </p>
           </PortalCard>
 
           <PortalCard className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-wide text-brand-navySoft">Merge fields</p>
-            <p className="text-sm text-brand-navySoft">
-              These fields are replaced with the poster’s zone figures when they read the guide.
-              You always see the raw tokens here.
-            </p>
             <div className="flex flex-wrap gap-2 pt-1">
               {["weekly_amount", "first_week_amount", "posts_per_day"].map((token) => (
                 <code

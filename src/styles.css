@@ -286,6 +286,12 @@
 .slides-crm .crm-search { height: 36px; width: 220px; max-width: 100%; border: 1px solid var(--brand-line); border-radius: 6px; padding: 0 10px; background: var(--card); font-size: 14px; }
 .slides-crm h2 { font-size: 16px; letter-spacing: 0; }
 .slides-crm .crm-count { font-size: 12px; color: var(--brand-navy-soft); }
+.slides-crm main, .slides-crm .crm-toolbar > * { min-width: 0; }
+.slides-crm .crm-counters > a { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; }
+.slides-crm .crm-tasks a { display: block; }
+.slides-crm .crm-setting-line { flex-wrap: nowrap; }
+.slides-crm .crm-setting-line > a { display: block; flex: 1; min-width: 0; min-height: 0; }
+.slides-crm .crm-setting-line > span { flex-shrink: 0; }
 
 .doc-mascot {
   position: relative;
