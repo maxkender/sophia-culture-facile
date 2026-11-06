@@ -42,7 +42,7 @@ export function DocAvatar({ app }: { app?: string | undefined }) {
   const { data: apps = [] } = useApps();
   const a = app && app !== "sophia" ? apps.find((x) => x.slug === app) : undefined;
   if (!app || app === "sophia") {
-    return <Logo className="h-16 gap-3 [&>svg:first-child]:h-16 [&>svg:last-child]:h-11" />;
+    return <div className="h-16"><Logo className="h-16 gap-3 [&>svg:first-child]:h-16 [&>svg:last-child]:h-11" /></div>;
   }
   return (
     <div className="flex size-[72px] items-center justify-center overflow-hidden rounded-full bg-doc-avatar text-doc-paper md:size-24">
