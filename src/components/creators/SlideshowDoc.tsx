@@ -88,7 +88,7 @@ export function DocShell({ children }: { children: ReactNode }) {
   return (
     <div lang={lang.htmlLang} dir={lang.dir} className="relative flex min-h-screen flex-col overflow-x-hidden bg-doc-paper font-doc tracking-tight text-doc-ink antialiased">
       <DocLangMenu />
-      <main className="mx-auto w-full max-w-[700px] flex-1 px-4 pb-16 pt-8 md:pt-16">{children}</main>
+      <main className="mx-auto w-full max-w-[700px] flex-1 px-4 pb-16 pt-16 md:pt-16">{children}</main>
       <footer className="mx-auto w-full max-w-[700px] px-4 pb-8 text-[13px] text-doc-muted">
         © Vik Studios SAS ·{" "}
         <Link to={privacyPath} className="hover:underline">{t.footer.privacy}</Link> ·{" "}
