@@ -116,7 +116,7 @@ const STEPS: [string, string, string | null][] = [
   ["logins_sent", "Logins sent", null], ["slack_added", "Added to Slack · by hand", null], ["hm_notified", "Hiring manager notified", "hm_notified_at"], ["warmup", "Warm-up done", null], ["started", "Started Monday", "started_at"], ["dropped", "Dropped", "dropped_at"],
 ];
 
-export function PosterCard({ a, score, zones, legal, initialMode = "none" }: { initialMode?: "none" | "accept" | "reject"; a: App; legal?: { prenom_legal: string; nom_legal: string } | null | undefined; score: ReturnType<typeof scoreOf>; zones: { zone: string; weekly_amount: number | null; first_week_amount: number | null }[] }) {
+export function PosterCard({ a, zones, legal, initialMode = "none" }: { initialMode?: "none" | "accept" | "reject"; a: App; legal?: { prenom_legal: string; nom_legal: string } | null | undefined; score: ReturnType<typeof scoreOf>; zones: { zone: string; weekly_amount: number | null; first_week_amount: number | null }[] }) {
   const qc = useQueryClient();
   const accept = useServerFn(acceptPoster); const reject = useServerFn(rejectPoster); const warm = useServerFn(keepWarm);
   const tick = useServerFn(tickStep); const retry = useServerFn(retryOs);
@@ -147,7 +147,7 @@ export function PosterCard({ a, score, zones, legal, initialMode = "none" }: { i
   return (
     <div className="space-y-4 pb-4" data-testid="poster-card">
       <div className="space-y-2 text-sm">
-        <p><b>Country</b> {a.country} · <b>Age 18+</b> {a.is_adult ? "OK" : "Not confirmed"}</p>
+        <p><b>Country</b> <Country country={a.country} /> · <b>Age 18+</b> {a.is_adult ? "OK" : "Not confirmed"}</p>
         <p>{a.phone ? <><b>Phone</b> {a.phone} · </> : null}<b>Language</b> {a.langue ? a.langue.toUpperCase() : `${langOfCountry(a.country).toUpperCase()} (country default)`}</p>
         <p>{a.has_upwork == null ? null : <><b>Upwork</b> {a.has_upwork ? (a.upwork_profile_url ? <a className="text-space-slides underline" href={a.upwork_profile_url} target="_blank" rel="noreferrer">profile</a> : "yes") : "no"} · </>}<b>Zone</b> {a.zone ?? "country not open"}</p>
         <div className="border-t border-brand-line py-3 text-xs">
@@ -159,6 +159,10 @@ export function PosterCard({ a, score, zones, legal, initialMode = "none" }: { i
         {a.os_email ? <p><b>OS login</b> {a.os_email}{(a as Record<string, unknown>)["os_langue"] ? ` · posting language ${String((a as Record<string, unknown>)["os_langue"]).toUpperCase()}` : ""}</p> : null}
         {a.rejected_reason ? <p><b>Reason</b> {a.rejected_reason}</p> : null}
         <p className="text-xs text-brand-navySoft"><b>Paid via</b> Ruul · {(a as Record<string, unknown>)["ruul_added_at"] ? "added" : "to add"}</p>
+        {legal ? <p><b>Legal name</b> {legal.prenom_legal} {legal.nom_legal}</p> : needsLegalName(a) ? <p className="text-xs text-brand-navySoft">Waiting for legal name</p> : null}
+        <div className="border-t border-brand-line pt-3 text-xs"><b>Emails sent</b><p>Acknowledgement · {fmt(a.ack_sent_at) || "—"}</p><p>Acceptance · {fmt(a.accepted_at) || "—"}</p><p>Logins · {fmt(tl["logins_sent"]?.at) || "—"}</p>{a.status === "rejected" ? <p>Refusal · {fmt(a.decided_at) || "—"}</p> : null}</div>
+        {a.admin_notes ? <p className="whitespace-pre-wrap text-xs"><b>Notes</b> {a.admin_notes}</p> : null}
+        {a.unswipe_code_id ? <p className="text-xs"><b>UnSwipe code</b> Assigned</p> : null}
       </div>
       <div className="space-y-3">
         <ul className="space-y-1 border-t border-brand-line py-3 text-sm">
@@ -177,7 +181,6 @@ export function PosterCard({ a, score, zones, legal, initialMode = "none" }: { i
         {["contract_signed", "os_created", "started"].includes(a.status) ? (
           <div className="space-y-2 rounded-xl border border-brand-line bg-card p-3 text-sm" data-testid="ruul-box">
             <p className="font-bold text-brand-navy">Add to Ruul <span className="ml-1 rounded-full bg-portal-bg px-2 py-0.5 text-xs font-semibold">{(a as Record<string, unknown>)["ruul_added_at"] ? "added" : "to add"}</span></p>
-            <p className="text-xs text-brand-navySoft">Ruul sends no invitation: add the poster in Ruul's "New Contractor" form with these exact values. The poster then creates his Ruul account with the same email.</p>
             {legal === null ? <p className="text-xs font-semibold text-portal-amber">Waiting for the legal name (asked in the Sophia OS onboarding)</p> : null}
             {([...(legal === null ? [] : [["First name", legal ? legal.prenom_legal : (a.full_name.trim().split(/\s+/)[0] ?? "")], ["Last name", legal ? legal.nom_legal : a.full_name.trim().split(/\s+/).slice(1).join(" ")]] as const), ["Country", a.country]] as const).map(([l, v]) => (
               <p key={l} className="flex items-center gap-2 text-xs"><b className="w-20">{l}</b><span className="flex-1 break-all">{v || "—"}</span><Button size="sm" variant="ghost" onClick={() => { void navigator.clipboard.writeText(v); toast.success("Copied"); }}>Copy</Button></p>
@@ -220,6 +223,7 @@ export function PosterCard({ a, score, zones, legal, initialMode = "none" }: { i
           </div>
         ) : null}
       </div>
+      <section className="border-t border-brand-line pt-3"><h2 className="mb-2 font-semibold">History</h2><ul className="space-y-2 text-xs">{Object.entries(tl).map(([key,event]) => <li key={key} className="flex flex-wrap justify-between gap-2"><span>{key.replace(/_/g," ")}</span><span className="text-brand-navySoft">{fmt(event?.at)}{event?.by ? ` · ${event.by}` : ""}</span></li>)}</ul></section>
     </div>
   );
 }
@@ -240,7 +244,7 @@ function AcceptAllButton({ country, pending, label, selection = false }: { count
   const nameOf = (id: string) => pending.find((p) => p.id === id)?.full_name ?? id;
   async function go() {
     setBusy(true);
-    try { setRes(await bulk({ data: { applicationIds: pending.map((p) => p.id) } }) as BulkOut); void qc.invalidateQueries({ queryKey: ["hub", "slides"] }); }
+    try { const result: BulkOut = { accepted: [], skipped: [], failed: [] }; for (let i = 0; i < pending.length; i += 200) { const part = await bulk({ data: { applicationIds: pending.slice(i,i+200).map((p) => p.id) } }); result.accepted.push(...part.accepted); result.skipped.push(...part.skipped); result.failed.push(...part.failed); } setRes(result); void qc.invalidateQueries({ queryKey: ["hub", "slides"] }); }
     catch (e) { toast.error((e as Error).message); } finally { setBusy(false); }
   }
   return (

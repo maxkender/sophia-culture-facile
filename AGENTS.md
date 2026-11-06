@@ -35,5 +35,6 @@ UGC acceptance/onboarding mutations use authenticated server functions to valida
 - UGC programme overview uses UgcOverview, never the legacy mixed CreatorsDashboard; why: author-side legacy code remains untouched and slideshow/influencer counts stay outside UGC.
 
 - Slideshows uses its own PosterGuideEditor with poster labels and zone merge fields; why: keep author editing pages unchanged.
+- Slideshow CRM styling is scoped by slides-crm; shared detail Sheets reuse PosterCard and all existing server actions, and Rates uses an opt-in compact view; why: keep other tracks, settings, public pages and lifecycle behavior unchanged.
 
 - UGC drafts: creators insert only 'submitted' creator_drafts rows; admins review (ugc-drafts.functions.ts); post links need a validated draft when draft_required; why: owner approves every video.
