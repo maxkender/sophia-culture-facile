@@ -115,8 +115,8 @@ export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
     ? ["Un montant fixe chaque semaine : aucun objectif d'abonnés ni de vues.", "Tout est préparé pour vous : vous n'avez jamais à trouver d'idées.", "Vous travaillez d'où vous voulez, au moment qui vous arrange dans la journée."]
     : ["A fixed amount every week: no follower or view target.", "Everything is prepared for you: you never have to find ideas.", "You work from anywhere, whenever suits you during the day."];
   const highlightedPhrases = fr
-    ? ["Pas de caméra, pas d'expérience nécessaire.", `${min} à ${max} $ par semaine`, "moins de 30 minutes par jour", "Un montant fixe chaque semaine"]
-    : ["No camera, no experience needed.", `$${min} to $${max} a week`, "under 30 minutes a day", "A fixed amount every week"];
+    ? ["Pas de caméra, pas d'expérience nécessaire.", `${min} à ${max} $ par semaine`, "moins de 10 minutes par jour", "Un montant fixe chaque semaine"]
+    : ["No camera, no experience needed.", `$${min} to $${max} a week`, "under 10 minutes a day", "A fixed amount every week"];
   const highlight = (text: string): ReactNode => {
     if (!isSophia) return text;
     const phrase = highlightedPhrases.find((p) => text.includes(p));
@@ -159,7 +159,7 @@ export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
         <Sec>
           <H2>{fr ? "Ce que vous ferez" : "What you'll be doing"}</H2>
           <p>{fr ? `Nous vous donnons une identité TikTok (nom, photo, bio). Vous créez le compte sur votre téléphone et vous le chauffez quelques jours, exactement comme nous vous l'indiquons. Le compte appartient à ${name} ; c'est vous qui le faites vivre.` : `We give you a TikTok identity (name, photo, bio). You create the account on your phone and warm it up for a few days, exactly as we tell you. The account belongs to ${name}; you run it.`}</p>
-          <p>{highlight(fr ? "Ensuite, chaque jour, 2 slideshows vous attendent dans votre espace. Vous les publiez sur TikTok et vous collez les liens. C'est tout : moins de 30 minutes par jour." : "Then, every day, 2 slideshows are waiting for you in your dashboard. You post them on TikTok and paste the links. That's it: under 30 minutes a day.")}</p>
+          <p>{highlight(fr ? "Ensuite, chaque jour, 2 slideshows vous attendent dans votre espace. Vous les publiez sur TikTok et vous collez les liens. C'est tout : moins de 10 minutes par jour." : "Then, every day, 2 slideshows are waiting for you in your dashboard. You post them on TikTok and paste the links. That's it: under 10 minutes a day.")}</p>
           <p>{fr ? "Une question ? Notre équipe vous répond sur Slack." : "Questions? Our team answers you on Slack."}</p>
         </Sec>
         <Sec>
