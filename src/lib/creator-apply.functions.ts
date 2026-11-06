@@ -1,3 +1,4 @@
+import { referralFields } from "./slideshow-referral";
 import { createServerFn } from "@tanstack/react-start";
 import { resolveAppId } from "./resolve-app.server";
 import { getRequest } from "@tanstack/react-start/server";
@@ -129,6 +130,10 @@ const slideSchema = z.object({
   q_hours_per_day: z.string().trim().max(120).optional(), // retired question; old answers stay stored
   q_tiktok_daily: z.string().trim().max(120).optional(), // optional screening question
   q_previous_content: z.string().trim().max(2000).optional(), // optional screening question
+  referred: z.boolean().optional(),
+  referral_name: z.string().trim().max(120).optional(),
+}).superRefine((d, ctx) => {
+  if (d.referred === true && !d.referral_name) ctx.addIssue({ code: "custom", path: ["referral_name"], message: "Referral name is required" });
 });
 
 export const submitSlideshowApplication = createServerFn({ method: "POST" })
@@ -156,6 +161,7 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
       q_hours_per_day: data.q_hours_per_day || null,
       q_tiktok_daily: data.q_tiktok_daily || null,
       q_previous_content: data.q_previous_content || null,
+      ...referralFields(data),
     }).select("id").single();
     if (error) {
       console.error("slideshow application insert failed", error.message);
