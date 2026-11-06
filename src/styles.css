@@ -342,3 +342,6 @@
 @media (prefers-reduced-motion: reduce) {
   .doc-mascot img { animation: none; }
 }
+@media (min-width: 768px) {
+  .slides-crm table td button { height: 24px; min-height: 24px; }
+}
