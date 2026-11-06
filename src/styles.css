@@ -298,18 +298,17 @@
 
 .doc-mascot {
   position: relative;
-  float: right;
-  width: 100px;
-  margin: 24px 0 12px 16px;
+  flex: none;
+  width: 64px;
 }
 
 .doc-mascot::after {
   content: "";
   position: absolute;
   bottom: -5px;
-  left: 15%;
+  inset-inline-start: 15%;
   width: 70%;
-  height: 12px;
+  height: 8px;
   background: radial-gradient(ellipse, var(--color-doc-ground-shadow), transparent 70%);
   filter: blur(3px);
   pointer-events: none;
@@ -323,18 +322,7 @@
 }
 
 @media (min-width: 768px) {
-  .doc-mascot { width: 150px; margin-left: 24px; }
-}
-
-@media (min-width: 1100px) {
-  .doc-mascot {
-    position: absolute;
-    top: 24px;
-    left: calc(100% + 24px);
-    float: none;
-    width: 180px;
-    margin: 0;
-  }
+  .doc-mascot { width: 88px; }
 }
 
 @keyframes doc-mascot-float {

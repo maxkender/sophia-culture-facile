@@ -1,40 +1,63 @@
-import { Link, useLocation } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 import { Logo, LogoMark } from "@/components/site/Logo";
 import sophiaPlush from "@/assets/sophia-plush-cutout.png.asset.json";
-import { useI18n, useLocalePath } from "@/i18n";
+import { ROUTES } from "@/i18n/routes";
+import { SLIDESHOW_LANGUAGES, fillSlideshow, slideshowLanguage, slideshowPageFromPath, slideshowPath, slideshowStrings } from "@/i18n/slideshow-pages";
 import { CONTACT_EMAIL } from "@/config/links";
 import { useApps } from "@/lib/apps";
 import { getSlideshowPayInfo } from "@/lib/slideshow-zones.functions";
 
-/** FR <-> EN counterpart of the slideshow recruiting pages (query string kept). */
-const PAIRS: [string, string][] = [
-  ["/en/creators/unswipe/slideshow", "/fr/createurs/unswipe/slideshow"],
-  ["/en/creators/slideshow", "/fr/createurs/slideshow"],
-  ["/en/slideshow-application", "/fr/candidature-slideshow"],
-];
+/** Language of the current slideshow page (English outside these pages). */
+export function useSlideshowLang() {
+  const pathname = useRouterState({ select: (st) => st.location.pathname });
+  const info = slideshowPageFromPath(pathname);
+  const lang = info?.lang ?? slideshowLanguage("en");
+  return { lang, page: info?.page ?? "landing", s: slideshowStrings(lang.code), pathname };
+}
 
-function DocLangSwitch() {
-  const { lang } = useI18n();
-  const loc = useLocation();
-  const path = loc.pathname.replace(/\/$/, "");
-  const pair = PAIRS.find(([en, fr]) => en === path || fr === path);
-  const search = typeof window !== "undefined" ? window.location.search : "";
-  const href = (l: "fr" | "en") => (pair ? (l === "en" ? pair[0] : pair[1]) + search : "#");
+/** `?app=` from the URL (SSR-safe). */
+export function useAppQuery(): string | undefined {
+  const search = useRouterState({ select: (st) => st.location.search as Record<string, unknown> });
+  const v = search["app"];
+  return typeof v === "string" && v ? v : undefined;
+}
+
+/** Inline markup: **bold**, ==highlight== (highlight only for Sophia), nesting allowed. */
+export function rich(text: string, mark: boolean): ReactNode {
+  const parts = text.split(/(\*\*.+?\*\*|==.+?==)/g).filter((p) => p !== "");
+  return parts.map((p, i) => {
+    if (p.startsWith("**") && p.endsWith("**") && p.length > 4) return <strong key={i} className="font-semibold">{rich(p.slice(2, -2), mark)}</strong>;
+    if (p.startsWith("==") && p.endsWith("==") && p.length > 4) {
+      const inner = rich(p.slice(2, -2), mark);
+      return mark ? <mark key={i} className="rounded-[3px] bg-doc-highlight px-[2px] text-inherit">{inner}</mark> : <Fragment key={i}>{inner}</Fragment>;
+    }
+    return <Fragment key={i}>{p}</Fragment>;
+  });
+}
+
+function DocLangMenu() {
+  const { lang, page, s, pathname } = useSlideshowLang();
+  const unswipe = pathname.includes("/unswipe/");
+  const go = (urlCode: string) => {
+    const q = new URLSearchParams(window.location.search);
+    if (unswipe && !q.get("app")) q.set("app", "unswipe");
+    const qs = q.toString();
+    window.location.href = slideshowPath(urlCode, page) + (qs ? `?${qs}` : "");
+  };
   return (
-    <nav aria-label="Language" className="absolute right-4 top-4 flex gap-1 text-[13px] font-medium md:right-6 md:top-5">
-      {(["fr", "en"] as const).map((l) => (
-        <a
-          key={l}
-          href={href(l)}
-          hrefLang={l}
-          aria-current={lang === l ? "true" : undefined}
-          className={`rounded px-2 py-1 ${lang === l ? "bg-doc-hover text-doc-ink" : "text-doc-muted hover:bg-doc-hover"}`}
-        >
-          {l.toUpperCase()}
-        </a>
-      ))}
-    </nav>
+    <div className="absolute end-3 top-3 md:end-6 md:top-5">
+      <select
+        aria-label={s.footer.languageMenu}
+        value={lang.urlCode}
+        onChange={(e) => go(e.target.value)}
+        className="h-8 max-w-[132px] cursor-pointer rounded-[6px] border border-doc-field bg-doc-paper px-2 text-[13px] font-medium text-doc-ink outline-none hover:bg-doc-hover focus:ring-[3px] focus:ring-doc-link/15"
+      >
+        {SLIDESHOW_LANGUAGES.map((l) => (
+          <option key={l.code} value={l.urlCode} lang={l.htmlLang}>{l.nativeName}</option>
+        ))}
+      </select>
+    </div>
   );
 }
 
@@ -58,17 +81,18 @@ export function DocAvatar({ app }: { app?: string | undefined }) {
 }
 
 export function DocShell({ children }: { children: ReactNode }) {
-  const { lang } = useI18n();
-  const privacyPath = useLocalePath("privacy");
-  const legalPath = useLocalePath("legal");
+  const { lang, s: t } = useSlideshowLang();
+  const fr = lang.code === "fr";
+  const privacyPath = fr ? ROUTES.privacy.fr : ROUTES.privacy.en;
+  const legalPath = fr ? ROUTES.legal.fr : ROUTES.legal.en;
   return (
-    <div lang={lang} className="relative flex min-h-screen flex-col overflow-x-hidden bg-doc-paper font-doc tracking-tight text-doc-ink antialiased">
-      <DocLangSwitch />
-      <main className="mx-auto w-full max-w-[700px] flex-1 px-4 pb-16 pt-8 md:pt-16">{children}</main>
+    <div lang={lang.htmlLang} dir={lang.dir} className="relative flex min-h-screen flex-col overflow-x-hidden bg-doc-paper font-doc tracking-tight text-doc-ink antialiased">
+      <DocLangMenu />
+      <main className="mx-auto w-full max-w-[700px] flex-1 px-4 pb-16 pt-16 md:pt-16">{children}</main>
       <footer className="mx-auto w-full max-w-[700px] px-4 pb-8 text-[13px] text-doc-muted">
         © Vik Studios SAS ·{" "}
-        <Link to={privacyPath} className="hover:underline">{lang === "fr" ? "Confidentialité" : "Privacy"}</Link> ·{" "}
-        <Link to={legalPath} className="hover:underline">{lang === "fr" ? "Mentions légales" : "Legal notice"}</Link> ·{" "}
+        <Link to={privacyPath} className="hover:underline">{t.footer.privacy}</Link> ·{" "}
+        <Link to={legalPath} className="hover:underline">{t.footer.legal}</Link> ·{" "}
         <a href={`mailto:${CONTACT_EMAIL}`} className="hover:underline">{CONTACT_EMAIL}</a>
       </footer>
     </div>
@@ -86,11 +110,13 @@ function Sec({ children }: { children: ReactNode }) {
   return <section className="space-y-4 border-t border-doc-line pt-7">{children}</section>;
 }
 
-const withApp = (to: string, slug?: string) => (slug && slug !== "sophia" ? `${to}?app=${slug}` : to);
+export const withApp = (to: string, slug?: string) => (slug && slug !== "sophia" ? `${to}?app=${slug}` : to);
 
-export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
-  const { lang } = useI18n();
-  const applyPath = useLocalePath("creatorsSlideshowApply");
+export function SlideshowDocLanding({ app: appProp }: { app?: string | undefined }) {
+  const { lang, s } = useSlideshowLang();
+  const t = s.landing;
+  const queryApp = useAppQuery();
+  const app = appProp ?? queryApp;
   const { data: apps = [] } = useApps();
   const a = app && app !== "sophia" ? apps.find((x) => x.slug === app) : undefined;
   const name = a?.name ?? "Sophia";
@@ -99,89 +125,49 @@ export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
   useEffect(() => {
     getSlideshowPayInfo({ data: {} }).then((r) => setRange(r.range)).catch(() => {});
   }, []);
-  const min = range?.min ?? 7;
-  const max = range?.max ?? 14;
-  const fr = lang === "fr";
-  const b = (s: string) => <strong className="font-semibold">{s}</strong>;
+  const vars = { name, min: range?.min ?? 7, max: range?.max ?? 14 };
+  const r = (text: string) => rich(fillSlideshow(text, vars), isSophia);
+  const sep = lang.code === "fr" ? " : " : ": ";
   const about = isSophia
-    ? fr
-      ? "Sophia est une application mobile qui aide à apprendre quelque chose de nouveau chaque jour : histoire, mythologie, art, littérature, sciences et monde d'aujourd'hui. Elle est éditée par Vik Studios SAS, une société française."
-      : "Sophia is a mobile learning app that helps people learn something new every day: history, mythology, art, literature, science and today's world. It is published by Vik Studios SAS, a French company."
-    : `${name}${a?.tagline ? ` (${a.tagline})` : ""}${a?.short_description ? `${fr ? " : " : ": "}${a.short_description}` : ""} ${fr ? `${name} est éditée par Vik Studios SAS, une société française.` : `${name} is published by Vik Studios SAS, a French company.`}`;
-  const crit = fr
-    ? ["Vous avez au moins 18 ans", "Vous avez un smartphone et une connexion internet fiable", "Vous pouvez publier 2 slideshows par jour, 7 jours sur 7", "Vous ne travaillez pas actuellement pour une application concurrente", "Vous acceptez de signer un court contrat avant de commencer"]
-    : ["You are at least 18 years old", "You have a smartphone and a reliable internet connection", "You can post 2 slideshows a day, 7 days a week", "You don't currently work for a competing app", "You agree to sign a short agreement before you start"];
-  const why = fr
-    ? ["Un montant fixe chaque semaine : aucun objectif d'abonnés ni de vues.", "Tout est préparé pour vous : vous n'avez jamais à trouver d'idées.", "Vous travaillez d'où vous voulez, au moment qui vous arrange dans la journée."]
-    : ["A fixed amount every week: no follower or view target.", "Everything is prepared for you: you never have to find ideas.", "You work from anywhere, whenever suits you during the day."];
-  const highlightedPhrases = fr
-    ? ["Pas de caméra, pas d'expérience nécessaire.", `${min} à ${max} $ par semaine`, "moins de 10 minutes par jour", "Un montant fixe chaque semaine"]
-    : ["No camera, no experience needed.", `$${min} to $${max} a week`, "under 10 minutes a day", "A fixed amount every week"];
-  const highlight = (text: string): ReactNode => {
-    if (!isSophia) return text;
-    const phrase = highlightedPhrases.find((p) => text.includes(p));
-    if (!phrase) return text;
-    const start = text.indexOf(phrase);
-    return <>{text.slice(0, start)}<mark className="rounded-[3px] bg-doc-highlight px-[2px] text-inherit">{phrase}</mark>{text.slice(start + phrase.length)}</>;
-  };
-  const stats = fr
-    ? [["500 000+", "utilisateurs"], ["4,8★", "sur l'App Store"], ["n°3", "en Éducation sur l'App Store (France, 2026)"], ["240+", "leçons dans 6 matières"]]
-    : [["500,000+", "users"], ["4.8★", "on the App Store"], ["#3", "in Education on the App Store (France, 2026)"], ["240+", "lessons in 6 subjects"]];
+    ? t.aboutSophia
+    : `${name}${a?.tagline ? ` (${a.tagline})` : ""}${a?.short_description ? `${sep}${a.short_description}` : ""} ${fillSlideshow(t.aboutOtherApp, vars)}`;
+  const applyHref = withApp(slideshowPath(lang.urlCode, "apply"), app);
 
   return (
     <DocShell>
       <DocAvatar app={app} />
-      <div className="relative flow-root">
-      {isSophia ? <div className="doc-mascot"><img src={sophiaPlush.url} alt={fr ? "Sophia, notre mascotte hibou" : "Sophia, our owl mascot"} width={440} height={621} /></div> : null}
-      <h1 className="mt-6 font-doc tracking-tight text-[30px] font-bold leading-tight md:text-[40px]">
-        {fr ? `Candidature créateur de slideshows ${name}` : `${name} Slideshow Creator Application`}
-      </h1>
-        <div className="mt-6 space-y-4 text-[17px] leading-[1.6]">
-          {fr ? (
-            <p>En tant que {b("créateur de slideshows")}, vous publiez 2 slideshows par jour sur un compte TikTok pour {b(name)}, depuis votre téléphone. Tout est préparé pour vous : les slides, la légende et la musique. Vous assemblez et vous publiez. {highlight("Pas de caméra, pas d'expérience nécessaire.")}</p>
-          ) : (
-            <p>As a {b("slideshow creator")}, you post 2 slideshows a day on a TikTok account for {b(name)}, from your phone. Everything is prepared for you: the slides, the caption and the music. You assemble and publish. {highlight("No camera, no experience needed.")}</p>
-          )}
-          {fr ? (
-            <p>Vous êtes payé·e {b("chaque lundi")} : un montant fixe de <strong className="font-semibold">{highlight(`${min} à ${max} $ par semaine`)}</strong> selon votre pays (1 $ de plus la première semaine), via Ruul.</p>
-          ) : (
-            <p>You are paid {b("every Monday")}: a fixed amount of <strong className="font-semibold">{highlight(`$${min} to $${max} a week`)}</strong> depending on your country ($1 extra your first week), through Ruul.</p>
-          )}
-          {!isSophia ? <p>{b(fr ? "Nous répondons par email, dans votre langue." : "We reply by email, in your language.")} {fr ? "Nous ouvrons les places pays par pays." : "We open places country by country."}</p> : null}
-        </div>
+      <div className="mt-6 flex items-center gap-3 md:gap-5">
+        <h1 className="min-w-0 flex-1 font-doc tracking-tight text-[30px] font-bold leading-tight md:text-[40px]">{fillSlideshow(t.title, vars)}</h1>
+        {isSophia ? <div className="doc-mascot"><img src={sophiaPlush.url} alt={t.mascotAlt} width={440} height={621} /></div> : null}
+      </div>
+      <div className="mt-6 space-y-4 text-[17px] leading-[1.6]">
+        <p>{r(t.intro)}</p>
+        <p>{r(t.pay)}</p>
       </div>
       <div className="mt-7 space-y-7 text-[17px] leading-[1.6]">
-        {isSophia ? <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">{stats.map(([number, label]) => <div key={number} className="rounded-lg bg-doc-callout p-3"><dt className="text-[24px] font-bold leading-tight">{number}</dt><dd className="mt-2 text-[13px] leading-[1.5] text-doc-muted">{label}</dd></div>)}</dl> : null}
         <Sec>
-          <H2>{fr ? "Qui sommes-nous" : "About us"}</H2>
-          <p>{about}</p>
+          <H2>{r(t.aboutTitle)}</H2>
+          <p>{isSophia ? r(about) : about}</p>
         </Sec>
         <Sec>
-          <H2>{fr ? "Ce que vous ferez" : "What you'll be doing"}</H2>
-          <p>{fr ? `Nous vous donnons une identité TikTok (nom, photo, bio). Vous créez le compte sur votre téléphone et vous le chauffez quelques jours, exactement comme nous vous l'indiquons. Le compte appartient à ${name} ; c'est vous qui le faites vivre.` : `We give you a TikTok identity (name, photo, bio). You create the account on your phone and warm it up for a few days, exactly as we tell you. The account belongs to ${name}; you run it.`}</p>
-          <p>{highlight(fr ? "Ensuite, chaque jour, 2 slideshows vous attendent dans votre espace. Vous les publiez sur TikTok et vous collez les liens. C'est tout : moins de 10 minutes par jour." : "Then, every day, 2 slideshows are waiting for you in your dashboard. You post them on TikTok and paste the links. That's it: under 10 minutes a day.")}</p>
-          <p>{fr ? "Une question ? Notre équipe vous répond sur Slack." : "Questions? Our team answers you on Slack."}</p>
+          <H2>{r(t.doingTitle)}</H2>
+          <p>{r(t.doing1)}</p>
+          <p>{r(t.doing2)}</p>
+          <p>{r(t.doing3)}</p>
         </Sec>
         <Sec>
-          <H2>{fr ? "Qui nous cherchons" : "Who we're looking for"}</H2>
-          <p>
-            {fr ? "Des personnes qui veulent une tâche simple et régulière, faisable depuis leur téléphone, et qui suivent les consignes à la lettre." : "People who want a simple, regular task they can do from their phone, and who follow instructions to the letter."}{" "}
-            {b(fr ? "Vous n'apparaissez pas à l'écran et aucune expérience n'est nécessaire." : "You don't appear on camera and you don't need any experience.")}
-          </p>
-          <p>{b(fr ? "Merci de ne pas postuler si vous ne remplissez pas ces critères." : "Please do not apply if you don't meet the following criteria.")}</p>
-          <ul className="list-disc space-y-1 pl-6">{crit.map((c) => <li key={c}>{c}</li>)}</ul>
+          <H2>{r(t.whoTitle)}</H2>
+          <p>{r(t.who1)}</p>
+          <p>{r(t.criteriaIntro)}</p>
+          <ul className="list-disc space-y-1 ps-6">{t.criteria.map((c) => <li key={c}>{r(c)}</li>)}</ul>
         </Sec>
         <Sec>
-          <H2>{fr ? `Pourquoi ${name} ?` : `Why ${name}?`}</H2>
-          {why.map((w) => <p key={w}>{highlight(w)}</p>)}
+          <H2>{r(t.whyTitle)}</H2>
+          {t.why.map((w) => <p key={w}>{r(w)}</p>)}
         </Sec>
         <div className="border-t border-doc-line pt-7">
-          <p>{fr ? "Une minute, pas de vidéo." : "One minute, no video needed."}</p>
-          {a ? (
-            <a href={withApp(applyPath, app)} className={`${docButton} mt-4`}>{fr ? "Postuler (1 min) →" : "Apply now (1 min) →"}</a>
-          ) : (
-            <Link to={applyPath} className={`${docButton} mt-4`}>{fr ? "Postuler (1 min) →" : "Apply now (1 min) →"}</Link>
-          )}
+          <p>{r(t.ctaLead)}</p>
+          <a href={applyHref} className={`${docButton} mt-4`}>{fillSlideshow(t.cta, vars)}</a>
         </div>
       </div>
     </DocShell>

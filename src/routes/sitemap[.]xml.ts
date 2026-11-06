@@ -3,6 +3,7 @@ import { getCourseSitemapEntries } from "@/content/api";
 import { getPublishedSitemapEntries } from "@/lib/public-content.functions";
 import { absUrl } from "@/config/site";
 import { ROUTES, coursePath, type RouteKey } from "@/i18n/routes";
+import { SLIDESHOW_LANGUAGES, slideshowPath } from "@/i18n/slideshow-pages";
 
 /** Une entrée = une URL + ses alternates hreflang (fr, en, x-default). */
 function urlEntry(opts: {
@@ -33,7 +34,6 @@ const STATIC_PAGES: { key: RouteKey; changefreq: string; priority: string }[] = 
   { key: "careers", changefreq: "monthly", priority: "0.6" },
   { key: "creators", changefreq: "monthly", priority: "0.6" },
   { key: "creatorsUgc", changefreq: "monthly", priority: "0.6" },
-  { key: "creatorsSlideshow", changefreq: "monthly", priority: "0.6" },
   { key: "creatorsInfluencer", changefreq: "monthly", priority: "0.6" },
   { key: "legal", changefreq: "yearly", priority: "0.3" },
   { key: "privacy", changefreq: "yearly", priority: "0.3" },
@@ -56,6 +56,19 @@ async function buildSitemap(): Promise<string> {
         priority: page.priority,
       }),
     );
+  });
+
+  // Slideshow landing + form: one URL per language, each with all 30 alternates.
+  const slideshowXml = (["landing", "apply"] as const).flatMap((page) => {
+    const alts = SLIDESHOW_LANGUAGES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l.htmlLang}" href="${absUrl(slideshowPath(l.urlCode, page))}" />`).join("\n");
+    return SLIDESHOW_LANGUAGES.map((l) => `  <url>
+    <loc>${absUrl(slideshowPath(l.urlCode, page))}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>${page === "landing" ? "0.6" : "0.5"}</priority>
+${alts}
+    <xhtml:link rel="alternate" hreflang="x-default" href="${absUrl(slideshowPath("en", page))}" />
+  </url>`);
   });
 
   const courseXml = getCourseSitemapEntries().map((entry) => {
@@ -89,7 +102,7 @@ async function buildSitemap(): Promise<string> {
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${[...staticXml, ...courseXml, ...publishedXml].join("\n")}
+${[...staticXml, ...slideshowXml, ...courseXml, ...publishedXml].join("\n")}
 </urlset>
 `;
 }

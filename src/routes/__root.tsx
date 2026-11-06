@@ -16,6 +16,7 @@ import appCss from "../styles.css?url";
 import { COMPANY } from "@/config/links";
 import { APPLE_ITUNES_APP_ID } from "@/config/site";
 import { langFromPath } from "@/i18n/routes";
+import { slideshowPageFromPath } from "@/i18n/slideshow-pages";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -109,9 +110,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const slideshow = slideshowPageFromPath(pathname);
 
   return (
-    <html lang={langFromPath(pathname)}>
+    <html lang={slideshow?.lang.htmlLang ?? langFromPath(pathname)} dir={slideshow?.lang.dir ?? "ltr"}>
       <head>
         <HeadContent />
       </head>
