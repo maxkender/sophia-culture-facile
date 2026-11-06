@@ -292,6 +292,9 @@
 .slides-crm .crm-setting-line { flex-wrap: nowrap; }
 .slides-crm .crm-setting-line > a { display: block; flex: 1; min-width: 0; min-height: 0; }
 .slides-crm .crm-setting-line > span { flex-shrink: 0; }
+.slides-crm [data-testid="slides-rates"] { min-width: 1000px; table-layout: fixed; }
+.slides-crm [data-testid="slides-rates"] th:first-child { width: 70px; }
+.slides-crm [data-testid="slides-rates"] th:nth-child(2) { width: 320px; }
 
 .doc-mascot {
   position: relative;
