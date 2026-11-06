@@ -6,7 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { countryNames, countryOptions } from "@/config/countries";
 import { cn } from "@/lib/utils";
 
-export function CountrySelect({ id, value, onChange, lang, labels, displayLocale }: { id?: string; value: string; onChange: (v: string) => void; lang: "fr" | "en"; labels: { select: string; search: string; empty: string }; displayLocale?: string }) {
+export function CountrySelect({ id, value, onChange, lang, labels, displayLocale }: { id?: string; value: string; onChange: (v: string) => void; lang: "fr" | "en"; labels: { select: string; search: string; empty: string }; displayLocale?: string | undefined }) {
   const [open, setOpen] = useState(false);
   const options = useMemo(
     () => (displayLocale ? countryOptions(lang, displayLocale) : countryNames(lang).map((n) => ({ value: n, label: n }))),
