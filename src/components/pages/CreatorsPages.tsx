@@ -9,6 +9,7 @@ import { CREATORS } from "@/i18n/creators";
 import { useEffect } from "react";
 import { trackFunnel } from "@/lib/funnel-events";
 import { useApps } from "@/lib/apps";
+import { SlideshowDocLanding } from "@/components/creators/SlideshowDoc";
 
 /** Brand band shown on app-specific creator pages (e.g. UnSwipe). */
 function AppBand({ slug }: { slug?: string | undefined }) {
@@ -171,41 +172,7 @@ export function UgcLandingPage({ app }: { app?: string | undefined } = {}) {
 }
 
 export function SlideshowLandingPage({ app }: { app?: string | undefined } = {}) {
-  const { lang } = useI18n();
-  const s = useAppCopy(CREATORS[lang].slideshow, app);
-  const applyPath = useLocalePath("creatorsSlideshowApply");
-  return (
-    <Shell>
-      <AppBand slug={app} />
-      <Hero app={app} title={s.heroTitle} subtitle={s.heroSubtitle} cta={s.cta} to={applyPath} />
-      <Section title={s.howTitle}>
-        <ol className="space-y-3">
-          {s.steps.map((step, i) => (
-            <li key={step} className="flex gap-4">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-navy text-sm font-bold text-brand-onNavy">
-                {i + 1}
-              </span>
-              <span className="pt-1">{step}</span>
-            </li>
-          ))}
-        </ol>
-      </Section>
-      <Section title={s.paidTitle}>
-        <p>{s.paid}</p>
-      </Section>
-      <Section title={s.forTitle}>
-        <p>{s.forText}</p>
-      </Section>
-      <Section title={s.reqTitle}>
-        <CheckList items={s.requirements} />
-      </Section>
-      <section className="mx-auto w-full max-w-3xl px-5 pb-20 pt-2">
-        <Button asChild variant="pill" size="pill">
-          {app ? <a href={withApp(applyPath, app)}>{s.cta}</a> : <Link to={applyPath}>{s.cta}</Link>}
-        </Button>
-      </section>
-    </Shell>
-  );
+  return <SlideshowDocLanding app={app} />;
 }
 
 export function InfluencerLandingPage({ app }: { app?: string | undefined } = {}) {
