@@ -323,6 +323,11 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
                   >
                     {a.full_name}
                   </Button>
+                  {a.referred ? (
+                    <span title={a.referral_name ?? ""} className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">
+                      Referred
+                    </span>
+                  ) : null}
                 </td>
                 <td>
                   <Country country={a.country} />
@@ -568,6 +573,15 @@ export function PosterCard({
           {a.q_previous_content ? (
             <p>
               <b>Previous content:</b> {a.q_previous_content}
+            </p>
+          ) : null}
+          {a.referred === true ? (
+            <p>
+              <b>Referral:</b> Yes — {a.referral_name}
+            </p>
+          ) : a.referred === false ? (
+            <p>
+              <b>Referral:</b> No
             </p>
           ) : null}
           {a.referral_source ? (
