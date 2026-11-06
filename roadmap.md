@@ -1,4 +1,5 @@
 # Sophia slideshow presentation (Nov 6)
+- [ ] Slideshow admin CRM: navigation/redirects, Home, Applications/Posters Sheets and bulk controls, Payouts/Rates/Guide; desktop/mobile QA, preserve business logic, do not publish.
 - [x] Replace plush with transparent cutout, remove specified Sophia sentences; EN/FR 1440/900/390px checks passed without overlap or horizontal scroll, reduced motion verified. Not published.
 - [x] Sophia-only colored logo, plush, stats, subject copy and marker highlights; desktop/390px checks. Not published.
 
