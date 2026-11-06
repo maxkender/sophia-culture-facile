@@ -22,6 +22,23 @@ export function countryNames(locale: "fr" | "en" = "en"): string[] {
   return sorted;
 }
 
+/** Country options for a picker: `value` is the fr/en name (what we store), `label` the name in `displayLocale`. */
+export function countryOptions(valueLocale: "fr" | "en", displayLocale: string): { value: string; label: string }[] {
+  let dv: Intl.DisplayNames | null = null;
+  let dl: Intl.DisplayNames | null = null;
+  try { dv = new Intl.DisplayNames([valueLocale], { type: "region" }); } catch { /* Intl unavailable */ }
+  try { dl = new Intl.DisplayNames([displayLocale, "en"], { type: "region" }); } catch { dl = dv; }
+  const seen = new Set<string>();
+  const out: { value: string; label: string }[] = [];
+  for (const c of CODES) {
+    const value = dv?.of(c) ?? c;
+    if (seen.has(value)) continue;
+    seen.add(value);
+    out.push({ value, label: dl?.of(c) ?? value });
+  }
+  return out.sort((a, b) => a.label.localeCompare(b.label, displayLocale));
+}
+
 /** Resolves a typed or picked country name (French or English) or a 2-letter code to its ISO code. */
 export function countryCodeOf(value: string | null | undefined): string | null {
   const v = (value ?? "").trim().toLowerCase();
