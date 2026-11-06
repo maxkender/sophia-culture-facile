@@ -49,15 +49,15 @@ export function osErrorInWords(error: string, langue?: string | null): string {
 }
 
 /** OS `zones` action, cached 10 minutes in hub_settings. */
-export async function getOsZones(admin: Admin): Promise<{ ok: boolean; ouverts: { pays_code: string }[]; fermes: { pays_code: string; raison?: string }[]; error?: string }> {
+export async function getOsZones(admin: Admin): Promise<{ ok: boolean; ouverts: { pays_code: string; langue?: string | null; langue_os: boolean }[]; fermes: { pays_code: string; raison?: string }[]; error?: string }> {
   const { data: cached } = await admin.from("hub_settings").select("value, updated_at").eq("key", "os_zones_cache").maybeSingle();
   if (cached?.value && cached.updated_at && Date.now() - new Date(cached.updated_at).getTime() < 10 * 60_000) {
-    try { const p = JSON.parse(cached.value); return { ok: true, ouverts: p.ouverts ?? [], fermes: p.fermes ?? [] }; } catch { /* refetch */ }
+    try { const p = JSON.parse(cached.value); return { ok: true, ouverts: (p.ouverts ?? []).map((o: any) => ({ ...o, langue_os: o.langue_os === true })), fermes: p.fermes ?? [] }; } catch { /* refetch */ }
   }
-  const r = await callOs<{ ouverts: { pays_code: string; hm_id?: string | null }[]; fermes: { pays_code: string; raison?: string }[] }>(admin, "zones", {});
+  const r = await callOs<{ ouverts: { pays_code: string; hm_id?: string | null; langue?: string | null; langue_os?: boolean }[]; fermes: { pays_code: string; raison?: string }[] }>(admin, "zones", {});
   if (!r.ok) return { ok: false, ouverts: [], fermes: [], error: r.error };
   // Every country listed in "ouverts" is open, whatever hm_id is (null = HM without an OS account).
-  const ouverts = (r.ouverts ?? []).filter((o) => o?.pays_code).map((o) => ({ pays_code: String(o.pays_code).toUpperCase() }));
+  const ouverts = (r.ouverts ?? []).filter((o) => o?.pays_code).map((o) => ({ pays_code: String(o.pays_code).toUpperCase(), langue: o.langue ?? null, langue_os: o.langue_os === true }));
   const fermes = (r.fermes ?? []).filter((f) => f?.pays_code).map((f) => ({ ...f, pays_code: String(f.pays_code).toUpperCase() }));
   await admin.from("hub_settings").upsert({ key: "os_zones_cache", value: JSON.stringify({ ouverts, fermes }), updated_at: new Date().toISOString() });
   return { ok: true, ouverts, fermes };
