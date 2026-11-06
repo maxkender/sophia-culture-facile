@@ -54,10 +54,13 @@ export async function getOsZones(admin: Admin): Promise<{ ok: boolean; ouverts: 
   if (cached?.value && cached.updated_at && Date.now() - new Date(cached.updated_at).getTime() < 10 * 60_000) {
     try { const p = JSON.parse(cached.value); return { ok: true, ouverts: p.ouverts ?? [], fermes: p.fermes ?? [] }; } catch { /* refetch */ }
   }
-  const r = await callOs<{ ouverts: { pays_code: string }[]; fermes: { pays_code: string; raison?: string }[] }>(admin, "zones", {});
+  const r = await callOs<{ ouverts: { pays_code: string; hm_id?: string | null }[]; fermes: { pays_code: string; raison?: string }[] }>(admin, "zones", {});
   if (!r.ok) return { ok: false, ouverts: [], fermes: [], error: r.error };
-  await admin.from("hub_settings").upsert({ key: "os_zones_cache", value: JSON.stringify({ ouverts: r.ouverts ?? [], fermes: r.fermes ?? [] }), updated_at: new Date().toISOString() });
-  return { ok: true, ouverts: r.ouverts ?? [], fermes: r.fermes ?? [] };
+  // Every country listed in "ouverts" is open, whatever hm_id is (null = HM without an OS account).
+  const ouverts = (r.ouverts ?? []).filter((o) => o?.pays_code).map((o) => ({ pays_code: String(o.pays_code).toUpperCase() }));
+  const fermes = (r.fermes ?? []).filter((f) => f?.pays_code).map((f) => ({ ...f, pays_code: String(f.pays_code).toUpperCase() }));
+  await admin.from("hub_settings").upsert({ key: "os_zones_cache", value: JSON.stringify({ ouverts, fermes }), updated_at: new Date().toISOString() });
+  return { ok: true, ouverts, fermes };
 }
 
 async function tick(admin: Admin, appId: string, key: string, by: string) {
