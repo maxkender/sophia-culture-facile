@@ -1,4 +1,5 @@
 # Sophia slideshow presentation (Nov 6)
+- [ ] Replace plush with transparent cutout, remove specified Sophia sentences, check 1440/900/390px; do not publish.
 - [x] Sophia-only colored logo, plush, stats, subject copy and marker highlights; desktop/390px checks. Not published.
 
 # UGC additions (Oct 12)
