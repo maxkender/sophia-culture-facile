@@ -1,9 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { SlideshowSection } from "@/components/hub/Sections";
 
 export const Route = createFileRoute("/_authenticated/hub/slideshows/$section")({
+  beforeLoad: ({ params }) => {
+    if (params.section === "managers" || params.section === "platform") throw redirect({ to: "/hub/slideshows/$section", params: { section: params.section === "managers" ? "applications" : "guide" }, replace: true, statusCode: 301 });
+  },
   head: ({ params }) => {
-    const labels: Record<string, string> = { applications: "Poster applications", posters: "Signed posters", managers: "Hiring managers & zones", rates: "Weekly rates", payouts: "Weekly poster payouts", guide: "Guide & templates", platform: "Old platform" };
+    const labels: Record<string, string> = { applications: "Poster applications", posters: "Signed posters", rates: "Weekly rates", payouts: "Weekly poster payouts", guide: "Guide & links" };
     const label = labels[params.section] ?? "Slideshows";
     const title = `${label} | Sophia Slideshows`;
     const description = `Sophia slideshow ${label.toLowerCase()}: country zones, weekly work and manual administration.`;
