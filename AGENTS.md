@@ -38,3 +38,4 @@ UGC acceptance/onboarding mutations use authenticated server functions to valida
 - Slideshow CRM styling is scoped by slides-crm; shared detail Sheets reuse PosterCard and all existing server actions, and Rates uses an opt-in compact view; why: keep other tracks, settings, public pages and lifecycle behavior unchanged.
 
 - UGC drafts: creators insert only 'submitted' creator_drafts rows; admins review (ugc-drafts.functions.ts); post links need a validated draft when draft_required; why: owner approves every video.
+- Slideshow landing/form copy for all 30 languages comes only from src/i18n/slideshow-pages.json via slideshow-pages.ts (EN/FR keep historic URLs, others /{urlCode}/creators/slideshow[/apply]); why: one final translated source, no hardcoded strings.
