@@ -45,7 +45,7 @@ export function DocAvatar({ app }: { app?: string | undefined }) {
       {a?.logo_path ? (
         <img src={a.logo_path} alt={a.name} className="size-full object-cover" />
       ) : (
-        <LogoMark className="h-9 w-auto md:h-12 [&_path[fill='#F5A3C7']]:fill-doc-paper" label="Sophia" />
+        <LogoMark className="doc-logo-white h-9 w-auto md:h-12" label="Sophia" />
       )}
     </div>
   );
@@ -101,7 +101,7 @@ export function SlideshowDocLanding({ app }: { app?: string | undefined }) {
     ? fr
       ? "Sophia est une application mobile qui aide à apprendre quelque chose de nouveau chaque jour : histoire, sciences, art, psychologie et bien plus. Elle est éditée par Vik Studios SAS, une société française."
       : "Sophia is a mobile learning app that helps people learn something new every day: history, science, art, psychology and more. It is published by Vik Studios SAS, a French company."
-    : `${name}${a?.tagline ? ` (${a.tagline})` : ""}${a?.short_description ? ` : ${a.short_description}` : ""} ${fr ? `${name} est éditée par Vik Studios SAS, une société française.` : `${name} is published by Vik Studios SAS, a French company.`}`.replace(" : ", fr ? " : " : ": ");
+    : `${name}${a?.tagline ? ` (${a.tagline})` : ""}${a?.short_description ? `${fr ? " : " : ": "}${a.short_description}` : ""} ${fr ? `${name} est éditée par Vik Studios SAS, une société française.` : `${name} is published by Vik Studios SAS, a French company.`}`;
   const crit = fr
     ? ["Vous avez au moins 18 ans", "Vous avez un smartphone et une connexion internet fiable", "Vous pouvez publier 2 slideshows par jour, 7 jours sur 7", "Vous ne travaillez pas actuellement pour une application concurrente", "Vous acceptez de signer un court contrat avant de commencer"]
     : ["You are at least 18 years old", "You have a smartphone and a reliable internet connection", "You can post 2 slideshows a day, 7 days a week", "You don't currently work for a competing app", "You agree to sign a short agreement before you start"];
