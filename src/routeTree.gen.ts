@@ -111,6 +111,8 @@ import { Route as FrCreateursIndexRouteImport } from './routes/fr/createurs/inde
 import { Route as FrCreateursInfluenceurRouteImport } from './routes/fr/createurs/influenceur'
 import { Route as FrCreateursSlideshowRouteImport } from './routes/fr/createurs/slideshow'
 import { Route as FrCreateursUgcRouteImport } from './routes/fr/createurs/ugc'
+import { Route as LangCreatorsSlideshowIndexRouteImport } from './routes/$lang/creators/slideshow.index'
+import { Route as LangCreatorsSlideshowApplyRouteImport } from './routes/$lang/creators/slideshow.apply'
 import { Route as AuthenticatedAuteursAdminIndexRouteImport } from './routes/_authenticated/auteurs/admin/index'
 import { Route as AuthenticatedAuteursAdminActivityRouteImport } from './routes/_authenticated/auteurs/admin/activity'
 import { Route as AuthenticatedAuteursAdminAiReviewRouteImport } from './routes/_authenticated/auteurs/admin/ai-review'
@@ -736,6 +738,18 @@ const FrCreateursUgcRoute = FrCreateursUgcRouteImport.update({
   path: '/fr/createurs/ugc',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LangCreatorsSlideshowIndexRoute =
+  LangCreatorsSlideshowIndexRouteImport.update({
+    id: '/$lang/creators/slideshow/',
+    path: '/$lang/creators/slideshow/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LangCreatorsSlideshowApplyRoute =
+  LangCreatorsSlideshowApplyRouteImport.update({
+    id: '/$lang/creators/slideshow/apply',
+    path: '/$lang/creators/slideshow/apply',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAuteursAdminIndexRoute =
   AuthenticatedAuteursAdminIndexRouteImport.update({
     id: '/auteurs/admin/',
@@ -1416,6 +1430,7 @@ export interface FileRoutesByFullPath {
   '/en/lessons/': typeof EnLessonsIndexRoute
   '/fr/cours/': typeof FrCoursIndexRoute
   '/fr/createurs/': typeof FrCreateursIndexRoute
+  '/$lang/creators/slideshow/apply': typeof LangCreatorsSlideshowApplyRoute
   '/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
   '/auteurs/admin/ai-review': typeof AuthenticatedAuteursAdminAiReviewRoute
   '/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
@@ -1458,6 +1473,7 @@ export interface FileRoutesByFullPath {
   '/fr/createurs/unswipe/influenceur': typeof FrCreateursUnswipeInfluenceurRoute
   '/fr/createurs/unswipe/slideshow': typeof FrCreateursUnswipeSlideshowRoute
   '/fr/createurs/unswipe/ugc': typeof FrCreateursUnswipeUgcRoute
+  '/$lang/creators/slideshow/': typeof LangCreatorsSlideshowIndexRoute
   '/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
   '/hub/campaigns/': typeof AuthenticatedHubCampaignsIndexRoute
@@ -1614,6 +1630,7 @@ export interface FileRoutesByTo {
   '/en/lessons': typeof EnLessonsIndexRoute
   '/fr/cours': typeof FrCoursIndexRoute
   '/fr/createurs': typeof FrCreateursIndexRoute
+  '/$lang/creators/slideshow/apply': typeof LangCreatorsSlideshowApplyRoute
   '/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
   '/auteurs/admin/ai-review': typeof AuthenticatedAuteursAdminAiReviewRoute
   '/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
@@ -1656,6 +1673,7 @@ export interface FileRoutesByTo {
   '/fr/createurs/unswipe/influenceur': typeof FrCreateursUnswipeInfluenceurRoute
   '/fr/createurs/unswipe/slideshow': typeof FrCreateursUnswipeSlideshowRoute
   '/fr/createurs/unswipe/ugc': typeof FrCreateursUnswipeUgcRoute
+  '/$lang/creators/slideshow': typeof LangCreatorsSlideshowIndexRoute
   '/auteurs/admin': typeof AuthenticatedAuteursAdminIndexRoute
   '/auteurs/courses': typeof AuthenticatedAuteursCoursesIndexRoute
   '/hub/campaigns': typeof AuthenticatedHubCampaignsIndexRoute
@@ -1817,6 +1835,7 @@ export interface FileRoutesById {
   '/en/lessons/': typeof EnLessonsIndexRoute
   '/fr/cours/': typeof FrCoursIndexRoute
   '/fr/createurs/': typeof FrCreateursIndexRoute
+  '/$lang/creators/slideshow/apply': typeof LangCreatorsSlideshowApplyRoute
   '/_authenticated/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
   '/_authenticated/auteurs/admin/ai-review': typeof AuthenticatedAuteursAdminAiReviewRoute
   '/_authenticated/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
@@ -1859,6 +1878,7 @@ export interface FileRoutesById {
   '/fr/createurs/unswipe/influenceur': typeof FrCreateursUnswipeInfluenceurRoute
   '/fr/createurs/unswipe/slideshow': typeof FrCreateursUnswipeSlideshowRoute
   '/fr/createurs/unswipe/ugc': typeof FrCreateursUnswipeUgcRoute
+  '/$lang/creators/slideshow/': typeof LangCreatorsSlideshowIndexRoute
   '/_authenticated/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
   '/_authenticated/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
   '/_authenticated/hub/campaigns/': typeof AuthenticatedHubCampaignsIndexRoute
@@ -2020,6 +2040,7 @@ export interface FileRouteTypes {
     | '/en/lessons/'
     | '/fr/cours/'
     | '/fr/createurs/'
+    | '/$lang/creators/slideshow/apply'
     | '/auteurs/admin/activity'
     | '/auteurs/admin/ai-review'
     | '/auteurs/admin/announcements'
@@ -2062,6 +2083,7 @@ export interface FileRouteTypes {
     | '/fr/createurs/unswipe/influenceur'
     | '/fr/createurs/unswipe/slideshow'
     | '/fr/createurs/unswipe/ugc'
+    | '/$lang/creators/slideshow/'
     | '/auteurs/admin/'
     | '/auteurs/courses/'
     | '/hub/campaigns/'
@@ -2218,6 +2240,7 @@ export interface FileRouteTypes {
     | '/en/lessons'
     | '/fr/cours'
     | '/fr/createurs'
+    | '/$lang/creators/slideshow/apply'
     | '/auteurs/admin/activity'
     | '/auteurs/admin/ai-review'
     | '/auteurs/admin/announcements'
@@ -2260,6 +2283,7 @@ export interface FileRouteTypes {
     | '/fr/createurs/unswipe/influenceur'
     | '/fr/createurs/unswipe/slideshow'
     | '/fr/createurs/unswipe/ugc'
+    | '/$lang/creators/slideshow'
     | '/auteurs/admin'
     | '/auteurs/courses'
     | '/hub/campaigns'
@@ -2420,6 +2444,7 @@ export interface FileRouteTypes {
     | '/en/lessons/'
     | '/fr/cours/'
     | '/fr/createurs/'
+    | '/$lang/creators/slideshow/apply'
     | '/_authenticated/auteurs/admin/activity'
     | '/_authenticated/auteurs/admin/ai-review'
     | '/_authenticated/auteurs/admin/announcements'
@@ -2462,6 +2487,7 @@ export interface FileRouteTypes {
     | '/fr/createurs/unswipe/influenceur'
     | '/fr/createurs/unswipe/slideshow'
     | '/fr/createurs/unswipe/ugc'
+    | '/$lang/creators/slideshow/'
     | '/_authenticated/auteurs/admin/'
     | '/_authenticated/auteurs/courses/'
     | '/_authenticated/hub/campaigns/'
@@ -2593,6 +2619,7 @@ export interface RootRouteChildren {
   EnLessonsIndexRoute: typeof EnLessonsIndexRoute
   FrCoursIndexRoute: typeof FrCoursIndexRoute
   FrCreateursIndexRoute: typeof FrCreateursIndexRoute
+  LangCreatorsSlideshowApplyRoute: typeof LangCreatorsSlideshowApplyRoute
   ApiPublicAppCoursesRoute: typeof ApiPublicAppCoursesRouteWithChildren
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicTiktokOauthRoute: typeof ApiPublicTiktokOauthRoute
@@ -2602,6 +2629,7 @@ export interface RootRouteChildren {
   FrCreateursUnswipeInfluenceurRoute: typeof FrCreateursUnswipeInfluenceurRoute
   FrCreateursUnswipeSlideshowRoute: typeof FrCreateursUnswipeSlideshowRoute
   FrCreateursUnswipeUgcRoute: typeof FrCreateursUnswipeUgcRoute
+  LangCreatorsSlideshowIndexRoute: typeof LangCreatorsSlideshowIndexRoute
   EnCreatorsUnswipeIndexRoute: typeof EnCreatorsUnswipeIndexRoute
   FrCreateursUnswipeIndexRoute: typeof FrCreateursUnswipeIndexRoute
   ApiPublicCronUgcJobRoute: typeof ApiPublicCronUgcJobRoute
@@ -3321,6 +3349,20 @@ declare module '@tanstack/react-router' {
       path: '/fr/createurs/ugc'
       fullPath: '/fr/createurs/ugc'
       preLoaderRoute: typeof FrCreateursUgcRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/creators/slideshow/': {
+      id: '/$lang/creators/slideshow/'
+      path: '/$lang/creators/slideshow'
+      fullPath: '/$lang/creators/slideshow/'
+      preLoaderRoute: typeof LangCreatorsSlideshowIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/creators/slideshow/apply': {
+      id: '/$lang/creators/slideshow/apply'
+      path: '/$lang/creators/slideshow/apply'
+      fullPath: '/$lang/creators/slideshow/apply'
+      preLoaderRoute: typeof LangCreatorsSlideshowApplyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/auteurs/admin/': {
@@ -4417,6 +4459,7 @@ const rootRouteChildren: RootRouteChildren = {
   EnLessonsIndexRoute: EnLessonsIndexRoute,
   FrCoursIndexRoute: FrCoursIndexRoute,
   FrCreateursIndexRoute: FrCreateursIndexRoute,
+  LangCreatorsSlideshowApplyRoute: LangCreatorsSlideshowApplyRoute,
   ApiPublicAppCoursesRoute: ApiPublicAppCoursesRouteWithChildren,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicTiktokOauthRoute: ApiPublicTiktokOauthRoute,
@@ -4426,6 +4469,7 @@ const rootRouteChildren: RootRouteChildren = {
   FrCreateursUnswipeInfluenceurRoute: FrCreateursUnswipeInfluenceurRoute,
   FrCreateursUnswipeSlideshowRoute: FrCreateursUnswipeSlideshowRoute,
   FrCreateursUnswipeUgcRoute: FrCreateursUnswipeUgcRoute,
+  LangCreatorsSlideshowIndexRoute: LangCreatorsSlideshowIndexRoute,
   EnCreatorsUnswipeIndexRoute: EnCreatorsUnswipeIndexRoute,
   FrCreateursUnswipeIndexRoute: FrCreateursUnswipeIndexRoute,
   ApiPublicCronUgcJobRoute: ApiPublicCronUgcJobRoute,
