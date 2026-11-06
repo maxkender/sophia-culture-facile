@@ -69,38 +69,19 @@ export const acceptPoster = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ applicationId: id, apps: z.array(z.enum(["sophia", "unswipe"])).min(1), zone: z.enum(["A", "B", "C"]), langue: z.enum(["fr", "en", "es", "it", "pt", "de"]) }).parse(d))
   .handler(async ({ data, context }) => {
     const me = await assertAdmin(context);
-    const a = await admin();
-    const { nextStartMonday, randomToken, getOsZones, RUUL_BLOCKED } = await import("./slideshows.server");
-    const { posterEmails } = await import("./slideshow-emails.server");
-    const { countryCodeOf } = await import("@/config/countries");
-    const { data: app } = await a.from("slideshow_applications").select("*").eq("id", data.applicationId).maybeSingle();
-    if (!app) throw new Error("Application not found");
-    if (!["pending", "pool"].includes(app.status)) throw new Error("This application was already decided.");
-    const code = countryCodeOf(app.country);
-    // Server-side gates: the OS zone must be open, and Ruul must be able to pay the country.
-    if (process.env["OS_HUB_SECRET"]) {
-      const z = await getOsZones(a);
-      if (z.ok) {
-        const closed = z.fermes.find((f) => f.pays_code === code);
-        if (code && !z.ouverts.some((o) => o.pays_code === code)) throw new Error(closed?.raison ? `Zone not in the OS yet — ${closed.raison}` : "Zone not in the OS yet (no HM for this country)");
-      }
-    }
-    const channel = "ruul";
-    if (code && RUUL_BLOCKED.includes(code)) throw new Error("Country not supported by Ruul");
-    const monday = nextStartMonday();
-    const token = randomToken();
-    await a.from("slideshow_applications").update({
-      status: "accepted", accepted_at: new Date().toISOString(), decided_at: new Date().toISOString(), decided_by: me.id,
-      applications: data.apps, langue: data.langue, start_monday: monday, signing_token: token, signing_token_created_at: new Date().toISOString(), payout_channel: channel,
-      ...(data.zone !== app.zone ? { zone: data.zone, zone_override: true, zone_note: `Set at acceptance by ${me.name}` } : {}),
-    }).eq("id", app.id);
-    await stamp(a, app.id, "accepted", me.name);
-    const site = process.env["SITE_URL"] ?? "https://sophia-culture.com";
-    const { data: zr } = await a.from("pay_zones").select("weekly_amount, first_week_amount").eq("zone", data.zone).maybeSingle();
-    const guideUrl = (await a.from("hub_settings").select("value").eq("key", "slideshow_poster_guide_url").maybeSingle()).data?.value ?? null;
-    const slackUrl = (await a.from("hub_settings").select("value").eq("key", "slideshow_slack_invite_url").maybeSingle()).data?.value ?? null;
-    const sent = await posterEmails.accepted(app.email, app.full_name, data.langue, monday, `${site}/creators/sign/${token}`, zr?.weekly_amount != null ? Number(zr.weekly_amount) : null, zr?.first_week_amount != null ? Number(zr.first_week_amount) : null, guideUrl, slackUrl);
-    return { ok: true, startMonday: monday, emailed: sent.sent, reason: sent.reason ?? null };
+    const { acceptSlideshowApplication } = await import("./slideshow-accept.server");
+    const r = await acceptSlideshowApplication(await admin(), data, { id: me.id, name: me.name });
+    return { ok: true, startMonday: r.startMonday, emailed: r.emailed, reason: r.reason };
+  });
+
+/** Accept all: same acceptance function, one by one; skips refusals and possible duplicates. */
+export const acceptPostersBulk = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ applicationIds: z.array(id).min(1).max(200) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const me = await assertAdmin(context);
+    const { acceptMany } = await import("./slideshow-accept.server");
+    return acceptMany(await admin(), data.applicationIds, { id: me.id, name: me.name });
   });
 
 /** Legal names typed by posters in the Sophia OS onboarding (Ruul checks them against the ID). */
