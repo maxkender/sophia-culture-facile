@@ -14,6 +14,7 @@ import { fillSlideshow, slideshowPath } from "@/i18n/slideshow-pages";
 import { isHttpUrl, isValidEmail } from "@/lib/creator-validation";
 import { APPLICANT_LANGS, langOfCountry, type ApplicantLang } from "@/config/countries";
 import { slideshowCountrySelection } from "@/lib/slideshow-country-selection";
+import { browserReferralCode } from "@/lib/slideshow-referral-code";
 
 const LANG_NAMES: Record<ApplicantLang, string> = { fr: "Français", en: "English", es: "Español", it: "Italiano", pt: "Português", de: "Deutsch" };
 
@@ -24,6 +25,7 @@ export function SlideshowApplyPage() {
   const privacyPath = lang === "fr" ? ROUTES.privacy.fr : ROUTES.privacy.en;
   const [appSlug, setAppSlug] = useState<string | null>(null);
   useEffect(() => {
+    browserReferralCode();
     const query = new URLSearchParams(window.location.search);
     setAppSlug(query.get("app"));
     const country = slideshowCountrySelection(query.get("country"), lang);
@@ -85,6 +87,7 @@ export function SlideshowApplyPage() {
           is_adult: true,
           consent: true,
           langue: langue ?? autoLang,
+          ref: browserReferralCode(),
           referred: referred === "yes",
           ...(referred === "yes" ? { referral_name: referralName.trim().slice(0, 120) } : {}),
         },

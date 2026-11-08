@@ -72,6 +72,8 @@ import { Route as AuthenticatedHubLearnRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedHubMessagesRouteImport } from './routes/_authenticated/hub/messages'
 import { Route as AuthenticatedHubPayoutsRouteImport } from './routes/_authenticated/hub/payouts'
 import { Route as AuthenticatedHubSettingsRouteImport } from './routes/_authenticated/hub/settings'
+import { Route as ApiPublicOsEmailRouteImport } from './routes/api/public/os-email'
+import { Route as ApiPublicOsEmailEventsRouteImport } from './routes/api/public/os-email-events'
 import { Route as CreatorsAppIndexRouteImport } from './routes/creators.app.index'
 import { Route as CreatorsAppAccountRouteImport } from './routes/creators.app.account'
 import { Route as CreatorsAppAppsRouteImport } from './routes/creators.app.apps'
@@ -541,6 +543,16 @@ const AuthenticatedHubSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
+const ApiPublicOsEmailRoute = ApiPublicOsEmailRouteImport.update({
+  id: '/api/public/os-email',
+  path: '/api/public/os-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicOsEmailEventsRoute = ApiPublicOsEmailEventsRouteImport.update({
+  id: '/api/public/os-email-events',
+  path: '/api/public/os-email-events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreatorsAppIndexRoute = CreatorsAppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -1389,6 +1401,8 @@ export interface FileRoutesByFullPath {
   '/hub/messages': typeof AuthenticatedHubMessagesRoute
   '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/hub/settings': typeof AuthenticatedHubSettingsRoute
+  '/api/public/os-email': typeof ApiPublicOsEmailRoute
+  '/api/public/os-email-events': typeof ApiPublicOsEmailEventsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
   '/creators/app/apps': typeof CreatorsAppAppsRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
@@ -1590,6 +1604,8 @@ export interface FileRoutesByTo {
   '/hub/messages': typeof AuthenticatedHubMessagesRoute
   '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/hub/settings': typeof AuthenticatedHubSettingsRoute
+  '/api/public/os-email': typeof ApiPublicOsEmailRoute
+  '/api/public/os-email-events': typeof ApiPublicOsEmailEventsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
   '/creators/app/apps': typeof CreatorsAppAppsRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
@@ -1794,6 +1810,8 @@ export interface FileRoutesById {
   '/_authenticated/hub/messages': typeof AuthenticatedHubMessagesRoute
   '/_authenticated/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/_authenticated/hub/settings': typeof AuthenticatedHubSettingsRoute
+  '/api/public/os-email': typeof ApiPublicOsEmailRoute
+  '/api/public/os-email-events': typeof ApiPublicOsEmailEventsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
   '/creators/app/apps': typeof CreatorsAppAppsRoute
   '/creators/app/calls': typeof CreatorsAppCallsRoute
@@ -1999,6 +2017,8 @@ export interface FileRouteTypes {
     | '/hub/messages'
     | '/hub/payouts'
     | '/hub/settings'
+    | '/api/public/os-email'
+    | '/api/public/os-email-events'
     | '/creators/app/account'
     | '/creators/app/apps'
     | '/creators/app/calls'
@@ -2200,6 +2220,8 @@ export interface FileRouteTypes {
     | '/hub/messages'
     | '/hub/payouts'
     | '/hub/settings'
+    | '/api/public/os-email'
+    | '/api/public/os-email-events'
     | '/creators/app/account'
     | '/creators/app/apps'
     | '/creators/app/calls'
@@ -2403,6 +2425,8 @@ export interface FileRouteTypes {
     | '/_authenticated/hub/messages'
     | '/_authenticated/hub/payouts'
     | '/_authenticated/hub/settings'
+    | '/api/public/os-email'
+    | '/api/public/os-email-events'
     | '/creators/app/account'
     | '/creators/app/apps'
     | '/creators/app/calls'
@@ -2593,6 +2617,8 @@ export interface RootRouteChildren {
   CreatorsIndexRoute: typeof CreatorsIndexRoute
   EnIndexRoute: typeof EnIndexRoute
   FrIndexRoute: typeof FrIndexRoute
+  ApiPublicOsEmailRoute: typeof ApiPublicOsEmailRoute
+  ApiPublicOsEmailEventsRoute: typeof ApiPublicOsEmailEventsRoute
   CreatorsInfluencerAppRoute: typeof CreatorsInfluencerAppRouteWithChildren
   CreatorsInfluencerApplyRoute: typeof CreatorsInfluencerApplyRoute
   CreatorsSignTokenRoute: typeof CreatorsSignTokenRoute
@@ -3077,6 +3103,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/hub/settings'
       preLoaderRoute: typeof AuthenticatedHubSettingsRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/api/public/os-email': {
+      id: '/api/public/os-email'
+      path: '/api/public/os-email'
+      fullPath: '/api/public/os-email'
+      preLoaderRoute: typeof ApiPublicOsEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/os-email-events': {
+      id: '/api/public/os-email-events'
+      path: '/api/public/os-email-events'
+      fullPath: '/api/public/os-email-events'
+      preLoaderRoute: typeof ApiPublicOsEmailEventsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/creators/app/': {
       id: '/creators/app/'
@@ -4433,6 +4473,8 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsIndexRoute: CreatorsIndexRoute,
   EnIndexRoute: EnIndexRoute,
   FrIndexRoute: FrIndexRoute,
+  ApiPublicOsEmailRoute: ApiPublicOsEmailRoute,
+  ApiPublicOsEmailEventsRoute: ApiPublicOsEmailEventsRoute,
   CreatorsInfluencerAppRoute: CreatorsInfluencerAppRouteWithChildren,
   CreatorsInfluencerApplyRoute: CreatorsInfluencerApplyRoute,
   CreatorsSignTokenRoute: CreatorsSignTokenRoute,
