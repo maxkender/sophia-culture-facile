@@ -204,7 +204,7 @@ export function HowItWorks() {
 
 export function PathSection() {
   const { c, lang } = useMk();
-  const a = ARCHETYPES.cultivate!;
+  const a = ARCHETYPES["cultivate"]!;
   return (
     <section className="mk-section relative overflow-hidden">
       <div className="mk-wrap flex flex-col items-center text-center">
