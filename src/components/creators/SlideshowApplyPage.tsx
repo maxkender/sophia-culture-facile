@@ -13,6 +13,7 @@ import { ROUTES } from "@/i18n/routes";
 import { fillSlideshow, slideshowPath } from "@/i18n/slideshow-pages";
 import { isHttpUrl, isValidEmail } from "@/lib/creator-validation";
 import { APPLICANT_LANGS, langOfCountry, type ApplicantLang } from "@/config/countries";
+import { slideshowCountrySelection } from "@/lib/slideshow-country-selection";
 
 const LANG_NAMES: Record<ApplicantLang, string> = { fr: "Français", en: "English", es: "Español", it: "Italiano", pt: "Português", de: "Deutsch" };
 
@@ -22,7 +23,12 @@ export function SlideshowApplyPage() {
   const lang: "fr" | "en" = pageLang.code === "fr" ? "fr" : "en";
   const privacyPath = lang === "fr" ? ROUTES.privacy.fr : ROUTES.privacy.en;
   const [appSlug, setAppSlug] = useState<string | null>(null);
-  useEffect(() => setAppSlug(new URLSearchParams(window.location.search).get("app")), []);
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    setAppSlug(query.get("app"));
+    const country = slideshowCountrySelection(query.get("country"), lang);
+    if (country) setF((current) => ({ ...current, country }));
+  }, []);
   const submitFn = useServerFn(submitSlideshowApplication);
   const [f, setF] = useState({ full_name: "", email: "", country: "" });
   const [langue, setLangue] = useState<ApplicantLang | null>(null);
@@ -36,14 +42,13 @@ export function SlideshowApplyPage() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const set = (k: keyof typeof f, v: string) => setF((c) => ({ ...c, [k]: v }));
-  const [payRange, setPayRange] = useState<{ min: number; max: number } | null>(null);
   const [countryPay, setCountryPay] = useState<{ weekly: number; first: number } | null>(null);
 
   useEffect(() => {
     let live = true;
+    setCountryPay(null);
     getSlideshowPayInfo({ data: { country: f.country || undefined } }).then((r) => {
       if (!live) return;
-      setPayRange(r.range);
       setCountryPay(r.country);
     }).catch(() => {});
     return () => { live = false; };
@@ -133,7 +138,7 @@ export function SlideshowApplyPage() {
       {header}
       <div className="mt-4 space-y-4 text-[17px] leading-[1.6]">
         <p>{t.lead}</p>
-        {payRange ? <p>{rich(fillSlideshow(t.paidLine, payRange), false)}</p> : null}
+        <p>{rich(t.paidLine, false)}</p>
       </div>
       <form data-funnel="apply" data-track="slideshow" onFocusCapture={(e) => { const f = e.currentTarget; if (!f.dataset["started"]) { f.dataset["started"] = "1"; trackFunnel("apply_started", { track: "slideshow" }); } }} onSubmit={onSubmit} className="relative mt-8 space-y-8 border-t border-doc-line pt-7" noValidate>
         <Honeypot value={honey} onChange={setHoney} />
