@@ -336,3 +336,34 @@
 @media (min-width: 768px) {
   .slides-crm table td button { height: 24px; min-height: 24px; }
 }
+
+/* ---------- /start onboarding funnel (scoped) ---------- */
+.ob-shell { min-height: 100vh; min-height: 100dvh; background: var(--brand-surface); color: var(--brand-navy); font-family: var(--font-sans); -webkit-tap-highlight-color: transparent; }
+.ob-step { animation: ob-in 280ms ease-out both; }
+@keyframes ob-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+.ob-title { font-size: 1.75rem; line-height: 1.15; font-weight: 800; letter-spacing: -0.01em; }
+.ob-text { font-size: 1.05rem; line-height: 1.5; color: var(--brand-navy-soft); }
+.ob-progress { flex: 1; height: 10px; border-radius: 999px; background: var(--brand-line); overflow: hidden; }
+.ob-progress > span { display: block; height: 100%; border-radius: inherit; background: var(--brand-pink); transition: width 320ms ease; }
+.ob-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 999px; color: var(--brand-navy); }
+.ob-primary, .ob-secondary { display: flex; width: 100%; min-height: 56px; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; font-weight: 700; font-size: 1.05rem; transition: transform 120ms ease, opacity 120ms; }
+.ob-primary { background: var(--brand-navy); color: var(--brand-on-navy); box-shadow: 0 6px 0 0 color-mix(in oklab, var(--brand-navy) 70%, black); }
+.ob-secondary { background: var(--card); color: var(--brand-navy); border: 2px solid var(--brand-line); }
+.ob-primary:active, .ob-secondary:active { transform: translateY(3px); }
+.ob-primary:disabled { opacity: 0.35; box-shadow: none; }
+.ob-option { display: flex; width: 100%; align-items: center; gap: 12px; padding: 16px 18px; border-radius: 20px; background: var(--card); border: 2px solid var(--brand-line); font-weight: 700; text-align: left; transition: border-color 150ms, background 150ms, transform 120ms; }
+.ob-option:active { transform: scale(0.98); }
+.ob-option[data-on="true"] { border-color: var(--brand-navy); background: color-mix(in oklab, var(--brand-pink) 22%, var(--card)); }
+.ob-option[data-state="right"] { border-color: var(--portal-green); background: color-mix(in oklab, var(--portal-green) 14%, var(--card)); }
+.ob-option[data-state="wrong"] { border-color: var(--portal-red); background: color-mix(in oklab, var(--portal-red) 12%, var(--card)); }
+.ob-option[data-state="dim"] { opacity: 0.5; }
+.ob-fact { border-radius: 20px; padding: 16px 18px; background: color-mix(in oklab, var(--brand-purple) 16%, var(--card)); animation: ob-in 250ms ease-out both; }
+.ob-card { border-radius: 20px; padding: 16px 18px; background: var(--card); box-shadow: var(--shadow-card); }
+.ob-chip { border-radius: 999px; padding: 6px 12px; background: var(--card); font-weight: 700; font-size: 0.875rem; border: 1px solid var(--brand-line); }
+.ob-badge { position: absolute; top: -11px; right: 16px; border-radius: 999px; padding: 2px 10px; background: var(--brand-pink); color: var(--brand-navy); font-size: 0.75rem; font-weight: 800; }
+.ob-radio { width: 22px; height: 22px; border-radius: 999px; border: 2px solid var(--brand-line); flex-shrink: 0; }
+.ob-radio[data-on="true"] { border: 7px solid var(--brand-navy); }
+.ob-ring { width: 140px; height: 140px; border-radius: 999px; display: grid; place-items: center; background: conic-gradient(var(--brand-pink) var(--p), var(--brand-line) 0); }
+.ob-ring > span { width: 112px; height: 112px; border-radius: 999px; display: grid; place-items: center; background: var(--brand-surface); font-size: 1.6rem; font-weight: 800; }
+.ob-success-badge { width: 88px; height: 88px; border-radius: 999px; display: grid; place-items: center; background: var(--brand-pink); color: var(--brand-navy); }
+@media (prefers-reduced-motion: reduce) { .ob-step, .ob-fact { animation: none; } .ob-progress > span { transition: none; } }
