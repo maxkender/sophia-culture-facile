@@ -211,7 +211,7 @@ describe("optional quiz", () => {
 
 describe("helpers", () => {
   it("word counts ignore markers", () => {
-    expect(countWords("Le **sfumato** de [[Léonard]] — vraiment.")).toBe(4);
+    expect(countWords("Le **sfumato** de [[Léonard]] — vraiment.")).toBe(5);
     expect(courseWords(base())).toBeGreaterThan(10);
   });
   it("inline spans split bold and glossary terms", () => {
