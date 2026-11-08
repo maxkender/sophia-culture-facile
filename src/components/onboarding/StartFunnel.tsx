@@ -29,7 +29,7 @@ export function StartFunnel({ lang }: { lang: StartLang }) {
 
   useEffect(() => {
     const attr = captureAttribution();
-    setSrc(attr.src ?? "direct");
+    setSrc(attr["src"] ?? "direct");
     setA(loadAnswers());
     setIsIos(/iPhone|iPad|iPod/i.test(navigator.userAgent));
     trackStart("view", { lang });
@@ -196,7 +196,7 @@ function PrimaryBtn(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return <button type="button" {...props} className="ob-primary" />;
 }
 
-function Choice({ title, options, lang, value, onPick }: { title: string; options: Option[]; lang: StartLang; value?: string; onPick: (v: string) => void }) {
+function Choice({ title, options, lang, value, onPick }: { title: string; options: Option[]; lang: StartLang; value?: string | undefined; onPick: (v: string) => void }) {
   return (
     <>
       <h1 className="ob-title mt-4">{title}</h1>
