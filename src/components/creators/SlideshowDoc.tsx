@@ -7,6 +7,9 @@ import { SLIDESHOW_LANGUAGES, fillSlideshow, slideshowLanguage, slideshowPageFro
 import { CONTACT_EMAIL } from "@/config/links";
 import { useApps } from "@/lib/apps";
 import { getSlideshowPayInfo } from "@/lib/slideshow-zones.functions";
+import { Button } from "@/components/ui/button";
+import { CountrySelect } from "./CountrySelect";
+import { slideshowApplyWithCountry, slideshowCountrySelection } from "@/lib/slideshow-country-selection";
 
 /** Language of the current slideshow page (English outside these pages). */
 export function useSlideshowLang() {
@@ -121,17 +124,34 @@ export function SlideshowDocLanding({ app: appProp }: { app?: string | undefined
   const a = app && app !== "sophia" ? apps.find((x) => x.slug === app) : undefined;
   const name = a?.name ?? "Sophia";
   const isSophia = !a;
-  const [range, setRange] = useState<{ min: number; max: number } | null>(null);
+  const [showPay, setShowPay] = useState(false);
+  const [country, setCountry] = useState("");
+  const [pay, setPay] = useState<{ weekly: number } | null>(null);
+  const [payState, setPayState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const countryLocale = lang.code === "fr" ? "fr" : "en";
   useEffect(() => {
-    getSlideshowPayInfo({ data: {} }).then((r) => setRange(r.range)).catch(() => {});
+    const selected = slideshowCountrySelection(new URLSearchParams(window.location.search).get("country"), countryLocale);
+    if (selected) { setCountry(selected); setShowPay(true); }
   }, []);
-  const vars = { name, min: range?.min ?? 7, max: range?.max ?? 14 };
+  useEffect(() => {
+    if (!country) return;
+    let live = true;
+    setPay(null);
+    setPayState("loading");
+    getSlideshowPayInfo({ data: { country } }).then((result) => {
+      if (!live) return;
+      setPay(result.country);
+      setPayState("ready");
+    }).catch(() => { if (live) setPayState("error"); });
+    return () => { live = false; };
+  }, [country]);
+  const vars = { name };
   const r = (text: string) => rich(fillSlideshow(text, vars), isSophia);
   const sep = lang.code === "fr" ? " : " : ": ";
   const about = isSophia
     ? t.aboutSophia
     : `${name}${a?.tagline ? ` (${a.tagline})` : ""}${a?.short_description ? `${sep}${a.short_description}` : ""} ${fillSlideshow(t.aboutOtherApp, vars)}`;
-  const applyHref = withApp(slideshowPath(lang.urlCode, "apply"), app);
+  const applyHref = slideshowApplyWithCountry(withApp(slideshowPath(lang.urlCode, "apply"), app), country);
 
   return (
     <DocShell>
@@ -143,6 +163,17 @@ export function SlideshowDocLanding({ app: appProp }: { app?: string | undefined
       <div className="mt-6 space-y-4 text-[17px] leading-[1.6]">
         <p>{r(t.intro)}</p>
         <p>{r(t.pay)}</p>
+        <Button type="button" variant="outline" aria-expanded={showPay} aria-controls="slideshow-pay" onClick={() => setShowPay((open) => !open)} className="h-auto min-h-10 whitespace-normal border-doc-field bg-doc-paper text-doc-ink shadow-none hover:bg-doc-hover">{t.viewPay}</Button>
+        {showPay ? <div id="slideshow-pay" className="space-y-3 border-s-2 border-doc-line ps-4">
+          <label htmlFor="pay-country" className="block font-semibold">{s.apply.country}</label>
+          <div className="max-w-[360px] [&_button[role=combobox]]:border-doc-field [&_button[role=combobox]]:bg-doc-paper [&_button[role=combobox]]:text-doc-ink [&_button[role=combobox]]:shadow-none">
+            <CountrySelect id="pay-country" value={country} onChange={setCountry} lang={countryLocale} displayLocale={lang.htmlLang} labels={{ select: s.apply.selectCountry, search: s.apply.searchCountry, empty: s.apply.noCountry }} />
+          </div>
+          <div aria-live="polite" aria-busy={payState === "loading"}>
+            {payState === "loading" ? <p className="text-doc-muted">…</p> : pay ? <p>{rich(fillSlideshow(t.payResult, { weekly: pay.weekly }), isSophia)}</p> : payState === "ready" ? <p className="text-doc-muted">{t.payUnavailable}</p> : payState === "error" ? <p role="alert" className="text-doc-error">{s.apply.genericError}</p> : null}
+          </div>
+          <Button asChild className={`${docButton} h-auto min-h-10 whitespace-normal shadow-none hover:bg-doc-button`}><a href={applyHref}>{fillSlideshow(t.cta, vars)}</a></Button>
+        </div> : null}
       </div>
       <div className="mt-7 space-y-7 text-[17px] leading-[1.6]">
         <Sec>

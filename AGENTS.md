@@ -39,3 +39,4 @@ UGC acceptance/onboarding mutations use authenticated server functions to valida
 
 - UGC drafts: creators insert only 'submitted' creator_drafts rows; admins review (ugc-drafts.functions.ts); post links need a validated draft when draft_required; why: owner approves every video.
 - Slideshow landing/form copy for all 30 languages comes only from src/i18n/slideshow-pages.json via slideshow-pages.ts (EN/FR keep historic URLs, others /{urlCode}/creators/slideshow[/apply]); why: one final translated source, no hardcoded strings.
+- Public slideshow pay previews reuse getSlideshowPayInfo and carry only a validated ISO country query into the form; why: show existing rates before applying without changing payouts or storing personal data.
