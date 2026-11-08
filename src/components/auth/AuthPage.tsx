@@ -28,7 +28,7 @@ export function AuthPage({ initialEmail = "", startWithReset = false }: { initia
       return;
     }
     const role = await resolveAccountRole();
-    window.location.assign(role ? homeFor(role) : "/auteurs");
+    window.location.assign(role && role !== "none" ? homeFor(role) : "/auteurs/join");
   }
 
   async function magicLink() {
@@ -95,7 +95,8 @@ export function AuthPage({ initialEmail = "", startWithReset = false }: { initia
       </button>
       {notice ? <p className="mt-3 text-center text-sm text-brand-navySoft">{notice}</p> : null}
       <p className="mt-7 border-t border-brand-line pt-6 text-center text-sm text-brand-navySoft">
-        Authors join by invitation from the Sophia editorial desk.
+        New to Sophia?{" "}
+        <a href="/auteurs/join" className="font-bold text-brand-navy underline-offset-4 hover:underline">Create a creator account</a>
       </p>
     </AuthShell>
   );
