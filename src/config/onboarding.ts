@@ -20,11 +20,49 @@ export const STEPS = [
 ] as const;
 export type StepId = (typeof STEPS)[number];
 
-/** The 14 steps that show the progress capsules, in order. */
-export const DOT_STEPS: StepId[] = [
-  "name", "age", "knowledge", "motivation", "goals", "topics", "help",
-  "mission", "questions", "phoneTime", "years", "reviews", "swipe", "loading",
+/**
+ * The funnel, in order. Flip `on` to change the flow (A/B test lengths);
+ * every screen stays in the code. `dots` = shows the progress capsules.
+ * Default flow: 12 screens (+ success), about 1 minute.
+ */
+export const FLOW: { id: StepId; on: boolean; dots?: boolean }[] = [
+  { id: "welcome", on: true },
+  { id: "language", on: false },
+  { id: "intro", on: false },
+  { id: "social", on: false },
+  { id: "name", on: false, dots: true },
+  { id: "age", on: false, dots: true },
+  { id: "topics", on: true, dots: true },
+  { id: "motivation", on: false, dots: true },
+  { id: "goals", on: true, dots: true },
+  { id: "help", on: false, dots: true }, // "objective intro" interstitial
+  { id: "knowledge", on: true, dots: true },
+  { id: "mission", on: false, dots: true },
+  { id: "questions", on: false, dots: true },
+  { id: "phoneTime", on: true, dots: true },
+  { id: "years", on: true, dots: true },
+  { id: "transform", on: false },
+  { id: "reviews", on: false, dots: true },
+  { id: "personalize", on: false },
+  { id: "swipe", on: true, dots: true },
+  { id: "loading", on: true, dots: true },
+  { id: "profile", on: true, dots: true },
+  { id: "readingTime", on: false },
+  { id: "email", on: false },
+  { id: "account", on: true },
+  { id: "aboard", on: false },
+  { id: "features", on: false },
+  { id: "trial", on: false },
+  { id: "reminder", on: false },
+  { id: "paywallA", on: true },
+  { id: "paywallB", on: true },
+  { id: "success", on: true },
 ];
+
+/** Active steps in order. */
+export const ACTIVE_STEPS: StepId[] = FLOW.filter((s) => s.on).map((s) => s.id);
+/** Active steps that show the progress capsules. */
+export const DOT_STEPS: StepId[] = FLOW.filter((s) => s.on && s.dots).map((s) => s.id);
 
 /* ------------------------------ design ------------------------------ */
 
@@ -220,6 +258,10 @@ export const COPY = {
     tapContinue: "Appuie pour continuer", tapAnywhere: "Appuie n'importe où pour continuer",
     // 1 welcome
     welcomeTitle: "Bienvenue sur Sophia", welcomeSub: "Deviens plus cultivé, un peu chaque jour.",
+    welcomeProof: "4,8 · 500 000 apprenants · 140+ pays",
+    yearsCycle: ["culture", "histoire", "sciences", "art", "littérature", "mythologie"],
+    accountApple: "Continuer avec Apple", accountGoogle: "Continuer avec Google", accountEmail: "Continuer avec l'email", accountOr: "ou",
+    paywallTimeline: [{ when: "Aujourd'hui", what: "Accès complet" }, { when: "Jour 2", what: "On te prévient" }, { when: "Jour 3", what: "Fin de l'essai" }],
     welcomeCta: "Commencer", alreadyAccount: "J'ai déjà un compte",
     // 2 language
     langTitle: "Choisis ta langue", langSub: "Glisse pour découvrir toutes les langues. Tu pourras la changer plus tard.",
@@ -347,6 +389,10 @@ export const COPY = {
     continue: "Continue", skip: "Skip", maybeLater: "Maybe later",
     tapContinue: "Tap to continue", tapAnywhere: "Tap anywhere to continue",
     welcomeTitle: "Welcome to Sophia", welcomeSub: "Get a little smarter every day.",
+    welcomeProof: "4.8 · 500,000 learners · 140+ countries",
+    yearsCycle: ["knowledge", "history", "science", "art", "literature", "mythology"],
+    accountApple: "Continue with Apple", accountGoogle: "Continue with Google", accountEmail: "Continue with email", accountOr: "or",
+    paywallTimeline: [{ when: "Today", what: "Full access" }, { when: "Day 2", what: "We remind you" }, { when: "Day 3", what: "Trial ends" }],
     welcomeCta: "Get started", alreadyAccount: "I already have an account",
     langTitle: "Choose your language", langSub: "Swipe to explore every language. You can change it later.",
     intro1: "Get **smarter** with **exciting** 10-minute **courses**, made for you.",

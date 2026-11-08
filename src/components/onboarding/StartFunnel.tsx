@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import {
   AGES, ARCHETYPES, COPY, FEATURES, GOALS, KNOWLEDGE_LEVELS, LANGUAGES, MOTIVATIONS,
-  OB, PRICING, REVIEWS, ROULETTE_QUESTIONS, STEPS, STUDENT_PHOTOS, TOPICS,
+  ACTIVE_STEPS, OB, PRICING, REVIEWS, ROULETTE_QUESTIONS, STUDENT_PHOTOS, TOPICS,
   buildProfileCourses, buildSwipeDeck, type StartLang, type StepId,
 } from "@/config/onboarding";
 import { captureAttribution, trackStart } from "@/lib/onboarding-events";
@@ -30,7 +30,7 @@ function loadState(): { step: StepId; answers: Answers } {
     const raw = sessionStorage.getItem(STORE_KEY) ?? localStorage.getItem(STORE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as { step?: StepId; answers?: Partial<Answers> };
-      if (parsed.step && (STEPS as readonly string[]).includes(parsed.step)) {
+      if (parsed.step && ACTIVE_STEPS.includes(parsed.step)) {
         return { step: parsed.step, answers: { ...EMPTY, ...parsed.answers } };
       }
     }
@@ -69,7 +69,7 @@ export function StartFunnel({ lang: routeLang }: { lang: StartLang }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    trackStart("step_view", { step, index: STEPS.indexOf(step) });
+    trackStart("step_view", { step, index: ACTIVE_STEPS.indexOf(step), total: ACTIVE_STEPS.length });
     window.scrollTo(0, 0);
   }, [step, hydrated]);
 
@@ -82,10 +82,9 @@ export function StartFunnel({ lang: routeLang }: { lang: StartLang }) {
     setStep(next);
   };
   const next = () => {
-    const idx = STEPS.indexOf(step);
-    let target = STEPS[Math.min(idx + 1, STEPS.length - 1)]!;
-    if (target === "trial" && PRICING.yearly.trialDays <= 0) target = "reminder";
-    if (target === "reminder" && PRICING.yearly.trialDays <= 0) target = "paywallA";
+    const steps = ACTIVE_STEPS.filter((s) => PRICING.yearly.trialDays > 0 || (s !== "trial" && s !== "reminder"));
+    const idx = steps.indexOf(step);
+    const target = steps[Math.min(idx + 1, steps.length - 1)]!;
     go(target);
   };
   const answer = (key: keyof Answers, value: unknown) => {
@@ -121,6 +120,13 @@ export function StartFunnel({ lang: routeLang }: { lang: StartLang }) {
               </div>
               <h1 className="ob-title-lg ob-reveal" style={{ "--d": "350ms" } as React.CSSProperties}>{c.welcomeTitle}</h1>
               <p className="ob-sub ob-reveal" style={{ "--d": "420ms" } as React.CSSProperties}>{c.welcomeSub}</p>
+              <div className="ob-reveal" style={{ "--d": "560ms", marginTop: 26, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 } as React.CSSProperties}>
+                <AvatarStack photos={STUDENT_PHOTOS} size={40} overlap={12} />
+                <p style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, fontWeight: 700, color: OB.ink }}>
+                  <Star style={{ width: 15, height: 15, color: OB.gold }} fill="currentColor" strokeWidth={0} />
+                  <span>{c.welcomeProof}</span>
+                </p>
+              </div>
               <div style={{ width: "100%", marginTop: "auto" }}>
                 <PrimaryBtn onClick={next}>{c.welcomeCta}</PrimaryBtn>
                 <a className="ob-link" href={storeHref} onClick={() => trackStart("cta_click", { cta: "already_account" })}>{c.alreadyAccount}</a>
@@ -385,7 +391,8 @@ export function StartFunnel({ lang: routeLang }: { lang: StartLang }) {
           {/* 24 — Account (email only, no auth) */}
           {step === "account" && (
             <AccountStep lang={lang} c={c} value={a.email}
-              onSubmit={(email) => { answer("email", email); next(); }} />
+              onSubmit={(email) => { answer("email", email); next(); }}
+              onProvider={(p) => { trackStart("step_answer", { step, answer: `${p}_placeholder` }); next(); }} />
           )}
 
           {/* 25 — Welcome aboard */}
@@ -468,6 +475,19 @@ export function StartFunnel({ lang: routeLang }: { lang: StartLang }) {
                   {c.viewAllPlans}
                 </button>
               </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 12, position: "relative" }}>
+                <span aria-hidden="true" style={{ position: "absolute", top: 13, left: "16%", right: "16%", height: 3, borderRadius: 3, background: `linear-gradient(90deg, ${OB.accentSoft}, ${OB.surfaceMuted})` }} />
+                {c.paywallTimeline.map((t, i) => (
+                  <div key={t.when} className="ob-reveal" style={{ "--d": `${i * 120}ms`, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, textAlign: "center", zIndex: 1 } as React.CSSProperties}>
+                    <span style={{ width: 28, height: 28, borderRadius: 999, display: "grid", placeItems: "center", background: i === 0 ? OB.accentSoft : OB.surfaceMuted, color: i === 0 ? "#fff" : OB.accentSoft, border: "2px solid #fff" }}>
+                      {i === 0 ? <LockOpen className="size-3.5" /> : i === 1 ? <Bell className="size-3.5" /> : <Star className="size-3.5" />}
+                    </span>
+                    <span style={{ fontSize: 12, fontWeight: 800 }}>{t.when}</span>
+                    <span style={{ fontSize: 12, fontWeight: 500, color: OB.inkSecondary }}>{t.what}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginBottom: 12 }}><ReviewCard index={1} lang={lang} /></div>
               <p style={{ textAlign: "center", fontSize: 13, fontWeight: 500, color: OB.inkSecondary, marginBottom: 10 }}>{c.paywallReassurance}</p>
               <button type="button" className="ob-primary" onClick={() => finish("paywall_a_trial")}>{c.trialCtaLong}</button>
               <p style={{ textAlign: "center", fontSize: 13, fontWeight: 500, color: OB.inkSecondary, marginTop: 8 }}>{c.billedYearly}</p>
@@ -655,8 +675,22 @@ function YearsStep({ lang, c, minutes, onNext }: { lang: StartLang; c: C; minute
       <div style={{ height: 48 }} />
       {ready ? <h1 className="ob-title ob-reveal" style={{ marginBottom: 22 }}>{c.yearsTitle}</h1> : <div style={{ height: 56 }} />}
       <YearsGrid minutes={minutes} lang={lang} onReady={() => setReady(true)} />
+      {ready ? <YearsClosing c={c} /> : null}
       {ready ? <PrimaryBtn onClick={onNext}>{c.continue}</PrimaryBtn> : null}
     </>
+  );
+}
+
+/** "With Sophia, turn that time into …" with the last word cycling in subject colours. */
+function YearsClosing({ c }: { c: C }) {
+  const [i, setI] = useState(0);
+  useEffect(() => { const t = window.setInterval(() => setI((v) => (v + 1) % c.yearsCycle.length), 1300); return () => window.clearInterval(t); }, [c]);
+  const lead = c.transformWords.split(" ").slice(0, -1).join(" ");
+  return (
+    <p className="ob-reveal" style={{ "--d": "500ms", marginTop: 22, textAlign: "center", fontSize: 21, fontWeight: 800, lineHeight: 1.3 } as React.CSSProperties}>
+      {lead}{" "}
+      <b key={i} className="ob-pop" style={{ display: "inline-block", color: TOPICS[i % TOPICS.length]!.color, filter: "brightness(0.9)" }}>{c.yearsCycle[i]}</b>
+    </p>
   );
 }
 
@@ -774,30 +808,46 @@ function EmailStep({ lang, c, value, onSubmit, onSkip }: {
   );
 }
 
-function AccountStep({ lang, c, value, onSubmit }: { lang: StartLang; c: C; value: string; onSubmit: (email: string) => void }) {
+function AccountStep({ c, value, onSubmit, onProvider }: { lang: StartLang; c: C; value: string; onSubmit: (email: string) => void; onProvider: (p: "apple" | "google") => void }) {
+  const [mode, setMode] = useState<"choose" | "email">("choose");
   const [email, setEmail] = useState(value);
   const [error, setError] = useState(false);
   const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const btn: React.CSSProperties = { display: "flex", width: "100%", minHeight: 56, alignItems: "center", justifyContent: "center", gap: 10, borderRadius: 999, fontSize: 17, fontWeight: 600 };
   return (
     <>
       <div className="ob-spacer" />
       <div style={{ display: "grid", placeItems: "center", marginBottom: 22 }}>
-        <span style={{ width: 96, height: 96, borderRadius: 999, background: "color-mix(in srgb, #2E62C4 12%, transparent)", display: "grid", placeItems: "center" }}>
-          <UserCheck style={{ width: 44, height: 44, color: OB.accentSoft }} />
-        </span>
+        <img src="/onboarding/splash_logo.png" alt="Sophia" className="ob-pop" style={{ width: 84, height: 84, borderRadius: 22 }} />
       </div>
       <h1 className="ob-title">{c.accountTitle}</h1>
       <p className="ob-sub">{c.accountSub}</p>
-      <form style={{ marginTop: 26 }} onSubmit={(e) => { e.preventDefault(); if (valid) onSubmit(email.trim()); else setError(true); }}>
-        <input className="ob-input" type="email" inputMode="email" autoComplete="email" style={{ fontSize: 17 }}
-          placeholder={c.emailPlaceholder} value={email}
-          onChange={(e) => { setEmail(e.target.value); setError(false); }} />
-        {error ? <p style={{ color: OB.danger, fontSize: 13, fontWeight: 600, textAlign: "center", marginTop: 8 }}>{c.emailInvalid}</p> : null}
-      </form>
-      <PrimaryBtn onClick={() => (valid ? onSubmit(email.trim()) : setError(true))}>{c.continue}</PrimaryBtn>
-      <p style={{ textAlign: "center", fontSize: 11, color: OB.inkTertiary, marginTop: 14 }}>
-        {c.accountLegal} {c.accountLegalLinks}
-      </p>
+      {mode === "choose" ? (
+        <div className="ob-footer" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <button type="button" style={{ ...btn, background: OB.ink, color: "#fff" }} onClick={() => onProvider("apple")}>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M16.37 12.6c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.77-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.76 2.28-1.6 2.78-.41 6.9 1.15 9.16.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.77.74 2.98.72 1.23-.02 2.01-1.12 2.76-2.23.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.4-.92-2.42-3.65zM14.1 5.86c.63-.77 1.06-1.83.94-2.89-.91.04-2.02.61-2.67 1.37-.58.67-1.1 1.76-.96 2.8 1.02.08 2.06-.52 2.69-1.28z" /></svg>
+            {c.accountApple}
+          </button>
+          <button type="button" style={{ ...btn, background: OB.surface, color: OB.ink, border: `1px solid ${OB.hairline}` }} onClick={() => onProvider("google")}>
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z"/></svg>
+            {c.accountGoogle}
+          </button>
+          <p style={{ textAlign: "center", fontSize: 13, fontWeight: 600, color: OB.inkTertiary }}>{c.accountOr}</p>
+          <button type="button" className="ob-link" style={{ margin: "0 auto" }} onClick={() => setMode("email")}>{c.accountEmail}</button>
+          <p style={{ textAlign: "center", fontSize: 11, color: OB.inkTertiary, marginTop: 4 }}>{c.accountLegal} {c.accountLegalLinks}</p>
+        </div>
+      ) : (
+        <>
+          <form style={{ marginTop: 26 }} onSubmit={(e) => { e.preventDefault(); if (valid) onSubmit(email.trim()); else setError(true); }}>
+            <input className="ob-input" type="email" inputMode="email" autoComplete="email" autoFocus style={{ fontSize: 17 }}
+              placeholder={c.emailPlaceholder} value={email}
+              onChange={(e) => { setEmail(e.target.value); setError(false); }} />
+            {error ? <p style={{ color: OB.danger, fontSize: 13, fontWeight: 600, textAlign: "center", marginTop: 8 }}>{c.emailInvalid}</p> : null}
+          </form>
+          <PrimaryBtn onClick={() => (valid ? onSubmit(email.trim()) : setError(true))}>{c.continue}</PrimaryBtn>
+          <p style={{ textAlign: "center", fontSize: 11, color: OB.inkTertiary, marginTop: 14 }}>{c.accountLegal} {c.accountLegalLinks}</p>
+        </>
+      )}
     </>
   );
 }
