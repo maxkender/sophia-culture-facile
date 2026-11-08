@@ -126,7 +126,7 @@ export function Roulette({ items, interval, renderCard }: {
         const idx = ((offset + slot) % items + items) % items;
         const focused = slot === 0;
         return (
-          <div key={`${idx}-${slot}`} className="ob-roulette-card" style={{
+          <div key={slot} className="ob-roulette-card" style={{
             transform: `translateY(calc(-50% + ${slot * 104}px)) scale(${focused ? 1 : 0.84})`,
             opacity: focused ? 1 : 0.42, filter: focused ? "none" : "blur(2px)",
             boxShadow: focused ? "0 8px 16px rgba(0,0,0,.08)" : "0 4px 8px rgba(0,0,0,.03)",

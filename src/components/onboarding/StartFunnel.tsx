@@ -225,7 +225,7 @@ export function StartFunnel({ lang: routeLang }: { lang: StartLang }) {
                   );
                 })}
               </div>
-              <PrimaryBtn disabled={!a.goals.length} onClick={() => { answer("goals", a.goals.join(",")); next(); }}>{c.continue}</PrimaryBtn>
+              <PrimaryBtn disabled={!a.goals.length} onClick={() => { trackStart("step_answer", { step, answer: a.goals.join(",") }); next(); }}>{c.continue}</PrimaryBtn>
             </>
           )}
 
@@ -249,7 +249,7 @@ export function StartFunnel({ lang: routeLang }: { lang: StartLang }) {
                   );
                 })}
               </div>
-              <PrimaryBtn disabled={!a.topics.length} onClick={() => { answer("topics", a.topics.join(",")); next(); }}>{c.continue}</PrimaryBtn>
+              <PrimaryBtn disabled={!a.topics.length} onClick={() => { trackStart("step_answer", { step, answer: a.topics.join(",") }); next(); }}>{c.continue}</PrimaryBtn>
             </>
           )}
 
@@ -339,7 +339,7 @@ export function StartFunnel({ lang: routeLang }: { lang: StartLang }) {
               <div style={{ height: 40 }} />
               <h1 style={{ fontSize: 22, fontWeight: 800, textAlign: "center" }}>{c.swipeTitle}</h1>
               <p className="ob-sub" style={{ fontSize: 15 }}>{c.swipeSub}</p>
-              <SwipeDeck deck={deck} lang={lang} onDone={(liked) => { answer("liked", liked.join(",")); next(); }} />
+              <SwipeDeck deck={deck} lang={lang} onDone={(liked) => { setA((p) => ({ ...p, liked })); trackStart("step_answer", { step: "swipe", answer: liked.join(",") }); next(); }} />
             </>
           )}
 
