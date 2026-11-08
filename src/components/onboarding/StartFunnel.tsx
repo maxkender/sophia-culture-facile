@@ -620,7 +620,7 @@ function Interstitial({ words, hint, icon, cycle, onTap }: {
         {parts.map((w, i) => {
           const isLast = cycle && i === parts.length - 1;
           if (isLast && ready) {
-            return <b key={`${cycleIdx}`} className="ob-pop" style={{ color: cycleColors[cycleIdx % cycleColors.length], display: "inline-block" }}>{cycle[cycleIdx]!} </b>;
+            return <b key={`cycle-${cycleIdx}`} className="ob-pop" style={{ color: cycleColors[cycleIdx % cycleColors.length], display: "inline-block" }}>{cycle[cycleIdx]!} </b>;
           }
           return i < shown ? <b key={i}>{w} </b> : <span key={i}>{w} </span>;
         })}
