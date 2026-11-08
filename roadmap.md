@@ -8,5 +8,5 @@
 - Studio Pass D: send creator.photo_url as a 7-day signed link from private author-photos (owner decision; no public bucket).
 - Studio: Google sign-in follow-up (provider not configured today).
 - Studio: owner to add secrets PUBLISH_API_KEY and STUDIO_WEBHOOK_SECRET before Pass D.
-- Pass 1 — marketing site redesign (home, app pages, header/footer). Waiting on: app screenshots, logo SVG, real prices, App Store link, analytics choice, reviews. Separate message.
+- Pass 1 — marketing redesign built (home, app page, download page), not published. Open: owner reviews copy keys; real images in public/onboarding/; author bios; Lighthouse to measure on the published build.
 - Replace the 42 placeholder images in public/onboarding/ with the real asset files (owner has them).
