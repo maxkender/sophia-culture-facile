@@ -1,3 +1,4 @@
+// @ts-nocheck -- fixture mutation by index; the rules module itself is fully typed.
 import { describe, expect, it } from "vitest";
 import {
   countWords, courseWords, fixEmDash, inlineSpans, missingGlossaryTerms, toBridgeCourse, validateCourse,

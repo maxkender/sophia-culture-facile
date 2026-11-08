@@ -37,7 +37,7 @@ const STATUS: Record<string, { en: string; fr: string; cls: string }> = {
   archived: { en: "Archived", fr: "Archivé", cls: "bg-brand-surfaceStrong text-brand-navySoft" },
 };
 export function StudioStatusPill({ status }: { status: string }) {
-  const s = STATUS[status] ?? STATUS.draft;
+  const s = STATUS[status] ?? STATUS["draft"]!;
   return <span className={cn("inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold", s.cls)}>{SL(s.en, s.fr)}</span>;
 }
 
