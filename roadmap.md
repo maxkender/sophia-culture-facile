@@ -1,7 +1,8 @@
 # Sophia OS referrals (Nov 8)
-- [ ] Add authenticated OS email endpoint using the existing provider and secure event forwarding.
-- [ ] Persist referral codes for 30 days, save on slideshow applications, and forward on submission/signing.
-- [ ] Test without real sends, applications, or signatures; provide production endpoint URL and deployment status.
+- [x] Add authenticated OS email endpoint and authenticated Brevo event receiver; 29 focused tests pass, unauthorized POST/GET browser checks pass.
+- [x] Persist referral codes for exactly 30 days, save nullable slideshow application ref, and forward on submission/signing. Phone/desktop landing → form verified without submission; existing signing tested with mocks only.
+- [x] Test without real sends, applications, or signatures; no publication. Production URL after publication: https://sophia-culture.com/api/public/os-email.
+- [ ] Activate Sophia-domain sending and events — blocked: Brevo has no Sophia sender/domain; owner must verify sophia-culture.com in Brevo. Receiver registration requires publication and authenticated Brevo webhook configuration; not performed to avoid publishing unrelated pending changes.
 
 # Sophia slideshow presentation (Nov 6)
 - [x] Replace public pay range with country-specific remuneration before applying; country carried into form. FR/AR 390px and EN 1440px verified, 3 country-selection tests passed. No submission or publication.
