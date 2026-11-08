@@ -34,3 +34,9 @@
 # Slideshow Monday payments (Oct 17)
 - [x] Update six-language acceptance/logins payment wording and first payment (+7 days); 18 mocked tests pass, no sends; rates, Slack links and forms preserved.
 - [ ] Publish Monday-payment update.
+
+## Sophia marketing + /start (approved plan 08/11)
+- [x] /start + /en/start funnel (placeholder look, no payment)
+- [ ] Restyle /start to match app onboarding — waiting on app screenshots, colours, fonts, illustrations
+- [ ] Marketing site redesign (pass 1) with copy in src/i18n/marketing — waiting on screenshots, logo SVG, real social proof
+- [ ] Real App Store URL, prices, analytics tool — waiting on owner
