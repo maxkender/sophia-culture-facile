@@ -52,7 +52,7 @@ function SignUpForm() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState<null | "confirm" | "magic">(null);
-  const redirect = typeof window !== "undefined" ? `${window.location.origin}/auteurs/join` : undefined;
+  const redirect = typeof window !== "undefined" ? `${window.location.origin}/auteurs/join` : "/auteurs/join";
 
   async function signUp(e: FormEvent) {
     e.preventDefault();
