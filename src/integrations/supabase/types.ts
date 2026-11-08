@@ -5503,6 +5503,10 @@ export type Database = {
           bio: string | null
           country: string | null
           created_at: string
+          creator_links: Json
+          creator_slug: string | null
+          creator_status: string
+          creator_verified: boolean
           declaration_accepted_at: string | null
           declaration_ip: string | null
           declaration_snapshot: Json | null
@@ -5512,6 +5516,7 @@ export type Database = {
           email: string | null
           examples_reviewed_at: string | null
           fee: string | null
+          first_name: string | null
           full_name: string
           guide_read_at: string | null
           id: string
@@ -5520,6 +5525,8 @@ export type Database = {
           invite_token: string | null
           invited_at: string | null
           is_test: boolean
+          last_name: string | null
+          onboarding_step: string | null
           orcid: string | null
           personal_site: string | null
           photo_url: string | null
@@ -5527,12 +5534,14 @@ export type Database = {
           public_slug: string | null
           role: Database["public"]["Enums"]["portal_role"]
           scholar_url: string | null
+          self_registered: boolean
           short_bio: string | null
           title: string | null
           updated_at: string
           upwork_status: string
           used_invite_token: string | null
           user_id: string | null
+          writing_lang: string | null
         }
         Insert: {
           access_code?: string | null
@@ -5542,6 +5551,10 @@ export type Database = {
           bio?: string | null
           country?: string | null
           created_at?: string
+          creator_links?: Json
+          creator_slug?: string | null
+          creator_status?: string
+          creator_verified?: boolean
           declaration_accepted_at?: string | null
           declaration_ip?: string | null
           declaration_snapshot?: Json | null
@@ -5551,6 +5564,7 @@ export type Database = {
           email?: string | null
           examples_reviewed_at?: string | null
           fee?: string | null
+          first_name?: string | null
           full_name: string
           guide_read_at?: string | null
           id?: string
@@ -5559,6 +5573,8 @@ export type Database = {
           invite_token?: string | null
           invited_at?: string | null
           is_test?: boolean
+          last_name?: string | null
+          onboarding_step?: string | null
           orcid?: string | null
           personal_site?: string | null
           photo_url?: string | null
@@ -5566,12 +5582,14 @@ export type Database = {
           public_slug?: string | null
           role?: Database["public"]["Enums"]["portal_role"]
           scholar_url?: string | null
+          self_registered?: boolean
           short_bio?: string | null
           title?: string | null
           updated_at?: string
           upwork_status?: string
           used_invite_token?: string | null
           user_id?: string | null
+          writing_lang?: string | null
         }
         Update: {
           access_code?: string | null
@@ -5581,6 +5599,10 @@ export type Database = {
           bio?: string | null
           country?: string | null
           created_at?: string
+          creator_links?: Json
+          creator_slug?: string | null
+          creator_status?: string
+          creator_verified?: boolean
           declaration_accepted_at?: string | null
           declaration_ip?: string | null
           declaration_snapshot?: Json | null
@@ -5590,6 +5612,7 @@ export type Database = {
           email?: string | null
           examples_reviewed_at?: string | null
           fee?: string | null
+          first_name?: string | null
           full_name?: string
           guide_read_at?: string | null
           id?: string
@@ -5598,6 +5621,8 @@ export type Database = {
           invite_token?: string | null
           invited_at?: string | null
           is_test?: boolean
+          last_name?: string | null
+          onboarding_step?: string | null
           orcid?: string | null
           personal_site?: string | null
           photo_url?: string | null
@@ -5605,12 +5630,14 @@ export type Database = {
           public_slug?: string | null
           role?: Database["public"]["Enums"]["portal_role"]
           scholar_url?: string | null
+          self_registered?: boolean
           short_bio?: string | null
           title?: string | null
           updated_at?: string
           upwork_status?: string
           used_invite_token?: string | null
           user_id?: string | null
+          writing_lang?: string | null
         }
         Relationships: []
       }
@@ -6371,6 +6398,163 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      studio_courses: {
+        Row: {
+          accepted_at: string | null
+          app_course_id: string | null
+          author_id: string
+          created_at: string
+          description: string
+          glossary: Json
+          hero: Json
+          id: string
+          job_status: string | null
+          languages: Json
+          last_job_id: string | null
+          origin_lang: string
+          precheck: Json | null
+          published_at: string | null
+          quiz: Json | null
+          review_comment: string | null
+          sections: Json
+          sources: Json
+          status: string
+          subcategory: string | null
+          subject: string | null
+          submitted_at: string | null
+          subtitle: string | null
+          title: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          accepted_at?: string | null
+          app_course_id?: string | null
+          author_id: string
+          created_at?: string
+          description?: string
+          glossary?: Json
+          hero?: Json
+          id?: string
+          job_status?: string | null
+          languages?: Json
+          last_job_id?: string | null
+          origin_lang?: string
+          precheck?: Json | null
+          published_at?: string | null
+          quiz?: Json | null
+          review_comment?: string | null
+          sections?: Json
+          sources?: Json
+          status?: string
+          subcategory?: string | null
+          subject?: string | null
+          submitted_at?: string | null
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          accepted_at?: string | null
+          app_course_id?: string | null
+          author_id?: string
+          created_at?: string
+          description?: string
+          glossary?: Json
+          hero?: Json
+          id?: string
+          job_status?: string | null
+          languages?: Json
+          last_job_id?: string | null
+          origin_lang?: string
+          precheck?: Json | null
+          published_at?: string | null
+          quiz?: Json | null
+          review_comment?: string | null
+          sections?: Json
+          sources?: Json
+          status?: string
+          subcategory?: string | null
+          subject?: string | null
+          submitted_at?: string | null
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "studio_courses_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      studio_jobs: {
+        Row: {
+          app_course_id: string | null
+          created_at: string
+          events: Json
+          job_id: string
+          status: string | null
+          steps: Json
+          studio_course_id: string
+          summary: Json | null
+          updated_at: string
+        }
+        Insert: {
+          app_course_id?: string | null
+          created_at?: string
+          events?: Json
+          job_id: string
+          status?: string | null
+          steps?: Json
+          studio_course_id: string
+          summary?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          app_course_id?: string | null
+          created_at?: string
+          events?: Json
+          job_id?: string
+          status?: string | null
+          steps?: Json
+          studio_course_id?: string
+          summary?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "studio_jobs_studio_course_id_fkey"
+            columns: ["studio_course_id"]
+            isOneToOne: false
+            referencedRelation: "studio_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      studio_stats_cache: {
+        Row: {
+          fetched_at: string
+          key: string
+          payload: Json
+        }
+        Insert: {
+          fetched_at?: string
+          key: string
+          payload: Json
+        }
+        Update: {
+          fetched_at?: string
+          key?: string
+          payload?: Json
+        }
+        Relationships: []
       }
       sync_runs: {
         Row: {

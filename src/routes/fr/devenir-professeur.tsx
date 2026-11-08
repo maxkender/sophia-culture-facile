@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ApplyPage } from "@/components/pages/ApplyPage";
+import { StudioCta } from "@/components/studio/StudioCta";
 import { fr } from "@/i18n/fr";
 import { langLinks, meta } from "@/lib/seo";
 
@@ -14,5 +15,14 @@ export const Route = createFileRoute("/fr/devenir-professeur")({
     }),
     links: langLinks("apply", "fr"),
   }),
-  component: ApplyPage,
+  component: TeacherPage,
 });
+
+function TeacherPage() {
+  return (
+    <>
+      <StudioCta lang="fr" />
+      <ApplyPage />
+    </>
+  );
+}

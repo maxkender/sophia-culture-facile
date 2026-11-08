@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { StudioSignups } from "@/components/studio/StudioDesk";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -78,6 +79,7 @@ export function ApplicationsList() {
 
   return (
     <div>
+      <StudioSignups />
       <PageTitle
         title="Applications"
         lead="Candidatures sent from the public form. Approving creates the author record and their access link to copy."
