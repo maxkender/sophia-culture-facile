@@ -4,13 +4,13 @@ import { notifyOsApplication, runOsNotification } from "./os-referral.server";
 afterEach(() => vi.unstubAllGlobals());
 describe("saved application OS notification", () => {
   it("sends candidature with the applicant email and stored code", async () => {
-    const fetcher = vi.fn(async () => Response.json({ ok: true }));
+    const fetcher = vi.fn<typeof fetch>(async () => Response.json({ ok: true }));
     vi.stubGlobal("fetch", fetcher);
     await notifyOsApplication({}, "poster@example.com", "CODE", "test-shared-value");
     expect(JSON.parse(String(fetcher.mock.calls[0]?.[1]?.body))).toEqual({ action: "candidature", email: "poster@example.com", ref: "CODE" });
   });
   it("old clients send null and OS failures never reject the application notification", async () => {
-    const fetcher = vi.fn(async () => { throw new Error("OS offline"); });
+    const fetcher = vi.fn<typeof fetch>(async () => { throw new Error("OS offline"); });
     vi.stubGlobal("fetch", fetcher);
     await expect(notifyOsApplication({}, "poster@example.com", null, "test-shared-value")).resolves.toBeUndefined();
     expect(JSON.parse(String(fetcher.mock.calls[0]?.[1]?.body))).toMatchObject({ ref: null });

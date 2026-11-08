@@ -14,7 +14,7 @@ describe("OS email request", () => {
     expect(hubSecretMatches("test-shared-value", undefined)).toBe(false);
   });
   it("sends both formats, requested sender name, tags and one-click headers from Sophia", async () => {
-    const fetcher = vi.fn(async () => Response.json({ messageId: "<provider-id>" }, { status: 201 }));
+    const fetcher = vi.fn<typeof fetch>(async () => Response.json({ messageId: "<provider-id>" }, { status: 201 }));
     const response = await handleOsEmail(request(payload, { "x-hub-secret": "test-shared-value" }), "test-shared-value", "test-provider", fetcher);
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true, message_id: "<provider-id>" });
@@ -47,7 +47,7 @@ describe("OS email request", () => {
 
 describe("Brevo events to OS", () => {
   it.each([["opened", "ouvert"], ["click", "clique"], ["hardBounce", "rebond"], ["softBounce", "rebond"]])("forwards %s as %s only after authentication", async (event, type) => {
-    const fetcher = vi.fn(async () => Response.json({ ok: true }));
+    const fetcher = vi.fn<typeof fetch>(async () => Response.json({ ok: true }));
     const response = await handleOsEmailEvent(request({ event, "message-id": "<id>" }, { authorization: "Bearer test-shared-value" }), "test-shared-value", fetcher);
     expect(response.status).toBe(200);
     expect(fetcher.mock.calls[0]?.[0]).toBe("https://mbikecieskoobeizixig.supabase.co/functions/v1/parrainage");
