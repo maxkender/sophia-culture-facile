@@ -266,7 +266,7 @@ export const COPY = {
     // 15 years
     yearsTitle: "Voici ta vie en années",
     legendSleep: "Sommeil", legendWork: "Travail", legendFree: "Temps libre", legendPhone: "Sur ton téléphone",
-    yearsUnit: (n: number) => (n <= 1 ? "an" : "ans"), yearsWord: "années",
+    yearsUnit: (n: number): string => (n <= 1 ? "an" : "ans"), yearsWord: "années",
     yearsCaption: (n: number) => `Sur tes 26 années de temps libre, tu en passes ${n} sur ton téléphone.`,
     // 16 transform
     transformWords: "Avec Sophia, transforme ce temps en culture",
@@ -379,7 +379,7 @@ export const COPY = {
     phoneTitle: "How long do you spend on your phone each day?",
     yearsTitle: "Here's your life in years",
     legendSleep: "Sleep", legendWork: "Work", legendFree: "Free time", legendPhone: "On your phone",
-    yearsUnit: (n: number) => (n <= 1 ? "year" : "years"), yearsWord: "years",
+    yearsUnit: (n: number): string => (n <= 1 ? "year" : "years"), yearsWord: "years",
     yearsCaption: (n: number) => `Of your 26 years of free time, you spend ${n} on your phone.`,
     transformWords: "With Sophia, turn that time into knowledge",
     transformCycle: ["knowledge", "art", "philosophy", "science", "history", "literature"],
