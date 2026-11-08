@@ -141,7 +141,7 @@ export function glossaryRefs(text: string): string[] {
   const out: string[] = [];
   const re = /\[\[([^[\]]+?)\]\]/g;
   let m: RegExpExecArray | null;
-  while ((m = re.exec(text))) out.push(m[1].trim());
+  while ((m = re.exec(text))) out.push((m[1] ?? "").trim());
   return out;
 }
 
@@ -359,9 +359,9 @@ export function validateCourse(c: StudioCourseContent): Issue[] {
   if (takeaways === 0)
     err("takeaway.count", sections.length ? `sections[${sections.length - 1}]` : "sections", "Add one Key takeaway block in the last section.", "Ajoutez un bloc « À retenir » dans la dernière section.");
   else if (takeaways > 1)
-    err("takeaway.count", `sections[${takeawayPaths[1].si}].blocks[${takeawayPaths[1].bi}]`, `Keep a single Key takeaway (now ${takeaways}).`, `Gardez un seul « À retenir » (actuellement ${takeaways}).`);
-  else if (takeawayPaths[0].si !== sections.length - 1)
-    err("takeaway.position", `sections[${takeawayPaths[0].si}].blocks[${takeawayPaths[0].bi}]`, "Move the Key takeaway to the last section.", "Déplacez « À retenir » dans la dernière section.");
+    err("takeaway.count", `sections[${takeawayPaths[1]!.si}].blocks[${takeawayPaths[1]!.bi}]`, `Keep a single Key takeaway (now ${takeaways}).`, `Gardez un seul « À retenir » (actuellement ${takeaways}).`);
+  else if (takeawayPaths[0]!.si !== sections.length - 1)
+    err("takeaway.position", `sections[${takeawayPaths[0]!.si}].blocks[${takeawayPaths[0]!.bi}]`, "Move the Key takeaway to the last section.", "Déplacez « À retenir » dans la dernière section.");
 
   // Inline markers
   for (const { path, text } of markedTexts(c)) {
@@ -567,7 +567,7 @@ export function inlineSpans(text: string): Span[] {
     if (m[1] !== undefined) {
       // bold may itself contain a glossary term
       for (const inner of inlineSpans(m[1])) out.push({ ...inner, bold: true });
-    } else out.push({ text: m[2], term: true });
+    } else out.push({ text: m[2] ?? "", term: true });
     last = m.index + m[0].length;
   }
   if (last < text.length) out.push({ text: text.slice(last) });
