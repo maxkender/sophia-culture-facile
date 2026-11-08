@@ -1,3 +1,8 @@
+# Sophia OS referrals (Nov 8)
+- [ ] Add authenticated OS email endpoint using the existing provider and secure event forwarding.
+- [ ] Persist referral codes for 30 days, save on slideshow applications, and forward on submission/signing.
+- [ ] Test without real sends, applications, or signatures; provide production endpoint URL and deployment status.
+
 # Sophia slideshow presentation (Nov 6)
 - [x] Replace public pay range with country-specific remuneration before applying; country carried into form. FR/AR 390px and EN 1440px verified, 3 country-selection tests passed. No submission or publication.
 - [x] Slideshow admin CRM: six-item menu/legacy redirects, compact Home, Applications/Posters Sheets and bulk controls, Payouts/Rates/Guide. All pages checked at 1440/390px; confirmations/guide typing checked; 22 isolated tests passed. No real decisions/emails/payments executed; real payout approval remains unverified (no draft rows). Not published.
