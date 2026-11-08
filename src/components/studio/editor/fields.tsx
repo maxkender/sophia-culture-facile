@@ -110,7 +110,7 @@ function BlockForm({ block, path, disabled, onChange }: { block: Block; path: st
     case "paragraph":
     case "funFact":
     case "takeaway":
-      return <MarkedTextarea path={`${path}.text`} value={block.text} disabled={disabled} rows={block.type === "paragraph" ? 4 : 2} onChange={(text) => onChange({ ...block, text })} />;
+      return <MarkedTextarea path={`${path}.text`} value={block.text} disabled={disabled} rows={block.type === "paragraph" ? 6 : 3} onChange={(text) => onChange({ ...block, text })} />;
     case "heading":
       return <input data-path={`${path}.text`} className={cn(inputCls, "font-bold")} value={block.text} disabled={disabled} onChange={(e) => onChange({ ...block, text: e.target.value })} />;
     case "quote":

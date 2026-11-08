@@ -239,7 +239,7 @@ function EditorBody({ row, ui, onSaved }: { row: Row; ui: string; onSaved: () =>
           <div className="mb-4 flex items-center gap-2 rounded-xl bg-brand-surfaceStrong p-3 text-sm text-brand-navy"><Lock className="size-4" />{SL("This course is with the desk and cannot be edited right now.", "Ce cours est entre les mains de la rédaction et ne peut pas être modifié pour l'instant.")}</div>
         ) : null}
 
-        <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[230px_minmax(0,1fr)_380px]">
+        <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[190px_minmax(0,1fr)_330px] 2xl:grid-cols-[230px_minmax(0,1fr)_400px]">
           {/* Left: outline */}
           <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
             <PortalCard className="p-4">
