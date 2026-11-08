@@ -1,4 +1,5 @@
 # Sophia slideshow presentation (Nov 6)
+- [ ] Replace public pay range with country-specific remuneration before applying, carry country into form, verify desktop/mobile; do not publish.
 - [x] Slideshow admin CRM: six-item menu/legacy redirects, compact Home, Applications/Posters Sheets and bulk controls, Payouts/Rates/Guide. All pages checked at 1440/390px; confirmations/guide typing checked; 22 isolated tests passed. No real decisions/emails/payments executed; real payout approval remains unverified (no draft rows). Not published.
 - [x] Replace plush with transparent cutout, remove specified Sophia sentences; EN/FR 1440/900/390px checks passed without overlap or horizontal scroll, reduced motion verified. Not published.
 - [x] Sophia-only colored logo, plush, stats, subject copy and marker highlights; desktop/390px checks. Not published.
