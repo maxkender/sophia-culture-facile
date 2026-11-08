@@ -538,7 +538,7 @@
 .mk-header[data-scrolled="true"] { background: color-mix(in srgb, var(--ob-bg) 72%, transparent); backdrop-filter: blur(18px) saturate(160%); box-shadow: 0 1px 0 var(--ob-line); }
 .mk-navlink { font-size: 15px; font-weight: 600; color: var(--ob-ink2); transition: color 150ms; }
 .mk-navlink:hover { color: var(--ob-ink); }
-.mk-menu { position: fixed; inset: 0; z-index: 60; background: var(--ob-bg); display: flex; flex-direction: column; padding: 20px; animation: mk-fade 300ms var(--mk-ease); }
+.mk-menu { position: fixed; inset: 0; z-index: 40; background: var(--ob-bg); display: flex; flex-direction: column; padding: 20px; animation: mk-fade 300ms var(--mk-ease); }
 .mk-menu a.mk-menu-link { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; padding: 10px 0; color: var(--ob-ink); animation: mk-rise 500ms var(--mk-ease) both; }
 
 /* reveal */
