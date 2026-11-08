@@ -26,6 +26,7 @@ import { Route as DotwellKnownAppleAppSiteAssociationRouteImport } from './route
 import { Route as AuthenticatedHubRouteRouteImport } from './routes/_authenticated/hub/route'
 import { Route as AuteursSlugRouteImport } from './routes/auteurs.$slug'
 import { Route as AuteursInviteRouteImport } from './routes/auteurs.invite'
+import { Route as AuteursJoinRouteImport } from './routes/auteurs.join'
 import { Route as AuteursLoginRouteImport } from './routes/auteurs.login'
 import { Route as CoursIndexRouteImport } from './routes/cours/index'
 import { Route as CoursSlugRouteImport } from './routes/cours/$slug'
@@ -299,6 +300,11 @@ const AuteursSlugRoute = AuteursSlugRouteImport.update({
 const AuteursInviteRoute = AuteursInviteRouteImport.update({
   id: '/auteurs/invite',
   path: '/auteurs/invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuteursJoinRoute = AuteursJoinRouteImport.update({
+  id: '/auteurs/join',
+  path: '/auteurs/join',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuteursLoginRoute = AuteursLoginRouteImport.update({
@@ -1369,6 +1375,7 @@ export interface FileRoutesByFullPath {
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
+  '/auteurs/join': typeof AuteursJoinRoute
   '/auteurs/login': typeof AuteursLoginRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/creators/app': typeof CreatorsAppRouteWithChildren
@@ -1575,6 +1582,7 @@ export interface FileRoutesByTo {
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
+  '/auteurs/join': typeof AuteursJoinRoute
   '/auteurs/login': typeof AuteursLoginRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/creators/invite': typeof CreatorsInviteRoute
@@ -1782,6 +1790,7 @@ export interface FileRoutesById {
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
   '/auteurs/$slug': typeof AuteursSlugRoute
   '/auteurs/invite': typeof AuteursInviteRoute
+  '/auteurs/join': typeof AuteursJoinRoute
   '/auteurs/login': typeof AuteursLoginRoute
   '/cours/$slug': typeof CoursSlugRoute
   '/creators/app': typeof CreatorsAppRouteWithChildren
@@ -1991,6 +2000,7 @@ export interface FileRouteTypes {
     | '/.well-known/apple-app-site-association'
     | '/auteurs/$slug'
     | '/auteurs/invite'
+    | '/auteurs/join'
     | '/auteurs/login'
     | '/cours/$slug'
     | '/creators/app'
@@ -2197,6 +2207,7 @@ export interface FileRouteTypes {
     | '/.well-known/apple-app-site-association'
     | '/auteurs/$slug'
     | '/auteurs/invite'
+    | '/auteurs/join'
     | '/auteurs/login'
     | '/cours/$slug'
     | '/creators/invite'
@@ -2403,6 +2414,7 @@ export interface FileRouteTypes {
     | '/.well-known/apple-app-site-association'
     | '/auteurs/$slug'
     | '/auteurs/invite'
+    | '/auteurs/join'
     | '/auteurs/login'
     | '/cours/$slug'
     | '/creators/app'
@@ -2611,6 +2623,7 @@ export interface RootRouteChildren {
   DotwellKnownAppleAppSiteAssociationRoute: typeof DotwellKnownAppleAppSiteAssociationRoute
   AuteursSlugRoute: typeof AuteursSlugRoute
   AuteursInviteRoute: typeof AuteursInviteRoute
+  AuteursJoinRoute: typeof AuteursJoinRoute
   AuteursLoginRoute: typeof AuteursLoginRoute
   CoursSlugRoute: typeof CoursSlugRoute
   CreatorsAppRoute: typeof CreatorsAppRouteWithChildren
@@ -2806,6 +2819,13 @@ declare module '@tanstack/react-router' {
       path: '/auteurs/invite'
       fullPath: '/auteurs/invite'
       preLoaderRoute: typeof AuteursInviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auteurs/join': {
+      id: '/auteurs/join'
+      path: '/auteurs/join'
+      fullPath: '/auteurs/join'
+      preLoaderRoute: typeof AuteursJoinRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auteurs/login': {
@@ -4483,6 +4503,7 @@ const rootRouteChildren: RootRouteChildren = {
     DotwellKnownAppleAppSiteAssociationRoute,
   AuteursSlugRoute: AuteursSlugRoute,
   AuteursInviteRoute: AuteursInviteRoute,
+  AuteursJoinRoute: AuteursJoinRoute,
   AuteursLoginRoute: AuteursLoginRoute,
   CoursSlugRoute: CoursSlugRoute,
   CreatorsAppRoute: CreatorsAppRouteWithChildren,

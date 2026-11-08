@@ -27,6 +27,11 @@ function Gate() {
         window.location.replace(homeFor(role));
         return;
       }
+      if (role === "none" && window.location.pathname.startsWith("/auteurs")) {
+        // A verified account without a profile yet: finish the Studio sign-up.
+        window.location.replace("/auteurs/join");
+        return;
+      }
       if (role === "author" && window.location.pathname.startsWith("/auteurs") && !ONBOARDING_EXEMPT.test(window.location.pathname)) {
         // Studio v2: authors who have not finished onboarding resume the wizard.
         const { data: u } = await supabase.auth.getUser();
