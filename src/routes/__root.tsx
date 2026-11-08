@@ -18,6 +18,7 @@ import { APPLE_ITUNES_APP_ID } from "@/config/site";
 import { langFromPath } from "@/i18n/routes";
 import { slideshowPageFromPath } from "@/i18n/slideshow-pages";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { browserReferralCode } from "@/lib/slideshow-referral-code";
 
 function NotFoundComponent() {
   return (
@@ -127,6 +128,8 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const referralLocation = useRouterState({ select: (s) => s.location.href });
+  useEffect(() => { browserReferralCode(); }, [referralLocation]);
   // Remember an outreach source (?src=va|formspree|dm…) so the UGC form can record it.
   useEffect(() => {
     const src = new URLSearchParams(window.location.search).get("src");

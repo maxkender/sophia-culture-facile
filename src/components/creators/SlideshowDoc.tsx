@@ -10,6 +10,7 @@ import { getSlideshowPayInfo } from "@/lib/slideshow-zones.functions";
 import { Button } from "@/components/ui/button";
 import { CountrySelect } from "./CountrySelect";
 import { slideshowApplyWithCountry, slideshowCountrySelection } from "@/lib/slideshow-country-selection";
+import { browserReferralCode, withReferralCode } from "@/lib/slideshow-referral-code";
 
 /** Language of the current slideshow page (English outside these pages). */
 export function useSlideshowLang() {
@@ -125,11 +126,13 @@ export function SlideshowDocLanding({ app: appProp }: { app?: string | undefined
   const name = a?.name ?? "Sophia";
   const isSophia = !a;
   const [showPay, setShowPay] = useState(false);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
   const [country, setCountry] = useState("");
   const [pay, setPay] = useState<{ weekly: number } | null>(null);
   const [payState, setPayState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const countryLocale = lang.code === "fr" ? "fr" : "en";
   useEffect(() => {
+    setReferralCode(browserReferralCode());
     const selected = slideshowCountrySelection(new URLSearchParams(window.location.search).get("country"), countryLocale);
     if (selected) { setCountry(selected); setShowPay(true); }
   }, []);
@@ -151,7 +154,7 @@ export function SlideshowDocLanding({ app: appProp }: { app?: string | undefined
   const about = isSophia
     ? t.aboutSophia
     : `${name}${a?.tagline ? ` (${a.tagline})` : ""}${a?.short_description ? `${sep}${a.short_description}` : ""} ${fillSlideshow(t.aboutOtherApp, vars)}`;
-  const applyHref = slideshowApplyWithCountry(withApp(slideshowPath(lang.urlCode, "apply"), app), country);
+  const applyHref = withReferralCode(slideshowApplyWithCountry(withApp(slideshowPath(lang.urlCode, "apply"), app), country), referralCode);
 
   return (
     <DocShell>

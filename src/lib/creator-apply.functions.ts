@@ -4,6 +4,7 @@ import { resolveAppId } from "./resolve-app.server";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { isValidInternationalPhone } from "@/lib/creator-validation";
+import { referralCodeSchema } from "./slideshow-referral-code";
 
 /** Public endpoints for the two creator application forms. Honeypot + rate limit. */
 
@@ -113,6 +114,7 @@ export const submitUgcApplication = createServerFn({ method: "POST" })
   });
 
 const slideSchema = z.object({
+  ref: referralCodeSchema.nullish(),
   website: z.string().max(200).optional(),
   full_name: z.string().trim().min(2).max(120),
   email: z.string().trim().email("Enter a complete email address, for example name@example.com.").max(200),
@@ -145,6 +147,7 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
     if (await rateLimited("slideshow_applications", hash, email)) return { ok: false as const, reason: "rate" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: inserted, error } = await supabaseAdmin.from("slideshow_applications").insert({
+      ref: data.ref ?? null,
       app_id: await resolveAppId(data.app),
       full_name: data.full_name,
       email,
@@ -166,6 +169,13 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
     if (error) {
       console.error("slideshow application insert failed", error.message);
       return { ok: false as const, reason: "server" as const };
+    }
+    const osSecret = process.env["OS_HUB_SECRET"];
+    if (osSecret) {
+      try {
+        const { notifyOsApplication, runOsNotification } = await import("./os-referral.server");
+        runOsNotification(getRequest(), notifyOsApplication(supabaseAdmin, email, data.ref ?? null, osSecret));
+      } catch { /* OS attribution must never change application success. */ }
     }
     // The one automatic email: an acknowledgement in the applicant's language. Nothing else is sent by itself.
     try {
