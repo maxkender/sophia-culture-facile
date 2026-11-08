@@ -440,7 +440,7 @@ export const COPY = {
     download: "Download Sophia",
     openBrowser: "Button not working? Open this page in your browser (⋯ menu).",
   },
-} as const;
+};
 export type Copy = (typeof COPY)["fr"];
 
 /** Renders **bold pink** segments of a copy string. */
