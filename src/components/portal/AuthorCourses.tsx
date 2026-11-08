@@ -4,6 +4,7 @@ import { type Course } from "@/lib/portal";
 import { usePortalProfile } from "./usePortal";
 import { CourseCard, ExamplesLockNotice } from "./CourseCards";
 import { EmptyState, PageTitle } from "./ui";
+import { StudioCourseList } from "@/components/studio/StudioCourseList";
 
 export function AuthorCourses() {
   const { data: me } = usePortalProfile();
@@ -27,6 +28,7 @@ export function AuthorCourses() {
   return (
     <div>
       <PageTitle title="My courses" lead="Every course commissioned to you, in the order we would like them written." />
+      {profile ? <StudioCourseList profileId={profile.id} writingLang={profile.writing_lang ?? null} /> : null}
       {locked ? (
         <div className="mb-6">
           <ExamplesLockNotice />

@@ -130,6 +130,7 @@ import { Route as AuthenticatedAuteursAdminPoolRouteImport } from './routes/_aut
 import { Route as AuthenticatedAuteursAdminSettingsRouteImport } from './routes/_authenticated/auteurs/admin/settings'
 import { Route as AuthenticatedAuteursCoursesIndexRouteImport } from './routes/_authenticated/auteurs/courses.index'
 import { Route as AuthenticatedAuteursCoursesCourseIdRouteImport } from './routes/_authenticated/auteurs/courses.$courseId'
+import { Route as AuthenticatedAuteursStudioIdRouteImport } from './routes/_authenticated/auteurs/studio.$id'
 import { Route as AuthenticatedHubCampaignsIndexRouteImport } from './routes/_authenticated/hub/campaigns.index'
 import { Route as AuthenticatedHubCampaignsCreateRouteImport } from './routes/_authenticated/hub/campaigns.create'
 import { Route as AuthenticatedHubCreatorsCreatorIdRouteImport } from './routes/_authenticated/hub/creators.$creatorId'
@@ -852,6 +853,12 @@ const AuthenticatedAuteursCoursesCourseIdRoute =
     path: '/auteurs/courses/$courseId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAuteursStudioIdRoute =
+  AuthenticatedAuteursStudioIdRouteImport.update({
+    id: '/auteurs/studio/$id',
+    path: '/auteurs/studio/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedHubCampaignsIndexRoute =
   AuthenticatedHubCampaignsIndexRouteImport.update({
     id: '/campaigns/',
@@ -1476,6 +1483,7 @@ export interface FileRoutesByFullPath {
   '/auteurs/admin/pool': typeof AuthenticatedAuteursAdminPoolRoute
   '/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
+  '/auteurs/studio/$id': typeof AuthenticatedAuteursStudioIdRoute
   '/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
   '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
   '/hub/influencers/$section': typeof AuthenticatedHubInfluencersSectionRoute
@@ -1681,6 +1689,7 @@ export interface FileRoutesByTo {
   '/auteurs/admin/pool': typeof AuthenticatedAuteursAdminPoolRoute
   '/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
+  '/auteurs/studio/$id': typeof AuthenticatedAuteursStudioIdRoute
   '/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
   '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
   '/hub/influencers/$section': typeof AuthenticatedHubInfluencersSectionRoute
@@ -1891,6 +1900,7 @@ export interface FileRoutesById {
   '/_authenticated/auteurs/admin/pool': typeof AuthenticatedAuteursAdminPoolRoute
   '/_authenticated/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
   '/_authenticated/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
+  '/_authenticated/auteurs/studio/$id': typeof AuthenticatedAuteursStudioIdRoute
   '/_authenticated/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
   '/_authenticated/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
   '/_authenticated/hub/influencers/$section': typeof AuthenticatedHubInfluencersSectionRoute
@@ -2101,6 +2111,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/pool'
     | '/auteurs/admin/settings'
     | '/auteurs/courses/$courseId'
+    | '/auteurs/studio/$id'
     | '/hub/campaigns/create'
     | '/hub/creators/$creatorId'
     | '/hub/influencers/$section'
@@ -2306,6 +2317,7 @@ export interface FileRouteTypes {
     | '/auteurs/admin/pool'
     | '/auteurs/admin/settings'
     | '/auteurs/courses/$courseId'
+    | '/auteurs/studio/$id'
     | '/hub/campaigns/create'
     | '/hub/creators/$creatorId'
     | '/hub/influencers/$section'
@@ -2515,6 +2527,7 @@ export interface FileRouteTypes {
     | '/_authenticated/auteurs/admin/pool'
     | '/_authenticated/auteurs/admin/settings'
     | '/_authenticated/auteurs/courses/$courseId'
+    | '/_authenticated/auteurs/studio/$id'
     | '/_authenticated/hub/campaigns/create'
     | '/_authenticated/hub/creators/$creatorId'
     | '/_authenticated/hub/influencers/$section'
@@ -3549,6 +3562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuteursCoursesCourseIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auteurs/studio/$id': {
+      id: '/_authenticated/auteurs/studio/$id'
+      path: '/auteurs/studio/$id'
+      fullPath: '/auteurs/studio/$id'
+      preLoaderRoute: typeof AuthenticatedAuteursStudioIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/hub/campaigns/': {
       id: '/_authenticated/hub/campaigns/'
       path: '/campaigns'
@@ -4262,6 +4282,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAuteursAdminPoolRoute: typeof AuthenticatedAuteursAdminPoolRoute
   AuthenticatedAuteursAdminSettingsRoute: typeof AuthenticatedAuteursAdminSettingsRoute
   AuthenticatedAuteursCoursesCourseIdRoute: typeof AuthenticatedAuteursCoursesCourseIdRoute
+  AuthenticatedAuteursStudioIdRoute: typeof AuthenticatedAuteursStudioIdRoute
   AuthenticatedAuteursAdminIndexRoute: typeof AuthenticatedAuteursAdminIndexRoute
   AuthenticatedAuteursCoursesIndexRoute: typeof AuthenticatedAuteursCoursesIndexRoute
   AuthenticatedAuteursAdminAuthorsAuthorIdRoute: typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
@@ -4326,6 +4347,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAuteursAdminSettingsRoute,
   AuthenticatedAuteursCoursesCourseIdRoute:
     AuthenticatedAuteursCoursesCourseIdRoute,
+  AuthenticatedAuteursStudioIdRoute: AuthenticatedAuteursStudioIdRoute,
   AuthenticatedAuteursAdminIndexRoute: AuthenticatedAuteursAdminIndexRoute,
   AuthenticatedAuteursCoursesIndexRoute: AuthenticatedAuteursCoursesIndexRoute,
   AuthenticatedAuteursAdminAuthorsAuthorIdRoute:
