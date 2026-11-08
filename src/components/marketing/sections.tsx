@@ -278,7 +278,7 @@ export function TimeBack() {
   ];
   const closing = stage >= 5;
   return (
-    <section ref={ref} className="relative" style={{ height: reduced ? "auto" : "420vh" }} aria-label={c.time.eyebrow}>
+    <section ref={ref} id="time" className="relative" style={{ height: reduced ? "auto" : "420vh" }} aria-label={c.time.eyebrow}>
       <div className={reduced ? "py-24" : "sticky top-0 flex h-screen items-center overflow-hidden"}>
         <div className="mk-wrap grid w-full items-center gap-10 lg:grid-cols-[1fr_1fr] lg:gap-20">
           <div className="relative min-h-[220px] lg:min-h-[340px]">
