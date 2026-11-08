@@ -20,6 +20,7 @@ import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SophiaCultureGeneraleRouteImport } from './routes/sophia-culture-generale'
+import { Route as StartRouteImport } from './routes/start'
 import { Route as TelechargerRouteImport } from './routes/telecharger'
 import { Route as DotwellKnownAppleAppSiteAssociationRouteImport } from './routes/[.]well-known.apple-app-site-association'
 import { Route as AuthenticatedHubRouteRouteImport } from './routes/_authenticated/hub/route'
@@ -41,6 +42,7 @@ import { Route as EnLegalNoticeRouteImport } from './routes/en/legal-notice'
 import { Route as EnPrivacyRouteImport } from './routes/en/privacy'
 import { Route as EnSlideshowApplicationRouteImport } from './routes/en/slideshow-application'
 import { Route as EnSophiaGeneralKnowledgeRouteImport } from './routes/en/sophia-general-knowledge'
+import { Route as EnStartRouteImport } from './routes/en/start'
 import { Route as EnUgcApplicationRouteImport } from './routes/en/ugc-application'
 import { Route as FrIndexRouteImport } from './routes/fr/index'
 import { Route as FrCandidatureInfluenceurRouteImport } from './routes/fr/candidature-influenceur'
@@ -268,6 +270,11 @@ const SophiaCultureGeneraleRoute = SophiaCultureGeneraleRouteImport.update({
   path: '/sophia-culture-generale',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StartRoute = StartRouteImport.update({
+  id: '/start',
+  path: '/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TelechargerRoute = TelechargerRouteImport.update({
   id: '/telecharger',
   path: '/telecharger',
@@ -375,6 +382,11 @@ const EnSophiaGeneralKnowledgeRoute =
     path: '/en/sophia-general-knowledge',
     getParentRoute: () => rootRouteImport,
   } as any)
+const EnStartRoute = EnStartRouteImport.update({
+  id: '/en/start',
+  path: '/en/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnUgcApplicationRoute = EnUgcApplicationRouteImport.update({
   id: '/en/ugc-application',
   path: '/en/ugc-application',
@@ -1351,6 +1363,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
+  '/start': typeof StartRoute
   '/telecharger': typeof TelechargerRoute
   '/hub': typeof AuthenticatedHubRouteRouteWithChildren
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
@@ -1369,6 +1382,7 @@ export interface FileRoutesByFullPath {
   '/en/privacy': typeof EnPrivacyRoute
   '/en/slideshow-application': typeof EnSlideshowApplicationRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
+  '/en/start': typeof EnStartRoute
   '/en/ugc-application': typeof EnUgcApplicationRoute
   '/fr/candidature-influenceur': typeof FrCandidatureInfluenceurRoute
   '/fr/candidature-slideshow': typeof FrCandidatureSlideshowRoute
@@ -1556,6 +1570,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
+  '/start': typeof StartRoute
   '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
   '/auteurs/$slug': typeof AuteursSlugRoute
@@ -1572,6 +1587,7 @@ export interface FileRoutesByTo {
   '/en/privacy': typeof EnPrivacyRoute
   '/en/slideshow-application': typeof EnSlideshowApplicationRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
+  '/en/start': typeof EnStartRoute
   '/en/ugc-application': typeof EnUgcApplicationRoute
   '/fr/candidature-influenceur': typeof FrCandidatureInfluenceurRoute
   '/fr/candidature-slideshow': typeof FrCandidatureSlideshowRoute
@@ -1760,6 +1776,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
+  '/start': typeof StartRoute
   '/telecharger': typeof TelechargerRoute
   '/_authenticated/hub': typeof AuthenticatedHubRouteRouteWithChildren
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
@@ -1778,6 +1795,7 @@ export interface FileRoutesById {
   '/en/privacy': typeof EnPrivacyRoute
   '/en/slideshow-application': typeof EnSlideshowApplicationRoute
   '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
+  '/en/start': typeof EnStartRoute
   '/en/ugc-application': typeof EnUgcApplicationRoute
   '/fr/candidature-influenceur': typeof FrCandidatureInfluenceurRoute
   '/fr/candidature-slideshow': typeof FrCandidatureSlideshowRoute
@@ -1967,6 +1985,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/sophia-culture-generale'
+    | '/start'
     | '/telecharger'
     | '/hub'
     | '/.well-known/apple-app-site-association'
@@ -1985,6 +2004,7 @@ export interface FileRouteTypes {
     | '/en/privacy'
     | '/en/slideshow-application'
     | '/en/sophia-general-knowledge'
+    | '/en/start'
     | '/en/ugc-application'
     | '/fr/candidature-influenceur'
     | '/fr/candidature-slideshow'
@@ -2172,6 +2192,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/sophia-culture-generale'
+    | '/start'
     | '/telecharger'
     | '/.well-known/apple-app-site-association'
     | '/auteurs/$slug'
@@ -2188,6 +2209,7 @@ export interface FileRouteTypes {
     | '/en/privacy'
     | '/en/slideshow-application'
     | '/en/sophia-general-knowledge'
+    | '/en/start'
     | '/en/ugc-application'
     | '/fr/candidature-influenceur'
     | '/fr/candidature-slideshow'
@@ -2375,6 +2397,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/sophia-culture-generale'
+    | '/start'
     | '/telecharger'
     | '/_authenticated/hub'
     | '/.well-known/apple-app-site-association'
@@ -2393,6 +2416,7 @@ export interface FileRouteTypes {
     | '/en/privacy'
     | '/en/slideshow-application'
     | '/en/sophia-general-knowledge'
+    | '/en/start'
     | '/en/ugc-application'
     | '/fr/candidature-influenceur'
     | '/fr/candidature-slideshow'
@@ -2582,6 +2606,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SophiaCultureGeneraleRoute: typeof SophiaCultureGeneraleRoute
+  StartRoute: typeof StartRoute
   TelechargerRoute: typeof TelechargerRoute
   DotwellKnownAppleAppSiteAssociationRoute: typeof DotwellKnownAppleAppSiteAssociationRoute
   AuteursSlugRoute: typeof AuteursSlugRoute
@@ -2599,6 +2624,7 @@ export interface RootRouteChildren {
   EnPrivacyRoute: typeof EnPrivacyRoute
   EnSlideshowApplicationRoute: typeof EnSlideshowApplicationRoute
   EnSophiaGeneralKnowledgeRoute: typeof EnSophiaGeneralKnowledgeRoute
+  EnStartRoute: typeof EnStartRoute
   EnUgcApplicationRoute: typeof EnUgcApplicationRoute
   FrCandidatureInfluenceurRoute: typeof FrCandidatureInfluenceurRoute
   FrCandidatureSlideshowRoute: typeof FrCandidatureSlideshowRoute
@@ -2738,6 +2764,13 @@ declare module '@tanstack/react-router' {
       path: '/sophia-culture-generale'
       fullPath: '/sophia-culture-generale'
       preLoaderRoute: typeof SophiaCultureGeneraleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/start': {
+      id: '/start'
+      path: '/start'
+      fullPath: '/start'
+      preLoaderRoute: typeof StartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/telecharger': {
@@ -2885,6 +2918,13 @@ declare module '@tanstack/react-router' {
       path: '/en/sophia-general-knowledge'
       fullPath: '/en/sophia-general-knowledge'
       preLoaderRoute: typeof EnSophiaGeneralKnowledgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/start': {
+      id: '/en/start'
+      path: '/en/start'
+      fullPath: '/en/start'
+      preLoaderRoute: typeof EnStartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/ugc-application': {
@@ -4437,6 +4477,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SophiaCultureGeneraleRoute: SophiaCultureGeneraleRoute,
+  StartRoute: StartRoute,
   TelechargerRoute: TelechargerRoute,
   DotwellKnownAppleAppSiteAssociationRoute:
     DotwellKnownAppleAppSiteAssociationRoute,
@@ -4455,6 +4496,7 @@ const rootRouteChildren: RootRouteChildren = {
   EnPrivacyRoute: EnPrivacyRoute,
   EnSlideshowApplicationRoute: EnSlideshowApplicationRoute,
   EnSophiaGeneralKnowledgeRoute: EnSophiaGeneralKnowledgeRoute,
+  EnStartRoute: EnStartRoute,
   EnUgcApplicationRoute: EnUgcApplicationRoute,
   FrCandidatureInfluenceurRoute: FrCandidatureInfluenceurRoute,
   FrCandidatureSlideshowRoute: FrCandidatureSlideshowRoute,
