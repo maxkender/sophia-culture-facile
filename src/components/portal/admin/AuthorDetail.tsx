@@ -15,6 +15,7 @@ import type { CourseStatus } from "@/config/portal";
 import { AuthorAvatar, useSignedPhotos } from "../AuthorPhoto";
 import { Banner, CopyButton, PageTitle, PortalCard, StatusPill } from "../ui";
 import { OpenThreadButton } from "../OpenThreadButton";
+import { StudioCreatorCard } from "@/components/studio/StudioDesk";
 
 type Lot = {
   key: string;
@@ -380,6 +381,7 @@ export function AuthorDetail({ authorId }: { authorId: string }) {
         lead={[author.display_title, author.institution, author.country].filter(Boolean).join(" · ")}
         action={<OpenThreadButton profileId={author.id} />}
       />
+      <div className="mb-6"><StudioCreatorCard authorId={author.id} /></div>
 
       {/* ————— Identity ————— */}
       <PortalCard>
