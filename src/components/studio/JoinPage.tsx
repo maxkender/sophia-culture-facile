@@ -129,7 +129,6 @@ function Progress({ step }: { step: OnboardingStep }) {
       {WIZARD_STEPS.map((s, n) => (
         <li key={s} className="flex-1">
           <div className={`h-1.5 rounded-full ${n <= i ? "bg-brand-navy" : "bg-brand-line"}`} />
-          <p className={`mt-2 hidden text-xs font-bold sm:block ${n === i ? "text-brand-navy" : "text-brand-navySoft"}`}>{st(STEP_LABEL[s])}</p>
         </li>
       ))}
     </ol>
