@@ -526,6 +526,13 @@
       "when": 1793970503515,
       "tag": "0074_slideshow_referral",
       "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1794153787314,
+      "tag": "0075_slideshow_os_referral_code",
+      "breakpoints": true
     }
   ]
 }
