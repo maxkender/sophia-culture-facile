@@ -115,6 +115,8 @@ export type Issue = {
   path: string;
   en: string;
   fr: string;
+  /** Extra value for actions, e.g. the missing glossary term. */
+  data?: string;
 };
 
 /* ---------------------------------------------------------------- helpers */
@@ -374,7 +376,7 @@ export function validateCourse(c: StudioCourseContent): Issue[] {
   // Glossary
   for (const term of missingGlossaryTerms(c)) {
     const at = markedTexts(c).find((t) => glossaryRefs(t.text).some((r) => termKey(r) === termKey(term)));
-    err("glossary.missing", at?.path ?? "glossary", `“${term}” is marked [[ ]] but has no glossary entry.`, `« ${term} » est marqué [[ ]] mais n'a pas d'entrée dans le glossaire.`);
+    issues.push({ severity: "error", rule: "glossary.missing", path: at?.path ?? "glossary", data: term, en: `“${term}” is marked [[ ]] but has no glossary entry.`, fr: `« ${term} » est marqué [[ ]] mais n'a pas d'entrée dans le glossaire.` });
   }
   const used = usedGlossaryKeys(c);
   const seenTerms = new Set<string>();
