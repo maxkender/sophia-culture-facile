@@ -603,9 +603,10 @@ function Interstitial({ words, hint, icon, cycle, onTap }: {
       const t = window.setTimeout(() => setShown((n) => n + 1), 130);
       return () => window.clearTimeout(t);
     }
+    return undefined;
   }, [shown, parts.length]);
   useEffect(() => {
-    if (!ready || !cycle) return;
+    if (!ready || !cycle) return undefined;
     const t = window.setInterval(() => setCycleIdx((i) => (i + 1) % cycle.length), 1150);
     return () => window.clearInterval(t);
   }, [ready, cycle]);
@@ -638,6 +639,7 @@ function ProgressiveWords({ words }: { words: string }) {
       const t = window.setTimeout(() => setShown((n) => n + 1), 320);
       return () => window.clearTimeout(t);
     }
+    return undefined;
   }, [shown, parts.length]);
   return (
     <p className="ob-words">
