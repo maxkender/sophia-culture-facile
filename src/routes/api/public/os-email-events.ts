@@ -4,7 +4,7 @@ import { handleOsEmailEvent, osEmailMethodNotAllowed } from "@/lib/os-email.serv
 export const Route = createFileRoute("/api/public/os-email-events")({
   server: {
     handlers: {
-      POST: ({ request }) => handleOsEmailEvent(request, process.env["OS_HUB_SECRET"]),
+      POST: ({ request }) => handleOsEmailEvent(request, process.env["BREVO_WEBHOOK_TOKEN"], process.env["OS_HUB_SECRET"]),
       GET: osEmailMethodNotAllowed,
       PUT: osEmailMethodNotAllowed,
       PATCH: osEmailMethodNotAllowed,

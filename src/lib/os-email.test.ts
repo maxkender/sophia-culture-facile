@@ -48,17 +48,30 @@ describe("OS email request", () => {
 describe("Brevo events to OS", () => {
   it.each([["opened", "ouvert"], ["click", "clique"], ["hardBounce", "rebond"], ["softBounce", "rebond"]])("forwards %s as %s only after authentication", async (event, type) => {
     const fetcher = vi.fn<typeof fetch>(async () => Response.json({ ok: true }));
-    const response = await handleOsEmailEvent(request({ event, "message-id": "<id>" }, { authorization: "Bearer test-shared-value" }), "test-shared-value", fetcher);
+    const response = await handleOsEmailEvent(request({ event, "message-id": "<id>" }, { authorization: "Bearer test-webhook-token" }), "test-webhook-token", "test-os-secret", fetcher);
     expect(response.status).toBe(200);
     expect(fetcher.mock.calls[0]?.[0]).toBe("https://mbikecieskoobeizixig.supabase.co/functions/v1/parrainage");
+    expect(fetcher.mock.calls[0]?.[1]?.headers).toMatchObject({ "x-hub-secret": "test-os-secret" });
     expect(JSON.parse(String(fetcher.mock.calls[0]?.[1]?.body))).toEqual({ action: "evenement", message_id: "<id>", type });
   });
   it("rejects unauthenticated webhook calls without forwarding", async () => {
     const fetcher = vi.fn();
-    expect((await handleOsEmailEvent(request({ event: "opened", "message-id": "<id>" }), "test-shared-value", fetcher)).status).toBe(401);
+    expect((await handleOsEmailEvent(request({ event: "opened", "message-id": "<id>" }), "test-webhook-token", "test-os-secret", fetcher)).status).toBe(401);
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+  it("fails closed when the webhook token is not configured", async () => {
+    const fetcher = vi.fn();
+    const response = await handleOsEmailEvent(request({ event: "opened", "message-id": "<id>" }, { authorization: "Bearer anything" }), undefined, "test-os-secret", fetcher);
+    expect(response.status).toBe(401);
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+  it("rejects the OS secret used as webhook token (dedicated token only)", async () => {
+    const fetcher = vi.fn();
+    const response = await handleOsEmailEvent(request({ event: "opened", "message-id": "<id>" }, { authorization: "Bearer test-os-secret" }), "test-webhook-token", "test-os-secret", fetcher);
+    expect(response.status).toBe(401);
     expect(fetcher).not.toHaveBeenCalled();
   });
   it("returns failure so a refused OS event can be retried by the provider", async () => {
-    expect((await handleOsEmailEvent(request({ event: "opened", "message-id": "<id>" }, { authorization: "Bearer test-shared-value" }), "test-shared-value", async () => Response.json({ ok: false }))).status).toBe(502);
+    expect((await handleOsEmailEvent(request({ event: "opened", "message-id": "<id>" }, { authorization: "Bearer test-webhook-token" }), "test-webhook-token", "test-os-secret", async () => Response.json({ ok: false }))).status).toBe(502);
   });
 });

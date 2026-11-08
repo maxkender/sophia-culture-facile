@@ -80,16 +80,16 @@ export function osEventType(event: z.infer<typeof brevoEventSchema>["event"]): "
   return event === "click" ? "clique" : event === "opened" || event === "uniqueOpened" ? "ouvert" : "rebond";
 }
 
-export async function handleOsEmailEvent(request: Request, secret: string | undefined, fetcher: typeof fetch = fetch): Promise<Response> {
-  // Brevo supports authenticated webhook calls; configure bearer auth when registering the receiver.
+export async function handleOsEmailEvent(request: Request, webhookToken: string | undefined, osSecret: string | undefined, fetcher: typeof fetch = fetch): Promise<Response> {
+  // Brevo supports authenticated webhook calls; the receiver uses its own dedicated bearer token.
   const authorization = request.headers.get("authorization");
-  if (!hubSecretMatches(authorization?.startsWith("Bearer ") ? authorization.slice(7) : null, secret)) return json({ ok: false, error: "unauthorized" }, 401);
+  if (!hubSecretMatches(authorization?.startsWith("Bearer ") ? authorization.slice(7) : null, webhookToken)) return json({ ok: false, error: "unauthorized" }, 401);
   let event: z.infer<typeof brevoEventSchema>;
   try { event = brevoEventSchema.parse(await readBoundedJson(request, 32_000)); }
   catch { return json({ ok: false, error: "invalid_event" }, 400); }
   try {
     const response = await fetcher("https://mbikecieskoobeizixig.supabase.co/functions/v1/parrainage", {
-      method: "POST", headers: { "content-type": "application/json", "x-hub-secret": secret ?? "" },
+      method: "POST", headers: { "content-type": "application/json", "x-hub-secret": osSecret ?? "" },
       body: JSON.stringify({ action: "evenement", message_id: event["message-id"], type: osEventType(event.event) }),
       signal: AbortSignal.timeout(8000),
     });
