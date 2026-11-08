@@ -1,184 +1,503 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Check, Apple, Play } from "lucide-react";
-import { LogoMark } from "@/components/site/Logo";
-import { appStoreHref, PLAY_STORE_URL } from "@/config/links";
 import {
-  COPY, DAILY_TIMES, GOALS, INTERESTS, LEVELS, PLANS, QUIZ, REMINDERS, STEPS,
-  buildPlan, type Option, type StartLang, type StepId,
+  Atom, Bell, BookOpen, Check, Crown, Download, Globe, GraduationCap, Hand,
+  Headphones, LockOpen, Puzzle, Star, Target, TrendingUp, Trophy, UserCheck, X,
+} from "lucide-react";
+import {
+  AGES, ARCHETYPES, COPY, FEATURES, GOALS, KNOWLEDGE_LEVELS, LANGUAGES, MOTIVATIONS,
+  OB, PRICING, REVIEWS, ROULETTE_QUESTIONS, STEPS, STUDENT_PHOTOS, TOPICS,
+  buildProfileCourses, buildSwipeDeck, type StartLang, type StepId,
 } from "@/config/onboarding";
 import { captureAttribution, trackStart } from "@/lib/onboarding-events";
+import { AvatarStack, Confetti, Dots, Highlight, LaurelBadge, LaurelBranch, OptionRow, PrimaryBtn, Stars } from "./funnel-ui";
+import { AboardHero, IntroVisual, LoadingRows, ReadingSky, ReviewCard, Roulette, SwipeDeck, YearsGrid, QuestionCard } from "./steps-visual";
+
+const TAAP = "https://taap.it/sophia.culture";
+const STORE_KEY = "sophia_start_v2";
 
 type Answers = {
-  interests: string[]; level?: string; goal?: string; time?: string; reminder?: string;
-  quiz: (number | null)[]; plan?: string;
+  name: string; age?: string; knowledge: string; motivation?: string;
+  goals: string[]; topics: string[]; phoneMinutes: number; liked: string[];
+  readingHour: number; email: string; plan: "yearly" | "monthly";
 };
-const EMPTY: Answers = { interests: [], quiz: [null, null, null] };
-const STORE_KEY = "sophia_start_answers";
+const EMPTY: Answers = {
+  name: "", knowledge: "decent", goals: [], topics: [], phoneMinutes: 180,
+  liked: [], readingHour: 8, email: "", plan: "yearly",
+};
 
-function loadAnswers(): Answers {
-  try { return { ...EMPTY, ...JSON.parse(sessionStorage.getItem(STORE_KEY) || "{}") }; } catch { return EMPTY; }
+function loadState(): { step: StepId; answers: Answers } {
+  try {
+    const raw = sessionStorage.getItem(STORE_KEY) ?? localStorage.getItem(STORE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as { step?: StepId; answers?: Partial<Answers> };
+      if (parsed.step && (STEPS as readonly string[]).includes(parsed.step)) {
+        return { step: parsed.step, answers: { ...EMPTY, ...parsed.answers } };
+      }
+    }
+  } catch { /* in-app browsers may block storage */ }
+  return { step: "welcome", answers: EMPTY };
 }
 
-export function StartFunnel({ lang }: { lang: StartLang }) {
-  const c = COPY[lang];
+export function StartFunnel({ lang: routeLang }: { lang: StartLang }) {
+  const [lang, setLang] = useState<StartLang>(routeLang);
   const [step, setStep] = useState<StepId>("welcome");
   const [a, setA] = useState<Answers>(EMPTY);
-  const [isIos, setIsIos] = useState(false);
   const [src, setSrc] = useState("direct");
-  const idx = STEPS.indexOf(step);
+  const [hydrated, setHydrated] = useState(false);
+  const lastAdvance = useRef(0);
+  const c = COPY[lang];
 
   useEffect(() => {
     const attr = captureAttribution();
     setSrc(attr["src"] ?? "direct");
-    setA(loadAnswers());
-    setIsIos(/iPhone|iPad|iPod/i.test(navigator.userAgent));
-    trackStart("view", { lang });
-    const onPop = (e: PopStateEvent) => {
-      const s = (e.state as { startStep?: StepId } | null)?.startStep;
-      setStep(s && STEPS.includes(s) ? s : "welcome");
-    };
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-  }, [lang]);
+    const saved = loadState();
+    setStep(saved.step);
+    setA(saved.answers);
+    setHydrated(true);
+    trackStart("view", { lang: routeLang });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    try { sessionStorage.setItem(STORE_KEY, JSON.stringify(a)); } catch { /* ignore */ }
-  }, [a]);
+    if (!hydrated) return;
+    try {
+      const raw = JSON.stringify({ step, answers: a });
+      sessionStorage.setItem(STORE_KEY, raw);
+      localStorage.setItem(STORE_KEY, raw);
+    } catch { /* ignore */ }
+  }, [step, a, hydrated]);
 
   useEffect(() => {
-    trackStart("step_view", { step, index: idx });
+    if (!hydrated) return;
+    trackStart("step_view", { step, index: STEPS.indexOf(step) });
     window.scrollTo(0, 0);
-  }, [step, idx]);
+  }, [step, hydrated]);
 
+  /** Forward-only advance with 400 ms double-tap guard + light haptic. */
   const go = (next: StepId) => {
-    try { window.history.pushState({ startStep: next }, ""); } catch { /* ignore */ }
+    const now = Date.now();
+    if (now - lastAdvance.current < 400) return;
+    lastAdvance.current = now;
+    try { navigator.vibrate?.(10); } catch { /* unsupported */ }
     setStep(next);
   };
-  const nextStep = () => go(STEPS[Math.min(idx + 1, STEPS.length - 1)]!);
-  const back = () => (idx > 0 ? window.history.back() : undefined);
-
-  const pick = (key: "level" | "goal" | "time" | "reminder", value: string) => {
-    setA((p) => ({ ...p, [key]: value }));
-    trackStart("step_answer", { step, answer: value });
-    window.setTimeout(nextStep, 220);
+  const next = () => {
+    const idx = STEPS.indexOf(step);
+    let target = STEPS[Math.min(idx + 1, STEPS.length - 1)]!;
+    if (target === "trial" && PRICING.yearly.trialDays <= 0) target = "reminder";
+    if (target === "reminder" && PRICING.yearly.trialDays <= 0) target = "paywallA";
+    go(target);
   };
+  const answer = (key: keyof Answers, value: unknown) => {
+    setA((p) => ({ ...p, [key]: value }));
+    trackStart("step_answer", { step, answer: String(value) });
+  };
+  const finish = (origin: string) => {
+    trackStart("cta_click", { cta: origin, plan: a.plan });
+    try { sessionStorage.removeItem(STORE_KEY); localStorage.removeItem(STORE_KEY); } catch { /* ignore */ }
+    go("success");
+  };
+  const storeHref = `${TAAP}?src=${encodeURIComponent(src)}`;
 
-  const showChrome = step !== "welcome" && step !== "building" && step !== "success";
-  const pct = Math.round((idx / (STEPS.length - 1)) * 100);
+  if (!hydrated) return <div className="ob-shell"><div className="ob-frame" /></div>;
+
+  const name = a.name.trim();
+  const deck = buildSwipeDeck(a.topics);
+  const profileCourses = buildProfileCourses(a.topics, a.liked);
+  const archetype = ARCHETYPES[a.goals[0] ?? "cultivate"]!;
 
   return (
     <div className="ob-shell">
-      <div className="mx-auto flex min-h-full w-full max-w-md flex-col px-5 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-[calc(env(safe-area-inset-top)+12px)]">
-        {showChrome ? (
-          <div className="flex items-center gap-3 py-2">
-            <button type="button" onClick={back} aria-label={c.back} className="ob-icon-btn">
-              <ArrowLeft className="size-5" aria-hidden="true" />
-            </button>
-            <div className="ob-progress" role="progressbar" aria-label={c.progress} aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
-              <span style={{ width: `${pct}%` }} />
-            </div>
-          </div>
-        ) : null}
-
-        <div key={step} className="ob-step flex flex-1 flex-col">
+      <div className="ob-frame">
+        <Dots step={step} />
+        <div key={step} className="ob-step">
+          {/* 1 — Welcome */}
           {step === "welcome" && (
-            <Centered>
-              <LogoMark className="mx-auto h-20 w-auto text-brand-navy" />
-              <h1 className="ob-title mt-8 text-center">{c.welcomeTitle}</h1>
-              <p className="ob-text mt-4 text-center">{c.welcomeText}</p>
-              <Footer><PrimaryBtn onClick={nextStep}>{c.start}</PrimaryBtn></Footer>
-            </Centered>
-          )}
-
-          {step === "interests" && (
-            <>
-              <h1 className="ob-title mt-4">{c.interestsTitle}</h1>
-              <p className="ob-text mt-2">{c.interestsHint}</p>
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                {INTERESTS.map((o) => {
-                  const on = a.interests.includes(o.id);
-                  return (
-                    <button key={o.id} type="button" aria-pressed={on} data-on={on} className="ob-option flex-col !items-start"
-                      onClick={() => setA((p) => ({ ...p, interests: on ? p.interests.filter((x) => x !== o.id) : [...p.interests, o.id] }))}>
-                      <span className="text-2xl" aria-hidden="true">{o.emoji}</span>
-                      <span>{o.label[lang]}</span>
-                    </button>
-                  );
-                })}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+              <div style={{ position: "relative", display: "grid", placeItems: "center", width: 220, height: 220 }}>
+                <span className="ob-halo" style={{ width: 220, height: 220 }} />
+                <span className="ob-halo" style={{ width: 140, height: 140, opacity: 0.12, animationDelay: "300ms" }} />
+                <img src="/onboarding/splash_logo.png" alt="Sophia" className="ob-pop" style={{ width: 104, height: 104, borderRadius: 26 }} />
               </div>
-              <Footer>
-                <PrimaryBtn disabled={!a.interests.length} onClick={() => { trackStart("step_answer", { step, answer: a.interests.join(",") }); nextStep(); }}>{c.next}</PrimaryBtn>
-              </Footer>
-            </>
+              <h1 className="ob-title-lg ob-reveal" style={{ "--d": "350ms" } as React.CSSProperties}>{c.welcomeTitle}</h1>
+              <p className="ob-sub ob-reveal" style={{ "--d": "420ms" } as React.CSSProperties}>{c.welcomeSub}</p>
+              <div style={{ width: "100%", marginTop: "auto" }}>
+                <PrimaryBtn onClick={next}>{c.welcomeCta}</PrimaryBtn>
+                <a className="ob-link" href={storeHref} onClick={() => trackStart("cta_click", { cta: "already_account" })}>{c.alreadyAccount}</a>
+              </div>
+            </div>
           )}
 
-          {step === "level" && <Choice title={c.levelTitle} options={LEVELS} lang={lang} value={a.level} onPick={(v) => pick("level", v)} />}
-          {step === "goal" && <Choice title={c.goalTitle} options={GOALS} lang={lang} value={a.goal} onPick={(v) => pick("goal", v)} />}
-          {step === "time" && <Choice title={c.timeTitle} options={DAILY_TIMES} lang={lang} value={a.time} onPick={(v) => pick("time", v)} />}
-
-          {(step === "quiz0" || step === "quiz1" || step === "quiz2") && (
-            <QuizStep
-              key={step}
-              lang={lang}
-              n={Number(step.slice(-1))}
-              chosen={a.quiz[Number(step.slice(-1))] ?? null}
-              onAnswer={(i, qi) => {
-                setA((p) => { const quiz = [...p.quiz]; quiz[qi] = i; return { ...p, quiz }; });
-                trackStart("quiz_answer", { question: QUIZ[qi]!.id, correct: i === QUIZ[qi]!.correct ? 1 : 0 });
-              }}
-              onNext={nextStep}
-            />
-          )}
-
-          {step === "reminder" && <Choice title={c.reminderTitle} options={REMINDERS} lang={lang} value={a.reminder} onPick={(v) => pick("reminder", v)} />}
-
-          {step === "building" && <Building lang={lang} onDone={nextStep} />}
-
-          {step === "result" && <Result lang={lang} a={a} onNext={() => { trackStart("plan_shown"); nextStep(); }} />}
-
-          {step === "paywall" && (
+          {/* 2 — Language */}
+          {step === "language" && (
             <>
-              <h1 className="ob-title mt-4">{c.paywallTitle}</h1>
-              <ul className="mt-5 flex flex-col gap-3">
-                {c.paywallPerks.map((p) => (
-                  <li key={p} className="flex items-center gap-3 font-semibold text-brand-navy">
-                    <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-pink/40"><Check className="size-3.5" aria-hidden="true" /></span>{p}
-                  </li>
+              <div className="ob-spacer" />
+              <h1 className="ob-title">{c.langTitle}</h1>
+              <p className="ob-sub">{c.langSub}</p>
+              <div className="ob-rows">
+                {LANGUAGES.map((l, i) => (
+                  <OptionRow key={l.id} delay={i * 60} label={l.native} emoji={l.flag} on={lang === l.id}
+                    onClick={() => { setLang(l.id); trackStart("step_answer", { step, answer: l.id }); }} />
                 ))}
-              </ul>
-              <div className="mt-6 flex flex-col gap-3">
-                {PLANS.map((p) => {
-                  const on = (a.plan ?? "yearly") === p.id;
+              </div>
+              <PrimaryBtn onClick={next}>{c.continue}</PrimaryBtn>
+            </>
+          )}
+
+          {/* 3 — Intro carousel */}
+          {step === "intro" && <IntroStep lang={lang} c={c} onDone={next} />}
+
+          {/* 4 — Social proof */}
+          {step === "social" && (
+            <>
+              <div style={{ height: 64 }} />
+              <h1 className="ob-title"><Highlight text={c.socialTitle} /></h1>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "10px 12px", justifyItems: "center", margin: "28px 0" }}>
+                {[...STUDENT_PHOTOS, ...[1, 2, 3, 4, 5].map((i) => `/onboarding/review_avatar_${i}.jpg`)].map((p, i) => (
+                  <img key={p} src={p} alt="" width={58} height={58} loading="lazy" className="ob-pop"
+                    style={{ width: 58, height: 58, borderRadius: 999, border: "3px solid #fff", boxShadow: "0 2px 8px rgba(0,0,0,.12)", objectFit: "cover", animationDelay: `${i * 80}ms` }} />
+                ))}
+              </div>
+              <div className="ob-pop" style={{ animationDelay: "900ms" }}>
+                <LaurelBadge caption={c.onAppStore} />
+              </div>
+              <p className="ob-reveal" style={{ "--d": "1100ms", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 24, fontSize: 15, fontWeight: 600, color: OB.inkSecondary } as React.CSSProperties}>
+                <Globe style={{ width: 18, height: 18, color: OB.accentSoft }} /> {c.countries}
+              </p>
+              <PrimaryBtn onClick={next}>{c.socialCta}</PrimaryBtn>
+            </>
+          )}
+
+          {/* 5 — Name */}
+          {step === "name" && (
+            <NameStep c={c} value={a.name} onChange={(v) => setA((p) => ({ ...p, name: v }))}
+              onSubmit={() => { answer("name", a.name.trim()); next(); }} onSkip={next} />
+          )}
+
+          {/* 6 — Age */}
+          {step === "age" && (
+            <>
+              <div className="ob-spacer" />
+              <h1 className="ob-title">{c.ageTitle}</h1>
+              <p className="ob-sub">{c.ageSub}</p>
+              <div className="ob-rows">
+                {AGES.map((o, i) => (
+                  <OptionRow key={o.id} delay={i * 70} label={o.label[lang]} on={a.age === o.id} onClick={() => answer("age", o.id)} />
+                ))}
+              </div>
+              <PrimaryBtn disabled={!a.age} onClick={next}>{c.continue}</PrimaryBtn>
+            </>
+          )}
+
+          {/* 7 — Knowledge */}
+          {step === "knowledge" && (
+            <KnowledgeStep lang={lang} c={c} value={a.knowledge}
+              onChange={(v) => answer("knowledge", v)} onNext={next} />
+          )}
+
+          {/* 8 — Motivation */}
+          {step === "motivation" && (
+            <>
+              <div className="ob-spacer" />
+              <h1 className="ob-title">{c.motivationTitle}</h1>
+              <p className="ob-sub">{c.motivationSub}</p>
+              <div className="ob-rows">
+                {MOTIVATIONS.map((o, i) => (
+                  <OptionRow key={o.id} delay={i * 70} label={o.label[lang]} emoji={o.emoji} on={a.motivation === o.id} onClick={() => answer("motivation", o.id)} />
+                ))}
+              </div>
+              <PrimaryBtn disabled={!a.motivation} onClick={next}>{c.continue}</PrimaryBtn>
+            </>
+          )}
+
+          {/* 9 — Goals (multi) */}
+          {step === "goals" && (
+            <>
+              <div className="ob-spacer" />
+              <h1 className="ob-title">{c.goalsTitle}</h1>
+              <p className="ob-sub">{c.goalsSub}</p>
+              <div className="ob-rows">
+                {GOALS.map((o, i) => {
+                  const on = a.goals.includes(o.id);
                   return (
-                    <button key={p.id} type="button" data-on={on} aria-pressed={on} className="ob-option relative justify-between"
-                      onClick={() => { setA((x) => ({ ...x, plan: p.id })); trackStart("plan_selected", { plan: p.id }); }}>
-                      {p.badge ? <span className="ob-badge">{p.badge[lang]}</span> : null}
-                      <span className="flex flex-col items-start text-left">
-                        <span className="text-lg font-extrabold">{p.price[lang]} <span className="text-sm font-semibold opacity-70">{p.per[lang]}</span></span>
-                        <span className="text-sm font-medium opacity-70">{p.trialDays ? c.trial(p.trialDays) + " · " : ""}{p.note[lang]}</span>
-                      </span>
-                      <span className="ob-radio" data-on={on} aria-hidden="true" />
+                    <OptionRow key={o.id} delay={i * 70} label={o.label[lang]} emoji={o.emoji} on={on} multi
+                      onClick={() => setA((p) => ({ ...p, goals: on ? p.goals.filter((g) => g !== o.id) : [...p.goals, o.id] }))} />
+                  );
+                })}
+              </div>
+              <PrimaryBtn disabled={!a.goals.length} onClick={() => { trackStart("step_answer", { step, answer: a.goals.join(",") }); next(); }}>{c.continue}</PrimaryBtn>
+            </>
+          )}
+
+          {/* 10 — Topics (multi grid) */}
+          {step === "topics" && (
+            <>
+              <div className="ob-spacer" />
+              <h1 className="ob-title">{c.topicsTitle}</h1>
+              <p className="ob-sub">{c.topicsSub}</p>
+              <div className="ob-tiles">
+                {TOPICS.map((t, i) => {
+                  const on = a.topics.includes(t.id);
+                  return (
+                    <button key={t.id} type="button" className="ob-tile ob-reveal" data-on={on} aria-pressed={on}
+                      style={{ "--tc": t.color, "--d": `${i * 70}ms` } as React.CSSProperties}
+                      onClick={() => setA((p) => ({ ...p, topics: on ? p.topics.filter((x) => x !== t.id) : [...p.topics, t.id] }))}>
+                      {on ? <span className="ob-tile-check"><Check className="size-3.5" strokeWidth={3.5} /></span> : null}
+                      <span className="ob-emoji" aria-hidden="true">{t.emoji}</span>
+                      {t.label[lang]}
                     </button>
                   );
                 })}
               </div>
-              <Footer>
-                <PrimaryBtn onClick={() => { trackStart("paywall_continue", { plan: a.plan ?? "yearly" }); nextStep(); }}>{c.paywallCta}</PrimaryBtn>
-                <p className="mt-3 text-center text-xs text-brand-navySoft">{c.paywallNote}</p>
-              </Footer>
+              <PrimaryBtn disabled={!a.topics.length} onClick={() => { trackStart("step_answer", { step, answer: a.topics.join(",") }); next(); }}>{c.continue}</PrimaryBtn>
             </>
           )}
 
+          {/* 11 — Sophia will help you (tap anywhere) */}
+          {step === "help" && (
+            <Interstitial words={c.helpWords(name)} hint={c.tapAnywhere} icon={<Target style={{ width: 46, height: 46, color: OB.accentSoft }} />} onTap={next} />
+          )}
+
+          {/* 12 — Mission */}
+          {step === "mission" && (
+            <>
+              <div className="ob-spacer" />
+              <div style={{ position: "relative", display: "grid", placeItems: "center", height: 150 }}>
+                <span className="ob-halo" style={{ width: 150, height: 150 }} />
+                <img src="/onboarding/splash_logo.png" alt="" className="ob-pop" style={{ width: 84, height: 84, borderRadius: 20 }} />
+              </div>
+              <h1 className="ob-title" style={{ marginTop: 16 }}>{c.missionTitle}</h1>
+              <p style={{ marginTop: 14, fontSize: 17, fontWeight: 600, textAlign: "center" }}>{c.missionBody1}</p>
+              <p className="ob-sub">{c.missionBody2}</p>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 22 }}>
+                <AvatarStack photos={["/onboarding/author_rana_abdalla.jpg", "/onboarding/author_mark_n_hoffman.jpg", "/onboarding/author_elizabeth_singer_hunt.jpg", "/onboarding/author_stacy_jankowski.jpg", "/onboarding/author_simon_lea.jpg"]} size={34} overlap={10} />
+                <span style={{ fontSize: 13, fontWeight: 600, color: OB.inkSecondary }}>{c.missionTeam}</span>
+              </div>
+              <PrimaryBtn onClick={next}>{c.continue}</PrimaryBtn>
+            </>
+          )}
+
+          {/* 13 — Questions roulette */}
+          {step === "questions" && (
+            <>
+              <div style={{ height: 84 }} />
+              <h1 className="ob-title">{c.questionsTitle}</h1>
+              <div style={{ marginTop: 24 }}>
+                <Roulette items={ROULETTE_QUESTIONS.length} interval={1600} renderCard={(i) => <QuestionCard index={i} lang={lang} />} />
+              </div>
+              <PrimaryBtn onClick={next}>{c.continue}</PrimaryBtn>
+            </>
+          )}
+
+          {/* 14 — Phone time */}
+          {step === "phoneTime" && (
+            <>
+              <div className="ob-spacer" />
+              <h1 className="ob-title">{c.phoneTitle}</h1>
+              <div className="ob-bignum" style={{ fontSize: 68, textAlign: "center", margin: "36px 0 24px" }}>
+                {a.phoneMinutes < 60 ? `${a.phoneMinutes} min` : `${Math.floor(a.phoneMinutes / 60)}h${a.phoneMinutes % 60 ? String(a.phoneMinutes % 60).padStart(2, "0") : ""}`}
+              </div>
+              <input type="range" className="ob-slider" min={30} max={600} step={30} value={a.phoneMinutes}
+                aria-label={c.phoneTitle}
+                onChange={(e) => setA((p) => ({ ...p, phoneMinutes: Number(e.target.value) }))} />
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10, fontSize: 12, fontWeight: 600, color: OB.inkTertiary }}>
+                <span>30 min</span><span>10h</span>
+              </div>
+              <PrimaryBtn onClick={() => { answer("phoneMinutes", a.phoneMinutes); next(); }}>{c.continue}</PrimaryBtn>
+            </>
+          )}
+
+          {/* 15 — Life in years */}
+          {step === "years" && <YearsStep lang={lang} c={c} minutes={a.phoneMinutes} onNext={next} />}
+
+          {/* 16 — Transform (tap anywhere) */}
+          {step === "transform" && (
+            <Interstitial words={c.transformWords} hint={c.tapContinue} cycle={c.transformCycle} onTap={next} />
+          )}
+
+          {/* 17 — Reviews */}
+          {step === "reviews" && (
+            <>
+              <div className="ob-spacer" />
+              <h1 className="ob-title">{c.reviewsTitle}</h1>
+              <div style={{ margin: "20px 0" }}>
+                <LaurelBadge caption={c.reviewsBadge} compact />
+              </div>
+              <Roulette items={REVIEWS.length} interval={3000} renderCard={(i) => <ReviewCard index={i} lang={lang} />} />
+              <PrimaryBtn onClick={next}>{c.continue}</PrimaryBtn>
+            </>
+          )}
+
+          {/* 18 — Personalize (tap anywhere) */}
+          {step === "personalize" && (
+            <Interstitial words={c.personalizeWords} hint={c.tapContinue} onTap={next} />
+          )}
+
+          {/* 19 — Swipe courses */}
+          {step === "swipe" && (
+            <>
+              <div style={{ height: 40 }} />
+              <h1 style={{ fontSize: 22, fontWeight: 800, textAlign: "center" }}>{c.swipeTitle}</h1>
+              <p className="ob-sub" style={{ fontSize: 15 }}>{c.swipeSub}</p>
+              <SwipeDeck deck={deck} lang={lang} onDone={(liked) => { setA((p) => ({ ...p, liked })); trackStart("step_answer", { step: "swipe", answer: liked.join(",") }); next(); }} />
+            </>
+          )}
+
+          {/* 20 — Loading */}
+          {step === "loading" && <LoadingStep lang={lang} c={c} name={name} onNext={next} />}
+
+          {/* 21 — Profile */}
+          {step === "profile" && (
+            <ProfileStep lang={lang} c={c} name={name} goals={a.goals} archetype={archetype} courses={profileCourses} onNext={next} />
+          )}
+
+          {/* 22 — Reading time */}
+          {step === "readingTime" && (
+            <>
+              <div className="ob-spacer" />
+              <h1 className="ob-title">{c.readingTitle}</h1>
+              <div style={{ margin: "26px 0" }}>
+                <ReadingSky hour={a.readingHour} />
+              </div>
+              <div className="ob-bignum" style={{ fontSize: 52, textAlign: "center", color: OB.ink }}>
+                {String(a.readingHour).padStart(2, "0")}:00
+              </div>
+              <p style={{ textAlign: "center", fontSize: 15, fontWeight: 600, color: OB.inkSecondary, marginTop: 4 }}>
+                {c.readingLabels[a.readingHour < 9 ? 0 : a.readingHour < 13 ? 1 : a.readingHour < 18 ? 2 : a.readingHour < 21 ? 3 : 4]}
+              </p>
+              <input type="range" className="ob-slider" min={5} max={23} step={1} value={a.readingHour}
+                aria-label={c.readingTitle} style={{ marginTop: 22 }}
+                onChange={(e) => setA((p) => ({ ...p, readingHour: Number(e.target.value) }))} />
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10, fontSize: 12, fontWeight: 600, color: OB.inkTertiary }}>
+                <span>05:00</span><span>23:00</span>
+              </div>
+              <PrimaryBtn onClick={() => { answer("readingHour", a.readingHour); next(); }}>{c.continue}</PrimaryBtn>
+            </>
+          )}
+
+          {/* 23 — Email reminders */}
+          {step === "email" && (
+            <EmailStep lang={lang} c={c} value={a.email}
+              onSubmit={(email) => { answer("email", email); next(); }}
+              onSkip={() => { trackStart("step_answer", { step, answer: "skipped" }); next(); }} />
+          )}
+
+          {/* 24 — Account (email only, no auth) */}
+          {step === "account" && (
+            <AccountStep lang={lang} c={c} value={a.email}
+              onSubmit={(email) => { answer("email", email); next(); }} />
+          )}
+
+          {/* 25 — Welcome aboard */}
+          {step === "aboard" && (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              <Confetti />
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                <AboardHero logo="/onboarding/splash_logo.png" />
+                <h1 className="ob-title-lg ob-reveal" style={{ "--d": "300ms", marginTop: 12 } as React.CSSProperties}>{c.aboardTitle(name)}</h1>
+                <p className="ob-sub ob-reveal" style={{ "--d": "400ms" } as React.CSSProperties}>{c.aboardSub}</p>
+              </div>
+              <PrimaryBtn onClick={next}>{c.continue}</PrimaryBtn>
+            </div>
+          )}
+
+          {/* 26 — Features */}
+          {step === "features" && (
+            <>
+              <div style={{ height: 48 }} />
+              <h1 className="ob-title">{c.featuresTitle(name)}</h1>
+              <div style={{ display: "flex", flexDirection: "column", gap: 0, marginTop: 28, position: "relative" }}>
+                <span style={{ position: "absolute", left: 23, top: 24, bottom: 24, width: 3, borderRadius: 24, background: OB.surfaceMuted }} aria-hidden="true" />
+                {FEATURES.map((f, i) => (
+                  <div key={f.icon} className="ob-reveal" style={{ "--d": `${i * 140}ms`, display: "flex", alignItems: "center", gap: 14, minHeight: 52 } as React.CSSProperties}>
+                    <span style={{ width: 48, height: 48, borderRadius: 999, background: f.color, color: "#fff", display: "grid", placeItems: "center", flexShrink: 0, zIndex: 1 }}>
+                      {f.icon === "puzzle" ? <Puzzle className="size-5" /> : f.icon === "book" ? <BookOpen className="size-5" /> : f.icon === "trophy" ? <Trophy className="size-5" /> : f.icon === "headphones" ? <Headphones className="size-5" /> : f.icon === "hand" ? <Hand className="size-5" /> : <Atom className="size-5" />}
+                    </span>
+                    <span style={{ fontSize: 17, fontWeight: 500 }}>{f.text[lang]}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="ob-laurel" style={{ marginTop: 26, color: OB.inkTertiary }}>
+                <LaurelBranch size={50} />
+                <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, color: OB.ink }}>
+                  <span style={{ fontSize: 20, fontWeight: 800 }}>4.8 / 5</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, color: OB.inkTertiary }}>{c.onTheAppStore}</span>
+                </span>
+                <LaurelBranch size={50} flip />
+              </div>
+              <div style={{ textAlign: "center", marginTop: 14 }}>
+                <Stars size={22} />
+                <div style={{ fontSize: 15, fontWeight: 800, marginTop: 4 }}>{c.reviewsCount}</div>
+              </div>
+              <p style={{ textAlign: "center", fontSize: 20, fontWeight: 700, marginTop: 18 }}>{c.noCommitment}</p>
+              <PrimaryBtn onClick={next}>{c.continue}</PrimaryBtn>
+            </>
+          )}
+
+          {/* 27 — Trial timeline (only when the annual plan has a trial) */}
+          {step === "trial" && <TrialStep lang={lang} c={c} onNext={next} />}
+
+          {/* 28 — Reminder */}
+          {step === "reminder" && (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", textAlign: "center" }}>
+              <div className="ob-pop" style={{ display: "grid", placeItems: "center", marginBottom: 28 }}>
+                <Bell className="ob-bell" style={{ width: 96, height: 96, color: OB.gold }} fill={OB.gold} strokeWidth={1} />
+              </div>
+              <ProgressiveWords words={c.reminderWords} />
+              <PrimaryBtn onClick={next}>{c.reminderCta}</PrimaryBtn>
+            </div>
+          )}
+
+          {/* 29 — Paywall A */}
+          {step === "paywallA" && (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", position: "relative" }}>
+              <button type="button" className="ob-x" aria-label="Close" onClick={() => go("paywallB")}><X className="size-4" /></button>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", gap: 18 }}>
+                <GraduationCap style={{ width: 46, height: 46, color: OB.accentSoft }} />
+                <h1 style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.3 }}>
+                  <span style={{ color: OB.success }}>{c.paywallAGreen}</span><br />{c.paywallAInk}
+                </h1>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <AvatarStack photos={STUDENT_PHOTOS.slice(0, 3)} size={28} overlap={10} />
+                  <Star style={{ width: 14, height: 14, color: OB.gold }} fill="currentColor" strokeWidth={0} />
+                  <span style={{ fontSize: 13, fontWeight: 700 }}>4.8</span>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: OB.inkSecondary }}>{c.paywallAProof}</span>
+                </div>
+                <button type="button" onClick={() => go("paywallB")}
+                  style={{ fontSize: 15, fontWeight: 600, color: OB.accentSoft, textDecoration: "underline" }}>
+                  {c.viewAllPlans}
+                </button>
+              </div>
+              <p style={{ textAlign: "center", fontSize: 13, fontWeight: 500, color: OB.inkSecondary, marginBottom: 10 }}>{c.paywallReassurance}</p>
+              <button type="button" className="ob-primary" onClick={() => finish("paywall_a_trial")}>{c.trialCtaLong}</button>
+              <p style={{ textAlign: "center", fontSize: 13, fontWeight: 500, color: OB.inkSecondary, marginTop: 8 }}>{c.billedYearly}</p>
+              <LegalRow c={c} storeHref={storeHref} />
+            </div>
+          )}
+
+          {/* 30 — Paywall B (comparison) */}
+          {step === "paywallB" && (
+            <PaywallB lang={lang} c={c} plan={a.plan}
+              onPlan={(p) => { setA((x) => ({ ...x, plan: p })); trackStart("plan_selected", { plan: p }); }}
+              onClose={() => finish("paywall_b_close")} onCta={() => finish("paywall_b_cta")} storeHref={storeHref} />
+          )}
+
+          {/* Success / download */}
           {step === "success" && (
-            <Centered>
-              <div className="ob-success-badge mx-auto"><Check className="size-10" aria-hidden="true" /></div>
-              <h1 className="ob-title mt-6 text-center">{c.successTitle}</h1>
-              <p className="ob-text mt-3 text-center">{c.successText}</p>
-              <Footer>
-                <StoreLinks lang={lang} src={src} iosFirst={isIos} />
-                <p className="mt-4 text-center text-xs text-brand-navySoft">{c.openBrowser}</p>
-              </Footer>
-            </Centered>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              <Confetti />
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                <AboardHero logo="/onboarding/splash_logo.png" />
+                <h1 className="ob-title-lg ob-reveal" style={{ "--d": "300ms", marginTop: 12 } as React.CSSProperties}>{c.successTitle}</h1>
+                <p className="ob-sub ob-reveal" style={{ "--d": "400ms" } as React.CSSProperties}>{c.successSub}</p>
+              </div>
+              <div className="ob-footer">
+                <a href={storeHref} className="ob-primary" onClick={() => trackStart("store_click", { store: "taap" })}>
+                  <Download className="size-5" /> {c.download}
+                </a>
+                <p style={{ textAlign: "center", fontSize: 12, color: OB.inkTertiary, marginTop: 14 }}>{c.openBrowser}</p>
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -186,130 +505,421 @@ export function StartFunnel({ lang }: { lang: StartLang }) {
   );
 }
 
-function Centered({ children }: { children: React.ReactNode }) {
-  return <div className="flex flex-1 flex-col justify-center pt-10">{children}</div>;
-}
-function Footer({ children }: { children: React.ReactNode }) {
-  return <div className="mt-auto pt-8">{children}</div>;
-}
-function PrimaryBtn(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  return <button type="button" {...props} className="ob-primary" />;
-}
+/* ============================ sub-steps ============================ */
 
-function Choice({ title, options, lang, value, onPick }: { title: string; options: Option[]; lang: StartLang; value?: string | undefined; onPick: (v: string) => void }) {
+type C = (typeof COPY)["fr"];
+
+function IntroStep({ lang, c, onDone }: { lang: StartLang; c: C; onDone: () => void }) {
+  const [page, setPage] = useState(0);
+  const pages = [
+    { title: c.intro1, sub: null },
+    { title: c.intro2, sub: c.intro2Sub },
+    { title: c.intro3, sub: c.intro3Sub },
+    { title: c.intro4, sub: c.intro4Sub },
+  ];
   return (
     <>
-      <h1 className="ob-title mt-4">{title}</h1>
-      <div className="mt-6 flex flex-col gap-3">
-        {options.map((o) => (
-          <button key={o.id} type="button" data-on={value === o.id} aria-pressed={value === o.id} className="ob-option" onClick={() => onPick(o.id)}>
-            <span className="text-2xl" aria-hidden="true">{o.emoji}</span><span>{o.label[lang]}</span>
-          </button>
-        ))}
+      <div style={{ height: 64 }} />
+      <div key={page} className="ob-step" style={{ padding: 0, animationDuration: "400ms" }}>
+        <h1 className="ob-title" style={{ minHeight: 108 }}>
+          <Highlight text={pages[page]!.title} />
+        </h1>
+        <div style={{ margin: "26px 0", minHeight: 240 }}>
+          <IntroVisual page={page} lang={lang} />
+        </div>
+        {pages[page]!.sub ? <p className="ob-sub">{pages[page]!.sub}</p> : null}
       </div>
+      <div className="ob-pager" aria-hidden="true">
+        {pages.map((_, i) => <span key={i} data-on={i === page} />)}
+      </div>
+      <PrimaryBtn onClick={() => (page < 3 ? setPage(page + 1) : onDone())}>{c.continue}</PrimaryBtn>
     </>
   );
 }
 
-function QuizStep({ lang, n, chosen, onAnswer, onNext }: { lang: StartLang; n: number; chosen: number | null; onAnswer: (i: number, q: number) => void; onNext: () => void }) {
-  const c = COPY[lang];
-  const q = QUIZ[n]!;
-  const answered = chosen !== null;
+function NameStep({ c, value, onChange, onSubmit, onSkip }: {
+  c: C; value: string; onChange: (v: string) => void; onSubmit: () => void; onSkip: () => void;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const t = window.setTimeout(() => ref.current?.focus(), 650);
+    return () => window.clearTimeout(t);
+  }, []);
   return (
     <>
-      <p className="mt-4 text-sm font-bold uppercase tracking-widest text-brand-pink">{c.quizIntro} · {n + 1}/3</p>
-      <h1 className="ob-title mt-2">{q.q[lang]}</h1>
-      <div className="mt-6 flex flex-col gap-3">
-        {q.answers[lang].map((ans, i) => {
-          const state = !answered ? undefined : i === q.correct ? "right" : i === chosen ? "wrong" : "dim";
-          return (
-            <button key={ans} type="button" disabled={answered} data-state={state} className="ob-option" onClick={() => onAnswer(i, n)}>{ans}</button>
-          );
-        })}
+      <div className="ob-spacer" />
+      <h1 className="ob-title">{c.nameTitle}</h1>
+      <p className="ob-sub">{c.nameSub}</p>
+      <form style={{ marginTop: 32 }} onSubmit={(e) => { e.preventDefault(); if (value.trim()) onSubmit(); }}>
+        <input ref={ref} className="ob-input" value={value} maxLength={24} placeholder={c.namePlaceholder}
+          onChange={(e) => onChange(e.target.value)} autoComplete="given-name" />
+      </form>
+      <PrimaryBtn disabled={!value.trim()} onClick={onSubmit}>{c.continue}</PrimaryBtn>
+      <button type="button" className="ob-link" onClick={onSkip}>{c.skip}</button>
+    </>
+  );
+}
+
+function KnowledgeStep({ lang, c, value, onChange, onNext }: {
+  lang: StartLang; c: C; value: string; onChange: (v: string) => void; onNext: () => void;
+}) {
+  const idx = Math.max(0, KNOWLEDGE_LEVELS.findIndex((l) => l.id === value));
+  const level = KNOWLEDGE_LEVELS[idx]!;
+  return (
+    <>
+      <div className="ob-spacer" />
+      <h1 className="ob-title">{c.knowledgeTitle}</h1>
+      <p className="ob-sub">{c.knowledgeSub}</p>
+      <div style={{ textAlign: "center", margin: "36px 0 28px" }}>
+        <div key={level.id} className="ob-pop" style={{ fontSize: 72, lineHeight: 1 }}>{level.emoji}</div>
+        <div key={`${level.id}-l`} className="ob-pop" style={{ fontSize: 28, fontWeight: 800, color: OB.accentSoft, marginTop: 10 }}>{level.label[lang]}</div>
       </div>
-      {answered ? (
-        <div className="ob-fact mt-5" role="status">
-          <p className="font-extrabold">{chosen === q.correct ? c.correct : c.wrong}</p>
-          <p className="mt-1 text-sm"><strong>{c.funFact}</strong> {q.fact[lang]}</p>
+      <div style={{ padding: "0 12px", position: "relative" }}>
+        <input type="range" className="ob-slider" min={0} max={3} step={1} value={idx}
+          aria-label={c.knowledgeTitle} onChange={(e) => onChange(KNOWLEDGE_LEVELS[Number(e.target.value)]!.id)} />
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
+          {KNOWLEDGE_LEVELS.map((l, i) => (
+            <span key={l.id} style={{ fontSize: 12, fontWeight: i === idx ? 700 : 500, color: i === idx ? OB.accentSoft : OB.inkTertiary, width: 70, textAlign: "center", marginLeft: i === 0 ? -24 : 0, marginRight: i === 3 ? -24 : 0 }}>
+              {l.label[lang]}
+            </span>
+          ))}
+        </div>
+      </div>
+      <PrimaryBtn onClick={onNext}>{c.continue}</PrimaryBtn>
+    </>
+  );
+}
+
+/** Interstitial: words turn bold one by one, then a pulsing hint; tap anywhere. */
+function Interstitial({ words, hint, icon, cycle, onTap }: {
+  words: string; hint: string; icon?: React.ReactNode; cycle?: readonly string[]; onTap: () => void;
+}) {
+  const parts = words.split(" ");
+  const [shown, setShown] = useState(0);
+  const [cycleIdx, setCycleIdx] = useState(0);
+  const ready = shown >= parts.length;
+  useEffect(() => {
+    if (shown < parts.length) {
+      const t = window.setTimeout(() => setShown((n) => n + 1), 130);
+      return () => window.clearTimeout(t);
+    }
+    return undefined;
+  }, [shown, parts.length]);
+  useEffect(() => {
+    if (!ready || !cycle) return undefined;
+    const t = window.setInterval(() => setCycleIdx((i) => (i + 1) % cycle.length), 1150);
+    return () => window.clearInterval(t);
+  }, [ready, cycle]);
+  const cycleColors = [OB.accent, OB.danger, OB.gold, OB.success, "#7A5CD1"];
+  return (
+    <div role="button" tabIndex={0} onClick={() => ready && onTap()} onKeyDown={(e) => e.key === "Enter" && ready && onTap()}
+      style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", position: "relative", cursor: "pointer", minHeight: "70vh" }}>
+      <span className="ob-halo" style={{ width: 320, height: 320, filter: "blur(30px)" }} />
+      {icon ? <span style={{ width: 108, height: 108, borderRadius: 999, background: "color-mix(in srgb, #2E62C4 10%, transparent)", display: "grid", placeItems: "center", marginBottom: 32, zIndex: 1 }}>{icon}</span> : null}
+      <p className="ob-words" style={{ zIndex: 1, maxWidth: 340 }}>
+        {parts.map((w, i) => {
+          const isLast = cycle && i === parts.length - 1;
+          if (isLast && ready) {
+            return <b key={`cycle-${cycleIdx}`} className="ob-pop" style={{ color: cycleColors[cycleIdx % cycleColors.length], display: "inline-block" }}>{cycle[cycleIdx]!} </b>;
+          }
+          return i < shown ? <b key={i}>{w} </b> : <span key={i}>{w} </span>;
+        })}
+      </p>
+      {ready ? <span className="ob-hint">{hint}</span> : null}
+    </div>
+  );
+}
+
+/** Progressive bold sentence (step 28). */
+function ProgressiveWords({ words }: { words: string }) {
+  const parts = words.split(" ");
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    if (shown < parts.length) {
+      const t = window.setTimeout(() => setShown((n) => n + 1), 320);
+      return () => window.clearTimeout(t);
+    }
+    return undefined;
+  }, [shown, parts.length]);
+  return (
+    <p className="ob-words">
+      {parts.map((w, i) => (i < shown ? <b key={i}>{w} </b> : <span key={i}>{w} </span>))}
+    </p>
+  );
+}
+
+function YearsStep({ lang, c, minutes, onNext }: { lang: StartLang; c: C; minutes: number; onNext: () => void }) {
+  const [ready, setReady] = useState(false);
+  return (
+    <>
+      <div style={{ height: 48 }} />
+      {ready ? <h1 className="ob-title ob-reveal" style={{ marginBottom: 22 }}>{c.yearsTitle}</h1> : <div style={{ height: 56 }} />}
+      <YearsGrid minutes={minutes} lang={lang} onReady={() => setReady(true)} />
+      {ready ? <PrimaryBtn onClick={onNext}>{c.continue}</PrimaryBtn> : null}
+    </>
+  );
+}
+
+function LoadingStep({ lang, c, name, onNext }: { lang: StartLang; c: C; name: string; onNext: () => void }) {
+  const [done, setDone] = useState(false);
+  return (
+    <>
+      <div className="ob-spacer" />
+      <h1 className="ob-title">{c.loadingTitle(name)}</h1>
+      <LoadingRows labels={c.loadingRows} onDone={() => setDone(true)} />
+      <div style={{ marginTop: 36, textAlign: "center", opacity: done ? 1 : 0.45, transition: "opacity 500ms" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+          <AvatarStack photos={STUDENT_PHOTOS} size={38} overlap={12} />
+        </div>
+        <LaurelBadge caption={c.reviewsBadge} compact />
+        <p style={{ fontSize: 14, color: OB.inkSecondary, marginTop: 10 }}>
+          {c.loadingProof} <strong style={{ color: OB.ink }}>{c.loadingJoin}</strong>
+        </p>
+      </div>
+      <PrimaryBtn disabled={!done} onClick={onNext}>{c.loadingCta}</PrimaryBtn>
+    </>
+  );
+}
+
+function ProfileStep({ lang, c, name, goals, archetype, courses, onNext }: {
+  lang: StartLang; c: C; name: string; goals: string[];
+  archetype: { emoji: string; name: Record<StartLang, string>; tagline: Record<StartLang, string> };
+  courses: ReturnType<typeof buildProfileCourses>; onNext: () => void;
+}) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => setReady(true), 1500);
+    return () => window.clearTimeout(t);
+  }, []);
+  const goalLabels = goals.map((g) => GOALS.find((x) => x.id === g)).filter(Boolean);
+  return (
+    <>
+      <div style={{ height: 40 }} />
+      <div style={{ position: "relative", display: "grid", placeItems: "center", marginBottom: 14 }}>
+        <span className="ob-halo" style={{ width: 340, height: 340, filter: "blur(34px)" }} />
+        <span className="ob-pop" style={{ width: 116, height: 116, borderRadius: 999, background: "color-mix(in srgb, #2E62C4 10%, transparent)", border: "1px solid color-mix(in srgb, #2E62C4 18%, transparent)", display: "grid", placeItems: "center", fontSize: 52 }}>
+          {archetype.emoji}
+        </span>
+      </div>
+      <p style={{ textAlign: "center", fontSize: 12, fontWeight: 700, letterSpacing: 1.6, textTransform: "uppercase", color: OB.accentSoft }}>{c.profileEyebrow(name)}</p>
+      <h1 style={{ textAlign: "center", fontSize: 34, fontWeight: 800, marginTop: 6 }}>{archetype.name[lang]}</h1>
+      <p className="ob-sub">{archetype.tagline[lang]}</p>
+      {goalLabels.length ? (
+        <div style={{ marginTop: 22 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: OB.inkTertiary, textAlign: "center" }}>{c.yourGoal}</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginTop: 10 }}>
+            {goalLabels.map((g) => (
+              <span key={g!.id} style={{ display: "inline-flex", alignItems: "center", gap: 6, borderRadius: 999, background: "#fff", border: "1px solid color-mix(in srgb, #2E62C4 25%, transparent)", padding: "9px 14px", fontSize: 15, fontWeight: 600 }}>
+                {g!.emoji} {g!.label[lang]}
+              </span>
+            ))}
+          </div>
         </div>
       ) : null}
-      <Footer><PrimaryBtn disabled={!answered} onClick={onNext}>{c.next}</PrimaryBtn></Footer>
+      <h2 style={{ fontSize: 20, fontWeight: 800, marginTop: 28 }}>{c.coursesWaiting}</h2>
+      <div style={{ display: "flex", gap: 12, overflowX: "auto", marginTop: 14, paddingBottom: 8, scrollbarWidth: "none" }}>
+        {courses.map((course) => (
+          <div key={course.id} style={{ position: "relative", flexShrink: 0, width: 168, height: 214, borderRadius: 20, overflow: "hidden", background: OB.ink }}>
+            <img src={course.img} alt="" loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+            <span style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 35%, rgba(0,0,0,.75))" }} />
+            <div style={{ position: "absolute", left: 12, right: 12, bottom: 12 }}>
+              <span className="ob-pill">{course.subject}</span>
+              <p style={{ color: "#fff", fontSize: 15, fontWeight: 700, lineHeight: 1.25, margin: "6px 0 0" }}>{course.title[lang]}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      {ready ? <PrimaryBtn onClick={onNext}>{c.profileCta}</PrimaryBtn> : <div style={{ height: 76 }} />}
     </>
   );
 }
 
-function Building({ lang, onDone }: { lang: StartLang; onDone: () => void }) {
-  const c = COPY[lang];
-  const [pct, setPct] = useState(0);
-  const done = useRef(false);
-  useEffect(() => {
-    const t = window.setInterval(() => setPct((p) => Math.min(100, p + 4)), 100);
-    return () => window.clearInterval(t);
-  }, []);
-  useEffect(() => {
-    if (pct >= 100 && !done.current) { done.current = true; window.setTimeout(onDone, 400); }
-  }, [pct, onDone]);
-  return (
-    <Centered>
-      <div className="ob-ring mx-auto" style={{ "--p": `${pct * 3.6}deg` } as React.CSSProperties}><span>{pct}%</span></div>
-      <h1 className="ob-title mt-8 text-center">{c.buildingTitle}</h1>
-      <ul className="mx-auto mt-6 flex flex-col gap-3">
-        {c.buildingSteps.map((s, i) => {
-          const on = pct >= (i + 1) * 30;
-          return (
-            <li key={s} className={`flex items-center gap-3 font-semibold transition-opacity ${on ? "text-brand-navy" : "text-brand-navySoft opacity-50"}`}>
-              <span className={`inline-flex size-6 items-center justify-center rounded-full ${on ? "bg-brand-pink" : "bg-brand-line"}`}>{on ? <Check className="size-3.5" aria-hidden="true" /> : null}</span>{s}
-            </li>
-          );
-        })}
-      </ul>
-    </Centered>
-  );
-}
-
-function Result({ lang, a, onNext }: { lang: StartLang; a: Answers; onNext: () => void }) {
-  const c = COPY[lang];
-  const plan = useMemo(() => buildPlan(a.interests), [a.interests]);
-  const score = a.quiz.filter((x, i) => x === QUIZ[i]!.correct).length;
-  const label = (id: string) => INTERESTS.find((i) => i.id === id);
+function EmailStep({ lang, c, value, onSubmit, onSkip }: {
+  lang: StartLang; c: C; value: string; onSubmit: (email: string) => void; onSkip: () => void;
+}) {
+  const [email, setEmail] = useState(value);
+  const [error, setError] = useState(false);
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   return (
     <>
-      <h1 className="ob-title mt-4">{c.resultTitle}</h1>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <span className="ob-chip">🏆 {c.resultScore(score)}</span>
-        <span className="ob-chip">⏱️ {c.resultMinutes(a.time ?? "5")}</span>
+      <div className="ob-spacer" />
+      <h1 className="ob-title-lg">{c.emailTitle}</h1>
+      <p className="ob-sub">{c.emailSub}</p>
+      <div className="ob-reveal" style={{ "--d": "150ms", display: "flex", alignItems: "center", gap: 10, borderRadius: 14, background: "color-mix(in srgb, #F2548F 8%, transparent)", padding: "12px 14px", marginTop: 22 } as React.CSSProperties}>
+        <TrendingUp style={{ width: 20, height: 20, color: OB.pink, flexShrink: 0 }} />
+        <span style={{ fontSize: 14, fontWeight: 600 }}><Highlight text={c.emailStat} /></span>
       </div>
-      <ol className="mt-6 flex flex-col gap-3">
-        {plan.map((id, w) => (
-          <li key={w} className="ob-card flex items-center gap-4">
-            <span className="text-3xl" aria-hidden="true">{label(id)?.emoji}</span>
-            <span className="flex flex-col">
-              <span className="text-xs font-bold uppercase tracking-widest text-brand-pink">{c.planWeek(w + 1)} · {c.planWeeks[w]}</span>
-              <span className="font-extrabold text-brand-navy">{label(id)?.label[lang]}</span>
-            </span>
-          </li>
-        ))}
-      </ol>
-      <Footer><PrimaryBtn onClick={onNext}>{c.resultCta}</PrimaryBtn></Footer>
+      <div className="ob-reveal" style={{ "--d": "250ms", borderRadius: 20, border: `1px solid ${OB.hairline}`, background: "#fff", padding: 16, marginTop: 16, display: "flex", gap: 12, alignItems: "flex-start" } as React.CSSProperties}>
+        <span style={{ width: 38, height: 38, borderRadius: 10, background: "color-mix(in srgb, #2E62C4 12%, transparent)", display: "grid", placeItems: "center", fontSize: 18, flexShrink: 0 }}>🔔</span>
+        <span>
+          <span style={{ display: "block", fontSize: 12, fontWeight: 600, color: OB.inkTertiary }}>Sophia</span>
+          <span style={{ display: "block", fontSize: 15, fontWeight: 700 }}>{c.notifTitle}</span>
+          <span style={{ display: "block", fontSize: 14, color: OB.inkSecondary }}>{c.notifBody}</span>
+        </span>
+      </div>
+      <ul style={{ listStyle: "none", padding: 0, margin: "18px 0 0", display: "flex", flexDirection: "column", gap: 8 }}>
+        {c.emailBullets.map((b) => <li key={b} style={{ fontSize: 15, fontWeight: 500 }}>{b}</li>)}
+      </ul>
+      <form style={{ marginTop: 18 }} onSubmit={(e) => { e.preventDefault(); if (valid) onSubmit(email.trim()); else setError(true); }}>
+        <input className="ob-input" type="email" inputMode="email" autoComplete="email" style={{ fontSize: 17 }}
+          placeholder={c.emailPlaceholder} value={email}
+          onChange={(e) => { setEmail(e.target.value); setError(false); }} />
+        {error ? <p style={{ color: OB.danger, fontSize: 13, fontWeight: 600, textAlign: "center", marginTop: 8 }}>{c.emailInvalid}</p> : null}
+      </form>
+      <PrimaryBtn onClick={() => (valid ? onSubmit(email.trim()) : setError(true))}>{c.emailCta}</PrimaryBtn>
+      <div style={{ textAlign: "center" }}>
+        <button type="button" className="ob-link ob-link-soft" onClick={onSkip}>{c.maybeLater}</button>
+      </div>
     </>
   );
 }
 
-function StoreLinks({ lang, src, iosFirst }: { lang: StartLang; src: string; iosFirst: boolean }) {
-  const c = COPY[lang];
-  const play = `${PLAY_STORE_URL}&referrer=${encodeURIComponent(`utm_source=${src}&utm_medium=web_start`)}`;
-  const links = [
-    { id: "ios", href: appStoreHref(), label: c.appStore, Icon: Apple },
-    { id: "android", href: play, label: c.play, Icon: Play },
-  ];
-  if (!iosFirst) links.reverse();
+function AccountStep({ lang, c, value, onSubmit }: { lang: StartLang; c: C; value: string; onSubmit: (email: string) => void }) {
+  const [email, setEmail] = useState(value);
+  const [error, setError] = useState(false);
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   return (
-    <div className="flex flex-col gap-3">
-      {links.map(({ id, href, label, Icon }, i) => (
-        <a key={id} href={href} className={i === 0 ? "ob-primary" : "ob-secondary"} onClick={() => trackStart("store_click", { store: id })}>
-          <Icon className="size-5" aria-hidden="true" />{label}
-        </a>
-      ))}
+    <>
+      <div className="ob-spacer" />
+      <div style={{ display: "grid", placeItems: "center", marginBottom: 22 }}>
+        <span style={{ width: 96, height: 96, borderRadius: 999, background: "color-mix(in srgb, #2E62C4 12%, transparent)", display: "grid", placeItems: "center" }}>
+          <UserCheck style={{ width: 44, height: 44, color: OB.accentSoft }} />
+        </span>
+      </div>
+      <h1 className="ob-title">{c.accountTitle}</h1>
+      <p className="ob-sub">{c.accountSub}</p>
+      <form style={{ marginTop: 26 }} onSubmit={(e) => { e.preventDefault(); if (valid) onSubmit(email.trim()); else setError(true); }}>
+        <input className="ob-input" type="email" inputMode="email" autoComplete="email" style={{ fontSize: 17 }}
+          placeholder={c.emailPlaceholder} value={email}
+          onChange={(e) => { setEmail(e.target.value); setError(false); }} />
+        {error ? <p style={{ color: OB.danger, fontSize: 13, fontWeight: 600, textAlign: "center", marginTop: 8 }}>{c.emailInvalid}</p> : null}
+      </form>
+      <PrimaryBtn onClick={() => (valid ? onSubmit(email.trim()) : setError(true))}>{c.continue}</PrimaryBtn>
+      <p style={{ textAlign: "center", fontSize: 11, color: OB.inkTertiary, marginTop: 14 }}>
+        {c.accountLegal} {c.accountLegalLinks}
+      </p>
+    </>
+  );
+}
+
+function TrialStep({ lang, c, onNext }: { lang: StartLang; c: C; onNext: () => void }) {
+  const endDate = new Date(Date.now() + PRICING.yearly.trialDays * 86400000);
+  const formatted = new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-US", { day: "numeric", month: "long" }).format(endDate);
+  const icons = [
+    <Check key="c" className="size-5" strokeWidth={3} />,
+    <LockOpen key="l" className="size-5" />,
+    <Bell key="b" className="size-5" />,
+    <Star key="s" className="size-5" />,
+  ];
+  return (
+    <>
+      <div className="ob-spacer" />
+      <h1 className="ob-title-lg ob-title-left">{c.trialTitle}</h1>
+      <div style={{ display: "flex", flexDirection: "column", marginTop: 30, position: "relative" }}>
+        <span style={{ position: "absolute", left: 19, top: 20, bottom: 20, width: 3, borderRadius: 3, background: "color-mix(in srgb, #2E62C4 18%, transparent)" }} aria-hidden="true" />
+        {c.trialSteps.map((s, i) => {
+          const active = i < 2;
+          return (
+            <div key={s.title} className="ob-reveal" style={{ "--d": `${i * 160}ms`, display: "flex", gap: 16, minHeight: 46, marginBottom: 18 } as React.CSSProperties}>
+              <span style={{
+                width: 40, height: 40, borderRadius: 999, flexShrink: 0, display: "grid", placeItems: "center", zIndex: 1,
+                background: active ? OB.accentSoft : OB.surfaceMuted, color: active ? "#fff" : OB.inkTertiary,
+              }}>
+                {icons[i]}
+              </span>
+              <span>
+                <span style={{ display: "block", fontSize: 17, fontWeight: 700, color: i === 1 ? OB.accentSoft : active ? OB.ink : OB.inkSecondary }}>{s.title}</span>
+                <span style={{ display: "block", fontSize: 15, fontWeight: 500, color: OB.inkSecondary, marginTop: 2 }}>
+                  {i === 3 ? c.trialEndsBody(formatted) : s.body}
+                </span>
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <PrimaryBtn onClick={onNext}>{c.trialCta}</PrimaryBtn>
+    </>
+  );
+}
+
+function LegalRow({ c, storeHref }: { c: C; storeHref: string }) {
+  return (
+    <div className="ob-legal">
+      <a href={storeHref} style={{ color: "inherit" }}>{c.legalLogin}</a>
+      <span>·</span><span>{c.legalTerms}</span>
+      <span>·</span><span>{c.legalPrivacy}</span>
+    </div>
+  );
+}
+
+function PaywallB({ lang, c, plan, onPlan, onClose, onCta, storeHref }: {
+  lang: StartLang; c: C; plan: "yearly" | "monthly";
+  onPlan: (p: "yearly" | "monthly") => void; onClose: () => void; onCta: () => void; storeHref: string;
+}) {
+  const rows: [string, boolean, boolean][] = [
+    [c.cmpRows[0]!, true, true], [c.cmpRows[1]!, true, true], [c.cmpRows[2]!, false, true],
+    [c.cmpRows[3]!, false, true], [c.cmpRows[4]!, false, true], [c.cmpRows[5]!, false, true],
+  ];
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", position: "relative" }}>
+      <button type="button" className="ob-x" aria-label="Close" onClick={onClose}><X className="size-4" /></button>
+      <div style={{ height: 52 }} />
+      <h1 className="ob-title ob-title-left">{c.paywallBTitle}</h1>
+      <div className="ob-cmp">
+        <table>
+          <thead>
+            <tr>
+              <th />
+              <th style={{ fontSize: 12, fontWeight: 600, color: OB.inkTertiary }}>{c.freeCol}</th>
+              <th className="ob-pro-col">
+                <Crown style={{ width: 16, height: 16, color: OB.gold, margin: "0 auto 4px" }} fill="currentColor" strokeWidth={0} />
+                <span className="ob-pro-pill">PRO</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(([label, free, pro]) => (
+              <tr key={label}>
+                <td>{label}</td>
+                <td className="ob-cmp-cell" style={{ color: free ? OB.inkTertiary : "color-mix(in srgb, #9AA4B2 60%, transparent)" }}>
+                  {free ? <Check className="size-4" style={{ margin: "0 auto" }} /> : <X className="size-4" style={{ margin: "0 auto" }} />}
+                </td>
+                <td className="ob-cmp-cell ob-pro-col">
+                  {pro ? (
+                    <span style={{ width: 22, height: 22, borderRadius: 999, background: OB.accentSoft, color: "#fff", display: "inline-grid", placeItems: "center" }}>
+                      <Check className="size-3" strokeWidth={3.5} />
+                    </span>
+                  ) : <X className="size-4" style={{ margin: "0 auto" }} />}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: "auto", paddingTop: 18 }}>
+        <button type="button" className="ob-plan" data-on={plan === "yearly"} onClick={() => onPlan("yearly")}>
+          <span className="ob-save">{c.planSave}</span>
+          <span style={{ flex: 1 }}>
+            <span style={{ display: "block", fontSize: 16, fontWeight: 700 }}>{c.planYearly}</span>
+            <span style={{ display: "block", fontSize: 13, fontWeight: 500, color: OB.inkSecondary }}>{c.planYearlyBilled}</span>
+          </span>
+          <span style={{ textAlign: "right" }}>
+            <span style={{ display: "block", fontSize: 17, fontWeight: 700 }}>{c.planYearlyPer}</span>
+            <span style={{ display: "block", fontSize: 11, fontWeight: 700, color: OB.success }}>{c.planTrialBadge}</span>
+          </span>
+        </button>
+        <button type="button" className="ob-plan" data-on={plan === "monthly"} onClick={() => onPlan("monthly")}>
+          <span style={{ flex: 1 }}>
+            <span style={{ display: "block", fontSize: 16, fontWeight: 700 }}>{c.planMonthly}</span>
+            <span style={{ display: "block", fontSize: 13, fontWeight: 500, color: OB.inkSecondary }}>{c.planMonthlyBilled}</span>
+          </span>
+          <span style={{ fontSize: 17, fontWeight: 700 }}>{c.planMonthlyPer}</span>
+        </button>
+        <button type="button" className="ob-primary" style={{ marginTop: 4 }} onClick={onCta}>
+          {plan === "yearly" ? c.trialCtaLong : c.subscribeNow}
+        </button>
+        <LegalRow c={c} storeHref={storeHref} />
+      </div>
     </div>
   );
 }
