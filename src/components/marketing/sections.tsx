@@ -1,5 +1,5 @@
 import { useEffect, useState, type CSSProperties } from "react";
-import { BellRing, BookOpen, Brain, FlaskConical, Headphones, Hand, Pause, Plus, Trophy } from "lucide-react";
+import { BellRing, BookOpen, FlaskConical, Headphones, Hand, Pause, Plus, Trophy } from "lucide-react";
 import {
   ABOARD_FLOATERS, ARCHETYPES, AUTHOR_PHOTOS, INTRO_COURSES, REVIEWS, SWIPE_BASE, TOPICS, UNIVERSITY_LOGOS, screenYears,
 } from "@/config/onboarding";
@@ -496,4 +496,3 @@ export function FinalCta() {
   );
 }
 
-export { Brain };

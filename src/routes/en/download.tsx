@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DownloadPage } from "@/components/pages/DownloadPage";
+import { MarketingDownload } from "@/components/marketing/pages";
 import { langLinks, meta } from "@/lib/seo";
 
 export const Route = createFileRoute("/en/download")({
@@ -13,5 +13,5 @@ export const Route = createFileRoute("/en/download")({
     }),
     links: langLinks("download", "en"),
   }),
-  component: DownloadPage,
+  component: MarketingDownload,
 });
