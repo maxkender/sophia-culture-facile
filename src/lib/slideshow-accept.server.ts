@@ -5,7 +5,7 @@ import { countryCodeOf, langOfCountry } from "@/config/countries";
 
 type Admin = any;
 export type Langue = "fr" | "en" | "es" | "it" | "pt" | "de";
-export type AcceptInput = { applicationId: string; apps?: ("sophia" | "unswipe")[]; zone?: "A" | "B" | "C"; langue?: Langue };
+export type AcceptInput = { applicationId: string; apps?: ("sophia" | "unswipe")[]; zone?: "A" | "B" | "C"; langue?: Langue; startMonday?: string };
 export type AcceptBy = { id: string | null; name: string };
 type Zones = Awaited<ReturnType<typeof getOsZones>> | null;
 
@@ -55,7 +55,7 @@ export async function acceptSlideshowApplication(a: Admin, input: AcceptInput, b
   const zone = input.zone ?? d.zone;
   const langue = input.langue ?? d.langue;
   if (!zone) throw new Error("No pay zone for this country");
-  const monday = nextStartMonday();
+  const monday = input.startMonday ?? nextStartMonday();
   const token = randomToken();
   const now = new Date().toISOString();
   await a.from("slideshow_applications").update({
