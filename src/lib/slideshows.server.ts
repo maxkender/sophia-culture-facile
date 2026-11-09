@@ -171,7 +171,7 @@ export async function buildWeek(admin: Admin, lundi = addDays(mondayOf(), -7)) {
     const row: Record<string, unknown> = { application_id: p.id, week_start: lundi, zone: p.zone, rate: base, first_week: first };
     const missed = Number(snap?.manques ?? 0);
     // Owner decision 17/10: pay does NOT depend on missed posts. Counts stay on the row for information only.
-    const suggested = Math.max(0, base) // owner 09/11: first week paid like every other week;
+    const suggested = Math.max(0, base); // owner 09/11: first week paid like every other week
     Object.assign(row, { status: "draft", skip_reason: null, prevus: snap?.prevus ?? null, publies: snap?.publies ?? null, manques: snap ? missed : null, suggested, amount: suggested, carried_in: carriedIn, ...(!snap ? { note: "Manual week — confirm attendance and adjust amount before approval" } : {}) });
     built++;
     await admin.from("slideshow_payouts").upsert(row, { onConflict: "application_id,week_start" });
