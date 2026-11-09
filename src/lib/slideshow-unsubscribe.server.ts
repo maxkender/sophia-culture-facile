@@ -21,5 +21,5 @@ export function unsubscribeUrl(email: string): string {
 
 /** Sets unsubscribed_at on every slideshow application with this email (first time only). */
 export async function markUnsubscribed(admin: any, email: string) {
-  await admin.from("slideshow_applications").update({ unsubscribed_at: new Date().toISOString() }).ilike("email", norm(email)).is("unsubscribed_at", null);
+  await admin.from("slideshow_applications").update({ unsubscribed_at: new Date().toISOString() }).ilike("email", norm(email).replace(/[%_\\]/g, "\\$&")).is("unsubscribed_at", null);
 }
