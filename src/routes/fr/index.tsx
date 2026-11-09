@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MarketingHome } from "@/components/marketing/pages";
+import { HomePage } from "@/components/pages/HomePage";
 import {
   faqSchema,
   ldScript,
@@ -25,5 +25,5 @@ export const Route = createFileRoute("/fr/")({
       ldScript(faqSchema("fr")),
     ],
   }),
-  component: MarketingHome,
+  component: HomePage,
 });
