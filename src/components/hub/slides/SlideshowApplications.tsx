@@ -25,6 +25,7 @@ import {
   rejectPoster,
   retryOs,
   saveRuulEmail,
+  sendSignatureReminders,
   tickStep,
 } from "@/lib/slideshows.functions";
 import { RUUL_BLOCKED } from "@/lib/ruul";
@@ -37,6 +38,64 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { STATUS_LABEL, useOsStatus, OS_UI_ENABLED } from "./useOs";
+
+/** Accepted, not signed, not unsubscribed/expired: the only applications a signature reminder can go to. */
+export const canRemind = (a: App) =>
+  ["accepted", "approved"].includes(a.status) &&
+  !a.agreement_signed_at &&
+  !a.contract_signed_at &&
+  !(a as Record<string, unknown>)["unsubscribed_at"] &&
+  !a.expired_at;
+
+/** "Send signature reminder": always asks for confirmation, then emails the signing link once per application. */
+function RemindButton({ targets, label }: { targets: App[]; label: string }) {
+  const qc = useQueryClient();
+  const send = useServerFn(sendSignatureReminders);
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const list = targets.filter(canRemind);
+  if (!list.length) return null;
+  async function go() {
+    setBusy(true);
+    try {
+      const r = await send({ data: { applicationIds: list.map((a) => a.id) } });
+      toast.success(`${r.sent} reminder${r.sent === 1 ? "" : "s"} sent${r.skipped.length ? ` · ${r.skipped.length} skipped` : ""}`);
+      setOpen(false);
+      void qc.invalidateQueries({ queryKey: ["hub", "slides"] });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <>
+      <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+        {label}
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send signature reminder</DialogTitle>
+            <DialogDescription>
+              {list.length} accepted applicant{list.length === 1 ? "" : "s"} who have not signed will get the email
+              with their signing link.
+            </DialogDescription>
+          </DialogHeader>
+          <p className="max-h-48 overflow-auto text-sm">{list.map((a) => a.full_name).join(", ")}</p>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setOpen(false)} disabled={busy}>
+              Cancel
+            </Button>
+            <Button onClick={() => void go()} disabled={busy}>
+              {busy ? "Sending…" : `Send ${list.length}`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 const sel = "h-9 rounded-lg border border-brand-line bg-card px-2 text-sm";
@@ -225,6 +284,12 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
           ))}
         </select>
         <div className="ml-auto flex gap-2">
+          {status === "accepted" ? (
+            <RemindButton
+              targets={rows}
+              label={`Send signature reminder (${rows.filter(canRemind).length})`}
+            />
+          ) : null}
           <AcceptAllValidButton n={validCount} />
           {country !== "all" ? (
             <AcceptAllButton
@@ -270,6 +335,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
           >
             Refuse
           </Button>
+          <RemindButton targets={selected} label="Send signature reminder" />
           <Button size="sm" variant="ghost" onClick={() => setChecked([])}>
             Clear
           </Button>
@@ -629,7 +695,26 @@ export function PosterCard({
           <b>Emails sent</b>
           <p>Acknowledgement · {fmt(a.ack_sent_at) || "—"}</p>
           <p>Acceptance · {fmt(a.accepted_at) || "—"}</p>
+          {(
+            [
+              ["remind_1", "Signature reminder J+1"],
+              ["remind_2", "Signature reminder J+3"],
+              ["remind_3", "Signature reminder J+6"],
+              ["remind_manual", "Signature reminder (manual)"],
+            ] as const
+          ).map(([k, l]) =>
+            tl[k] ? (
+              <p key={k}>
+                {l} · {fmt(tl[k]?.at)}
+              </p>
+            ) : null,
+          )}
           <p>Logins · {fmt(tl["logins_sent"]?.at) || "—"}</p>
+          {canRemind(a) ? (
+            <div className="pt-1">
+              <RemindButton targets={[a]} label="Send signature reminder" />
+            </div>
+          ) : null}
           {a.status === "rejected" ? <p>Refusal · {fmt(a.decided_at) || "—"}</p> : null}
         </div>
         {a.admin_notes ? (

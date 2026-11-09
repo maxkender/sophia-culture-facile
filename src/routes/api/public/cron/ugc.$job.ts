@@ -10,7 +10,13 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
         const given = request.headers.get("x-cron-secret") ?? "";
         const envSecret = process.env["LOVABLE_CRON_SECRET"];
         const { data: cfg } = await a.from("ugc_settings").select("cron_token").eq("id", 1).maybeSingle();
-        if (!given || (given !== envSecret && given !== cfg?.cron_token)) return new Response("Unauthorized", { status: 401 });
+        const secretOk = Boolean(given) && (given === envSecret || given === cfg?.cron_token);
+        if (!secretOk) {
+          // Managed schedules authenticate with a bearer token instead of x-cron-secret.
+          const { authenticateCronRequest } = await import("@/integrations/supabase/cron-auth");
+          const authFailure = await authenticateCronRequest(request);
+          if (authFailure) return authFailure;
+        }
         // Schedules fire at two UTC hours to follow Paris daylight saving; only the one matching Paris time runs.
         const wantHour = new URL(request.url).searchParams.get("parisHour");
         if (wantHour) {
@@ -65,6 +71,11 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
           if (params.job === "budget") {
             const { applyBudgetCap } = await import("@/lib/hub-automation.server");
             return Response.json(await applyBudgetCap(a));
+          }
+          if (params.job === "slides-remind") {
+            const { runSignatureReminders } = await import("@/lib/slideshow-reminders.server");
+            const { withLock } = await import("@/lib/hub-automation.server");
+            return Response.json(await withLock(a, "slides-remind", 15, () => runSignatureReminders(a)));
           }
           if (params.job === "slides-pool-expiry") {
             const { expirePool } = await import("@/lib/slideshows.server");
