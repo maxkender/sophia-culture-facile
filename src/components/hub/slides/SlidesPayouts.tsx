@@ -167,7 +167,7 @@ export function SlidesPayouts() {
           onClick={() =>
             void go(
               () => approve({ data: { lundi } }),
-              (r) => `${r.approved} approved, ${r.carried} carried over (under $20)`,
+              (r) => `${r.approved} approved, ${r.skipped} skipped (nothing to pay)`,
             )
           }
         >

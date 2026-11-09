@@ -234,23 +234,26 @@ export const buildWeekNow = createServerFn({ method: "POST" })
     return buildWeek(await admin(), data.lundi);
   });
 
-/** Approve a week: rows under the 20 $ minimum (with carry-over) are carried to the next week. */
+/** Approve a week: every draft row above 0 is approved (no per-poster minimum, paid every Monday); rows at 0 are skipped. */
 export const approveWeek = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ lundi: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).parse(d))
   .handler(async ({ data, context }) => {
     const me = await assertAdmin(context);
     const a = await admin();
-    const { MIN_PAYOUT } = await import("./slideshows.server");
     const { data: rows } = await a.from("slideshow_payouts").select("id, amount, carried_in").eq("week_start", data.lundi).eq("status", "draft");
-    let approved = 0, carried = 0;
+    let approved = 0, skipped = 0;
     for (const r of rows ?? []) {
       const total = Number(r.amount ?? 0) + Number(r.carried_in ?? 0);
-      const status = total < MIN_PAYOUT ? "carried" : "approved";
-      await a.from("slideshow_payouts").update({ status, approved_by: me.id, approved_at: new Date().toISOString() }).eq("id", r.id);
-      if (status === "approved") approved++; else carried++;
+      if (total > 0) {
+        await a.from("slideshow_payouts").update({ status: "approved", approved_by: me.id, approved_at: new Date().toISOString() }).eq("id", r.id);
+        approved++;
+      } else {
+        await a.from("slideshow_payouts").update({ status: "skipped", skip_reason: "Nothing to pay this week" }).eq("id", r.id);
+        skipped++;
+      }
     }
-    return { ok: true, approved, carried };
+    return { ok: true, approved, skipped };
   });
 
 export const payWeekStripe = createServerFn({ method: "POST" })
