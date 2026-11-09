@@ -74,6 +74,7 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
           }
           if (params.job === "slides-remind") {
             const { runSignatureReminders } = await import("@/lib/slideshow-reminders.server");
+            const { withLock } = await import("@/lib/hub-automation.server");
             return Response.json(await withLock(a, "slides-remind", 15, () => runSignatureReminders(a)));
           }
           if (params.job === "slides-pool-expiry") {
