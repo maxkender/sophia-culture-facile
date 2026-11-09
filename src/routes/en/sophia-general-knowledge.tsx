@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MarketingApp } from "@/components/marketing/pages";
+import { LandingPage } from "@/components/pages/LandingPage";
 import { langLinks, ldScript, meta, mobileApplicationSchema } from "@/lib/seo";
 
 export const Route = createFileRoute("/en/sophia-general-knowledge")({
@@ -14,5 +14,5 @@ export const Route = createFileRoute("/en/sophia-general-knowledge")({
     links: langLinks("landing", "en"),
     scripts: [ldScript(mobileApplicationSchema("en"))],
   }),
-  component: MarketingApp,
+  component: LandingPage,
 });
