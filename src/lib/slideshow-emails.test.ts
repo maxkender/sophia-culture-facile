@@ -17,14 +17,14 @@ describe("acceptance signing deadline", () => {
 
 describe("Slack invite link in poster emails", () => {
   it("acceptance email adds the Join Slack link after the Slack bullet (EN + FR labels)", async () => {
-    await posterEmails.accepted("p@example.com", "Test P", "en", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, 15, null, SLACK_URL);
+    await posterEmails.accepted("p@example.com", "Test P", "en", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, null, SLACK_URL);
     let html = sendCalls[0]!.html;
     expect(html).toContain(`href="${SLACK_URL}"`);
     expect(html).toContain(">Join Slack</a>");
     expect(sendCalls[0]!.text).toContain(`Join Slack: ${SLACK_URL}`);
 
     sendCalls.length = 0;
-    await posterEmails.accepted("p@example.com", "Test P", "fr", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, 15, null, SLACK_URL);
+    await posterEmails.accepted("p@example.com", "Test P", "fr", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, null, SLACK_URL);
     html = sendCalls[0]!.html;
     expect(html).toContain(`href="${SLACK_URL}"`);
     expect(html).toContain(">Rejoindre Slack</a>");
@@ -32,21 +32,21 @@ describe("Slack invite link in poster emails", () => {
   });
 
   it("acceptance email without Slack setting has no link", async () => {
-    await posterEmails.accepted("p@example.com", "Test P", "en", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, 15, null, null);
+    await posterEmails.accepted("p@example.com", "Test P", "en", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, null, null);
     expect(sendCalls[0]!.html).not.toContain("join.slack.com");
   });
 
-  it("logins email puts the link right after #ruul-cohort in the money line", async () => {
-    await posterEmails.logins("p@example.com", "Test P", "en", { osUrl: "https://os.example", login: "os@x", password: "pw", slack: SLACK_URL, monday: "2026-10-26", ruulEmail: "p@example.com", weekly: 14, first: 15 });
+  it("logins email puts the link right after #ruul-questions in the money line", async () => {
+    await posterEmails.logins("p@example.com", "Test P", "en", { osUrl: "https://os.example", login: "os@x", password: "pw", slack: SLACK_URL, monday: "2026-10-26", ruulEmail: "p@example.com", weekly: 14 });
     const html = sendCalls[0]!.html;
-    // "#ruul-cohort" is immediately followed by the clickable link, then the tail.
-    expect(html).toContain(`#ruul-cohort <a href="${SLACK_URL}"`);
+    // "#ruul-questions" is immediately followed by the clickable link, then the tail.
+    expect(html).toContain(`#ruul-questions <a href="${SLACK_URL}"`);
     expect(html).toContain(`>Join Slack</a>, never in the channel.`);
     expect(sendCalls[0]!.text).toContain(`Join Slack: ${SLACK_URL}`);
   });
 
   it("logins email without Slack setting keeps the plain money line", async () => {
-    await posterEmails.logins("p@example.com", "Test P", "en", { osUrl: "https://os.example", login: "os@x", password: "pw", slack: null, monday: "2026-10-26", ruulEmail: "p@example.com", weekly: 14, first: 15 });
+    await posterEmails.logins("p@example.com", "Test P", "en", { osUrl: "https://os.example", login: "os@x", password: "pw", slack: null, monday: "2026-10-26", ruulEmail: "p@example.com", weekly: 14 });
     expect(sendCalls[0]!.html).toContain("never in the channel.");
     expect(sendCalls[0]!.html).not.toContain("join.slack.com");
   });

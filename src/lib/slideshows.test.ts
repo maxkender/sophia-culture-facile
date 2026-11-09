@@ -17,11 +17,11 @@ function fixture(existing = false, future = false) {
   return { sb, writes };
 }
 describe("manual slideshow week", () => {
-  it("prepares a draft without OS data, plus $1 first week, never pays", async () => {
+  it("prepares a draft without OS data, first week at the normal rate, never pays", async () => {
     const { sb, writes } = fixture();
     const result = await buildWeek(sb, "2026-10-05");
     expect(result.built).toBe(1);
-    expect(writes[0]).toMatchObject({ status: "draft", amount: 15, rate: 14, first_week: true, manques: null });
+    expect(writes[0]).toMatchObject({ status: "draft", amount: 14, rate: 14, first_week: true, manques: null });
     expect(writes[0]?.["note"]).toContain("Manual week");
   });
   it("does not overwrite an edited existing draft", async () => { const { sb, writes } = fixture(true); await buildWeek(sb, "2026-10-05"); expect(writes).toHaveLength(0); });

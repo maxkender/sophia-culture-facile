@@ -268,7 +268,6 @@ export function SlidesPayouts() {
               <th className="p-3">Poster</th>
               <th className="p-3">Zone</th>
               <th className="p-3">Zone rate</th>
-              <th className="p-3">First week</th>
               <th className="p-3">Posts</th>
               <th className="p-3">Missed</th>
               <th className="p-3">Suggested</th>
@@ -310,7 +309,6 @@ export function SlidesPayouts() {
                       {r.first_week ? " · 1st week" : ""}
                     </td>
                     <td className="p-3">${Number(r.rate ?? 0)}</td>
-                    <td className="p-3">{r.first_week ? "+$1" : "—"}</td>
                     <td className="p-3">
                       {r.prevus ?? "—"}/{r.publies ?? "—"}
                     </td>
