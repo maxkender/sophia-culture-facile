@@ -40,7 +40,7 @@ export function PayZonesSettings({ compact = false }: { compact?: boolean }) {
     const { error } = await supabase
       .from("pay_zones")
       // Owner 09/11: slideshow first week pays the same as every week — keep first_week_amount in sync.
-      .update({ ...patch, ...(patch.weekly_amount != null ? { first_week_amount: patch.weekly_amount } : {}), updated_at: new Date().toISOString() })
+      .update({ ...patch, ...(patch["weekly_amount"] != null ? { first_week_amount: patch["weekly_amount"] } : {}), updated_at: new Date().toISOString() })
       .eq("zone", zone);
     if (error) toast.error("Could not save.");
     else {
