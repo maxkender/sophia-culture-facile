@@ -39,7 +39,8 @@ export function PayZonesSettings({ compact = false }: { compact?: boolean }) {
   async function saveZone(zone: string, patch: Record<string, number | null>) {
     const { error } = await supabase
       .from("pay_zones")
-      .update({ ...patch, updated_at: new Date().toISOString() })
+      // Owner 09/11: slideshow first week pays the same as every week — keep first_week_amount in sync.
+      .update({ ...patch, ...(patch.weekly_amount != null ? { first_week_amount: patch.weekly_amount } : {}), updated_at: new Date().toISOString() })
       .eq("zone", zone);
     if (error) toast.error("Could not save.");
     else {
@@ -126,22 +127,6 @@ export function PayZonesSettings({ compact = false }: { compact?: boolean }) {
                         onBlur={(e) => {
                           if (e.target.value && Number(e.target.value) !== Number(z.weekly_amount))
                             void saveZone(z.zone, { weekly_amount: Number(e.target.value) });
-                        }}
-                      />
-                      <span className="text-xs text-brand-navySoft">First week</span>
-                      <Input
-                        aria-label={`First week rate ${z.zone}`}
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        className="h-8 w-24"
-                        defaultValue={z.first_week_amount ?? ""}
-                        onBlur={(e) => {
-                          if (
-                            e.target.value &&
-                            Number(e.target.value) !== Number(z.first_week_amount)
-                          )
-                            void saveZone(z.zone, { first_week_amount: Number(e.target.value) });
                         }}
                       />
                     </div>
@@ -297,8 +282,8 @@ export function PayZonesSettings({ compact = false }: { compact?: boolean }) {
     <PortalCard className="md:col-span-2">
       <p className="text-sm font-bold text-brand-navy">Weekly pay per zone</p>
       <p className="mt-1 text-xs text-brand-navySoft">
-        Figures in USD per week, 2 posts a day, 7 days a week. The first week pays the first-week
-        figure. A country not listed has no zone: "country not open" (still kept in the pool).
+        Figures in USD per week, 2 posts a day, 7 days a week. The first week pays the same as every
+        other week. A country not listed has no zone: "country not open" (still kept in the pool).
       </p>
       <div className="mt-4 overflow-x-auto">
         <table className="w-full min-w-[520px] text-sm">
@@ -306,7 +291,6 @@ export function PayZonesSettings({ compact = false }: { compact?: boolean }) {
             <tr className="text-left text-xs uppercase text-brand-navySoft">
               <th className="py-2">Zone</th>
               <th>Per week</th>
-              <th>First week</th>
               <th>Posts/day</th>
             </tr>
           </thead>
@@ -320,7 +304,7 @@ export function PayZonesSettings({ compact = false }: { compact?: boolean }) {
                     Zone {z.zone}
                   </span>
                 </td>
-                {(["weekly_amount", "first_week_amount", "posts_per_day"] as const).map((f) => (
+                {(["weekly_amount", "posts_per_day"] as const).map((f) => (
                   <td key={f} className="pr-2">
                     <Input
                       type="number"
