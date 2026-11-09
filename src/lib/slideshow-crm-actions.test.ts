@@ -108,4 +108,12 @@ describe("slideshow CRM actions preserve existing handlers (isolated, no sends)"
     expect(fake.writes).toHaveLength(1);
     expect(fake.writes[0]).toMatchObject({ status: "approved", approved_by: "admin" });
   });
+  it("approves a $7 week (no per-poster minimum) and skips a $0 row", async () => {
+    fake.writes.length = 0;
+    fake.drafts = [{ id: "c", amount: 7, carried_in: 0 }, { id: "z", amount: 0, carried_in: 0 }];
+    const r = (await invoke(approveWeek, { lundi: "2026-11-02" })) as { approved: number; skipped: number };
+    expect(r).toMatchObject({ approved: 1, skipped: 1 });
+    expect(fake.writes[0]).toMatchObject({ status: "approved" });
+    expect(fake.writes[1]).toMatchObject({ status: "skipped" });
+  });
 });
