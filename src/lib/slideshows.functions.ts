@@ -63,6 +63,16 @@ async function stamp(a: any, appId: string, key: string, by: string, patch: Reco
   await a.from("slideshow_applications").update({ ...patch, timeline }).eq("id", appId);
 }
 
+/** Admin "Send signature reminder" (single or bulk): skips signed, refused, expired or unsubscribed applications. */
+export const sendSignatureReminders = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ applicationIds: z.array(id).min(1).max(100) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const me = await assertAdmin(context);
+    const { sendManualReminders } = await import("./slideshow-reminders.server");
+    return sendManualReminders(await admin(), data.applicationIds, me.name);
+  });
+
 /** Accept: choose app(s), confirm zone; sets start Monday, creates the contract link and emails the applicant. */
 export const acceptPoster = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
