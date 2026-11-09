@@ -1,0 +1,1 @@
+ALTER TABLE public.slideshow_applications ADD COLUMN IF NOT EXISTS unsubscribed_at timestamptz;
