@@ -16,7 +16,7 @@ UGC acceptance/onboarding mutations use authenticated server functions to valida
 - Authors admin uses ADMIN_AUTHOR_NAV only; creator tracks use /hub, with reciprocal sidebar-bottom links and 301s from old creator-admin URLs; why: keep spaces separate.
 - Prospects grid prefs/views live in admin_ui_prefs; why: follow the admin across devices.
 
-- Space routing is decided by src/lib/account-role.ts (admin > author > creator > none) in the /auteurs gate, the creator space and both login pages; why: one login never shows the wrong space.
+- Space routing is decided by src/lib/account-role.ts (admin > author > creator > influencer > none) in the /auteurs gate, the creator space and both login pages; why: one login never shows the wrong space.
 
 - Slideshow pay zones: country_zones/pay_zones drive slideshow_applications.zone by trigger; the guide is merged server-side (slideshow-zones.functions.ts) so no other zone figures reach the client. UGC never uses zones.
 - Creator-facing forms use the shared creator-validation utility before showing failures; why: raw validation, database, or payment-provider errors must never reach creators.
