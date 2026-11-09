@@ -965,7 +965,7 @@ export function PosterCard({
               </select>
               {z ? (
                 <span className="text-xs">
-                  ${Number(z.weekly_amount)}/week · first week ${Number(z.first_week_amount)}
+                  ${Number(z.weekly_amount)}/week
                 </span>
               ) : null}
             </div>

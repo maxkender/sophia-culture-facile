@@ -310,7 +310,7 @@ export function SlidesPayouts() {
                       {r.first_week ? " · 1st week" : ""}
                     </td>
                     <td className="p-3">${Number(r.rate ?? 0)}</td>
-                    <td className="p-3">{r.first_week ? "+$1" : "—"}</td>
+                    <td className="p-3">—</td>
                     <td className="p-3">
                       {r.prevus ?? "—"}/{r.publies ?? "—"}
                     </td>

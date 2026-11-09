@@ -414,7 +414,7 @@ function ZonePanel({ app, onChange }: { app: SlideshowApplication; onChange: (ne
       <div className="flex flex-wrap items-center gap-2">
         <ZoneBadge zone={app.zone} />
         {info?.pz ? (
-          <span className="text-brand-navy">${Number(info.pz.weekly_amount)}/week · first week ${Number(info.pz.first_week_amount)}</span>
+          <span className="text-brand-navy">${Number(info.pz.weekly_amount)}/week</span>
         ) : null}
         {app.zone === "A" && info?.ceiling && info.pz?.ceiling_amount ? (
           <span className="text-xs text-brand-navySoft">ceiling ${Number(info.pz.ceiling_amount)}, only as a response to a refusal</span>
@@ -438,7 +438,7 @@ function ZonePanel({ app, onChange }: { app: SlideshowApplication; onChange: (ne
         <div className="space-y-1 border-t border-brand-line pt-3">
           <p className="text-xs text-brand-navySoft">
             {app.guide_opened_at
-              ? `Guide opened ${formatDateTime(app.guide_opened_at)} · Zone ${app.guide_zone_shown ?? "?"} figures shown${shown ? ` ($${shown.weekly_amount ?? "?"}/week, first week $${shown.first_week_amount ?? "?"})` : ""}`
+              ? `Guide opened ${formatDateTime(app.guide_opened_at)} · Zone ${app.guide_zone_shown ?? "?"} figures shown${shown ? ` ($${shown.weekly_amount ?? "?"}/week)` : ""}`
               : "Guide not opened yet."}
           </p>
           {app.zone ? <Button type="button" size="sm" variant="outline" onClick={() => void pdf()}>Download guide PDF</Button> : null}

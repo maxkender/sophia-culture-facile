@@ -66,10 +66,10 @@ export async function acceptSlideshowApplication(a: Admin, input: AcceptInput, b
   const { data: tlRow } = await a.from("slideshow_applications").select("timeline").eq("id", app.id).maybeSingle();
   await a.from("slideshow_applications").update({ timeline: { ...(tlRow?.timeline ?? {}), accepted: { at: new Date().toISOString(), by: by.name } } }).eq("id", app.id);
   const site = process.env["SITE_URL"] ?? "https://sophia-culture.com";
-  const { data: zr } = await a.from("pay_zones").select("weekly_amount, first_week_amount").eq("zone", zone).maybeSingle();
+  const { data: zr } = await a.from("pay_zones").select("weekly_amount").eq("zone", zone).maybeSingle();
   const guideUrl = (await a.from("hub_settings").select("value").eq("key", "slideshow_poster_guide_url").maybeSingle()).data?.value ?? null;
   const slackUrl = (await a.from("hub_settings").select("value").eq("key", "slideshow_slack_invite_url").maybeSingle()).data?.value ?? null;
-  const sent = await posterEmails.accepted(app.email, app.full_name, langue, monday, `${site}/creators/sign/${token}`, zr?.weekly_amount != null ? Number(zr.weekly_amount) : null, zr?.first_week_amount != null ? Number(zr.first_week_amount) : null, guideUrl, slackUrl);
+  const sent = await posterEmails.accepted(app.email, app.full_name, langue, monday, `${site}/creators/sign/${token}`, zr?.weekly_amount != null ? Number(zr.weekly_amount) : null, guideUrl, slackUrl);
   return { ok: true as const, startMonday: monday, emailed: sent.sent, reason: sent.reason ?? null, name: app.full_name as string, country: app.country as string };
 }
 
