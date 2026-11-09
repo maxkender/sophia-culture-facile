@@ -7,6 +7,8 @@ import { getSigningPage, signWithToken } from "@/lib/creator-agreement.functions
 import { creatorAgreementBlocks, TRACK_LABEL } from "@/lib/creator-agreement";
 import { parseBlocks } from "@/lib/documents";
 import { CreatorAgreementForm } from "@/components/creators/CreatorAgreementForm";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/creators/sign/$token")({
   head: () => ({
@@ -28,6 +30,8 @@ function SignPage() {
   const load = useServerFn(getSigningPage);
   const sign = useServerFn(signWithToken);
   const [done, setDone] = useState(false);
+  const [ruulEmail, setRuulEmail] = useState("");
+  const ruulOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ruulEmail.trim());
   const { data, isLoading } = useQuery({ queryKey: ["sign", token], queryFn: () => load({ data: { token } }), retry: false });
 
   let body: React.ReactNode;
@@ -43,9 +47,17 @@ function SignPage() {
         version={data.version}
         blocks={creatorAgreementBlocks(parseBlocks(data.content), "slideshow")}
         merge={{ legal_name: data.name, country: data.country, email: data.email, track: TRACK_LABEL.slideshow }}
+        extraValid={ruulOk}
+        extraField={
+          <div className="space-y-2">
+            <Label htmlFor="ruul-email">Your Ruul email</Label>
+            <Input id="ruul-email" type="email" required value={ruulEmail} maxLength={254} onChange={(e) => setRuulEmail(e.target.value)} className="h-11" autoComplete="email" />
+            <p className="text-xs text-brand-navySoft">Create your free Ruul account with this email address. Ruul is where you will be paid every week.</p>
+          </div>
+        }
         onSign={async (signedName) => {
           try {
-            await sign({ data: { token, signedName, documentVersion: data.version, userAgent: navigator.userAgent.slice(0, 400) } });
+            await sign({ data: { token, signedName, ruulEmail: ruulEmail.trim(), documentVersion: data.version, userAgent: navigator.userAgent.slice(0, 400) } });
             setDone(true);
           } catch (e: any) {
             toast.error(e?.message ?? "The signature could not be recorded.");

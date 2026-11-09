@@ -6084,6 +6084,7 @@ export type Database = {
           stripe_onboarded: boolean
           submit_ip_hash: string | null
           timeline: Json
+          unsubscribed_at: string | null
           unswipe_code_id: string | null
           upwork_profile_url: string | null
           wise_email: string | null
@@ -6154,6 +6155,7 @@ export type Database = {
           stripe_onboarded?: boolean
           submit_ip_hash?: string | null
           timeline?: Json
+          unsubscribed_at?: string | null
           unswipe_code_id?: string | null
           upwork_profile_url?: string | null
           wise_email?: string | null
@@ -6224,6 +6226,7 @@ export type Database = {
           stripe_onboarded?: boolean
           submit_ip_hash?: string | null
           timeline?: Json
+          unsubscribed_at?: string | null
           unswipe_code_id?: string | null
           upwork_profile_url?: string | null
           wise_email?: string | null

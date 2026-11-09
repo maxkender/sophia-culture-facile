@@ -46,6 +46,7 @@ export function buildEmailHtml(options: {
   postParagraphs?: string[];
   linkSection?: { text: string; url: string; linkLabel: string };
   section?: EmailSection;
+  footer?: { text: string; linkLabel: string; url: string };
 }): string {
   const { paragraphs, bullets, buttonLabel, buttonUrl } = options;
   const body = paragraphs
@@ -72,6 +73,7 @@ export function buildEmailHtml(options: {
 <div style="max-width:560px;margin:0 auto;padding:32px 24px;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;font-size:15px;line-height:1.6;">
 <p style="margin:0 0 24px;font-weight:700;letter-spacing:0.02em;">Sophia</p>
 ${body}${list}${extraLink}${postParagraphs}${section}${button}${linkSection}
+${options.footer ? `<p style="margin:24px 0 0;font-size:12px;color:#888888;">${escapeHtml(options.footer.text)} <a href="${escapeAttribute(options.footer.url)}" style="color:#888888;">${escapeHtml(options.footer.linkLabel)}</a></p>` : ""}
 <p style="margin:24px 0 0;font-size:12px;color:#888888;">Sophia — apprendre la culture facilement. sophia-culture.com</p>
 </div></body></html>`;
 }

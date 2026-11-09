@@ -3,7 +3,7 @@ export const BREVO_SENDER = { name: "Maximilien — Sophia", email: "maximilien@
 
 export type BrevoResult = { sent: boolean; messageId?: string; reason?: string };
 
-export async function sendBrevoEmail(opts: { to: string; toName?: string; subject: string; html: string; text: string }): Promise<BrevoResult> {
+export async function sendBrevoEmail(opts: { to: string; toName?: string; subject: string; html: string; text: string; headers?: Record<string, string> }): Promise<BrevoResult> {
   const key = process.env["BREVO_API_KEY"];
   if (!key) return { sent: false, reason: "brevo_key_missing" };
   if (/@fastlane\.sophia-culture\.com$/i.test(opts.to.trim())) return { sent: false, reason: "email_pending" };
@@ -18,6 +18,7 @@ export async function sendBrevoEmail(opts: { to: string; toName?: string; subjec
         subject: opts.subject,
         htmlContent: opts.html,
         textContent: opts.text,
+        ...(opts.headers ? { headers: opts.headers } : {}),
       }),
     });
     const body = await res.json().catch(() => ({}));

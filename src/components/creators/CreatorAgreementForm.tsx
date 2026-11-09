@@ -13,12 +13,16 @@ export function CreatorAgreementForm({
   blocks,
   merge,
   onSign,
+  extraField,
+  extraValid = true,
 }: {
   title: string;
   version: string;
   blocks: DocBlock[];
   merge: MergeValues;
   onSign: (signedName: string) => Promise<void>;
+  extraField?: React.ReactNode;
+  extraValid?: boolean;
 }) {
   const [accepted, setAccepted] = useState(false);
   const [name, setName] = useState("");
@@ -26,7 +30,7 @@ export function CreatorAgreementForm({
 
   async function submit(e: FormEvent) {
     e.preventDefault();
-    if (!accepted || name.trim().length < 2) return;
+    if (!accepted || name.trim().length < 2 || !extraValid) return;
     setBusy(true);
     try {
       await onSign(name.trim());
@@ -54,10 +58,11 @@ export function CreatorAgreementForm({
           <Label htmlFor="signed-name">{ct("Your full legal name")}</Label>
           <Input id="signed-name" value={name} maxLength={160} onChange={(e) => setName(e.target.value)} className="h-11" autoComplete="name" />
         </div>
+        {extraField}
         <p className="text-xs text-brand-navySoft">
           Signing records your typed name, the date and time, your IP address, your browser and document version {version}.
         </p>
-        <Button type="submit" disabled={busy || !accepted || name.trim().length < 2}>
+        <Button type="submit" disabled={busy || !accepted || name.trim().length < 2 || !extraValid}>
           {busy ? "Signing…" : "Sign"}
         </Button>
       </form>

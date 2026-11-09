@@ -78,7 +78,7 @@ export async function createPosterInOs(admin: Admin, applicationId: string) {
   const r = await callOs<{ profile_id: string; email_os: string; password: string | null; langue?: string | null; manager: { id: string; prenom: string; nom: string; email: string } | null; existed: boolean; deja_connecte?: boolean }>(admin, "creer_posteur", {
     hub_id: a.id, prenom, nom: rest.join(" "), email_perso: a.email, telephone: a.phone, pays_code: code, pays_nom: a.country,
     langue: a.langue ?? "en", zone_paiement: a.zone, applications: a.applications ?? [], deux_telephones: Boolean(a.deux_telephones), source: "site", start_monday: a.start_monday,
-    ref: a.ref ?? null,
+    ref: a.ref ?? null, ruul_email: a.ruul_email ?? null,
   });
   if (!r.ok) {
     const friendly = osErrorInWords(r.error, a.langue);

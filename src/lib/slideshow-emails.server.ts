@@ -2,6 +2,7 @@
 import { buildEmailHtml, emailSectionText, type EmailSection } from "./email-send.server";
 import { sendBrevoEmail, type BrevoResult } from "./brevo.server";
 import type { ApplicantLang } from "@/config/countries";
+import { unsubscribeUrl } from "./slideshow-unsubscribe.server";
 
 type L = ApplicantLang;
 const LANGS: L[] = ["fr", "en", "es", "it", "pt", "de"];
@@ -136,9 +137,11 @@ const T = {
 };
 
 async function send(to: string, name: string, subject: string, paragraphs: string[], button?: { label: string; url: string }, bullets?: string[], section?: EmailSection, extraLink?: { label: string; url: string }, postParagraphs?: string[]): Promise<BrevoResult> {
-  const html = buildEmailHtml({ paragraphs, ...(bullets ? { bullets } : {}), ...(extraLink ? { extraLink } : {}), ...(postParagraphs?.length ? { postParagraphs } : {}), ...(section ? { section } : {}), ...(button ? { buttonLabel: button.label, buttonUrl: button.url } : {}) });
-  const text = [...paragraphs, ...(bullets ?? []), ...(extraLink ? [`${extraLink.label}: ${extraLink.url}`] : []), ...(postParagraphs ?? []), ...(section ? emailSectionText(section) : []), ...(button ? [`${button.label}: ${button.url}`] : [])].join("\n\n");
-  return sendBrevoEmail({ to, toName: name, subject, html, text });
+  const unsub = unsubscribeUrl(to);
+  const footer = { text: "You can also reply STOP.", linkLabel: "Unsubscribe", url: unsub };
+  const html = buildEmailHtml({ paragraphs, footer, ...(bullets ? { bullets } : {}), ...(extraLink ? { extraLink } : {}), ...(postParagraphs?.length ? { postParagraphs } : {}), ...(section ? { section } : {}), ...(button ? { buttonLabel: button.label, buttonUrl: button.url } : {}) });
+  const text = [...paragraphs, ...(bullets ?? []), ...(extraLink ? [`${extraLink.label}: ${extraLink.url}`] : []), ...(postParagraphs ?? []), ...(section ? emailSectionText(section) : []), ...(button ? [`${button.label}: ${button.url}`] : []), `${footer.text} ${footer.linkLabel}: ${unsub}`].join("\n\n");
+  return sendBrevoEmail({ to, toName: name, subject, html, text, headers: { "List-Unsubscribe": `<${unsub}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } });
 }
 const first = (n: string) => n.trim().split(/\s+/)[0] ?? n;
 
@@ -173,6 +176,9 @@ export const posterEmails = {
   },
   rejected: (to: string, name: string, l: L, reason: string | null) =>
     send(to, name, T.rejected.subject[l], [hi[l](first(name)), T.rejected.body[l], ...(reason ? [`${T.rejected.reason[l]} ${reason}`] : [])]),
+  /** Signature reminder (English for every language). */
+  remindSignature: (to: string, name: string, link: string) =>
+    send(to, name, "Your contract is waiting for your signature", [`Hi ${first(name)}, your contract is waiting for your signature. It takes 2 minutes: ${link}`]),
   expired: (to: string, name: string, l: L) => send(to, name, T.expired.subject[l], [hi[l](first(name)), T.expired.body[l]]),
   logins: (to: string, name: string, l: L, o: { osUrl: string; login: string; password: string; slack: string | null; monday: string; ruulEmail: string; weekly: number | null; first: number | null }) => {
     const x = T.logins.lines[l];
