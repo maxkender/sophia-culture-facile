@@ -17,6 +17,7 @@ import { Route as CareersRouteImport } from './routes/careers'
 import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
 import { Route as DevenirProfesseurRouteImport } from './routes/devenir-professeur'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
+import { Route as PosterUnsubscribeRouteImport } from './routes/poster-unsubscribe'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SophiaCultureGeneraleRouteImport } from './routes/sophia-culture-generale'
@@ -75,6 +76,7 @@ import { Route as AuthenticatedHubLearnRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedHubMessagesRouteImport } from './routes/_authenticated/hub/messages'
 import { Route as AuthenticatedHubPayoutsRouteImport } from './routes/_authenticated/hub/payouts'
 import { Route as AuthenticatedHubSettingsRouteImport } from './routes/_authenticated/hub/settings'
+import { Route as ApiPublicOsCandidaturesRouteImport } from './routes/api/public/os-candidatures'
 import { Route as ApiPublicOsEmailRouteImport } from './routes/api/public/os-email'
 import { Route as ApiPublicOsEmailEventsRouteImport } from './routes/api/public/os-email-events'
 import { Route as CreatorsAppIndexRouteImport } from './routes/creators.app.index'
@@ -255,6 +257,11 @@ const DevenirProfesseurRoute = DevenirProfesseurRouteImport.update({
 const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
   id: '/mentions-legales',
   path: '/mentions-legales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PosterUnsubscribeRoute = PosterUnsubscribeRouteImport.update({
+  id: '/poster-unsubscribe',
+  path: '/poster-unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -562,6 +569,11 @@ const AuthenticatedHubSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
+const ApiPublicOsCandidaturesRoute = ApiPublicOsCandidaturesRouteImport.update({
+  id: '/api/public/os-candidatures',
+  path: '/api/public/os-candidatures',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicOsEmailRoute = ApiPublicOsEmailRouteImport.update({
   id: '/api/public/os-email',
   path: '/api/public/os-email',
@@ -1373,6 +1385,7 @@ export interface FileRoutesByFullPath {
   '/confidentialite': typeof ConfidentialiteRoute
   '/devenir-professeur': typeof DevenirProfesseurRoute
   '/mentions-legales': typeof MentionsLegalesRoute
+  '/poster-unsubscribe': typeof PosterUnsubscribeRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
@@ -1429,6 +1442,7 @@ export interface FileRoutesByFullPath {
   '/hub/messages': typeof AuthenticatedHubMessagesRoute
   '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/hub/settings': typeof AuthenticatedHubSettingsRoute
+  '/api/public/os-candidatures': typeof ApiPublicOsCandidaturesRoute
   '/api/public/os-email': typeof ApiPublicOsEmailRoute
   '/api/public/os-email-events': typeof ApiPublicOsEmailEventsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
@@ -1582,6 +1596,7 @@ export interface FileRoutesByTo {
   '/confidentialite': typeof ConfidentialiteRoute
   '/devenir-professeur': typeof DevenirProfesseurRoute
   '/mentions-legales': typeof MentionsLegalesRoute
+  '/poster-unsubscribe': typeof PosterUnsubscribeRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
@@ -1636,6 +1651,7 @@ export interface FileRoutesByTo {
   '/hub/messages': typeof AuthenticatedHubMessagesRoute
   '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/hub/settings': typeof AuthenticatedHubSettingsRoute
+  '/api/public/os-candidatures': typeof ApiPublicOsCandidaturesRoute
   '/api/public/os-email': typeof ApiPublicOsEmailRoute
   '/api/public/os-email-events': typeof ApiPublicOsEmailEventsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
@@ -1790,6 +1806,7 @@ export interface FileRoutesById {
   '/confidentialite': typeof ConfidentialiteRoute
   '/devenir-professeur': typeof DevenirProfesseurRoute
   '/mentions-legales': typeof MentionsLegalesRoute
+  '/poster-unsubscribe': typeof PosterUnsubscribeRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
@@ -1846,6 +1863,7 @@ export interface FileRoutesById {
   '/_authenticated/hub/messages': typeof AuthenticatedHubMessagesRoute
   '/_authenticated/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/_authenticated/hub/settings': typeof AuthenticatedHubSettingsRoute
+  '/api/public/os-candidatures': typeof ApiPublicOsCandidaturesRoute
   '/api/public/os-email': typeof ApiPublicOsEmailRoute
   '/api/public/os-email-events': typeof ApiPublicOsEmailEventsRoute
   '/creators/app/account': typeof CreatorsAppAccountRoute
@@ -2001,6 +2019,7 @@ export interface FileRouteTypes {
     | '/confidentialite'
     | '/devenir-professeur'
     | '/mentions-legales'
+    | '/poster-unsubscribe'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sophia-culture-generale'
@@ -2057,6 +2076,7 @@ export interface FileRouteTypes {
     | '/hub/messages'
     | '/hub/payouts'
     | '/hub/settings'
+    | '/api/public/os-candidatures'
     | '/api/public/os-email'
     | '/api/public/os-email-events'
     | '/creators/app/account'
@@ -2210,6 +2230,7 @@ export interface FileRouteTypes {
     | '/confidentialite'
     | '/devenir-professeur'
     | '/mentions-legales'
+    | '/poster-unsubscribe'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sophia-culture-generale'
@@ -2264,6 +2285,7 @@ export interface FileRouteTypes {
     | '/hub/messages'
     | '/hub/payouts'
     | '/hub/settings'
+    | '/api/public/os-candidatures'
     | '/api/public/os-email'
     | '/api/public/os-email-events'
     | '/creators/app/account'
@@ -2417,6 +2439,7 @@ export interface FileRouteTypes {
     | '/confidentialite'
     | '/devenir-professeur'
     | '/mentions-legales'
+    | '/poster-unsubscribe'
     | '/reset-password'
     | '/sitemap.xml'
     | '/sophia-culture-generale'
@@ -2473,6 +2496,7 @@ export interface FileRouteTypes {
     | '/_authenticated/hub/messages'
     | '/_authenticated/hub/payouts'
     | '/_authenticated/hub/settings'
+    | '/api/public/os-candidatures'
     | '/api/public/os-email'
     | '/api/public/os-email-events'
     | '/creators/app/account'
@@ -2628,6 +2652,7 @@ export interface RootRouteChildren {
   ConfidentialiteRoute: typeof ConfidentialiteRoute
   DevenirProfesseurRoute: typeof DevenirProfesseurRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
+  PosterUnsubscribeRoute: typeof PosterUnsubscribeRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SophiaCultureGeneraleRoute: typeof SophiaCultureGeneraleRoute
@@ -2669,6 +2694,7 @@ export interface RootRouteChildren {
   CreatorsIndexRoute: typeof CreatorsIndexRoute
   EnIndexRoute: typeof EnIndexRoute
   FrIndexRoute: typeof FrIndexRoute
+  ApiPublicOsCandidaturesRoute: typeof ApiPublicOsCandidaturesRoute
   ApiPublicOsEmailRoute: typeof ApiPublicOsEmailRoute
   ApiPublicOsEmailEventsRoute: typeof ApiPublicOsEmailEventsRoute
   CreatorsInfluencerAppRoute: typeof CreatorsInfluencerAppRouteWithChildren
@@ -2769,6 +2795,13 @@ declare module '@tanstack/react-router' {
       path: '/mentions-legales'
       fullPath: '/mentions-legales'
       preLoaderRoute: typeof MentionsLegalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/poster-unsubscribe': {
+      id: '/poster-unsubscribe'
+      path: '/poster-unsubscribe'
+      fullPath: '/poster-unsubscribe'
+      preLoaderRoute: typeof PosterUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -3176,6 +3209,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/hub/settings'
       preLoaderRoute: typeof AuthenticatedHubSettingsRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
+    }
+    '/api/public/os-candidatures': {
+      id: '/api/public/os-candidatures'
+      path: '/api/public/os-candidatures'
+      fullPath: '/api/public/os-candidatures'
+      preLoaderRoute: typeof ApiPublicOsCandidaturesRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/os-email': {
       id: '/api/public/os-email'
@@ -4516,6 +4556,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfidentialiteRoute: ConfidentialiteRoute,
   DevenirProfesseurRoute: DevenirProfesseurRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
+  PosterUnsubscribeRoute: PosterUnsubscribeRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SophiaCultureGeneraleRoute: SophiaCultureGeneraleRoute,
@@ -4558,6 +4599,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsIndexRoute: CreatorsIndexRoute,
   EnIndexRoute: EnIndexRoute,
   FrIndexRoute: FrIndexRoute,
+  ApiPublicOsCandidaturesRoute: ApiPublicOsCandidaturesRoute,
   ApiPublicOsEmailRoute: ApiPublicOsEmailRoute,
   ApiPublicOsEmailEventsRoute: ApiPublicOsEmailEventsRoute,
   CreatorsInfluencerAppRoute: CreatorsInfluencerAppRouteWithChildren,
