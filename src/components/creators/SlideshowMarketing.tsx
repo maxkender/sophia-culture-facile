@@ -12,8 +12,10 @@ export function SlideshowMarketing({lang}:{lang:string}) {
   const [open,setOpen]=useState(false);
   const [choice,setChoice]=useState<MarketingConsent|null>(null);
   useEffect(()=>{
-    const sync=()=>{const c=browserConsent();setChoice(c);setOpen(!c);browserAttribution();if(!marketingAllowed())revokeSlideshowPixel();else void slideshowMetaConfig().then(config=>{if(marketingAllowed()&&config.connected)initializeSlideshowPixel(config.pixelId);}).catch(()=>{});};
-    sync();window.addEventListener("storage",sync);window.addEventListener("slideshow-consent",sync);return()=>{window.removeEventListener("storage",sync);window.removeEventListener("slideshow-consent",sync);};
+    setOpen(!browserConsent());
+    const sync=()=>{const c=browserConsent();setChoice(c);browserAttribution();if(!marketingAllowed())revokeSlideshowPixel();else void slideshowMetaConfig().then(config=>{if(marketingAllowed()&&config.connected)initializeSlideshowPixel(config.pixelId);}).catch(()=>{});};
+    const onStorage=(event:StorageEvent)=>{if(event.key===CONSENT_KEY){sync();setOpen(false);}};
+    sync();window.addEventListener("storage",onStorage);window.addEventListener("slideshow-consent",sync);return()=>{window.removeEventListener("storage",onStorage);window.removeEventListener("slideshow-consent",sync);};
   },[]);
   function choose(accepted:boolean){
     const gpc=Boolean((navigator as Navigator&{globalPrivacyControl?:boolean}).globalPrivacyControl);
