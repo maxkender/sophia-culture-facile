@@ -140,6 +140,7 @@ import { Route as AuthenticatedHubInfluencersIndexRouteImport } from './routes/_
 import { Route as AuthenticatedHubInfluencersSectionRouteImport } from './routes/_authenticated/hub/influencers/$section'
 import { Route as AuthenticatedHubSlideshowsIndexRouteImport } from './routes/_authenticated/hub/slideshows/index'
 import { Route as AuthenticatedHubSlideshowsSectionRouteImport } from './routes/_authenticated/hub/slideshows/$section'
+import { Route as AuthenticatedHubSlideshowsParcoursRuulRouteImport } from './routes/_authenticated/hub/slideshows/parcours-ruul'
 import { Route as AuthenticatedHubToolsSplatRouteImport } from './routes/_authenticated/hub/tools.$'
 import { Route as AuthenticatedHubUgcIndexRouteImport } from './routes/_authenticated/hub/ugc/index'
 import { Route as AuthenticatedHubUgcAdsRouteImport } from './routes/_authenticated/hub/ugc/ads'
@@ -913,6 +914,12 @@ const AuthenticatedHubSlideshowsSectionRoute =
     path: '/slideshows/$section',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
+const AuthenticatedHubSlideshowsParcoursRuulRoute =
+  AuthenticatedHubSlideshowsParcoursRuulRouteImport.update({
+    id: '/slideshows/parcours-ruul',
+    path: '/slideshows/parcours-ruul',
+    getParentRoute: () => AuthenticatedHubRouteRoute,
+  } as any)
 const AuthenticatedHubToolsSplatRoute =
   AuthenticatedHubToolsSplatRouteImport.update({
     id: '/tools/$',
@@ -1502,6 +1509,7 @@ export interface FileRoutesByFullPath {
   '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
   '/hub/influencers/$section': typeof AuthenticatedHubInfluencersSectionRoute
   '/hub/slideshows/$section': typeof AuthenticatedHubSlideshowsSectionRoute
+  '/hub/slideshows/parcours-ruul': typeof AuthenticatedHubSlideshowsParcoursRuulRoute
   '/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
   '/hub/ugc/ads': typeof AuthenticatedHubUgcAdsRoute
   '/hub/ugc/analytics': typeof AuthenticatedHubUgcAnalyticsRoute
@@ -1710,6 +1718,7 @@ export interface FileRoutesByTo {
   '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
   '/hub/influencers/$section': typeof AuthenticatedHubInfluencersSectionRoute
   '/hub/slideshows/$section': typeof AuthenticatedHubSlideshowsSectionRoute
+  '/hub/slideshows/parcours-ruul': typeof AuthenticatedHubSlideshowsParcoursRuulRoute
   '/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
   '/hub/ugc/ads': typeof AuthenticatedHubUgcAdsRoute
   '/hub/ugc/analytics': typeof AuthenticatedHubUgcAnalyticsRoute
@@ -1923,6 +1932,7 @@ export interface FileRoutesById {
   '/_authenticated/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
   '/_authenticated/hub/influencers/$section': typeof AuthenticatedHubInfluencersSectionRoute
   '/_authenticated/hub/slideshows/$section': typeof AuthenticatedHubSlideshowsSectionRoute
+  '/_authenticated/hub/slideshows/parcours-ruul': typeof AuthenticatedHubSlideshowsParcoursRuulRoute
   '/_authenticated/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
   '/_authenticated/hub/ugc/ads': typeof AuthenticatedHubUgcAdsRoute
   '/_authenticated/hub/ugc/analytics': typeof AuthenticatedHubUgcAnalyticsRoute
@@ -2136,6 +2146,7 @@ export interface FileRouteTypes {
     | '/hub/creators/$creatorId'
     | '/hub/influencers/$section'
     | '/hub/slideshows/$section'
+    | '/hub/slideshows/parcours-ruul'
     | '/hub/tools/$'
     | '/hub/ugc/ads'
     | '/hub/ugc/analytics'
@@ -2344,6 +2355,7 @@ export interface FileRouteTypes {
     | '/hub/creators/$creatorId'
     | '/hub/influencers/$section'
     | '/hub/slideshows/$section'
+    | '/hub/slideshows/parcours-ruul'
     | '/hub/tools/$'
     | '/hub/ugc/ads'
     | '/hub/ugc/analytics'
@@ -2556,6 +2568,7 @@ export interface FileRouteTypes {
     | '/_authenticated/hub/creators/$creatorId'
     | '/_authenticated/hub/influencers/$section'
     | '/_authenticated/hub/slideshows/$section'
+    | '/_authenticated/hub/slideshows/parcours-ruul'
     | '/_authenticated/hub/tools/$'
     | '/_authenticated/hub/ugc/ads'
     | '/_authenticated/hub/ugc/analytics'
@@ -3658,6 +3671,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHubSlideshowsSectionRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
+    '/_authenticated/hub/slideshows/parcours-ruul': {
+      id: '/_authenticated/hub/slideshows/parcours-ruul'
+      path: '/slideshows/parcours-ruul'
+      fullPath: '/hub/slideshows/parcours-ruul'
+      preLoaderRoute: typeof AuthenticatedHubSlideshowsParcoursRuulRouteImport
+      parentRoute: typeof AuthenticatedHubRouteRoute
+    }
     '/_authenticated/hub/tools/$': {
       id: '/_authenticated/hub/tools/$'
       path: '/tools/$'
@@ -4228,6 +4248,7 @@ interface AuthenticatedHubRouteRouteChildren {
   AuthenticatedHubCreatorsCreatorIdRoute: typeof AuthenticatedHubCreatorsCreatorIdRoute
   AuthenticatedHubInfluencersSectionRoute: typeof AuthenticatedHubInfluencersSectionRoute
   AuthenticatedHubSlideshowsSectionRoute: typeof AuthenticatedHubSlideshowsSectionRoute
+  AuthenticatedHubSlideshowsParcoursRuulRoute: typeof AuthenticatedHubSlideshowsParcoursRuulRoute
   AuthenticatedHubToolsSplatRoute: typeof AuthenticatedHubToolsSplatRoute
   AuthenticatedHubUgcAdsRoute: typeof AuthenticatedHubUgcAdsRoute
   AuthenticatedHubUgcAnalyticsRoute: typeof AuthenticatedHubUgcAnalyticsRoute
@@ -4269,6 +4290,8 @@ const AuthenticatedHubRouteRouteChildren: AuthenticatedHubRouteRouteChildren = {
     AuthenticatedHubInfluencersSectionRoute,
   AuthenticatedHubSlideshowsSectionRoute:
     AuthenticatedHubSlideshowsSectionRoute,
+  AuthenticatedHubSlideshowsParcoursRuulRoute:
+    AuthenticatedHubSlideshowsParcoursRuulRoute,
   AuthenticatedHubToolsSplatRoute: AuthenticatedHubToolsSplatRoute,
   AuthenticatedHubUgcAdsRoute: AuthenticatedHubUgcAdsRoute,
   AuthenticatedHubUgcAnalyticsRoute: AuthenticatedHubUgcAnalyticsRoute,

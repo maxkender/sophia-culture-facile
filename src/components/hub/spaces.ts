@@ -30,6 +30,7 @@ export const SPACE_NAV: Record<Space, NavItem[]> = {
   ],
   slideshows: [
     { to: "/hub/slideshows", label: "Home", icon: Home, exact: true, mobile: true, lead: "This week across every zone" },
+    { to: "/hub/slideshows/parcours-ruul", label: "Parcours Ruul", icon: CalendarCheck, mobile: true, lead: "From referral to payment" },
     { to: "/hub/slideshows/applications", label: "Applications", icon: Inbox, mobile: true, lead: "Pick posters one by one, country by country" },
     { to: "/hub/slideshows/posters", label: "Posters", icon: Users, mobile: true, lead: "Signed posters, start Monday and manual checklist" },
     { to: "/hub/slideshows/payouts", label: "Payouts", icon: Percent, lead: "Weekly Ruul file for started posters" },
