@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Done
-- Slideshow-only cleanup (10/11): marketing, /start, UGC, influencers, authors/Studio, UnSwipe and go links removed; old home/creator URLs 301 to the slideshow page; 12 ugc-* schedules removed; domain unchanged. Restore point 2908c0bc. Not published.
+- Slideshow-only cleanup (10/11): marketing, /start, UGC, influencers, authors/Studio, UnSwipe and go links removed; mini landing at / /en /fr; old creator URLs 301 to the slideshow page; 12 ugc-* schedules removed; domain unchanged. Restore point 2908c0bc. Not published.
 - Slideshow Sophia app source: classification, declared fallback, badges/filters/CSV and FR/EN link checks completed; 49 tests passed, authenticated Hub filters checked, no application submitted or publication.
 - Pass 2 — /start web-to-app funnel rebuilt to the iOS onboarding spec (30 steps, FR/EN, paywalls A/B, taap.it success, dataLayer events with ?src, resume, noindex). Tested end-to-end at 390px; not published.
 

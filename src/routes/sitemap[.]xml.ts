@@ -24,6 +24,7 @@ function urlEntry(opts: {
 }
 
 const STATIC_PAGES: { key: RouteKey; changefreq: string; priority: string }[] = [
+  { key: "home", changefreq: "monthly", priority: "0.8" },
   { key: "legal", changefreq: "yearly", priority: "0.3" },
   { key: "privacy", changefreq: "yearly", priority: "0.3" },
 ];

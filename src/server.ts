@@ -53,9 +53,6 @@ export function slideshowRedirect(pathname: string, lang: () => string): string 
   const p = pathname.replace(/\/+$/, "") || "/";
   const EN = "/en/creators/slideshow";
   const FR = "/fr/createurs/slideshow";
-  if (p === "/") return EN;
-  if (p === "/en") return EN;
-  if (p === "/fr") return FR;
   if (/^\/en\/creators(\/(ugc|influencer|unswipe)(\/.*)?)?$/.test(p)) return EN;
   if (/^\/fr\/creators(\/(ugc|slideshow|influencer|unswipe)(\/.*)?)?$/.test(p)) return FR;
   if (/^\/fr\/createurs(\/(ugc|influenceur|unswipe)(\/.*)?)?$/.test(p)) return FR;
