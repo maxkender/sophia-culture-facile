@@ -13,15 +13,12 @@ import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, C
 import { cn } from "@/lib/utils";
 import { useAdminApp, useApps } from "@/lib/apps";
 import { usePortalProfile } from "@/components/portal/usePortal";
-import { NotificationBell } from "@/components/portal/NotificationBell";
 import { useSetupChecklist } from "./hub-data";
-import { SidekickDrawer } from "./Sidekick";
 import { lastSpace, SPACE_ACCENT, SPACE_HOME, SPACE_KEY, SPACE_LABEL, SPACE_NAV, SPACES, spaceOf, type NavItem, type Space } from "./spaces";
 
 type Item = NavItem;
 const SHARED_TITLES: Record<string, [string, string]> = {
-  "/hub/settings": ["Settings", "Shooting rules, descriptions, Notion, payments and team"],
-  "/hub/ugc/creators": ["Creators", "Creator file"],
+  "/hub/settings": ["Settings", "OS connection, team and security"],
 };
 
 function isActive(pathname: string, i: Item) {
@@ -76,31 +73,18 @@ function GlobalSearch({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
     queryKey: ["hub", "search-index"],
     enabled: open,
     queryFn: async () => {
-      const [c, p, b, j, s, inf, d] = await Promise.all([
-        supabase.from("creators").select("id, full_name").eq("track", "ugc").eq("is_test", false).neq("status", "pending").limit(500),
-        supabase.from("creator_posts").select("id, url").order("created_at", { ascending: false }).limit(200),
-        supabase.from("briefs").select("id, title").limit(300),
-        supabase.from("jobs").select("id, title").limit(200),
-        supabase.from("slideshow_applications").select("id, full_name, country").limit(500),
-        supabase.from("influencers").select("id, display_name").limit(500),
-        supabase.from("influencer_deals").select("id, influencers(display_name), influencer_briefs(title)").limit(300),
-      ]);
-      return { creators: c.data ?? [], posts: p.data ?? [], briefs: b.data ?? [], jobs: j.data ?? [], slides: s.data ?? [], infl: inf.data ?? [], deals: d.data ?? [] };
+      const s = await supabase.from("slideshow_applications").select("id, full_name, country").limit(500);
+      return { slides: s.data ?? [] };
     },
   });
   const go = (to: string, params?: Record<string, string>, search?: Record<string, string>) => { onOpenChange(false); void navigate({ to, params, search } as never); };
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandInput placeholder="Search every space…" />
+      <CommandInput placeholder="Search slideshows…" />
       <CommandList>
         <CommandEmpty>No result.</CommandEmpty>
         {SPACES.map((sp) => <CommandGroup key={sp} heading={`${SPACE_LABEL[sp]} · pages`}>{SPACE_NAV[sp].map((i) => <CommandItem key={i.to} value={`${SPACE_LABEL[sp]} ${i.label}`} onSelect={() => go(i.to)}>{i.label}</CommandItem>)}</CommandGroup>)}
-                <CommandGroup heading="UGC · creators">{data?.creators.map((c) => <CommandItem key={c.id} value={`creator ${c.full_name}`} onSelect={() => go("/hub/ugc/creators/$creatorId", { creatorId: c.id })}>{c.full_name}</CommandItem>)}</CommandGroup>
-        <CommandGroup heading="UGC · briefs">{data?.briefs.map((b) => <CommandItem key={b.id} value={`brief ${b.title}`} onSelect={() => go("/hub/ugc/briefs/$briefId", { briefId: b.id })}>{b.title}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="Slideshows · applications & posters">{data?.slides.map((s) => <CommandItem key={s.id} value={`slideshow ${s.full_name} ${s.country}`} onSelect={() => go("/hub/slideshows/applications", undefined, { id: s.id })}>{s.full_name} · {s.country}</CommandItem>)}</CommandGroup>
-        <CommandGroup heading="Influencers · profiles">{data?.infl.map((i) => <CommandItem key={i.id} value={`influencer ${i.display_name}`} onSelect={() => go("/hub/influencers/influencers", undefined, { id: i.id })}>{i.display_name}</CommandItem>)}</CommandGroup>
-        <CommandGroup heading="Influencers · deals">{data?.deals.map((d) => { const n = `${(d.influencers as { display_name?: string } | null)?.display_name ?? ""} · ${(d.influencer_briefs as { title?: string } | null)?.title ?? ""}`; return <CommandItem key={d.id} value={`deal ${n}`} onSelect={() => go("/hub/influencers/deals", undefined, { id: d.id })}>{n}</CommandItem>; })}</CommandGroup>
-        <CommandGroup heading="UGC · posts">{data?.posts.map((p) => <CommandItem key={p.id} value={`post ${p.url}`} onSelect={() => go("/hub/ugc/posts", undefined)}>{p.url}</CommandItem>)}</CommandGroup>
       </CommandList>
     </CommandDialog>
   );
@@ -130,8 +114,7 @@ export function HubShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [search, setSearch] = useState(false);
-  const [sidekick, setSidekick] = useState(false);
-  const [stored, setStored] = useState<Space>("ugc");
+  const [stored, setStored] = useState<Space>("slideshows");
   useEffect(() => setStored(lastSpace()), []);
   const space: Space = spaceOf(pathname) ?? stored;
   useEffect(() => { const s = spaceOf(pathname); if (s) window.localStorage.setItem(SPACE_KEY, s); }, [pathname]);
@@ -144,7 +127,7 @@ export function HubShell({ children }: { children: ReactNode }) {
 
   if (isLoading) return <div className="min-h-screen bg-portal-bg" />;
   if (profile?.role !== "admin") {
-    return <div className="flex min-h-screen items-center justify-center bg-portal-bg p-6 text-center text-brand-navy"><p>This space is for admins only. <Link className="font-bold underline" to="/auteurs">Back</Link></p></div>;
+    return <div className="flex min-h-screen items-center justify-center bg-portal-bg p-6 text-center text-brand-navy"><p>This space is for admins only. <Link className="font-bold underline" to="/auth">Sign in</Link></p></div>;
   }
 
   const nav = SPACE_NAV[space];
@@ -157,15 +140,14 @@ export function HubShell({ children }: { children: ReactNode }) {
   async function signOut() {
     qc.clear();
     await supabase.auth.signOut();
-    await navigate({ to: "/auteurs/login", replace: true });
+    await navigate({ to: "/auth", replace: true });
   }
 
   return (
     <div className="min-h-screen bg-portal-bg">
       <GlobalSearch open={search} onOpenChange={setSearch} />
-      <SidekickDrawer open={sidekick} onOpenChange={setSidekick} />
       <aside className="fixed inset-y-0 left-0 z-50 hidden w-60 flex-col border-r border-brand-line bg-card lg:flex">
-        <div className="space-y-3 px-4 pt-4"><div className="flex items-center gap-2"><Logo /><span className={cn("rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-card", accent.bg)} data-testid="space-badge">{SPACE_LABEL[space]}</span></div><SpaceSwitcher space={space} /></div>
+        <div className="space-y-3 px-4 pt-4"><div className="flex items-center gap-2"><Logo /><span className={cn("rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-card", accent.bg)} data-testid="space-badge">{SPACE_LABEL[space]}</span></div></div>
         <nav aria-label={`${SPACE_LABEL[space]} navigation`} className="flex-1 space-y-1 overflow-y-auto px-3 py-3">
           {nav.map((i) => {
             const Icon = i.icon;
@@ -174,9 +156,7 @@ export function HubShell({ children }: { children: ReactNode }) {
         </nav>
         <div className="space-y-1 border-t border-brand-line p-3">
           <AppSwitcher />
-          {space !== "ugc" ? <button type="button" onClick={() => setSidekick(true)} className="flex min-h-10 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold text-brand-navy hover:bg-brand-navy/10"><Bot className="size-4" />Assistant</button> : null}
-          {space !== "ugc" ? <Link to="/hub/settings" className={cn("flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold", pathname.startsWith("/hub/settings") ? "bg-brand-navy text-card" : "text-brand-navy hover:bg-brand-navy/10")}><Settings className="size-4" />Settings</Link> : null}
-          <Link to="/auteurs/admin" className="flex min-h-10 items-center rounded-xl px-3 text-sm font-semibold text-portal-accent hover:bg-brand-navy/10">Passer à l'espace profs →</Link>
+          <Link to="/hub/settings" className={cn("flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold", pathname.startsWith("/hub/settings") ? "bg-brand-navy text-card" : "text-brand-navy hover:bg-brand-navy/10")}><Settings className="size-4" />Settings</Link>
           <div className="flex items-center gap-2 px-1">
             <span className="flex size-8 items-center justify-center rounded-full bg-portal-accent text-xs font-bold text-card">{name.slice(0, 1)}</span>
             <span className="min-w-0 flex-1 truncate text-sm font-semibold text-brand-navy">{name}</span>
@@ -189,7 +169,6 @@ export function HubShell({ children }: { children: ReactNode }) {
         
         <header className="safe-top border-b border-brand-line bg-card">
           <div className="flex min-h-16 flex-wrap items-center gap-3 px-4 py-2 sm:px-6">
-            <div className="lg:hidden"><SpaceSwitcher space={space} /></div>
             <div className="min-w-0 flex-1">
               <h1 className="truncate text-lg font-extrabold text-brand-navy">{title}</h1>
               {space !== "slideshows" ? <p className="hidden truncate text-xs text-brand-navySoft sm:block">{lead}</p> : null}
@@ -198,9 +177,6 @@ export function HubShell({ children }: { children: ReactNode }) {
               <Search className="size-4" /> <span className="flex-1 text-left">Search Hub</span><span className="text-[10px] font-bold">⌘K</span>
             </button>
             <Button variant="ghost" size="icon" className="md:hidden" aria-label="Search" onClick={() => setSearch(true)}><Search className="size-5" /></Button>
-            {space === "ugc" ? <Button size="icon" aria-label="New brief" title="New brief" onClick={() => void navigate({ to: "/hub/ugc/briefs/$briefId", params: { briefId: "new" } })}><Plus className="size-5" /></Button>
-            : <Button size="icon" variant="outline" aria-label="Open Assistant" title="Assistant" onClick={() => setSidekick(true)}><Bot className="size-4" /></Button>}
-            <NotificationBell profileId={profile.id} />
           </div>
         </header>
         <main className={cn("safe-bottom mx-auto w-full min-w-0 max-w-7xl px-4 py-6 sm:px-6", space === "slideshows" && "slides-crm")}>{children}</main>
@@ -219,9 +195,7 @@ export function HubShell({ children }: { children: ReactNode }) {
           <DropdownMenuTrigger asChild><button type="button" className="flex min-h-14 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold text-brand-navySoft"><MoreHorizontal className="size-5" />More</button></DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="top" className="w-56">
             {nav.filter((i) => !i.mobile).map((i) => <DropdownMenuItem key={i.label} onSelect={() => void navigate({ to: i.to } as never)}>{i.label}</DropdownMenuItem>)}
-            {space !== "ugc" ? <DropdownMenuItem onSelect={() => setSidekick(true)}>Assistant</DropdownMenuItem> : null}
-            {space !== "ugc" ? <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/settings" })}>Settings</DropdownMenuItem> : null}
-            <DropdownMenuItem onSelect={() => void navigate({ to: "/auteurs/admin" })}>Passer à l'espace profs →</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => void navigate({ to: "/hub/settings" })}>Settings</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </nav>

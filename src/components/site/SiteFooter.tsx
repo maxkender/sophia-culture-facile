@@ -8,9 +8,7 @@ export function SiteFooter() {
   const { t } = useI18n();
   const legalPath = useLocalePath("legal");
   const privacyPath = useLocalePath("privacy");
-  const coursesPath = useLocalePath("courses");
-  const applyPath = useLocalePath("apply");
-  const creatorsPath = useLocalePath("creatorsUgc");
+  const creatorsPath = useLocalePath("creatorsSlideshow");
 
   return (
     <footer className="border-t border-brand-line bg-brand-surface">
@@ -25,21 +23,6 @@ export function SiteFooter() {
         </div>
 
         <ul className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-semibold text-brand-navy">
-          <li>
-            <Link to={coursesPath} className="underline-offset-4 hover:underline">
-              {t.courses.hubLink}
-            </Link>
-          </li>
-          <li>
-            <Link to="/auth" className="underline-offset-4 hover:underline">
-              {t.nav.teacherLogin}
-            </Link>
-          </li>
-          <li>
-            <Link to={applyPath} className="underline-offset-4 hover:underline">
-              {t.nav.becomeTeacher}
-            </Link>
-          </li>
           <li>
             <Link to={creatorsPath} className="underline-offset-4 hover:underline">
               {t.nav.becomeCreator}

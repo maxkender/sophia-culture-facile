@@ -1,6 +1,3 @@
-import { UGC_EMAIL_CATALOG } from "@/lib/ugc-email-texts";
-import { DraftRequiredToggle } from "./UgcDrafts";
-import { NotionSettingsCard } from "./NotionSync";
 import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -8,28 +5,14 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { AppBadge, useAdminApp } from "@/lib/apps";
 import { PayZonesSettings } from "@/components/portal/admin/PayZonesSettings";
-import { DocumentEditor } from "@/components/portal/admin/DocumentEditor";
-import { InfluencerApplications } from "@/components/portal/admin/InfluencerApplications";
-import { InfluencerBriefDetail, InfluencerBriefsList } from "@/components/portal/admin/InfluencerBriefsAdmin";
-import { InfluencerDealDetail, InfluencerDealsBoard } from "@/components/portal/admin/InfluencerDealsAdmin";
-import { InfluencerInbox } from "@/components/portal/admin/InfluencerInbox";
-import { InfluencerAdminDetail, InfluencerPayoutsAdmin, InfluencerPerformance, InfluencerSettingsAdmin, InfluencersGrid } from "@/components/portal/admin/InfluencersAdmin";
-import { AppsSettings } from "@/components/portal/admin/AppsSettings";
-import { CodesPool } from "@/components/portal/admin/CodesPool";
 import { AdminSettings } from "@/components/portal/admin/AdminSettings";
-import { IntegrationsSetup } from "@/components/portal/admin/UgcAdmin";
 import { SlideshowApplications } from "./slides/SlideshowApplications";
 import { Posters } from "./slides/Posters";
 import { PosterGuideEditor } from "./slides/PosterGuideEditor";
 import { SlidesPayouts } from "./slides/SlidesPayouts";
 import { OsConnectionCard } from "./slides/OsConnectionCard";
 import { OS_UI_ENABLED } from "./slides/useOs";
-import { GuidelinesEditor } from "@/components/creators/Guidelines";
-import { HubAccessCodes } from "./HubAccessCodes";
-import { Templates } from "./Learn";
-import { PostDescriptionSettings } from "@/components/creators/PostDescription";
 
 const card = "rounded-2xl bg-card p-5 shadow-portal";
 
@@ -94,34 +77,15 @@ export function SlideshowSection({ section, id }: { section: string; id?: string
   }
 }
 
-/* ---------------- Influencers ---------------- */
-export function InfluencersHome() {
-  return <div className="space-y-4"><p className="text-sm text-brand-navySoft">Every deal at a glance. Open one to see its deliverables, payments and messages.</p><InfluencerDealsBoard /></div>;
-}
-
-export function InfluencerSection({ section, id }: { section: string; id?: string | undefined }) {
-  switch (section) {
-    case "applications": return <InfluencerApplications />;
-    case "influencers": return id ? <InfluencerAdminDetail influencerId={id} /> : <InfluencersGrid />;
-    case "offers": return id ? <InfluencerBriefDetail briefId={id} /> : <InfluencerBriefsList />;
-    case "deals": return id ? <InfluencerDealDetail dealId={id} /> : <InfluencerDealsBoard />;
-    case "messages": return <InfluencerInbox />;
-    case "attribution": return <InfluencerPerformance />;
-    case "settings": return <div className="space-y-6"><InfluencerSettingsAdmin /><DocumentEditor slug={"influencer-agreement" as never} /></div>;
-    case "payouts": return <PaymentsOff />;
-    default: return <p className={cn(card, "text-sm")}>This page does not exist. <Link to="/hub/influencers" className="font-bold underline">Influencers home</Link></p>;
-  }
-}
-
 /** Payments are switched off (hub_settings.payments_enabled = false); payout screens stay dormant. */
 export function PaymentsOff() {
   return <p className={cn(card, "text-sm text-brand-navySoft")}>Payments are off for now. Nothing is paid and no payout is prepared.</p>;
 }
 
 /* ---------------- Settings ---------------- */
-export const SETTINGS_TABS: [string, string][] = [["ugc-guidelines", "Shooting rules"], ["post-descriptions", "Post descriptions"], ["notion", "Notion"], ["email", "Emails & team"], ["apps", "Apps & codes"], ["connections", "Connections"], ["security", "Security"]];
+export const SETTINGS_TABS: [string, string][] = [["connections", "Connections"], ["team", "Team"], ["security", "Security"]];
 
-const TRACKS = [["ugc", "UGC"], ["slideshow", "Slideshows"], ["influencer", "Influencers"]] as const;
+const TRACKS = [["slideshow", "Slideshows"]] as const;
 function Team({ track }: { track?: string } = {}) {
   const qc = useQueryClient();
   const { data } = useAdmins();
@@ -130,7 +94,7 @@ function Team({ track }: { track?: string } = {}) {
     queryFn: async () => {
       const [s, i] = await Promise.all([
         supabase.from("slideshow_applications").select("assigned_hm_id").eq("status", "pending").not("assigned_hm_id", "is", null),
-        track === "slideshow" ? Promise.resolve({ data: [] }) : supabase.from("influencer_applications").select("assigned_hm_id").eq("status", "pending").not("assigned_hm_id", "is", null),
+        Promise.resolve({ data: [] as { assigned_hm_id: string | null }[] }),
       ]);
       const q: Record<string, number> = {};
       for (const r of [...(s.data ?? []), ...(i.data ?? [])]) q[r.assigned_hm_id as string] = (q[r.assigned_hm_id as string] ?? 0) + 1;
@@ -161,32 +125,12 @@ function Team({ track }: { track?: string } = {}) {
   );
 }
 
-function EmailSettings() {
-  const [lang, setLang] = useState<"fr" | "en">("fr");
-  return (
-    <div className="space-y-4">
-      <div className={cn(card, "space-y-2 text-sm")}>
-        <div className="flex items-center gap-2"><h3 className="font-extrabold text-brand-navy">Emails to creators</h3>
-          <span className="ml-auto flex gap-1">{(["fr", "en"] as const).map((l) => <Button key={l} size="sm" variant={lang === l ? "default" : "outline"} onClick={() => setLang(l)}>{l.toUpperCase()}</Button>)}</span></div>
-        <p className="text-brand-navySoft">These are the only emails that exist. Each is sent only when someone clicks something; nothing is sent automatically.</p>
-      </div>
-      {UGC_EMAIL_CATALOG.map((e) => (
-        <div key={e.key} className={cn(card, "space-y-1 text-sm")} data-testid={`email-${e.key}`}>
-          <p className="text-xs font-bold uppercase text-brand-navySoft">{e.when}</p>
-          <p className="font-bold text-brand-navy">{e[lang].subject}</p>
-          <p className="whitespace-pre-line text-brand-navySoft">{e[lang].body}</p>
-        </div>
-      ))}
-      <Team />
-    </div>
-  );
-}
-
 export function HubSettings({ tab }: { tab?: string | undefined }) {
-  const t = pick(SETTINGS_TABS, tab === "codes" ? "apps" : tab === "team" ? "email" : tab);
+  const t = pick(SETTINGS_TABS, tab);
   const body: Record<string, ReactNode> = {
-    apps: <div className="space-y-6"><AppsSettings /><HubAccessCodes /><details className="rounded-2xl bg-card p-4 shadow-portal"><summary className="cursor-pointer text-sm font-bold">Author codes and assignment history</summary><div className="mt-4"><CodesPool /></div></details></div>, codes: null, email: <EmailSettings />, "ugc-guidelines": <div className="space-y-4"><DraftRequiredToggle /><div className={card}><GuidelinesEditor /></div></div>, "post-descriptions": <PostDescriptionSettings />, notion: <NotionSettingsCard />, connections: <div className="space-y-4">{OS_UI_ENABLED ? <OsConnectionCard /> : null}<IntegrationsSetup /></div>, team: <Team />, security: <AdminSettings />,
+    connections: <div className="space-y-4">{OS_UI_ENABLED ? <OsConnectionCard /> : null}</div>,
+    team: <Team track="slideshow" />,
+    security: <AdminSettings />,
   };
   return <div><SectionTabs base="/hub/settings" tabs={SETTINGS_TABS} current={t} />{body[t]}</div>;
 }
-

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
-import { DownloadCta } from "./DownloadCta";
 import { LanguageToggle, useI18n, useLocalePath } from "@/i18n";
 
 /**
@@ -12,8 +11,6 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
   const [scrolled, setScrolled] = useState(false);
   const { t } = useI18n();
   const homePath = useLocalePath("home");
-  const coursesPath = useLocalePath("courses");
-  const careersPath = useLocalePath("careers");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -42,39 +39,7 @@ export function SiteHeader({ bare = false }: { bare?: boolean; overDark?: boolea
           </Link>
         )}
         <div className="flex items-center gap-2">
-          {!bare && (
-            <Link
-              to={careersPath}
-              className="hidden rounded-full border border-brand-line px-3 py-1.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy/5 md:inline-flex"
-              activeProps={{ className: "underline underline-offset-4" }}
-            >
-              {t.nav.careers}
-            </Link>
-          )}
-          {!bare && (
-            <Link
-              to={coursesPath}
-              className="hidden rounded-full px-3 py-1.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy/5 sm:inline-flex"
-              activeProps={{ className: "underline underline-offset-4" }}
-            >
-              {t.courses.hubLink}
-            </Link>
-          )}
-          {!bare && (
-            <Link
-              to="/auth"
-              className="inline-flex rounded-full border border-brand-navy px-3 py-1.5 text-xs font-semibold text-brand-navy transition-colors hover:bg-brand-navy hover:text-brand-surface sm:text-sm"
-            >
-              <span className="sm:hidden">{t.nav.teacherLogin.split(" ")[0]}</span>
-              <span className="hidden sm:inline">{t.nav.teacherLogin}</span>
-            </Link>
-          )}
           <LanguageToggle />
-          <span className="hidden sm:inline-flex">
-            <DownloadCta variant="pillPink" size="pillSm">
-              {t.nav.download}
-            </DownloadCta>
-          </span>
         </div>
       </nav>
     </header>

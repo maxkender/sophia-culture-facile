@@ -13,213 +13,40 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AccountNotSetUpRouteImport } from './routes/account-not-set-up'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as CareersRouteImport } from './routes/careers'
 import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
-import { Route as DevenirProfesseurRouteImport } from './routes/devenir-professeur'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as PosterUnsubscribeRouteImport } from './routes/poster-unsubscribe'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SophiaCultureGeneraleRouteImport } from './routes/sophia-culture-generale'
-import { Route as StartRouteImport } from './routes/start'
-import { Route as TelechargerRouteImport } from './routes/telecharger'
 import { Route as DotwellKnownAppleAppSiteAssociationRouteImport } from './routes/[.]well-known.apple-app-site-association'
 import { Route as AuthenticatedHubRouteRouteImport } from './routes/_authenticated/hub/route'
-import { Route as AuteursSlugRouteImport } from './routes/auteurs.$slug'
-import { Route as AuteursInviteRouteImport } from './routes/auteurs.invite'
-import { Route as AuteursJoinRouteImport } from './routes/auteurs.join'
-import { Route as AuteursLoginRouteImport } from './routes/auteurs.login'
-import { Route as CoursIndexRouteImport } from './routes/cours/index'
-import { Route as CoursSlugRouteImport } from './routes/cours/$slug'
-import { Route as CreatorsIndexRouteImport } from './routes/creators.index'
-import { Route as CreatorsAppRouteImport } from './routes/creators.app'
-import { Route as CreatorsInviteRouteImport } from './routes/creators.invite'
-import { Route as CreatorsLoginRouteImport } from './routes/creators.login'
 import { Route as EnIndexRouteImport } from './routes/en/index'
-import { Route as EnBecomeATeacherRouteImport } from './routes/en/become-a-teacher'
-import { Route as EnCareersRouteImport } from './routes/en/careers'
-import { Route as EnDownloadRouteImport } from './routes/en/download'
-import { Route as EnInfluencerApplicationRouteImport } from './routes/en/influencer-application'
 import { Route as EnLegalNoticeRouteImport } from './routes/en/legal-notice'
 import { Route as EnPrivacyRouteImport } from './routes/en/privacy'
 import { Route as EnSlideshowApplicationRouteImport } from './routes/en/slideshow-application'
-import { Route as EnSophiaGeneralKnowledgeRouteImport } from './routes/en/sophia-general-knowledge'
-import { Route as EnStartRouteImport } from './routes/en/start'
-import { Route as EnUgcApplicationRouteImport } from './routes/en/ugc-application'
 import { Route as FrIndexRouteImport } from './routes/fr/index'
-import { Route as FrCandidatureInfluenceurRouteImport } from './routes/fr/candidature-influenceur'
 import { Route as FrCandidatureSlideshowRouteImport } from './routes/fr/candidature-slideshow'
-import { Route as FrCandidatureUgcRouteImport } from './routes/fr/candidature-ugc'
-import { Route as FrCareersRouteImport } from './routes/fr/careers'
 import { Route as FrConfidentialiteRouteImport } from './routes/fr/confidentialite'
-import { Route as FrDevenirProfesseurRouteImport } from './routes/fr/devenir-professeur'
 import { Route as FrMentionsLegalesRouteImport } from './routes/fr/mentions-legales'
-import { Route as FrSophiaCultureGeneraleRouteImport } from './routes/fr/sophia-culture-generale'
-import { Route as FrTelechargerRouteImport } from './routes/fr/telecharger'
-import { Route as GoHandleRouteImport } from './routes/go.$handle'
-import { Route as InviteTokenRouteImport } from './routes/invite.$token'
-import { Route as JobsSlugRouteImport } from './routes/jobs.$slug'
 import { Route as PayoutTokenRouteImport } from './routes/payout.$token'
-import { Route as AuthenticatedAuteursIndexRouteImport } from './routes/_authenticated/auteurs/index'
-import { Route as AuthenticatedAuteursContractRouteImport } from './routes/_authenticated/auteurs/contract'
-import { Route as AuthenticatedAuteursExamplesRouteImport } from './routes/_authenticated/auteurs/examples'
-import { Route as AuthenticatedAuteursGuideRouteImport } from './routes/_authenticated/auteurs/guide'
-import { Route as AuthenticatedAuteursMessagesRouteImport } from './routes/_authenticated/auteurs/messages'
-import { Route as AuthenticatedAuteursOpenRouteImport } from './routes/_authenticated/auteurs/open'
-import { Route as AuthenticatedAuteursProfileRouteImport } from './routes/_authenticated/auteurs/profile'
 import { Route as AuthenticatedHubIndexRouteImport } from './routes/_authenticated/hub/index'
-import { Route as AuthenticatedHubAdsRouteImport } from './routes/_authenticated/hub/ads'
-import { Route as AuthenticatedHubAffiliatesRouteImport } from './routes/_authenticated/hub/affiliates'
-import { Route as AuthenticatedHubAnalyticsRouteImport } from './routes/_authenticated/hub/analytics'
-import { Route as AuthenticatedHubDiscoverRouteImport } from './routes/_authenticated/hub/discover'
-import { Route as AuthenticatedHubLearnRouteImport } from './routes/_authenticated/hub/learn'
-import { Route as AuthenticatedHubMessagesRouteImport } from './routes/_authenticated/hub/messages'
-import { Route as AuthenticatedHubPayoutsRouteImport } from './routes/_authenticated/hub/payouts'
 import { Route as AuthenticatedHubSettingsRouteImport } from './routes/_authenticated/hub/settings'
 import { Route as ApiPublicOsCandidaturesRouteImport } from './routes/api/public/os-candidatures'
 import { Route as ApiPublicOsEmailRouteImport } from './routes/api/public/os-email'
 import { Route as ApiPublicOsEmailEventsRouteImport } from './routes/api/public/os-email-events'
-import { Route as CreatorsAppIndexRouteImport } from './routes/creators.app.index'
-import { Route as CreatorsAppAccountRouteImport } from './routes/creators.app.account'
-import { Route as CreatorsAppAppsRouteImport } from './routes/creators.app.apps'
-import { Route as CreatorsAppCallsRouteImport } from './routes/creators.app.calls'
-import { Route as CreatorsAppContractRouteImport } from './routes/creators.app.contract'
-import { Route as CreatorsAppEarningsRouteImport } from './routes/creators.app.earnings'
-import { Route as CreatorsAppJobsRouteImport } from './routes/creators.app.jobs'
-import { Route as CreatorsAppLibraryRouteImport } from './routes/creators.app.library'
-import { Route as CreatorsAppMessagesRouteImport } from './routes/creators.app.messages'
-import { Route as CreatorsAppPostsRouteImport } from './routes/creators.app.posts'
-import { Route as CreatorsAppProfileRouteImport } from './routes/creators.app.profile'
-import { Route as CreatorsAppRulesRouteImport } from './routes/creators.app.rules'
-import { Route as CreatorsAppTasksRouteImport } from './routes/creators.app.tasks'
-import { Route as CreatorsInfluencerIndexRouteImport } from './routes/creators.influencer.index'
-import { Route as CreatorsInfluencerAppRouteImport } from './routes/creators.influencer.app'
-import { Route as CreatorsInfluencerApplyRouteImport } from './routes/creators.influencer.apply'
 import { Route as CreatorsSignTokenRouteImport } from './routes/creators.sign.$token'
 import { Route as CreatorsSlideshowIndexRouteImport } from './routes/creators.slideshow.index'
 import { Route as CreatorsSlideshowApplyRouteImport } from './routes/creators.slideshow.apply'
-import { Route as CreatorsUgcIndexRouteImport } from './routes/creators.ugc.index'
-import { Route as CreatorsUgcApplyRouteImport } from './routes/creators.ugc.apply'
-import { Route as CreatorsUnswipeIndexRouteImport } from './routes/creators.unswipe.index'
-import { Route as CreatorsUnswipeInfluencerRouteImport } from './routes/creators.unswipe.influencer'
-import { Route as CreatorsUnswipeSlideshowRouteImport } from './routes/creators.unswipe.slideshow'
-import { Route as CreatorsUnswipeUgcRouteImport } from './routes/creators.unswipe.ugc'
-import { Route as EnAuthorsSlugRouteImport } from './routes/en/authors.$slug'
-import { Route as EnCreatorsIndexRouteImport } from './routes/en/creators/index'
-import { Route as EnCreatorsInfluencerRouteImport } from './routes/en/creators/influencer'
 import { Route as EnCreatorsSlideshowRouteImport } from './routes/en/creators/slideshow'
-import { Route as EnCreatorsUgcRouteImport } from './routes/en/creators/ugc'
-import { Route as EnLessonsIndexRouteImport } from './routes/en/lessons/index'
-import { Route as EnLessonsSlugRouteImport } from './routes/en/lessons/$slug'
-import { Route as FrAuteursSlugRouteImport } from './routes/fr/auteurs.$slug'
-import { Route as FrCoursIndexRouteImport } from './routes/fr/cours/index'
-import { Route as FrCoursSlugRouteImport } from './routes/fr/cours/$slug'
-import { Route as FrCreateursIndexRouteImport } from './routes/fr/createurs/index'
-import { Route as FrCreateursInfluenceurRouteImport } from './routes/fr/createurs/influenceur'
 import { Route as FrCreateursSlideshowRouteImport } from './routes/fr/createurs/slideshow'
-import { Route as FrCreateursUgcRouteImport } from './routes/fr/createurs/ugc'
 import { Route as LangCreatorsSlideshowIndexRouteImport } from './routes/$lang/creators/slideshow.index'
 import { Route as LangCreatorsSlideshowApplyRouteImport } from './routes/$lang/creators/slideshow.apply'
-import { Route as AuthenticatedAuteursAdminIndexRouteImport } from './routes/_authenticated/auteurs/admin/index'
-import { Route as AuthenticatedAuteursAdminActivityRouteImport } from './routes/_authenticated/auteurs/admin/activity'
-import { Route as AuthenticatedAuteursAdminAiReviewRouteImport } from './routes/_authenticated/auteurs/admin/ai-review'
-import { Route as AuthenticatedAuteursAdminAnnouncementsRouteImport } from './routes/_authenticated/auteurs/admin/announcements'
-import { Route as AuthenticatedAuteursAdminApiRouteImport } from './routes/_authenticated/auteurs/admin/api'
-import { Route as AuthenticatedAuteursAdminApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/applications'
-import { Route as AuthenticatedAuteursAdminCodesRouteImport } from './routes/_authenticated/auteurs/admin/codes'
-import { Route as AuthenticatedAuteursAdminMessagesRouteImport } from './routes/_authenticated/auteurs/admin/messages'
-import { Route as AuthenticatedAuteursAdminPoolRouteImport } from './routes/_authenticated/auteurs/admin/pool'
-import { Route as AuthenticatedAuteursAdminSettingsRouteImport } from './routes/_authenticated/auteurs/admin/settings'
-import { Route as AuthenticatedAuteursCoursesIndexRouteImport } from './routes/_authenticated/auteurs/courses.index'
-import { Route as AuthenticatedAuteursCoursesCourseIdRouteImport } from './routes/_authenticated/auteurs/courses.$courseId'
-import { Route as AuthenticatedAuteursStudioIdRouteImport } from './routes/_authenticated/auteurs/studio.$id'
-import { Route as AuthenticatedHubCampaignsIndexRouteImport } from './routes/_authenticated/hub/campaigns.index'
-import { Route as AuthenticatedHubCampaignsCreateRouteImport } from './routes/_authenticated/hub/campaigns.create'
-import { Route as AuthenticatedHubCreatorsCreatorIdRouteImport } from './routes/_authenticated/hub/creators.$creatorId'
-import { Route as AuthenticatedHubInfluencersIndexRouteImport } from './routes/_authenticated/hub/influencers/index'
-import { Route as AuthenticatedHubInfluencersSectionRouteImport } from './routes/_authenticated/hub/influencers/$section'
 import { Route as AuthenticatedHubSlideshowsIndexRouteImport } from './routes/_authenticated/hub/slideshows/index'
 import { Route as AuthenticatedHubSlideshowsSectionRouteImport } from './routes/_authenticated/hub/slideshows/$section'
 import { Route as AuthenticatedHubSlideshowsParcoursRuulRouteImport } from './routes/_authenticated/hub/slideshows/parcours-ruul'
-import { Route as AuthenticatedHubToolsSplatRouteImport } from './routes/_authenticated/hub/tools.$'
-import { Route as AuthenticatedHubUgcIndexRouteImport } from './routes/_authenticated/hub/ugc/index'
-import { Route as AuthenticatedHubUgcAdsRouteImport } from './routes/_authenticated/hub/ugc/ads'
-import { Route as AuthenticatedHubUgcAnalyticsRouteImport } from './routes/_authenticated/hub/ugc/analytics'
-import { Route as AuthenticatedHubUgcApplicationsRouteImport } from './routes/_authenticated/hub/ugc/applications'
-import { Route as AuthenticatedHubUgcInspirationRouteImport } from './routes/_authenticated/hub/ugc/inspiration'
-import { Route as AuthenticatedHubUgcLibraryRouteImport } from './routes/_authenticated/hub/ugc/library'
-import { Route as AuthenticatedHubUgcMessagesRouteImport } from './routes/_authenticated/hub/ugc/messages'
-import { Route as AuthenticatedHubUgcPayoutsRouteImport } from './routes/_authenticated/hub/ugc/payouts'
-import { Route as AuthenticatedHubUgcPostsRouteImport } from './routes/_authenticated/hub/ugc/posts'
-import { Route as AuthenticatedHubUgcReferralsRouteImport } from './routes/_authenticated/hub/ugc/referrals'
 import { Route as ApiPublicAppCoursesRouteImport } from './routes/api/public/app/courses'
-import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
-import { Route as ApiPublicTiktokOauthRouteImport } from './routes/api/public/tiktok/oauth'
-import { Route as CreatorsAppBriefsIndexRouteImport } from './routes/creators.app.briefs.index'
-import { Route as CreatorsAppBriefsBriefIdRouteImport } from './routes/creators.app.briefs.$briefId'
-import { Route as CreatorsInfluencerAppIndexRouteImport } from './routes/creators.influencer.app.index'
-import { Route as CreatorsInfluencerAppAgreementRouteImport } from './routes/creators.influencer.app.agreement'
-import { Route as CreatorsInfluencerAppBriefsRouteImport } from './routes/creators.influencer.app.briefs'
-import { Route as CreatorsInfluencerAppEarningsRouteImport } from './routes/creators.influencer.app.earnings'
-import { Route as CreatorsInfluencerAppMessagesRouteImport } from './routes/creators.influencer.app.messages'
-import { Route as CreatorsInfluencerAppOffersRouteImport } from './routes/creators.influencer.app.offers'
-import { Route as CreatorsInfluencerAppPayoutsRouteImport } from './routes/creators.influencer.app.payouts'
-import { Route as CreatorsInfluencerAppProfileRouteImport } from './routes/creators.influencer.app.profile'
-import { Route as CreatorsInfluencerAppRulesRouteImport } from './routes/creators.influencer.app.rules'
-import { Route as EnCreatorsUnswipeIndexRouteImport } from './routes/en/creators/unswipe/index'
-import { Route as EnCreatorsUnswipeInfluencerRouteImport } from './routes/en/creators/unswipe/influencer'
-import { Route as EnCreatorsUnswipeSlideshowRouteImport } from './routes/en/creators/unswipe/slideshow'
-import { Route as EnCreatorsUnswipeUgcRouteImport } from './routes/en/creators/unswipe/ugc'
-import { Route as FrCreateursUnswipeIndexRouteImport } from './routes/fr/createurs/unswipe/index'
-import { Route as FrCreateursUnswipeInfluenceurRouteImport } from './routes/fr/createurs/unswipe/influenceur'
-import { Route as FrCreateursUnswipeSlideshowRouteImport } from './routes/fr/createurs/unswipe/slideshow'
-import { Route as FrCreateursUnswipeUgcRouteImport } from './routes/fr/createurs/unswipe/ugc'
-import { Route as AuthenticatedAuteursAdminAuthorsIndexRouteImport } from './routes/_authenticated/auteurs/admin/authors.index'
-import { Route as AuthenticatedAuteursAdminAuthorsAuthorIdRouteImport } from './routes/_authenticated/auteurs/admin/authors.$authorId'
-import { Route as AuthenticatedAuteursAdminAuthorsNewRouteImport } from './routes/_authenticated/auteurs/admin/authors.new'
-import { Route as AuthenticatedAuteursAdminCoursesIndexRouteImport } from './routes/_authenticated/auteurs/admin/courses.index'
-import { Route as AuthenticatedAuteursAdminCoursesCourseIdRouteImport } from './routes/_authenticated/auteurs/admin/courses.$courseId'
-import { Route as AuthenticatedAuteursAdminCreatorsIndexRouteImport } from './routes/_authenticated/auteurs/admin/creators.index'
-import { Route as AuthenticatedAuteursAdminCreatorsCreatorIdRouteImport } from './routes/_authenticated/auteurs/admin/creators.$creatorId'
-import { Route as AuthenticatedAuteursAdminCreatorsApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.applications'
-import { Route as AuthenticatedAuteursAdminCreatorsAppsRouteImport } from './routes/_authenticated/auteurs/admin/creators.apps'
-import { Route as AuthenticatedAuteursAdminCreatorsComplianceRouteImport } from './routes/_authenticated/auteurs/admin/creators.compliance'
-import { Route as AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-applications'
-import { Route as AuthenticatedAuteursAdminCreatorsInfluencerMessagesRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-messages'
-import { Route as AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-payouts'
-import { Route as AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-performance'
-import { Route as AuthenticatedAuteursAdminCreatorsInfluencerSettingsRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-settings'
-import { Route as AuthenticatedAuteursAdminCreatorsIntegrationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.integrations'
-import { Route as AuthenticatedAuteursAdminCreatorsMessagesRouteImport } from './routes/_authenticated/auteurs/admin/creators.messages'
-import { Route as AuthenticatedAuteursAdminCreatorsOpsRouteImport } from './routes/_authenticated/auteurs/admin/creators.ops'
-import { Route as AuthenticatedAuteursAdminCreatorsPayoutsRouteImport } from './routes/_authenticated/auteurs/admin/creators.payouts'
-import { Route as AuthenticatedAuteursAdminCreatorsPlannerRouteImport } from './routes/_authenticated/auteurs/admin/creators.planner'
-import { Route as AuthenticatedAuteursAdminCreatorsProspectsRouteImport } from './routes/_authenticated/auteurs/admin/creators.prospects'
-import { Route as AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.slideshow-applications'
-import { Route as AuthenticatedAuteursAdminCreatorsUgcApplicationsRouteImport } from './routes/_authenticated/auteurs/admin/creators.ugc-applications'
-import { Route as AuthenticatedAuteursAdminCreatorsUgcBriefsRouteImport } from './routes/_authenticated/auteurs/admin/creators.ugc-briefs'
-import { Route as AuthenticatedAuteursAdminDocumentsIndexRouteImport } from './routes/_authenticated/auteurs/admin/documents.index'
-import { Route as AuthenticatedAuteursAdminDocumentsSlugRouteImport } from './routes/_authenticated/auteurs/admin/documents.$slug'
-import { Route as AuthenticatedAuteursAdminReviewIndexRouteImport } from './routes/_authenticated/auteurs/admin/review.index'
-import { Route as AuthenticatedAuteursAdminReviewCourseIdRouteImport } from './routes/_authenticated/auteurs/admin/review.$courseId'
-import { Route as AuthenticatedHubLearnBriefsBriefIdRouteImport } from './routes/_authenticated/hub/learn_.briefs.$briefId'
-import { Route as AuthenticatedHubUgcBriefsIndexRouteImport } from './routes/_authenticated/hub/ugc/briefs.index'
-import { Route as AuthenticatedHubUgcBriefsBriefIdRouteImport } from './routes/_authenticated/hub/ugc/briefs.$briefId'
-import { Route as AuthenticatedHubUgcCampaignsIndexRouteImport } from './routes/_authenticated/hub/ugc/campaigns.index'
-import { Route as AuthenticatedHubUgcCampaignsCreateRouteImport } from './routes/_authenticated/hub/ugc/campaigns.create'
-import { Route as AuthenticatedHubUgcCreatorsIndexRouteImport } from './routes/_authenticated/hub/ugc/creators.index'
-import { Route as AuthenticatedHubUgcCreatorsCreatorIdRouteImport } from './routes/_authenticated/hub/ugc/creators.$creatorId'
 import { Route as ApiPublicAppCoursesSlugRouteImport } from './routes/api/public/app/courses.$slug'
 import { Route as ApiPublicCronUgcJobRouteImport } from './routes/api/public/cron/ugc.$job'
-import { Route as CreatorsInfluencerAppDealsIndexRouteImport } from './routes/creators.influencer.app.deals.index'
-import { Route as CreatorsInfluencerAppDealsDealIdRouteImport } from './routes/creators.influencer.app.deals.$dealId'
-import { Route as AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-briefs.index'
-import { Route as AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-briefs.$briefId'
-import { Route as AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-deals.index'
-import { Route as AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencer-deals.$dealId'
-import { Route as AuthenticatedAuteursAdminCreatorsInfluencersIndexRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencers.index'
-import { Route as AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRouteImport } from './routes/_authenticated/auteurs/admin/creators.influencers.$influencerId'
-import { Route as AuthenticatedHubUgcLibraryBriefsBriefIdRouteImport } from './routes/_authenticated/hub/ugc/library_.briefs.$briefId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -240,19 +67,9 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CareersRoute = CareersRouteImport.update({
-  id: '/careers',
-  path: '/careers',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ConfidentialiteRoute = ConfidentialiteRouteImport.update({
   id: '/confidentialite',
   path: '/confidentialite',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevenirProfesseurRoute = DevenirProfesseurRouteImport.update({
-  id: '/devenir-professeur',
-  path: '/devenir-professeur',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
@@ -275,21 +92,6 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SophiaCultureGeneraleRoute = SophiaCultureGeneraleRouteImport.update({
-  id: '/sophia-culture-generale',
-  path: '/sophia-culture-generale',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StartRoute = StartRouteImport.update({
-  id: '/start',
-  path: '/start',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TelechargerRoute = TelechargerRouteImport.update({
-  id: '/telecharger',
-  path: '/telecharger',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DotwellKnownAppleAppSiteAssociationRoute =
   DotwellKnownAppleAppSiteAssociationRouteImport.update({
     id: '/.well-known/apple-app-site-association',
@@ -301,79 +103,9 @@ const AuthenticatedHubRouteRoute = AuthenticatedHubRouteRouteImport.update({
   path: '/hub',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuteursSlugRoute = AuteursSlugRouteImport.update({
-  id: '/auteurs/$slug',
-  path: '/auteurs/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuteursInviteRoute = AuteursInviteRouteImport.update({
-  id: '/auteurs/invite',
-  path: '/auteurs/invite',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuteursJoinRoute = AuteursJoinRouteImport.update({
-  id: '/auteurs/join',
-  path: '/auteurs/join',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuteursLoginRoute = AuteursLoginRouteImport.update({
-  id: '/auteurs/login',
-  path: '/auteurs/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CoursIndexRoute = CoursIndexRouteImport.update({
-  id: '/cours/',
-  path: '/cours/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CoursSlugRoute = CoursSlugRouteImport.update({
-  id: '/cours/$slug',
-  path: '/cours/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreatorsIndexRoute = CreatorsIndexRouteImport.update({
-  id: '/creators/',
-  path: '/creators/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreatorsAppRoute = CreatorsAppRouteImport.update({
-  id: '/creators/app',
-  path: '/creators/app',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreatorsInviteRoute = CreatorsInviteRouteImport.update({
-  id: '/creators/invite',
-  path: '/creators/invite',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreatorsLoginRoute = CreatorsLoginRouteImport.update({
-  id: '/creators/login',
-  path: '/creators/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EnIndexRoute = EnIndexRouteImport.update({
   id: '/en/',
   path: '/en/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnBecomeATeacherRoute = EnBecomeATeacherRouteImport.update({
-  id: '/en/become-a-teacher',
-  path: '/en/become-a-teacher',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnCareersRoute = EnCareersRouteImport.update({
-  id: '/en/careers',
-  path: '/en/careers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnDownloadRoute = EnDownloadRouteImport.update({
-  id: '/en/download',
-  path: '/en/download',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnInfluencerApplicationRoute = EnInfluencerApplicationRouteImport.update({
-  id: '/en/influencer-application',
-  path: '/en/influencer-application',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnLegalNoticeRoute = EnLegalNoticeRouteImport.update({
@@ -391,46 +123,14 @@ const EnSlideshowApplicationRoute = EnSlideshowApplicationRouteImport.update({
   path: '/en/slideshow-application',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EnSophiaGeneralKnowledgeRoute =
-  EnSophiaGeneralKnowledgeRouteImport.update({
-    id: '/en/sophia-general-knowledge',
-    path: '/en/sophia-general-knowledge',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const EnStartRoute = EnStartRouteImport.update({
-  id: '/en/start',
-  path: '/en/start',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnUgcApplicationRoute = EnUgcApplicationRouteImport.update({
-  id: '/en/ugc-application',
-  path: '/en/ugc-application',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const FrIndexRoute = FrIndexRouteImport.update({
   id: '/fr/',
   path: '/fr/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FrCandidatureInfluenceurRoute =
-  FrCandidatureInfluenceurRouteImport.update({
-    id: '/fr/candidature-influenceur',
-    path: '/fr/candidature-influenceur',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const FrCandidatureSlideshowRoute = FrCandidatureSlideshowRouteImport.update({
   id: '/fr/candidature-slideshow',
   path: '/fr/candidature-slideshow',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrCandidatureUgcRoute = FrCandidatureUgcRouteImport.update({
-  id: '/fr/candidature-ugc',
-  path: '/fr/candidature-ugc',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrCareersRoute = FrCareersRouteImport.update({
-  id: '/fr/careers',
-  path: '/fr/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FrConfidentialiteRoute = FrConfidentialiteRouteImport.update({
@@ -438,39 +138,9 @@ const FrConfidentialiteRoute = FrConfidentialiteRouteImport.update({
   path: '/fr/confidentialite',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FrDevenirProfesseurRoute = FrDevenirProfesseurRouteImport.update({
-  id: '/fr/devenir-professeur',
-  path: '/fr/devenir-professeur',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const FrMentionsLegalesRoute = FrMentionsLegalesRouteImport.update({
   id: '/fr/mentions-legales',
   path: '/fr/mentions-legales',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrSophiaCultureGeneraleRoute = FrSophiaCultureGeneraleRouteImport.update({
-  id: '/fr/sophia-culture-generale',
-  path: '/fr/sophia-culture-generale',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrTelechargerRoute = FrTelechargerRouteImport.update({
-  id: '/fr/telecharger',
-  path: '/fr/telecharger',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GoHandleRoute = GoHandleRouteImport.update({
-  id: '/go/$handle',
-  path: '/go/$handle',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InviteTokenRoute = InviteTokenRouteImport.update({
-  id: '/invite/$token',
-  path: '/invite/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JobsSlugRoute = JobsSlugRouteImport.update({
-  id: '/jobs/$slug',
-  path: '/jobs/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayoutTokenRoute = PayoutTokenRouteImport.update({
@@ -478,90 +148,9 @@ const PayoutTokenRoute = PayoutTokenRouteImport.update({
   path: '/payout/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAuteursIndexRoute =
-  AuthenticatedAuteursIndexRouteImport.update({
-    id: '/auteurs/',
-    path: '/auteurs/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursContractRoute =
-  AuthenticatedAuteursContractRouteImport.update({
-    id: '/auteurs/contract',
-    path: '/auteurs/contract',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursExamplesRoute =
-  AuthenticatedAuteursExamplesRouteImport.update({
-    id: '/auteurs/examples',
-    path: '/auteurs/examples',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursGuideRoute =
-  AuthenticatedAuteursGuideRouteImport.update({
-    id: '/auteurs/guide',
-    path: '/auteurs/guide',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursMessagesRoute =
-  AuthenticatedAuteursMessagesRouteImport.update({
-    id: '/auteurs/messages',
-    path: '/auteurs/messages',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursOpenRoute =
-  AuthenticatedAuteursOpenRouteImport.update({
-    id: '/auteurs/open',
-    path: '/auteurs/open',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursProfileRoute =
-  AuthenticatedAuteursProfileRouteImport.update({
-    id: '/auteurs/profile',
-    path: '/auteurs/profile',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedHubIndexRoute = AuthenticatedHubIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthenticatedHubRouteRoute,
-} as any)
-const AuthenticatedHubAdsRoute = AuthenticatedHubAdsRouteImport.update({
-  id: '/ads',
-  path: '/ads',
-  getParentRoute: () => AuthenticatedHubRouteRoute,
-} as any)
-const AuthenticatedHubAffiliatesRoute =
-  AuthenticatedHubAffiliatesRouteImport.update({
-    id: '/affiliates',
-    path: '/affiliates',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubAnalyticsRoute =
-  AuthenticatedHubAnalyticsRouteImport.update({
-    id: '/analytics',
-    path: '/analytics',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubDiscoverRoute =
-  AuthenticatedHubDiscoverRouteImport.update({
-    id: '/discover',
-    path: '/discover',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubLearnRoute = AuthenticatedHubLearnRouteImport.update({
-  id: '/learn',
-  path: '/learn',
-  getParentRoute: () => AuthenticatedHubRouteRoute,
-} as any)
-const AuthenticatedHubMessagesRoute =
-  AuthenticatedHubMessagesRouteImport.update({
-    id: '/messages',
-    path: '/messages',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubPayoutsRoute = AuthenticatedHubPayoutsRouteImport.update({
-  id: '/payouts',
-  path: '/payouts',
   getParentRoute: () => AuthenticatedHubRouteRoute,
 } as any)
 const AuthenticatedHubSettingsRoute =
@@ -585,86 +174,6 @@ const ApiPublicOsEmailEventsRoute = ApiPublicOsEmailEventsRouteImport.update({
   path: '/api/public/os-email-events',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CreatorsAppIndexRoute = CreatorsAppIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppAccountRoute = CreatorsAppAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppAppsRoute = CreatorsAppAppsRouteImport.update({
-  id: '/apps',
-  path: '/apps',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppCallsRoute = CreatorsAppCallsRouteImport.update({
-  id: '/calls',
-  path: '/calls',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppContractRoute = CreatorsAppContractRouteImport.update({
-  id: '/contract',
-  path: '/contract',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppEarningsRoute = CreatorsAppEarningsRouteImport.update({
-  id: '/earnings',
-  path: '/earnings',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppJobsRoute = CreatorsAppJobsRouteImport.update({
-  id: '/jobs',
-  path: '/jobs',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppLibraryRoute = CreatorsAppLibraryRouteImport.update({
-  id: '/library',
-  path: '/library',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppMessagesRoute = CreatorsAppMessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppPostsRoute = CreatorsAppPostsRouteImport.update({
-  id: '/posts',
-  path: '/posts',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppProfileRoute = CreatorsAppProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppRulesRoute = CreatorsAppRulesRouteImport.update({
-  id: '/rules',
-  path: '/rules',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppTasksRoute = CreatorsAppTasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsInfluencerIndexRoute = CreatorsInfluencerIndexRouteImport.update({
-  id: '/creators/influencer/',
-  path: '/creators/influencer/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreatorsInfluencerAppRoute = CreatorsInfluencerAppRouteImport.update({
-  id: '/creators/influencer/app',
-  path: '/creators/influencer/app',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreatorsInfluencerApplyRoute = CreatorsInfluencerApplyRouteImport.update({
-  id: '/creators/influencer/apply',
-  path: '/creators/influencer/apply',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CreatorsSignTokenRoute = CreatorsSignTokenRouteImport.update({
   id: '/creators/sign/$token',
   path: '/creators/sign/$token',
@@ -680,106 +189,14 @@ const CreatorsSlideshowApplyRoute = CreatorsSlideshowApplyRouteImport.update({
   path: '/creators/slideshow/apply',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CreatorsUgcIndexRoute = CreatorsUgcIndexRouteImport.update({
-  id: '/creators/ugc/',
-  path: '/creators/ugc/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreatorsUgcApplyRoute = CreatorsUgcApplyRouteImport.update({
-  id: '/creators/ugc/apply',
-  path: '/creators/ugc/apply',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreatorsUnswipeIndexRoute = CreatorsUnswipeIndexRouteImport.update({
-  id: '/creators/unswipe/',
-  path: '/creators/unswipe/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreatorsUnswipeInfluencerRoute =
-  CreatorsUnswipeInfluencerRouteImport.update({
-    id: '/creators/unswipe/influencer',
-    path: '/creators/unswipe/influencer',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const CreatorsUnswipeSlideshowRoute =
-  CreatorsUnswipeSlideshowRouteImport.update({
-    id: '/creators/unswipe/slideshow',
-    path: '/creators/unswipe/slideshow',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const CreatorsUnswipeUgcRoute = CreatorsUnswipeUgcRouteImport.update({
-  id: '/creators/unswipe/ugc',
-  path: '/creators/unswipe/ugc',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnAuthorsSlugRoute = EnAuthorsSlugRouteImport.update({
-  id: '/en/authors/$slug',
-  path: '/en/authors/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnCreatorsIndexRoute = EnCreatorsIndexRouteImport.update({
-  id: '/en/creators/',
-  path: '/en/creators/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnCreatorsInfluencerRoute = EnCreatorsInfluencerRouteImport.update({
-  id: '/en/creators/influencer',
-  path: '/en/creators/influencer',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EnCreatorsSlideshowRoute = EnCreatorsSlideshowRouteImport.update({
   id: '/en/creators/slideshow',
   path: '/en/creators/slideshow',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EnCreatorsUgcRoute = EnCreatorsUgcRouteImport.update({
-  id: '/en/creators/ugc',
-  path: '/en/creators/ugc',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnLessonsIndexRoute = EnLessonsIndexRouteImport.update({
-  id: '/en/lessons/',
-  path: '/en/lessons/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnLessonsSlugRoute = EnLessonsSlugRouteImport.update({
-  id: '/en/lessons/$slug',
-  path: '/en/lessons/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrAuteursSlugRoute = FrAuteursSlugRouteImport.update({
-  id: '/fr/auteurs/$slug',
-  path: '/fr/auteurs/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrCoursIndexRoute = FrCoursIndexRouteImport.update({
-  id: '/fr/cours/',
-  path: '/fr/cours/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrCoursSlugRoute = FrCoursSlugRouteImport.update({
-  id: '/fr/cours/$slug',
-  path: '/fr/cours/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrCreateursIndexRoute = FrCreateursIndexRouteImport.update({
-  id: '/fr/createurs/',
-  path: '/fr/createurs/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrCreateursInfluenceurRoute = FrCreateursInfluenceurRouteImport.update({
-  id: '/fr/createurs/influenceur',
-  path: '/fr/createurs/influenceur',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const FrCreateursSlideshowRoute = FrCreateursSlideshowRouteImport.update({
   id: '/fr/createurs/slideshow',
   path: '/fr/createurs/slideshow',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrCreateursUgcRoute = FrCreateursUgcRouteImport.update({
-  id: '/fr/createurs/ugc',
-  path: '/fr/createurs/ugc',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LangCreatorsSlideshowIndexRoute =
@@ -793,114 +210,6 @@ const LangCreatorsSlideshowApplyRoute =
     id: '/$lang/creators/slideshow/apply',
     path: '/$lang/creators/slideshow/apply',
     getParentRoute: () => rootRouteImport,
-  } as any)
-const AuthenticatedAuteursAdminIndexRoute =
-  AuthenticatedAuteursAdminIndexRouteImport.update({
-    id: '/auteurs/admin/',
-    path: '/auteurs/admin/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminActivityRoute =
-  AuthenticatedAuteursAdminActivityRouteImport.update({
-    id: '/auteurs/admin/activity',
-    path: '/auteurs/admin/activity',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminAiReviewRoute =
-  AuthenticatedAuteursAdminAiReviewRouteImport.update({
-    id: '/auteurs/admin/ai-review',
-    path: '/auteurs/admin/ai-review',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminAnnouncementsRoute =
-  AuthenticatedAuteursAdminAnnouncementsRouteImport.update({
-    id: '/auteurs/admin/announcements',
-    path: '/auteurs/admin/announcements',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminApiRoute =
-  AuthenticatedAuteursAdminApiRouteImport.update({
-    id: '/auteurs/admin/api',
-    path: '/auteurs/admin/api',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminApplicationsRoute =
-  AuthenticatedAuteursAdminApplicationsRouteImport.update({
-    id: '/auteurs/admin/applications',
-    path: '/auteurs/admin/applications',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCodesRoute =
-  AuthenticatedAuteursAdminCodesRouteImport.update({
-    id: '/auteurs/admin/codes',
-    path: '/auteurs/admin/codes',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminMessagesRoute =
-  AuthenticatedAuteursAdminMessagesRouteImport.update({
-    id: '/auteurs/admin/messages',
-    path: '/auteurs/admin/messages',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminPoolRoute =
-  AuthenticatedAuteursAdminPoolRouteImport.update({
-    id: '/auteurs/admin/pool',
-    path: '/auteurs/admin/pool',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminSettingsRoute =
-  AuthenticatedAuteursAdminSettingsRouteImport.update({
-    id: '/auteurs/admin/settings',
-    path: '/auteurs/admin/settings',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursCoursesIndexRoute =
-  AuthenticatedAuteursCoursesIndexRouteImport.update({
-    id: '/auteurs/courses/',
-    path: '/auteurs/courses/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursCoursesCourseIdRoute =
-  AuthenticatedAuteursCoursesCourseIdRouteImport.update({
-    id: '/auteurs/courses/$courseId',
-    path: '/auteurs/courses/$courseId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursStudioIdRoute =
-  AuthenticatedAuteursStudioIdRouteImport.update({
-    id: '/auteurs/studio/$id',
-    path: '/auteurs/studio/$id',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedHubCampaignsIndexRoute =
-  AuthenticatedHubCampaignsIndexRouteImport.update({
-    id: '/campaigns/',
-    path: '/campaigns/',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubCampaignsCreateRoute =
-  AuthenticatedHubCampaignsCreateRouteImport.update({
-    id: '/campaigns/create',
-    path: '/campaigns/create',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubCreatorsCreatorIdRoute =
-  AuthenticatedHubCreatorsCreatorIdRouteImport.update({
-    id: '/creators/$creatorId',
-    path: '/creators/$creatorId',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubInfluencersIndexRoute =
-  AuthenticatedHubInfluencersIndexRouteImport.update({
-    id: '/influencers/',
-    path: '/influencers/',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubInfluencersSectionRoute =
-  AuthenticatedHubInfluencersSectionRouteImport.update({
-    id: '/influencers/$section',
-    path: '/influencers/$section',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
 const AuthenticatedHubSlideshowsIndexRoute =
   AuthenticatedHubSlideshowsIndexRouteImport.update({
@@ -920,405 +229,11 @@ const AuthenticatedHubSlideshowsParcoursRuulRoute =
     path: '/slideshows/parcours-ruul',
     getParentRoute: () => AuthenticatedHubRouteRoute,
   } as any)
-const AuthenticatedHubToolsSplatRoute =
-  AuthenticatedHubToolsSplatRouteImport.update({
-    id: '/tools/$',
-    path: '/tools/$',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcIndexRoute =
-  AuthenticatedHubUgcIndexRouteImport.update({
-    id: '/ugc/',
-    path: '/ugc/',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcAdsRoute = AuthenticatedHubUgcAdsRouteImport.update({
-  id: '/ugc/ads',
-  path: '/ugc/ads',
-  getParentRoute: () => AuthenticatedHubRouteRoute,
-} as any)
-const AuthenticatedHubUgcAnalyticsRoute =
-  AuthenticatedHubUgcAnalyticsRouteImport.update({
-    id: '/ugc/analytics',
-    path: '/ugc/analytics',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcApplicationsRoute =
-  AuthenticatedHubUgcApplicationsRouteImport.update({
-    id: '/ugc/applications',
-    path: '/ugc/applications',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcInspirationRoute =
-  AuthenticatedHubUgcInspirationRouteImport.update({
-    id: '/ugc/inspiration',
-    path: '/ugc/inspiration',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcLibraryRoute =
-  AuthenticatedHubUgcLibraryRouteImport.update({
-    id: '/ugc/library',
-    path: '/ugc/library',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcMessagesRoute =
-  AuthenticatedHubUgcMessagesRouteImport.update({
-    id: '/ugc/messages',
-    path: '/ugc/messages',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcPayoutsRoute =
-  AuthenticatedHubUgcPayoutsRouteImport.update({
-    id: '/ugc/payouts',
-    path: '/ugc/payouts',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcPostsRoute =
-  AuthenticatedHubUgcPostsRouteImport.update({
-    id: '/ugc/posts',
-    path: '/ugc/posts',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcReferralsRoute =
-  AuthenticatedHubUgcReferralsRouteImport.update({
-    id: '/ugc/referrals',
-    path: '/ugc/referrals',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
 const ApiPublicAppCoursesRoute = ApiPublicAppCoursesRouteImport.update({
   id: '/api/public/app/courses',
   path: '/api/public/app/courses',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
-  id: '/api/public/stripe/webhook',
-  path: '/api/public/stripe/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicTiktokOauthRoute = ApiPublicTiktokOauthRouteImport.update({
-  id: '/api/public/tiktok/oauth',
-  path: '/api/public/tiktok/oauth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreatorsAppBriefsIndexRoute = CreatorsAppBriefsIndexRouteImport.update({
-  id: '/briefs/',
-  path: '/briefs/',
-  getParentRoute: () => CreatorsAppRoute,
-} as any)
-const CreatorsAppBriefsBriefIdRoute =
-  CreatorsAppBriefsBriefIdRouteImport.update({
-    id: '/briefs/$briefId',
-    path: '/briefs/$briefId',
-    getParentRoute: () => CreatorsAppRoute,
-  } as any)
-const CreatorsInfluencerAppIndexRoute =
-  CreatorsInfluencerAppIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => CreatorsInfluencerAppRoute,
-  } as any)
-const CreatorsInfluencerAppAgreementRoute =
-  CreatorsInfluencerAppAgreementRouteImport.update({
-    id: '/agreement',
-    path: '/agreement',
-    getParentRoute: () => CreatorsInfluencerAppRoute,
-  } as any)
-const CreatorsInfluencerAppBriefsRoute =
-  CreatorsInfluencerAppBriefsRouteImport.update({
-    id: '/briefs',
-    path: '/briefs',
-    getParentRoute: () => CreatorsInfluencerAppRoute,
-  } as any)
-const CreatorsInfluencerAppEarningsRoute =
-  CreatorsInfluencerAppEarningsRouteImport.update({
-    id: '/earnings',
-    path: '/earnings',
-    getParentRoute: () => CreatorsInfluencerAppRoute,
-  } as any)
-const CreatorsInfluencerAppMessagesRoute =
-  CreatorsInfluencerAppMessagesRouteImport.update({
-    id: '/messages',
-    path: '/messages',
-    getParentRoute: () => CreatorsInfluencerAppRoute,
-  } as any)
-const CreatorsInfluencerAppOffersRoute =
-  CreatorsInfluencerAppOffersRouteImport.update({
-    id: '/offers',
-    path: '/offers',
-    getParentRoute: () => CreatorsInfluencerAppRoute,
-  } as any)
-const CreatorsInfluencerAppPayoutsRoute =
-  CreatorsInfluencerAppPayoutsRouteImport.update({
-    id: '/payouts',
-    path: '/payouts',
-    getParentRoute: () => CreatorsInfluencerAppRoute,
-  } as any)
-const CreatorsInfluencerAppProfileRoute =
-  CreatorsInfluencerAppProfileRouteImport.update({
-    id: '/profile',
-    path: '/profile',
-    getParentRoute: () => CreatorsInfluencerAppRoute,
-  } as any)
-const CreatorsInfluencerAppRulesRoute =
-  CreatorsInfluencerAppRulesRouteImport.update({
-    id: '/rules',
-    path: '/rules',
-    getParentRoute: () => CreatorsInfluencerAppRoute,
-  } as any)
-const EnCreatorsUnswipeIndexRoute = EnCreatorsUnswipeIndexRouteImport.update({
-  id: '/en/creators/unswipe/',
-  path: '/en/creators/unswipe/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnCreatorsUnswipeInfluencerRoute =
-  EnCreatorsUnswipeInfluencerRouteImport.update({
-    id: '/en/creators/unswipe/influencer',
-    path: '/en/creators/unswipe/influencer',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const EnCreatorsUnswipeSlideshowRoute =
-  EnCreatorsUnswipeSlideshowRouteImport.update({
-    id: '/en/creators/unswipe/slideshow',
-    path: '/en/creators/unswipe/slideshow',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const EnCreatorsUnswipeUgcRoute = EnCreatorsUnswipeUgcRouteImport.update({
-  id: '/en/creators/unswipe/ugc',
-  path: '/en/creators/unswipe/ugc',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrCreateursUnswipeIndexRoute = FrCreateursUnswipeIndexRouteImport.update({
-  id: '/fr/createurs/unswipe/',
-  path: '/fr/createurs/unswipe/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FrCreateursUnswipeInfluenceurRoute =
-  FrCreateursUnswipeInfluenceurRouteImport.update({
-    id: '/fr/createurs/unswipe/influenceur',
-    path: '/fr/createurs/unswipe/influenceur',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const FrCreateursUnswipeSlideshowRoute =
-  FrCreateursUnswipeSlideshowRouteImport.update({
-    id: '/fr/createurs/unswipe/slideshow',
-    path: '/fr/createurs/unswipe/slideshow',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const FrCreateursUnswipeUgcRoute = FrCreateursUnswipeUgcRouteImport.update({
-  id: '/fr/createurs/unswipe/ugc',
-  path: '/fr/createurs/unswipe/ugc',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedAuteursAdminAuthorsIndexRoute =
-  AuthenticatedAuteursAdminAuthorsIndexRouteImport.update({
-    id: '/auteurs/admin/authors/',
-    path: '/auteurs/admin/authors/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminAuthorsAuthorIdRoute =
-  AuthenticatedAuteursAdminAuthorsAuthorIdRouteImport.update({
-    id: '/auteurs/admin/authors/$authorId',
-    path: '/auteurs/admin/authors/$authorId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminAuthorsNewRoute =
-  AuthenticatedAuteursAdminAuthorsNewRouteImport.update({
-    id: '/auteurs/admin/authors/new',
-    path: '/auteurs/admin/authors/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCoursesIndexRoute =
-  AuthenticatedAuteursAdminCoursesIndexRouteImport.update({
-    id: '/auteurs/admin/courses/',
-    path: '/auteurs/admin/courses/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCoursesCourseIdRoute =
-  AuthenticatedAuteursAdminCoursesCourseIdRouteImport.update({
-    id: '/auteurs/admin/courses/$courseId',
-    path: '/auteurs/admin/courses/$courseId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsIndexRoute =
-  AuthenticatedAuteursAdminCreatorsIndexRouteImport.update({
-    id: '/auteurs/admin/creators/',
-    path: '/auteurs/admin/creators/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsCreatorIdRoute =
-  AuthenticatedAuteursAdminCreatorsCreatorIdRouteImport.update({
-    id: '/auteurs/admin/creators/$creatorId',
-    path: '/auteurs/admin/creators/$creatorId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsApplicationsRoute =
-  AuthenticatedAuteursAdminCreatorsApplicationsRouteImport.update({
-    id: '/auteurs/admin/creators/applications',
-    path: '/auteurs/admin/creators/applications',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsAppsRoute =
-  AuthenticatedAuteursAdminCreatorsAppsRouteImport.update({
-    id: '/auteurs/admin/creators/apps',
-    path: '/auteurs/admin/creators/apps',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsComplianceRoute =
-  AuthenticatedAuteursAdminCreatorsComplianceRouteImport.update({
-    id: '/auteurs/admin/creators/compliance',
-    path: '/auteurs/admin/creators/compliance',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute =
-  AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRouteImport.update({
-    id: '/auteurs/admin/creators/influencer-applications',
-    path: '/auteurs/admin/creators/influencer-applications',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute =
-  AuthenticatedAuteursAdminCreatorsInfluencerMessagesRouteImport.update({
-    id: '/auteurs/admin/creators/influencer-messages',
-    path: '/auteurs/admin/creators/influencer-messages',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute =
-  AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRouteImport.update({
-    id: '/auteurs/admin/creators/influencer-payouts',
-    path: '/auteurs/admin/creators/influencer-payouts',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute =
-  AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRouteImport.update({
-    id: '/auteurs/admin/creators/influencer-performance',
-    path: '/auteurs/admin/creators/influencer-performance',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute =
-  AuthenticatedAuteursAdminCreatorsInfluencerSettingsRouteImport.update({
-    id: '/auteurs/admin/creators/influencer-settings',
-    path: '/auteurs/admin/creators/influencer-settings',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsIntegrationsRoute =
-  AuthenticatedAuteursAdminCreatorsIntegrationsRouteImport.update({
-    id: '/auteurs/admin/creators/integrations',
-    path: '/auteurs/admin/creators/integrations',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsMessagesRoute =
-  AuthenticatedAuteursAdminCreatorsMessagesRouteImport.update({
-    id: '/auteurs/admin/creators/messages',
-    path: '/auteurs/admin/creators/messages',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsOpsRoute =
-  AuthenticatedAuteursAdminCreatorsOpsRouteImport.update({
-    id: '/auteurs/admin/creators/ops',
-    path: '/auteurs/admin/creators/ops',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsPayoutsRoute =
-  AuthenticatedAuteursAdminCreatorsPayoutsRouteImport.update({
-    id: '/auteurs/admin/creators/payouts',
-    path: '/auteurs/admin/creators/payouts',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsPlannerRoute =
-  AuthenticatedAuteursAdminCreatorsPlannerRouteImport.update({
-    id: '/auteurs/admin/creators/planner',
-    path: '/auteurs/admin/creators/planner',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsProspectsRoute =
-  AuthenticatedAuteursAdminCreatorsProspectsRouteImport.update({
-    id: '/auteurs/admin/creators/prospects',
-    path: '/auteurs/admin/creators/prospects',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute =
-  AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRouteImport.update({
-    id: '/auteurs/admin/creators/slideshow-applications',
-    path: '/auteurs/admin/creators/slideshow-applications',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute =
-  AuthenticatedAuteursAdminCreatorsUgcApplicationsRouteImport.update({
-    id: '/auteurs/admin/creators/ugc-applications',
-    path: '/auteurs/admin/creators/ugc-applications',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsUgcBriefsRoute =
-  AuthenticatedAuteursAdminCreatorsUgcBriefsRouteImport.update({
-    id: '/auteurs/admin/creators/ugc-briefs',
-    path: '/auteurs/admin/creators/ugc-briefs',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminDocumentsIndexRoute =
-  AuthenticatedAuteursAdminDocumentsIndexRouteImport.update({
-    id: '/auteurs/admin/documents/',
-    path: '/auteurs/admin/documents/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminDocumentsSlugRoute =
-  AuthenticatedAuteursAdminDocumentsSlugRouteImport.update({
-    id: '/auteurs/admin/documents/$slug',
-    path: '/auteurs/admin/documents/$slug',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminReviewIndexRoute =
-  AuthenticatedAuteursAdminReviewIndexRouteImport.update({
-    id: '/auteurs/admin/review/',
-    path: '/auteurs/admin/review/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminReviewCourseIdRoute =
-  AuthenticatedAuteursAdminReviewCourseIdRouteImport.update({
-    id: '/auteurs/admin/review/$courseId',
-    path: '/auteurs/admin/review/$courseId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedHubLearnBriefsBriefIdRoute =
-  AuthenticatedHubLearnBriefsBriefIdRouteImport.update({
-    id: '/learn_/briefs/$briefId',
-    path: '/learn/briefs/$briefId',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcBriefsIndexRoute =
-  AuthenticatedHubUgcBriefsIndexRouteImport.update({
-    id: '/ugc/briefs/',
-    path: '/ugc/briefs/',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcBriefsBriefIdRoute =
-  AuthenticatedHubUgcBriefsBriefIdRouteImport.update({
-    id: '/ugc/briefs/$briefId',
-    path: '/ugc/briefs/$briefId',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcCampaignsIndexRoute =
-  AuthenticatedHubUgcCampaignsIndexRouteImport.update({
-    id: '/ugc/campaigns/',
-    path: '/ugc/campaigns/',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcCampaignsCreateRoute =
-  AuthenticatedHubUgcCampaignsCreateRouteImport.update({
-    id: '/ugc/campaigns/create',
-    path: '/ugc/campaigns/create',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcCreatorsIndexRoute =
-  AuthenticatedHubUgcCreatorsIndexRouteImport.update({
-    id: '/ugc/creators/',
-    path: '/ugc/creators/',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
-const AuthenticatedHubUgcCreatorsCreatorIdRoute =
-  AuthenticatedHubUgcCreatorsCreatorIdRouteImport.update({
-    id: '/ugc/creators/$creatorId',
-    path: '/ugc/creators/$creatorId',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
 const ApiPublicAppCoursesSlugRoute = ApiPublicAppCoursesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -1329,481 +244,83 @@ const ApiPublicCronUgcJobRoute = ApiPublicCronUgcJobRouteImport.update({
   path: '/api/public/cron/ugc/$job',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CreatorsInfluencerAppDealsIndexRoute =
-  CreatorsInfluencerAppDealsIndexRouteImport.update({
-    id: '/deals/',
-    path: '/deals/',
-    getParentRoute: () => CreatorsInfluencerAppRoute,
-  } as any)
-const CreatorsInfluencerAppDealsDealIdRoute =
-  CreatorsInfluencerAppDealsDealIdRouteImport.update({
-    id: '/deals/$dealId',
-    path: '/deals/$dealId',
-    getParentRoute: () => CreatorsInfluencerAppRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRoute =
-  AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRouteImport.update({
-    id: '/auteurs/admin/creators/influencer-briefs/',
-    path: '/auteurs/admin/creators/influencer-briefs/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRoute =
-  AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRouteImport.update({
-    id: '/auteurs/admin/creators/influencer-briefs/$briefId',
-    path: '/auteurs/admin/creators/influencer-briefs/$briefId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRoute =
-  AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRouteImport.update({
-    id: '/auteurs/admin/creators/influencer-deals/',
-    path: '/auteurs/admin/creators/influencer-deals/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRoute =
-  AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRouteImport.update({
-    id: '/auteurs/admin/creators/influencer-deals/$dealId',
-    path: '/auteurs/admin/creators/influencer-deals/$dealId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsInfluencersIndexRoute =
-  AuthenticatedAuteursAdminCreatorsInfluencersIndexRouteImport.update({
-    id: '/auteurs/admin/creators/influencers/',
-    path: '/auteurs/admin/creators/influencers/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRoute =
-  AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRouteImport.update({
-    id: '/auteurs/admin/creators/influencers/$influencerId',
-    path: '/auteurs/admin/creators/influencers/$influencerId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedHubUgcLibraryBriefsBriefIdRoute =
-  AuthenticatedHubUgcLibraryBriefsBriefIdRouteImport.update({
-    id: '/ugc/library_/briefs/$briefId',
-    path: '/ugc/library/briefs/$briefId',
-    getParentRoute: () => AuthenticatedHubRouteRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account-not-set-up': typeof AccountNotSetUpRoute
   '/auth': typeof AuthRoute
-  '/careers': typeof CareersRoute
   '/confidentialite': typeof ConfidentialiteRoute
-  '/devenir-professeur': typeof DevenirProfesseurRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/poster-unsubscribe': typeof PosterUnsubscribeRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
-  '/start': typeof StartRoute
-  '/telecharger': typeof TelechargerRoute
   '/hub': typeof AuthenticatedHubRouteRouteWithChildren
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
-  '/auteurs/$slug': typeof AuteursSlugRoute
-  '/auteurs/invite': typeof AuteursInviteRoute
-  '/auteurs/join': typeof AuteursJoinRoute
-  '/auteurs/login': typeof AuteursLoginRoute
-  '/cours/$slug': typeof CoursSlugRoute
-  '/creators/app': typeof CreatorsAppRouteWithChildren
-  '/creators/invite': typeof CreatorsInviteRoute
-  '/creators/login': typeof CreatorsLoginRoute
-  '/en/become-a-teacher': typeof EnBecomeATeacherRoute
-  '/en/careers': typeof EnCareersRoute
-  '/en/download': typeof EnDownloadRoute
-  '/en/influencer-application': typeof EnInfluencerApplicationRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/slideshow-application': typeof EnSlideshowApplicationRoute
-  '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
-  '/en/start': typeof EnStartRoute
-  '/en/ugc-application': typeof EnUgcApplicationRoute
-  '/fr/candidature-influenceur': typeof FrCandidatureInfluenceurRoute
   '/fr/candidature-slideshow': typeof FrCandidatureSlideshowRoute
-  '/fr/candidature-ugc': typeof FrCandidatureUgcRoute
-  '/fr/careers': typeof FrCareersRoute
   '/fr/confidentialite': typeof FrConfidentialiteRoute
-  '/fr/devenir-professeur': typeof FrDevenirProfesseurRoute
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
-  '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
-  '/fr/telecharger': typeof FrTelechargerRoute
-  '/go/$handle': typeof GoHandleRoute
-  '/invite/$token': typeof InviteTokenRoute
-  '/jobs/$slug': typeof JobsSlugRoute
   '/payout/$token': typeof PayoutTokenRoute
-  '/cours/': typeof CoursIndexRoute
-  '/creators/': typeof CreatorsIndexRoute
   '/en/': typeof EnIndexRoute
   '/fr/': typeof FrIndexRoute
-  '/auteurs/contract': typeof AuthenticatedAuteursContractRoute
-  '/auteurs/examples': typeof AuthenticatedAuteursExamplesRoute
-  '/auteurs/guide': typeof AuthenticatedAuteursGuideRoute
-  '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
-  '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
-  '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
-  '/hub/ads': typeof AuthenticatedHubAdsRoute
-  '/hub/affiliates': typeof AuthenticatedHubAffiliatesRoute
-  '/hub/analytics': typeof AuthenticatedHubAnalyticsRoute
-  '/hub/discover': typeof AuthenticatedHubDiscoverRoute
-  '/hub/learn': typeof AuthenticatedHubLearnRoute
-  '/hub/messages': typeof AuthenticatedHubMessagesRoute
-  '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/hub/settings': typeof AuthenticatedHubSettingsRoute
   '/api/public/os-candidatures': typeof ApiPublicOsCandidaturesRoute
   '/api/public/os-email': typeof ApiPublicOsEmailRoute
   '/api/public/os-email-events': typeof ApiPublicOsEmailEventsRoute
-  '/creators/app/account': typeof CreatorsAppAccountRoute
-  '/creators/app/apps': typeof CreatorsAppAppsRoute
-  '/creators/app/calls': typeof CreatorsAppCallsRoute
-  '/creators/app/contract': typeof CreatorsAppContractRoute
-  '/creators/app/earnings': typeof CreatorsAppEarningsRoute
-  '/creators/app/jobs': typeof CreatorsAppJobsRoute
-  '/creators/app/library': typeof CreatorsAppLibraryRoute
-  '/creators/app/messages': typeof CreatorsAppMessagesRoute
-  '/creators/app/posts': typeof CreatorsAppPostsRoute
-  '/creators/app/profile': typeof CreatorsAppProfileRoute
-  '/creators/app/rules': typeof CreatorsAppRulesRoute
-  '/creators/app/tasks': typeof CreatorsAppTasksRoute
-  '/creators/influencer/app': typeof CreatorsInfluencerAppRouteWithChildren
-  '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
-  '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
-  '/creators/unswipe/influencer': typeof CreatorsUnswipeInfluencerRoute
-  '/creators/unswipe/slideshow': typeof CreatorsUnswipeSlideshowRoute
-  '/creators/unswipe/ugc': typeof CreatorsUnswipeUgcRoute
-  '/en/authors/$slug': typeof EnAuthorsSlugRoute
-  '/en/creators/influencer': typeof EnCreatorsInfluencerRoute
   '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
-  '/en/creators/ugc': typeof EnCreatorsUgcRoute
-  '/en/lessons/$slug': typeof EnLessonsSlugRoute
-  '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
-  '/fr/cours/$slug': typeof FrCoursSlugRoute
-  '/fr/createurs/influenceur': typeof FrCreateursInfluenceurRoute
   '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
-  '/fr/createurs/ugc': typeof FrCreateursUgcRoute
-  '/auteurs/': typeof AuthenticatedAuteursIndexRoute
   '/hub/': typeof AuthenticatedHubIndexRoute
-  '/creators/app/': typeof CreatorsAppIndexRoute
-  '/creators/influencer/': typeof CreatorsInfluencerIndexRoute
   '/creators/slideshow/': typeof CreatorsSlideshowIndexRoute
-  '/creators/ugc/': typeof CreatorsUgcIndexRoute
-  '/creators/unswipe/': typeof CreatorsUnswipeIndexRoute
-  '/en/creators/': typeof EnCreatorsIndexRoute
-  '/en/lessons/': typeof EnLessonsIndexRoute
-  '/fr/cours/': typeof FrCoursIndexRoute
-  '/fr/createurs/': typeof FrCreateursIndexRoute
   '/$lang/creators/slideshow/apply': typeof LangCreatorsSlideshowApplyRoute
-  '/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
-  '/auteurs/admin/ai-review': typeof AuthenticatedAuteursAdminAiReviewRoute
-  '/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
-  '/auteurs/admin/api': typeof AuthenticatedAuteursAdminApiRoute
-  '/auteurs/admin/applications': typeof AuthenticatedAuteursAdminApplicationsRoute
-  '/auteurs/admin/codes': typeof AuthenticatedAuteursAdminCodesRoute
-  '/auteurs/admin/messages': typeof AuthenticatedAuteursAdminMessagesRoute
-  '/auteurs/admin/pool': typeof AuthenticatedAuteursAdminPoolRoute
-  '/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
-  '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
-  '/auteurs/studio/$id': typeof AuthenticatedAuteursStudioIdRoute
-  '/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
-  '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
-  '/hub/influencers/$section': typeof AuthenticatedHubInfluencersSectionRoute
   '/hub/slideshows/$section': typeof AuthenticatedHubSlideshowsSectionRoute
   '/hub/slideshows/parcours-ruul': typeof AuthenticatedHubSlideshowsParcoursRuulRoute
-  '/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
-  '/hub/ugc/ads': typeof AuthenticatedHubUgcAdsRoute
-  '/hub/ugc/analytics': typeof AuthenticatedHubUgcAnalyticsRoute
-  '/hub/ugc/applications': typeof AuthenticatedHubUgcApplicationsRoute
-  '/hub/ugc/inspiration': typeof AuthenticatedHubUgcInspirationRoute
-  '/hub/ugc/library': typeof AuthenticatedHubUgcLibraryRoute
-  '/hub/ugc/messages': typeof AuthenticatedHubUgcMessagesRoute
-  '/hub/ugc/payouts': typeof AuthenticatedHubUgcPayoutsRoute
-  '/hub/ugc/posts': typeof AuthenticatedHubUgcPostsRoute
-  '/hub/ugc/referrals': typeof AuthenticatedHubUgcReferralsRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
-  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
-  '/api/public/tiktok/oauth': typeof ApiPublicTiktokOauthRoute
-  '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
-  '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
-  '/creators/influencer/app/briefs': typeof CreatorsInfluencerAppBriefsRoute
-  '/creators/influencer/app/earnings': typeof CreatorsInfluencerAppEarningsRoute
-  '/creators/influencer/app/messages': typeof CreatorsInfluencerAppMessagesRoute
-  '/creators/influencer/app/offers': typeof CreatorsInfluencerAppOffersRoute
-  '/creators/influencer/app/payouts': typeof CreatorsInfluencerAppPayoutsRoute
-  '/creators/influencer/app/profile': typeof CreatorsInfluencerAppProfileRoute
-  '/creators/influencer/app/rules': typeof CreatorsInfluencerAppRulesRoute
-  '/en/creators/unswipe/influencer': typeof EnCreatorsUnswipeInfluencerRoute
-  '/en/creators/unswipe/slideshow': typeof EnCreatorsUnswipeSlideshowRoute
-  '/en/creators/unswipe/ugc': typeof EnCreatorsUnswipeUgcRoute
-  '/fr/createurs/unswipe/influenceur': typeof FrCreateursUnswipeInfluenceurRoute
-  '/fr/createurs/unswipe/slideshow': typeof FrCreateursUnswipeSlideshowRoute
-  '/fr/createurs/unswipe/ugc': typeof FrCreateursUnswipeUgcRoute
   '/$lang/creators/slideshow/': typeof LangCreatorsSlideshowIndexRoute
-  '/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
-  '/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
-  '/hub/campaigns/': typeof AuthenticatedHubCampaignsIndexRoute
-  '/hub/influencers/': typeof AuthenticatedHubInfluencersIndexRoute
   '/hub/slideshows/': typeof AuthenticatedHubSlideshowsIndexRoute
-  '/hub/ugc/': typeof AuthenticatedHubUgcIndexRoute
-  '/creators/app/briefs/': typeof CreatorsAppBriefsIndexRoute
-  '/creators/influencer/app/': typeof CreatorsInfluencerAppIndexRoute
-  '/en/creators/unswipe/': typeof EnCreatorsUnswipeIndexRoute
-  '/fr/createurs/unswipe/': typeof FrCreateursUnswipeIndexRoute
-  '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
-  '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
-  '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
-  '/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
-  '/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
-  '/auteurs/admin/creators/apps': typeof AuthenticatedAuteursAdminCreatorsAppsRoute
-  '/auteurs/admin/creators/compliance': typeof AuthenticatedAuteursAdminCreatorsComplianceRoute
-  '/auteurs/admin/creators/influencer-applications': typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
-  '/auteurs/admin/creators/influencer-messages': typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
-  '/auteurs/admin/creators/influencer-payouts': typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
-  '/auteurs/admin/creators/influencer-performance': typeof AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute
-  '/auteurs/admin/creators/influencer-settings': typeof AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute
-  '/auteurs/admin/creators/integrations': typeof AuthenticatedAuteursAdminCreatorsIntegrationsRoute
-  '/auteurs/admin/creators/messages': typeof AuthenticatedAuteursAdminCreatorsMessagesRoute
-  '/auteurs/admin/creators/ops': typeof AuthenticatedAuteursAdminCreatorsOpsRoute
-  '/auteurs/admin/creators/payouts': typeof AuthenticatedAuteursAdminCreatorsPayoutsRoute
-  '/auteurs/admin/creators/planner': typeof AuthenticatedAuteursAdminCreatorsPlannerRoute
-  '/auteurs/admin/creators/prospects': typeof AuthenticatedAuteursAdminCreatorsProspectsRoute
-  '/auteurs/admin/creators/slideshow-applications': typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute
-  '/auteurs/admin/creators/ugc-applications': typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute
-  '/auteurs/admin/creators/ugc-briefs': typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRoute
-  '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
-  '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
-  '/hub/learn/briefs/$briefId': typeof AuthenticatedHubLearnBriefsBriefIdRoute
-  '/hub/ugc/briefs/$briefId': typeof AuthenticatedHubUgcBriefsBriefIdRoute
-  '/hub/ugc/campaigns/create': typeof AuthenticatedHubUgcCampaignsCreateRoute
-  '/hub/ugc/creators/$creatorId': typeof AuthenticatedHubUgcCreatorsCreatorIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/api/public/cron/ugc/$job': typeof ApiPublicCronUgcJobRoute
-  '/creators/influencer/app/deals/$dealId': typeof CreatorsInfluencerAppDealsDealIdRoute
-  '/auteurs/admin/authors/': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
-  '/auteurs/admin/courses/': typeof AuthenticatedAuteursAdminCoursesIndexRoute
-  '/auteurs/admin/creators/': typeof AuthenticatedAuteursAdminCreatorsIndexRoute
-  '/auteurs/admin/documents/': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
-  '/auteurs/admin/review/': typeof AuthenticatedAuteursAdminReviewIndexRoute
-  '/hub/ugc/briefs/': typeof AuthenticatedHubUgcBriefsIndexRoute
-  '/hub/ugc/campaigns/': typeof AuthenticatedHubUgcCampaignsIndexRoute
-  '/hub/ugc/creators/': typeof AuthenticatedHubUgcCreatorsIndexRoute
-  '/creators/influencer/app/deals/': typeof CreatorsInfluencerAppDealsIndexRoute
-  '/auteurs/admin/creators/influencer-briefs/$briefId': typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRoute
-  '/auteurs/admin/creators/influencer-deals/$dealId': typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRoute
-  '/auteurs/admin/creators/influencers/$influencerId': typeof AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRoute
-  '/hub/ugc/library/briefs/$briefId': typeof AuthenticatedHubUgcLibraryBriefsBriefIdRoute
-  '/auteurs/admin/creators/influencer-briefs/': typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRoute
-  '/auteurs/admin/creators/influencer-deals/': typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRoute
-  '/auteurs/admin/creators/influencers/': typeof AuthenticatedAuteursAdminCreatorsInfluencersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account-not-set-up': typeof AccountNotSetUpRoute
   '/auth': typeof AuthRoute
-  '/careers': typeof CareersRoute
   '/confidentialite': typeof ConfidentialiteRoute
-  '/devenir-professeur': typeof DevenirProfesseurRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/poster-unsubscribe': typeof PosterUnsubscribeRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
-  '/start': typeof StartRoute
-  '/telecharger': typeof TelechargerRoute
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
-  '/auteurs/$slug': typeof AuteursSlugRoute
-  '/auteurs/invite': typeof AuteursInviteRoute
-  '/auteurs/join': typeof AuteursJoinRoute
-  '/auteurs/login': typeof AuteursLoginRoute
-  '/cours/$slug': typeof CoursSlugRoute
-  '/creators/invite': typeof CreatorsInviteRoute
-  '/creators/login': typeof CreatorsLoginRoute
-  '/en/become-a-teacher': typeof EnBecomeATeacherRoute
-  '/en/careers': typeof EnCareersRoute
-  '/en/download': typeof EnDownloadRoute
-  '/en/influencer-application': typeof EnInfluencerApplicationRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/slideshow-application': typeof EnSlideshowApplicationRoute
-  '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
-  '/en/start': typeof EnStartRoute
-  '/en/ugc-application': typeof EnUgcApplicationRoute
-  '/fr/candidature-influenceur': typeof FrCandidatureInfluenceurRoute
   '/fr/candidature-slideshow': typeof FrCandidatureSlideshowRoute
-  '/fr/candidature-ugc': typeof FrCandidatureUgcRoute
-  '/fr/careers': typeof FrCareersRoute
   '/fr/confidentialite': typeof FrConfidentialiteRoute
-  '/fr/devenir-professeur': typeof FrDevenirProfesseurRoute
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
-  '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
-  '/fr/telecharger': typeof FrTelechargerRoute
-  '/go/$handle': typeof GoHandleRoute
-  '/invite/$token': typeof InviteTokenRoute
-  '/jobs/$slug': typeof JobsSlugRoute
   '/payout/$token': typeof PayoutTokenRoute
-  '/cours': typeof CoursIndexRoute
-  '/creators': typeof CreatorsIndexRoute
   '/en': typeof EnIndexRoute
   '/fr': typeof FrIndexRoute
-  '/auteurs/contract': typeof AuthenticatedAuteursContractRoute
-  '/auteurs/examples': typeof AuthenticatedAuteursExamplesRoute
-  '/auteurs/guide': typeof AuthenticatedAuteursGuideRoute
-  '/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
-  '/auteurs/open': typeof AuthenticatedAuteursOpenRoute
-  '/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
-  '/hub/ads': typeof AuthenticatedHubAdsRoute
-  '/hub/affiliates': typeof AuthenticatedHubAffiliatesRoute
-  '/hub/analytics': typeof AuthenticatedHubAnalyticsRoute
-  '/hub/discover': typeof AuthenticatedHubDiscoverRoute
-  '/hub/learn': typeof AuthenticatedHubLearnRoute
-  '/hub/messages': typeof AuthenticatedHubMessagesRoute
-  '/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/hub/settings': typeof AuthenticatedHubSettingsRoute
   '/api/public/os-candidatures': typeof ApiPublicOsCandidaturesRoute
   '/api/public/os-email': typeof ApiPublicOsEmailRoute
   '/api/public/os-email-events': typeof ApiPublicOsEmailEventsRoute
-  '/creators/app/account': typeof CreatorsAppAccountRoute
-  '/creators/app/apps': typeof CreatorsAppAppsRoute
-  '/creators/app/calls': typeof CreatorsAppCallsRoute
-  '/creators/app/contract': typeof CreatorsAppContractRoute
-  '/creators/app/earnings': typeof CreatorsAppEarningsRoute
-  '/creators/app/jobs': typeof CreatorsAppJobsRoute
-  '/creators/app/library': typeof CreatorsAppLibraryRoute
-  '/creators/app/messages': typeof CreatorsAppMessagesRoute
-  '/creators/app/posts': typeof CreatorsAppPostsRoute
-  '/creators/app/profile': typeof CreatorsAppProfileRoute
-  '/creators/app/rules': typeof CreatorsAppRulesRoute
-  '/creators/app/tasks': typeof CreatorsAppTasksRoute
-  '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
-  '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
-  '/creators/unswipe/influencer': typeof CreatorsUnswipeInfluencerRoute
-  '/creators/unswipe/slideshow': typeof CreatorsUnswipeSlideshowRoute
-  '/creators/unswipe/ugc': typeof CreatorsUnswipeUgcRoute
-  '/en/authors/$slug': typeof EnAuthorsSlugRoute
-  '/en/creators/influencer': typeof EnCreatorsInfluencerRoute
   '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
-  '/en/creators/ugc': typeof EnCreatorsUgcRoute
-  '/en/lessons/$slug': typeof EnLessonsSlugRoute
-  '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
-  '/fr/cours/$slug': typeof FrCoursSlugRoute
-  '/fr/createurs/influenceur': typeof FrCreateursInfluenceurRoute
   '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
-  '/fr/createurs/ugc': typeof FrCreateursUgcRoute
-  '/auteurs': typeof AuthenticatedAuteursIndexRoute
   '/hub': typeof AuthenticatedHubIndexRoute
-  '/creators/app': typeof CreatorsAppIndexRoute
-  '/creators/influencer': typeof CreatorsInfluencerIndexRoute
   '/creators/slideshow': typeof CreatorsSlideshowIndexRoute
-  '/creators/ugc': typeof CreatorsUgcIndexRoute
-  '/creators/unswipe': typeof CreatorsUnswipeIndexRoute
-  '/en/creators': typeof EnCreatorsIndexRoute
-  '/en/lessons': typeof EnLessonsIndexRoute
-  '/fr/cours': typeof FrCoursIndexRoute
-  '/fr/createurs': typeof FrCreateursIndexRoute
   '/$lang/creators/slideshow/apply': typeof LangCreatorsSlideshowApplyRoute
-  '/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
-  '/auteurs/admin/ai-review': typeof AuthenticatedAuteursAdminAiReviewRoute
-  '/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
-  '/auteurs/admin/api': typeof AuthenticatedAuteursAdminApiRoute
-  '/auteurs/admin/applications': typeof AuthenticatedAuteursAdminApplicationsRoute
-  '/auteurs/admin/codes': typeof AuthenticatedAuteursAdminCodesRoute
-  '/auteurs/admin/messages': typeof AuthenticatedAuteursAdminMessagesRoute
-  '/auteurs/admin/pool': typeof AuthenticatedAuteursAdminPoolRoute
-  '/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
-  '/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
-  '/auteurs/studio/$id': typeof AuthenticatedAuteursStudioIdRoute
-  '/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
-  '/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
-  '/hub/influencers/$section': typeof AuthenticatedHubInfluencersSectionRoute
   '/hub/slideshows/$section': typeof AuthenticatedHubSlideshowsSectionRoute
   '/hub/slideshows/parcours-ruul': typeof AuthenticatedHubSlideshowsParcoursRuulRoute
-  '/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
-  '/hub/ugc/ads': typeof AuthenticatedHubUgcAdsRoute
-  '/hub/ugc/analytics': typeof AuthenticatedHubUgcAnalyticsRoute
-  '/hub/ugc/applications': typeof AuthenticatedHubUgcApplicationsRoute
-  '/hub/ugc/inspiration': typeof AuthenticatedHubUgcInspirationRoute
-  '/hub/ugc/library': typeof AuthenticatedHubUgcLibraryRoute
-  '/hub/ugc/messages': typeof AuthenticatedHubUgcMessagesRoute
-  '/hub/ugc/payouts': typeof AuthenticatedHubUgcPayoutsRoute
-  '/hub/ugc/posts': typeof AuthenticatedHubUgcPostsRoute
-  '/hub/ugc/referrals': typeof AuthenticatedHubUgcReferralsRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
-  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
-  '/api/public/tiktok/oauth': typeof ApiPublicTiktokOauthRoute
-  '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
-  '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
-  '/creators/influencer/app/briefs': typeof CreatorsInfluencerAppBriefsRoute
-  '/creators/influencer/app/earnings': typeof CreatorsInfluencerAppEarningsRoute
-  '/creators/influencer/app/messages': typeof CreatorsInfluencerAppMessagesRoute
-  '/creators/influencer/app/offers': typeof CreatorsInfluencerAppOffersRoute
-  '/creators/influencer/app/payouts': typeof CreatorsInfluencerAppPayoutsRoute
-  '/creators/influencer/app/profile': typeof CreatorsInfluencerAppProfileRoute
-  '/creators/influencer/app/rules': typeof CreatorsInfluencerAppRulesRoute
-  '/en/creators/unswipe/influencer': typeof EnCreatorsUnswipeInfluencerRoute
-  '/en/creators/unswipe/slideshow': typeof EnCreatorsUnswipeSlideshowRoute
-  '/en/creators/unswipe/ugc': typeof EnCreatorsUnswipeUgcRoute
-  '/fr/createurs/unswipe/influenceur': typeof FrCreateursUnswipeInfluenceurRoute
-  '/fr/createurs/unswipe/slideshow': typeof FrCreateursUnswipeSlideshowRoute
-  '/fr/createurs/unswipe/ugc': typeof FrCreateursUnswipeUgcRoute
   '/$lang/creators/slideshow': typeof LangCreatorsSlideshowIndexRoute
-  '/auteurs/admin': typeof AuthenticatedAuteursAdminIndexRoute
-  '/auteurs/courses': typeof AuthenticatedAuteursCoursesIndexRoute
-  '/hub/campaigns': typeof AuthenticatedHubCampaignsIndexRoute
-  '/hub/influencers': typeof AuthenticatedHubInfluencersIndexRoute
   '/hub/slideshows': typeof AuthenticatedHubSlideshowsIndexRoute
-  '/hub/ugc': typeof AuthenticatedHubUgcIndexRoute
-  '/creators/app/briefs': typeof CreatorsAppBriefsIndexRoute
-  '/creators/influencer/app': typeof CreatorsInfluencerAppIndexRoute
-  '/en/creators/unswipe': typeof EnCreatorsUnswipeIndexRoute
-  '/fr/createurs/unswipe': typeof FrCreateursUnswipeIndexRoute
-  '/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
-  '/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
-  '/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
-  '/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
-  '/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
-  '/auteurs/admin/creators/apps': typeof AuthenticatedAuteursAdminCreatorsAppsRoute
-  '/auteurs/admin/creators/compliance': typeof AuthenticatedAuteursAdminCreatorsComplianceRoute
-  '/auteurs/admin/creators/influencer-applications': typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
-  '/auteurs/admin/creators/influencer-messages': typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
-  '/auteurs/admin/creators/influencer-payouts': typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
-  '/auteurs/admin/creators/influencer-performance': typeof AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute
-  '/auteurs/admin/creators/influencer-settings': typeof AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute
-  '/auteurs/admin/creators/integrations': typeof AuthenticatedAuteursAdminCreatorsIntegrationsRoute
-  '/auteurs/admin/creators/messages': typeof AuthenticatedAuteursAdminCreatorsMessagesRoute
-  '/auteurs/admin/creators/ops': typeof AuthenticatedAuteursAdminCreatorsOpsRoute
-  '/auteurs/admin/creators/payouts': typeof AuthenticatedAuteursAdminCreatorsPayoutsRoute
-  '/auteurs/admin/creators/planner': typeof AuthenticatedAuteursAdminCreatorsPlannerRoute
-  '/auteurs/admin/creators/prospects': typeof AuthenticatedAuteursAdminCreatorsProspectsRoute
-  '/auteurs/admin/creators/slideshow-applications': typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute
-  '/auteurs/admin/creators/ugc-applications': typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute
-  '/auteurs/admin/creators/ugc-briefs': typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRoute
-  '/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
-  '/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
-  '/hub/learn/briefs/$briefId': typeof AuthenticatedHubLearnBriefsBriefIdRoute
-  '/hub/ugc/briefs/$briefId': typeof AuthenticatedHubUgcBriefsBriefIdRoute
-  '/hub/ugc/campaigns/create': typeof AuthenticatedHubUgcCampaignsCreateRoute
-  '/hub/ugc/creators/$creatorId': typeof AuthenticatedHubUgcCreatorsCreatorIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/api/public/cron/ugc/$job': typeof ApiPublicCronUgcJobRoute
-  '/creators/influencer/app/deals/$dealId': typeof CreatorsInfluencerAppDealsDealIdRoute
-  '/auteurs/admin/authors': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
-  '/auteurs/admin/courses': typeof AuthenticatedAuteursAdminCoursesIndexRoute
-  '/auteurs/admin/creators': typeof AuthenticatedAuteursAdminCreatorsIndexRoute
-  '/auteurs/admin/documents': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
-  '/auteurs/admin/review': typeof AuthenticatedAuteursAdminReviewIndexRoute
-  '/hub/ugc/briefs': typeof AuthenticatedHubUgcBriefsIndexRoute
-  '/hub/ugc/campaigns': typeof AuthenticatedHubUgcCampaignsIndexRoute
-  '/hub/ugc/creators': typeof AuthenticatedHubUgcCreatorsIndexRoute
-  '/creators/influencer/app/deals': typeof CreatorsInfluencerAppDealsIndexRoute
-  '/auteurs/admin/creators/influencer-briefs/$briefId': typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRoute
-  '/auteurs/admin/creators/influencer-deals/$dealId': typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRoute
-  '/auteurs/admin/creators/influencers/$influencerId': typeof AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRoute
-  '/hub/ugc/library/briefs/$briefId': typeof AuthenticatedHubUgcLibraryBriefsBriefIdRoute
-  '/auteurs/admin/creators/influencer-briefs': typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRoute
-  '/auteurs/admin/creators/influencer-deals': typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRoute
-  '/auteurs/admin/creators/influencers': typeof AuthenticatedAuteursAdminCreatorsInfluencersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1811,213 +328,40 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/account-not-set-up': typeof AccountNotSetUpRoute
   '/auth': typeof AuthRoute
-  '/careers': typeof CareersRoute
   '/confidentialite': typeof ConfidentialiteRoute
-  '/devenir-professeur': typeof DevenirProfesseurRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/poster-unsubscribe': typeof PosterUnsubscribeRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/sophia-culture-generale': typeof SophiaCultureGeneraleRoute
-  '/start': typeof StartRoute
-  '/telecharger': typeof TelechargerRoute
   '/_authenticated/hub': typeof AuthenticatedHubRouteRouteWithChildren
   '/.well-known/apple-app-site-association': typeof DotwellKnownAppleAppSiteAssociationRoute
-  '/auteurs/$slug': typeof AuteursSlugRoute
-  '/auteurs/invite': typeof AuteursInviteRoute
-  '/auteurs/join': typeof AuteursJoinRoute
-  '/auteurs/login': typeof AuteursLoginRoute
-  '/cours/$slug': typeof CoursSlugRoute
-  '/creators/app': typeof CreatorsAppRouteWithChildren
-  '/creators/invite': typeof CreatorsInviteRoute
-  '/creators/login': typeof CreatorsLoginRoute
-  '/en/become-a-teacher': typeof EnBecomeATeacherRoute
-  '/en/careers': typeof EnCareersRoute
-  '/en/download': typeof EnDownloadRoute
-  '/en/influencer-application': typeof EnInfluencerApplicationRoute
   '/en/legal-notice': typeof EnLegalNoticeRoute
   '/en/privacy': typeof EnPrivacyRoute
   '/en/slideshow-application': typeof EnSlideshowApplicationRoute
-  '/en/sophia-general-knowledge': typeof EnSophiaGeneralKnowledgeRoute
-  '/en/start': typeof EnStartRoute
-  '/en/ugc-application': typeof EnUgcApplicationRoute
-  '/fr/candidature-influenceur': typeof FrCandidatureInfluenceurRoute
   '/fr/candidature-slideshow': typeof FrCandidatureSlideshowRoute
-  '/fr/candidature-ugc': typeof FrCandidatureUgcRoute
-  '/fr/careers': typeof FrCareersRoute
   '/fr/confidentialite': typeof FrConfidentialiteRoute
-  '/fr/devenir-professeur': typeof FrDevenirProfesseurRoute
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
-  '/fr/sophia-culture-generale': typeof FrSophiaCultureGeneraleRoute
-  '/fr/telecharger': typeof FrTelechargerRoute
-  '/go/$handle': typeof GoHandleRoute
-  '/invite/$token': typeof InviteTokenRoute
-  '/jobs/$slug': typeof JobsSlugRoute
   '/payout/$token': typeof PayoutTokenRoute
-  '/cours/': typeof CoursIndexRoute
-  '/creators/': typeof CreatorsIndexRoute
   '/en/': typeof EnIndexRoute
   '/fr/': typeof FrIndexRoute
-  '/_authenticated/auteurs/contract': typeof AuthenticatedAuteursContractRoute
-  '/_authenticated/auteurs/examples': typeof AuthenticatedAuteursExamplesRoute
-  '/_authenticated/auteurs/guide': typeof AuthenticatedAuteursGuideRoute
-  '/_authenticated/auteurs/messages': typeof AuthenticatedAuteursMessagesRoute
-  '/_authenticated/auteurs/open': typeof AuthenticatedAuteursOpenRoute
-  '/_authenticated/auteurs/profile': typeof AuthenticatedAuteursProfileRoute
-  '/_authenticated/hub/ads': typeof AuthenticatedHubAdsRoute
-  '/_authenticated/hub/affiliates': typeof AuthenticatedHubAffiliatesRoute
-  '/_authenticated/hub/analytics': typeof AuthenticatedHubAnalyticsRoute
-  '/_authenticated/hub/discover': typeof AuthenticatedHubDiscoverRoute
-  '/_authenticated/hub/learn': typeof AuthenticatedHubLearnRoute
-  '/_authenticated/hub/messages': typeof AuthenticatedHubMessagesRoute
-  '/_authenticated/hub/payouts': typeof AuthenticatedHubPayoutsRoute
   '/_authenticated/hub/settings': typeof AuthenticatedHubSettingsRoute
   '/api/public/os-candidatures': typeof ApiPublicOsCandidaturesRoute
   '/api/public/os-email': typeof ApiPublicOsEmailRoute
   '/api/public/os-email-events': typeof ApiPublicOsEmailEventsRoute
-  '/creators/app/account': typeof CreatorsAppAccountRoute
-  '/creators/app/apps': typeof CreatorsAppAppsRoute
-  '/creators/app/calls': typeof CreatorsAppCallsRoute
-  '/creators/app/contract': typeof CreatorsAppContractRoute
-  '/creators/app/earnings': typeof CreatorsAppEarningsRoute
-  '/creators/app/jobs': typeof CreatorsAppJobsRoute
-  '/creators/app/library': typeof CreatorsAppLibraryRoute
-  '/creators/app/messages': typeof CreatorsAppMessagesRoute
-  '/creators/app/posts': typeof CreatorsAppPostsRoute
-  '/creators/app/profile': typeof CreatorsAppProfileRoute
-  '/creators/app/rules': typeof CreatorsAppRulesRoute
-  '/creators/app/tasks': typeof CreatorsAppTasksRoute
-  '/creators/influencer/app': typeof CreatorsInfluencerAppRouteWithChildren
-  '/creators/influencer/apply': typeof CreatorsInfluencerApplyRoute
   '/creators/sign/$token': typeof CreatorsSignTokenRoute
   '/creators/slideshow/apply': typeof CreatorsSlideshowApplyRoute
-  '/creators/ugc/apply': typeof CreatorsUgcApplyRoute
-  '/creators/unswipe/influencer': typeof CreatorsUnswipeInfluencerRoute
-  '/creators/unswipe/slideshow': typeof CreatorsUnswipeSlideshowRoute
-  '/creators/unswipe/ugc': typeof CreatorsUnswipeUgcRoute
-  '/en/authors/$slug': typeof EnAuthorsSlugRoute
-  '/en/creators/influencer': typeof EnCreatorsInfluencerRoute
   '/en/creators/slideshow': typeof EnCreatorsSlideshowRoute
-  '/en/creators/ugc': typeof EnCreatorsUgcRoute
-  '/en/lessons/$slug': typeof EnLessonsSlugRoute
-  '/fr/auteurs/$slug': typeof FrAuteursSlugRoute
-  '/fr/cours/$slug': typeof FrCoursSlugRoute
-  '/fr/createurs/influenceur': typeof FrCreateursInfluenceurRoute
   '/fr/createurs/slideshow': typeof FrCreateursSlideshowRoute
-  '/fr/createurs/ugc': typeof FrCreateursUgcRoute
-  '/_authenticated/auteurs/': typeof AuthenticatedAuteursIndexRoute
   '/_authenticated/hub/': typeof AuthenticatedHubIndexRoute
-  '/creators/app/': typeof CreatorsAppIndexRoute
-  '/creators/influencer/': typeof CreatorsInfluencerIndexRoute
   '/creators/slideshow/': typeof CreatorsSlideshowIndexRoute
-  '/creators/ugc/': typeof CreatorsUgcIndexRoute
-  '/creators/unswipe/': typeof CreatorsUnswipeIndexRoute
-  '/en/creators/': typeof EnCreatorsIndexRoute
-  '/en/lessons/': typeof EnLessonsIndexRoute
-  '/fr/cours/': typeof FrCoursIndexRoute
-  '/fr/createurs/': typeof FrCreateursIndexRoute
   '/$lang/creators/slideshow/apply': typeof LangCreatorsSlideshowApplyRoute
-  '/_authenticated/auteurs/admin/activity': typeof AuthenticatedAuteursAdminActivityRoute
-  '/_authenticated/auteurs/admin/ai-review': typeof AuthenticatedAuteursAdminAiReviewRoute
-  '/_authenticated/auteurs/admin/announcements': typeof AuthenticatedAuteursAdminAnnouncementsRoute
-  '/_authenticated/auteurs/admin/api': typeof AuthenticatedAuteursAdminApiRoute
-  '/_authenticated/auteurs/admin/applications': typeof AuthenticatedAuteursAdminApplicationsRoute
-  '/_authenticated/auteurs/admin/codes': typeof AuthenticatedAuteursAdminCodesRoute
-  '/_authenticated/auteurs/admin/messages': typeof AuthenticatedAuteursAdminMessagesRoute
-  '/_authenticated/auteurs/admin/pool': typeof AuthenticatedAuteursAdminPoolRoute
-  '/_authenticated/auteurs/admin/settings': typeof AuthenticatedAuteursAdminSettingsRoute
-  '/_authenticated/auteurs/courses/$courseId': typeof AuthenticatedAuteursCoursesCourseIdRoute
-  '/_authenticated/auteurs/studio/$id': typeof AuthenticatedAuteursStudioIdRoute
-  '/_authenticated/hub/campaigns/create': typeof AuthenticatedHubCampaignsCreateRoute
-  '/_authenticated/hub/creators/$creatorId': typeof AuthenticatedHubCreatorsCreatorIdRoute
-  '/_authenticated/hub/influencers/$section': typeof AuthenticatedHubInfluencersSectionRoute
   '/_authenticated/hub/slideshows/$section': typeof AuthenticatedHubSlideshowsSectionRoute
   '/_authenticated/hub/slideshows/parcours-ruul': typeof AuthenticatedHubSlideshowsParcoursRuulRoute
-  '/_authenticated/hub/tools/$': typeof AuthenticatedHubToolsSplatRoute
-  '/_authenticated/hub/ugc/ads': typeof AuthenticatedHubUgcAdsRoute
-  '/_authenticated/hub/ugc/analytics': typeof AuthenticatedHubUgcAnalyticsRoute
-  '/_authenticated/hub/ugc/applications': typeof AuthenticatedHubUgcApplicationsRoute
-  '/_authenticated/hub/ugc/inspiration': typeof AuthenticatedHubUgcInspirationRoute
-  '/_authenticated/hub/ugc/library': typeof AuthenticatedHubUgcLibraryRoute
-  '/_authenticated/hub/ugc/messages': typeof AuthenticatedHubUgcMessagesRoute
-  '/_authenticated/hub/ugc/payouts': typeof AuthenticatedHubUgcPayoutsRoute
-  '/_authenticated/hub/ugc/posts': typeof AuthenticatedHubUgcPostsRoute
-  '/_authenticated/hub/ugc/referrals': typeof AuthenticatedHubUgcReferralsRoute
   '/api/public/app/courses': typeof ApiPublicAppCoursesRouteWithChildren
-  '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
-  '/api/public/tiktok/oauth': typeof ApiPublicTiktokOauthRoute
-  '/creators/app/briefs/$briefId': typeof CreatorsAppBriefsBriefIdRoute
-  '/creators/influencer/app/agreement': typeof CreatorsInfluencerAppAgreementRoute
-  '/creators/influencer/app/briefs': typeof CreatorsInfluencerAppBriefsRoute
-  '/creators/influencer/app/earnings': typeof CreatorsInfluencerAppEarningsRoute
-  '/creators/influencer/app/messages': typeof CreatorsInfluencerAppMessagesRoute
-  '/creators/influencer/app/offers': typeof CreatorsInfluencerAppOffersRoute
-  '/creators/influencer/app/payouts': typeof CreatorsInfluencerAppPayoutsRoute
-  '/creators/influencer/app/profile': typeof CreatorsInfluencerAppProfileRoute
-  '/creators/influencer/app/rules': typeof CreatorsInfluencerAppRulesRoute
-  '/en/creators/unswipe/influencer': typeof EnCreatorsUnswipeInfluencerRoute
-  '/en/creators/unswipe/slideshow': typeof EnCreatorsUnswipeSlideshowRoute
-  '/en/creators/unswipe/ugc': typeof EnCreatorsUnswipeUgcRoute
-  '/fr/createurs/unswipe/influenceur': typeof FrCreateursUnswipeInfluenceurRoute
-  '/fr/createurs/unswipe/slideshow': typeof FrCreateursUnswipeSlideshowRoute
-  '/fr/createurs/unswipe/ugc': typeof FrCreateursUnswipeUgcRoute
   '/$lang/creators/slideshow/': typeof LangCreatorsSlideshowIndexRoute
-  '/_authenticated/auteurs/admin/': typeof AuthenticatedAuteursAdminIndexRoute
-  '/_authenticated/auteurs/courses/': typeof AuthenticatedAuteursCoursesIndexRoute
-  '/_authenticated/hub/campaigns/': typeof AuthenticatedHubCampaignsIndexRoute
-  '/_authenticated/hub/influencers/': typeof AuthenticatedHubInfluencersIndexRoute
   '/_authenticated/hub/slideshows/': typeof AuthenticatedHubSlideshowsIndexRoute
-  '/_authenticated/hub/ugc/': typeof AuthenticatedHubUgcIndexRoute
-  '/creators/app/briefs/': typeof CreatorsAppBriefsIndexRoute
-  '/creators/influencer/app/': typeof CreatorsInfluencerAppIndexRoute
-  '/en/creators/unswipe/': typeof EnCreatorsUnswipeIndexRoute
-  '/fr/createurs/unswipe/': typeof FrCreateursUnswipeIndexRoute
-  '/_authenticated/auteurs/admin/authors/$authorId': typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
-  '/_authenticated/auteurs/admin/authors/new': typeof AuthenticatedAuteursAdminAuthorsNewRoute
-  '/_authenticated/auteurs/admin/courses/$courseId': typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
-  '/_authenticated/auteurs/admin/creators/$creatorId': typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
-  '/_authenticated/auteurs/admin/creators/applications': typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
-  '/_authenticated/auteurs/admin/creators/apps': typeof AuthenticatedAuteursAdminCreatorsAppsRoute
-  '/_authenticated/auteurs/admin/creators/compliance': typeof AuthenticatedAuteursAdminCreatorsComplianceRoute
-  '/_authenticated/auteurs/admin/creators/influencer-applications': typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
-  '/_authenticated/auteurs/admin/creators/influencer-messages': typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
-  '/_authenticated/auteurs/admin/creators/influencer-payouts': typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
-  '/_authenticated/auteurs/admin/creators/influencer-performance': typeof AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute
-  '/_authenticated/auteurs/admin/creators/influencer-settings': typeof AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute
-  '/_authenticated/auteurs/admin/creators/integrations': typeof AuthenticatedAuteursAdminCreatorsIntegrationsRoute
-  '/_authenticated/auteurs/admin/creators/messages': typeof AuthenticatedAuteursAdminCreatorsMessagesRoute
-  '/_authenticated/auteurs/admin/creators/ops': typeof AuthenticatedAuteursAdminCreatorsOpsRoute
-  '/_authenticated/auteurs/admin/creators/payouts': typeof AuthenticatedAuteursAdminCreatorsPayoutsRoute
-  '/_authenticated/auteurs/admin/creators/planner': typeof AuthenticatedAuteursAdminCreatorsPlannerRoute
-  '/_authenticated/auteurs/admin/creators/prospects': typeof AuthenticatedAuteursAdminCreatorsProspectsRoute
-  '/_authenticated/auteurs/admin/creators/slideshow-applications': typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute
-  '/_authenticated/auteurs/admin/creators/ugc-applications': typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute
-  '/_authenticated/auteurs/admin/creators/ugc-briefs': typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRoute
-  '/_authenticated/auteurs/admin/documents/$slug': typeof AuthenticatedAuteursAdminDocumentsSlugRoute
-  '/_authenticated/auteurs/admin/review/$courseId': typeof AuthenticatedAuteursAdminReviewCourseIdRoute
-  '/_authenticated/hub/learn_/briefs/$briefId': typeof AuthenticatedHubLearnBriefsBriefIdRoute
-  '/_authenticated/hub/ugc/briefs/$briefId': typeof AuthenticatedHubUgcBriefsBriefIdRoute
-  '/_authenticated/hub/ugc/campaigns/create': typeof AuthenticatedHubUgcCampaignsCreateRoute
-  '/_authenticated/hub/ugc/creators/$creatorId': typeof AuthenticatedHubUgcCreatorsCreatorIdRoute
   '/api/public/app/courses/$slug': typeof ApiPublicAppCoursesSlugRoute
   '/api/public/cron/ugc/$job': typeof ApiPublicCronUgcJobRoute
-  '/creators/influencer/app/deals/$dealId': typeof CreatorsInfluencerAppDealsDealIdRoute
-  '/_authenticated/auteurs/admin/authors/': typeof AuthenticatedAuteursAdminAuthorsIndexRoute
-  '/_authenticated/auteurs/admin/courses/': typeof AuthenticatedAuteursAdminCoursesIndexRoute
-  '/_authenticated/auteurs/admin/creators/': typeof AuthenticatedAuteursAdminCreatorsIndexRoute
-  '/_authenticated/auteurs/admin/documents/': typeof AuthenticatedAuteursAdminDocumentsIndexRoute
-  '/_authenticated/auteurs/admin/review/': typeof AuthenticatedAuteursAdminReviewIndexRoute
-  '/_authenticated/hub/ugc/briefs/': typeof AuthenticatedHubUgcBriefsIndexRoute
-  '/_authenticated/hub/ugc/campaigns/': typeof AuthenticatedHubUgcCampaignsIndexRoute
-  '/_authenticated/hub/ugc/creators/': typeof AuthenticatedHubUgcCreatorsIndexRoute
-  '/creators/influencer/app/deals/': typeof CreatorsInfluencerAppDealsIndexRoute
-  '/_authenticated/auteurs/admin/creators/influencer-briefs/$briefId': typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRoute
-  '/_authenticated/auteurs/admin/creators/influencer-deals/$dealId': typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRoute
-  '/_authenticated/auteurs/admin/creators/influencers/$influencerId': typeof AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRoute
-  '/_authenticated/hub/ugc/library_/briefs/$briefId': typeof AuthenticatedHubUgcLibraryBriefsBriefIdRoute
-  '/_authenticated/auteurs/admin/creators/influencer-briefs/': typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRoute
-  '/_authenticated/auteurs/admin/creators/influencer-deals/': typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRoute
-  '/_authenticated/auteurs/admin/creators/influencers/': typeof AuthenticatedAuteursAdminCreatorsInfluencersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -2025,635 +369,118 @@ export interface FileRouteTypes {
     | '/'
     | '/account-not-set-up'
     | '/auth'
-    | '/careers'
     | '/confidentialite'
-    | '/devenir-professeur'
     | '/mentions-legales'
     | '/poster-unsubscribe'
     | '/reset-password'
     | '/sitemap.xml'
-    | '/sophia-culture-generale'
-    | '/start'
-    | '/telecharger'
     | '/hub'
     | '/.well-known/apple-app-site-association'
-    | '/auteurs/$slug'
-    | '/auteurs/invite'
-    | '/auteurs/join'
-    | '/auteurs/login'
-    | '/cours/$slug'
-    | '/creators/app'
-    | '/creators/invite'
-    | '/creators/login'
-    | '/en/become-a-teacher'
-    | '/en/careers'
-    | '/en/download'
-    | '/en/influencer-application'
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/slideshow-application'
-    | '/en/sophia-general-knowledge'
-    | '/en/start'
-    | '/en/ugc-application'
-    | '/fr/candidature-influenceur'
     | '/fr/candidature-slideshow'
-    | '/fr/candidature-ugc'
-    | '/fr/careers'
     | '/fr/confidentialite'
-    | '/fr/devenir-professeur'
     | '/fr/mentions-legales'
-    | '/fr/sophia-culture-generale'
-    | '/fr/telecharger'
-    | '/go/$handle'
-    | '/invite/$token'
-    | '/jobs/$slug'
     | '/payout/$token'
-    | '/cours/'
-    | '/creators/'
     | '/en/'
     | '/fr/'
-    | '/auteurs/contract'
-    | '/auteurs/examples'
-    | '/auteurs/guide'
-    | '/auteurs/messages'
-    | '/auteurs/open'
-    | '/auteurs/profile'
-    | '/hub/ads'
-    | '/hub/affiliates'
-    | '/hub/analytics'
-    | '/hub/discover'
-    | '/hub/learn'
-    | '/hub/messages'
-    | '/hub/payouts'
     | '/hub/settings'
     | '/api/public/os-candidatures'
     | '/api/public/os-email'
     | '/api/public/os-email-events'
-    | '/creators/app/account'
-    | '/creators/app/apps'
-    | '/creators/app/calls'
-    | '/creators/app/contract'
-    | '/creators/app/earnings'
-    | '/creators/app/jobs'
-    | '/creators/app/library'
-    | '/creators/app/messages'
-    | '/creators/app/posts'
-    | '/creators/app/profile'
-    | '/creators/app/rules'
-    | '/creators/app/tasks'
-    | '/creators/influencer/app'
-    | '/creators/influencer/apply'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
-    | '/creators/ugc/apply'
-    | '/creators/unswipe/influencer'
-    | '/creators/unswipe/slideshow'
-    | '/creators/unswipe/ugc'
-    | '/en/authors/$slug'
-    | '/en/creators/influencer'
     | '/en/creators/slideshow'
-    | '/en/creators/ugc'
-    | '/en/lessons/$slug'
-    | '/fr/auteurs/$slug'
-    | '/fr/cours/$slug'
-    | '/fr/createurs/influenceur'
     | '/fr/createurs/slideshow'
-    | '/fr/createurs/ugc'
-    | '/auteurs/'
     | '/hub/'
-    | '/creators/app/'
-    | '/creators/influencer/'
     | '/creators/slideshow/'
-    | '/creators/ugc/'
-    | '/creators/unswipe/'
-    | '/en/creators/'
-    | '/en/lessons/'
-    | '/fr/cours/'
-    | '/fr/createurs/'
     | '/$lang/creators/slideshow/apply'
-    | '/auteurs/admin/activity'
-    | '/auteurs/admin/ai-review'
-    | '/auteurs/admin/announcements'
-    | '/auteurs/admin/api'
-    | '/auteurs/admin/applications'
-    | '/auteurs/admin/codes'
-    | '/auteurs/admin/messages'
-    | '/auteurs/admin/pool'
-    | '/auteurs/admin/settings'
-    | '/auteurs/courses/$courseId'
-    | '/auteurs/studio/$id'
-    | '/hub/campaigns/create'
-    | '/hub/creators/$creatorId'
-    | '/hub/influencers/$section'
     | '/hub/slideshows/$section'
     | '/hub/slideshows/parcours-ruul'
-    | '/hub/tools/$'
-    | '/hub/ugc/ads'
-    | '/hub/ugc/analytics'
-    | '/hub/ugc/applications'
-    | '/hub/ugc/inspiration'
-    | '/hub/ugc/library'
-    | '/hub/ugc/messages'
-    | '/hub/ugc/payouts'
-    | '/hub/ugc/posts'
-    | '/hub/ugc/referrals'
     | '/api/public/app/courses'
-    | '/api/public/stripe/webhook'
-    | '/api/public/tiktok/oauth'
-    | '/creators/app/briefs/$briefId'
-    | '/creators/influencer/app/agreement'
-    | '/creators/influencer/app/briefs'
-    | '/creators/influencer/app/earnings'
-    | '/creators/influencer/app/messages'
-    | '/creators/influencer/app/offers'
-    | '/creators/influencer/app/payouts'
-    | '/creators/influencer/app/profile'
-    | '/creators/influencer/app/rules'
-    | '/en/creators/unswipe/influencer'
-    | '/en/creators/unswipe/slideshow'
-    | '/en/creators/unswipe/ugc'
-    | '/fr/createurs/unswipe/influenceur'
-    | '/fr/createurs/unswipe/slideshow'
-    | '/fr/createurs/unswipe/ugc'
     | '/$lang/creators/slideshow/'
-    | '/auteurs/admin/'
-    | '/auteurs/courses/'
-    | '/hub/campaigns/'
-    | '/hub/influencers/'
     | '/hub/slideshows/'
-    | '/hub/ugc/'
-    | '/creators/app/briefs/'
-    | '/creators/influencer/app/'
-    | '/en/creators/unswipe/'
-    | '/fr/createurs/unswipe/'
-    | '/auteurs/admin/authors/$authorId'
-    | '/auteurs/admin/authors/new'
-    | '/auteurs/admin/courses/$courseId'
-    | '/auteurs/admin/creators/$creatorId'
-    | '/auteurs/admin/creators/applications'
-    | '/auteurs/admin/creators/apps'
-    | '/auteurs/admin/creators/compliance'
-    | '/auteurs/admin/creators/influencer-applications'
-    | '/auteurs/admin/creators/influencer-messages'
-    | '/auteurs/admin/creators/influencer-payouts'
-    | '/auteurs/admin/creators/influencer-performance'
-    | '/auteurs/admin/creators/influencer-settings'
-    | '/auteurs/admin/creators/integrations'
-    | '/auteurs/admin/creators/messages'
-    | '/auteurs/admin/creators/ops'
-    | '/auteurs/admin/creators/payouts'
-    | '/auteurs/admin/creators/planner'
-    | '/auteurs/admin/creators/prospects'
-    | '/auteurs/admin/creators/slideshow-applications'
-    | '/auteurs/admin/creators/ugc-applications'
-    | '/auteurs/admin/creators/ugc-briefs'
-    | '/auteurs/admin/documents/$slug'
-    | '/auteurs/admin/review/$courseId'
-    | '/hub/learn/briefs/$briefId'
-    | '/hub/ugc/briefs/$briefId'
-    | '/hub/ugc/campaigns/create'
-    | '/hub/ugc/creators/$creatorId'
     | '/api/public/app/courses/$slug'
     | '/api/public/cron/ugc/$job'
-    | '/creators/influencer/app/deals/$dealId'
-    | '/auteurs/admin/authors/'
-    | '/auteurs/admin/courses/'
-    | '/auteurs/admin/creators/'
-    | '/auteurs/admin/documents/'
-    | '/auteurs/admin/review/'
-    | '/hub/ugc/briefs/'
-    | '/hub/ugc/campaigns/'
-    | '/hub/ugc/creators/'
-    | '/creators/influencer/app/deals/'
-    | '/auteurs/admin/creators/influencer-briefs/$briefId'
-    | '/auteurs/admin/creators/influencer-deals/$dealId'
-    | '/auteurs/admin/creators/influencers/$influencerId'
-    | '/hub/ugc/library/briefs/$briefId'
-    | '/auteurs/admin/creators/influencer-briefs/'
-    | '/auteurs/admin/creators/influencer-deals/'
-    | '/auteurs/admin/creators/influencers/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/account-not-set-up'
     | '/auth'
-    | '/careers'
     | '/confidentialite'
-    | '/devenir-professeur'
     | '/mentions-legales'
     | '/poster-unsubscribe'
     | '/reset-password'
     | '/sitemap.xml'
-    | '/sophia-culture-generale'
-    | '/start'
-    | '/telecharger'
     | '/.well-known/apple-app-site-association'
-    | '/auteurs/$slug'
-    | '/auteurs/invite'
-    | '/auteurs/join'
-    | '/auteurs/login'
-    | '/cours/$slug'
-    | '/creators/invite'
-    | '/creators/login'
-    | '/en/become-a-teacher'
-    | '/en/careers'
-    | '/en/download'
-    | '/en/influencer-application'
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/slideshow-application'
-    | '/en/sophia-general-knowledge'
-    | '/en/start'
-    | '/en/ugc-application'
-    | '/fr/candidature-influenceur'
     | '/fr/candidature-slideshow'
-    | '/fr/candidature-ugc'
-    | '/fr/careers'
     | '/fr/confidentialite'
-    | '/fr/devenir-professeur'
     | '/fr/mentions-legales'
-    | '/fr/sophia-culture-generale'
-    | '/fr/telecharger'
-    | '/go/$handle'
-    | '/invite/$token'
-    | '/jobs/$slug'
     | '/payout/$token'
-    | '/cours'
-    | '/creators'
     | '/en'
     | '/fr'
-    | '/auteurs/contract'
-    | '/auteurs/examples'
-    | '/auteurs/guide'
-    | '/auteurs/messages'
-    | '/auteurs/open'
-    | '/auteurs/profile'
-    | '/hub/ads'
-    | '/hub/affiliates'
-    | '/hub/analytics'
-    | '/hub/discover'
-    | '/hub/learn'
-    | '/hub/messages'
-    | '/hub/payouts'
     | '/hub/settings'
     | '/api/public/os-candidatures'
     | '/api/public/os-email'
     | '/api/public/os-email-events'
-    | '/creators/app/account'
-    | '/creators/app/apps'
-    | '/creators/app/calls'
-    | '/creators/app/contract'
-    | '/creators/app/earnings'
-    | '/creators/app/jobs'
-    | '/creators/app/library'
-    | '/creators/app/messages'
-    | '/creators/app/posts'
-    | '/creators/app/profile'
-    | '/creators/app/rules'
-    | '/creators/app/tasks'
-    | '/creators/influencer/apply'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
-    | '/creators/ugc/apply'
-    | '/creators/unswipe/influencer'
-    | '/creators/unswipe/slideshow'
-    | '/creators/unswipe/ugc'
-    | '/en/authors/$slug'
-    | '/en/creators/influencer'
     | '/en/creators/slideshow'
-    | '/en/creators/ugc'
-    | '/en/lessons/$slug'
-    | '/fr/auteurs/$slug'
-    | '/fr/cours/$slug'
-    | '/fr/createurs/influenceur'
     | '/fr/createurs/slideshow'
-    | '/fr/createurs/ugc'
-    | '/auteurs'
     | '/hub'
-    | '/creators/app'
-    | '/creators/influencer'
     | '/creators/slideshow'
-    | '/creators/ugc'
-    | '/creators/unswipe'
-    | '/en/creators'
-    | '/en/lessons'
-    | '/fr/cours'
-    | '/fr/createurs'
     | '/$lang/creators/slideshow/apply'
-    | '/auteurs/admin/activity'
-    | '/auteurs/admin/ai-review'
-    | '/auteurs/admin/announcements'
-    | '/auteurs/admin/api'
-    | '/auteurs/admin/applications'
-    | '/auteurs/admin/codes'
-    | '/auteurs/admin/messages'
-    | '/auteurs/admin/pool'
-    | '/auteurs/admin/settings'
-    | '/auteurs/courses/$courseId'
-    | '/auteurs/studio/$id'
-    | '/hub/campaigns/create'
-    | '/hub/creators/$creatorId'
-    | '/hub/influencers/$section'
     | '/hub/slideshows/$section'
     | '/hub/slideshows/parcours-ruul'
-    | '/hub/tools/$'
-    | '/hub/ugc/ads'
-    | '/hub/ugc/analytics'
-    | '/hub/ugc/applications'
-    | '/hub/ugc/inspiration'
-    | '/hub/ugc/library'
-    | '/hub/ugc/messages'
-    | '/hub/ugc/payouts'
-    | '/hub/ugc/posts'
-    | '/hub/ugc/referrals'
     | '/api/public/app/courses'
-    | '/api/public/stripe/webhook'
-    | '/api/public/tiktok/oauth'
-    | '/creators/app/briefs/$briefId'
-    | '/creators/influencer/app/agreement'
-    | '/creators/influencer/app/briefs'
-    | '/creators/influencer/app/earnings'
-    | '/creators/influencer/app/messages'
-    | '/creators/influencer/app/offers'
-    | '/creators/influencer/app/payouts'
-    | '/creators/influencer/app/profile'
-    | '/creators/influencer/app/rules'
-    | '/en/creators/unswipe/influencer'
-    | '/en/creators/unswipe/slideshow'
-    | '/en/creators/unswipe/ugc'
-    | '/fr/createurs/unswipe/influenceur'
-    | '/fr/createurs/unswipe/slideshow'
-    | '/fr/createurs/unswipe/ugc'
     | '/$lang/creators/slideshow'
-    | '/auteurs/admin'
-    | '/auteurs/courses'
-    | '/hub/campaigns'
-    | '/hub/influencers'
     | '/hub/slideshows'
-    | '/hub/ugc'
-    | '/creators/app/briefs'
-    | '/creators/influencer/app'
-    | '/en/creators/unswipe'
-    | '/fr/createurs/unswipe'
-    | '/auteurs/admin/authors/$authorId'
-    | '/auteurs/admin/authors/new'
-    | '/auteurs/admin/courses/$courseId'
-    | '/auteurs/admin/creators/$creatorId'
-    | '/auteurs/admin/creators/applications'
-    | '/auteurs/admin/creators/apps'
-    | '/auteurs/admin/creators/compliance'
-    | '/auteurs/admin/creators/influencer-applications'
-    | '/auteurs/admin/creators/influencer-messages'
-    | '/auteurs/admin/creators/influencer-payouts'
-    | '/auteurs/admin/creators/influencer-performance'
-    | '/auteurs/admin/creators/influencer-settings'
-    | '/auteurs/admin/creators/integrations'
-    | '/auteurs/admin/creators/messages'
-    | '/auteurs/admin/creators/ops'
-    | '/auteurs/admin/creators/payouts'
-    | '/auteurs/admin/creators/planner'
-    | '/auteurs/admin/creators/prospects'
-    | '/auteurs/admin/creators/slideshow-applications'
-    | '/auteurs/admin/creators/ugc-applications'
-    | '/auteurs/admin/creators/ugc-briefs'
-    | '/auteurs/admin/documents/$slug'
-    | '/auteurs/admin/review/$courseId'
-    | '/hub/learn/briefs/$briefId'
-    | '/hub/ugc/briefs/$briefId'
-    | '/hub/ugc/campaigns/create'
-    | '/hub/ugc/creators/$creatorId'
     | '/api/public/app/courses/$slug'
     | '/api/public/cron/ugc/$job'
-    | '/creators/influencer/app/deals/$dealId'
-    | '/auteurs/admin/authors'
-    | '/auteurs/admin/courses'
-    | '/auteurs/admin/creators'
-    | '/auteurs/admin/documents'
-    | '/auteurs/admin/review'
-    | '/hub/ugc/briefs'
-    | '/hub/ugc/campaigns'
-    | '/hub/ugc/creators'
-    | '/creators/influencer/app/deals'
-    | '/auteurs/admin/creators/influencer-briefs/$briefId'
-    | '/auteurs/admin/creators/influencer-deals/$dealId'
-    | '/auteurs/admin/creators/influencers/$influencerId'
-    | '/hub/ugc/library/briefs/$briefId'
-    | '/auteurs/admin/creators/influencer-briefs'
-    | '/auteurs/admin/creators/influencer-deals'
-    | '/auteurs/admin/creators/influencers'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/account-not-set-up'
     | '/auth'
-    | '/careers'
     | '/confidentialite'
-    | '/devenir-professeur'
     | '/mentions-legales'
     | '/poster-unsubscribe'
     | '/reset-password'
     | '/sitemap.xml'
-    | '/sophia-culture-generale'
-    | '/start'
-    | '/telecharger'
     | '/_authenticated/hub'
     | '/.well-known/apple-app-site-association'
-    | '/auteurs/$slug'
-    | '/auteurs/invite'
-    | '/auteurs/join'
-    | '/auteurs/login'
-    | '/cours/$slug'
-    | '/creators/app'
-    | '/creators/invite'
-    | '/creators/login'
-    | '/en/become-a-teacher'
-    | '/en/careers'
-    | '/en/download'
-    | '/en/influencer-application'
     | '/en/legal-notice'
     | '/en/privacy'
     | '/en/slideshow-application'
-    | '/en/sophia-general-knowledge'
-    | '/en/start'
-    | '/en/ugc-application'
-    | '/fr/candidature-influenceur'
     | '/fr/candidature-slideshow'
-    | '/fr/candidature-ugc'
-    | '/fr/careers'
     | '/fr/confidentialite'
-    | '/fr/devenir-professeur'
     | '/fr/mentions-legales'
-    | '/fr/sophia-culture-generale'
-    | '/fr/telecharger'
-    | '/go/$handle'
-    | '/invite/$token'
-    | '/jobs/$slug'
     | '/payout/$token'
-    | '/cours/'
-    | '/creators/'
     | '/en/'
     | '/fr/'
-    | '/_authenticated/auteurs/contract'
-    | '/_authenticated/auteurs/examples'
-    | '/_authenticated/auteurs/guide'
-    | '/_authenticated/auteurs/messages'
-    | '/_authenticated/auteurs/open'
-    | '/_authenticated/auteurs/profile'
-    | '/_authenticated/hub/ads'
-    | '/_authenticated/hub/affiliates'
-    | '/_authenticated/hub/analytics'
-    | '/_authenticated/hub/discover'
-    | '/_authenticated/hub/learn'
-    | '/_authenticated/hub/messages'
-    | '/_authenticated/hub/payouts'
     | '/_authenticated/hub/settings'
     | '/api/public/os-candidatures'
     | '/api/public/os-email'
     | '/api/public/os-email-events'
-    | '/creators/app/account'
-    | '/creators/app/apps'
-    | '/creators/app/calls'
-    | '/creators/app/contract'
-    | '/creators/app/earnings'
-    | '/creators/app/jobs'
-    | '/creators/app/library'
-    | '/creators/app/messages'
-    | '/creators/app/posts'
-    | '/creators/app/profile'
-    | '/creators/app/rules'
-    | '/creators/app/tasks'
-    | '/creators/influencer/app'
-    | '/creators/influencer/apply'
     | '/creators/sign/$token'
     | '/creators/slideshow/apply'
-    | '/creators/ugc/apply'
-    | '/creators/unswipe/influencer'
-    | '/creators/unswipe/slideshow'
-    | '/creators/unswipe/ugc'
-    | '/en/authors/$slug'
-    | '/en/creators/influencer'
     | '/en/creators/slideshow'
-    | '/en/creators/ugc'
-    | '/en/lessons/$slug'
-    | '/fr/auteurs/$slug'
-    | '/fr/cours/$slug'
-    | '/fr/createurs/influenceur'
     | '/fr/createurs/slideshow'
-    | '/fr/createurs/ugc'
-    | '/_authenticated/auteurs/'
     | '/_authenticated/hub/'
-    | '/creators/app/'
-    | '/creators/influencer/'
     | '/creators/slideshow/'
-    | '/creators/ugc/'
-    | '/creators/unswipe/'
-    | '/en/creators/'
-    | '/en/lessons/'
-    | '/fr/cours/'
-    | '/fr/createurs/'
     | '/$lang/creators/slideshow/apply'
-    | '/_authenticated/auteurs/admin/activity'
-    | '/_authenticated/auteurs/admin/ai-review'
-    | '/_authenticated/auteurs/admin/announcements'
-    | '/_authenticated/auteurs/admin/api'
-    | '/_authenticated/auteurs/admin/applications'
-    | '/_authenticated/auteurs/admin/codes'
-    | '/_authenticated/auteurs/admin/messages'
-    | '/_authenticated/auteurs/admin/pool'
-    | '/_authenticated/auteurs/admin/settings'
-    | '/_authenticated/auteurs/courses/$courseId'
-    | '/_authenticated/auteurs/studio/$id'
-    | '/_authenticated/hub/campaigns/create'
-    | '/_authenticated/hub/creators/$creatorId'
-    | '/_authenticated/hub/influencers/$section'
     | '/_authenticated/hub/slideshows/$section'
     | '/_authenticated/hub/slideshows/parcours-ruul'
-    | '/_authenticated/hub/tools/$'
-    | '/_authenticated/hub/ugc/ads'
-    | '/_authenticated/hub/ugc/analytics'
-    | '/_authenticated/hub/ugc/applications'
-    | '/_authenticated/hub/ugc/inspiration'
-    | '/_authenticated/hub/ugc/library'
-    | '/_authenticated/hub/ugc/messages'
-    | '/_authenticated/hub/ugc/payouts'
-    | '/_authenticated/hub/ugc/posts'
-    | '/_authenticated/hub/ugc/referrals'
     | '/api/public/app/courses'
-    | '/api/public/stripe/webhook'
-    | '/api/public/tiktok/oauth'
-    | '/creators/app/briefs/$briefId'
-    | '/creators/influencer/app/agreement'
-    | '/creators/influencer/app/briefs'
-    | '/creators/influencer/app/earnings'
-    | '/creators/influencer/app/messages'
-    | '/creators/influencer/app/offers'
-    | '/creators/influencer/app/payouts'
-    | '/creators/influencer/app/profile'
-    | '/creators/influencer/app/rules'
-    | '/en/creators/unswipe/influencer'
-    | '/en/creators/unswipe/slideshow'
-    | '/en/creators/unswipe/ugc'
-    | '/fr/createurs/unswipe/influenceur'
-    | '/fr/createurs/unswipe/slideshow'
-    | '/fr/createurs/unswipe/ugc'
     | '/$lang/creators/slideshow/'
-    | '/_authenticated/auteurs/admin/'
-    | '/_authenticated/auteurs/courses/'
-    | '/_authenticated/hub/campaigns/'
-    | '/_authenticated/hub/influencers/'
     | '/_authenticated/hub/slideshows/'
-    | '/_authenticated/hub/ugc/'
-    | '/creators/app/briefs/'
-    | '/creators/influencer/app/'
-    | '/en/creators/unswipe/'
-    | '/fr/createurs/unswipe/'
-    | '/_authenticated/auteurs/admin/authors/$authorId'
-    | '/_authenticated/auteurs/admin/authors/new'
-    | '/_authenticated/auteurs/admin/courses/$courseId'
-    | '/_authenticated/auteurs/admin/creators/$creatorId'
-    | '/_authenticated/auteurs/admin/creators/applications'
-    | '/_authenticated/auteurs/admin/creators/apps'
-    | '/_authenticated/auteurs/admin/creators/compliance'
-    | '/_authenticated/auteurs/admin/creators/influencer-applications'
-    | '/_authenticated/auteurs/admin/creators/influencer-messages'
-    | '/_authenticated/auteurs/admin/creators/influencer-payouts'
-    | '/_authenticated/auteurs/admin/creators/influencer-performance'
-    | '/_authenticated/auteurs/admin/creators/influencer-settings'
-    | '/_authenticated/auteurs/admin/creators/integrations'
-    | '/_authenticated/auteurs/admin/creators/messages'
-    | '/_authenticated/auteurs/admin/creators/ops'
-    | '/_authenticated/auteurs/admin/creators/payouts'
-    | '/_authenticated/auteurs/admin/creators/planner'
-    | '/_authenticated/auteurs/admin/creators/prospects'
-    | '/_authenticated/auteurs/admin/creators/slideshow-applications'
-    | '/_authenticated/auteurs/admin/creators/ugc-applications'
-    | '/_authenticated/auteurs/admin/creators/ugc-briefs'
-    | '/_authenticated/auteurs/admin/documents/$slug'
-    | '/_authenticated/auteurs/admin/review/$courseId'
-    | '/_authenticated/hub/learn_/briefs/$briefId'
-    | '/_authenticated/hub/ugc/briefs/$briefId'
-    | '/_authenticated/hub/ugc/campaigns/create'
-    | '/_authenticated/hub/ugc/creators/$creatorId'
     | '/api/public/app/courses/$slug'
     | '/api/public/cron/ugc/$job'
-    | '/creators/influencer/app/deals/$dealId'
-    | '/_authenticated/auteurs/admin/authors/'
-    | '/_authenticated/auteurs/admin/courses/'
-    | '/_authenticated/auteurs/admin/creators/'
-    | '/_authenticated/auteurs/admin/documents/'
-    | '/_authenticated/auteurs/admin/review/'
-    | '/_authenticated/hub/ugc/briefs/'
-    | '/_authenticated/hub/ugc/campaigns/'
-    | '/_authenticated/hub/ugc/creators/'
-    | '/creators/influencer/app/deals/'
-    | '/_authenticated/auteurs/admin/creators/influencer-briefs/$briefId'
-    | '/_authenticated/auteurs/admin/creators/influencer-deals/$dealId'
-    | '/_authenticated/auteurs/admin/creators/influencers/$influencerId'
-    | '/_authenticated/hub/ugc/library_/briefs/$briefId'
-    | '/_authenticated/auteurs/admin/creators/influencer-briefs/'
-    | '/_authenticated/auteurs/admin/creators/influencer-deals/'
-    | '/_authenticated/auteurs/admin/creators/influencers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -2661,94 +488,32 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AccountNotSetUpRoute: typeof AccountNotSetUpRoute
   AuthRoute: typeof AuthRoute
-  CareersRoute: typeof CareersRoute
   ConfidentialiteRoute: typeof ConfidentialiteRoute
-  DevenirProfesseurRoute: typeof DevenirProfesseurRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   PosterUnsubscribeRoute: typeof PosterUnsubscribeRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  SophiaCultureGeneraleRoute: typeof SophiaCultureGeneraleRoute
-  StartRoute: typeof StartRoute
-  TelechargerRoute: typeof TelechargerRoute
   DotwellKnownAppleAppSiteAssociationRoute: typeof DotwellKnownAppleAppSiteAssociationRoute
-  AuteursSlugRoute: typeof AuteursSlugRoute
-  AuteursInviteRoute: typeof AuteursInviteRoute
-  AuteursJoinRoute: typeof AuteursJoinRoute
-  AuteursLoginRoute: typeof AuteursLoginRoute
-  CoursSlugRoute: typeof CoursSlugRoute
-  CreatorsAppRoute: typeof CreatorsAppRouteWithChildren
-  CreatorsInviteRoute: typeof CreatorsInviteRoute
-  CreatorsLoginRoute: typeof CreatorsLoginRoute
-  EnBecomeATeacherRoute: typeof EnBecomeATeacherRoute
-  EnCareersRoute: typeof EnCareersRoute
-  EnDownloadRoute: typeof EnDownloadRoute
-  EnInfluencerApplicationRoute: typeof EnInfluencerApplicationRoute
   EnLegalNoticeRoute: typeof EnLegalNoticeRoute
   EnPrivacyRoute: typeof EnPrivacyRoute
   EnSlideshowApplicationRoute: typeof EnSlideshowApplicationRoute
-  EnSophiaGeneralKnowledgeRoute: typeof EnSophiaGeneralKnowledgeRoute
-  EnStartRoute: typeof EnStartRoute
-  EnUgcApplicationRoute: typeof EnUgcApplicationRoute
-  FrCandidatureInfluenceurRoute: typeof FrCandidatureInfluenceurRoute
   FrCandidatureSlideshowRoute: typeof FrCandidatureSlideshowRoute
-  FrCandidatureUgcRoute: typeof FrCandidatureUgcRoute
-  FrCareersRoute: typeof FrCareersRoute
   FrConfidentialiteRoute: typeof FrConfidentialiteRoute
-  FrDevenirProfesseurRoute: typeof FrDevenirProfesseurRoute
   FrMentionsLegalesRoute: typeof FrMentionsLegalesRoute
-  FrSophiaCultureGeneraleRoute: typeof FrSophiaCultureGeneraleRoute
-  FrTelechargerRoute: typeof FrTelechargerRoute
-  GoHandleRoute: typeof GoHandleRoute
-  InviteTokenRoute: typeof InviteTokenRoute
-  JobsSlugRoute: typeof JobsSlugRoute
   PayoutTokenRoute: typeof PayoutTokenRoute
-  CoursIndexRoute: typeof CoursIndexRoute
-  CreatorsIndexRoute: typeof CreatorsIndexRoute
   EnIndexRoute: typeof EnIndexRoute
   FrIndexRoute: typeof FrIndexRoute
   ApiPublicOsCandidaturesRoute: typeof ApiPublicOsCandidaturesRoute
   ApiPublicOsEmailRoute: typeof ApiPublicOsEmailRoute
   ApiPublicOsEmailEventsRoute: typeof ApiPublicOsEmailEventsRoute
-  CreatorsInfluencerAppRoute: typeof CreatorsInfluencerAppRouteWithChildren
-  CreatorsInfluencerApplyRoute: typeof CreatorsInfluencerApplyRoute
   CreatorsSignTokenRoute: typeof CreatorsSignTokenRoute
   CreatorsSlideshowApplyRoute: typeof CreatorsSlideshowApplyRoute
-  CreatorsUgcApplyRoute: typeof CreatorsUgcApplyRoute
-  CreatorsUnswipeInfluencerRoute: typeof CreatorsUnswipeInfluencerRoute
-  CreatorsUnswipeSlideshowRoute: typeof CreatorsUnswipeSlideshowRoute
-  CreatorsUnswipeUgcRoute: typeof CreatorsUnswipeUgcRoute
-  EnAuthorsSlugRoute: typeof EnAuthorsSlugRoute
-  EnCreatorsInfluencerRoute: typeof EnCreatorsInfluencerRoute
   EnCreatorsSlideshowRoute: typeof EnCreatorsSlideshowRoute
-  EnCreatorsUgcRoute: typeof EnCreatorsUgcRoute
-  EnLessonsSlugRoute: typeof EnLessonsSlugRoute
-  FrAuteursSlugRoute: typeof FrAuteursSlugRoute
-  FrCoursSlugRoute: typeof FrCoursSlugRoute
-  FrCreateursInfluenceurRoute: typeof FrCreateursInfluenceurRoute
   FrCreateursSlideshowRoute: typeof FrCreateursSlideshowRoute
-  FrCreateursUgcRoute: typeof FrCreateursUgcRoute
-  CreatorsInfluencerIndexRoute: typeof CreatorsInfluencerIndexRoute
   CreatorsSlideshowIndexRoute: typeof CreatorsSlideshowIndexRoute
-  CreatorsUgcIndexRoute: typeof CreatorsUgcIndexRoute
-  CreatorsUnswipeIndexRoute: typeof CreatorsUnswipeIndexRoute
-  EnCreatorsIndexRoute: typeof EnCreatorsIndexRoute
-  EnLessonsIndexRoute: typeof EnLessonsIndexRoute
-  FrCoursIndexRoute: typeof FrCoursIndexRoute
-  FrCreateursIndexRoute: typeof FrCreateursIndexRoute
   LangCreatorsSlideshowApplyRoute: typeof LangCreatorsSlideshowApplyRoute
   ApiPublicAppCoursesRoute: typeof ApiPublicAppCoursesRouteWithChildren
-  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
-  ApiPublicTiktokOauthRoute: typeof ApiPublicTiktokOauthRoute
-  EnCreatorsUnswipeInfluencerRoute: typeof EnCreatorsUnswipeInfluencerRoute
-  EnCreatorsUnswipeSlideshowRoute: typeof EnCreatorsUnswipeSlideshowRoute
-  EnCreatorsUnswipeUgcRoute: typeof EnCreatorsUnswipeUgcRoute
-  FrCreateursUnswipeInfluenceurRoute: typeof FrCreateursUnswipeInfluenceurRoute
-  FrCreateursUnswipeSlideshowRoute: typeof FrCreateursUnswipeSlideshowRoute
-  FrCreateursUnswipeUgcRoute: typeof FrCreateursUnswipeUgcRoute
   LangCreatorsSlideshowIndexRoute: typeof LangCreatorsSlideshowIndexRoute
-  EnCreatorsUnswipeIndexRoute: typeof EnCreatorsUnswipeIndexRoute
-  FrCreateursUnswipeIndexRoute: typeof FrCreateursUnswipeIndexRoute
   ApiPublicCronUgcJobRoute: typeof ApiPublicCronUgcJobRoute
 }
 
@@ -2782,25 +547,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/careers': {
-      id: '/careers'
-      path: '/careers'
-      fullPath: '/careers'
-      preLoaderRoute: typeof CareersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/confidentialite': {
       id: '/confidentialite'
       path: '/confidentialite'
       fullPath: '/confidentialite'
       preLoaderRoute: typeof ConfidentialiteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/devenir-professeur': {
-      id: '/devenir-professeur'
-      path: '/devenir-professeur'
-      fullPath: '/devenir-professeur'
-      preLoaderRoute: typeof DevenirProfesseurRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mentions-legales': {
@@ -2831,27 +582,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sophia-culture-generale': {
-      id: '/sophia-culture-generale'
-      path: '/sophia-culture-generale'
-      fullPath: '/sophia-culture-generale'
-      preLoaderRoute: typeof SophiaCultureGeneraleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/start': {
-      id: '/start'
-      path: '/start'
-      fullPath: '/start'
-      preLoaderRoute: typeof StartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/telecharger': {
-      id: '/telecharger'
-      path: '/telecharger'
-      fullPath: '/telecharger'
-      preLoaderRoute: typeof TelechargerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/.well-known/apple-app-site-association': {
       id: '/.well-known/apple-app-site-association'
       path: '/.well-known/apple-app-site-association'
@@ -2866,109 +596,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHubRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/auteurs/$slug': {
-      id: '/auteurs/$slug'
-      path: '/auteurs/$slug'
-      fullPath: '/auteurs/$slug'
-      preLoaderRoute: typeof AuteursSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auteurs/invite': {
-      id: '/auteurs/invite'
-      path: '/auteurs/invite'
-      fullPath: '/auteurs/invite'
-      preLoaderRoute: typeof AuteursInviteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auteurs/join': {
-      id: '/auteurs/join'
-      path: '/auteurs/join'
-      fullPath: '/auteurs/join'
-      preLoaderRoute: typeof AuteursJoinRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auteurs/login': {
-      id: '/auteurs/login'
-      path: '/auteurs/login'
-      fullPath: '/auteurs/login'
-      preLoaderRoute: typeof AuteursLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cours/': {
-      id: '/cours/'
-      path: '/cours'
-      fullPath: '/cours/'
-      preLoaderRoute: typeof CoursIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cours/$slug': {
-      id: '/cours/$slug'
-      path: '/cours/$slug'
-      fullPath: '/cours/$slug'
-      preLoaderRoute: typeof CoursSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/': {
-      id: '/creators/'
-      path: '/creators'
-      fullPath: '/creators/'
-      preLoaderRoute: typeof CreatorsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/app': {
-      id: '/creators/app'
-      path: '/creators/app'
-      fullPath: '/creators/app'
-      preLoaderRoute: typeof CreatorsAppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/invite': {
-      id: '/creators/invite'
-      path: '/creators/invite'
-      fullPath: '/creators/invite'
-      preLoaderRoute: typeof CreatorsInviteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/login': {
-      id: '/creators/login'
-      path: '/creators/login'
-      fullPath: '/creators/login'
-      preLoaderRoute: typeof CreatorsLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/en/': {
       id: '/en/'
       path: '/en'
       fullPath: '/en/'
       preLoaderRoute: typeof EnIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/become-a-teacher': {
-      id: '/en/become-a-teacher'
-      path: '/en/become-a-teacher'
-      fullPath: '/en/become-a-teacher'
-      preLoaderRoute: typeof EnBecomeATeacherRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/careers': {
-      id: '/en/careers'
-      path: '/en/careers'
-      fullPath: '/en/careers'
-      preLoaderRoute: typeof EnCareersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/download': {
-      id: '/en/download'
-      path: '/en/download'
-      fullPath: '/en/download'
-      preLoaderRoute: typeof EnDownloadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/influencer-application': {
-      id: '/en/influencer-application'
-      path: '/en/influencer-application'
-      fullPath: '/en/influencer-application'
-      preLoaderRoute: typeof EnInfluencerApplicationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/legal-notice': {
@@ -2992,39 +624,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnSlideshowApplicationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/en/sophia-general-knowledge': {
-      id: '/en/sophia-general-knowledge'
-      path: '/en/sophia-general-knowledge'
-      fullPath: '/en/sophia-general-knowledge'
-      preLoaderRoute: typeof EnSophiaGeneralKnowledgeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/start': {
-      id: '/en/start'
-      path: '/en/start'
-      fullPath: '/en/start'
-      preLoaderRoute: typeof EnStartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/ugc-application': {
-      id: '/en/ugc-application'
-      path: '/en/ugc-application'
-      fullPath: '/en/ugc-application'
-      preLoaderRoute: typeof EnUgcApplicationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/fr/': {
       id: '/fr/'
       path: '/fr'
       fullPath: '/fr/'
       preLoaderRoute: typeof FrIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/candidature-influenceur': {
-      id: '/fr/candidature-influenceur'
-      path: '/fr/candidature-influenceur'
-      fullPath: '/fr/candidature-influenceur'
-      preLoaderRoute: typeof FrCandidatureInfluenceurRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fr/candidature-slideshow': {
@@ -3034,32 +638,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FrCandidatureSlideshowRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/fr/candidature-ugc': {
-      id: '/fr/candidature-ugc'
-      path: '/fr/candidature-ugc'
-      fullPath: '/fr/candidature-ugc'
-      preLoaderRoute: typeof FrCandidatureUgcRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/careers': {
-      id: '/fr/careers'
-      path: '/fr/careers'
-      fullPath: '/fr/careers'
-      preLoaderRoute: typeof FrCareersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/fr/confidentialite': {
       id: '/fr/confidentialite'
       path: '/fr/confidentialite'
       fullPath: '/fr/confidentialite'
       preLoaderRoute: typeof FrConfidentialiteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/devenir-professeur': {
-      id: '/fr/devenir-professeur'
-      path: '/fr/devenir-professeur'
-      fullPath: '/fr/devenir-professeur'
-      preLoaderRoute: typeof FrDevenirProfesseurRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fr/mentions-legales': {
@@ -3069,41 +652,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FrMentionsLegalesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/fr/sophia-culture-generale': {
-      id: '/fr/sophia-culture-generale'
-      path: '/fr/sophia-culture-generale'
-      fullPath: '/fr/sophia-culture-generale'
-      preLoaderRoute: typeof FrSophiaCultureGeneraleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/telecharger': {
-      id: '/fr/telecharger'
-      path: '/fr/telecharger'
-      fullPath: '/fr/telecharger'
-      preLoaderRoute: typeof FrTelechargerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/go/$handle': {
-      id: '/go/$handle'
-      path: '/go/$handle'
-      fullPath: '/go/$handle'
-      preLoaderRoute: typeof GoHandleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/invite/$token': {
-      id: '/invite/$token'
-      path: '/invite/$token'
-      fullPath: '/invite/$token'
-      preLoaderRoute: typeof InviteTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/jobs/$slug': {
-      id: '/jobs/$slug'
-      path: '/jobs/$slug'
-      fullPath: '/jobs/$slug'
-      preLoaderRoute: typeof JobsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/payout/$token': {
       id: '/payout/$token'
       path: '/payout/$token'
@@ -3111,109 +659,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PayoutTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/auteurs/': {
-      id: '/_authenticated/auteurs/'
-      path: '/auteurs'
-      fullPath: '/auteurs/'
-      preLoaderRoute: typeof AuthenticatedAuteursIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/contract': {
-      id: '/_authenticated/auteurs/contract'
-      path: '/auteurs/contract'
-      fullPath: '/auteurs/contract'
-      preLoaderRoute: typeof AuthenticatedAuteursContractRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/examples': {
-      id: '/_authenticated/auteurs/examples'
-      path: '/auteurs/examples'
-      fullPath: '/auteurs/examples'
-      preLoaderRoute: typeof AuthenticatedAuteursExamplesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/guide': {
-      id: '/_authenticated/auteurs/guide'
-      path: '/auteurs/guide'
-      fullPath: '/auteurs/guide'
-      preLoaderRoute: typeof AuthenticatedAuteursGuideRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/messages': {
-      id: '/_authenticated/auteurs/messages'
-      path: '/auteurs/messages'
-      fullPath: '/auteurs/messages'
-      preLoaderRoute: typeof AuthenticatedAuteursMessagesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/open': {
-      id: '/_authenticated/auteurs/open'
-      path: '/auteurs/open'
-      fullPath: '/auteurs/open'
-      preLoaderRoute: typeof AuthenticatedAuteursOpenRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/profile': {
-      id: '/_authenticated/auteurs/profile'
-      path: '/auteurs/profile'
-      fullPath: '/auteurs/profile'
-      preLoaderRoute: typeof AuthenticatedAuteursProfileRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/hub/': {
       id: '/_authenticated/hub/'
       path: '/'
       fullPath: '/hub/'
       preLoaderRoute: typeof AuthenticatedHubIndexRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ads': {
-      id: '/_authenticated/hub/ads'
-      path: '/ads'
-      fullPath: '/hub/ads'
-      preLoaderRoute: typeof AuthenticatedHubAdsRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/affiliates': {
-      id: '/_authenticated/hub/affiliates'
-      path: '/affiliates'
-      fullPath: '/hub/affiliates'
-      preLoaderRoute: typeof AuthenticatedHubAffiliatesRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/analytics': {
-      id: '/_authenticated/hub/analytics'
-      path: '/analytics'
-      fullPath: '/hub/analytics'
-      preLoaderRoute: typeof AuthenticatedHubAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/discover': {
-      id: '/_authenticated/hub/discover'
-      path: '/discover'
-      fullPath: '/hub/discover'
-      preLoaderRoute: typeof AuthenticatedHubDiscoverRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/learn': {
-      id: '/_authenticated/hub/learn'
-      path: '/learn'
-      fullPath: '/hub/learn'
-      preLoaderRoute: typeof AuthenticatedHubLearnRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/messages': {
-      id: '/_authenticated/hub/messages'
-      path: '/messages'
-      fullPath: '/hub/messages'
-      preLoaderRoute: typeof AuthenticatedHubMessagesRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/payouts': {
-      id: '/_authenticated/hub/payouts'
-      path: '/payouts'
-      fullPath: '/hub/payouts'
-      preLoaderRoute: typeof AuthenticatedHubPayoutsRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
     '/_authenticated/hub/settings': {
@@ -3244,118 +694,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicOsEmailEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/creators/app/': {
-      id: '/creators/app/'
-      path: '/'
-      fullPath: '/creators/app/'
-      preLoaderRoute: typeof CreatorsAppIndexRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/account': {
-      id: '/creators/app/account'
-      path: '/account'
-      fullPath: '/creators/app/account'
-      preLoaderRoute: typeof CreatorsAppAccountRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/apps': {
-      id: '/creators/app/apps'
-      path: '/apps'
-      fullPath: '/creators/app/apps'
-      preLoaderRoute: typeof CreatorsAppAppsRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/calls': {
-      id: '/creators/app/calls'
-      path: '/calls'
-      fullPath: '/creators/app/calls'
-      preLoaderRoute: typeof CreatorsAppCallsRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/contract': {
-      id: '/creators/app/contract'
-      path: '/contract'
-      fullPath: '/creators/app/contract'
-      preLoaderRoute: typeof CreatorsAppContractRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/earnings': {
-      id: '/creators/app/earnings'
-      path: '/earnings'
-      fullPath: '/creators/app/earnings'
-      preLoaderRoute: typeof CreatorsAppEarningsRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/jobs': {
-      id: '/creators/app/jobs'
-      path: '/jobs'
-      fullPath: '/creators/app/jobs'
-      preLoaderRoute: typeof CreatorsAppJobsRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/library': {
-      id: '/creators/app/library'
-      path: '/library'
-      fullPath: '/creators/app/library'
-      preLoaderRoute: typeof CreatorsAppLibraryRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/messages': {
-      id: '/creators/app/messages'
-      path: '/messages'
-      fullPath: '/creators/app/messages'
-      preLoaderRoute: typeof CreatorsAppMessagesRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/posts': {
-      id: '/creators/app/posts'
-      path: '/posts'
-      fullPath: '/creators/app/posts'
-      preLoaderRoute: typeof CreatorsAppPostsRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/profile': {
-      id: '/creators/app/profile'
-      path: '/profile'
-      fullPath: '/creators/app/profile'
-      preLoaderRoute: typeof CreatorsAppProfileRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/rules': {
-      id: '/creators/app/rules'
-      path: '/rules'
-      fullPath: '/creators/app/rules'
-      preLoaderRoute: typeof CreatorsAppRulesRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/tasks': {
-      id: '/creators/app/tasks'
-      path: '/tasks'
-      fullPath: '/creators/app/tasks'
-      preLoaderRoute: typeof CreatorsAppTasksRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/influencer/': {
-      id: '/creators/influencer/'
-      path: '/creators/influencer'
-      fullPath: '/creators/influencer/'
-      preLoaderRoute: typeof CreatorsInfluencerIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/influencer/app': {
-      id: '/creators/influencer/app'
-      path: '/creators/influencer/app'
-      fullPath: '/creators/influencer/app'
-      preLoaderRoute: typeof CreatorsInfluencerAppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/influencer/apply': {
-      id: '/creators/influencer/apply'
-      path: '/creators/influencer/apply'
-      fullPath: '/creators/influencer/apply'
-      preLoaderRoute: typeof CreatorsInfluencerApplyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/creators/sign/$token': {
       id: '/creators/sign/$token'
       path: '/creators/sign/$token'
@@ -3377,69 +715,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreatorsSlideshowApplyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/creators/ugc/': {
-      id: '/creators/ugc/'
-      path: '/creators/ugc'
-      fullPath: '/creators/ugc/'
-      preLoaderRoute: typeof CreatorsUgcIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/ugc/apply': {
-      id: '/creators/ugc/apply'
-      path: '/creators/ugc/apply'
-      fullPath: '/creators/ugc/apply'
-      preLoaderRoute: typeof CreatorsUgcApplyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/unswipe/': {
-      id: '/creators/unswipe/'
-      path: '/creators/unswipe'
-      fullPath: '/creators/unswipe/'
-      preLoaderRoute: typeof CreatorsUnswipeIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/unswipe/influencer': {
-      id: '/creators/unswipe/influencer'
-      path: '/creators/unswipe/influencer'
-      fullPath: '/creators/unswipe/influencer'
-      preLoaderRoute: typeof CreatorsUnswipeInfluencerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/unswipe/slideshow': {
-      id: '/creators/unswipe/slideshow'
-      path: '/creators/unswipe/slideshow'
-      fullPath: '/creators/unswipe/slideshow'
-      preLoaderRoute: typeof CreatorsUnswipeSlideshowRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/unswipe/ugc': {
-      id: '/creators/unswipe/ugc'
-      path: '/creators/unswipe/ugc'
-      fullPath: '/creators/unswipe/ugc'
-      preLoaderRoute: typeof CreatorsUnswipeUgcRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/authors/$slug': {
-      id: '/en/authors/$slug'
-      path: '/en/authors/$slug'
-      fullPath: '/en/authors/$slug'
-      preLoaderRoute: typeof EnAuthorsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/creators/': {
-      id: '/en/creators/'
-      path: '/en/creators'
-      fullPath: '/en/creators/'
-      preLoaderRoute: typeof EnCreatorsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/creators/influencer': {
-      id: '/en/creators/influencer'
-      path: '/en/creators/influencer'
-      fullPath: '/en/creators/influencer'
-      preLoaderRoute: typeof EnCreatorsInfluencerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/en/creators/slideshow': {
       id: '/en/creators/slideshow'
       path: '/en/creators/slideshow'
@@ -3447,74 +722,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnCreatorsSlideshowRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/en/creators/ugc': {
-      id: '/en/creators/ugc'
-      path: '/en/creators/ugc'
-      fullPath: '/en/creators/ugc'
-      preLoaderRoute: typeof EnCreatorsUgcRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/lessons/': {
-      id: '/en/lessons/'
-      path: '/en/lessons'
-      fullPath: '/en/lessons/'
-      preLoaderRoute: typeof EnLessonsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/lessons/$slug': {
-      id: '/en/lessons/$slug'
-      path: '/en/lessons/$slug'
-      fullPath: '/en/lessons/$slug'
-      preLoaderRoute: typeof EnLessonsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/auteurs/$slug': {
-      id: '/fr/auteurs/$slug'
-      path: '/fr/auteurs/$slug'
-      fullPath: '/fr/auteurs/$slug'
-      preLoaderRoute: typeof FrAuteursSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/cours/': {
-      id: '/fr/cours/'
-      path: '/fr/cours'
-      fullPath: '/fr/cours/'
-      preLoaderRoute: typeof FrCoursIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/cours/$slug': {
-      id: '/fr/cours/$slug'
-      path: '/fr/cours/$slug'
-      fullPath: '/fr/cours/$slug'
-      preLoaderRoute: typeof FrCoursSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/createurs/': {
-      id: '/fr/createurs/'
-      path: '/fr/createurs'
-      fullPath: '/fr/createurs/'
-      preLoaderRoute: typeof FrCreateursIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/createurs/influenceur': {
-      id: '/fr/createurs/influenceur'
-      path: '/fr/createurs/influenceur'
-      fullPath: '/fr/createurs/influenceur'
-      preLoaderRoute: typeof FrCreateursInfluenceurRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/fr/createurs/slideshow': {
       id: '/fr/createurs/slideshow'
       path: '/fr/createurs/slideshow'
       fullPath: '/fr/createurs/slideshow'
       preLoaderRoute: typeof FrCreateursSlideshowRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/createurs/ugc': {
-      id: '/fr/createurs/ugc'
-      path: '/fr/createurs/ugc'
-      fullPath: '/fr/createurs/ugc'
-      preLoaderRoute: typeof FrCreateursUgcRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$lang/creators/slideshow/': {
@@ -3530,132 +742,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/$lang/creators/slideshow/apply'
       preLoaderRoute: typeof LangCreatorsSlideshowApplyRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/auteurs/admin/': {
-      id: '/_authenticated/auteurs/admin/'
-      path: '/auteurs/admin'
-      fullPath: '/auteurs/admin/'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/activity': {
-      id: '/_authenticated/auteurs/admin/activity'
-      path: '/auteurs/admin/activity'
-      fullPath: '/auteurs/admin/activity'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminActivityRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/ai-review': {
-      id: '/_authenticated/auteurs/admin/ai-review'
-      path: '/auteurs/admin/ai-review'
-      fullPath: '/auteurs/admin/ai-review'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminAiReviewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/announcements': {
-      id: '/_authenticated/auteurs/admin/announcements'
-      path: '/auteurs/admin/announcements'
-      fullPath: '/auteurs/admin/announcements'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminAnnouncementsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/api': {
-      id: '/_authenticated/auteurs/admin/api'
-      path: '/auteurs/admin/api'
-      fullPath: '/auteurs/admin/api'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminApiRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/applications': {
-      id: '/_authenticated/auteurs/admin/applications'
-      path: '/auteurs/admin/applications'
-      fullPath: '/auteurs/admin/applications'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminApplicationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/codes': {
-      id: '/_authenticated/auteurs/admin/codes'
-      path: '/auteurs/admin/codes'
-      fullPath: '/auteurs/admin/codes'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCodesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/messages': {
-      id: '/_authenticated/auteurs/admin/messages'
-      path: '/auteurs/admin/messages'
-      fullPath: '/auteurs/admin/messages'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminMessagesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/pool': {
-      id: '/_authenticated/auteurs/admin/pool'
-      path: '/auteurs/admin/pool'
-      fullPath: '/auteurs/admin/pool'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminPoolRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/settings': {
-      id: '/_authenticated/auteurs/admin/settings'
-      path: '/auteurs/admin/settings'
-      fullPath: '/auteurs/admin/settings'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/courses/': {
-      id: '/_authenticated/auteurs/courses/'
-      path: '/auteurs/courses'
-      fullPath: '/auteurs/courses/'
-      preLoaderRoute: typeof AuthenticatedAuteursCoursesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/courses/$courseId': {
-      id: '/_authenticated/auteurs/courses/$courseId'
-      path: '/auteurs/courses/$courseId'
-      fullPath: '/auteurs/courses/$courseId'
-      preLoaderRoute: typeof AuthenticatedAuteursCoursesCourseIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/studio/$id': {
-      id: '/_authenticated/auteurs/studio/$id'
-      path: '/auteurs/studio/$id'
-      fullPath: '/auteurs/studio/$id'
-      preLoaderRoute: typeof AuthenticatedAuteursStudioIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/hub/campaigns/': {
-      id: '/_authenticated/hub/campaigns/'
-      path: '/campaigns'
-      fullPath: '/hub/campaigns/'
-      preLoaderRoute: typeof AuthenticatedHubCampaignsIndexRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/campaigns/create': {
-      id: '/_authenticated/hub/campaigns/create'
-      path: '/campaigns/create'
-      fullPath: '/hub/campaigns/create'
-      preLoaderRoute: typeof AuthenticatedHubCampaignsCreateRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/creators/$creatorId': {
-      id: '/_authenticated/hub/creators/$creatorId'
-      path: '/creators/$creatorId'
-      fullPath: '/hub/creators/$creatorId'
-      preLoaderRoute: typeof AuthenticatedHubCreatorsCreatorIdRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/influencers/': {
-      id: '/_authenticated/hub/influencers/'
-      path: '/influencers'
-      fullPath: '/hub/influencers/'
-      preLoaderRoute: typeof AuthenticatedHubInfluencersIndexRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/influencers/$section': {
-      id: '/_authenticated/hub/influencers/$section'
-      path: '/influencers/$section'
-      fullPath: '/hub/influencers/$section'
-      preLoaderRoute: typeof AuthenticatedHubInfluencersSectionRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
     }
     '/_authenticated/hub/slideshows/': {
       id: '/_authenticated/hub/slideshows/'
@@ -3678,481 +764,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHubSlideshowsParcoursRuulRouteImport
       parentRoute: typeof AuthenticatedHubRouteRoute
     }
-    '/_authenticated/hub/tools/$': {
-      id: '/_authenticated/hub/tools/$'
-      path: '/tools/$'
-      fullPath: '/hub/tools/$'
-      preLoaderRoute: typeof AuthenticatedHubToolsSplatRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/': {
-      id: '/_authenticated/hub/ugc/'
-      path: '/ugc'
-      fullPath: '/hub/ugc/'
-      preLoaderRoute: typeof AuthenticatedHubUgcIndexRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/ads': {
-      id: '/_authenticated/hub/ugc/ads'
-      path: '/ugc/ads'
-      fullPath: '/hub/ugc/ads'
-      preLoaderRoute: typeof AuthenticatedHubUgcAdsRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/analytics': {
-      id: '/_authenticated/hub/ugc/analytics'
-      path: '/ugc/analytics'
-      fullPath: '/hub/ugc/analytics'
-      preLoaderRoute: typeof AuthenticatedHubUgcAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/applications': {
-      id: '/_authenticated/hub/ugc/applications'
-      path: '/ugc/applications'
-      fullPath: '/hub/ugc/applications'
-      preLoaderRoute: typeof AuthenticatedHubUgcApplicationsRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/inspiration': {
-      id: '/_authenticated/hub/ugc/inspiration'
-      path: '/ugc/inspiration'
-      fullPath: '/hub/ugc/inspiration'
-      preLoaderRoute: typeof AuthenticatedHubUgcInspirationRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/library': {
-      id: '/_authenticated/hub/ugc/library'
-      path: '/ugc/library'
-      fullPath: '/hub/ugc/library'
-      preLoaderRoute: typeof AuthenticatedHubUgcLibraryRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/messages': {
-      id: '/_authenticated/hub/ugc/messages'
-      path: '/ugc/messages'
-      fullPath: '/hub/ugc/messages'
-      preLoaderRoute: typeof AuthenticatedHubUgcMessagesRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/payouts': {
-      id: '/_authenticated/hub/ugc/payouts'
-      path: '/ugc/payouts'
-      fullPath: '/hub/ugc/payouts'
-      preLoaderRoute: typeof AuthenticatedHubUgcPayoutsRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/posts': {
-      id: '/_authenticated/hub/ugc/posts'
-      path: '/ugc/posts'
-      fullPath: '/hub/ugc/posts'
-      preLoaderRoute: typeof AuthenticatedHubUgcPostsRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/referrals': {
-      id: '/_authenticated/hub/ugc/referrals'
-      path: '/ugc/referrals'
-      fullPath: '/hub/ugc/referrals'
-      preLoaderRoute: typeof AuthenticatedHubUgcReferralsRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
     '/api/public/app/courses': {
       id: '/api/public/app/courses'
       path: '/api/public/app/courses'
       fullPath: '/api/public/app/courses'
       preLoaderRoute: typeof ApiPublicAppCoursesRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/api/public/stripe/webhook': {
-      id: '/api/public/stripe/webhook'
-      path: '/api/public/stripe/webhook'
-      fullPath: '/api/public/stripe/webhook'
-      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/tiktok/oauth': {
-      id: '/api/public/tiktok/oauth'
-      path: '/api/public/tiktok/oauth'
-      fullPath: '/api/public/tiktok/oauth'
-      preLoaderRoute: typeof ApiPublicTiktokOauthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/creators/app/briefs/': {
-      id: '/creators/app/briefs/'
-      path: '/briefs'
-      fullPath: '/creators/app/briefs/'
-      preLoaderRoute: typeof CreatorsAppBriefsIndexRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/app/briefs/$briefId': {
-      id: '/creators/app/briefs/$briefId'
-      path: '/briefs/$briefId'
-      fullPath: '/creators/app/briefs/$briefId'
-      preLoaderRoute: typeof CreatorsAppBriefsBriefIdRouteImport
-      parentRoute: typeof CreatorsAppRoute
-    }
-    '/creators/influencer/app/': {
-      id: '/creators/influencer/app/'
-      path: '/'
-      fullPath: '/creators/influencer/app/'
-      preLoaderRoute: typeof CreatorsInfluencerAppIndexRouteImport
-      parentRoute: typeof CreatorsInfluencerAppRoute
-    }
-    '/creators/influencer/app/agreement': {
-      id: '/creators/influencer/app/agreement'
-      path: '/agreement'
-      fullPath: '/creators/influencer/app/agreement'
-      preLoaderRoute: typeof CreatorsInfluencerAppAgreementRouteImport
-      parentRoute: typeof CreatorsInfluencerAppRoute
-    }
-    '/creators/influencer/app/briefs': {
-      id: '/creators/influencer/app/briefs'
-      path: '/briefs'
-      fullPath: '/creators/influencer/app/briefs'
-      preLoaderRoute: typeof CreatorsInfluencerAppBriefsRouteImport
-      parentRoute: typeof CreatorsInfluencerAppRoute
-    }
-    '/creators/influencer/app/earnings': {
-      id: '/creators/influencer/app/earnings'
-      path: '/earnings'
-      fullPath: '/creators/influencer/app/earnings'
-      preLoaderRoute: typeof CreatorsInfluencerAppEarningsRouteImport
-      parentRoute: typeof CreatorsInfluencerAppRoute
-    }
-    '/creators/influencer/app/messages': {
-      id: '/creators/influencer/app/messages'
-      path: '/messages'
-      fullPath: '/creators/influencer/app/messages'
-      preLoaderRoute: typeof CreatorsInfluencerAppMessagesRouteImport
-      parentRoute: typeof CreatorsInfluencerAppRoute
-    }
-    '/creators/influencer/app/offers': {
-      id: '/creators/influencer/app/offers'
-      path: '/offers'
-      fullPath: '/creators/influencer/app/offers'
-      preLoaderRoute: typeof CreatorsInfluencerAppOffersRouteImport
-      parentRoute: typeof CreatorsInfluencerAppRoute
-    }
-    '/creators/influencer/app/payouts': {
-      id: '/creators/influencer/app/payouts'
-      path: '/payouts'
-      fullPath: '/creators/influencer/app/payouts'
-      preLoaderRoute: typeof CreatorsInfluencerAppPayoutsRouteImport
-      parentRoute: typeof CreatorsInfluencerAppRoute
-    }
-    '/creators/influencer/app/profile': {
-      id: '/creators/influencer/app/profile'
-      path: '/profile'
-      fullPath: '/creators/influencer/app/profile'
-      preLoaderRoute: typeof CreatorsInfluencerAppProfileRouteImport
-      parentRoute: typeof CreatorsInfluencerAppRoute
-    }
-    '/creators/influencer/app/rules': {
-      id: '/creators/influencer/app/rules'
-      path: '/rules'
-      fullPath: '/creators/influencer/app/rules'
-      preLoaderRoute: typeof CreatorsInfluencerAppRulesRouteImport
-      parentRoute: typeof CreatorsInfluencerAppRoute
-    }
-    '/en/creators/unswipe/': {
-      id: '/en/creators/unswipe/'
-      path: '/en/creators/unswipe'
-      fullPath: '/en/creators/unswipe/'
-      preLoaderRoute: typeof EnCreatorsUnswipeIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/creators/unswipe/influencer': {
-      id: '/en/creators/unswipe/influencer'
-      path: '/en/creators/unswipe/influencer'
-      fullPath: '/en/creators/unswipe/influencer'
-      preLoaderRoute: typeof EnCreatorsUnswipeInfluencerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/creators/unswipe/slideshow': {
-      id: '/en/creators/unswipe/slideshow'
-      path: '/en/creators/unswipe/slideshow'
-      fullPath: '/en/creators/unswipe/slideshow'
-      preLoaderRoute: typeof EnCreatorsUnswipeSlideshowRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en/creators/unswipe/ugc': {
-      id: '/en/creators/unswipe/ugc'
-      path: '/en/creators/unswipe/ugc'
-      fullPath: '/en/creators/unswipe/ugc'
-      preLoaderRoute: typeof EnCreatorsUnswipeUgcRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/createurs/unswipe/': {
-      id: '/fr/createurs/unswipe/'
-      path: '/fr/createurs/unswipe'
-      fullPath: '/fr/createurs/unswipe/'
-      preLoaderRoute: typeof FrCreateursUnswipeIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/createurs/unswipe/influenceur': {
-      id: '/fr/createurs/unswipe/influenceur'
-      path: '/fr/createurs/unswipe/influenceur'
-      fullPath: '/fr/createurs/unswipe/influenceur'
-      preLoaderRoute: typeof FrCreateursUnswipeInfluenceurRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/createurs/unswipe/slideshow': {
-      id: '/fr/createurs/unswipe/slideshow'
-      path: '/fr/createurs/unswipe/slideshow'
-      fullPath: '/fr/createurs/unswipe/slideshow'
-      preLoaderRoute: typeof FrCreateursUnswipeSlideshowRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fr/createurs/unswipe/ugc': {
-      id: '/fr/createurs/unswipe/ugc'
-      path: '/fr/createurs/unswipe/ugc'
-      fullPath: '/fr/createurs/unswipe/ugc'
-      preLoaderRoute: typeof FrCreateursUnswipeUgcRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/auteurs/admin/authors/': {
-      id: '/_authenticated/auteurs/admin/authors/'
-      path: '/auteurs/admin/authors'
-      fullPath: '/auteurs/admin/authors/'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminAuthorsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/authors/$authorId': {
-      id: '/_authenticated/auteurs/admin/authors/$authorId'
-      path: '/auteurs/admin/authors/$authorId'
-      fullPath: '/auteurs/admin/authors/$authorId'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminAuthorsAuthorIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/authors/new': {
-      id: '/_authenticated/auteurs/admin/authors/new'
-      path: '/auteurs/admin/authors/new'
-      fullPath: '/auteurs/admin/authors/new'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminAuthorsNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/courses/': {
-      id: '/_authenticated/auteurs/admin/courses/'
-      path: '/auteurs/admin/courses'
-      fullPath: '/auteurs/admin/courses/'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCoursesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/courses/$courseId': {
-      id: '/_authenticated/auteurs/admin/courses/$courseId'
-      path: '/auteurs/admin/courses/$courseId'
-      fullPath: '/auteurs/admin/courses/$courseId'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCoursesCourseIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/': {
-      id: '/_authenticated/auteurs/admin/creators/'
-      path: '/auteurs/admin/creators'
-      fullPath: '/auteurs/admin/creators/'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/$creatorId': {
-      id: '/_authenticated/auteurs/admin/creators/$creatorId'
-      path: '/auteurs/admin/creators/$creatorId'
-      fullPath: '/auteurs/admin/creators/$creatorId'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsCreatorIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/applications': {
-      id: '/_authenticated/auteurs/admin/creators/applications'
-      path: '/auteurs/admin/creators/applications'
-      fullPath: '/auteurs/admin/creators/applications'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsApplicationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/apps': {
-      id: '/_authenticated/auteurs/admin/creators/apps'
-      path: '/auteurs/admin/creators/apps'
-      fullPath: '/auteurs/admin/creators/apps'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsAppsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/compliance': {
-      id: '/_authenticated/auteurs/admin/creators/compliance'
-      path: '/auteurs/admin/creators/compliance'
-      fullPath: '/auteurs/admin/creators/compliance'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsComplianceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/influencer-applications': {
-      id: '/_authenticated/auteurs/admin/creators/influencer-applications'
-      path: '/auteurs/admin/creators/influencer-applications'
-      fullPath: '/auteurs/admin/creators/influencer-applications'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/influencer-messages': {
-      id: '/_authenticated/auteurs/admin/creators/influencer-messages'
-      path: '/auteurs/admin/creators/influencer-messages'
-      fullPath: '/auteurs/admin/creators/influencer-messages'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/influencer-payouts': {
-      id: '/_authenticated/auteurs/admin/creators/influencer-payouts'
-      path: '/auteurs/admin/creators/influencer-payouts'
-      fullPath: '/auteurs/admin/creators/influencer-payouts'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/influencer-performance': {
-      id: '/_authenticated/auteurs/admin/creators/influencer-performance'
-      path: '/auteurs/admin/creators/influencer-performance'
-      fullPath: '/auteurs/admin/creators/influencer-performance'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/influencer-settings': {
-      id: '/_authenticated/auteurs/admin/creators/influencer-settings'
-      path: '/auteurs/admin/creators/influencer-settings'
-      fullPath: '/auteurs/admin/creators/influencer-settings'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/integrations': {
-      id: '/_authenticated/auteurs/admin/creators/integrations'
-      path: '/auteurs/admin/creators/integrations'
-      fullPath: '/auteurs/admin/creators/integrations'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsIntegrationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/messages': {
-      id: '/_authenticated/auteurs/admin/creators/messages'
-      path: '/auteurs/admin/creators/messages'
-      fullPath: '/auteurs/admin/creators/messages'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsMessagesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/ops': {
-      id: '/_authenticated/auteurs/admin/creators/ops'
-      path: '/auteurs/admin/creators/ops'
-      fullPath: '/auteurs/admin/creators/ops'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsOpsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/payouts': {
-      id: '/_authenticated/auteurs/admin/creators/payouts'
-      path: '/auteurs/admin/creators/payouts'
-      fullPath: '/auteurs/admin/creators/payouts'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsPayoutsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/planner': {
-      id: '/_authenticated/auteurs/admin/creators/planner'
-      path: '/auteurs/admin/creators/planner'
-      fullPath: '/auteurs/admin/creators/planner'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsPlannerRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/prospects': {
-      id: '/_authenticated/auteurs/admin/creators/prospects'
-      path: '/auteurs/admin/creators/prospects'
-      fullPath: '/auteurs/admin/creators/prospects'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsProspectsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/slideshow-applications': {
-      id: '/_authenticated/auteurs/admin/creators/slideshow-applications'
-      path: '/auteurs/admin/creators/slideshow-applications'
-      fullPath: '/auteurs/admin/creators/slideshow-applications'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/ugc-applications': {
-      id: '/_authenticated/auteurs/admin/creators/ugc-applications'
-      path: '/auteurs/admin/creators/ugc-applications'
-      fullPath: '/auteurs/admin/creators/ugc-applications'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/ugc-briefs': {
-      id: '/_authenticated/auteurs/admin/creators/ugc-briefs'
-      path: '/auteurs/admin/creators/ugc-briefs'
-      fullPath: '/auteurs/admin/creators/ugc-briefs'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/documents/': {
-      id: '/_authenticated/auteurs/admin/documents/'
-      path: '/auteurs/admin/documents'
-      fullPath: '/auteurs/admin/documents/'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminDocumentsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/documents/$slug': {
-      id: '/_authenticated/auteurs/admin/documents/$slug'
-      path: '/auteurs/admin/documents/$slug'
-      fullPath: '/auteurs/admin/documents/$slug'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminDocumentsSlugRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/review/': {
-      id: '/_authenticated/auteurs/admin/review/'
-      path: '/auteurs/admin/review'
-      fullPath: '/auteurs/admin/review/'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminReviewIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/review/$courseId': {
-      id: '/_authenticated/auteurs/admin/review/$courseId'
-      path: '/auteurs/admin/review/$courseId'
-      fullPath: '/auteurs/admin/review/$courseId'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminReviewCourseIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/hub/learn_/briefs/$briefId': {
-      id: '/_authenticated/hub/learn_/briefs/$briefId'
-      path: '/learn/briefs/$briefId'
-      fullPath: '/hub/learn/briefs/$briefId'
-      preLoaderRoute: typeof AuthenticatedHubLearnBriefsBriefIdRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/briefs/': {
-      id: '/_authenticated/hub/ugc/briefs/'
-      path: '/ugc/briefs'
-      fullPath: '/hub/ugc/briefs/'
-      preLoaderRoute: typeof AuthenticatedHubUgcBriefsIndexRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/briefs/$briefId': {
-      id: '/_authenticated/hub/ugc/briefs/$briefId'
-      path: '/ugc/briefs/$briefId'
-      fullPath: '/hub/ugc/briefs/$briefId'
-      preLoaderRoute: typeof AuthenticatedHubUgcBriefsBriefIdRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/campaigns/': {
-      id: '/_authenticated/hub/ugc/campaigns/'
-      path: '/ugc/campaigns'
-      fullPath: '/hub/ugc/campaigns/'
-      preLoaderRoute: typeof AuthenticatedHubUgcCampaignsIndexRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/campaigns/create': {
-      id: '/_authenticated/hub/ugc/campaigns/create'
-      path: '/ugc/campaigns/create'
-      fullPath: '/hub/ugc/campaigns/create'
-      preLoaderRoute: typeof AuthenticatedHubUgcCampaignsCreateRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/creators/': {
-      id: '/_authenticated/hub/ugc/creators/'
-      path: '/ugc/creators'
-      fullPath: '/hub/ugc/creators/'
-      preLoaderRoute: typeof AuthenticatedHubUgcCreatorsIndexRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
-    '/_authenticated/hub/ugc/creators/$creatorId': {
-      id: '/_authenticated/hub/ugc/creators/$creatorId'
-      path: '/ugc/creators/$creatorId'
-      fullPath: '/hub/ugc/creators/$creatorId'
-      preLoaderRoute: typeof AuthenticatedHubUgcCreatorsCreatorIdRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
     }
     '/api/public/app/courses/$slug': {
       id: '/api/public/app/courses/$slug'
@@ -4168,157 +785,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronUgcJobRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/creators/influencer/app/deals/': {
-      id: '/creators/influencer/app/deals/'
-      path: '/deals'
-      fullPath: '/creators/influencer/app/deals/'
-      preLoaderRoute: typeof CreatorsInfluencerAppDealsIndexRouteImport
-      parentRoute: typeof CreatorsInfluencerAppRoute
-    }
-    '/creators/influencer/app/deals/$dealId': {
-      id: '/creators/influencer/app/deals/$dealId'
-      path: '/deals/$dealId'
-      fullPath: '/creators/influencer/app/deals/$dealId'
-      preLoaderRoute: typeof CreatorsInfluencerAppDealsDealIdRouteImport
-      parentRoute: typeof CreatorsInfluencerAppRoute
-    }
-    '/_authenticated/auteurs/admin/creators/influencer-briefs/': {
-      id: '/_authenticated/auteurs/admin/creators/influencer-briefs/'
-      path: '/auteurs/admin/creators/influencer-briefs'
-      fullPath: '/auteurs/admin/creators/influencer-briefs/'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/influencer-briefs/$briefId': {
-      id: '/_authenticated/auteurs/admin/creators/influencer-briefs/$briefId'
-      path: '/auteurs/admin/creators/influencer-briefs/$briefId'
-      fullPath: '/auteurs/admin/creators/influencer-briefs/$briefId'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/influencer-deals/': {
-      id: '/_authenticated/auteurs/admin/creators/influencer-deals/'
-      path: '/auteurs/admin/creators/influencer-deals'
-      fullPath: '/auteurs/admin/creators/influencer-deals/'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/influencer-deals/$dealId': {
-      id: '/_authenticated/auteurs/admin/creators/influencer-deals/$dealId'
-      path: '/auteurs/admin/creators/influencer-deals/$dealId'
-      fullPath: '/auteurs/admin/creators/influencer-deals/$dealId'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/influencers/': {
-      id: '/_authenticated/auteurs/admin/creators/influencers/'
-      path: '/auteurs/admin/creators/influencers'
-      fullPath: '/auteurs/admin/creators/influencers/'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencersIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/auteurs/admin/creators/influencers/$influencerId': {
-      id: '/_authenticated/auteurs/admin/creators/influencers/$influencerId'
-      path: '/auteurs/admin/creators/influencers/$influencerId'
-      fullPath: '/auteurs/admin/creators/influencers/$influencerId'
-      preLoaderRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/hub/ugc/library_/briefs/$briefId': {
-      id: '/_authenticated/hub/ugc/library_/briefs/$briefId'
-      path: '/ugc/library/briefs/$briefId'
-      fullPath: '/hub/ugc/library/briefs/$briefId'
-      preLoaderRoute: typeof AuthenticatedHubUgcLibraryBriefsBriefIdRouteImport
-      parentRoute: typeof AuthenticatedHubRouteRoute
-    }
   }
 }
 
 interface AuthenticatedHubRouteRouteChildren {
-  AuthenticatedHubAdsRoute: typeof AuthenticatedHubAdsRoute
-  AuthenticatedHubAffiliatesRoute: typeof AuthenticatedHubAffiliatesRoute
-  AuthenticatedHubAnalyticsRoute: typeof AuthenticatedHubAnalyticsRoute
-  AuthenticatedHubDiscoverRoute: typeof AuthenticatedHubDiscoverRoute
-  AuthenticatedHubLearnRoute: typeof AuthenticatedHubLearnRoute
-  AuthenticatedHubMessagesRoute: typeof AuthenticatedHubMessagesRoute
-  AuthenticatedHubPayoutsRoute: typeof AuthenticatedHubPayoutsRoute
   AuthenticatedHubSettingsRoute: typeof AuthenticatedHubSettingsRoute
   AuthenticatedHubIndexRoute: typeof AuthenticatedHubIndexRoute
-  AuthenticatedHubCampaignsCreateRoute: typeof AuthenticatedHubCampaignsCreateRoute
-  AuthenticatedHubCreatorsCreatorIdRoute: typeof AuthenticatedHubCreatorsCreatorIdRoute
-  AuthenticatedHubInfluencersSectionRoute: typeof AuthenticatedHubInfluencersSectionRoute
   AuthenticatedHubSlideshowsSectionRoute: typeof AuthenticatedHubSlideshowsSectionRoute
   AuthenticatedHubSlideshowsParcoursRuulRoute: typeof AuthenticatedHubSlideshowsParcoursRuulRoute
-  AuthenticatedHubToolsSplatRoute: typeof AuthenticatedHubToolsSplatRoute
-  AuthenticatedHubUgcAdsRoute: typeof AuthenticatedHubUgcAdsRoute
-  AuthenticatedHubUgcAnalyticsRoute: typeof AuthenticatedHubUgcAnalyticsRoute
-  AuthenticatedHubUgcApplicationsRoute: typeof AuthenticatedHubUgcApplicationsRoute
-  AuthenticatedHubUgcInspirationRoute: typeof AuthenticatedHubUgcInspirationRoute
-  AuthenticatedHubUgcLibraryRoute: typeof AuthenticatedHubUgcLibraryRoute
-  AuthenticatedHubUgcMessagesRoute: typeof AuthenticatedHubUgcMessagesRoute
-  AuthenticatedHubUgcPayoutsRoute: typeof AuthenticatedHubUgcPayoutsRoute
-  AuthenticatedHubUgcPostsRoute: typeof AuthenticatedHubUgcPostsRoute
-  AuthenticatedHubUgcReferralsRoute: typeof AuthenticatedHubUgcReferralsRoute
-  AuthenticatedHubCampaignsIndexRoute: typeof AuthenticatedHubCampaignsIndexRoute
-  AuthenticatedHubInfluencersIndexRoute: typeof AuthenticatedHubInfluencersIndexRoute
   AuthenticatedHubSlideshowsIndexRoute: typeof AuthenticatedHubSlideshowsIndexRoute
-  AuthenticatedHubUgcIndexRoute: typeof AuthenticatedHubUgcIndexRoute
-  AuthenticatedHubLearnBriefsBriefIdRoute: typeof AuthenticatedHubLearnBriefsBriefIdRoute
-  AuthenticatedHubUgcBriefsBriefIdRoute: typeof AuthenticatedHubUgcBriefsBriefIdRoute
-  AuthenticatedHubUgcCampaignsCreateRoute: typeof AuthenticatedHubUgcCampaignsCreateRoute
-  AuthenticatedHubUgcCreatorsCreatorIdRoute: typeof AuthenticatedHubUgcCreatorsCreatorIdRoute
-  AuthenticatedHubUgcBriefsIndexRoute: typeof AuthenticatedHubUgcBriefsIndexRoute
-  AuthenticatedHubUgcCampaignsIndexRoute: typeof AuthenticatedHubUgcCampaignsIndexRoute
-  AuthenticatedHubUgcCreatorsIndexRoute: typeof AuthenticatedHubUgcCreatorsIndexRoute
-  AuthenticatedHubUgcLibraryBriefsBriefIdRoute: typeof AuthenticatedHubUgcLibraryBriefsBriefIdRoute
 }
 
 const AuthenticatedHubRouteRouteChildren: AuthenticatedHubRouteRouteChildren = {
-  AuthenticatedHubAdsRoute: AuthenticatedHubAdsRoute,
-  AuthenticatedHubAffiliatesRoute: AuthenticatedHubAffiliatesRoute,
-  AuthenticatedHubAnalyticsRoute: AuthenticatedHubAnalyticsRoute,
-  AuthenticatedHubDiscoverRoute: AuthenticatedHubDiscoverRoute,
-  AuthenticatedHubLearnRoute: AuthenticatedHubLearnRoute,
-  AuthenticatedHubMessagesRoute: AuthenticatedHubMessagesRoute,
-  AuthenticatedHubPayoutsRoute: AuthenticatedHubPayoutsRoute,
   AuthenticatedHubSettingsRoute: AuthenticatedHubSettingsRoute,
   AuthenticatedHubIndexRoute: AuthenticatedHubIndexRoute,
-  AuthenticatedHubCampaignsCreateRoute: AuthenticatedHubCampaignsCreateRoute,
-  AuthenticatedHubCreatorsCreatorIdRoute:
-    AuthenticatedHubCreatorsCreatorIdRoute,
-  AuthenticatedHubInfluencersSectionRoute:
-    AuthenticatedHubInfluencersSectionRoute,
   AuthenticatedHubSlideshowsSectionRoute:
     AuthenticatedHubSlideshowsSectionRoute,
   AuthenticatedHubSlideshowsParcoursRuulRoute:
     AuthenticatedHubSlideshowsParcoursRuulRoute,
-  AuthenticatedHubToolsSplatRoute: AuthenticatedHubToolsSplatRoute,
-  AuthenticatedHubUgcAdsRoute: AuthenticatedHubUgcAdsRoute,
-  AuthenticatedHubUgcAnalyticsRoute: AuthenticatedHubUgcAnalyticsRoute,
-  AuthenticatedHubUgcApplicationsRoute: AuthenticatedHubUgcApplicationsRoute,
-  AuthenticatedHubUgcInspirationRoute: AuthenticatedHubUgcInspirationRoute,
-  AuthenticatedHubUgcLibraryRoute: AuthenticatedHubUgcLibraryRoute,
-  AuthenticatedHubUgcMessagesRoute: AuthenticatedHubUgcMessagesRoute,
-  AuthenticatedHubUgcPayoutsRoute: AuthenticatedHubUgcPayoutsRoute,
-  AuthenticatedHubUgcPostsRoute: AuthenticatedHubUgcPostsRoute,
-  AuthenticatedHubUgcReferralsRoute: AuthenticatedHubUgcReferralsRoute,
-  AuthenticatedHubCampaignsIndexRoute: AuthenticatedHubCampaignsIndexRoute,
-  AuthenticatedHubInfluencersIndexRoute: AuthenticatedHubInfluencersIndexRoute,
   AuthenticatedHubSlideshowsIndexRoute: AuthenticatedHubSlideshowsIndexRoute,
-  AuthenticatedHubUgcIndexRoute: AuthenticatedHubUgcIndexRoute,
-  AuthenticatedHubLearnBriefsBriefIdRoute:
-    AuthenticatedHubLearnBriefsBriefIdRoute,
-  AuthenticatedHubUgcBriefsBriefIdRoute: AuthenticatedHubUgcBriefsBriefIdRoute,
-  AuthenticatedHubUgcCampaignsCreateRoute:
-    AuthenticatedHubUgcCampaignsCreateRoute,
-  AuthenticatedHubUgcCreatorsCreatorIdRoute:
-    AuthenticatedHubUgcCreatorsCreatorIdRoute,
-  AuthenticatedHubUgcBriefsIndexRoute: AuthenticatedHubUgcBriefsIndexRoute,
-  AuthenticatedHubUgcCampaignsIndexRoute:
-    AuthenticatedHubUgcCampaignsIndexRoute,
-  AuthenticatedHubUgcCreatorsIndexRoute: AuthenticatedHubUgcCreatorsIndexRoute,
-  AuthenticatedHubUgcLibraryBriefsBriefIdRoute:
-    AuthenticatedHubUgcLibraryBriefsBriefIdRoute,
 }
 
 const AuthenticatedHubRouteRouteWithChildren =
@@ -4328,236 +813,14 @@ const AuthenticatedHubRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedHubRouteRoute: typeof AuthenticatedHubRouteRouteWithChildren
-  AuthenticatedAuteursContractRoute: typeof AuthenticatedAuteursContractRoute
-  AuthenticatedAuteursExamplesRoute: typeof AuthenticatedAuteursExamplesRoute
-  AuthenticatedAuteursGuideRoute: typeof AuthenticatedAuteursGuideRoute
-  AuthenticatedAuteursMessagesRoute: typeof AuthenticatedAuteursMessagesRoute
-  AuthenticatedAuteursOpenRoute: typeof AuthenticatedAuteursOpenRoute
-  AuthenticatedAuteursProfileRoute: typeof AuthenticatedAuteursProfileRoute
-  AuthenticatedAuteursIndexRoute: typeof AuthenticatedAuteursIndexRoute
-  AuthenticatedAuteursAdminActivityRoute: typeof AuthenticatedAuteursAdminActivityRoute
-  AuthenticatedAuteursAdminAiReviewRoute: typeof AuthenticatedAuteursAdminAiReviewRoute
-  AuthenticatedAuteursAdminAnnouncementsRoute: typeof AuthenticatedAuteursAdminAnnouncementsRoute
-  AuthenticatedAuteursAdminApiRoute: typeof AuthenticatedAuteursAdminApiRoute
-  AuthenticatedAuteursAdminApplicationsRoute: typeof AuthenticatedAuteursAdminApplicationsRoute
-  AuthenticatedAuteursAdminCodesRoute: typeof AuthenticatedAuteursAdminCodesRoute
-  AuthenticatedAuteursAdminMessagesRoute: typeof AuthenticatedAuteursAdminMessagesRoute
-  AuthenticatedAuteursAdminPoolRoute: typeof AuthenticatedAuteursAdminPoolRoute
-  AuthenticatedAuteursAdminSettingsRoute: typeof AuthenticatedAuteursAdminSettingsRoute
-  AuthenticatedAuteursCoursesCourseIdRoute: typeof AuthenticatedAuteursCoursesCourseIdRoute
-  AuthenticatedAuteursStudioIdRoute: typeof AuthenticatedAuteursStudioIdRoute
-  AuthenticatedAuteursAdminIndexRoute: typeof AuthenticatedAuteursAdminIndexRoute
-  AuthenticatedAuteursCoursesIndexRoute: typeof AuthenticatedAuteursCoursesIndexRoute
-  AuthenticatedAuteursAdminAuthorsAuthorIdRoute: typeof AuthenticatedAuteursAdminAuthorsAuthorIdRoute
-  AuthenticatedAuteursAdminAuthorsNewRoute: typeof AuthenticatedAuteursAdminAuthorsNewRoute
-  AuthenticatedAuteursAdminCoursesCourseIdRoute: typeof AuthenticatedAuteursAdminCoursesCourseIdRoute
-  AuthenticatedAuteursAdminCreatorsCreatorIdRoute: typeof AuthenticatedAuteursAdminCreatorsCreatorIdRoute
-  AuthenticatedAuteursAdminCreatorsApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsApplicationsRoute
-  AuthenticatedAuteursAdminCreatorsAppsRoute: typeof AuthenticatedAuteursAdminCreatorsAppsRoute
-  AuthenticatedAuteursAdminCreatorsComplianceRoute: typeof AuthenticatedAuteursAdminCreatorsComplianceRoute
-  AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute
-  AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute
-  AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute
-  AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute
-  AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute
-  AuthenticatedAuteursAdminCreatorsIntegrationsRoute: typeof AuthenticatedAuteursAdminCreatorsIntegrationsRoute
-  AuthenticatedAuteursAdminCreatorsMessagesRoute: typeof AuthenticatedAuteursAdminCreatorsMessagesRoute
-  AuthenticatedAuteursAdminCreatorsOpsRoute: typeof AuthenticatedAuteursAdminCreatorsOpsRoute
-  AuthenticatedAuteursAdminCreatorsPayoutsRoute: typeof AuthenticatedAuteursAdminCreatorsPayoutsRoute
-  AuthenticatedAuteursAdminCreatorsPlannerRoute: typeof AuthenticatedAuteursAdminCreatorsPlannerRoute
-  AuthenticatedAuteursAdminCreatorsProspectsRoute: typeof AuthenticatedAuteursAdminCreatorsProspectsRoute
-  AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute
-  AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute: typeof AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute
-  AuthenticatedAuteursAdminCreatorsUgcBriefsRoute: typeof AuthenticatedAuteursAdminCreatorsUgcBriefsRoute
-  AuthenticatedAuteursAdminDocumentsSlugRoute: typeof AuthenticatedAuteursAdminDocumentsSlugRoute
-  AuthenticatedAuteursAdminReviewCourseIdRoute: typeof AuthenticatedAuteursAdminReviewCourseIdRoute
-  AuthenticatedAuteursAdminAuthorsIndexRoute: typeof AuthenticatedAuteursAdminAuthorsIndexRoute
-  AuthenticatedAuteursAdminCoursesIndexRoute: typeof AuthenticatedAuteursAdminCoursesIndexRoute
-  AuthenticatedAuteursAdminCreatorsIndexRoute: typeof AuthenticatedAuteursAdminCreatorsIndexRoute
-  AuthenticatedAuteursAdminDocumentsIndexRoute: typeof AuthenticatedAuteursAdminDocumentsIndexRoute
-  AuthenticatedAuteursAdminReviewIndexRoute: typeof AuthenticatedAuteursAdminReviewIndexRoute
-  AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRoute
-  AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRoute
-  AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRoute
-  AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRoute
-  AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRoute
-  AuthenticatedAuteursAdminCreatorsInfluencersIndexRoute: typeof AuthenticatedAuteursAdminCreatorsInfluencersIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHubRouteRoute: AuthenticatedHubRouteRouteWithChildren,
-  AuthenticatedAuteursContractRoute: AuthenticatedAuteursContractRoute,
-  AuthenticatedAuteursExamplesRoute: AuthenticatedAuteursExamplesRoute,
-  AuthenticatedAuteursGuideRoute: AuthenticatedAuteursGuideRoute,
-  AuthenticatedAuteursMessagesRoute: AuthenticatedAuteursMessagesRoute,
-  AuthenticatedAuteursOpenRoute: AuthenticatedAuteursOpenRoute,
-  AuthenticatedAuteursProfileRoute: AuthenticatedAuteursProfileRoute,
-  AuthenticatedAuteursIndexRoute: AuthenticatedAuteursIndexRoute,
-  AuthenticatedAuteursAdminActivityRoute:
-    AuthenticatedAuteursAdminActivityRoute,
-  AuthenticatedAuteursAdminAiReviewRoute:
-    AuthenticatedAuteursAdminAiReviewRoute,
-  AuthenticatedAuteursAdminAnnouncementsRoute:
-    AuthenticatedAuteursAdminAnnouncementsRoute,
-  AuthenticatedAuteursAdminApiRoute: AuthenticatedAuteursAdminApiRoute,
-  AuthenticatedAuteursAdminApplicationsRoute:
-    AuthenticatedAuteursAdminApplicationsRoute,
-  AuthenticatedAuteursAdminCodesRoute: AuthenticatedAuteursAdminCodesRoute,
-  AuthenticatedAuteursAdminMessagesRoute:
-    AuthenticatedAuteursAdminMessagesRoute,
-  AuthenticatedAuteursAdminPoolRoute: AuthenticatedAuteursAdminPoolRoute,
-  AuthenticatedAuteursAdminSettingsRoute:
-    AuthenticatedAuteursAdminSettingsRoute,
-  AuthenticatedAuteursCoursesCourseIdRoute:
-    AuthenticatedAuteursCoursesCourseIdRoute,
-  AuthenticatedAuteursStudioIdRoute: AuthenticatedAuteursStudioIdRoute,
-  AuthenticatedAuteursAdminIndexRoute: AuthenticatedAuteursAdminIndexRoute,
-  AuthenticatedAuteursCoursesIndexRoute: AuthenticatedAuteursCoursesIndexRoute,
-  AuthenticatedAuteursAdminAuthorsAuthorIdRoute:
-    AuthenticatedAuteursAdminAuthorsAuthorIdRoute,
-  AuthenticatedAuteursAdminAuthorsNewRoute:
-    AuthenticatedAuteursAdminAuthorsNewRoute,
-  AuthenticatedAuteursAdminCoursesCourseIdRoute:
-    AuthenticatedAuteursAdminCoursesCourseIdRoute,
-  AuthenticatedAuteursAdminCreatorsCreatorIdRoute:
-    AuthenticatedAuteursAdminCreatorsCreatorIdRoute,
-  AuthenticatedAuteursAdminCreatorsApplicationsRoute:
-    AuthenticatedAuteursAdminCreatorsApplicationsRoute,
-  AuthenticatedAuteursAdminCreatorsAppsRoute:
-    AuthenticatedAuteursAdminCreatorsAppsRoute,
-  AuthenticatedAuteursAdminCreatorsComplianceRoute:
-    AuthenticatedAuteursAdminCreatorsComplianceRoute,
-  AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute:
-    AuthenticatedAuteursAdminCreatorsInfluencerApplicationsRoute,
-  AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute:
-    AuthenticatedAuteursAdminCreatorsInfluencerMessagesRoute,
-  AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute:
-    AuthenticatedAuteursAdminCreatorsInfluencerPayoutsRoute,
-  AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute:
-    AuthenticatedAuteursAdminCreatorsInfluencerPerformanceRoute,
-  AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute:
-    AuthenticatedAuteursAdminCreatorsInfluencerSettingsRoute,
-  AuthenticatedAuteursAdminCreatorsIntegrationsRoute:
-    AuthenticatedAuteursAdminCreatorsIntegrationsRoute,
-  AuthenticatedAuteursAdminCreatorsMessagesRoute:
-    AuthenticatedAuteursAdminCreatorsMessagesRoute,
-  AuthenticatedAuteursAdminCreatorsOpsRoute:
-    AuthenticatedAuteursAdminCreatorsOpsRoute,
-  AuthenticatedAuteursAdminCreatorsPayoutsRoute:
-    AuthenticatedAuteursAdminCreatorsPayoutsRoute,
-  AuthenticatedAuteursAdminCreatorsPlannerRoute:
-    AuthenticatedAuteursAdminCreatorsPlannerRoute,
-  AuthenticatedAuteursAdminCreatorsProspectsRoute:
-    AuthenticatedAuteursAdminCreatorsProspectsRoute,
-  AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute:
-    AuthenticatedAuteursAdminCreatorsSlideshowApplicationsRoute,
-  AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute:
-    AuthenticatedAuteursAdminCreatorsUgcApplicationsRoute,
-  AuthenticatedAuteursAdminCreatorsUgcBriefsRoute:
-    AuthenticatedAuteursAdminCreatorsUgcBriefsRoute,
-  AuthenticatedAuteursAdminDocumentsSlugRoute:
-    AuthenticatedAuteursAdminDocumentsSlugRoute,
-  AuthenticatedAuteursAdminReviewCourseIdRoute:
-    AuthenticatedAuteursAdminReviewCourseIdRoute,
-  AuthenticatedAuteursAdminAuthorsIndexRoute:
-    AuthenticatedAuteursAdminAuthorsIndexRoute,
-  AuthenticatedAuteursAdminCoursesIndexRoute:
-    AuthenticatedAuteursAdminCoursesIndexRoute,
-  AuthenticatedAuteursAdminCreatorsIndexRoute:
-    AuthenticatedAuteursAdminCreatorsIndexRoute,
-  AuthenticatedAuteursAdminDocumentsIndexRoute:
-    AuthenticatedAuteursAdminDocumentsIndexRoute,
-  AuthenticatedAuteursAdminReviewIndexRoute:
-    AuthenticatedAuteursAdminReviewIndexRoute,
-  AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRoute:
-    AuthenticatedAuteursAdminCreatorsInfluencerBriefsBriefIdRoute,
-  AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRoute:
-    AuthenticatedAuteursAdminCreatorsInfluencerDealsDealIdRoute,
-  AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRoute:
-    AuthenticatedAuteursAdminCreatorsInfluencersInfluencerIdRoute,
-  AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRoute:
-    AuthenticatedAuteursAdminCreatorsInfluencerBriefsIndexRoute,
-  AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRoute:
-    AuthenticatedAuteursAdminCreatorsInfluencerDealsIndexRoute,
-  AuthenticatedAuteursAdminCreatorsInfluencersIndexRoute:
-    AuthenticatedAuteursAdminCreatorsInfluencersIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
-
-interface CreatorsAppRouteChildren {
-  CreatorsAppAccountRoute: typeof CreatorsAppAccountRoute
-  CreatorsAppAppsRoute: typeof CreatorsAppAppsRoute
-  CreatorsAppCallsRoute: typeof CreatorsAppCallsRoute
-  CreatorsAppContractRoute: typeof CreatorsAppContractRoute
-  CreatorsAppEarningsRoute: typeof CreatorsAppEarningsRoute
-  CreatorsAppJobsRoute: typeof CreatorsAppJobsRoute
-  CreatorsAppLibraryRoute: typeof CreatorsAppLibraryRoute
-  CreatorsAppMessagesRoute: typeof CreatorsAppMessagesRoute
-  CreatorsAppPostsRoute: typeof CreatorsAppPostsRoute
-  CreatorsAppProfileRoute: typeof CreatorsAppProfileRoute
-  CreatorsAppRulesRoute: typeof CreatorsAppRulesRoute
-  CreatorsAppTasksRoute: typeof CreatorsAppTasksRoute
-  CreatorsAppIndexRoute: typeof CreatorsAppIndexRoute
-  CreatorsAppBriefsBriefIdRoute: typeof CreatorsAppBriefsBriefIdRoute
-  CreatorsAppBriefsIndexRoute: typeof CreatorsAppBriefsIndexRoute
-}
-
-const CreatorsAppRouteChildren: CreatorsAppRouteChildren = {
-  CreatorsAppAccountRoute: CreatorsAppAccountRoute,
-  CreatorsAppAppsRoute: CreatorsAppAppsRoute,
-  CreatorsAppCallsRoute: CreatorsAppCallsRoute,
-  CreatorsAppContractRoute: CreatorsAppContractRoute,
-  CreatorsAppEarningsRoute: CreatorsAppEarningsRoute,
-  CreatorsAppJobsRoute: CreatorsAppJobsRoute,
-  CreatorsAppLibraryRoute: CreatorsAppLibraryRoute,
-  CreatorsAppMessagesRoute: CreatorsAppMessagesRoute,
-  CreatorsAppPostsRoute: CreatorsAppPostsRoute,
-  CreatorsAppProfileRoute: CreatorsAppProfileRoute,
-  CreatorsAppRulesRoute: CreatorsAppRulesRoute,
-  CreatorsAppTasksRoute: CreatorsAppTasksRoute,
-  CreatorsAppIndexRoute: CreatorsAppIndexRoute,
-  CreatorsAppBriefsBriefIdRoute: CreatorsAppBriefsBriefIdRoute,
-  CreatorsAppBriefsIndexRoute: CreatorsAppBriefsIndexRoute,
-}
-
-const CreatorsAppRouteWithChildren = CreatorsAppRoute._addFileChildren(
-  CreatorsAppRouteChildren,
-)
-
-interface CreatorsInfluencerAppRouteChildren {
-  CreatorsInfluencerAppAgreementRoute: typeof CreatorsInfluencerAppAgreementRoute
-  CreatorsInfluencerAppBriefsRoute: typeof CreatorsInfluencerAppBriefsRoute
-  CreatorsInfluencerAppEarningsRoute: typeof CreatorsInfluencerAppEarningsRoute
-  CreatorsInfluencerAppMessagesRoute: typeof CreatorsInfluencerAppMessagesRoute
-  CreatorsInfluencerAppOffersRoute: typeof CreatorsInfluencerAppOffersRoute
-  CreatorsInfluencerAppPayoutsRoute: typeof CreatorsInfluencerAppPayoutsRoute
-  CreatorsInfluencerAppProfileRoute: typeof CreatorsInfluencerAppProfileRoute
-  CreatorsInfluencerAppRulesRoute: typeof CreatorsInfluencerAppRulesRoute
-  CreatorsInfluencerAppIndexRoute: typeof CreatorsInfluencerAppIndexRoute
-  CreatorsInfluencerAppDealsDealIdRoute: typeof CreatorsInfluencerAppDealsDealIdRoute
-  CreatorsInfluencerAppDealsIndexRoute: typeof CreatorsInfluencerAppDealsIndexRoute
-}
-
-const CreatorsInfluencerAppRouteChildren: CreatorsInfluencerAppRouteChildren = {
-  CreatorsInfluencerAppAgreementRoute: CreatorsInfluencerAppAgreementRoute,
-  CreatorsInfluencerAppBriefsRoute: CreatorsInfluencerAppBriefsRoute,
-  CreatorsInfluencerAppEarningsRoute: CreatorsInfluencerAppEarningsRoute,
-  CreatorsInfluencerAppMessagesRoute: CreatorsInfluencerAppMessagesRoute,
-  CreatorsInfluencerAppOffersRoute: CreatorsInfluencerAppOffersRoute,
-  CreatorsInfluencerAppPayoutsRoute: CreatorsInfluencerAppPayoutsRoute,
-  CreatorsInfluencerAppProfileRoute: CreatorsInfluencerAppProfileRoute,
-  CreatorsInfluencerAppRulesRoute: CreatorsInfluencerAppRulesRoute,
-  CreatorsInfluencerAppIndexRoute: CreatorsInfluencerAppIndexRoute,
-  CreatorsInfluencerAppDealsDealIdRoute: CreatorsInfluencerAppDealsDealIdRoute,
-  CreatorsInfluencerAppDealsIndexRoute: CreatorsInfluencerAppDealsIndexRoute,
-}
-
-const CreatorsInfluencerAppRouteWithChildren =
-  CreatorsInfluencerAppRoute._addFileChildren(
-    CreatorsInfluencerAppRouteChildren,
-  )
 
 interface ApiPublicAppCoursesRouteChildren {
   ApiPublicAppCoursesSlugRoute: typeof ApiPublicAppCoursesSlugRoute
@@ -4575,95 +838,33 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AccountNotSetUpRoute: AccountNotSetUpRoute,
   AuthRoute: AuthRoute,
-  CareersRoute: CareersRoute,
   ConfidentialiteRoute: ConfidentialiteRoute,
-  DevenirProfesseurRoute: DevenirProfesseurRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   PosterUnsubscribeRoute: PosterUnsubscribeRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  SophiaCultureGeneraleRoute: SophiaCultureGeneraleRoute,
-  StartRoute: StartRoute,
-  TelechargerRoute: TelechargerRoute,
   DotwellKnownAppleAppSiteAssociationRoute:
     DotwellKnownAppleAppSiteAssociationRoute,
-  AuteursSlugRoute: AuteursSlugRoute,
-  AuteursInviteRoute: AuteursInviteRoute,
-  AuteursJoinRoute: AuteursJoinRoute,
-  AuteursLoginRoute: AuteursLoginRoute,
-  CoursSlugRoute: CoursSlugRoute,
-  CreatorsAppRoute: CreatorsAppRouteWithChildren,
-  CreatorsInviteRoute: CreatorsInviteRoute,
-  CreatorsLoginRoute: CreatorsLoginRoute,
-  EnBecomeATeacherRoute: EnBecomeATeacherRoute,
-  EnCareersRoute: EnCareersRoute,
-  EnDownloadRoute: EnDownloadRoute,
-  EnInfluencerApplicationRoute: EnInfluencerApplicationRoute,
   EnLegalNoticeRoute: EnLegalNoticeRoute,
   EnPrivacyRoute: EnPrivacyRoute,
   EnSlideshowApplicationRoute: EnSlideshowApplicationRoute,
-  EnSophiaGeneralKnowledgeRoute: EnSophiaGeneralKnowledgeRoute,
-  EnStartRoute: EnStartRoute,
-  EnUgcApplicationRoute: EnUgcApplicationRoute,
-  FrCandidatureInfluenceurRoute: FrCandidatureInfluenceurRoute,
   FrCandidatureSlideshowRoute: FrCandidatureSlideshowRoute,
-  FrCandidatureUgcRoute: FrCandidatureUgcRoute,
-  FrCareersRoute: FrCareersRoute,
   FrConfidentialiteRoute: FrConfidentialiteRoute,
-  FrDevenirProfesseurRoute: FrDevenirProfesseurRoute,
   FrMentionsLegalesRoute: FrMentionsLegalesRoute,
-  FrSophiaCultureGeneraleRoute: FrSophiaCultureGeneraleRoute,
-  FrTelechargerRoute: FrTelechargerRoute,
-  GoHandleRoute: GoHandleRoute,
-  InviteTokenRoute: InviteTokenRoute,
-  JobsSlugRoute: JobsSlugRoute,
   PayoutTokenRoute: PayoutTokenRoute,
-  CoursIndexRoute: CoursIndexRoute,
-  CreatorsIndexRoute: CreatorsIndexRoute,
   EnIndexRoute: EnIndexRoute,
   FrIndexRoute: FrIndexRoute,
   ApiPublicOsCandidaturesRoute: ApiPublicOsCandidaturesRoute,
   ApiPublicOsEmailRoute: ApiPublicOsEmailRoute,
   ApiPublicOsEmailEventsRoute: ApiPublicOsEmailEventsRoute,
-  CreatorsInfluencerAppRoute: CreatorsInfluencerAppRouteWithChildren,
-  CreatorsInfluencerApplyRoute: CreatorsInfluencerApplyRoute,
   CreatorsSignTokenRoute: CreatorsSignTokenRoute,
   CreatorsSlideshowApplyRoute: CreatorsSlideshowApplyRoute,
-  CreatorsUgcApplyRoute: CreatorsUgcApplyRoute,
-  CreatorsUnswipeInfluencerRoute: CreatorsUnswipeInfluencerRoute,
-  CreatorsUnswipeSlideshowRoute: CreatorsUnswipeSlideshowRoute,
-  CreatorsUnswipeUgcRoute: CreatorsUnswipeUgcRoute,
-  EnAuthorsSlugRoute: EnAuthorsSlugRoute,
-  EnCreatorsInfluencerRoute: EnCreatorsInfluencerRoute,
   EnCreatorsSlideshowRoute: EnCreatorsSlideshowRoute,
-  EnCreatorsUgcRoute: EnCreatorsUgcRoute,
-  EnLessonsSlugRoute: EnLessonsSlugRoute,
-  FrAuteursSlugRoute: FrAuteursSlugRoute,
-  FrCoursSlugRoute: FrCoursSlugRoute,
-  FrCreateursInfluenceurRoute: FrCreateursInfluenceurRoute,
   FrCreateursSlideshowRoute: FrCreateursSlideshowRoute,
-  FrCreateursUgcRoute: FrCreateursUgcRoute,
-  CreatorsInfluencerIndexRoute: CreatorsInfluencerIndexRoute,
   CreatorsSlideshowIndexRoute: CreatorsSlideshowIndexRoute,
-  CreatorsUgcIndexRoute: CreatorsUgcIndexRoute,
-  CreatorsUnswipeIndexRoute: CreatorsUnswipeIndexRoute,
-  EnCreatorsIndexRoute: EnCreatorsIndexRoute,
-  EnLessonsIndexRoute: EnLessonsIndexRoute,
-  FrCoursIndexRoute: FrCoursIndexRoute,
-  FrCreateursIndexRoute: FrCreateursIndexRoute,
   LangCreatorsSlideshowApplyRoute: LangCreatorsSlideshowApplyRoute,
   ApiPublicAppCoursesRoute: ApiPublicAppCoursesRouteWithChildren,
-  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
-  ApiPublicTiktokOauthRoute: ApiPublicTiktokOauthRoute,
-  EnCreatorsUnswipeInfluencerRoute: EnCreatorsUnswipeInfluencerRoute,
-  EnCreatorsUnswipeSlideshowRoute: EnCreatorsUnswipeSlideshowRoute,
-  EnCreatorsUnswipeUgcRoute: EnCreatorsUnswipeUgcRoute,
-  FrCreateursUnswipeInfluenceurRoute: FrCreateursUnswipeInfluenceurRoute,
-  FrCreateursUnswipeSlideshowRoute: FrCreateursUnswipeSlideshowRoute,
-  FrCreateursUnswipeUgcRoute: FrCreateursUnswipeUgcRoute,
   LangCreatorsSlideshowIndexRoute: LangCreatorsSlideshowIndexRoute,
-  EnCreatorsUnswipeIndexRoute: EnCreatorsUnswipeIndexRoute,
-  FrCreateursUnswipeIndexRoute: FrCreateursUnswipeIndexRoute,
   ApiPublicCronUgcJobRoute: ApiPublicCronUgcJobRoute,
 }
 export const routeTree = rootRouteImport

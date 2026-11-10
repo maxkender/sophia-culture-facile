@@ -20,13 +20,8 @@ export async function resolveAccountRole(): Promise<AccountRole | null> {
   return "none";
 }
 
+/** Only the slideshow Hub remains on this site; every other role has no space here. */
 export function homeFor(role: AccountRole): string {
-  if (role === "creator") return "/creators/app";
-  if (role === "influencer") return "/creators/influencer/app";
-  if (role === "admin") {
-    const mode = typeof window !== "undefined" ? window.localStorage.getItem(ADMIN_MODE_KEY) : null;
-    return mode === "creators" ? "/auteurs/admin/creators" : "/auteurs/admin";
-  }
-  if (role === "author") return "/auteurs";
+  if (role === "admin") return "/hub/slideshows";
   return "/account-not-set-up";
 }

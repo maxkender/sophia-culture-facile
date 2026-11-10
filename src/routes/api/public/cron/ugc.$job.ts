@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-/** Scheduled UGC jobs: compliance (Mon 06:00 Paris), d7 (daily 07:00), monthly (1st 08:00). Caller must send the cron secret. */
+/** Scheduled slideshow poster jobs (slides-*). Caller must send the cron secret. Path kept so existing schedules keep working. */
 export const Route = createFileRoute("/api/public/cron/ugc/$job")({
   server: {
     handlers: {
@@ -23,55 +23,9 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
           const parisHour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Paris", hour: "2-digit", hour12: false }).format(new Date()));
           if (parisHour !== Number(wantHour)) return Response.json({ skipped: "not the Paris hour" });
         }
-        // No automatic emails, no pay jobs: these entry points are switched off for good (cron rows deactivated too).
-        if (["nurture", "dormancy", "brief-drop", "planner-reminder", "monthly", "tiers", "compliance", "daily-detect", "budget"].includes(params.job)) return Response.json({ skipped: "disabled" });
+        // Only the slideshow poster jobs remain on this site; every other job name is gone.
+        if (!params.job.startsWith("slides-")) return Response.json({ error: "Unknown job" }, { status: 404 });
         try {
-          if (params.job === "compliance" || params.job === "d7") {
-            if (!process.env["APIFY_TOKEN"]) return Response.json({ skipped: "APIFY_TOKEN missing" });
-            const sync = await import("@/lib/ugc-sync.server");
-            const r = params.job === "compliance" ? await sync.runComplianceSync(a) : await sync.runD7Sync(a);
-            if (params.job === "d7") {
-              // Validated posts: daily view refresh, then J+7 freeze and pricing.
-              const j7 = await import("@/lib/ugc-j7.server");
-              const tracked = await j7.trackValidated(a).catch((e: Error) => ({ error: e.message }));
-              return Response.json({ ...r, tracked, frozen: await j7.freezeDue(a) });
-            }
-            return Response.json(r);
-          }
-          if (params.job === "monthly") {
-            const { generateMonth } = await import("@/lib/ugc-month.server");
-            const { previousPeriod } = await import("@/lib/ugc-pay");
-            return Response.json(await generateMonth(a, previousPeriod(), null));
-          }
-          if (params.job === "tiers") {
-            const { runTierJob } = await import("@/lib/ugc-tiers.server");
-            return Response.json(await runTierJob(a));
-          }
-          if (params.job === "ads-metrics") {
-            const { syncAdMetrics } = await import("@/lib/ads.server");
-            return Response.json(await syncAdMetrics(a));
-          }
-          if (params.job === "daily-detect") {
-            if (!process.env["APIFY_TOKEN"]) return Response.json({ skipped: "APIFY_TOKEN missing" });
-            const { runDailyDetect } = await import("@/lib/hub-automation.server");
-            return Response.json(await runDailyDetect(a));
-          }
-          if (params.job === "dormancy") {
-            const { runDormancy } = await import("@/lib/hub-automation.server");
-            return Response.json(await runDormancy(a));
-          }
-          if (params.job === "brief-drop") {
-            const { runBriefDrop } = await import("@/lib/hub-automation.server");
-            return Response.json(await runBriefDrop(a));
-          }
-          if (params.job === "nurture") {
-            const { runNurture } = await import("@/lib/hub-automation.server");
-            return Response.json(await runNurture(a, new URL(request.url).origin));
-          }
-          if (params.job === "budget") {
-            const { applyBudgetCap } = await import("@/lib/hub-automation.server");
-            return Response.json(await applyBudgetCap(a));
-          }
           if (params.job === "slides-remind") {
             const { runSignatureReminders } = await import("@/lib/slideshow-reminders.server");
             const { withLock } = await import("@/lib/hub-automation.server");
@@ -141,25 +95,7 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             const { withLock } = await import("@/lib/hub-automation.server");
             return Response.json(await withLock(a, "slides-week", 15, () => buildWeek(a)));
           }
-          if (params.job === "inspiration") {
-            const { runInspirationTick } = await import("@/lib/inspirations.server");
-            const { withLock } = await import("@/lib/hub-automation.server");
-            return Response.json(await withLock(a, "inspiration", 10, () => runInspirationTick(a)));
-          }
-          if (params.job === "notion-sync") {
-            if (!process.env["NOTION_TOKEN"]) return Response.json({ skipped: "NOTION_TOKEN missing" });
-            const { data: s } = await a.from("ugc_settings").select("notion_auto").eq("id", 1).maybeSingle();
-            if (s && s.notion_auto === false) return Response.json({ skipped: "auto-sync off" });
-            const { runNotionSync } = await import("@/lib/notion-sync.server");
-            const { withLock } = await import("@/lib/hub-automation.server");
-            return Response.json(await withLock(a, "notion-sync", 5, () => runNotionSync(a)));
-          }
-          if (params.job === "planner-reminder") {
-            const { data: admins } = await a.from("profiles").select("id").eq("role", "admin");
-            await a.from("notifications").insert((admins ?? []).map((p: any) => ({ profile_id: p.id, type: "message", body: "Reminder: publish next week's UGC briefs in the Week planner by Friday." })));
-            return Response.json({ ok: true });
-          }
-          return new Response("Unknown job", { status: 404 });
+          return Response.json({ error: "Unknown job" }, { status: 404 });
         } catch (e) {
           return Response.json({ error: (e as Error).message }, { status: 500 });
         }

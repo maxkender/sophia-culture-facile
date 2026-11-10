@@ -45,42 +45,32 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+/**
+ * This site now only serves the slideshow poster programme: the old home pages and
+ * other creator tracks send people (and Sophia app links) to the slideshow page.
+ */
+export function slideshowRedirect(pathname: string, lang: () => string): string | null {
+  const p = pathname.replace(/\/+$/, "") || "/";
+  const EN = "/en/creators/slideshow";
+  const FR = "/fr/createurs/slideshow";
+  if (p === "/") return EN;
+  if (p === "/en") return EN;
+  if (p === "/fr") return FR;
+  if (/^\/en\/creators(\/(ugc|influencer|unswipe)(\/.*)?)?$/.test(p)) return EN;
+  if (/^\/fr\/creators(\/(ugc|slideshow|influencer|unswipe)(\/.*)?)?$/.test(p)) return FR;
+  if (/^\/fr\/createurs(\/(ugc|influenceur|unswipe)(\/.*)?)?$/.test(p)) return FR;
+  if (/^\/creators(\/(ugc|influencer|unswipe)(\/.*)?)?$/.test(p)) return lang() === "fr" ? FR : EN;
+  return null;
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const url = new URL(request.url);
-    if (request.method === "GET" && (url.pathname === "/" || url.pathname === "")) {
-      // Première visite : aiguillage temporaire vers la langue détectée.
-      const lang = detectLangFromHeaders(request.headers);
-      return new Response(null, {
-        status: 302,
-        headers: {
-          location: `/${lang}${url.search}`,
-          vary: "Accept-Language, Cookie",
-          "cache-control": "no-store",
-        },
-      });
-    }
-    const frEnglishPath = url.pathname.replace(/\/$/, "").match(/^\/fr\/creators(\/ugc|\/slideshow|\/influencer)?$/);
-    if (request.method === "GET" && frEnglishPath) {
-      const seg = frEnglishPath[1] === "/influencer" ? "/influenceur" : frEnglishPath[1] ?? "";
-      return new Response(null, {
-        status: 301,
-        headers: { location: `/fr/createurs${seg}${url.search}` },
-      });
-    }
-    const creatorShort = url.pathname.replace(/\/$/, "").match(/^\/creators(\/ugc|\/slideshow|\/influencer)?$/);
-    if (request.method === "GET" && creatorShort) {
-      const lang = detectLangFromHeaders(request.headers);
-      const base = lang === "fr" ? "/fr/createurs" : "/en/creators";
-      const seg = lang === "fr" && creatorShort[1] === "/influencer" ? "/influenceur" : creatorShort[1] ?? "";
-      return new Response(null, {
-        status: 302,
-        headers: {
-          location: `${base}${seg}${url.search}`,
-          vary: "Accept-Language, Cookie",
-          "cache-control": "no-store",
-        },
-      });
+    if (request.method === "GET") {
+      const target = slideshowRedirect(url.pathname, () => detectLangFromHeaders(request.headers));
+      if (target) {
+        return new Response(null, { status: 301, headers: { location: `${target}${url.search}` } });
+      }
     }
 
     try {

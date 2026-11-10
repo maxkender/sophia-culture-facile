@@ -2,7 +2,6 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { fr, type Dict } from "./fr";
 import { en } from "./en";
 import {
-  courseRoute,
   langFromPath,
   pathFor,
   ROUTES,
@@ -72,14 +71,6 @@ export function LanguageToggle({
     onClick: () => rememberLang(other),
     className: `${TOGGLE_CLASS} ${className}`,
   };
-
-  if (alternateSlug) {
-    return (
-      <Link to={courseRoute(other)} params={{ slug: alternateSlug }} {...common}>
-        <span aria-hidden="true">{FLAGS[lang]}</span>
-      </Link>
-    );
-  }
 
   return (
     <Link to={pathFor(key, other)} {...common}>

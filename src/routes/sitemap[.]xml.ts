@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getCourseSitemapEntries } from "@/content/api";
-import { getPublishedSitemapEntries } from "@/lib/public-content.functions";
 import { absUrl } from "@/config/site";
-import { ROUTES, coursePath, type RouteKey } from "@/i18n/routes";
+import { ROUTES, type RouteKey } from "@/i18n/routes";
 import { SLIDESHOW_LANGUAGES, slideshowPath } from "@/i18n/slideshow-pages";
 
 /** Une entrée = une URL + ses alternates hreflang (fr, en, x-default). */
@@ -26,20 +24,11 @@ function urlEntry(opts: {
 }
 
 const STATIC_PAGES: { key: RouteKey; changefreq: string; priority: string }[] = [
-  { key: "home", changefreq: "weekly", priority: "1.0" },
-  { key: "download", changefreq: "monthly", priority: "0.9" },
-  { key: "landing", changefreq: "monthly", priority: "0.9" },
-  { key: "courses", changefreq: "weekly", priority: "0.9" },
-  { key: "apply", changefreq: "monthly", priority: "0.5" },
-  { key: "careers", changefreq: "monthly", priority: "0.6" },
-  { key: "creators", changefreq: "monthly", priority: "0.6" },
-  { key: "creatorsUgc", changefreq: "monthly", priority: "0.6" },
-  { key: "creatorsInfluencer", changefreq: "monthly", priority: "0.6" },
   { key: "legal", changefreq: "yearly", priority: "0.3" },
   { key: "privacy", changefreq: "yearly", priority: "0.3" },
 ];
 
-/** Sitemap généré à la volée : les cours viennent de `src/content/api.ts`. */
+/** Sitemap: legal pages and the slideshow poster pages (30 languages). */
 async function buildSitemap(): Promise<string> {
   const today = new Date().toISOString().slice(0, 10);
 
@@ -71,38 +60,9 @@ ${alts}
   </url>`);
   });
 
-  const courseXml = getCourseSitemapEntries().map((entry) => {
-    const frSlug = entry.locale === "fr" ? entry.slug : entry.alternateSlug;
-    const enSlug = entry.locale === "en" ? entry.slug : entry.alternateSlug;
-    return urlEntry({
-      loc: absUrl(coursePath(entry.locale, entry.slug)),
-      frUrl: absUrl(coursePath("fr", frSlug)),
-      enUrl: absUrl(coursePath("en", enSlug)),
-      lastmod: entry.updatedAt,
-      changefreq: "monthly",
-      priority: "0.8",
-    });
-  });
-
-  // Cours publiés depuis le portail auteur : URL françaises uniques, sans alternates.
-  let publishedXml: string[] = [];
-  try {
-    const entries = await getPublishedSitemapEntries();
-    publishedXml = entries.map(
-      (entry) => `  <url>
-    <loc>${absUrl(entry.path)}</loc>
-    <lastmod>${entry.lastmod}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>`,
-    );
-  } catch {
-    publishedXml = [];
-  }
-
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${[...staticXml, ...slideshowXml, ...courseXml, ...publishedXml].join("\n")}
+${[...staticXml, ...slideshowXml].join("\n")}
 </urlset>
 `;
 }

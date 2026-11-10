@@ -36,14 +36,6 @@ export function AdminSettings() {
           <p className="mt-2 inline-flex rounded-full bg-portal-accent/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-portal-accent">
             Admin
           </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Button asChild variant="pillSecondary" size="pillSm">
-              <Link to="/auteurs/profile">Edit your details</Link>
-            </Button>
-            <Button asChild variant="pillSecondary" size="pillSm">
-              <Link to="/auteurs/admin/documents">Manage documents</Link>
-            </Button>
-          </div>
         </PortalCard>
 
         <PortalCard>
