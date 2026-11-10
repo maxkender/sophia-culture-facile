@@ -33,7 +33,7 @@ export function downloadHref(): string {
 /** Vrai si la destination est un lien externe (donc un <a>, pas un <Link>). */
 export const IS_EXTERNAL_DOWNLOAD = USE_SMART_LINK;
 
-export const CONTACT_EMAIL = "contact@vikstudios.fr"; // TO REPLACE
+export const CONTACT_EMAIL = "support@vikstudios.com";
 
 export const COMPANY = "Vik Studios SAS";
 
