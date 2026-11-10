@@ -18,6 +18,7 @@ import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as PosterUnsubscribeRouteImport } from './routes/poster-unsubscribe'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as LangIndexRouteImport } from './routes/$lang/index'
 import { Route as DotwellKnownAppleAppSiteAssociationRouteImport } from './routes/[.]well-known.apple-app-site-association'
 import { Route as AuthenticatedHubRouteRouteImport } from './routes/_authenticated/hub/route'
 import { Route as EnIndexRouteImport } from './routes/en/index'
@@ -90,6 +91,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangIndexRoute = LangIndexRouteImport.update({
+  id: '/$lang/',
+  path: '/$lang/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DotwellKnownAppleAppSiteAssociationRoute =
@@ -263,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/fr/confidentialite': typeof FrConfidentialiteRoute
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
   '/payout/$token': typeof PayoutTokenRoute
+  '/$lang/': typeof LangIndexRoute
   '/en/': typeof EnIndexRoute
   '/fr/': typeof FrIndexRoute
   '/hub/settings': typeof AuthenticatedHubSettingsRoute
@@ -301,6 +308,7 @@ export interface FileRoutesByTo {
   '/fr/confidentialite': typeof FrConfidentialiteRoute
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
   '/payout/$token': typeof PayoutTokenRoute
+  '/$lang': typeof LangIndexRoute
   '/en': typeof EnIndexRoute
   '/fr': typeof FrIndexRoute
   '/hub/settings': typeof AuthenticatedHubSettingsRoute
@@ -342,6 +350,7 @@ export interface FileRoutesById {
   '/fr/confidentialite': typeof FrConfidentialiteRoute
   '/fr/mentions-legales': typeof FrMentionsLegalesRoute
   '/payout/$token': typeof PayoutTokenRoute
+  '/$lang/': typeof LangIndexRoute
   '/en/': typeof EnIndexRoute
   '/fr/': typeof FrIndexRoute
   '/_authenticated/hub/settings': typeof AuthenticatedHubSettingsRoute
@@ -383,6 +392,7 @@ export interface FileRouteTypes {
     | '/fr/confidentialite'
     | '/fr/mentions-legales'
     | '/payout/$token'
+    | '/$lang/'
     | '/en/'
     | '/fr/'
     | '/hub/settings'
@@ -421,6 +431,7 @@ export interface FileRouteTypes {
     | '/fr/confidentialite'
     | '/fr/mentions-legales'
     | '/payout/$token'
+    | '/$lang'
     | '/en'
     | '/fr'
     | '/hub/settings'
@@ -461,6 +472,7 @@ export interface FileRouteTypes {
     | '/fr/confidentialite'
     | '/fr/mentions-legales'
     | '/payout/$token'
+    | '/$lang/'
     | '/en/'
     | '/fr/'
     | '/_authenticated/hub/settings'
@@ -501,6 +513,7 @@ export interface RootRouteChildren {
   FrConfidentialiteRoute: typeof FrConfidentialiteRoute
   FrMentionsLegalesRoute: typeof FrMentionsLegalesRoute
   PayoutTokenRoute: typeof PayoutTokenRoute
+  LangIndexRoute: typeof LangIndexRoute
   EnIndexRoute: typeof EnIndexRoute
   FrIndexRoute: typeof FrIndexRoute
   ApiPublicOsCandidaturesRoute: typeof ApiPublicOsCandidaturesRoute
@@ -580,6 +593,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/': {
+      id: '/$lang/'
+      path: '/$lang'
+      fullPath: '/$lang/'
+      preLoaderRoute: typeof LangIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.well-known/apple-app-site-association': {
@@ -852,6 +872,7 @@ const rootRouteChildren: RootRouteChildren = {
   FrConfidentialiteRoute: FrConfidentialiteRoute,
   FrMentionsLegalesRoute: FrMentionsLegalesRoute,
   PayoutTokenRoute: PayoutTokenRoute,
+  LangIndexRoute: LangIndexRoute,
   EnIndexRoute: EnIndexRoute,
   FrIndexRoute: FrIndexRoute,
   ApiPublicOsCandidaturesRoute: ApiPublicOsCandidaturesRoute,
