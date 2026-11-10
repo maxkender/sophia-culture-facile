@@ -6082,6 +6082,7 @@ export type Database = {
           signing_token: string | null
           signing_token_created_at: string | null
           source: string | null
+          source_declared: boolean | null
           start_monday: string | null
           started_at: string | null
           status: string
@@ -6163,6 +6164,7 @@ export type Database = {
           signing_token?: string | null
           signing_token_created_at?: string | null
           source?: string | null
+          source_declared?: boolean | null
           start_monday?: string | null
           started_at?: string | null
           status?: string
@@ -6244,6 +6246,7 @@ export type Database = {
           signing_token?: string | null
           signing_token_created_at?: string | null
           source?: string | null
+          source_declared?: boolean | null
           start_monday?: string | null
           started_at?: string | null
           status?: string

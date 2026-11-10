@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Done
+- Slideshow Sophia app source: classification, declared fallback, badges/filters/CSV and FR/EN link checks completed; 49 tests passed, authenticated Hub filters checked, no application submitted or publication.
 - Pass 2 — /start web-to-app funnel rebuilt to the iOS onboarding spec (30 steps, FR/EN, paywalls A/B, taap.it success, dataLayer events with ?src, resume, noindex). Tested end-to-end at 390px; not published.
 
 ## Open

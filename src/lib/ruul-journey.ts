@@ -1,6 +1,6 @@
 import { countryCodeOf } from "@/config/countries";
 import type { Database } from "@/integrations/supabase/types";
-import { applicationSource, ATTRIBUTION_KEYS, type Attribution, type ApplicationSource } from "./slideshow-attribution";
+import { applicationSource, sourceDeclared, ATTRIBUTION_KEYS, type Attribution, type ApplicationSource } from "./slideshow-attribution";
 
 export type JourneyApplication = Database["public"]["Tables"]["slideshow_applications"]["Row"];
 export const JOURNEY_STEPS = [
@@ -28,7 +28,7 @@ export function paidPeopleThisWeek(payouts: Payout[], now: string): number {
 }
 export type JourneyRow = {
   id: string; applicationId: string | null; name: string; email: string; country: string; zone: string;
-  referrer: string; referrerChannel: string | null; source: ApplicationSource; startMonday: string; attribution: Attribution;
+  referrer: string; referrerChannel: string | null; source: ApplicationSource; sourceDeclared: boolean; startMonday: string; attribution: Attribution;
   dates: Record<JourneyStep, string | null>; reminderDates: { j2: string | null; j5: string | null };
   current: JourneyStep | "ended" | "complete"; currentLabel: string; since: string | null;
   daysStuck: number | null; red: boolean; ended: boolean; nextAction: string;
@@ -123,12 +123,13 @@ export function buildJourneys(applications: JourneyApplication[], referrals: Ref
       paid: since && Date.parse(since)>Date.parse(now) ? "Waiting for payment Monday" : "Review and pay completed week", bonus: "Check referrer bonus payment",
     };
     const nextAction = endedLabel ?? (current === "complete" ? "Journey complete" : current === "ended" ? "Journey ended" : !a && !r?.friend_email ? "No email — ask referrer" : actions[current]);
-    return { id, applicationId: a?.id ?? null, name: a?.full_name ?? ([r?.friend_first_name,r?.friend_last_name].filter(Boolean).join(" ") || "Unnamed friend"), email: a?.email ?? r?.friend_email ?? "", country, zone: a?.zone ?? "", referrer: r?.referrer_name || a?.referral_name || "", referrerChannel: r?.referrer_channel ?? null, source: r ? "referral" : applicationSource(a ?? {}), attribution: Object.fromEntries(ATTRIBUTION_KEYS.map(k=>[k,a?.[k] ?? null])), startMonday: a?.start_monday ?? "", dates, reminderDates: { j2: r?.j2_sent_at ?? null, j5: r?.j5_sent_at ?? null }, current, currentLabel: endedLabel ?? (current === "complete" ? "Complete" : JOURNEY_STEPS.find(([k]) => k === current)?.[1] ?? current), since, daysStuck, red: !endedLabel && current !== "complete" && age !== null && age > 48*3600000, ended: Boolean(endedLabel), nextAction, postObserved: !postExact && Boolean(dates.post), openedAt: r?.opened_at ?? null, clickedAt: r?.clicked_at ?? null, bonusStatus: r?.bonus_status ?? null };
+    const declared = !r && sourceDeclared(a ?? {});
+    return { id, applicationId: a?.id ?? null, name: a?.full_name ?? ([r?.friend_first_name,r?.friend_last_name].filter(Boolean).join(" ") || "Unnamed friend"), email: a?.email ?? r?.friend_email ?? "", country, zone: a?.zone ?? "", referrer: r?.referrer_name || a?.referral_name || "", referrerChannel: r?.referrer_channel ?? null, source: r ? "referral" : applicationSource(a ?? {}), sourceDeclared: declared, attribution: Object.fromEntries(ATTRIBUTION_KEYS.map(k=>[k,a?.[k] ?? null])), startMonday: a?.start_monday ?? "", dates, reminderDates: { j2: r?.j2_sent_at ?? null, j5: r?.j5_sent_at ?? null }, current, currentLabel: endedLabel ?? (current === "complete" ? "Complete" : JOURNEY_STEPS.find(([k]) => k === current)?.[1] ?? current), since, daysStuck, red: !endedLabel && current !== "complete" && age !== null && age > 48*3600000, ended: Boolean(endedLabel), nextAction, postObserved: !postExact && Boolean(dates.post), openedAt: r?.opened_at ?? null, clickedAt: r?.clicked_at ?? null, bonusStatus: r?.bonus_status ?? null };
   }).sort((a,b) => Number(b.red)-Number(a.red) || (b.daysStuck ?? -1)-(a.daysStuck ?? -1));
 }
 
 export function journeyCsv(rows: JourneyRow[]): string {
   const safe = (v: unknown) => { const s = String(v ?? ""); return `"${(/^[=+\-@\t\r]/.test(s) ? "'" : "")+s.replaceAll('"','""')}"`; };
-  const headers = ["Name","Email","Country","Zone","Referrer","Referrer channel","Source","Start Monday","Current step","Days stuck","Next action",...JOURNEY_STEPS.map(([,l])=>l),"J+2 sent","J+5 sent","Opened","Clicked","First post observed","Bonus status",...ATTRIBUTION_KEYS];
-  return '\uFEFF'+[headers, ...rows.map(r => [r.name,r.email,r.country,r.zone,r.referrer,r.referrerChannel,r.source,r.startMonday,r.currentLabel,r.daysStuck,r.nextAction,...JOURNEY_STEPS.map(([k])=>r.dates[k]),r.reminderDates.j2,r.reminderDates.j5,r.openedAt,r.clickedAt,r.postObserved,r.bonusStatus,...ATTRIBUTION_KEYS.map(k=>r.attribution[k])])].map(row=>row.map(safe).join(",")).join("\r\n");
+  const headers = ["Name","Email","Country","Zone","Referrer","Referrer channel","Source","Source declared","Start Monday","Current step","Days stuck","Next action",...JOURNEY_STEPS.map(([,l])=>l),"J+2 sent","J+5 sent","Opened","Clicked","First post observed","Bonus status",...ATTRIBUTION_KEYS];
+  return '\uFEFF'+[headers, ...rows.map(r => [r.name,r.email,r.country,r.zone,r.referrer,r.referrerChannel,r.source,r.sourceDeclared,r.startMonday,r.currentLabel,r.daysStuck,r.nextAction,...JOURNEY_STEPS.map(([k])=>r.dates[k]),r.reminderDates.j2,r.reminderDates.j5,r.openedAt,r.clickedAt,r.postObserved,r.bonusStatus,...ATTRIBUTION_KEYS.map(k=>r.attribution[k])])].map(row=>row.map(safe).join(",")).join("\r\n");
 }

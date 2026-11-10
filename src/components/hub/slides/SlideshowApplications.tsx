@@ -38,7 +38,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { STATUS_LABEL, useOsStatus, OS_UI_ENABLED } from "./useOs";
-import { applicationSource, attributionCsv, SOURCE_LABELS } from "@/lib/slideshow-attribution";
+import { applicationSource, attributionCsv, sourceDeclared, SOURCE_LABELS } from "@/lib/slideshow-attribution";
 import { Download } from "lucide-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
@@ -402,6 +402,8 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
                     </span>
                   ) : null}
                   {applicationSource(a) === "meta" || ["facebook","fb","instagram","ig","meta"].includes(a.utm_source?.toLowerCase() ?? "") || a.fbclid ? <span className="ml-2 rounded bg-space-slides/10 px-1.5 py-0.5 text-[10px] text-space-slides">Meta</span> : null}
+                  {applicationSource(a) === "sophia_app" || a.utm_source?.trim().toLowerCase() === "sophia_app" ? <span className="ml-2 rounded bg-space-slides/10 px-1.5 py-0.5 text-[10px] text-space-slides">Sophia app</span> : null}
+                  {sourceDeclared(a) ? <span className="ml-1 text-[10px] text-muted-foreground">declared</span> : null}
                 </td>
                 <td>
                   <Country country={a.country} />
@@ -663,7 +665,7 @@ export function PosterCard({
               <b>Heard via:</b> {a.referral_source}
             </p>
           ) : null}
-          <p><b>Source:</b> {SOURCE_LABELS[applicationSource(a)]}</p>
+          <p><b>Source:</b> {SOURCE_LABELS[applicationSource(a)]}{sourceDeclared(a) ? " · declared" : ""}</p>
           {a.utm_campaign ? <p className="break-words"><b>Campaign:</b> {a.utm_campaign}</p> : null}
           {a.utm_content ? <p className="break-words"><b>Ad:</b> {a.utm_content}</p> : null}
         </div>
