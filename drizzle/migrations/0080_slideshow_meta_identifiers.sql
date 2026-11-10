@@ -1,0 +1,2 @@
+ALTER TABLE public.slideshow_applications ADD COLUMN IF NOT EXISTS fbc text, ADD COLUMN IF NOT EXISTS fbp text;
+COMMENT ON COLUMN public.slideshow_applications.meta_event_id IS 'UUID shared between browser and server Meta Lead events; existing UUID type retained for compatibility.';

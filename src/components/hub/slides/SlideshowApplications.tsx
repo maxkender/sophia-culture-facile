@@ -362,6 +362,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
               </th>
               <th>Name</th>
               <th>Country</th>
+              <th>Source</th>
               <th>Zone</th>
               <th>Status</th>
               <th>Applied</th>
@@ -416,6 +417,9 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
                       Language not in OS
                     </span>
                   ) : null}
+                </td>
+                <td className="max-w-56 whitespace-normal break-words">
+                  {a.utm_source?.trim().toLowerCase()==="meta" ? `Meta${a.utm_content ? ` · ${a.utm_content}` : ""}` : a.utm_source || "—"}
                 </td>
                 <td>{a.zone ?? "—"}</td>
                 <td>

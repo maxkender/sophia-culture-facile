@@ -85,8 +85,10 @@ export function SlideshowApplyPage() {
     }
     setBusy(true);
     try {
+      const eventId=crypto.randomUUID();
       const res = await submitFn({
         data: { app: new URLSearchParams(window.location.search).get("app") ?? undefined,
+          meta_event_id: eventId,
           ...browserAttribution(),
           marketing_consent: browserConsent(),
           referral_source: heard || undefined,

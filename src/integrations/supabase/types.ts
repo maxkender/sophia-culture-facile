@@ -6039,7 +6039,9 @@ export type Database = {
           dropped_at: string | null
           email: string
           expired_at: string | null
+          fbc: string | null
           fbclid: string | null
+          fbp: string | null
           full_name: string
           guide_figures_shown: Json | null
           guide_opened_at: string | null
@@ -6121,7 +6123,9 @@ export type Database = {
           dropped_at?: string | null
           email: string
           expired_at?: string | null
+          fbc?: string | null
           fbclid?: string | null
+          fbp?: string | null
           full_name: string
           guide_figures_shown?: Json | null
           guide_opened_at?: string | null
@@ -6203,7 +6207,9 @@ export type Database = {
           dropped_at?: string | null
           email?: string
           expired_at?: string | null
+          fbc?: string | null
           fbclid?: string | null
+          fbp?: string | null
           full_name?: string
           guide_figures_shown?: Json | null
           guide_opened_at?: string | null
