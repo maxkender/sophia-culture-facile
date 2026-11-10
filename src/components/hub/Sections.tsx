@@ -41,7 +41,7 @@ function useAdmins() {
 }
 
 
-function SettingLink({ k, label, help, compact = false }: { k: string; label: string; help: string; compact?: boolean }) {
+function SettingLink({ k, label, help, compact = false, email = false }: { k: string; label: string; help: string; compact?: boolean; email?: boolean }) {
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["hub", "setting", k], queryFn: async () => (await supabase.from("hub_settings").select("value").eq("key", k).maybeSingle()).data?.value ?? "" });
   const [v, setV] = useState<string | null>(null);
@@ -49,10 +49,10 @@ function SettingLink({ k, label, help, compact = false }: { k: string; label: st
   const [editing, setEditing] = useState(false);
   return (
     <div className={compact ? "space-y-2 border-b border-brand-line py-2 text-sm" : cn(card, "space-y-3")}>
-      <div className={compact ? "crm-setting-line flex items-center gap-2" : "flex flex-wrap items-center gap-2"}><span className="font-medium">{label}:</span>{data ? <a href={data} target="_blank" rel="noreferrer" className="max-w-full truncate text-portal-accent underline">{compact ? data : `Open ${label.toLowerCase()} ↗`}</a> : <span className="text-brand-navySoft">—</span>}{compact ? <><span>·</span><Button variant="link" size="sm" className="h-auto p-0" onClick={() => setEditing(!editing)}>edit</Button></> : null}</div>
+      <div className={compact ? "crm-setting-line flex items-center gap-2" : "flex flex-wrap items-center gap-2"}><span className="font-medium">{label}:</span>{data ? <a href={email ? `mailto:${data}` : data} target="_blank" rel="noreferrer" className="max-w-full truncate text-portal-accent underline">{compact ? data : `Open ${label.toLowerCase()} ↗`}</a> : <span className="text-brand-navySoft">—</span>}{compact ? <><span>·</span><Button variant="link" size="sm" className="h-auto p-0" onClick={() => setEditing(!editing)}>edit</Button></> : null}</div>
       {!compact ? <p className="text-sm text-brand-navySoft">{help}</p> : null}
-      {(!compact || editing) ? <div className="flex gap-2"><input aria-label={label} value={val} onChange={(e) => setV(e.target.value)} placeholder="https://…" className="h-10 flex-1 rounded-lg border px-3 text-sm" />
-        <Button onClick={async () => { if (val && !/^https:\/\//.test(val)) { toast.error("Use a full link starting with https://"); return; } const { error } = await supabase.from("hub_settings").upsert({ key: k, value: val || null, updated_at: new Date().toISOString() }); if (error) toast.error("Could not save."); else { toast.success("Saved"); void qc.invalidateQueries({ queryKey: ["hub", "setting", k] }); } }}>Save</Button></div> : null}
+      {(!compact || editing) ? <div className="flex gap-2"><input aria-label={label} value={val} onChange={(e) => setV(e.target.value)} placeholder={email ? "support@vikstudios.com" : "https://…"} className="h-10 flex-1 rounded-lg border px-3 text-sm" />
+        <Button onClick={async () => { if (email ? (val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim())) : (val && !/^https:\/\//.test(val))) { toast.error(email ? "Enter a valid email address" : "Use a full link starting with https://"); return; } const { error } = await supabase.from("hub_settings").upsert({ key: k, value: val || null, updated_at: new Date().toISOString() }); if (error) toast.error("Could not save."); else { toast.success("Saved"); void qc.invalidateQueries({ queryKey: ["hub", "setting", k] }); } }}>Save</Button></div> : null}
     </div>
   );
 }
