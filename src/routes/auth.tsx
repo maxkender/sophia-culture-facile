@@ -9,6 +9,6 @@ function AuthRoute() {
 
 export const Route = createFileRoute("/auth")({
   validateSearch: z.object({ email: z.string().email().optional(), reset: z.boolean().optional() }),
-  head: () => ({ meta: [{ title: "Sign in | Sophia author portal" }, { name: "description", content: "Sign in to the Sophia author portal." }, { name: "robots", content: "noindex, nofollow" }, { property: "og:title", content: "Sign in | Sophia author portal" }, { property: "og:description", content: "Sign in to the Sophia author portal." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Sign in | Vik Studios Hub" }, { name: "description", content: "Admin sign-in for the Vik Studios slideshow Hub." }, { name: "robots", content: "noindex, nofollow" }, { property: "og:title", content: "Sign in | Vik Studios Hub" }, { property: "og:description", content: "Admin sign-in for the Vik Studios slideshow Hub." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AuthRoute,
 });

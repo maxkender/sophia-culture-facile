@@ -1,5 +1,4 @@
-import { useState, type FormEvent } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useEffect, useState, type FormEvent } from "react";
 import { Mail, LockKeyhole } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,15 +7,28 @@ import { homeFor, resolveAccountRole } from "@/lib/account-role";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { adminAuthLinks } from "@/lib/admin-auth-links";
 
 export function AuthPage({ initialEmail = "", startWithReset = false }: { initialEmail?: string; startWithReset?: boolean } = {}) {
-  const navigate = useNavigate();
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(
     startWithReset ? "Enter your email address below and we will send you a reset link." : null,
   );
+
+  useEffect(() => {
+    let active = true;
+    async function routeSession() {
+      const role = await resolveAccountRole();
+      if (active && role !== null) window.location.assign(homeFor(role));
+    }
+    void routeSession();
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN") setTimeout(() => { if (active) void routeSession(); }, 0);
+    });
+    return () => { active = false; data.subscription.unsubscribe(); };
+  }, []);
 
   async function signIn(event: FormEvent) {
     event.preventDefault();
@@ -28,7 +40,7 @@ export function AuthPage({ initialEmail = "", startWithReset = false }: { initia
       return;
     }
     const role = await resolveAccountRole();
-    window.location.assign(role && role !== "none" ? homeFor(role) : "/auteurs/join");
+    window.location.assign(role ? homeFor(role) : "/account-not-set-up");
   }
 
   async function magicLink() {
@@ -39,7 +51,7 @@ export function AuthPage({ initialEmail = "", startWithReset = false }: { initia
     setLoading(true);
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: { emailRedirectTo: `${window.location.origin}/auteurs` },
+      options: { emailRedirectTo: adminAuthLinks(window.location.origin).signIn, shouldCreateUser: false },
     });
     setLoading(false);
     if (error) {
@@ -56,7 +68,7 @@ export function AuthPage({ initialEmail = "", startWithReset = false }: { initia
     }
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/reset-password?space=authors`,
+      redirectTo: adminAuthLinks(window.location.origin).resetPassword,
     });
     setLoading(false);
     if (error) {
@@ -67,7 +79,7 @@ export function AuthPage({ initialEmail = "", startWithReset = false }: { initia
   }
 
   return (
-    <AuthShell title="Sophia author space" intro="Sign in to write and review Sophia courses. Creators: your space is at sophia-culture.com/creators/login.">
+    <AuthShell title="Vik Studios Hub">
       <form onSubmit={signIn} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="email">Email address</Label>
@@ -90,14 +102,10 @@ export function AuthPage({ initialEmail = "", startWithReset = false }: { initia
       <Button type="button" variant="ghost" size="pillSm" className="mt-3 w-full" disabled={loading} onClick={magicLink}>
         Email me a sign-in link
       </Button>
-      <button type="button" onClick={sendReset} disabled={loading} className="mt-3 w-full text-center text-sm font-semibold text-brand-navy underline-offset-4 hover:underline disabled:opacity-50">
+      <Button type="button" variant="ghost" onClick={sendReset} disabled={loading} className="mt-3 w-full text-center text-sm font-semibold text-brand-navy underline-offset-4 hover:underline disabled:opacity-50">
         Forgot your password?
-      </button>
+      </Button>
       {notice ? <p className="mt-3 text-center text-sm text-brand-navySoft">{notice}</p> : null}
-      <p className="mt-7 border-t border-brand-line pt-6 text-center text-sm text-brand-navySoft">
-        New to Sophia?{" "}
-        <a href="/auteurs/join" className="font-bold text-brand-navy underline-offset-4 hover:underline">Create a creator account</a>
-      </p>
     </AuthShell>
   );
 }
