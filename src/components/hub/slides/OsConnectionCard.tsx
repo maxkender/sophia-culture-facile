@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { saveOsBaseUrl, testOsConnection } from "@/lib/slideshows.functions";
 import { OS_NOT_CONNECTED, useOsStatus } from "./useOs";
+import { SlideshowMetaStatus } from "./SlideshowMetaStatus";
 
 export function OsConnectionCard() {
   const qc = useQueryClient();
@@ -31,6 +32,7 @@ export function OsConnectionCard() {
       <p className="text-xs text-brand-navySoft">Last sync: {data?.lastSync ? new Date(data.lastSync).toLocaleString("en-GB") : "never"} · Last error: {data?.lastError ?? "none"}</p>
       <p className="text-xs text-brand-navySoft">Hiring manager alerts: {data?.slack ? "Slack (SLACK_WEBHOOK_URL set)" : "email to the hiring manager (add SLACK_WEBHOOK_URL in Settings → Secrets for Slack)"}</p>
       {data?.calls.length ? <ul className="space-y-1 text-xs">{data.calls.map((c: { created_at: string; action: string; ok: boolean; error: string | null; ms: number | null }, i: number) => <li key={i}>{new Date(c.created_at).toLocaleString("en-GB")} · {c.action} · {c.ok ? "ok" : `failed: ${c.error}`} · {c.ms} ms</li>)}</ul> : null}
+      <SlideshowMetaStatus />
     </div>
   );
 }

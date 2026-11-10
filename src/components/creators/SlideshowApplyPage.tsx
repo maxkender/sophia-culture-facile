@@ -15,6 +15,10 @@ import { isHttpUrl, isValidEmail } from "@/lib/creator-validation";
 import { APPLICANT_LANGS, langOfCountry, type ApplicantLang } from "@/config/countries";
 import { slideshowCountrySelection } from "@/lib/slideshow-country-selection";
 import { browserReferralCode } from "@/lib/slideshow-referral-code";
+import { browserAttribution } from "./SlideshowMarketing";
+import { withAttribution, type Attribution } from "@/lib/slideshow-attribution";
+import { browserConsent } from "@/lib/slideshow-marketing-consent";
+import { slideshowPixelLead } from "@/lib/slideshow-meta-pixel";
 
 const LANG_NAMES: Record<ApplicantLang, string> = { fr: "Français", en: "English", es: "Español", it: "Italiano", pt: "Português", de: "Deutsch" };
 
@@ -24,8 +28,11 @@ export function SlideshowApplyPage() {
   const lang: "fr" | "en" = pageLang.code === "fr" ? "fr" : "en";
   const privacyPath = lang === "fr" ? ROUTES.privacy.fr : ROUTES.privacy.en;
   const [appSlug, setAppSlug] = useState<string | null>(null);
+  const [attribution, setAttribution] = useState<Attribution>({});
+  const [heard, setHeard] = useState("");
   useEffect(() => {
     browserReferralCode();
+    setAttribution(browserAttribution());
     const query = new URLSearchParams(window.location.search);
     setAppSlug(query.get("app"));
     const country = slideshowCountrySelection(query.get("country"), lang);
@@ -80,6 +87,9 @@ export function SlideshowApplyPage() {
     try {
       const res = await submitFn({
         data: { app: new URLSearchParams(window.location.search).get("app") ?? undefined,
+          ...browserAttribution(),
+          marketing_consent: browserConsent(),
+          referral_source: heard || undefined,
           website: honey,
           full_name: f.full_name,
           email: f.email,
@@ -101,6 +111,7 @@ export function SlideshowApplyPage() {
         return;
       }
       trackFunnel("apply_submitted", { track: "slideshow" });
+      slideshowPixelLead("eventId" in res ? res.eventId : undefined);
       setDone(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
@@ -117,7 +128,7 @@ export function SlideshowApplyPage() {
   const header = (
     <>
       <DocAvatar app={appSlug ?? undefined} />
-      <a href={landing} className="mt-6 inline-block text-[14px] text-doc-muted hover:text-doc-ink">{t.back}</a>
+       <a href={withAttribution(landing, attribution)} className="mt-6 inline-block text-[14px] text-doc-muted hover:text-doc-ink">{t.back}</a>
       <h1 className="mt-2 font-doc tracking-tight text-[30px] font-bold leading-tight md:text-[40px]">{fillSlideshow(t.title, { name })}</h1>
     </>
   );
@@ -182,6 +193,15 @@ export function SlideshowApplyPage() {
         <div className="space-y-2">
           <p id="langue-label" className={label}>{t.emailLanguage}{req}</p>
           <Choices labelledBy="langue-label" value={langue ?? autoLang} onChange={(v) => setLangue(v as ApplicantLang)} options={APPLICANT_LANGS.map((l) => ({ v: l, l: LANG_NAMES[l] }))} />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="referral_source" className={label}>{t.heardQuestion}</label>
+          <select id="referral_source" className={field} value={heard} onChange={e => setHeard(e.target.value)}>
+            <option value="">{t.heardEmpty}</option>
+            <option value="Instagram / Facebook ad">{t.heardAd}</option>
+            <option value="Referral">{t.heardReferral}</option>
+            <option value="Other">{t.heardOther}</option>
+          </select>
         </div>
         <div className="space-y-3 border-t border-doc-line pt-7">
           <h2 className="font-doc tracking-tight text-xl font-semibold">{t.consentTitle}</h2>

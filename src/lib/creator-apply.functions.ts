@@ -5,6 +5,8 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { isValidInternationalPhone } from "@/lib/creator-validation";
 import { referralCodeSchema } from "./slideshow-referral-code";
+import { attributionSchema, applicationSource } from "./slideshow-attribution";
+import { marketingConsentSchema, validMarketingConsent } from "./slideshow-marketing-consent";
 
 /** Public endpoints for the two creator application forms. Honeypot + rate limit. */
 
@@ -114,6 +116,8 @@ export const submitUgcApplication = createServerFn({ method: "POST" })
   });
 
 const slideSchema = z.object({
+  ...attributionSchema.shape,
+  marketing_consent: marketingConsentSchema.nullish(),
   ref: referralCodeSchema.nullish(),
   website: z.string().max(200).optional(),
   full_name: z.string().trim().min(2).max(120),
@@ -146,7 +150,15 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
     const hash = await ipHash();
     if (await rateLimited("slideshow_applications", hash, email)) return { ok: false as const, reason: "rate" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const marketing = getRequest().headers.get("sec-gpc") !== "1" && validMarketingConsent(data.marketing_consent);
+    const tracking = attributionSchema.parse(data);
+    if (!marketing) tracking.fbclid = null;
+    const eventId = crypto.randomUUID();
     const { data: inserted, error } = await supabaseAdmin.from("slideshow_applications").insert({
+      ...tracking,
+      source: applicationSource({ ...tracking, ref: data.ref }),
+      marketing_consent: data.marketing_consent ?? null,
+      meta_event_id: eventId,
       ref: data.ref ?? null,
       app_id: await resolveAppId(data.app),
       full_name: data.full_name,
@@ -165,10 +177,16 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
       q_tiktok_daily: data.q_tiktok_daily || null,
       q_previous_content: data.q_previous_content || null,
       ...referralFields(data),
-    }).select("id").single();
+    }).select("id,created_at,marketing_consent,landing_url,meta_event_id").single();
     if (error) {
       console.error("slideshow application insert failed", error.message);
       return { ok: false as const, reason: "server" as const };
+    }
+    if (marketing) {
+      try {
+        const { sendSlideshowMetaLead } = await import("./slideshow-meta.server");
+        await sendSlideshowMetaLead({ id: eventId, created_at: inserted.created_at, marketing_consent: inserted.marketing_consent, landing_url: inserted.landing_url }, getRequest(), data.marketing_consent);
+      } catch { /* Tracking cannot fail an application. */ }
     }
     const osSecret = process.env["OS_HUB_SECRET"];
     if (osSecret) {
@@ -191,5 +209,5 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
       const r = await posterEmails.ack(email, data.full_name, data.langue, kind);
       if (r.sent) await supabaseAdmin.from("slideshow_applications").update({ ack_sent_at: new Date().toISOString() }).eq("id", inserted.id);
     } catch { /* the application is saved either way */ }
-    return { ok: true as const };
+    return { ok: true as const, eventId };
   });
