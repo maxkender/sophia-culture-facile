@@ -420,6 +420,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
                 </td>
                 <td className="max-w-56 whitespace-normal break-words">
                   {a.utm_source?.trim().toLowerCase()==="meta" ? `Meta${a.utm_content ? ` · ${a.utm_content}` : ""}` : a.utm_source || "—"}
+                </td>
                 <td>{a.zone ?? "—"}</td>
                 <td>
                   <StatusPill status={a.status} />
