@@ -38,6 +38,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { STATUS_LABEL, useOsStatus, OS_UI_ENABLED } from "./useOs";
+import { applicationSource, attributionCsv, SOURCE_LABELS } from "@/lib/slideshow-attribution";
+import { Download } from "lucide-react";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 /** Accepted, not signed, not unsubscribed/expired: the only applications a signature reminder can go to. */
 export const canRemind = (a: App) =>
@@ -189,6 +192,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
   const [country, setCountry] = useState("all");
   const [status, setStatus] = useState(focusId ? "all" : "pending");
   const [search, setSearch] = useState("");
+  const [source, setSource] = useState("all");
   const [open, setOpen] = useState<string | null>(focusId ?? null);
   const [mode, setMode] = useState<"none" | "accept" | "reject">("none");
   const [checked, setChecked] = useState<string[]>([]);
@@ -208,6 +212,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
   const rows = apps.filter(
     (a) =>
       (country === "all" || a.country === country) &&
+      (source === "all" || applicationSource(a) === source) &&
       statusInTab(a.status, status) &&
       `${a.full_name} ${a.email} ${a.country}`.toLowerCase().includes(search.toLowerCase()),
   );
@@ -283,6 +288,8 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
             <option key={c}>{c}</option>
           ))}
         </select>
+        <Select value={source} onValueChange={setSource}><SelectTrigger aria-label="Source" className="w-40"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Source: all</SelectItem>{Object.entries(SOURCE_LABELS).map(([value,label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent></Select>
+        <Button variant="outline" size="sm" onClick={() => {const url=URL.createObjectURL(new Blob([attributionCsv(rows)],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="slideshow-applications.csv";a.click();URL.revokeObjectURL(url);}}><Download className="size-4" />CSV</Button>
         <div className="ml-auto flex gap-2">
           {status === "accepted" ? (
             <RemindButton
@@ -394,6 +401,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
                       Referred
                     </span>
                   ) : null}
+                  {applicationSource(a) === "meta" || ["facebook","fb","instagram","ig","meta"].includes(a.utm_source?.toLowerCase() ?? "") || a.fbclid ? <span className="ml-2 rounded bg-space-slides/10 px-1.5 py-0.5 text-[10px] text-space-slides">Meta</span> : null}
                 </td>
                 <td>
                   <Country country={a.country} />
@@ -655,6 +663,9 @@ export function PosterCard({
               <b>Heard via:</b> {a.referral_source}
             </p>
           ) : null}
+          <p><b>Source:</b> {SOURCE_LABELS[applicationSource(a)]}</p>
+          {a.utm_campaign ? <p className="break-words"><b>Campaign:</b> {a.utm_campaign}</p> : null}
+          {a.utm_content ? <p className="break-words"><b>Ad:</b> {a.utm_content}</p> : null}
         </div>
         {a.start_monday ? (
           <p>

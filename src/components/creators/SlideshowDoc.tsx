@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { CountrySelect } from "./CountrySelect";
 import { slideshowApplyWithCountry, slideshowCountrySelection } from "@/lib/slideshow-country-selection";
 import { browserReferralCode, withReferralCode } from "@/lib/slideshow-referral-code";
+import { SlideshowMarketing, browserAttribution } from "./SlideshowMarketing";
+import { withAttribution, type Attribution } from "@/lib/slideshow-attribution";
 
 /** Language of the current slideshow page (English outside these pages). */
 export function useSlideshowLang() {
@@ -99,6 +101,7 @@ export function DocShell({ children }: { children: ReactNode }) {
         <Link to={legalPath} className="hover:underline">{t.footer.legal}</Link> ·{" "}
         <a href={`mailto:${CONTACT_EMAIL}`} className="hover:underline">{CONTACT_EMAIL}</a>
       </footer>
+      <SlideshowMarketing lang={lang.code} />
     </div>
   );
 }
@@ -127,14 +130,20 @@ export function SlideshowDocLanding({ app: appProp }: { app?: string | undefined
   const isSophia = !a;
   const [showPay, setShowPay] = useState(false);
   const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [attribution, setAttribution] = useState<Attribution>({});
   const [country, setCountry] = useState("");
   const [pay, setPay] = useState<{ weekly: number } | null>(null);
   const [payState, setPayState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const countryLocale = lang.code === "fr" ? "fr" : "en";
   useEffect(() => {
     setReferralCode(browserReferralCode());
+    const sync = () => setAttribution(browserAttribution());
+    sync();
+    window.addEventListener("slideshow-consent", sync);
+    window.addEventListener("storage", sync);
     const selected = slideshowCountrySelection(new URLSearchParams(window.location.search).get("country"), countryLocale);
     if (selected) { setCountry(selected); setShowPay(true); }
+    return () => { window.removeEventListener("slideshow-consent", sync); window.removeEventListener("storage", sync); };
   }, []);
   useEffect(() => {
     if (!country) return;
@@ -154,7 +163,7 @@ export function SlideshowDocLanding({ app: appProp }: { app?: string | undefined
   const about = isSophia
     ? t.aboutSophia
     : `${name}${a?.tagline ? ` (${a.tagline})` : ""}${a?.short_description ? `${sep}${a.short_description}` : ""} ${fillSlideshow(t.aboutOtherApp, vars)}`;
-  const applyHref = withReferralCode(slideshowApplyWithCountry(withApp(slideshowPath(lang.urlCode, "apply"), app), country), referralCode);
+  const applyHref = withAttribution(withReferralCode(slideshowApplyWithCountry(withApp(slideshowPath(lang.urlCode, "apply"), app), country), referralCode), attribution);
 
   return (
     <DocShell>

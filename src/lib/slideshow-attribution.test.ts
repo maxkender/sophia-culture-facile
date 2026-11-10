@@ -1,0 +1,25 @@
+import {describe,it,expect} from "vitest";
+import {captureAttribution,applicationSource,ATTRIBUTION_TTL,withAttribution,attributionCsv} from "./slideshow-attribution";
+import {validMarketingConsent,CONSENT_VERSION} from "./slideshow-marketing-consent";
+import {buildMetaLead,sendSlideshowMetaLead} from "./slideshow-meta.server";
+const store=()=>{const m=new Map<string,string>();return {getItem:(k:string)=>m.get(k)??null,setItem:(k:string,v:string)=>{m.set(k,v);},removeItem:(k:string)=>{m.delete(k);}};};
+describe("slideshow attribution",()=>{
+ it("keeps all five UTM fields for 30 days then expires",()=>{const s=store();const url="https://sophia-culture.com/en/creators/slideshow?utm_source=meta&utm_medium=paid&utm_campaign=Recruit&utm_content=Video&utm_term=posters";captureAttribution(s,url,false,100);expect(captureAttribution(s,"https://sophia-culture.com/en/slideshow-application",false,100+ATTRIBUTION_TTL-1).utm_campaign).toBe("Recruit");expect(captureAttribution(s,"https://sophia-culture.com/en/slideshow-application",false,100+ATTRIBUTION_TTL).utm_campaign).toBeUndefined();});
+ it("first paid touch wins",()=>{const s=store();captureAttribution(s,"https://sophia-culture.com/en/creators/slideshow?utm_source=meta&utm_medium=paid&utm_campaign=First",false,0);expect(captureAttribution(s,"https://sophia-culture.com/en/creators/slideshow?utm_source=meta&utm_medium=paid&utm_campaign=Second",false,1).utm_campaign).toBe("First");});
+ it("later paid utm_source overrides an organic touch",()=>{const s=store();captureAttribution(s,"https://sophia-culture.com/en/creators/slideshow?utm_source=google&utm_medium=organic",false,0);expect(captureAttribution(s,"https://sophia-culture.com/en/creators/slideshow?utm_source=meta&utm_medium=paid",false,1).utm_source).toBe("meta");});
+ it("fbclid needs marketing consent and is removed on refusal",()=>{const s=store();const url="https://sophia-culture.com/en/creators/slideshow?fbclid=click";expect(captureAttribution(s,url,false,0).fbclid).toBeUndefined();expect(captureAttribution(s,url,true,1).fbclid).toBe("click");expect(captureAttribution(s,url,false,2).fbclid).toBeUndefined();});
+ it.each(["facebook","fb","instagram","ig","meta"])("%s is Meta",source=>expect(applicationSource({utm_source:source})).toBe("meta"));
+ it("fbclid alone is Meta",()=>expect(applicationSource({fbclid:"click"})).toBe("meta"));
+ it("referral beats Meta without dropping campaign fields",()=>expect(applicationSource({ref:"REF",utm_source:"meta",utm_campaign:"Recruit"})).toBe("referral"));
+ it("other UTM versus direct",()=>{expect(applicationSource({utm_campaign:"Search"})).toBe("other_utm");expect(applicationSource({})).toBe("direct");});
+ it("links keep country, app and attribution",()=>expect(withAttribution("/en/slideshow-application?country=FR&app=unswipe",{utm_source:"meta",utm_campaign:"A B"})).toContain("country=FR&app=unswipe&utm_source=meta&utm_campaign=A+B"));
+ it("CSV contains campaign/ad and all attribution fields",()=>{const c=attributionCsv([{full_name:"Test",email:"test@example.test",country:"FR",utm_source:"meta",utm_campaign:"Recruit",utm_content:"Video"}]);expect(c).toContain('"utm_campaign"');expect(c).toContain('"Recruit","Video"');});
+});
+describe("Meta permission and event evidence",()=>{
+ const consent=()=>({id:"12345678-1234-4234-8234-123456789012",accepted:true,at:new Date(Date.now()-1000).toISOString(),version:CONSENT_VERSION,gpc:false});
+ const record=()=>({id:"lead-id",created_at:new Date().toISOString(),landing_url:"https://sophia-culture.com/en/creators/slideshow?utm_source=meta&email=private@example.test",marketing_consent:consent()});
+ it("only explicit unexpired advertising acceptance permits an event",()=>{expect(validMarketingConsent(consent())).toBe(true);expect(validMarketingConsent({...consent(),accepted:false})).toBe(false);expect(validMarketingConsent({...consent(),gpc:true})).toBe(false);expect(validMarketingConsent({...consent(),at:new Date(Date.now()-31*86400000).toISOString()})).toBe(false);});
+ it("Lead uses the saved event id and original event time",()=>{const r=record();const e=buildMetaLead(r,new Request("https://sophia-culture.com",{headers:{"user-agent":"Test browser"}}),consent());expect(e?.event_name).toBe("Lead");expect(e?.event_id).toBe("lead-id");expect(e?.event_time).toBe(Math.floor(Date.parse(r.created_at)/1000));expect(e?.event_source_url).not.toContain("email");});
+ it("GPC and latest withdrawal block server event construction",()=>{expect(buildMetaLead(record(),new Request("https://sophia-culture.com",{headers:{"sec-gpc":"1","user-agent":"Test"}}),consent())).toBeNull();expect(buildMetaLead(record(),new Request("https://sophia-culture.com",{headers:{"user-agent":"Test"}}),{...consent(),accepted:false})).toBeNull();});
+ it("missing Meta connection sends nothing",async()=>expect(await sendSlideshowMetaLead(record(),new Request("https://sophia-culture.com"),consent())).toEqual({sent:false,reason:"not_connected"}));
+});

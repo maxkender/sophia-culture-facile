@@ -11,6 +11,7 @@ import { JOURNEY_STEPS, journeyCsv, type JourneyRow } from "@/lib/ruul-journey";
 import { cn } from "@/lib/utils";
 import { Country, DetailSheet, shortDate } from "./Crm";
 import { PosterCard, scoreOf } from "./SlideshowApplications";
+import { SOURCE_LABELS } from "@/lib/slideshow-attribution";
 
 export const ruulJourneyQuery = queryOptions({ queryKey: ["hub", "slides", "journey"], queryFn: () => getRuulJourney(), staleTime: 60_000 });
 const route = getRouteApi("/_authenticated/hub/slideshows/parcours-ruul");
@@ -51,7 +52,7 @@ export function RuulJourney() {
     <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
       <Input aria-label="Search name or email" placeholder="Search name or email" className="sm:max-w-64" value={filters.q} onChange={e=>set("q",e.target.value)} />
       <Filter label="Step" value={filters.step} options={[...JOURNEY_STEPS.map(([value,label])=>({value,label})),{value:"ended",label:"Ended"},{value:"complete",label:"Complete"}]} onChange={v=>set("step",v)}/>
-      <Filter label="Source" value={filters.source} options={[{value:"referral",label:"Referral"},{value:"direct",label:"Direct"}]} onChange={v=>set("source",v)}/>
+      <Filter label="Source" value={filters.source} options={Object.entries(SOURCE_LABELS).map(([value,label])=>({value,label}))} onChange={v=>set("source",v)}/>
       <Filter label="Country" value={filters.country} options={options("country")} onChange={v=>set("country",v)}/>
       <Filter label="Referrer" value={filters.referrer} options={options("referrer")} onChange={v=>set("referrer",v)}/>
       <Filter label="Start Monday" value={filters.monday} options={options("startMonday")} onChange={v=>set("monday",v)}/>
@@ -61,7 +62,7 @@ export function RuulJourney() {
     <div className="crm-table max-h-[70dvh]" tabIndex={0} aria-label="Ruul journey table"><table className="whitespace-nowrap"><thead className="sticky top-0 z-10 bg-card"><tr><th className="text-left">Person</th><th>Country</th><th>Zone</th><th className="text-left">Referrer</th><th>Source</th><th className="text-left">Current step</th><th>Days stuck</th><th className="text-left">Next action</th>{JOURNEY_STEPS.map(([k,l])=><th key={k}>{l}</th>)}</tr></thead><tbody>
       {rows.map(r=><tr key={r.id} className={cn("cursor-pointer border-t border-brand-line",r.ended ? "text-muted-foreground bg-muted/50" : r.red ? "bg-portal-red/5" : "")} onClick={()=>setOpen(r.id)}>
         <td><Button variant="link" className="h-auto min-w-48 justify-start p-0 text-left text-inherit" onClick={e=>{e.stopPropagation();setOpen(r.id)}}><span><span className="block font-medium">{r.name}</span><span className="block text-xs text-muted-foreground">{r.email || "No email"}</span></span></Button></td>
-        <td><Country country={r.country}/></td><td>{r.zone||"—"}</td><td>{r.referrer||"—"}{r.referrerChannel && <span className="block text-xs text-muted-foreground">{r.referrerChannel}</span>}</td><td className="capitalize">{r.source}</td>
+        <td><Country country={r.country}/></td><td>{r.zone||"—"}</td><td>{r.referrer||"—"}{r.referrerChannel && <span className="block text-xs text-muted-foreground">{r.referrerChannel}</span>}</td><td>{SOURCE_LABELS[r.source]}</td>
         <td><span className={cn("rounded px-2 py-1 text-xs",r.red ? "text-portal-red bg-portal-red/10" : r.ended ? "bg-muted" : "bg-space-slides/10 text-space-slides")}>{r.currentLabel}</span></td><td className={cn("text-center tabular-nums",r.red && "font-semibold text-portal-red")}>{r.daysStuck??"—"}</td><td className="max-w-72 whitespace-normal text-sm">{r.nextAction}</td>
         {JOURNEY_STEPS.map(([k,l])=><td key={k} className="text-center">{k==="reminders" ? reminderDetail(r) : <DateChip value={r.dates[k]} label={l} observed={k==="post" && r.postObserved}/>}</td>)}
       </tr>)}
