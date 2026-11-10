@@ -16,7 +16,7 @@ describe("acceptance signing deadline", () => {
 });
 
 describe("Slack invite link in poster emails", () => {
-  it("acceptance email adds the Join Slack link after the Slack bullet (EN + FR labels)", async () => {
+  it("acceptance email adds the Join Slack link after the Slack bullet (always English, even for langue fr)", async () => {
     await posterEmails.accepted("p@example.com", "Test P", "en", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, null, SLACK_URL);
     let html = sendCalls[0]!.html;
     expect(html).toContain(`href="${SLACK_URL}"`);
@@ -27,8 +27,8 @@ describe("Slack invite link in poster emails", () => {
     await posterEmails.accepted("p@example.com", "Test P", "fr", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, null, SLACK_URL);
     html = sendCalls[0]!.html;
     expect(html).toContain(`href="${SLACK_URL}"`);
-    expect(html).toContain(">Rejoindre Slack</a>");
-    expect(sendCalls[0]!.text).toContain(`Rejoindre Slack: ${SLACK_URL}`);
+    expect(html).toContain(">Join Slack</a>");
+    expect(sendCalls[0]!.text).toContain(`Join Slack: ${SLACK_URL}`);
   });
 
   it("acceptance email without Slack setting has no link", async () => {
@@ -58,5 +58,23 @@ describe("Slack invite link in poster emails", () => {
     ["2026-12-28", "2027-01-04"],
   ])("starts %s and first pays %s (seven days later)", (start, payment) => {
     expect(firstPaymentMonday(start)).toBe(payment);
+  });
+});
+
+describe("poster emails are always English", () => {
+  it("accepted/contract email for langue es renders in English", async () => {
+    await posterEmails.accepted("p@example.com", "Ana Lopez", "es", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, null, null);
+    const m = sendCalls[0]!;
+    console.log("SUBJECT:", m.subject, "\nTEXT:", m.text.slice(0, 400));
+    expect(m.text).toContain("Hi Ana,");
+    expect(m.text).not.toContain("Hola");
+    expect(m.text).toContain("October");
+  });
+  it.each(["es", "it", "pt", "de", "fr"] as const)("rejected/expired/payout/ack in %s use English", async (l) => {
+    await posterEmails.rejected("p@example.com", "Ana", l, null);
+    await posterEmails.expired("p@example.com", "Ana", l);
+    await posterEmails.payout("p@example.com", "Ana", l, "https://x");
+    await posterEmails.ack("p@example.com", "Ana", l, "open");
+    for (const m of sendCalls) expect(m.text.startsWith("Hi Ana,")).toBe(true);
   });
 });

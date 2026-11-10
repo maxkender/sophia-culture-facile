@@ -1,4 +1,5 @@
-// Server-only: poster emails in the applicant's language (FR, EN, ES, IT, PT, DE; else EN).
+// Server-only: poster emails. Every poster email is sent in English, whatever the applicant's langue (owner rule).
+// Other-language texts are kept but unused.
 import { buildEmailHtml, emailSectionText, type EmailSection } from "./email-send.server";
 import { sendBrevoEmail, type BrevoResult } from "./brevo.server";
 import type { ApplicantLang } from "@/config/countries";
@@ -162,7 +163,7 @@ export function formatSigningFriday(monday: string, lang: L) {
   return new Intl.DateTimeFormat(lang, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(friday);
 }
 
-export const posterEmails = {
+const localizedPosterEmails = {
   /** kind: "open" (country open in the OS and payable by Ruul), "closed" (today's text), "neutral" (OS unreachable). */
   ack: (to: string, name: string, l: L, kind: "open" | "closed" | "neutral" = "closed") =>
     send(to, name, T.ack.subject[l], [hi[l](first(name)), kind === "open" ? T.ackOpen[l] : kind === "neutral" ? T.ackNeutral[l] : T.ack.body[l]]),
@@ -197,4 +198,18 @@ export const posterEmails = {
   ruul: (to: string, name: string, l: L, ruulEmail: string, monday: string) =>
     send(to, name, T.ruul.subject[l], [hi[l](first(name)), T.ruul.body[l](ruulEmail, formatMonday(monday, l))]),
   payout: (to: string, name: string, l: L, link: string) => send(to, name, T.payout.subject[l], [hi[l](first(name)), T.payout.body[l]], { label: T.payout.button[l], url: link }),
+};
+
+/** Poster emails always render in English; the language argument is accepted for call-site compatibility and ignored. */
+export const POSTER_EMAIL_LANG: L = "en";
+export const posterEmails = {
+  ack: (to: string, name: string, _l: L, kind: "open" | "closed" | "neutral" = "closed") => localizedPosterEmails.ack(to, name, POSTER_EMAIL_LANG, kind),
+  accepted: (to: string, name: string, _l: L, monday: string, link: string, weeklyAmount: number | null, guideUrl: string | null, slackUrl: string | null) =>
+    localizedPosterEmails.accepted(to, name, POSTER_EMAIL_LANG, monday, link, weeklyAmount, guideUrl, slackUrl),
+  rejected: (to: string, name: string, _l: L, reason: string | null) => localizedPosterEmails.rejected(to, name, POSTER_EMAIL_LANG, reason),
+  remindSignature: localizedPosterEmails.remindSignature,
+  expired: (to: string, name: string, _l: L) => localizedPosterEmails.expired(to, name, POSTER_EMAIL_LANG),
+  logins: (to: string, name: string, _l: L, o: Parameters<typeof localizedPosterEmails.logins>[3]) => localizedPosterEmails.logins(to, name, POSTER_EMAIL_LANG, o),
+  ruul: (to: string, name: string, _l: L, ruulEmail: string, monday: string) => localizedPosterEmails.ruul(to, name, POSTER_EMAIL_LANG, ruulEmail, monday),
+  payout: (to: string, name: string, _l: L, link: string) => localizedPosterEmails.payout(to, name, POSTER_EMAIL_LANG, link),
 };
