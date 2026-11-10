@@ -73,7 +73,7 @@ export function buildJourneys(applications: JourneyApplication[], referrals: Ref
     const key = match ? emailKey(match.email) || `app:${match.id}` : email || `ref:${r.id}`;
     const g = groups.get(key) ?? { apps: [], refs: [] }; g.refs.push(r); groups.set(key, g);
   }
-  return [...groups.entries()].map(([id, g]) => {
+  return [...groups.entries()].map(([id, g]): JourneyRow => {
     const apps = g.apps.sort((a,b) => Date.parse(b.created_at)-Date.parse(a.created_at));
     // Keep progressed records in preference to repeat pending submissions.
     const a = apps.find(a => a.contract_signed_at || a.agreement_signed_at || a.accepted_at) ?? apps[0];
@@ -117,7 +117,7 @@ export function buildJourneys(applications: JourneyApplication[], referrals: Ref
       ruul: "Add in Ruul", post: a?.start_monday && Date.parse(a.start_monday)>Date.parse(now) ? "Waiting for start Monday" : "Waiting for first post",
       paid: since && Date.parse(since)>Date.parse(now) ? "Waiting for payment Monday" : "Review and pay completed week", bonus: "Check referrer bonus payment",
     };
-    const nextAction = endedLabel ?? (current === "complete" ? "Journey complete" : !a && !r?.friend_email ? "No email — ask referrer" : actions[current]);
+    const nextAction = endedLabel ?? (current === "complete" ? "Journey complete" : current === "ended" ? "Journey ended" : !a && !r?.friend_email ? "No email — ask referrer" : actions[current]);
     return { id, applicationId: a?.id ?? null, name: a?.full_name ?? ([r?.friend_first_name,r?.friend_last_name].filter(Boolean).join(" ") || "Unnamed friend"), email: a?.email ?? r?.friend_email ?? "", country, zone: a?.zone ?? "", referrer: r?.referrer_name || a?.referral_name || "", referrerChannel: r?.referrer_channel ?? null, source: r || a?.ref || a?.referred ? "referral" : "direct", startMonday: a?.start_monday ?? "", dates, reminderDates: { j2: r?.j2_sent_at ?? null, j5: r?.j5_sent_at ?? null }, current, currentLabel: endedLabel ?? (current === "complete" ? "Complete" : JOURNEY_STEPS.find(([k]) => k === current)?.[1] ?? current), since, daysStuck, red: !endedLabel && current !== "complete" && age !== null && age > 48*3600000, ended: Boolean(endedLabel), nextAction, postObserved: !postExact && Boolean(dates.post), openedAt: r?.opened_at ?? null, clickedAt: r?.clicked_at ?? null, bonusStatus: r?.bonus_status ?? null };
   }).sort((a,b) => Number(b.red)-Number(a.red) || (b.daysStuck ?? -1)-(a.daysStuck ?? -1));
 }
