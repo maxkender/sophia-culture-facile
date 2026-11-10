@@ -5,7 +5,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { isValidInternationalPhone } from "@/lib/creator-validation";
 import { referralCodeSchema } from "./slideshow-referral-code";
-import { attributionSchema, applicationSource } from "./slideshow-attribution";
+import { attributionSchema, applicationSource, sourceDeclared } from "./slideshow-attribution";
 import { marketingConsentSchema, validMarketingConsent } from "./slideshow-marketing-consent";
 
 /** Public endpoints for the two creator application forms. Honeypot + rate limit. */
@@ -157,7 +157,8 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
     const eventId = crypto.randomUUID();
     const { data: inserted, error } = await supabaseAdmin.from("slideshow_applications").insert({
       ...tracking,
-      source: applicationSource({ ...tracking, ref: data.ref }),
+      source: applicationSource({ ...tracking, ref: data.ref, referral_source: data.referral_source }),
+      source_declared: sourceDeclared({ ...tracking, ref: data.ref, referral_source: data.referral_source }),
       marketing_consent: data.marketing_consent ?? null,
       meta_event_id: eventId,
       ref: data.ref ?? null,

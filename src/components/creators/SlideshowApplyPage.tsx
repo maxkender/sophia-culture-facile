@@ -199,6 +199,7 @@ export function SlideshowApplyPage() {
           <select id="referral_source" className={field} value={heard} onChange={e => setHeard(e.target.value)}>
             <option value="">{t.heardEmpty}</option>
             <option value="Instagram / Facebook ad">{t.heardAd}</option>
+            <option value="In the Sophia app">{t.heardSophiaApp}</option>
             <option value="Referral">{t.heardReferral}</option>
             <option value="Other">{t.heardOther}</option>
           </select>
