@@ -152,9 +152,9 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const marketing = getRequest().headers.get("sec-gpc") !== "1" && validMarketingConsent(data.marketing_consent);
     const parsedTracking = attributionSchema.parse(data);
-    const tracking = { utm_source: parsedTracking.utm_source || null, utm_medium: parsedTracking.utm_medium || null, utm_campaign: parsedTracking.utm_campaign || null, utm_content: parsedTracking.utm_content || null, utm_term: parsedTracking.utm_term || null, fbclid: parsedTracking.fbclid || null, landing_url: parsedTracking.landing_url || null };
-    if (!marketing) tracking.fbclid = null;
-    const eventId = crypto.randomUUID();
+    const tracking = { utm_source: parsedTracking.utm_source || null, utm_medium: parsedTracking.utm_medium || null, utm_campaign: parsedTracking.utm_campaign || null, utm_content: parsedTracking.utm_content || null, utm_term: parsedTracking.utm_term || null, fbclid: parsedTracking.fbclid || null, fbc: parsedTracking.fbc || null, fbp: parsedTracking.fbp || null, landing_url: parsedTracking.landing_url || null };
+    if (!marketing) {tracking.fbclid = null;tracking.fbc=null;tracking.fbp=null;}
+    const eventId = data.meta_event_id ?? crypto.randomUUID();
     const { data: inserted, error } = await supabaseAdmin.from("slideshow_applications").insert({
       ...tracking,
       source: applicationSource({ ...tracking, ref: data.ref, referral_source: data.referral_source }),
@@ -187,8 +187,8 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
     if (marketing) {
       try {
         const { sendSlideshowMetaLead } = await import("./slideshow-meta.server");
-        await sendSlideshowMetaLead({ id: eventId, created_at: inserted.created_at, marketing_consent: inserted.marketing_consent, landing_url: inserted.landing_url }, getRequest(), data.marketing_consent);
-      } catch { /* Tracking cannot fail an application. */ }
+        await sendSlideshowMetaLead({ id: eventId, created_at: inserted.created_at, marketing_consent: inserted.marketing_consent, landing_url: inserted.landing_url, email, country:data.country, fbc:tracking.fbc, fbp:tracking.fbp }, getRequest(), data.marketing_consent);
+      } catch { console.error("Slideshow Meta Lead unavailable; application saved"); }
     }
     const osSecret = process.env["OS_HUB_SECRET"];
     if (osSecret) {

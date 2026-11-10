@@ -1,14 +1,14 @@
 import { z } from "zod";
 
 export const UTM_KEYS = ["utm_source","utm_medium","utm_campaign","utm_content","utm_term"] as const;
-export const ATTRIBUTION_KEYS = [...UTM_KEYS,"fbclid","landing_url"] as const;
+export const ATTRIBUTION_KEYS = [...UTM_KEYS,"fbclid","fbc","fbp","landing_url"] as const;
 export type Attribution = Partial<Record<typeof ATTRIBUTION_KEYS[number], string | null | undefined>>;
 export type ApplicationSource = "meta" | "sophia_app" | "referral" | "other_utm" | "direct";
 export const SOURCE_LABELS: Record<ApplicationSource,string> = { meta:"Meta",sophia_app:"Sophia app",referral:"Referral",direct:"Direct",other_utm:"Other" };
 export const ATTRIBUTION_STORAGE_KEY = "sophia_slideshow_attribution";
 export const ATTRIBUTION_TTL = 30*86400000;
-const field = z.string().trim().max(500).nullish();
-export const attributionSchema = z.object({utm_source:field,utm_medium:field,utm_campaign:field,utm_content:field,utm_term:field,fbclid:z.string().trim().max(1000).nullish(),landing_url:z.string().max(3000).url().nullish()});
+const field = z.string().transform(v=>v.trim().replace(/[\u0000-\u001f\u007f]/g,"").slice(0,300)).nullish();
+export const attributionSchema = z.object({utm_source:field,utm_medium:field,utm_campaign:field,utm_content:field,utm_term:field,fbclid:field,fbc:field,fbp:field,landing_url:field});
 type Store = Pick<Storage,"getItem"|"setItem"|"removeItem">;
 type SourceInput = Attribution & {ref?:string|null|undefined;source?:string|null|undefined;referral_source?:string|null|undefined};
 export function sourceDeclared(a: SourceInput): boolean {
@@ -33,11 +33,15 @@ export function captureAttribution(store:Store, raw:string, marketing:boolean, n
     const saved=JSON.parse(store.getItem(ATTRIBUTION_STORAGE_KEY)??"null") as {data:Attribution;expiresAt:number}|null;
     const valid=saved && saved.expiresAt>now && attributionSchema.safeParse(saved.data).success;
     let data=valid ? {...saved.data} : current;
-    if(valid && paidTouch(current) && !paidTouch(data)) data=current;
+    const newTouch = UTM_KEYS.some(k=>Boolean(current[k])) && (!valid || data.landing_url !== current.landing_url);
+    if(newTouch) data=current;
     // A click identifier can be consented to later on the same landing; never import one from a different touch.
-    if(marketing && current.fbclid && data.landing_url===current.landing_url) data.fbclid=current.fbclid;
-    if(!marketing) delete data.fbclid;
-    store.setItem(ATTRIBUTION_STORAGE_KEY,JSON.stringify({data,expiresAt:valid && data.landing_url===saved.data.landing_url ? saved.expiresAt : now+ATTRIBUTION_TTL}));
+    if(marketing && current.fbclid && data.landing_url===current.landing_url) {
+      if(data.fbclid!==current.fbclid || !data.fbc) data.fbc=`fb.1.${now}.${current.fbclid}`;
+      data.fbclid=current.fbclid;
+    }
+    if(!marketing) {delete data.fbclid;delete data.fbc;delete data.fbp;}
+    store.setItem(ATTRIBUTION_STORAGE_KEY,JSON.stringify({data,expiresAt:valid && !newTouch ? saved.expiresAt : now+ATTRIBUTION_TTL}));
     return data;
   } catch { return current; }
 }
