@@ -129,10 +129,12 @@ export const signWithToken = createServerFn({ method: "POST" })
       .update({
         signing_token: null, guide_token: data.token, agreement_signed_at: now, ruul_email: data.ruulEmail,
         start_monday: startMondayAtSignature(app.start_monday, signedAt),
-        ...(app.status === "accepted" ? {
-          status: "contract_signed", contract_signed_at: now,
-          timeline: { ...((app.timeline as object) ?? {}), contract_signed: { at: now, by: "Poster" } },
-        } : {}),
+        ...(app.status === "accepted" ? { status: "contract_signed", contract_signed_at: now } : {}),
+        timeline: {
+          ...((app.timeline as object) ?? {}),
+          ...(app.status === "accepted" ? { contract_signed: { at: now, by: "Poster" } } : {}),
+          ...(data.ruulEmail ? { ruul_email: { at: now, by: "Poster" } } : {}),
+        },
       })
       .eq("id", app.id);
     if (updateError) throw new Error("The signature could not be recorded.");

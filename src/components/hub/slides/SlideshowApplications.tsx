@@ -40,6 +40,9 @@ import {
 import { STATUS_LABEL, useOsStatus, OS_UI_ENABLED } from "./useOs";
 import { applicationSource, attributionCsv, sourceDeclared, SOURCE_LABELS } from "@/lib/slideshow-attribution";
 import { Download } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { autoAcceptReason, takenEmails } from "@/lib/slideshow-auto-accept";
+import { getAutoAccept, setAutoAccept } from "@/lib/slideshows.functions";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 /** Accepted, not signed, not unsubscribed/expired: the only applications a signature reminder can go to. */
@@ -209,6 +212,8 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
     retry: false,
   });
   const countries = useMemo(() => [...new Set(apps.map((a) => a.country))].sort(), [apps]);
+  const taken = useMemo(() => takenEmails(apps), [apps]);
+  const autoReason = (a: App) => { const r = autoAcceptReason(a, taken); return r && r !== "Not pending" && r !== "Unsubscribed" ? r : null; };
   const rows = apps.filter(
     (a) =>
       (country === "all" || a.country === country) &&
@@ -266,6 +271,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
   }
   return (
     <div className="space-y-3">
+      <AutoAcceptSwitch />
       <p className="crm-count">
         {rows.length} applications · {apps.filter((a) => a.status === "pending").length} pending
       </p>
@@ -424,6 +430,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
                 <td>{a.zone ?? "—"}</td>
                 <td>
                   <StatusPill status={a.status} />
+                  {autoReason(a) ? <span title="Not auto-accepted" className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">{autoReason(a)}</span> : null}
                 </td>
                 <td className="whitespace-nowrap">{shortDate(a.created_at)}</td>
                 <td className="whitespace-nowrap">{shortDate(a.start_monday)}</td>
@@ -1300,5 +1307,26 @@ function AcceptAllValidButton({ n }: { n: number }) {
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+/** Hub setting slides_auto_accept: eligible pending applications are accepted on submit and by the hourly sweep. */
+function AutoAcceptSwitch() {
+  const qc = useQueryClient();
+  const get = useServerFn(getAutoAccept);
+  const set = useServerFn(setAutoAccept);
+  const { data } = useQuery({ queryKey: ["hub", "slides", "auto-accept"], queryFn: () => get(), staleTime: 60000 });
+  const [saving, setSaving] = useState(false);
+  const on = data?.enabled ?? true;
+  return (
+    <label className="flex w-fit items-center gap-2 rounded border border-brand-line px-3 py-1.5 text-sm">
+      <Switch checked={on} disabled={!data || saving} aria-label="Auto-accept" onCheckedChange={async (v) => {
+        setSaving(true);
+        try { await set({ data: { enabled: v } }); await qc.invalidateQueries({ queryKey: ["hub", "slides", "auto-accept"] }); toast.success(`Auto-accept ${v ? "ON" : "OFF"}`); }
+        catch { toast.error("Could not save"); } finally { setSaving(false); }
+      }} />
+      <span className="font-medium">Auto-accept: {on ? "ON" : "OFF"}</span>
+      <span className="text-xs text-muted-foreground">on submit + hourly sweep</span>
+    </label>
   );
 }

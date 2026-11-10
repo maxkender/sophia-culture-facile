@@ -6035,6 +6035,7 @@ export type Database = {
           created_at: string
           decided_at: string | null
           decided_by: string | null
+          decided_via: string | null
           deux_telephones: boolean | null
           dropped_at: string | null
           email: string
@@ -6119,6 +6120,7 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          decided_via?: string | null
           deux_telephones?: boolean | null
           dropped_at?: string | null
           email: string
@@ -6203,6 +6205,7 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          decided_via?: string | null
           deux_telephones?: boolean | null
           dropped_at?: string | null
           email?: string

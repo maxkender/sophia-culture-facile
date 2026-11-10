@@ -31,6 +31,11 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
             const { withLock } = await import("@/lib/hub-automation.server");
             return Response.json(await withLock(a, "slides-remind", 15, () => runSignatureReminders(a)));
           }
+          if (params.job === "slides-auto-accept") {
+            const { runAutoAccept } = await import("@/lib/slideshow-auto-accept.server");
+            const { withLock } = await import("@/lib/hub-automation.server");
+            return Response.json(await withLock(a, "slides-auto-accept", 15, () => runAutoAccept(a)));
+          }
           if (params.job === "slides-pool-expiry") {
             const { expirePool } = await import("@/lib/slideshows.server");
             return Response.json(await expirePool(a));

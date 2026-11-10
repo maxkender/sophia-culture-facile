@@ -6,7 +6,7 @@ export type JourneyApplication = Database["public"]["Tables"]["slideshow_applica
 export const JOURNEY_STEPS = [
   ["referred", "Referred"], ["invited", "Invited"], ["reminders", "Reminders"],
   ["applied", "Applied"], ["accepted", "Accepted"], ["signed", "Signed"],
-  ["os", "OS account created"], ["login", "Logged in"], ["ruul", "Added in Ruul"],
+  ["os", "OS account created"], ["login", "Logged in"], ["ruul_email", "Ruul email given"], ["ruul", "Added in Ruul"],
   ["post", "First post"], ["paid", "First week paid"], ["bonus", "Referrer bonus paid"],
 ] as const;
 export type JourneyStep = typeof JOURNEY_STEPS[number][0];
@@ -29,7 +29,7 @@ export function paidPeopleThisWeek(payouts: Payout[], now: string): number {
 export type JourneyRow = {
   id: string; applicationId: string | null; name: string; email: string; country: string; zone: string;
   referrer: string; referrerChannel: string | null; source: ApplicationSource; sourceDeclared: boolean; startMonday: string; attribution: Attribution;
-  dates: Record<JourneyStep, string | null>; reminderDates: { j2: string | null; j5: string | null };
+  dates: Record<JourneyStep, string | null>; undatedDone: JourneyStep[]; reminderDates: { j2: string | null; j5: string | null };
   current: JourneyStep | "ended" | "complete"; currentLabel: string; since: string | null;
   daysStuck: number | null; red: boolean; ended: boolean; nextAction: string;
   postObserved: boolean; openedAt: string | null; clickedAt: string | null; bonusStatus: string | null;
@@ -88,6 +88,7 @@ export function buildJourneys(applications: JourneyApplication[], referrals: Ref
     const paid = payouts.filter(p => appIds.has(p.application_id) && p.status === "paid");
     const timeline = obj(a?.timeline);
     const tlDate = (key: string) => date(obj(timeline[key])["at"]);
+    const hasRuulEmail = Boolean(text(a?.ruul_email));
     const postExact = r?.first_post_at ?? tlDate("first_post");
     const dates: JourneyRow["dates"] = {
       referred: earliest(g.refs.map(r => r.created_at)), invited: earliest(g.refs.map(r => r.j0_sent_at)),
@@ -95,7 +96,7 @@ export function buildJourneys(applications: JourneyApplication[], referrals: Ref
       applied: earliest([...apps.map(a => a.created_at), ...g.refs.map(r => r.applied_at)]),
       accepted: a?.accepted_at ?? (a && ["accepted","approved","contract_signed","os_created","started"].includes(a.status) ? a.decided_at : null),
       signed: a?.contract_signed_at ?? a?.agreement_signed_at ?? null, os: a?.os_created_at ?? null,
-      login: r?.first_login_at ?? tlDate("first_login") ?? tlDate("logged_in"), ruul: a?.ruul_added_at ?? null,
+      login: r?.first_login_at ?? tlDate("first_login") ?? tlDate("logged_in"), ruul_email: tlDate("ruul_email"), ruul: a?.ruul_added_at ?? null,
       post: postExact ?? earliest(snaps.map(s => s.dernier_post_at)), paid: earliest(paid.map(p => p.paid_at)),
       bonus: earliest(g.refs.filter(r => r.bonus_status === "paid").map(r => r.bonus_paid_at)),
     };
@@ -106,11 +107,11 @@ export function buildJourneys(applications: JourneyApplication[], referrals: Ref
       : a?.dropped_at || a?.status === "dropped" ? "Dropped"
       : a && ["rejected","refused"].includes(a.status) || r?.invitation_status === "refused" ? "Refused" : null;
     // Reminders are optional, not a gate. Non-referrals skip referral milestones.
-    const required: JourneyStep[] = [...(r && !dates.applied ? ["invited","applied"] as JourneyStep[] : ["applied"] as JourneyStep[]), "accepted","signed","os","login","ruul","post","paid", ...(r ? ["bonus"] as JourneyStep[] : [])];
+    const required: JourneyStep[] = [...(r && !dates.applied ? ["invited","applied"] as JourneyStep[] : ["applied"] as JourneyStep[]), "accepted","signed","os","login","ruul_email","ruul","post","paid", ...(r ? ["bonus"] as JourneyStep[] : [])];
     // Later evidence proves earlier progress, but never invents missing dates.
-    const missing = required.find(s => !dates[s] && !(s === "login" && (dates.post || dates.paid)) && !(s === "post" && dates.paid));
+    const missing = required.find(s => !dates[s] && !(s === "login" && (dates.post || dates.paid)) && !(s === "ruul_email" && (hasRuulEmail || dates.ruul)) && !(s === "post" && dates.paid));
     const current = endedLabel ? "ended" : missing ?? "complete";
-    const anchors: Partial<Record<JourneyStep, string | null>> = { invited: dates.referred, applied: dates.invited ?? dates.referred, accepted: dates.applied, signed: dates.accepted, os: dates.signed, login: dates.os, ruul: dates.login ?? dates.os, post: a?.start_monday ?? dates.ruul, paid: a?.start_monday ? new Date(Date.parse(a.start_monday)+7*86400000).toISOString() : dates.post, bonus: dates.paid };
+    const anchors: Partial<Record<JourneyStep, string | null>> = { invited: dates.referred, applied: dates.invited ?? dates.referred, accepted: dates.applied, signed: dates.accepted, os: dates.signed, login: dates.os, ruul_email: dates.login ?? dates.os, ruul: dates.ruul_email ?? dates.login ?? dates.os, post: a?.start_monday ?? dates.ruul, paid: a?.start_monday ? new Date(Date.parse(a.start_monday)+7*86400000).toISOString() : dates.post, bonus: dates.paid };
     const since = current === "ended" || current === "complete" ? null : anchors[current] ?? null;
     const age = since ? Math.max(0, Date.parse(now)-Date.parse(since)) : null;
     const daysStuck = age === null ? null : Math.floor(age/86400000);
@@ -119,17 +120,17 @@ export function buildJourneys(applications: JourneyApplication[], referrals: Ref
       referred: "Waiting for referral", invited: "Send invitation", reminders: "Waiting for application",
       applied: "Waiting for application", accepted: "Review application", signed: `Waiting for signature${signatureReminder ? ` — reminder ${signatureReminder[1]} sent` : ""}`,
       os: a?.os_error ? "OS creation failed — review poster card" : "Create OS account", login: "Waiting for first login — date not available",
-      ruul: "Add in Ruul", post: a?.start_monday && Date.parse(a.start_monday)>Date.parse(now) ? "Waiting for start Monday" : "Waiting for first post",
+      ruul_email: "Ask for Ruul email", ruul: "Add in Ruul", post: a?.start_monday && Date.parse(a.start_monday)>Date.parse(now) ? "Waiting for start Monday" : "Waiting for first post",
       paid: since && Date.parse(since)>Date.parse(now) ? "Waiting for payment Monday" : "Review and pay completed week", bonus: "Check referrer bonus payment",
     };
     const nextAction = endedLabel ?? (current === "complete" ? "Journey complete" : current === "ended" ? "Journey ended" : !a && !r?.friend_email ? "No email — ask referrer" : actions[current]);
     const declared = !r && sourceDeclared(a ?? {});
-    return { id, applicationId: a?.id ?? null, name: a?.full_name ?? ([r?.friend_first_name,r?.friend_last_name].filter(Boolean).join(" ") || "Unnamed friend"), email: a?.email ?? r?.friend_email ?? "", country, zone: a?.zone ?? "", referrer: r?.referrer_name || a?.referral_name || "", referrerChannel: r?.referrer_channel ?? null, source: r ? "referral" : applicationSource(a ?? {}), sourceDeclared: declared, attribution: Object.fromEntries(ATTRIBUTION_KEYS.map(k=>[k,a?.[k] ?? null])), startMonday: a?.start_monday ?? "", dates, reminderDates: { j2: r?.j2_sent_at ?? null, j5: r?.j5_sent_at ?? null }, current, currentLabel: endedLabel ?? (current === "complete" ? "Complete" : JOURNEY_STEPS.find(([k]) => k === current)?.[1] ?? current), since, daysStuck, red: !endedLabel && current !== "complete" && age !== null && age > 48*3600000, ended: Boolean(endedLabel), nextAction, postObserved: !postExact && Boolean(dates.post), openedAt: r?.opened_at ?? null, clickedAt: r?.clicked_at ?? null, bonusStatus: r?.bonus_status ?? null };
+    return { id, applicationId: a?.id ?? null, name: a?.full_name ?? ([r?.friend_first_name,r?.friend_last_name].filter(Boolean).join(" ") || "Unnamed friend"), email: a?.email ?? r?.friend_email ?? "", country, zone: a?.zone ?? "", referrer: r?.referrer_name || a?.referral_name || "", referrerChannel: r?.referrer_channel ?? null, source: r ? "referral" : applicationSource(a ?? {}), sourceDeclared: declared, attribution: Object.fromEntries(ATTRIBUTION_KEYS.map(k=>[k,a?.[k] ?? null])), startMonday: a?.start_monday ?? "", dates, undatedDone: (hasRuulEmail || dates.ruul) && !dates.ruul_email ? ["ruul_email"] as JourneyStep[] : [], reminderDates: { j2: r?.j2_sent_at ?? null, j5: r?.j5_sent_at ?? null }, current, currentLabel: endedLabel ?? (current === "complete" ? "Complete" : JOURNEY_STEPS.find(([k]) => k === current)?.[1] ?? current), since, daysStuck, red: !endedLabel && current !== "complete" && age !== null && age > 48*3600000, ended: Boolean(endedLabel), nextAction, postObserved: !postExact && Boolean(dates.post), openedAt: r?.opened_at ?? null, clickedAt: r?.clicked_at ?? null, bonusStatus: r?.bonus_status ?? null };
   }).sort((a,b) => Number(b.red)-Number(a.red) || (b.daysStuck ?? -1)-(a.daysStuck ?? -1));
 }
 
 export function journeyCsv(rows: JourneyRow[]): string {
   const safe = (v: unknown) => { const s = String(v ?? ""); return `"${(/^[=+\-@\t\r]/.test(s) ? "'" : "")+s.replaceAll('"','""')}"`; };
   const headers = ["Name","Email","Country","Zone","Referrer","Referrer channel","Source","Source declared","Start Monday","Current step","Days stuck","Next action",...JOURNEY_STEPS.map(([,l])=>l),"J+2 sent","J+5 sent","Opened","Clicked","First post observed","Bonus status",...ATTRIBUTION_KEYS];
-  return '\uFEFF'+[headers, ...rows.map(r => [r.name,r.email,r.country,r.zone,r.referrer,r.referrerChannel,r.source,r.sourceDeclared,r.startMonday,r.currentLabel,r.daysStuck,r.nextAction,...JOURNEY_STEPS.map(([k])=>r.dates[k]),r.reminderDates.j2,r.reminderDates.j5,r.openedAt,r.clickedAt,r.postObserved,r.bonusStatus,...ATTRIBUTION_KEYS.map(k=>r.attribution[k])])].map(row=>row.map(safe).join(",")).join("\r\n");
+  return '\uFEFF'+[headers, ...rows.map(r => [r.name,r.email,r.country,r.zone,r.referrer,r.referrerChannel,r.source,r.sourceDeclared,r.startMonday,r.currentLabel,r.daysStuck,r.nextAction,...JOURNEY_STEPS.map(([k])=>r.dates[k] ?? (r.undatedDone.includes(k) ? "done (no date)" : null)),r.reminderDates.j2,r.reminderDates.j5,r.openedAt,r.clickedAt,r.postObserved,r.bonusStatus,...ATTRIBUTION_KEYS.map(k=>r.attribution[k])])].map(row=>row.map(safe).join(",")).join("\r\n");
 }

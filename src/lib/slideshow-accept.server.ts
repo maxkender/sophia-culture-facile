@@ -6,7 +6,7 @@ import { countryCodeOf, langOfCountry } from "@/config/countries";
 type Admin = any;
 export type Langue = "fr" | "en" | "es" | "it" | "pt" | "de";
 export type AcceptInput = { applicationId: string; apps?: ("sophia" | "unswipe")[]; zone?: "A" | "B" | "C"; langue?: Langue; startMonday?: string };
-export type AcceptBy = { id: string | null; name: string };
+export type AcceptBy = { id: string | null; name: string; via?: "auto" };
 type Zones = Awaited<ReturnType<typeof getOsZones>> | null;
 
 /** Statuses that no longer count as an active application for duplicate checks. */
@@ -59,7 +59,7 @@ export async function acceptSlideshowApplication(a: Admin, input: AcceptInput, b
   const token = randomToken();
   const now = new Date().toISOString();
   await a.from("slideshow_applications").update({
-    status: "accepted", accepted_at: now, decided_at: now, decided_by: by.id,
+    status: "accepted", accepted_at: now, decided_at: now, decided_by: by.id, decided_via: by.via ?? null,
     applications: apps, langue, start_monday: monday, signing_token: token, signing_token_created_at: now, payout_channel: "ruul",
     ...(zone !== app.zone ? { zone, zone_override: true, zone_note: `Set at acceptance by ${by.name}` } : {}),
   }).eq("id", app.id);

@@ -1,0 +1,2 @@
+ALTER TABLE public.slideshow_applications ADD COLUMN IF NOT EXISTS decided_via text;
+COMMENT ON COLUMN public.slideshow_applications.decided_via IS 'How the decision was made: auto for auto-accept, null for a person (decided_by holds their profile id).';

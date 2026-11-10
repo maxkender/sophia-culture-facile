@@ -40,6 +40,23 @@ export const saveOsBaseUrl = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const getAutoAccept = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { autoAcceptEnabled } = await import("./slideshow-auto-accept.server");
+    return { enabled: await autoAcceptEnabled(await admin()) };
+  });
+
+export const setAutoAccept = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ enabled: z.boolean() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    await (await admin()).from("hub_settings").upsert({ key: "slides_auto_accept", value: String(data.enabled), updated_at: new Date().toISOString() });
+    return { enabled: data.enabled };
+  });
+
 export const testOsConnection = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -143,8 +160,11 @@ export const saveRuulEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ applicationId: id, email: z.string().trim().email().max(200) }).parse(d))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
-    await (await admin()).from("slideshow_applications").update({ ruul_email: data.email.toLowerCase() }).eq("id", data.applicationId);
+    const me = await assertAdmin(context);
+    const a = await admin();
+    const { data: row } = await a.from("slideshow_applications").select("timeline").eq("id", data.applicationId).maybeSingle();
+    const timeline = { ...((row?.timeline as object) ?? {}), ruul_email: { at: new Date().toISOString(), by: me.name } };
+    await a.from("slideshow_applications").update({ ruul_email: data.email.toLowerCase(), timeline }).eq("id", data.applicationId);
     return { ok: true };
   });
 

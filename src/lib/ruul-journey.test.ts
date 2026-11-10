@@ -55,6 +55,16 @@ describe("Ruul journey rules", () => {
     const base = app({accepted_at:"2026-11-01",contract_signed_at:"2026-11-02",os_created_at:"2026-11-02",ruul_added_at:"2026-11-03",start_monday:"2026-11-16",timeline:{first_login:{at:"2026-11-03"}}});
     const row = buildJourneys([base],[],[],[],now)[0]; expect(row?.red).toBe(false); expect(row?.nextAction).toBe("Waiting for start Monday");
   });
+  it("asks for the Ruul email after login when missing", () => {
+    const row = buildJourneys([app({accepted_at:"2026-11-01",contract_signed_at:"2026-11-02",os_created_at:"2026-11-02",ruul_email:null,timeline:{first_login:{at:"2026-11-03"}}})],[],[],[],now)[0];
+    expect(row?.current).toBe("ruul_email"); expect(row?.nextAction).toBe("Ask for Ruul email");
+  });
+  it("Ruul email given is dated from the timeline, else done without date", () => {
+    const dated = buildJourneys([app({ruul_email:"r@x.com",timeline:{ruul_email:{at:"2026-11-04"}}})],[],[],[],now)[0];
+    expect(dated?.dates.ruul_email).toBe("2026-11-04");
+    const undated = buildJourneys([app({ruul_email:"r@x.com"})],[],[],[],now)[0];
+    expect(undated?.dates.ruul_email).toBeNull(); expect(undated?.undatedDone).toEqual(["ruul_email"]);
+  });
   it("optional J+2/J+5 reminders are not gates for applied people", () => {
     expect(buildJourneys([app()],[referral({j0_sent_at:"2026-10-30"})],[],[],now)[0]?.current).toBe("accepted");
   });

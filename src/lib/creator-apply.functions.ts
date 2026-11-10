@@ -212,5 +212,10 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
       const r = await posterEmails.ack(email, data.full_name, data.langue, kind);
       if (r.sent) await supabaseAdmin.from("slideshow_applications").update({ ack_sent_at: new Date().toISOString() }).eq("id", inserted.id);
     } catch { /* the application is saved either way */ }
+    // Auto-accept right after the confirmation email; never changes the application's success.
+    try {
+      const { runAutoAccept } = await import("./slideshow-auto-accept.server");
+      await runAutoAccept(supabaseAdmin, [inserted.id]);
+    } catch (e) { console.error("[slides-auto-accept] after submit failed", (e as Error).message); }
     return { ok: true as const, eventId };
   });
