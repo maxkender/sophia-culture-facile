@@ -69,6 +69,7 @@ export function SlideshowSection({ section, id }: { section: string; id?: string
           <SettingLink compact k="slideshow_poster_guide_url" label="Poster Guide link" help="Shared with new posters by hand with their logins." />
           <SettingLink compact k="slideshow_slack_invite_url" label="Slack invite link" help="Shared with new posters by hand with their logins." />
         </div>
+        <SettingLink compact email k="slides_alert_email" label="Internal alerts email" help="Receives “New Ruul poster” alerts. Empty = support@vikstudios.com." />
         <SettingLink compact k="slideshow_platform_url" label="Old platform" help="" />
         <PosterGuideEditor />
       </div>

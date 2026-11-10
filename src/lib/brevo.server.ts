@@ -1,5 +1,6 @@
 // Server-only Brevo transactional email sender. Never import from client code.
-export const BREVO_SENDER = { name: "Maximilien — Sophia", email: "maximilien@vikstudios.com" };
+export const SUPPORT_EMAIL = "support@vikstudios.com";
+export const BREVO_SENDER = { name: "Sophia", email: SUPPORT_EMAIL };
 
 export type BrevoResult = { sent: boolean; messageId?: string; reason?: string };
 
@@ -13,7 +14,7 @@ export async function sendBrevoEmail(opts: { to: string; toName?: string; subjec
       headers: { "api-key": key, "content-type": "application/json", accept: "application/json" },
       body: JSON.stringify({
         sender: BREVO_SENDER,
-        replyTo: { email: BREVO_SENDER.email },
+        replyTo: { email: SUPPORT_EMAIL },
         to: [{ email: opts.to, ...(opts.toName ? { name: opts.toName } : {}) }],
         subject: opts.subject,
         htmlContent: opts.html,

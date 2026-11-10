@@ -1,7 +1,7 @@
 // Server-only: slideshow poster lifecycle (accept → contract → OS account → started), OS snapshots and weekly payouts.
 import { callOs } from "./os-bridge.server";
 import { pickLang, posterEmails } from "./slideshow-emails.server";
-import { sendBrevoEmail } from "./brevo.server";
+import { sendBrevoEmail, SUPPORT_EMAIL } from "./brevo.server";
 import { countryCodeOf } from "@/config/countries";
 
 type Admin = any;
@@ -119,7 +119,8 @@ async function notifyManager(admin: Admin, o: { name: string; country: string; m
     const res = await fetch(hook, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) }).catch(() => null);
     if (res?.ok) return;
   }
-  await sendBrevoEmail({ to: "maximilien@vikstudios.com", subject: `New Ruul poster: ${o.name}`, html: `<p>${text}</p>`, text });
+  const to = (await setting(admin, "slides_alert_email")) || SUPPORT_EMAIL;
+  await sendBrevoEmail({ to, subject: `New Ruul poster: ${o.name}`, html: `<p>${text}</p>`, text });
   void admin;
 }
 
