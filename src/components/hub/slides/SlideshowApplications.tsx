@@ -28,7 +28,7 @@ import {
   sendSignatureReminders,
   tickStep,
 } from "@/lib/slideshows.functions";
-import { RUUL_BLOCKED } from "@/lib/ruul";
+import { RUUL_BLOCKED, SLIDESHOW_CLOSED } from "@/lib/ruul";
 import {
   Dialog,
   DialogContent,
@@ -241,6 +241,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
       Boolean(zones?.ok && countryCodeOf(a.country)) &&
       !langOff(a) &&
       !RUUL_BLOCKED.includes(countryCodeOf(a.country) ?? "") &&
+      !SLIDESHOW_CLOSED.includes(countryCodeOf(a.country) ?? "") &&
       Boolean(a.zone),
   ).length;
   const show = (a: App, action: "none" | "accept" | "reject" = "none") => {

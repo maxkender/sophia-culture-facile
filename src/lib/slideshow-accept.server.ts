@@ -1,4 +1,5 @@
 // Server-only: the ONE acceptance path for slideshow poster applications (single Accept, Accept all, assistant job).
+import { SLIDESHOW_CLOSED } from "./ruul";
 import { getOsZones, nextStartMonday, randomToken, RUUL_BLOCKED } from "./slideshows.server";
 import { posterEmails } from "./slideshow-emails.server";
 import { countryCodeOf, langOfCountry } from "@/config/countries";
@@ -25,6 +26,7 @@ export function refusalReason(app: any, zones: Zones): string | null {
     const closed = zones.fermes.find((f) => f.pays_code === code);
     return closed?.raison ? `Closed in OS — ${closed.raison}` : "Closed in OS";
   }
+  if (code && SLIDESHOW_CLOSED.includes(code)) return "Country closed";
   if (code && RUUL_BLOCKED.includes(code)) return "Country not supported by Ruul";
   return null;
 }

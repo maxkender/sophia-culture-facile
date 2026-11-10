@@ -25,3 +25,6 @@ export const RUUL_HELPERS = [
 export const RUUL_MIN_EUR = 100;
 /** At most 500 data rows per file. */
 export const RUUL_MAX_ROWS = 500;
+
+/** Countries closed for slideshow posters (no new applications accepted). */
+export const SLIDESHOW_CLOSED: string[] = ["ID"];

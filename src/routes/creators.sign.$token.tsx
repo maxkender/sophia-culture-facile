@@ -39,6 +39,8 @@ function SignPage() {
   else if (isLoading) body = <p className="text-sm text-brand-navySoft">Loading…</p>;
   else if (!data || data.state === "invalid")
     body = <Note title="This link is no longer valid">It has already been used or replaced. Ask your hiring manager for a new link.</Note>;
+  else if (data.state === "withdrawn")
+    body = <Note title="This offer is no longer available">We're sorry, this position is no longer open in your country, so this agreement can't be signed. Thank you for your interest.</Note>;
   else if (data.state === "unpublished") body = <Note title="Not available yet">The agreement is being finalised. Try again later.</Note>;
   else
     body = (

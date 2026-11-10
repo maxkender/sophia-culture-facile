@@ -84,6 +84,7 @@ export const getSigningPage = createServerFn({ method: "GET" })
       const { data: signed } = await supabaseAdmin.from("slideshow_applications").select("status").eq("guide_token", data.token).maybeSingle();
       return signed && ["approved", "contract_signed", "os_created", "started"].includes(signed.status) ? { state: "signed" as const } : { state: "invalid" as const };
     }
+    if (app.status === "rejected") return { state: "withdrawn" as const };
     if (!["approved", "accepted"].includes(app.status)) return { state: "invalid" as const };
     const { data: doc } = await supabaseAdmin.from("documents").select("title, content, current_version, published").eq("slug", "creator-agreement").maybeSingle();
     if (!doc?.published) return { state: "unpublished" as const };
