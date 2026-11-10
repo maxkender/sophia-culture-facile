@@ -1,0 +1,3 @@
+import {useQuery} from "@tanstack/react-query";
+import {slideshowMetaConfig} from "@/lib/slideshow-meta.functions";
+export function SlideshowMetaStatus(){const {data}=useQuery({queryKey:["hub","slides","meta-config"],queryFn:()=>slideshowMetaConfig()});return <div className="border-t border-brand-line pt-3 text-sm"><h4 className="font-semibold">Slideshow Meta tracking</h4><p className="text-muted-foreground">{data?.connected?"Meta tracking connected":"Meta tracking not connected"}</p></div>;}
