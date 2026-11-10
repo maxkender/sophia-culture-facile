@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const UTM_KEYS = ["utm_source","utm_medium","utm_campaign","utm_content","utm_term"] as const;
 export const ATTRIBUTION_KEYS = [...UTM_KEYS,"fbclid","landing_url"] as const;
-export type Attribution = Partial<Record<typeof ATTRIBUTION_KEYS[number], string | null>>;
+export type Attribution = Partial<Record<typeof ATTRIBUTION_KEYS[number], string | null | undefined>>;
 export type ApplicationSource = "meta" | "referral" | "other_utm" | "direct";
 export const SOURCE_LABELS: Record<ApplicationSource,string> = { meta:"Meta",referral:"Referral",direct:"Direct",other_utm:"Other" };
 export const ATTRIBUTION_STORAGE_KEY = "sophia_slideshow_attribution";
@@ -10,7 +10,7 @@ export const ATTRIBUTION_TTL = 30*86400000;
 const field = z.string().trim().max(500).nullish();
 export const attributionSchema = z.object({utm_source:field,utm_medium:field,utm_campaign:field,utm_content:field,utm_term:field,fbclid:z.string().trim().max(1000).nullish(),landing_url:z.string().max(3000).url().nullish()});
 type Store = Pick<Storage,"getItem"|"setItem"|"removeItem">;
-export function applicationSource(a: Attribution & {ref?:string|null;source?:string|null}): ApplicationSource {
+export function applicationSource(a: Attribution & {ref?:string|null|undefined;source?:string|null|undefined}): ApplicationSource {
   if (a.ref?.trim()) return "referral";
   if (["facebook","fb","instagram","ig","meta"].includes(a.utm_source?.trim().toLowerCase() ?? "") || a.fbclid) return "meta";
   if (UTM_KEYS.some(k=>Boolean(a[k]))) return "other_utm";

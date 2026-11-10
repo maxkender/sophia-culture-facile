@@ -151,7 +151,8 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
     if (await rateLimited("slideshow_applications", hash, email)) return { ok: false as const, reason: "rate" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const marketing = getRequest().headers.get("sec-gpc") !== "1" && validMarketingConsent(data.marketing_consent);
-    const tracking = attributionSchema.parse(data);
+    const parsedTracking = attributionSchema.parse(data);
+    const tracking = { utm_source: parsedTracking.utm_source || null, utm_medium: parsedTracking.utm_medium || null, utm_campaign: parsedTracking.utm_campaign || null, utm_content: parsedTracking.utm_content || null, utm_term: parsedTracking.utm_term || null, fbclid: parsedTracking.fbclid || null, landing_url: parsedTracking.landing_url || null };
     if (!marketing) tracking.fbclid = null;
     const eventId = crypto.randomUUID();
     const { data: inserted, error } = await supabaseAdmin.from("slideshow_applications").insert({
