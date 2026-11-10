@@ -547,6 +547,13 @@
       "when": 1794230307919,
       "tag": "0077_slideshow_unsubscribed_at",
       "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1794306423968,
+      "tag": "0078_slideshow_attribution",
+      "breakpoints": true
     }
   ]
 }

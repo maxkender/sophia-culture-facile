@@ -6039,6 +6039,7 @@ export type Database = {
           dropped_at: string | null
           email: string
           expired_at: string | null
+          fbclid: string | null
           full_name: string
           guide_figures_shown: Json | null
           guide_opened_at: string | null
@@ -6048,9 +6049,12 @@ export type Database = {
           hm_notified_at: string | null
           id: string
           is_adult: boolean
+          landing_url: string | null
           langue: string | null
           manager_email: string | null
           manager_name: string | null
+          marketing_consent: Json | null
+          meta_event_id: string | null
           os_created_at: string | null
           os_email: string | null
           os_error: string | null
@@ -6077,6 +6081,7 @@ export type Database = {
           ruul_email: string | null
           signing_token: string | null
           signing_token_created_at: string | null
+          source: string | null
           start_monday: string | null
           started_at: string | null
           status: string
@@ -6087,6 +6092,11 @@ export type Database = {
           unsubscribed_at: string | null
           unswipe_code_id: string | null
           upwork_profile_url: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
           wise_email: string | null
           zone: string | null
           zone_note: string | null
@@ -6110,6 +6120,7 @@ export type Database = {
           dropped_at?: string | null
           email: string
           expired_at?: string | null
+          fbclid?: string | null
           full_name: string
           guide_figures_shown?: Json | null
           guide_opened_at?: string | null
@@ -6119,9 +6130,12 @@ export type Database = {
           hm_notified_at?: string | null
           id?: string
           is_adult: boolean
+          landing_url?: string | null
           langue?: string | null
           manager_email?: string | null
           manager_name?: string | null
+          marketing_consent?: Json | null
+          meta_event_id?: string | null
           os_created_at?: string | null
           os_email?: string | null
           os_error?: string | null
@@ -6148,6 +6162,7 @@ export type Database = {
           ruul_email?: string | null
           signing_token?: string | null
           signing_token_created_at?: string | null
+          source?: string | null
           start_monday?: string | null
           started_at?: string | null
           status?: string
@@ -6158,6 +6173,11 @@ export type Database = {
           unsubscribed_at?: string | null
           unswipe_code_id?: string | null
           upwork_profile_url?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
           wise_email?: string | null
           zone?: string | null
           zone_note?: string | null
@@ -6181,6 +6201,7 @@ export type Database = {
           dropped_at?: string | null
           email?: string
           expired_at?: string | null
+          fbclid?: string | null
           full_name?: string
           guide_figures_shown?: Json | null
           guide_opened_at?: string | null
@@ -6190,9 +6211,12 @@ export type Database = {
           hm_notified_at?: string | null
           id?: string
           is_adult?: boolean
+          landing_url?: string | null
           langue?: string | null
           manager_email?: string | null
           manager_name?: string | null
+          marketing_consent?: Json | null
+          meta_event_id?: string | null
           os_created_at?: string | null
           os_email?: string | null
           os_error?: string | null
@@ -6219,6 +6243,7 @@ export type Database = {
           ruul_email?: string | null
           signing_token?: string | null
           signing_token_created_at?: string | null
+          source?: string | null
           start_monday?: string | null
           started_at?: string | null
           status?: string
@@ -6229,6 +6254,11 @@ export type Database = {
           unsubscribed_at?: string | null
           unswipe_code_id?: string | null
           upwork_profile_url?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
           wise_email?: string | null
           zone?: string | null
           zone_note?: string | null
