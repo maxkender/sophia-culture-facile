@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/config/site";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { CONTACT_EMAIL } from "@/config/links";
@@ -19,7 +20,7 @@ export function homeLandingCopy(code: string): HomeCopy {
   return c;
 }
 
-const SITE = "https://sophia-culture.com";
+const SITE = SITE_URL;
 /** /en and /fr keep their own routes; every other poster language lives at /{urlCode}. */
 export const homePath = (urlCode: string) => `/${urlCode}`;
 

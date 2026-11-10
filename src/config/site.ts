@@ -3,7 +3,7 @@
  * Toute URL absolue doit être construite à partir de SITE_URL.
  */
 
-export const SITE_URL = "https://sophia-culture.com";
+export const SITE_URL = "https://vik-studios-creators.com";
 
 /** Construit une URL absolue à partir d'un chemin de route. */
 export function absUrl(path: string): string {

@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/config/site";
 // Server-only: signature reminders for accepted slideshow posters who have not signed yet.
 // Automatic at J+1, J+3, J+6 after acceptance (timeline keys remind_1/2/3, once each); manual sends use remind_manual.
 
@@ -10,7 +11,7 @@ export type RemindKey = (typeof REMIND_SLOTS)[number]["key"] | "remind_manual";
 /** Automatic reminders only cover acceptances from the last 7 days, so older backlogs are never mass-emailed. */
 export const AUTO_WINDOW_DAYS = 7;
 const DAY = 86_400_000;
-const SITE = () => process.env["SITE_URL"] ?? "https://sophia-culture.com";
+const SITE = () => process.env["SITE_URL"] ?? SITE_URL;
 
 type AppLike = {
   status: string;

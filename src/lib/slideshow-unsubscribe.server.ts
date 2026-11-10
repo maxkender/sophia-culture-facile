@@ -1,7 +1,8 @@
+import { SITE_URL } from "@/config/site";
 // Server-only: signed one-click unsubscribe links for slideshow candidate/poster emails.
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-const SITE = () => process.env["SITE_URL"] ?? "https://sophia-culture.com";
+const SITE = () => process.env["SITE_URL"] ?? SITE_URL;
 const norm = (email: string) => email.trim().toLowerCase();
 
 export function unsubscribeToken(email: string, secret = process.env["OS_HUB_SECRET"] ?? ""): string {

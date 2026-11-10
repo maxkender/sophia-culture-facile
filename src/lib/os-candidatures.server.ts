@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/config/site";
 // Server-only: Sophia OS endpoint for slideshow recruiting (list + actions). Auth: x-hub-secret === OS_HUB_SECRET.
 import { z } from "zod";
 import { hubSecretMatches, readBoundedJson } from "./os-email.server";
@@ -5,7 +6,7 @@ import { hubSecretMatches, readBoundedJson } from "./os-email.server";
 const FIELDS = "id, full_name, email, country, is_adult, deux_telephones, q_country_now, q_hours_per_day, q_tiktok_daily, q_previous_content, referred, referral_name, ref, langue, status, created_at, accepted_at, contract_signed_at, os_created_at, os_profile_id, start_monday, expired_at, ruul_email, phone, unsubscribed_at";
 const SINCE_COLS = ["created_at", "decided_at", "accepted_at", "contract_signed_at", "os_created_at", "expired_at", "unsubscribed_at", "agreement_signed_at"];
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "cache-control": "no-store" } });
-const SITE = () => process.env["SITE_URL"] ?? "https://sophia-culture.com";
+const SITE = () => process.env["SITE_URL"] ?? SITE_URL;
 
 const monday = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine((d) => { const x = new Date(`${d}T00:00:00Z`); return !isNaN(x.getTime()) && x.getUTCDay() === 1 && x.toISOString().slice(0, 10) === d; }, "start_monday must be a Monday (YYYY-MM-DD)");
 const id = z.string().uuid();

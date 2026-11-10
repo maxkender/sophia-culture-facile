@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/config/site";
 // Server-only: the ONE acceptance path for slideshow poster applications (single Accept, Accept all, assistant job).
 import { SLIDESHOW_CLOSED } from "./ruul";
 import { getOsZones, nextStartMonday, randomToken, RUUL_BLOCKED } from "./slideshows.server";
@@ -67,7 +68,7 @@ export async function acceptSlideshowApplication(a: Admin, input: AcceptInput, b
   }).eq("id", app.id);
   const { data: tlRow } = await a.from("slideshow_applications").select("timeline").eq("id", app.id).maybeSingle();
   await a.from("slideshow_applications").update({ timeline: { ...(tlRow?.timeline ?? {}), accepted: { at: new Date().toISOString(), by: by.name } } }).eq("id", app.id);
-  const site = process.env["SITE_URL"] ?? "https://sophia-culture.com";
+  const site = process.env["SITE_URL"] ?? SITE_URL;
   const { data: zr } = await a.from("pay_zones").select("weekly_amount").eq("zone", zone).maybeSingle();
   const guideUrl = (await a.from("hub_settings").select("value").eq("key", "slideshow_poster_guide_url").maybeSingle()).data?.value ?? null;
   const slackUrl = (await a.from("hub_settings").select("value").eq("key", "slideshow_slack_invite_url").maybeSingle()).data?.value ?? null;

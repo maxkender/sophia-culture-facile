@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/config/site";
 // Server-only: slideshow poster lifecycle (accept → contract → OS account → started), OS snapshots and weekly payouts.
 import { callOs } from "./os-bridge.server";
 import { pickLang, posterEmails } from "./slideshow-emails.server";
@@ -5,7 +6,7 @@ import { sendBrevoEmail, SUPPORT_EMAIL } from "./brevo.server";
 import { countryCodeOf } from "@/config/countries";
 
 type Admin = any;
-const SITE = () => process.env["SITE_URL"] ?? "https://sophia-culture.com";
+const SITE = () => process.env["SITE_URL"] ?? SITE_URL;
 const day = (d: Date) => d.toISOString().slice(0, 10);
 
 /** The next Monday at least 3 days away (UTC dates). */

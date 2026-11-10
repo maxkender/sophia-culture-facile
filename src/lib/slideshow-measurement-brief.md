@@ -12,4 +12,4 @@ Privacy gap: recruiting notice names Meta and shared technical data, purpose and
 
 Provider receipt, deduplication and published-domain installation remain unverified until connection and publish. Other-language marketing notice/option labels currently fall back to English except FR (and selected translated options); original form copy remains untouched.
 
-Ads URL: https://sophia-culture.com/en/creators/slideshow?utm_source=meta&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}
+Ads URL: https://vik-studios-creators.com/en/creators/slideshow?utm_source=meta&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}

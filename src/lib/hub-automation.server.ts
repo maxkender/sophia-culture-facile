@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/config/site";
 // Server-only: phase-3 automation (daily post detection, fraud flags, budget cap, dormancy, brief drops).
 import { clean, scrapeInstagram, scrapeTikTok, settings, upsertFound, type Found } from "./ugc-sync.server";
 import { previewMonth } from "./ugc-month.server";
@@ -121,14 +122,14 @@ async function remind(admin: Admin, c: any, kind: "d3" | "d7") {
     const p = kind === "d3"
       ? [`Salut ${first},`, "On n’a pas vu de nouveau post de ta part depuis 3 jours. Ta prochaine vidéo t’attend : ouvre ton espace créateur pour les briefs de la semaine.", "Poster régulièrement fait grandir ton compte et tes gains."]
       : [`Salut ${first},`, "Ça fait une semaine sans post. Si quelque chose te bloque, réponds à cet email et on t’aide.", "S’il n’y a toujours pas de post après 14 jours, le compte revient à l’équipe pour qu’un autre créateur puisse l’utiliser."];
-    const o = { paragraphs: p, buttonLabel: "Ouvrir mon espace créateur", buttonUrl: "https://sophia-culture.com/creators/app/briefs" };
+    const o = { paragraphs: p, buttonLabel: "Ouvrir mon espace créateur", buttonUrl: `${SITE_URL}/creators/app/briefs` };
     const rf = await sendBrevoEmail({ to: c.email, toName: c.full_name, subject: kind === "d3" ? "Ta prochaine vidéo t’attend" : "Tes vidéos nous manquent", html: buildEmailHtml(o), text: buildEmailText(o) });
     return rf.sent;
   }
   const paragraphs = kind === "d3"
     ? [`Hi ${first},`, "We haven't seen a new post from you for 3 days. Your next video is waiting: open your creator space for this week's briefs.", "Posting regularly keeps your account growing and your earnings coming."]
     : [`Hi ${first},`, "It's been a week without a post. If something is blocking you, reply to this email and we'll help.", "If there is still no post after 14 days, the account goes back to the team so another creator can use it."];
-  const opts = { paragraphs, buttonLabel: "Open my creator space", buttonUrl: "https://sophia-culture.com/creators/app/briefs" };
+  const opts = { paragraphs, buttonLabel: "Open my creator space", buttonUrl: `${SITE_URL}/creators/app/briefs` };
   const r = await sendBrevoEmail({ to: c.email, toName: c.full_name, subject: kind === "d3" ? "Your next video is waiting" : "We miss your videos", html: buildEmailHtml(opts), text: buildEmailText(opts) });
   return r.sent;
 }
@@ -207,7 +208,7 @@ export async function referralAdjustments(admin: Admin, p: string, rows: { creat
 }
 
 /** Daily 09:00 Paris: nurture emails (J0/J+2/J+7) for sign-ups who have not created their account yet. Texts come from saved_templates (nurture-<step>-<lang>). */
-export async function runNurture(admin: Admin, origin = "https://sophia-culture.com") {
+export async function runNurture(admin: Admin, origin = SITE_URL) {
   return { disabled: true }; // No automatic emails (owner decision). Code below is dormant.
   return withLock(admin, "nurture", 15, async () => {
     const { data: due } = await admin.from("creator_email_sequence").select("id, step, creator_id, creators(id, full_name, email, country, user_id, invite_token, social_account_created_at, status)")

@@ -46,4 +46,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://sophia-culture.com/sitemap.xml
+Sitemap: https://vik-studios-creators.com/sitemap.xml
