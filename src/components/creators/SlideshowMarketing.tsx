@@ -20,7 +20,7 @@ export function SlideshowMarketing({lang}:{lang:string}) {
     setOpen(!browserConsent());
     const sync=()=>{const c=browserConsent();setChoice(c);browserAttribution();if(!marketingAllowed())revokeSlideshowPixel();else void slideshowMetaConfig().then(config=>{if(marketingAllowed())initializeSlideshowPixel(config.pixelId);}).catch(()=>{});};
     const onStorage=(event:StorageEvent)=>{if(event.key===CONSENT_KEY){sync();setOpen(false);}};
-    sync();window.addEventListener("storage",onStorage);window.addEventListener("slideshow-consent",sync);return()=>{window.removeEventListener("storage",onStorage);window.removeEventListener("slideshow-consent",sync);};
+    sync();window.addEventListener("storage",onStorage);window.addEventListener("slideshow-consent",sync);return()=>{window.removeEventListener("storage",onStorage);window.removeEventListener("slideshow-consent",sync);revokeSlideshowPixel();};
   },[]);
   function choose(accepted:boolean){
     const gpc=Boolean((navigator as Navigator&{globalPrivacyControl?:boolean}).globalPrivacyControl);
