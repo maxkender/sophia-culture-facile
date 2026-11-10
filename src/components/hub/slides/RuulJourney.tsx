@@ -37,7 +37,7 @@ export function RuulJourney() {
   const app = data.applications.find(a=>a.id===active?.applicationId);
   const week = new Date(data.now); week.setUTCHours(0,0,0,0); week.setUTCDate(week.getUTCDate()-((week.getUTCDay()+6)%7));
   const inWeek = (d:string|null) => Boolean(d && Date.parse(d)>=week.getTime() && Date.parse(d)<=Date.parse(data.now));
-  const counts = { signed:data.rows.filter(r=>inWeek(r.dates.signed)).length, ruul:data.rows.filter(r=>inWeek(r.dates.ruul)).length, paid:data.rows.filter(r=>inWeek(r.dates.paid)).length };
+  const counts = { signed:data.rows.filter(r=>inWeek(r.dates.signed)).length, ruul:data.rows.filter(r=>inWeek(r.dates.ruul)).length, paid:data.paidThisWeek };
   function exportCsv() {
     const url = URL.createObjectURL(new Blob([journeyCsv(rows)],{type:"text/csv;charset=utf-8"}));
     const link = document.createElement("a"); link.href=url; link.download="parcours-ruul.csv"; link.click(); URL.revokeObjectURL(url);
@@ -46,7 +46,7 @@ export function RuulJourney() {
   return <div className="slides-crm min-w-0 space-y-4">
     <div className="flex flex-wrap items-center justify-between gap-2"><h1 className="text-xl font-semibold">Parcours Ruul</h1><div className="flex gap-2"><Button variant="outline" size="sm" onClick={()=>void navigate({search:{}})} title="Reset filters"><RotateCcw className="size-4"/><span>Reset</span></Button><Button variant="outline" size="sm" onClick={exportCsv}><Download className="size-4"/>CSV</Button></div></div>
     {!data.referralsConnected && <div role="status" className="rounded-md border border-brand-line bg-portal-amber/10 px-3 py-2 text-sm text-foreground">Referral data not connected yet</div>}
-    <div className="flex flex-wrap gap-x-5 gap-y-2 border-y border-brand-line py-3 text-sm"><strong className="text-portal-red">{data.rows.filter(r=>r.red).length} red rows</strong><span>This week: <b>{counts.signed}</b> signed · <b>{counts.ruul}</b> added in Ruul · <b>{counts.paid}</b> first week paid</span><span className="text-muted-foreground">{data.rows.length} people</span></div>
+    <div className="flex flex-wrap gap-x-5 gap-y-2 border-y border-brand-line py-3 text-sm"><strong className="text-portal-red">{data.rows.filter(r=>r.red).length} red rows</strong><span>This week: <b>{counts.signed}</b> signed · <b>{counts.ruul}</b> added in Ruul · <b>{counts.paid}</b> paid</span><span className="text-muted-foreground">{data.rows.length} people</span></div>
     <div className="grid grid-cols-3 gap-x-4 gap-y-2 border-b border-brand-line pb-3 sm:grid-cols-6 xl:grid-cols-12" aria-label="Journey funnel">{JOURNEY_STEPS.map(([key,label])=><div key={key} className="min-w-0"><b className="block text-lg tabular-nums">{data.rows.filter(r=>Boolean(r.dates[key])).length}</b><span className="block text-xs text-muted-foreground">{label}</span></div>)}</div>
     <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
       <Input aria-label="Search name or email" placeholder="Search name or email" className="sm:max-w-64" value={filters.q} onChange={e=>set("q",e.target.value)} />

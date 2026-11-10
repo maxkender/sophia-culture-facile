@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildJourneys, journeyCsv, normalizeReferral, type JourneyApplication } from "./ruul-journey";
+import { buildJourneys, journeyCsv, normalizeReferral, paidPeopleThisWeek, type JourneyApplication } from "./ruul-journey";
 
 const app = (patch: Partial<JourneyApplication> = {}) => ({ id: "a", email: "friend@example.test", full_name: "Friend", country: "FR", status: "pending", created_at: "2026-11-01T10:00:00Z", ...patch }) as JourneyApplication;
 const referral = (patch: Record<string, unknown> = {}) => {
@@ -8,6 +8,9 @@ const referral = (patch: Record<string, unknown> = {}) => {
 };
 const now = "2026-11-10T10:00:00Z";
 describe("Ruul journey rules", () => {
+  it("this-week paid count includes returning posters, not only their first payment", () => {
+    expect(paidPeopleThisWeek([{application_id:"a",status:"paid",paid_at:"2026-11-02",week_start:"2026-10-26"},{application_id:"a",status:"paid",paid_at:"2026-11-09",week_start:"2026-11-02"},{application_id:"b",status:"approved",paid_at:null,week_start:"2026-11-02"}],now)).toBe(1);
+  });
   it("matches a referral to an application by normalized email, one row per person", () => {
     const rows = buildJourneys([app(),app({ id:"b", email:"FRIEND@example.test" })],[referral()],[],[],now);
     expect(rows).toHaveLength(1); expect(rows[0]?.source).toBe("referral");

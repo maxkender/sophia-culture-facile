@@ -21,6 +21,10 @@ export type Referral = {
 };
 type Snapshot = { application_id: string; lundi: string; publies: number; dernier_post_at: string | null };
 type Payout = { application_id: string; status: string; paid_at: string | null; week_start: string };
+export function paidPeopleThisWeek(payouts: Payout[], now: string): number {
+  const monday = new Date(now); monday.setUTCHours(0, 0, 0, 0); monday.setUTCDate(monday.getUTCDate() - ((monday.getUTCDay() + 6) % 7));
+  return new Set(payouts.filter(p => p.status === "paid" && p.paid_at && Date.parse(p.paid_at) >= monday.getTime() && Date.parse(p.paid_at) <= Date.parse(now)).map(p => p.application_id)).size;
+}
 export type JourneyRow = {
   id: string; applicationId: string | null; name: string; email: string; country: string; zone: string;
   referrer: string; referrerChannel: string | null; source: "referral" | "direct"; startMonday: string;

@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { buildJourneys, normalizeReferral, type JourneyApplication } from "./ruul-journey";
+import { buildJourneys, normalizeReferral, paidPeopleThisWeek, type JourneyApplication } from "./ruul-journey";
 
 /** Admin read model only. No lifecycle, email, OS creation or payment actions. */
 export const getRuulJourney = createServerFn({ method: "GET" })
@@ -45,5 +45,5 @@ export const getRuulJourney = createServerFn({ method: "GET" })
     const now = new Date().toISOString();
     const apps = applications as unknown as JourneyApplication[];
     const rows = buildJourneys(apps, referrals, snapshots as unknown as Parameters<typeof buildJourneys>[2], payouts as unknown as Parameters<typeof buildJourneys>[3], now);
-    return { rows, applications: apps, zones: zoneResult.data ?? [], referralsConnected, now };
+    return { rows, applications: apps, zones: zoneResult.data ?? [], referralsConnected, now, paidThisWeek: paidPeopleThisWeek(payouts as unknown as Parameters<typeof buildJourneys>[3], now) };
   });
