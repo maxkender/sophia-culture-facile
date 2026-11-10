@@ -554,6 +554,13 @@
       "when": 1794306423968,
       "tag": "0078_slideshow_attribution",
       "breakpoints": true
+    },
+    {
+      "idx": 79,
+      "version": "7",
+      "when": 1794307163498,
+      "tag": "0079_slideshow_sophia_app_source",
+      "breakpoints": true
     }
   ]
 }
