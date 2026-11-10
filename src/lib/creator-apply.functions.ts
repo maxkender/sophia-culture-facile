@@ -198,8 +198,19 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
         runOsNotification(getRequest(), notifyOsApplication(supabaseAdmin, email, data.ref ?? null, osSecret));
       } catch { /* OS attribution must never change application success. */ }
     }
-    // The one automatic email: an acknowledgement in the applicant's language. Nothing else is sent by itself.
+    let acceptedImmediately = false;
     try {
+      const { runAutoAccept } = await import("./slideshow-auto-accept.server");
+      const result = await runAutoAccept(supabaseAdmin, [inserted.id]);
+      acceptedImmediately = result.accepted.some(row => row.id === inserted.id);
+    } catch { console.error("[slides-auto-accept] after submit failed; application saved"); }
+    // Acceptance may persist before an email/audit failure: read back before acknowledging.
+    if (!acceptedImmediately) try {
+      const { data: current } = await supabaseAdmin.from("slideshow_applications").select("status").eq("id", inserted.id).maybeSingle();
+      acceptedImmediately = current?.status === "accepted";
+    } catch { /* best effort; saved application is never failed by notifications */ }
+    // Acknowledge only if the immediate acceptance did not happen.
+    if (!acceptedImmediately) try {
       const { posterEmails } = await import("./slideshow-emails.server");
       let kind: "open" | "closed" | "neutral" = "neutral";
       try {
@@ -212,10 +223,5 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
       const r = await posterEmails.ack(email, data.full_name, data.langue, kind);
       if (r.sent) await supabaseAdmin.from("slideshow_applications").update({ ack_sent_at: new Date().toISOString() }).eq("id", inserted.id);
     } catch { /* the application is saved either way */ }
-    // Auto-accept right after the confirmation email; never changes the application's success.
-    try {
-      const { runAutoAccept } = await import("./slideshow-auto-accept.server");
-      await runAutoAccept(supabaseAdmin, [inserted.id]);
-    } catch (e) { console.error("[slides-auto-accept] after submit failed", (e as Error).message); }
     return { ok: true as const, eventId };
   });

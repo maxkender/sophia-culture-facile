@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -31,8 +31,12 @@ function SignPage() {
   const sign = useServerFn(signWithToken);
   const [done, setDone] = useState(false);
   const [ruulEmail, setRuulEmail] = useState("");
-  const ruulOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ruulEmail.trim());
+  const ruulOk = !ruulEmail.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ruulEmail.trim());
   const { data, isLoading } = useQuery({ queryKey: ["sign", token], queryFn: () => load({ data: { token } }), retry: false });
+
+  useEffect(() => {
+    if (data?.state === "ready") setRuulEmail(data.email ?? "");
+  }, [data]);
 
   let body: React.ReactNode;
   if (done || data?.state === "signed") body = <SignedWithGuide token={token} />;
@@ -52,9 +56,9 @@ function SignPage() {
         extraValid={ruulOk}
         extraField={
           <div className="space-y-2">
-            <Label htmlFor="ruul-email">Your Ruul email</Label>
-            <Input id="ruul-email" type="email" required value={ruulEmail} maxLength={254} onChange={(e) => setRuulEmail(e.target.value)} className="h-11" autoComplete="email" />
-            <p className="text-xs text-brand-navySoft">Create your free Ruul account with this email address. Ruul is where you will be paid every week.</p>
+            <Label htmlFor="ruul-email">Email for your Ruul account (we'll send your Ruul invitation there)</Label>
+            <Input id="ruul-email" type="email" value={ruulEmail} maxLength={254} onChange={(e) => setRuulEmail(e.target.value)} className="h-11" autoComplete="email" />
+            <p className="text-xs text-brand-navySoft">Optional. You can also add it later on your dashboard.</p>
           </div>
         }
         onSign={async (signedName) => {

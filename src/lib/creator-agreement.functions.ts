@@ -101,7 +101,7 @@ export const getSigningPage = createServerFn({ method: "GET" })
 
 // Public: sign with the token. The token dies on use.
 export const signWithToken = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => signInput.extend({ token: z.string().min(20).max(100), ruulEmail: z.string().trim().toLowerCase().email().max(254) }).parse(d))
+  .inputValidator((d: unknown) => signInput.extend({ token: z.string().min(20).max(100), ruulEmail: z.union([z.string().trim().toLowerCase().email().max(254), z.literal("")]).optional() }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: app } = await supabaseAdmin
@@ -128,7 +128,7 @@ export const signWithToken = createServerFn({ method: "POST" })
     const { error: updateError } = await supabaseAdmin
       .from("slideshow_applications")
       .update({
-        signing_token: null, guide_token: data.token, agreement_signed_at: now, ruul_email: data.ruulEmail,
+        signing_token: null, guide_token: data.token, agreement_signed_at: now, ruul_email: data.ruulEmail || null,
         start_monday: startMondayAtSignature(app.start_monday, signedAt),
         ...(app.status === "accepted" ? { status: "contract_signed", contract_signed_at: now } : {}),
         timeline: {

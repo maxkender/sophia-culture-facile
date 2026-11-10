@@ -168,7 +168,7 @@ export const saveRuulEmail = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/** "Added in Ruul" / "Resend": stamps ruul_added_at (first time) and emails the Ruul signup instructions. */
+/** Records the Ruul invitation action; never sends a separate poster email. */
 export const markRuulAdded = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ applicationId: id }).parse(d))
@@ -237,24 +237,6 @@ export const retryOs = createServerFn({ method: "POST" })
     return createPosterInOs(await admin(), data.applicationId);
   });
 
-/** Emails (or re-emails) the 7-day payout-method link. */
-export const sendPayoutLink = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ applicationId: id }).parse(d))
-  .handler(async ({ data, context }) => {
-    await (await import("./payments-gate.server")).assertPaymentsOn();
-    await assertAdmin(context);
-    const a = await admin();
-    const { randomToken, payoutLink } = await import("./slideshows.server");
-    const { posterEmails, pickLang } = await import("./slideshow-emails.server");
-    const { data: app } = await a.from("slideshow_applications").select("id, email, full_name, langue").eq("id", data.applicationId).maybeSingle();
-    if (!app) throw new Error("Not found");
-    const token = randomToken();
-    await a.from("slideshow_applications").update({ payout_token: token, payout_token_expires_at: new Date(Date.now() + 7 * 864e5).toISOString() }).eq("id", app.id);
-    const sent = await posterEmails.payout(app.email, app.full_name, pickLang(app.langue), payoutLink(token));
-    return { ok: true, emailed: sent.sent, link: payoutLink(token) };
-  });
-
 export const buildWeekNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ lundi: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional() }).parse(d))
@@ -319,59 +301,3 @@ export const markWeekPaid = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/* ---------- Public: poster payout-method page (7-day token, no login) ---------- */
-const tok = z.object({ token: z.string().regex(/^[a-f0-9]{48}$/) });
-async function byToken(a: any, token: string) {
-  const { data } = await a.from("slideshow_applications").select("id, full_name, email, langue, payout_method, paypal_email, wise_email, stripe_account_id, stripe_onboarded, payout_token_expires_at").eq("payout_token", token).maybeSingle();
-  if (!data || !data.payout_token_expires_at || new Date(data.payout_token_expires_at) < new Date()) return null;
-  return data;
-}
-
-export const getPosterPayout = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => tok.parse(d))
-  .handler(async ({ data }) => {
-    await (await import("./payments-gate.server")).assertPaymentsOn();
-    const a = await admin();
-    const p = await byToken(a, data.token);
-    if (!p) return { state: "invalid" as const };
-    let onboarded = Boolean(p.stripe_onboarded);
-    if (p.stripe_account_id && !onboarded) {
-      try {
-        const { stripeClient } = await import("./slideshows.server");
-        const acc = await (await stripeClient()).accounts.retrieve(p.stripe_account_id);
-        onboarded = Boolean(acc.payouts_enabled && acc.details_submitted);
-        if (onboarded) await a.from("slideshow_applications").update({ stripe_onboarded: true }).eq("id", p.id);
-      } catch { /* keep current state */ }
-    }
-    return { state: "ready" as const, name: String(p.full_name).split(/\s+/)[0], lang: p.langue ?? "en", method: p.payout_method, paypal: p.paypal_email, wise: p.wise_email, stripeOnboarded: onboarded, stripeStarted: Boolean(p.stripe_account_id) };
-  });
-
-export const savePosterPayout = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => tok.extend({ method: z.enum(["paypal", "wise"]), email: z.string().trim().email().max(200) }).parse(d))
-  .handler(async ({ data }) => {
-    await (await import("./payments-gate.server")).assertPaymentsOn();
-    const a = await admin();
-    const p = await byToken(a, data.token);
-    if (!p) throw new Error("This link has expired. Ask us for a new one.");
-    await a.from("slideshow_applications").update({ payout_method: data.method, [data.method === "paypal" ? "paypal_email" : "wise_email"]: data.email.toLowerCase() }).eq("id", p.id);
-    return { ok: true };
-  });
-
-export const startPosterStripe = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => tok.parse(d))
-  .handler(async ({ data }) => {
-    await (await import("./payments-gate.server")).assertPaymentsOn();
-    const a = await admin();
-    const p = await byToken(a, data.token);
-    if (!p) throw new Error("This link has expired. Ask us for a new one.");
-    const { stripeClient, payoutLink } = await import("./slideshows.server");
-    const s = await stripeClient();
-    let acct = p.stripe_account_id as string | null;
-    if (!acct) {
-      const created = await s.accounts.create({ type: "express", email: p.email, capabilities: { transfers: { requested: true } }, metadata: { slideshow_application_id: p.id } }, { idempotencyKey: `poster-account-${p.id}` });
-      acct = created.id;
-      await a.from("slideshow_applications").update({ stripe_account_id: acct, payout_method: "stripe" }).eq("id", p.id);
-    }
-    const link = await s.accountLinks.create({ account: acct, refresh_url: payoutLink(data.token), return_url: payoutLink(data.token), type: "account_onboarding" });
-    return { url: link.url };
-  });

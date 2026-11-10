@@ -1,4 +1,3 @@
-import { SITE_URL } from "@/config/site";
 // Server-only: slideshow poster lifecycle (accept → contract → OS account → started), OS snapshots and weekly payouts.
 import { callOs } from "./os-bridge.server";
 import { pickLang, posterEmails } from "./slideshow-emails.server";
@@ -6,21 +5,9 @@ import { sendBrevoEmail, SUPPORT_EMAIL } from "./brevo.server";
 import { countryCodeOf } from "@/config/countries";
 
 type Admin = any;
-const SITE = () => process.env["SITE_URL"] ?? SITE_URL;
 const day = (d: Date) => d.toISOString().slice(0, 10);
 
-/** The next Monday at least 3 days away (UTC dates). */
-export function nextStartMonday(now = new Date()): string {
-  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  d.setUTCDate(d.getUTCDate() + 3);
-  while (d.getUTCDay() !== 1) d.setUTCDate(d.getUTCDate() + 1);
-  return day(d);
-}
-/** Signing can defer the accepted Monday, but must never bring it forward. */
-export function startMondayAtSignature(stored: string | null, now = new Date()): string {
-  const next = nextStartMonday(now);
-  return stored && stored > next ? stored : next;
-}
+export { nextStartMonday, startMondayAtSignature } from "./slideshow-start";
 /** Monday of the week containing `d` (UTC). */
 export function mondayOf(d = new Date()): string {
   const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
@@ -99,6 +86,7 @@ export async function createPosterInOs(admin: Admin, applicationId: string) {
     await posterEmails.logins(a.email, a.full_name, l, {
       osUrl: (await setting(admin, "os_app_url")) ?? "https://sophia-marketing-orga.vercel.app",
       login: r.email_os, password: r.password, slack: await setting(admin, "slideshow_slack_invite_url"), monday: a.start_monday, ruulEmail: a.ruul_email || a.email,
+      guideUrl: await setting(admin, "slideshow_poster_guide_url"),
       weekly: pz?.weekly_amount != null ? Number(pz.weekly_amount) : null,
     });
     await tick(admin, a.id, "logins_sent", "Sophia OS");
@@ -114,7 +102,7 @@ export async function createPosterInOs(admin: Admin, applicationId: string) {
 /** Site posters have no hiring manager (OS "RUUL cohort" profile has no mailbox): Slack webhook, else email the owner. */
 async function notifyManager(admin: Admin, o: { name: string; country: string; monday: string; managerEmail?: string | null }) {
   const date = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${o.monday}T12:00:00Z`));
-  const text = `New Ruul poster: ${o.name}, ${o.country}, starts Monday ${date}. Add them in Ruul and to #ruul-cohort.`;
+  const text = `New Ruul poster: ${o.name}, ${o.country}, starts Monday ${date}. Add them in Ruul and to #welcome, #posting-help and #ruul-posters.`;
   const hook = process.env["SLACK_WEBHOOK_URL"];
   if (hook) {
     const res = await fetch(hook, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) }).catch(() => null);
@@ -206,4 +194,4 @@ export async function stripeClient() {
   return new Stripe(key);
 }
 
-export const payoutLink = (token: string) => `${SITE()}/payout/${token}`;
+

@@ -50,7 +50,7 @@ afterEach(() => vi.useRealTimers());
 describe("signature persists the start before OS creation (mocked only)", () => {
   it.each([
     ["2026-10-23", "2026-10-26"],
-    ["2026-10-24", "2026-11-02"],
+    ["2026-10-24", "2026-10-26"],
     ["2026-10-26", "2026-11-02"],
   ])("signs %s and sends %s to the OS", async (signed, expected) => {
     vi.useFakeTimers();
@@ -69,4 +69,11 @@ describe("signature persists the start before OS creation (mocked only)", () => 
     });
     expect(fake.os).toHaveBeenCalledOnce();
   });
+});
+it("allows signing without a Ruul email and leaves it available for later onboarding", async () => {
+  fake.app = { id: "poster", status: "accepted", start_monday: "2026-11-16", timeline: {} };
+  fake.writes = [];
+  fake.os.mockReset().mockResolvedValue({ ok: true });
+  await signWithToken({ data: { token: "test-token-no-real-contract", signedName: "Test Poster", documentVersion: "1", ruulEmail: "" } });
+  expect(fake.writes[0]).toMatchObject({ ruul_email: null, status: "contract_signed" });
 });

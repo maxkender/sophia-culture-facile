@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Done
+- Ruul poster rewrite: English acceptance/reminder/access emails, invitation-only onboarding, Saturday 20:00 Paris deadline, optional prefilled signing email, retired payment-choice flow, live guide setting, mocked renders and regression checks; no messages sent, not published.
 - Admin sign-in: /auth and /hub show Vik Studios Hub with no creator link; magic/recovery links use public same-origin pages. Two tests and desktop/mobile preview checks passed; no emails sent, not published.
 - Slideshow-only cleanup (10/11): marketing, /start, UGC, influencers, authors/Studio, UnSwipe and go links removed; mini landing at / /en /fr; old creator URLs 301 to the slideshow page; 12 ugc-* schedules removed; domain unchanged. Restore point 2908c0bc. Not published.
 - Slideshow Sophia app source: classification, declared fallback, badges/filters/CSV and FR/EN link checks completed; 49 tests passed, authenticated Hub filters checked, no application submitted or publication.

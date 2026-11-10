@@ -29,9 +29,9 @@ describe("manual slideshow week", () => {
 });
 
 
-describe("slideshow start Monday at signature (UTC)", () => {
+describe("slideshow start Monday at signature (Paris)", () => {
   it("accepts Saturday 17 October with a stored Monday of 26 October", () => {
-    expect(nextStartMonday(new Date("2026-10-17T15:51:00Z"))).toBe("2026-10-26");
+    expect(nextStartMonday(new Date("2026-10-17T15:51:00Z"))).toBe("2026-10-19");
   });
   it.each([
     ["2026-10-23", "2026-10-26"],

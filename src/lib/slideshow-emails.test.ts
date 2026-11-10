@@ -1,80 +1,36 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi } from 'vitest';
+import { mkdirSync, writeFileSync } from 'node:fs';
+const calls: { html: string; text: string; subject: string; to: string }[] = [];
+vi.mock('./brevo.server', () => ({ sendBrevoEmail: vi.fn(async (o) => { calls.push(o); return { sent: true }; }) }));
+import { firstPaymentMonday, posterEmails } from './slideshow-emails.server';
+import { nextStartMonday, signingSaturday, startMondayAtSignature } from './slideshow-start';
 
-// Date formatting and email building only: no email transport is ever called.
-const sendCalls: { html: string; text: string; subject: string; to: string }[] = [];
-vi.mock("./brevo.server", () => ({ sendBrevoEmail: vi.fn(async (o: any) => { sendCalls.push(o); return { sent: true }; }) }));
-import { firstPaymentMonday, formatSigningFriday, posterEmails } from "./slideshow-emails.server";
-
-beforeEach(() => { sendCalls.length = 0; });
-
-const SLACK_URL = "https://join.slack.com/t/sophia-system/shared_invite/zt-4dusa2eyo-6_CjWI3ylCGdlAqA8737Ew";
-
-describe("acceptance signing deadline", () => {
-  it("shows Friday 23 October for Monday 26 October 2026", () => {
-    expect(formatSigningFriday("2026-10-26", "en")).toBe("Friday, October 23");
-  });
-});
-
-describe("Slack invite link in poster emails", () => {
-  it("acceptance email adds the Join Slack link after the Slack bullet (always English, even for langue fr)", async () => {
-    await posterEmails.accepted("p@example.com", "Test P", "en", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, null, SLACK_URL);
-    let html = sendCalls[0]!.html;
-    expect(html).toContain(`href="${SLACK_URL}"`);
-    expect(html).toContain(">Join Slack</a>");
-    expect(sendCalls[0]!.text).toContain(`Join Slack: ${SLACK_URL}`);
-
-    sendCalls.length = 0;
-    await posterEmails.accepted("p@example.com", "Test P", "fr", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, null, SLACK_URL);
-    html = sendCalls[0]!.html;
-    expect(html).toContain(`href="${SLACK_URL}"`);
-    expect(html).toContain(">Join Slack</a>");
-    expect(sendCalls[0]!.text).toContain(`Join Slack: ${SLACK_URL}`);
-  });
-
-  it("acceptance email without Slack setting has no link", async () => {
-    await posterEmails.accepted("p@example.com", "Test P", "en", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, null, null);
-    expect(sendCalls[0]!.html).not.toContain("join.slack.com");
-  });
-
-  it("logins email puts the link right after #ruul-questions in the money line", async () => {
-    await posterEmails.logins("p@example.com", "Test P", "en", { osUrl: "https://os.example", login: "os@x", password: "pw", slack: SLACK_URL, monday: "2026-10-26", ruulEmail: "p@example.com", weekly: 14 });
-    const html = sendCalls[0]!.html;
-    // "#ruul-questions" is immediately followed by the clickable link, then the tail.
-    expect(html).toContain(`#ruul-questions <a href="${SLACK_URL}"`);
-    expect(html).toContain(`>Join Slack</a>, never in the channel.`);
-    expect(sendCalls[0]!.text).toContain(`Join Slack: ${SLACK_URL}`);
-  });
-
-  it("logins email without Slack setting keeps the plain money line", async () => {
-    await posterEmails.logins("p@example.com", "Test P", "en", { osUrl: "https://os.example", login: "os@x", password: "pw", slack: null, monday: "2026-10-26", ruulEmail: "p@example.com", weekly: 14 });
-    expect(sendCalls[0]!.html).toContain("never in the channel.");
-    expect(sendCalls[0]!.html).not.toContain("join.slack.com");
-  });
-});
-
- describe("first slideshow payment after the completed posting week", () => {
+describe('Saturday 20:00 Europe/Paris cutoff', () => {
   it.each([
-    ["2026-10-26", "2026-11-02"],
-    ["2026-12-28", "2027-01-04"],
-  ])("starts %s and first pays %s (seven days later)", (start, payment) => {
-    expect(firstPaymentMonday(start)).toBe(payment);
-  });
+    ['2026-11-14T18:59:59Z','2026-11-16'],
+    ['2026-11-14T19:00:00Z','2026-11-16'],
+    ['2026-11-14T19:00:00.001Z','2026-11-23'],
+    ['2026-11-14T19:00:01Z','2026-11-23'],
+    ['2026-11-15T09:00:00Z','2026-11-23'],
+    ['2026-07-11T18:00:00Z','2026-07-13'],
+    ['2026-07-11T18:00:01Z','2026-07-20'],
+    ['2026-10-24T18:00:00Z','2026-10-26'],
+    ['2026-10-24T18:00:01Z','2026-11-02'],
+  ])('%s allows Monday %s', (now,monday) => expect(nextStartMonday(new Date(now))).toBe(monday));
+  it('keeps a later stored start Monday', () => expect(startMondayAtSignature('2026-11-30',new Date('2026-11-14T19:00:00Z'))).toBe('2026-11-30'));
+  it('deadline is the Saturday immediately before Monday', () => expect(signingSaturday('2026-11-16')).toBe('2026-11-14'));
+  it.each([['2026-11-16','2026-11-23'],['2026-12-28','2027-01-04']])('first payment is seven days after %s', (start,pay) => expect(firstPaymentMonday(start)).toBe(pay));
 });
 
-describe("poster emails are always English", () => {
-  it("accepted/contract email for langue es renders in English", async () => {
-    await posterEmails.accepted("p@example.com", "Ana Lopez", "es", "2026-10-26", "https://sophia-culture.com/creators/sign/t", 14, null, null);
-    const m = sendCalls[0]!;
-    console.log("SUBJECT:", m.subject, "\nTEXT:", m.text.slice(0, 400));
-    expect(m.text).toContain("Hi Ana,");
-    expect(m.text).not.toContain("Hola");
-    expect(m.text).toContain("October");
-  });
-  it.each(["es", "it", "pt", "de", "fr"] as const)("rejected/expired/payout/ack in %s use English", async (l) => {
-    await posterEmails.rejected("p@example.com", "Ana", l, null);
-    await posterEmails.expired("p@example.com", "Ana", l);
-    await posterEmails.payout("p@example.com", "Ana", l, "https://x");
-    await posterEmails.ack("p@example.com", "Ana", l, "open");
-    for (const m of sendCalls) expect(m.text.startsWith("Hi Ana,")).toBe(true);
-  });
+// Owner-requested HTML/text test renders; transport is mocked, no real emails or passwords.
+it('renders accepted, reminder and logins for preview review without sending', async () => {
+  vi.useFakeTimers(); vi.setSystemTime(new Date('2026-11-10T18:37:00Z'));
+  calls.length = 0;
+  await posterEmails.accepted('demo@example.invalid','Ana Demo','es','2026-11-16','https://vik-studios-creators.com/creators/sign/preview-not-a-real-token',14,null,null);
+  await posterEmails.remindSignature('demo@example.invalid','Ana Demo','https://vik-studios-creators.com/creators/sign/preview-not-a-real-token','2026-11-16');
+  await posterEmails.logins('demo@example.invalid','Ana Demo','es',{osUrl:'https://dashboard.example.invalid',login:'demo@example.invalid',password:'DEMO — not a real password',slack:'https://join.slack.com/example-preview',monday:'2026-11-16',ruulEmail:'demo@example.invalid',weekly:14});
+  mkdirSync('/tmp/poster-email-renders',{recursive:true});
+  calls.forEach((m,i) => { const slug=['accepted','signature-reminder','logins'][i]; writeFileSync(`/tmp/poster-email-renders/${slug}.html`,m.html);writeFileSync(`/tmp/poster-email-renders/${slug}.txt`,`${m.subject}\n\n${m.text}`); });
+  expect(calls).toHaveLength(3);
+  vi.useRealTimers();
 });
