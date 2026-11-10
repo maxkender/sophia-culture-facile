@@ -33,7 +33,7 @@ export function captureAttribution(store:Store, raw:string, marketing:boolean, n
     const saved=JSON.parse(store.getItem(ATTRIBUTION_STORAGE_KEY)??"null") as {data:Attribution;expiresAt:number}|null;
     const valid=saved && saved.expiresAt>now && attributionSchema.safeParse(saved.data).success;
     let data=valid ? {...saved.data} : current;
-    const newTouch = UTM_KEYS.some(k=>Boolean(current[k])) && (!valid || data.landing_url !== current.landing_url);
+    const newTouch = UTM_KEYS.some(k=>Boolean(current[k])) && (!valid || UTM_KEYS.some(k=>data[k]!==current[k]));
     if(newTouch) data=current;
     // A click identifier can be consented to later on the same landing; never import one from a different touch.
     if(marketing && current.fbclid && data.landing_url===current.landing_url) {

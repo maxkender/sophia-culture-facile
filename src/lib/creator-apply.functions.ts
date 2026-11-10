@@ -117,6 +117,7 @@ export const submitUgcApplication = createServerFn({ method: "POST" })
 
 const slideSchema = z.object({
   ...attributionSchema.shape,
+  meta_event_id: z.string().uuid().optional(),
   marketing_consent: marketingConsentSchema.nullish(),
   ref: referralCodeSchema.nullish(),
   website: z.string().max(200).optional(),
