@@ -53,7 +53,8 @@ export async function handleOsEmail(request: Request, secret: string | undefined
       method: "POST",
       headers: { "api-key": brevoKey, "content-type": "application/json", accept: "application/json" },
       body: JSON.stringify({
-        sender: { name: parsed.from_name, email: "noreply@sophia-culture.com" },
+        sender: { name: parsed.from_name, email: "support@vikstudios.com" },
+        replyTo: { email: "support@reply.vikstudios.com", name: "Vik Studios" },
         to: [{ email: parsed.to }], subject: parsed.subject,
         htmlContent: parsed.html, textContent: parsed.text, tags: parsed.tags,
         headers: { "List-Unsubscribe": `<${parsed.unsubscribe_url}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" },
