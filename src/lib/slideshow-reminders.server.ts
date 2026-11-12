@@ -47,8 +47,10 @@ export function dueReminder(app: AppLike, now = new Date()): RemindKey | null {
 }
 
 async function stamp(a: any, appId: string, key: string, by: string) {
-  const { data } = await a.from("slideshow_applications").select("timeline").eq("id", appId).maybeSingle();
-  await a.from("slideshow_applications").update({ timeline: { ...((data?.timeline as object) ?? {}), [key]: { at: new Date().toISOString(), by } } }).eq("id", appId);
+  const { data, error: readError } = await a.from("slideshow_applications").select("timeline").eq("id", appId).maybeSingle();
+  if (readError || !data) throw new Error("reminder_timeline_read_failed");
+  const { error } = await a.from("slideshow_applications").update({ timeline: { ...((data.timeline as object) ?? {}), [key]: { at: new Date().toISOString(), by } } }).eq("id", appId);
+  if (error) throw new Error("reminder_timeline_write_failed");
 }
 
 export async function sendSignatureReminder(a: any, app: AppLike & { id: string; email: string; full_name: string }, key: RemindKey, by: string) {
@@ -68,14 +70,19 @@ export async function runSignatureReminders(a: any, now = new Date()) {
   const since = new Date(now.getTime() - AUTO_WINDOW_DAYS * DAY).toISOString();
   const { data, error } = await a.from("slideshow_applications").select(COLS)
     .in("status", ["accepted", "approved"]).is("agreement_signed_at", null).is("contract_signed_at", null)
-    .is("unsubscribed_at", null).gte("accepted_at", since).limit(500);
+    .is("unsubscribed_at", null).gte("accepted_at", since)
+    .lte("accepted_at", new Date(now.getTime() - DAY).toISOString())
+    .order("accepted_at", { ascending: true });
   if (error) throw new Error(error.message);
   let sent = 0, failed = 0;
   for (const app of data ?? []) {
     const key = dueReminder(app, now);
     if (!key) continue;
     const r = await sendSignatureReminder(a, app, key, "Automatic reminder").catch((e: Error) => ({ sent: false as const, reason: e.message }));
-    if (r.sent) sent++; else failed++;
+    if (r.sent) sent++; else {
+      failed++;
+      console.error("[slides-remind] reminder failed", { id: app.id, key, reason: r.reason });
+    }
   }
   return { ok: true, checked: data?.length ?? 0, sent, failed };
 }

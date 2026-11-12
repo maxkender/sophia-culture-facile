@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Done
+- Creator emails: shared Help-only footer on eight site-authored variants, exact shared Ruul payment copy, unchanged sender/design; 18 October unsigned acceptances identified outside original seven-day window. Hourly reminders currently work; removed arbitrary query limit and added failure diagnostics/log-write checks. 166 tests and desktop/mobile fictional renders passed; no messages sent or publication.
 - Ruul poster rewrite: English acceptance/reminder/access emails, invitation-only onboarding, Saturday 20:00 Paris deadline, optional prefilled signing email, retired payment-choice flow, live guide setting, mocked renders and regression checks; no messages sent, not published.
 - Admin sign-in: /auth and /hub show Vik Studios Hub with no creator link; magic/recovery links use public same-origin pages. Two tests and desktop/mobile preview checks passed; no emails sent, not published.
 - Slideshow-only cleanup (10/11): marketing, /start, UGC, influencers, authors/Studio, UnSwipe and go links removed; mini landing at / /en /fr; old creator URLs 301 to the slideshow page; 12 ugc-* schedules removed; domain unchanged. Restore point 2908c0bc. Not published.
@@ -8,6 +9,7 @@
 - Pass 2 — /start web-to-app funnel rebuilt to the iOS onboarding spec (30 steps, FR/EN, paywalls A/B, taap.it success, dataLayer events with ?src, resume, noindex). Tested end-to-end at 390px; not published.
 
 ## Open
+- OS-authored referral email wording: external OS owns the HTML/text passed to this site's relay, so its templates must adopt Help-only support there; local poster templates are updated and relay behavior remains unchanged.
 - Admin auth Site URL: owner must set https://vik-studios-creators.com in More → Users → Auth settings → Advanced. Hosted read confirms new and old domain redirect patterns are already allowed; Site URL still uses the published Lovable address. No agent tool can change this setting.
 - Meta slideshow: pixel 1755822698850602 enabled behind consent; last-UTM attribution, identifiers, browser UUID deduplication, Source column and matching payload built. 54 tests and mocked pixel consent/browser checks passed. CAPI transport still disabled: no available Meta connection, META_CAPI_TOKEN absent; real successful submission/provider receipt and privacy disclosure remain unverified. Not published.
 - Parcours Ruul: OS team must enable parrainages and confirm final referral field names; exact first-login/first-post dates also need OS timestamps. Table, filters/CSV and authenticated mobile/desktop checks completed; not published.

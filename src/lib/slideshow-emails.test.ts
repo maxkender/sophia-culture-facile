@@ -32,5 +32,11 @@ it('renders accepted, reminder and logins for preview review without sending', a
   mkdirSync('/tmp/poster-email-renders',{recursive:true});
   calls.forEach((m,i) => { const slug=['accepted','signature-reminder','logins'][i]; writeFileSync(`/tmp/poster-email-renders/${slug}.html`,m.html);writeFileSync(`/tmp/poster-email-renders/${slug}.txt`,`${m.subject}\n\n${m.text}`); });
   expect(calls).toHaveLength(3);
+  await posterEmails.ack('demo@example.invalid','Ana Demo','es','open');
+  await posterEmails.ack('demo@example.invalid','Ana Demo','tr' as never,'closed');
+  await posterEmails.ack('demo@example.invalid','Ana Demo','fr','neutral');
+  await posterEmails.rejected('demo@example.invalid','Ana Demo','es',null);
+  await posterEmails.expired('demo@example.invalid','Ana Demo','fr');
+  calls.slice(3).forEach((m,i) => { const slug=['application-open','application-closed','application-neutral','rejected','expired'][i]; writeFileSync(`/tmp/poster-email-renders/${slug}.html`,m.html);writeFileSync(`/tmp/poster-email-renders/${slug}.txt`,`${m.subject}\n\n${m.text}`); });
   vi.useRealTimers();
 });
