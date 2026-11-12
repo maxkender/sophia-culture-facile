@@ -57,6 +57,23 @@ export const setAutoAccept = createServerFn({ method: "POST" })
     return { enabled: data.enabled };
   });
 
+export const getOsSendsWelcome = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { data } = await (await admin()).from("hub_settings").select("value").eq("key", "os_sends_welcome").maybeSingle();
+    return { enabled: String(data?.value ?? "false") === "true" };
+  });
+
+export const setOsSendsWelcome = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ enabled: z.boolean() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    await (await admin()).from("hub_settings").upsert({ key: "os_sends_welcome", value: String(data.enabled), updated_at: new Date().toISOString() });
+    return { enabled: data.enabled };
+  });
+
 export const testOsConnection = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

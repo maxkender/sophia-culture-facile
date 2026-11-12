@@ -80,7 +80,9 @@ export async function createPosterInOs(admin: Admin, applicationId: string) {
   }).eq("id", a.id);
   await tick(admin, a.id, "os_created", "Sophia OS");
   // The OS returns password: null when the poster already existed and already logged in — no logins email then.
-  if (typeof r.password === "string" && r.password) {
+  const { data: osWelcome } = await admin.from("hub_settings").select("value").eq("key", "os_sends_welcome").maybeSingle();
+  // os_sends_welcome=true hands the welcome/logins email to the OS; poster creation above is unchanged.
+  if (typeof r.password === "string" && r.password && String(osWelcome?.value ?? "false") !== "true") {
     const l = pickLang(a.langue);
     const { data: pz } = await admin.from("pay_zones").select("weekly_amount").eq("zone", a.zone).maybeSingle();
     await posterEmails.logins(a.email, a.full_name, l, {

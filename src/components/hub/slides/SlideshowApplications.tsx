@@ -42,7 +42,7 @@ import { applicationSource, attributionCsv, sourceDeclared, SOURCE_LABELS } from
 import { Download } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { autoAcceptReason, takenEmails } from "@/lib/slideshow-auto-accept";
-import { getAutoAccept, setAutoAccept } from "@/lib/slideshows.functions";
+import { getAutoAccept, getOsSendsWelcome, setOsSendsWelcome, setAutoAccept } from "@/lib/slideshows.functions";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 /** Accepted, not signed, not unsubscribed/expired: the only applications a signature reminder can go to. */
@@ -272,7 +272,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
   }
   return (
     <div className="space-y-3">
-      <AutoAcceptSwitch />
+      <div className="flex flex-wrap gap-2"><AutoAcceptSwitch /><OsWelcomeSwitch /></div>
       <p className="crm-count">
         {rows.length} applications · {apps.filter((a) => a.status === "pending").length} pending
       </p>
@@ -1308,6 +1308,26 @@ function AcceptAllValidButton({ n }: { n: number }) {
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+/** Hub setting os_sends_welcome: when ON the site stops sending the post-signature welcome email. */
+function OsWelcomeSwitch() {
+  const qc = useQueryClient();
+  const get = useServerFn(getOsSendsWelcome);
+  const set = useServerFn(setOsSendsWelcome);
+  const { data } = useQuery({ queryKey: ["hub", "slides", "os-welcome"], queryFn: () => get(), staleTime: 60000 });
+  const [saving, setSaving] = useState(false);
+  const on = data?.enabled ?? false;
+  return (
+    <label className="flex w-fit items-center gap-2 rounded border border-brand-line px-3 py-1.5 text-sm">
+      <Switch checked={on} disabled={!data || saving} aria-label="Welcome email sent by the OS" onCheckedChange={async (v) => {
+        setSaving(true);
+        try { await set({ data: { enabled: v } }); await qc.invalidateQueries({ queryKey: ["hub", "slides", "os-welcome"] }); toast.success(`Welcome email sent by the OS: ${v ? "ON" : "OFF"}`); }
+        catch { toast.error("Could not save"); } finally { setSaving(false); }
+      }} />
+      <span className="font-medium">Welcome email sent by the OS: {on ? "ON" : "OFF"}</span>
+    </label>
   );
 }
 

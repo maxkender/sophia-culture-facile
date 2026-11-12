@@ -37,5 +37,5 @@ UGC acceptance/onboarding mutations use authenticated server functions to valida
 - Every absolute link comes from SITE_URL in src/config/site.ts (server code may override via env SITE_URL); why: the domain moved once already and must change in one place.
 - Admin auth email callbacks use admin-auth-links.ts with the current origin and public /auth or /reset-password paths; /auth validates the recovered user's role before routing, so removed author paths and anonymous account creation are not used.
 
-- Poster email layout is isolated in slideshow-email-render.ts; Paris cutoff dates are shared in slideshow-start.ts; why: one deadline calculation across acceptance, signing and reminders without changing other email layouts.
+- Poster email layout is isolated in slideshow-email-render.ts; Paris Sunday-midnight cutoff dates are shared in slideshow-start.ts; why: one deadline calculation across acceptance, signing and reminders without changing other email layouts.
 - Poster templates share the Help footer and one payment-copy helper; reminder jobs preserve the seven-day no-backfill window and report send/timeline failures, with no arbitrary 500-row cut; why: consistent messages and observable reminders without contacting historical applicants.

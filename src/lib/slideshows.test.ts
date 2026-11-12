@@ -35,7 +35,8 @@ describe("slideshow start Monday at signature (Paris)", () => {
   });
   it.each([
     ["2026-10-23", "2026-10-26"],
-    ["2026-10-24", "2026-11-02"],
+    ["2026-10-24", "2026-10-26"],
+    ["2026-10-25", "2026-11-02"],
     ["2026-10-26", "2026-11-02"],
   ])("signing on %s starts on %s", (signed, expected) => {
     expect(startMondayAtSignature("2026-10-26", new Date(`${signed}T23:59:59Z`))).toBe(expected);

@@ -3,22 +3,20 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 const calls: { html: string; text: string; subject: string; to: string }[] = [];
 vi.mock('./brevo.server', () => ({ sendBrevoEmail: vi.fn(async (o) => { calls.push(o); return { sent: true }; }) }));
 import { firstPaymentMonday, posterEmails } from './slideshow-emails.server';
-import { nextStartMonday, signingSaturday, startMondayAtSignature } from './slideshow-start';
+import { nextStartMonday, signingSunday, startMondayAtSignature } from './slideshow-start';
 
-describe('Saturday 20:00 Europe/Paris cutoff', () => {
+describe('Sunday midnight Europe/Paris cutoff', () => {
   it.each([
-    ['2026-11-14T18:59:59Z','2026-11-16'],
-    ['2026-11-14T19:00:00Z','2026-11-16'],
-    ['2026-11-14T19:00:00.001Z','2026-11-23'],
-    ['2026-11-14T19:00:01Z','2026-11-23'],
-    ['2026-11-15T09:00:00Z','2026-11-23'],
-    ['2026-07-11T18:00:00Z','2026-07-13'],
-    ['2026-07-11T18:00:01Z','2026-07-20'],
-    ['2026-10-24T18:00:00Z','2026-10-26'],
-    ['2026-10-24T18:00:01Z','2026-11-02'],
+    ['2026-11-14T19:00:01Z','2026-11-16'],
+    ['2026-11-15T22:59:59Z','2026-11-16'],
+    ['2026-11-15T23:00:00Z','2026-11-23'],
+    ['2026-11-16T09:00:00Z','2026-11-23'],
+    ['2026-07-12T21:59:59Z','2026-07-13'],
+    ['2026-07-12T22:00:00Z','2026-07-20'],
+    ['2026-10-25T22:59:59Z','2026-10-26'],
   ])('%s allows Monday %s', (now,monday) => expect(nextStartMonday(new Date(now))).toBe(monday));
   it('keeps a later stored start Monday', () => expect(startMondayAtSignature('2026-11-30',new Date('2026-11-14T19:00:00Z'))).toBe('2026-11-30'));
-  it('deadline is the Saturday immediately before Monday', () => expect(signingSaturday('2026-11-16')).toBe('2026-11-14'));
+  it('deadline is the Sunday immediately before Monday', () => expect(signingSunday('2026-11-16')).toBe('2026-11-15'));
   it.each([['2026-11-16','2026-11-23'],['2026-12-28','2027-01-04']])('first payment is seven days after %s', (start,pay) => expect(firstPaymentMonday(start)).toBe(pay));
 });
 
