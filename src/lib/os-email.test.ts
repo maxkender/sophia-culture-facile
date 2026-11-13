@@ -19,7 +19,7 @@ describe("OS email request", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true, message_id: "<provider-id>" });
     const sent = JSON.parse(String(fetcher.mock.calls[0]?.[1]?.body));
-    expect(sent).toEqual({ sender: { name: "Sophia", email: "support@vikstudios.com" }, replyTo: { email: "support@reply.vikstudios.com", name: "Vik Studios" }, to: [{ email: "test@example.com" }], subject: "Referral update", htmlContent: "<p>Update</p>", textContent: "Update", tags: ["parrainage"], headers: { "List-Unsubscribe": "<https://example.com/unsubscribe>", "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } });
+    expect(sent).toEqual({ sender: { name: "Sophia", email: "support@vikstudios.com" }, replyTo: { email: "support@vikstudios.com", name: "Vik Studios" }, to: [{ email: "test@example.com" }], subject: "Referral update", htmlContent: "<p>Update</p>", textContent: "Update", tags: ["parrainage"], headers: { "List-Unsubscribe": "<https://example.com/unsubscribe>", "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } });
   });
   it("rejects invalid action and header injection before sending", async () => {
     const fetcher = vi.fn();
