@@ -6980,6 +6980,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      record_slideshow_email_result: {
+        Args: { p_email: string; p_event: Json; p_key: string }
+        Returns: number
+      }
       slugify: { Args: { value: string }; Returns: string }
       ugc_draft_required: { Args: never; Returns: boolean }
       unaccent_fallback: { Args: { value: string }; Returns: string }

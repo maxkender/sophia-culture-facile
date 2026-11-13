@@ -4,6 +4,7 @@ import type { ApplicantLang } from '@/config/countries';
 import { unsubscribeUrl } from './slideshow-unsubscribe.server';
 import { renderPosterEmail, type PosterEmailContent } from './slideshow-email-render';
 import { signingSunday, startMondayAtSignature } from './slideshow-start';
+import { recordPosterEmail } from './slideshow-email-audit.server';
 
 export const POSTER_GUIDE_URL = 'https://star-water-a0e.notion.site/Vik-Studios-TikTok-Poster-Guide-3f4241308d6681f8ad41dc507f2c8505';
 export const POSTER_EMAIL_LANG: ApplicantLang = 'en';
@@ -20,7 +21,9 @@ const guide = (url: string | null | undefined) => !url || url.includes('app.noti
 const payment = (amount: number|null) => `How you get paid: through Ruul, a simple platform for freelancers. After you sign, we invite you to Ruul by email: accept the invitation and finish your Ruul account (2 minutes), then click "It's done" on your dashboard. Every Monday, you receive $${amount ?? '—'} for the week you posted (Monday to Sunday). Your first payment arrives the Monday after your first week of posting.`;
 async function send(to: string, name: string, subject: string, content: PosterEmailContent) {
   const unsub = unsubscribeUrl(to);
-  return sendBrevoEmail({ to, toName: name, subject, ...renderPosterEmail(content, unsub), headers: { 'List-Unsubscribe': `<${unsub}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } });
+  const result = await sendBrevoEmail({ to, toName: name, subject, ...renderPosterEmail(content, unsub), headers: { 'List-Unsubscribe': `<${unsub}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } });
+  await recordPosterEmail(to, subject, result);
+  return result;
 }
 export const posterEmails = {
   ack: (to: string, name: string, _lang: ApplicantLang, kind: 'open'|'closed'|'neutral' = 'closed') => send(to,name,'Thanks for applying',{ paragraphs: [`Hi ${first(name)},`, kind === 'open' ? "Thanks! Your application is in. Your country is open: we're reviewing it and will get back to you here shortly." : kind === 'neutral' ? "Thanks! Your application is in. We review every application and will get back to you here." : "Thanks! We open places country by country, week after week. If your country opens, we'll write to you here."] }),

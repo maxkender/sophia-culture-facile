@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { mkdirSync, writeFileSync } from 'node:fs';
 const calls: { html: string; text: string; subject: string; to: string }[] = [];
 vi.mock('./brevo.server', () => ({ sendBrevoEmail: vi.fn(async (o) => { calls.push(o); return { sent: true }; }) }));
+vi.mock('./slideshow-email-audit.server', () => ({ recordPosterEmail: vi.fn() }));
 import { firstPaymentMonday, posterEmails } from './slideshow-emails.server';
 import { nextStartMonday, signingSunday, startMondayAtSignature } from './slideshow-start';
 

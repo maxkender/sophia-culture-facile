@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { handleOsEmail, handleOsEmailEvent, hubSecretMatches, osEmailMethodNotAllowed } from "./os-email.server";
+vi.mock('./slideshow-email-audit.server', () => ({ recordPosterEmail: vi.fn() }));
 
 const payload = { action: "envoyer_email", to: "test@example.com", from_name: "Sophia", subject: "Referral update", html: "<p>Update</p>", text: "Update", tags: ["parrainage"], unsubscribe_url: "https://example.com/unsubscribe" };
 const request = (body: unknown, headers: Record<string, string> = {}) => new Request("https://example.com/api/public/os-email", { method: "POST", headers: { "content-type": "application/json", ...headers }, body: JSON.stringify(body) });

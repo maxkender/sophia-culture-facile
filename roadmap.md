@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Done
+- Brevo catch-up (13 Nov): one acceptance to each of 17 eligible people and one reminder to Maria Jönsson, existing signing links and verified zone rates; all 18 accepted by Brevo, outcomes checked by message ID and recorded in timelines. No welcome emails. All site poster templates and OS relay now audit provider results atomically; Hub history shows IDs and failures. 168 tests passed; not published. Admin preview inspection awaits a signed-in session.
 - Creator emails: shared Help-only footer on eight site-authored variants, exact shared Ruul payment copy, unchanged sender/design; 18 October unsigned acceptances identified outside original seven-day window. Hourly reminders currently work; removed arbitrary query limit and added failure diagnostics/log-write checks. 166 tests and desktop/mobile fictional renders passed; no messages sent or publication.
 - Ruul poster rewrite: English acceptance/reminder/access emails, invitation-only onboarding, Saturday 20:00 Paris deadline, optional prefilled signing email, retired payment-choice flow, live guide setting, mocked renders and regression checks; no messages sent, not published.
 - Admin sign-in: /auth and /hub show Vik Studios Hub with no creator link; magic/recovery links use public same-origin pages. Two tests and desktop/mobile preview checks passed; no emails sent, not published.

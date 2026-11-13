@@ -1,5 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
+import { recordPosterEmail } from './slideshow-email-audit.server';
 
 const headerText = z.string().trim().min(1).max(200).refine((value) => !/[\r\n]/.test(value));
 const httpsUrl = z.string().max(2000).url().refine((value) => new URL(value).protocol === "https:");
@@ -47,7 +48,10 @@ export async function handleOsEmail(request: Request, secret: string | undefined
   let parsed: z.infer<typeof osEmailSchema>;
   try { parsed = osEmailSchema.parse(await readBoundedJson(request, 450_000)); }
   catch { return json({ ok: false, error: "invalid_request" }, 400); }
-  if (!brevoKey) return json({ ok: false, error: "email_provider_not_configured" }, 503);
+  if (!brevoKey) {
+    await recordPosterEmail(parsed.to, parsed.subject, { sent: false, reason: 'email_provider_not_configured' });
+    return json({ ok: false, error: "email_provider_not_configured" }, 503);
+  }
   try {
     const response = await fetcher("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
@@ -65,11 +69,19 @@ export async function handleOsEmail(request: Request, secret: string | undefined
     if (!response.ok) {
       // Error codes, not echoed arbitrary provider content: no credential/body leakage.
       const code = typeof result?.code === "string" && /^[a-z0-9_-]{1,80}$/i.test(result.code) ? result.code : "email_provider_error";
+      await recordPosterEmail(parsed.to, parsed.subject, { sent: false, reason: `brevo_${response.status}: ${code}` });
       return json({ ok: false, error: code }, response.status >= 400 && response.status <= 599 ? response.status : 502);
     }
-    if (typeof result?.messageId !== "string" || !result.messageId) return json({ ok: false, error: "missing_message_id" }, 502);
+    if (typeof result?.messageId !== "string" || !result.messageId) {
+      await recordPosterEmail(parsed.to, parsed.subject, { sent: false, reason: 'missing_message_id' });
+      return json({ ok: false, error: "missing_message_id" }, 502);
+    }
+    await recordPosterEmail(parsed.to, parsed.subject, { sent: true, messageId: result.messageId });
     return json({ ok: true, message_id: result.messageId });
-  } catch { return json({ ok: false, error: "email_provider_unavailable" }, 502); }
+  } catch {
+    await recordPosterEmail(parsed.to, parsed.subject, { sent: false, reason: 'email_provider_unavailable' });
+    return json({ ok: false, error: "email_provider_unavailable" }, 502);
+  }
 }
 
 export const brevoEventSchema = z.object({

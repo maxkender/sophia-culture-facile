@@ -581,7 +581,7 @@ export function PosterCard({
     }
   }
   const z = zones.find((x) => x.zone === zone);
-  const tl = (a.timeline ?? {}) as unknown as Record<string, { at: string; by: string }>;
+  const tl = (a.timeline ?? {}) as unknown as Record<string, { at: string; by: string; sent?: boolean; subject?: string; messageId?: string | null; reason?: string | null }>;
   const decided = !["pending", "pool"].includes(a.status);
   // Accept gates: the OS zone must be open, and Ruul must be able to pay the country.
   const iso = countryCodeOf(a.country);
@@ -1049,10 +1049,11 @@ export function PosterCard({
       </div>
       <section className="border-t border-brand-line pt-3">
         <h2 className="mb-2 font-semibold">History</h2>
+        {Object.values(tl).some((event) => event.sent === false) ? <p className="mb-2 text-sm text-destructive">Email sending failure — see details below</p> : null}
         <ul className="space-y-2 text-xs">
           {Object.entries(tl).map(([key, event]) => (
             <li key={key} className="flex flex-wrap justify-between gap-2">
-              <span>{key.replace(/_/g, " ")}</span>
+              <span>{event.subject ?? key.replace(/_/g, " ")}{event.sent === false ? <span className="block text-destructive">Failed: {event.reason ?? "Email not sent"}</span> : null}{event.sent === true ? <span className="block text-brand-navySoft">Accepted by Brevo{event.messageId ? ` · ${event.messageId}` : ""}</span> : null}</span>
               <span className="text-brand-navySoft">
                 {fmt(event?.at)}
                 {event?.by ? ` · ${event.by}` : ""}

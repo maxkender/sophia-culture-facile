@@ -39,3 +39,4 @@ UGC acceptance/onboarding mutations use authenticated server functions to valida
 
 - Poster email layout is isolated in slideshow-email-render.ts; Paris Sunday-midnight cutoff dates are shared in slideshow-start.ts; why: one deadline calculation across acceptance, signing and reminders without changing other email layouts.
 - Poster templates share the Help footer and one payment-copy helper; reminder jobs preserve the seven-day no-backfill window and report send/timeline failures, with no arbitrary 500-row cut; why: consistent messages and observable reminders without contacting historical applicants.
+- Poster templates and OS relay audit every Brevo result with slideshow-email-audit.server.ts and a service-role-only atomic timeline merge; Hub shows failures and message IDs, never equates send acceptance with delivery; why: provider failures must remain visible without lifecycle changes.
