@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Done
+- Creator branding: Vik Studios sender names (including forced OS relay), public recruiting headings/consent in 30 languages, signing/unsubscribe titles and acceptance copy; Sophia app and Sophia OS dashboard names retained. Tests and public page checks completed; no emails sent, owner publishes. OS-authored message bodies remain external templates.
 - Signing page: exact English after-signing box above Signature, shared start Monday rule; desktop/mobile checked on an unsigned page without signing, 171 tests passed. Test applicant signature and OS creation confirmed read-only; not published.
 - Brevo catch-up (13 Nov): one acceptance to each of 17 eligible people and one reminder to Maria Jönsson, existing signing links and verified zone rates; all 18 accepted by Brevo, outcomes checked by message ID and recorded in timelines. No welcome emails. All site poster templates and OS relay now audit provider results atomically; Hub history shows IDs and failures. 168 tests passed; not published. Admin preview inspection awaits a signed-in session.
 - Creator emails: shared Help-only footer on eight site-authored variants, exact shared Ruul payment copy, unchanged sender/design; 18 October unsigned acceptances identified outside original seven-day window. Hourly reminders currently work; removed arbitrary query limit and added failure diagnostics/log-write checks. 166 tests and desktop/mobile fictional renders passed; no messages sent or publication.

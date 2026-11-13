@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Fragment, useEffect, useState, type ReactNode } from "react";
-import { Logo, LogoMark } from "@/components/site/Logo";
+import { LogoMark } from "@/components/site/Logo";
 import sophiaPlush from "@/assets/sophia-plush-cutout.png.asset.json";
 import { ROUTES } from "@/i18n/routes";
 import { SLIDESHOW_LANGUAGES, fillSlideshow, slideshowLanguage, slideshowPageFromPath, slideshowPath, slideshowStrings } from "@/i18n/slideshow-pages";
@@ -71,7 +71,7 @@ export function DocAvatar({ app }: { app?: string | undefined }) {
   const { data: apps = [] } = useApps();
   const a = app && app !== "sophia" ? apps.find((x) => x.slug === app) : undefined;
   if (!app || app === "sophia") {
-    return <div className="h-16"><Logo className="h-16 gap-3 [&>svg:first-child]:h-16 [&>svg:last-child]:h-11" /></div>;
+    return <div className="flex h-16 items-center font-doc text-[32px] font-bold text-doc-ink">Vik Studios</div>;
   }
   return (
     <div className="flex size-[72px] items-center justify-center overflow-hidden rounded-full bg-doc-avatar text-doc-paper md:size-24">
@@ -80,7 +80,7 @@ export function DocAvatar({ app }: { app?: string | undefined }) {
       ) : a ? (
         <span className="text-[32px] font-bold md:text-[40px]">{a.name.charAt(0)}</span>
       ) : (
-        <LogoMark className="doc-logo-white h-9 w-auto md:h-12" label="Sophia" />
+        <LogoMark className="doc-logo-white h-9 w-auto md:h-12" label="Sophia app" />
       )}
     </div>
   );
@@ -126,7 +126,7 @@ export function SlideshowDocLanding({ app: appProp }: { app?: string | undefined
   const app = appProp ?? queryApp;
   const { data: apps = [] } = useApps();
   const a = app && app !== "sophia" ? apps.find((x) => x.slug === app) : undefined;
-  const name = a?.name ?? "Sophia";
+  const name = "Vik Studios";
   const isSophia = !a;
   const [showPay, setShowPay] = useState(false);
   const [referralCode, setReferralCode] = useState<string | null>(null);
@@ -162,7 +162,7 @@ export function SlideshowDocLanding({ app: appProp }: { app?: string | undefined
   const sep = lang.code === "fr" ? " : " : ": ";
   const about = isSophia
     ? t.aboutSophia
-    : `${name}${a?.tagline ? ` (${a.tagline})` : ""}${a?.short_description ? `${sep}${a.short_description}` : ""} ${fillSlideshow(t.aboutOtherApp, vars)}`;
+    : `${a?.name}${a?.tagline ? ` (${a.tagline})` : ""}${a?.short_description ? `${sep}${a.short_description}` : ""} ${fillSlideshow(t.aboutOtherApp, { name: a?.name ?? "Sophia" })}`;
   const applyHref = withAttribution(withReferralCode(slideshowApplyWithCountry(withApp(slideshowPath(lang.urlCode, "apply"), app), country), referralCode), attribution);
 
   return (

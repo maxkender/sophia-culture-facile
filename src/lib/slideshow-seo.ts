@@ -10,9 +10,10 @@ export const loadSlideshowRange = (): Promise<PayRange> =>
 
 /** Head of a slideshow landing/form page in one language, with canonical and 30 hreflang alternates. */
 export function slideshowHead(urlCode: string, page: "landing" | "apply", range: PayRange | undefined) {
-  const lang = findSlideshowLanguage(urlCode) ?? findSlideshowLanguage("en")!;
+  const lang = findSlideshowLanguage(urlCode) ?? findSlideshowLanguage("en");
+  if (!lang) throw new Error("Missing English slideshow language");
   const s = slideshowStrings(lang.code);
-  const vars = { name: "Sophia", min: range?.min ?? 7, max: range?.max ?? 14 };
+  const vars = { name: "Vik Studios", min: range?.min ?? 7, max: range?.max ?? 14 };
   const title = fillSlideshow(page === "landing" ? s.landing.pageTitle : s.apply.pageTitle, vars);
   const description = fillSlideshow(s.landing.metaDescription, vars);
   const url = absUrl(slideshowPath(lang.urlCode, page));

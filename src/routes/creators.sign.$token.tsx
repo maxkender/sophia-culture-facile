@@ -13,10 +13,10 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/creators/sign/$token")({
   head: () => ({
     meta: [
-      { title: "Creator Account Agreement | Sophia" },
-      { name: "description", content: "Sign your Sophia Creator Account Agreement." },
-      { property: "og:title", content: "Creator Account Agreement | Sophia" },
-      { property: "og:description", content: "Sign your Sophia Creator Account Agreement." },
+      { title: "Creator Account Agreement | Vik Studios" },
+      { name: "description", content: "Sign your Vik Studios Creator Account Agreement." },
+      { property: "og:title", content: "Creator Account Agreement | Vik Studios" },
+      { property: "og:description", content: "Sign your Vik Studios Creator Account Agreement." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex, nofollow" },

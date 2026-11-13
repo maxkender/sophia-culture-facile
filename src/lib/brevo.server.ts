@@ -1,6 +1,6 @@
 // Server-only Brevo transactional email sender. Never import from client code.
 export const SUPPORT_EMAIL = "support@vikstudios.com";
-export const BREVO_SENDER = { name: "Sophia", email: SUPPORT_EMAIL };
+export const BREVO_SENDER = { name: "Vik Studios", email: SUPPORT_EMAIL };
 
 export type BrevoResult = { sent: boolean; messageId?: string; reason?: string };
 

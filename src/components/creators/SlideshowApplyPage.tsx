@@ -123,7 +123,7 @@ export function SlideshowApplyPage() {
     }
   }
 
-  const name = "Sophia";
+  const name = "Vik Studios";
   const landing = appSlug && appSlug !== "sophia" && (pageLang.code === "fr" || pageLang.code === "en")
     ? `${lang === "fr" ? "/fr/createurs" : "/en/creators"}/${appSlug}/slideshow`
     : withApp(slideshowPath(pageLang.urlCode, "landing"), appSlug ?? undefined);

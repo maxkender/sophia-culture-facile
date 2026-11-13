@@ -14,13 +14,13 @@ describe("OS email request", () => {
     expect(hubSecretMatches("wrong", "test-shared-value")).toBe(false);
     expect(hubSecretMatches("test-shared-value", undefined)).toBe(false);
   });
-  it("sends both formats, requested sender name, tags and one-click headers from Sophia", async () => {
+  it("forces Vik Studios sender despite the OS name, preserving formats, tags and one-click headers", async () => {
     const fetcher = vi.fn<typeof fetch>(async () => Response.json({ messageId: "<provider-id>" }, { status: 201 }));
     const response = await handleOsEmail(request(payload, { "x-hub-secret": "test-shared-value" }), "test-shared-value", "test-provider", fetcher);
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true, message_id: "<provider-id>" });
     const sent = JSON.parse(String(fetcher.mock.calls[0]?.[1]?.body));
-    expect(sent).toEqual({ sender: { name: "Sophia", email: "support@vikstudios.com" }, replyTo: { email: "support@vikstudios.com", name: "Vik Studios" }, to: [{ email: "test@example.com" }], subject: "Referral update", htmlContent: "<p>Update</p>", textContent: "Update", tags: ["parrainage"], headers: { "List-Unsubscribe": "<https://example.com/unsubscribe>", "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } });
+    expect(sent).toEqual({ sender: { name: "Vik Studios", email: "support@vikstudios.com" }, replyTo: { email: "support@vikstudios.com", name: "Vik Studios" }, to: [{ email: "test@example.com" }], subject: "Referral update", htmlContent: "<p>Update</p>", textContent: "Update", tags: ["parrainage"], headers: { "List-Unsubscribe": "<https://example.com/unsubscribe>", "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } });
   });
   it("rejects invalid action and header injection before sending", async () => {
     const fetcher = vi.fn();
