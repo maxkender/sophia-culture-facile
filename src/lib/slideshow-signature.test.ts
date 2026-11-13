@@ -43,9 +43,25 @@ vi.mock("@/integrations/supabase/client.server", () => ({
     },
   },
 }));
-import { signWithToken } from "./creator-agreement.functions";
+import { getSigningPage, signWithToken } from "./creator-agreement.functions";
 
 afterEach(() => vi.useRealTimers());
+
+describe("signing-page start Monday matches the signature date rule", () => {
+  it.each([
+    ["2026-11-13T12:00:00Z", "2026-11-16", "2026-11-16"],
+    ["2026-11-15T23:00:00Z", "2026-11-16", "2026-11-23"],
+    ["2026-11-13T12:00:00Z", "2026-11-30", "2026-11-30"],
+  ])("at %s displays %s as %s", async (now, stored, expected) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(now));
+    fake.app = { status: "accepted", start_monday: stored };
+    fake.writes = [];
+    const result = await getSigningPage({ data: { token: "test-token-no-real-contract" } });
+    expect(result).toMatchObject({ state: "ready", startMonday: expected });
+    expect(fake.writes).toHaveLength(0);
+  });
+});
 
 describe("signature persists the start before OS creation (mocked only)", () => {
   it.each([

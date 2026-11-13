@@ -13,6 +13,7 @@ export function CreatorAgreementForm({
   blocks,
   merge,
   onSign,
+  beforeSignature,
   extraField,
   extraValid = true,
 }: {
@@ -21,6 +22,7 @@ export function CreatorAgreementForm({
   blocks: DocBlock[];
   merge: MergeValues;
   onSign: (signedName: string) => Promise<void>;
+  beforeSignature?: React.ReactNode;
   extraField?: React.ReactNode;
   extraValid?: boolean;
 }) {
@@ -46,6 +48,7 @@ export function CreatorAgreementForm({
         <p className="mt-1 text-sm text-brand-navySoft">Version {version}</p>
         <DocumentBody blocks={blocks} merge={merge} className="mt-6" />
       </div>
+      {beforeSignature}
       <form onSubmit={submit} className="space-y-5 rounded-2xl border border-brand-line bg-card p-5">
         <h2 className="text-lg font-extrabold text-brand-navy">{ct("Signature")}</h2>
         <div className="flex items-start gap-3">
