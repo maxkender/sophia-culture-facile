@@ -148,7 +148,11 @@ export const signWithToken = createServerFn({ method: "POST" })
       try {
         const { createPosterInOs } = await import("./slideshows.server");
         await createPosterInOs(supabaseAdmin, app.id);
-      } catch { /* recorded on the card via os_error when possible */ }
+      } catch (e) {
+        // Record the thrown error on the card (Retry + cron pick it up); never block the signature.
+        const msg = (e instanceof Error ? e.message : String(e)).slice(0, 300) || "Unknown error";
+        try { await supabaseAdmin.from("slideshow_applications").update({ os_error: msg }).eq("id", app.id); } catch { /* ignore */ }
+      }
     }
     return { ok: true };
   });

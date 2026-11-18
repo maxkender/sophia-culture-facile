@@ -42,10 +42,12 @@ export const Route = createFileRoute("/api/public/cron/ugc/$job")({
           }
           if (params.job === "slides-os-retry") {
             const { createPosterInOs } = await import("@/lib/slideshows.server");
-            const { data: rows, error } = await a.from("slideshow_applications").select("id")
-              .eq("status", "contract_signed").not("agreement_signed_at", "is", null).not("os_error", "is", null)
-              .order("agreement_signed_at", { ascending: true }).limit(20);
+            const { shouldRetryOs } = await import("@/lib/slideshow-os-retry");
+            const { data: all, error } = await a.from("slideshow_applications").select("id, status, agreement_signed_at, os_created_at, os_error, start_monday")
+              .eq("status", "contract_signed").not("agreement_signed_at", "is", null).is("os_created_at", null)
+              .order("agreement_signed_at", { ascending: true });
             if (error) return Response.json({ error: error.message }, { status: 500 });
+            const rows = ((all ?? []) as any[]).filter((r) => shouldRetryOs(r)).slice(0, 20);
             let created = 0;
             const failed: { id: string; error: string }[] = [];
             for (const row of (rows ?? []) as { id: string }[]) {
