@@ -16,6 +16,7 @@ export const actionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("remind_signature"), id, step: z.union([z.literal(1), z.literal(3), z.literal(6)]) }),
   z.object({ action: z.literal("expire"), id }),
   z.object({ action: z.literal("move_start"), id, start_monday: monday }),
+  z.object({ action: z.literal("ruul_email"), application_id: z.string().uuid().nullable().optional(), hub_id: z.string().nullable().optional(), profile_id: z.string().uuid(), ruul_email: z.string().trim().toLowerCase().email().max(254) }),
 ]);
 
 const BY = { id: null, name: "Sophia OS" };
@@ -35,6 +36,20 @@ export async function listCandidatures(a: any, since: string | null) {
 }
 
 export async function runAction(a: any, input: z.infer<typeof actionSchema>): Promise<{ ok: true; [k: string]: unknown } | { ok: false; error: string }> {
+  if (input.action === "ruul_email") {
+    let app: any = null;
+    if (input.application_id) {
+      const { data } = await a.from("slideshow_applications").select("*").eq("id", input.application_id).maybeSingle();
+      app = data;
+    }
+    if (!app) {
+      const { data } = await a.from("slideshow_applications").select("*").eq("os_profile_id", input.profile_id).order("created_at", { ascending: false }).limit(1).maybeSingle();
+      app = data;
+    }
+    if (!app) return { ok: true, skipped: "no_application" };
+    await a.from("slideshow_applications").update({ ruul_email: input.ruul_email }).eq("id", app.id);
+    return { ok: true, updated: true };
+  }
   const { data: app } = await a.from("slideshow_applications").select("*").eq("id", input.id).maybeSingle();
   if (!app) return { ok: false, error: "Application not found" };
   switch (input.action) {

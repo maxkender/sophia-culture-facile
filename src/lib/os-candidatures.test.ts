@@ -15,6 +15,14 @@ describe("os-candidatures actions", () => {
     expect(actionSchema.safeParse({ action: "remind_signature", id, step: 3 }).success).toBe(true);
     expect(actionSchema.safeParse({ action: "remind_signature", id, step: 2 }).success).toBe(false);
   });
+  it("accepts a ruul_email action with a null application_id", () => {
+    const parsed = actionSchema.safeParse({ action: "ruul_email", application_id: null, hub_id: null, profile_id: id, ruul_email: "name@example.com" });
+    expect(parsed.success).toBe(true);
+    expect(parsed.data).toMatchObject({ action: "ruul_email", profile_id: id, ruul_email: "name@example.com" });
+  });
+  it("rejects a ruul_email action with an invalid email", () => {
+    expect(actionSchema.safeParse({ action: "ruul_email", application_id: null, profile_id: id, ruul_email: "not-an-email" }).success).toBe(false);
+  });
 });
 
 describe("unsubscribe link", () => {
