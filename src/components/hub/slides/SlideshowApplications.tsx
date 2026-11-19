@@ -227,27 +227,34 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
     setChecked((c) => (on ? (c.includes(id) ? c : [...c, id]) : c.filter((x) => x !== id)));
   }, []);
   const active = apps.find((a) => a.id === open);
-  const isClosed = (a: App) =>
-    Boolean(
-      zones?.ok &&
-      countryCodeOf(a.country) &&
-      !zones.ouverts.some((z) => z.pays_code === countryCodeOf(a.country)),
-    );
+  const isoOf = useMemo(() => {
+    const m = new Map<string, string | null>();
+    for (const a of apps) if (!m.has(a.country)) m.set(a.country, countryCodeOf(a.country) ?? null);
+    return (c: string) => (m.has(c) ? m.get(c)! : (countryCodeOf(c) ?? null));
+  }, [apps]);
+  const openZones = useMemo(
+    () => new Map((zones?.ok ? zones.ouverts : []).map((z) => [z.pays_code, z] as const)),
+    [zones],
+  );
+  const isClosed = (a: App) => {
+    const iso = isoOf(a.country);
+    return Boolean(zones?.ok && iso && !openZones.has(iso));
+  };
   const langOff = (a: App) => {
-    const iso = countryCodeOf(a.country);
-    const o = zones?.ok && iso ? zones.ouverts.find((z) => z.pays_code === iso) : undefined;
+    const iso = isoOf(a.country);
+    const o = iso ? openZones.get(iso) : undefined;
     return Boolean(o && (o as { langue_os?: boolean }).langue_os !== true);
   };
-  const validCount = apps.filter(
+  const validCount = useMemo(() => apps.filter(
     (a) =>
       ["pending", "pool"].includes(a.status) &&
       !isClosed(a) &&
-      Boolean(zones?.ok && countryCodeOf(a.country)) &&
+      Boolean(zones?.ok && isoOf(a.country)) &&
       !langOff(a) &&
-      !RUUL_BLOCKED.includes(countryCodeOf(a.country) ?? "") &&
-      !SLIDESHOW_CLOSED.includes(countryCodeOf(a.country) ?? "") &&
+      !RUUL_BLOCKED.includes(isoOf(a.country) ?? "") &&
+      !SLIDESHOW_CLOSED.includes(isoOf(a.country) ?? "") &&
       Boolean(a.zone),
-  ).length;
+  ).length, [apps, isoOf, openZones, zones]);
   const show = useCallback((a: App, action: "none" | "accept" | "reject" = "none") => {
     setOpen(a.id);
     setMode(action);
