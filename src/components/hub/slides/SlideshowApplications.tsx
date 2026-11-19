@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Country, DetailSheet, shortDate, StatusPill } from "./Crm";
@@ -221,7 +221,11 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
       statusInTab(a.status, status) &&
       `${a.full_name} ${a.email} ${a.country}`.toLowerCase().includes(search.toLowerCase()),
   );
-  const selected = apps.filter((a) => checked.includes(a.id));
+  const checkedSet = useMemo(() => new Set(checked), [checked]);
+  const selected = useMemo(() => apps.filter((a) => checkedSet.has(a.id)), [apps, checkedSet]);
+  const toggle = useCallback((id: string, on: boolean) => {
+    setChecked((c) => (on ? (c.includes(id) ? c : [...c, id]) : c.filter((x) => x !== id)));
+  }, []);
   const active = apps.find((a) => a.id === open);
   const isClosed = (a: App) =>
     Boolean(
@@ -244,10 +248,10 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
       !SLIDESHOW_CLOSED.includes(countryCodeOf(a.country) ?? "") &&
       Boolean(a.zone),
   ).length;
-  const show = (a: App, action: "none" | "accept" | "reject" = "none") => {
+  const show = useCallback((a: App, action: "none" | "accept" | "reject" = "none") => {
     setOpen(a.id);
     setMode(action);
-  };
+  }, []);
   async function refuseSelected() {
     setBusy(true);
     let refused = 0;
@@ -363,7 +367,7 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
                 <input
                   type="checkbox"
                   aria-label="Select all shown"
-                  checked={rows.length > 0 && rows.every((a) => checked.includes(a.id))}
+                  checked={rows.length > 0 && rows.every((a) => checkedSet.has(a.id))}
                   onChange={(e) => setChecked(e.target.checked ? rows.map((a) => a.id) : [])}
                 />
               </th>
@@ -378,87 +382,17 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
             </tr>
           </thead>
           <tbody>
-            {rows.map((a) => (
-              <tr
+{rows.map((a) => (
+              <ApplicationRow
                 key={a.id}
-                className="cursor-pointer border-t border-brand-line"
-                onClick={() => show(a)}
-              >
-                <td onClick={(e) => e.stopPropagation()}>
-                  <input
-                    type="checkbox"
-                    aria-label={`Select ${a.full_name}`}
-                    checked={checked.includes(a.id)}
-                    onChange={(e) =>
-                      setChecked(
-                        e.target.checked ? [...checked, a.id] : checked.filter((id) => id !== a.id),
-                      )
-                    }
-                  />
-                </td>
-                <td>
-                  <Button
-                    variant="link"
-                    className="h-auto p-0 text-sm font-medium text-brand-navy"
-                    onClick={() => show(a)}
-                  >
-                    {a.full_name}
-                  </Button>
-                  {a.referred ? (
-                    <span title={a.referral_name ?? ""} className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">
-                      Referred
-                    </span>
-                  ) : null}
-                  {applicationSource(a) === "meta" || ["facebook","fb","instagram","ig","meta"].includes(a.utm_source?.toLowerCase() ?? "") || a.fbclid ? <span className="ml-2 rounded bg-space-slides/10 px-1.5 py-0.5 text-[10px] text-space-slides">Meta</span> : null}
-                  {applicationSource(a) === "sophia_app" || a.utm_source?.trim().toLowerCase() === "sophia_app" ? <span className="ml-2 rounded bg-space-slides/10 px-1.5 py-0.5 text-[10px] text-space-slides">Sophia app</span> : null}
-                  {sourceDeclared(a) ? <span className="ml-1 text-[10px] text-muted-foreground">declared</span> : null}
-                </td>
-                <td>
-                  <Country country={a.country} />
-                  {isClosed(a) ? (
-                    <span className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">
-                      Closed in OS
-                    </span>
-                  ) : langOff(a) ? (
-                    <span className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">
-                      Language not in OS
-                    </span>
-                  ) : null}
-                </td>
-                <td className="max-w-56 whitespace-normal break-words">
-                  {a.utm_source?.trim().toLowerCase()==="meta" ? `Meta${a.utm_content ? ` · ${a.utm_content}` : ""}` : a.utm_source || "—"}
-                </td>
-                <td>{a.zone ?? "—"}</td>
-                <td>
-                  <StatusPill status={a.status} />
-                  {autoReason(a) ? <span title="Not auto-accepted" className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">{autoReason(a)}</span> : null}
-                </td>
-                <td className="whitespace-nowrap">{shortDate(a.created_at)}</td>
-                <td className="whitespace-nowrap">{shortDate(a.start_monday)}</td>
-                <td onClick={(e) => e.stopPropagation()}>
-                  {["pending", "pool"].includes(a.status) ? (
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        disabled={
-                          isClosed(a) ||
-                          Boolean(
-                            countryCodeOf(a.country) &&
-                            RUUL_BLOCKED.includes(countryCodeOf(a.country) ?? ""),
-                          )
-                        }
-                        onClick={() => show(a, "accept")}
-                      >
-                        Accept
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => show(a, "reject")}>
-                        Refuse
-                      </Button>
-                    </div>
-                  ) : null}
-                </td>
-              </tr>
+                a={a}
+                isChecked={checkedSet.has(a.id)}
+                closed={isClosed(a)}
+                langOff={langOff(a)}
+                autoReason={autoReason(a)}
+                onToggle={toggle}
+                onShow={show}
+              />
             ))}
           </tbody>
         </table>
@@ -1352,3 +1286,100 @@ function AutoAcceptSwitch() {
     </label>
   );
 }
+
+const ApplicationRow = memo(function ApplicationRow({
+  a,
+  isChecked,
+  closed,
+  langOff,
+  autoReason,
+  onToggle,
+  onShow,
+}: {
+  a: App;
+  isChecked: boolean;
+  closed: boolean;
+  langOff: boolean;
+  autoReason: string | null;
+  onToggle: (id: string, on: boolean) => void;
+  onShow: (a: App, action?: "none" | "accept" | "reject") => void;
+}) {
+  return (
+              <tr
+                key={a.id}
+                className="cursor-pointer border-t border-brand-line"
+                onClick={() => onShow(a)}
+              >
+                <td onClick={(e) => e.stopPropagation()}>
+                  <input
+                    type="checkbox"
+                    aria-label={`Select ${a.full_name}`}
+                    checked={isChecked}
+                    onChange={(e) => onToggle(a.id, e.target.checked)}
+                  />
+                </td>
+                <td>
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 text-sm font-medium text-brand-navy"
+                    onClick={() => onShow(a)}
+                  >
+                    {a.full_name}
+                  </Button>
+                  {a.referred ? (
+                    <span title={a.referral_name ?? ""} className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">
+                      Referred
+                    </span>
+                  ) : null}
+                  {applicationSource(a) === "meta" || ["facebook","fb","instagram","ig","meta"].includes(a.utm_source?.toLowerCase() ?? "") || a.fbclid ? <span className="ml-2 rounded bg-space-slides/10 px-1.5 py-0.5 text-[10px] text-space-slides">Meta</span> : null}
+                  {applicationSource(a) === "sophia_app" || a.utm_source?.trim().toLowerCase() === "sophia_app" ? <span className="ml-2 rounded bg-space-slides/10 px-1.5 py-0.5 text-[10px] text-space-slides">Sophia app</span> : null}
+                  {sourceDeclared(a) ? <span className="ml-1 text-[10px] text-muted-foreground">declared</span> : null}
+                </td>
+                <td>
+                  <Country country={a.country} />
+                  {closed ? (
+                    <span className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">
+                      Closed in OS
+                    </span>
+                  ) : langOff ? (
+                    <span className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">
+                      Language not in OS
+                    </span>
+                  ) : null}
+                </td>
+                <td className="max-w-56 whitespace-normal break-words">
+                  {a.utm_source?.trim().toLowerCase()==="meta" ? `Meta${a.utm_content ? ` · ${a.utm_content}` : ""}` : a.utm_source || "—"}
+                </td>
+                <td>{a.zone ?? "—"}</td>
+                <td>
+                  <StatusPill status={a.status} />
+                  {autoReason ? <span title="Not auto-accepted" className="ml-2 rounded bg-portal-bg px-1.5 py-0.5 text-[10px] text-brand-navySoft">{autoReason}</span> : null}
+                </td>
+                <td className="whitespace-nowrap">{shortDate(a.created_at)}</td>
+                <td className="whitespace-nowrap">{shortDate(a.start_monday)}</td>
+                <td onClick={(e) => e.stopPropagation()}>
+                  {["pending", "pool"].includes(a.status) ? (
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        disabled={
+                          closed ||
+                          Boolean(
+                            countryCodeOf(a.country) &&
+                            RUUL_BLOCKED.includes(countryCodeOf(a.country) ?? ""),
+                          )
+                        }
+                        onClick={() => onShow(a, "accept")}
+                      >
+                        Accept
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => onShow(a, "reject")}>
+                        Refuse
+                      </Button>
+                    </div>
+                  ) : null}
+                </td>
+              </tr>
+  );
+});
