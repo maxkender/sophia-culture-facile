@@ -10,10 +10,8 @@ import {
 } from "@/components/ui/sheet";
 import { STATUS_LABEL } from "./useOs";
 
-export const shortDate = (d?: string | null) =>
-  d
-    ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" })
-    : "—";
+const SHORT_DATE = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+export const shortDate = (d?: string | null) => (d ? SHORT_DATE.format(new Date(d)) : "—");
 export function Country({ country }: { country: string }) {
   const iso = countryCodeOf(country);
   const flag = iso

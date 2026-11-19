@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useDeferredValue, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Country, DetailSheet, shortDate, StatusPill } from "./Crm";
@@ -214,12 +214,13 @@ export function SlideshowApplications({ focusId }: { focusId?: string | undefine
   const countries = useMemo(() => [...new Set(apps.map((a) => a.country))].sort(), [apps]);
   const taken = useMemo(() => takenEmails(apps), [apps]);
   const autoReason = (a: App) => { const r = autoAcceptReason(a, taken); return r && r !== "Not pending" && r !== "Unsubscribed" ? r : null; };
+  const q = useDeferredValue(search).toLowerCase();
   const rows = apps.filter(
     (a) =>
       (country === "all" || a.country === country) &&
       (source === "all" || applicationSource(a) === source) &&
       statusInTab(a.status, status) &&
-      `${a.full_name} ${a.email} ${a.country}`.toLowerCase().includes(search.toLowerCase()),
+      `${a.full_name} ${a.email} ${a.country}`.toLowerCase().includes(q),
   );
   const checkedSet = useMemo(() => new Set(checked), [checked]);
   const selected = useMemo(() => apps.filter((a) => checkedSet.has(a.id)), [apps, checkedSet]);

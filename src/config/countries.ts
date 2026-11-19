@@ -40,9 +40,16 @@ export function countryOptions(valueLocale: "fr" | "en", displayLocale: string):
 }
 
 /** Resolves a typed or picked country name (French or English) or a 2-letter code to its ISO code. */
+const codeCache = new Map<string, string | null>();
 export function countryCodeOf(value: string | null | undefined): string | null {
   const v = (value ?? "").trim().toLowerCase();
   if (!v) return null;
+  if (codeCache.has(v)) return codeCache.get(v)!;
+  const r = resolveCountryCode(v);
+  if (codeCache.size < 2000) codeCache.set(v, r);
+  return r;
+}
+function resolveCountryCode(v: string): string | null {
   if (/^[a-z]{2}$/.test(v) && CODES.includes(v.toUpperCase())) return v.toUpperCase();
   for (const locale of ["en", "fr", "es", "it", "pt", "de"]) {
     try {

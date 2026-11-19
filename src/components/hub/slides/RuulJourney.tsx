@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { getRouteApi } from "@tanstack/react-router";
 import { Download, RotateCcw } from "lucide-react";
@@ -28,10 +28,18 @@ export function RuulJourney() {
   const filters = route.useSearch();
   const navigate = route.useNavigate();
   const [open, setOpen] = useState<string|null>(null);
+  const [qInput, setQInput] = useState(filters.q ?? "");
+  const q = useDeferredValue(qInput);
+  useEffect(() => { setQInput(filters.q ?? ""); }, [filters.q]);
+  useEffect(() => {
+    if (qInput === (filters.q ?? "")) return;
+    const t = setTimeout(() => void navigate({ search: (prev) => ({ ...prev, q: qInput }) }), 400);
+    return () => clearTimeout(t);
+  }, [qInput]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (key: "q"|"step"|"country"|"referrer"|"monday"|"source", value:string) => void navigate({search: prev => ({...prev,[key]:value})});
   const options = (key: "country"|"referrer"|"startMonday") => [...new Set(data.rows.map(r=>r[key]).filter(Boolean))].sort().map(v=>({value:v,label:v}));
   const rows = data.rows.filter(r =>
-    (!filters.q || `${r.name} ${r.email}`.toLowerCase().includes(filters.q.trim().toLowerCase())) &&
+    (!q || `${r.name} ${r.email}`.toLowerCase().includes(q.trim().toLowerCase())) &&
     (!filters.step || r.current === filters.step) && (!filters.red || r.red) &&
     (!filters.source || r.source === filters.source) && (!filters.country || r.country === filters.country) &&
     (!filters.referrer || r.referrer === filters.referrer) && (!filters.monday || r.startMonday === filters.monday));
@@ -51,7 +59,7 @@ export function RuulJourney() {
     <div className="flex flex-wrap gap-x-5 gap-y-2 border-y border-brand-line py-3 text-sm"><strong className="text-portal-red">{data.rows.filter(r=>r.red).length} red rows</strong><span>This week: <b>{counts.signed}</b> signed · <b>{counts.ruul}</b> added in Ruul · <b>{counts.paid}</b> paid</span><span className="text-muted-foreground">{data.rows.length} people</span></div>
     <div className="grid grid-cols-3 gap-x-4 gap-y-2 border-b border-brand-line pb-3 sm:grid-cols-6 xl:grid-cols-12" aria-label="Journey funnel">{JOURNEY_STEPS.map(([key,label])=><div key={key} className="min-w-0"><b className="block text-lg tabular-nums">{data.rows.filter(r=>Boolean(r.dates[key]) || r.undatedDone.includes(key)).length}</b><span className="block text-xs text-muted-foreground">{label}</span></div>)}</div>
     <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
-      <Input aria-label="Search name or email" placeholder="Search name or email" className="sm:max-w-64" value={filters.q} onChange={e=>set("q",e.target.value)} />
+      <Input aria-label="Search name or email" placeholder="Search name or email" className="sm:max-w-64" value={qInput} onChange={e=>setQInput(e.target.value)} />
       <Filter label="Step" value={filters.step} options={[...JOURNEY_STEPS.map(([value,label])=>({value,label})),{value:"ended",label:"Ended"},{value:"complete",label:"Complete"}]} onChange={v=>set("step",v)}/>
       <Filter label="Source" value={filters.source} options={Object.entries(SOURCE_LABELS).map(([value,label])=>({value,label}))} onChange={v=>set("source",v)}/>
       <Filter label="Country" value={filters.country} options={options("country")} onChange={v=>set("country",v)}/>
