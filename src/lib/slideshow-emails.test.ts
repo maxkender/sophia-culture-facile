@@ -39,3 +39,26 @@ it('renders accepted, reminder and logins for preview review without sending', a
   calls.slice(3).forEach((m,i) => { const slug=['application-open','application-closed','application-neutral','rejected','expired'][i]; writeFileSync(`/tmp/poster-email-renders/${slug}.html`,m.html);writeFileSync(`/tmp/poster-email-renders/${slug}.txt`,`${m.subject}\n\n${m.text}`); });
   vi.useRealTimers();
 });
+
+describe('poster emails follow the country language', () => {
+  const link = 'https://vik-studios-creators.com/creators/sign/tok-123';
+  it.each([
+    ['Hungary','Felvettünk — írd alá a szerződésed','A szerződésed az aláírásodra vár','november 22., vasárnap','november 23., hétfő'],
+    ['Serbia','Primljen(a) si — potpiši svoj ugovor','Tvoj ugovor čeka tvoj potpis','nedelja, 22. novembar','ponedeljak, 23. novembar'],
+    ['Türkiye','Kabul edildin — sözleşmeni imzala','Sözleşmen imzanı bekliyor','22 Kasım Pazar','23 Kasım Pazartesi'],
+    ['Greece','Έγινες δεκτός/ή — υπόγραψε το συμβόλαιό σου','Το συμβόλαιό σου περιμένει την υπογραφή σου','Κυριακή 22 Νοεμβρίου','Δευτέρα 23 Νοεμβρίου'],
+    ['Brazil','Você foi aceito(a) — assine seu contrato','Seu contrato está esperando sua assinatura','domingo, 22 de novembro','segunda-feira, 23 de novembro'],
+    ['United Kingdom',"You're accepted — sign your contract",'Your contract is waiting for your signature','Sunday 22 November','Monday 23 November'],
+    ['Atlantis',"You're accepted — sign your contract",'Your contract is waiting for your signature','Sunday 22 November','Monday 23 November'],
+  ])('%s', async (country, accSubject, remSubject, sunday, monday) => {
+    vi.useFakeTimers(); vi.setSystemTime(new Date('2026-11-18T10:00:00Z'));
+    calls.length = 0;
+    await posterEmails.accepted('p@example.invalid','Ana Demo','en','2026-11-23',link,14,null,null,country);
+    await posterEmails.remindSignature('p@example.invalid','Ana Demo',link,'2026-11-23',country);
+    vi.useRealTimers();
+    const [acc, rem] = calls;
+    expect(acc?.subject).toBe(accSubject); expect(rem?.subject).toBe(remSubject);
+    for (const m of [acc!, rem!]) { expect(m.text).toContain(link); expect(m.html).toContain(link); expect(m.text).toContain(sunday); expect(m.text).toContain(monday); }
+    expect(acc?.text).toContain('$14');
+  });
+});

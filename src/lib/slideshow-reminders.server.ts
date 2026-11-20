@@ -23,6 +23,7 @@ type AppLike = {
   expired_at?: string | null;
   signing_token?: string | null;
   timeline?: unknown;
+  country?: string | null;
 };
 
 /** Why a reminder cannot go out (null = it can). */
@@ -57,13 +58,13 @@ export async function sendSignatureReminder(a: any, app: AppLike & { id: string;
   const blocked = blockedReason(app);
   if (blocked) return { sent: false as const, reason: blocked };
   const { posterEmails } = await import("./slideshow-emails.server");
-  const r = await posterEmails.remindSignature(app.email, app.full_name, `${SITE()}/creators/sign/${app.signing_token}`, app.start_monday);
+  const r = await posterEmails.remindSignature(app.email, app.full_name, `${SITE()}/creators/sign/${app.signing_token}`, app.start_monday, app.country);
   if (!r.sent) return { sent: false as const, reason: r.reason ?? "email_failed" };
   await stamp(a, app.id, key, by);
   return { sent: true as const };
 }
 
-const COLS = "start_monday, id, email, full_name, status, accepted_at, agreement_signed_at, contract_signed_at, unsubscribed_at, expired_at, signing_token, timeline";
+const COLS = "start_monday, id, email, full_name, status, accepted_at, agreement_signed_at, contract_signed_at, unsubscribed_at, expired_at, signing_token, timeline, country";
 
 /** Cron entry: send each due J+1 / J+3 / J+6 reminder once. */
 export async function runSignatureReminders(a: any, now = new Date()) {

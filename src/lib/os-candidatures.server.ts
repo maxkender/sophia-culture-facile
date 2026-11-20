@@ -67,7 +67,7 @@ export async function runAction(a: any, input: z.infer<typeof actionSchema>): Pr
       await a.from("slideshow_applications").update({ status: "rejected", rejected_reason: reason, rejection_reason: reason, decided_at: new Date().toISOString(), decided_by: null }).eq("id", app.id);
       await stamp(a, app.id, "rejected");
       const { posterEmails, pickLang } = await import("./slideshow-emails.server");
-      const sent = await posterEmails.rejected(app.email, app.full_name, pickLang(app.langue), reason);
+      const sent = await posterEmails.rejected(app.email, app.full_name, pickLang(app.langue), reason, app.country);
       return { ok: true, emailed: sent.sent };
     }
     case "remind_signature": {
@@ -75,7 +75,7 @@ export async function runAction(a: any, input: z.infer<typeof actionSchema>): Pr
       if (app.unsubscribed_at) return { ok: true, skipped: "unsubscribed" };
       if (!app.signing_token || !["accepted", "approved"].includes(app.status)) return { ok: false, error: "No active signing link for this application" };
       const { posterEmails } = await import("./slideshow-emails.server");
-      const sent = await posterEmails.remindSignature(app.email, app.full_name, `${SITE()}/creators/sign/${app.signing_token}`, app.start_monday);
+      const sent = await posterEmails.remindSignature(app.email, app.full_name, `${SITE()}/creators/sign/${app.signing_token}`, app.start_monday, app.country);
       if (sent.sent) await stamp(a, app.id, ({ 1: "remind_1", 3: "remind_2", 6: "remind_3" } as const)[input.step]);
       return sent.sent ? { ok: true, emailed: true } : { ok: false, error: sent.reason ?? "Email not sent" };
     }

@@ -220,7 +220,7 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
         const z = process.env["OS_HUB_SECRET"] ? await getOsZones(supabaseAdmin) : { ok: false, ouverts: [] as { pays_code: string }[] };
         if (z.ok) { const code = countryCodeOf(data.country); kind = code && z.ouverts.some((o) => o.pays_code === code) && !RUUL_BLOCKED.includes(code) && !SLIDESHOW_CLOSED.includes(code) ? "open" : "closed"; }
       } catch { kind = "neutral"; }
-      const r = await posterEmails.ack(email, data.full_name, data.langue, kind);
+      const r = await posterEmails.ack(email, data.full_name, data.langue, kind, data.country);
       if (r.sent) await supabaseAdmin.from("slideshow_applications").update({ ack_sent_at: new Date().toISOString() }).eq("id", inserted.id);
     } catch { /* the application is saved either way */ }
     return { ok: true as const, eventId };

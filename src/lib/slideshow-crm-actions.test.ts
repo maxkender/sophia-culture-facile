@@ -101,6 +101,7 @@ describe("slideshow CRM actions preserve existing handlers (isolated, no sends)"
       "Test Poster",
       "fr",
       "Test refusal",
+      undefined,
     );
   });
   it("week approval only marks the draft approved, never paid", async () => {

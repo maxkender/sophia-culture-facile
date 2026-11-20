@@ -88,7 +88,7 @@ export async function createPosterInOs(admin: Admin, applicationId: string) {
     await posterEmails.logins(a.email, a.full_name, l, {
       osUrl: (await setting(admin, "os_app_url")) ?? "https://sophia-marketing-orga.vercel.app",
       login: r.email_os, password: r.password, slack: await setting(admin, "slideshow_slack_invite_url"), monday: a.start_monday, ruulEmail: a.ruul_email || a.email,
-      guideUrl: await setting(admin, "slideshow_poster_guide_url"),
+      guideUrl: await setting(admin, "slideshow_poster_guide_url"), country: a.country,
       weekly: pz?.weekly_amount != null ? Number(pz.weekly_amount) : null,
     });
     await tick(admin, a.id, "logins_sent", "Sophia OS");
@@ -175,10 +175,10 @@ export async function buildWeek(admin: Admin, lundi = addDays(mondayOf(), -7)) {
 /** Day 60 in the pool: polite email, status expired. Daily 10:00 Paris. */
 export async function expirePool(admin: Admin) {
   const cutoff = new Date(Date.now() - 60 * 864e5).toISOString();
-  const { data } = await admin.from("slideshow_applications").select("id, email, full_name, langue").eq("status", "pool").lte("pool_at", cutoff).limit(200);
+  const { data } = await admin.from("slideshow_applications").select("id, email, full_name, langue, country").eq("status", "pool").lte("pool_at", cutoff).limit(200);
   let n = 0;
   for (const a of data ?? []) {
-    await posterEmails.expired(a.email, a.full_name, pickLang(a.langue));
+    await posterEmails.expired(a.email, a.full_name, pickLang(a.langue), a.country);
     await admin.from("slideshow_applications").update({ status: "expired", expired_at: new Date().toISOString() }).eq("id", a.id);
     n++;
   }

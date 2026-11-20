@@ -1,4 +1,4 @@
-// Poster emails are English regardless of the stored OS language.
+// Poster emails use the language of the applicant's country, English fallback.
 import { sendBrevoEmail } from './brevo.server';
 import type { ApplicantLang } from '@/config/countries';
 import { unsubscribeUrl } from './slideshow-unsubscribe.server';
@@ -18,29 +18,37 @@ export function firstPaymentMonday(start: string) {
 }
 export const formatSigningSunday = (monday: string) => formatMonday(signingSunday(monday));
 const guide = (url: string | null | undefined) => !url || url.includes('app.notion.com') ? POSTER_GUIDE_URL : url;
-const payment = (amount: number|null) => `How you get paid: through Ruul, a simple platform for freelancers. After you sign, we invite you to Ruul by email: accept the invitation and finish your Ruul account (2 minutes), then click "It's done" on your dashboard. Every Monday, you receive $${amount ?? '—'} for the week you posted (Monday to Sunday). Your first payment arrives the Monday after your first week of posting.`;
-async function send(to: string, name: string, subject: string, content: PosterEmailContent) {
+import { fill, formatPosterDate, posterDict, posterLangFor, type PosterLang } from './slideshow-email-i18n';
+type L = { lang: PosterLang; t: (k: keyof ReturnType<typeof posterDict>, v?: Record<string, string>) => string; date: (d: string) => string };
+const loc = (country: string | null | undefined): L => {
+  const lang = posterLangFor(country); const d = posterDict(lang);
+  return { lang, t: (k, v = {}) => fill(d[k], v), date: (x) => formatPosterDate(x, lang) };
+};
+const payment = (l: L, amount: number|null) => l.t('pay', { amount: `$${amount ?? '—'}` });
+async function send(l: L, to: string, name: string, subject: string, content: PosterEmailContent) {
   const unsub = unsubscribeUrl(to);
-  const result = await sendBrevoEmail({ to, toName: name, subject, ...renderPosterEmail(content, unsub), headers: { 'List-Unsubscribe': `<${unsub}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } });
+  const result = await sendBrevoEmail({ to, toName: name, subject, ...renderPosterEmail(content, unsub, { lang: l.lang, help: l.t('help', { url: '{url}' }), stop: l.t('stop'), unsub: l.t('unsub') }), headers: { 'List-Unsubscribe': `<${unsub}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } });
   await recordPosterEmail(to, subject, result);
   return result;
 }
+type Country = string | null | undefined;
+/** Each email is written in the language of the applicant's country (see slideshow-email-i18n.ts). */
 export const posterEmails = {
-  ack: (to: string, name: string, _lang: ApplicantLang, kind: 'open'|'closed'|'neutral' = 'closed') => send(to,name,'Thanks for applying',{ paragraphs: [`Hi ${first(name)},`, kind === 'open' ? "Thanks! Your application is in. Your country is open: we're reviewing it and will get back to you here shortly." : kind === 'neutral' ? "Thanks! Your application is in. We review every application and will get back to you here." : "Thanks! We open places country by country, week after week. If your country opens, we'll write to you here."] }),
-  accepted: (to: string, name: string, _lang: ApplicantLang, monday: string, link: string, amount: number|null, guideUrl: string|null, _slackUrl: string|null) => send(to,name,"You're accepted — sign your contract",{
-    paragraphs: [`Hi ${first(name)},`, "Good news: you're accepted as a Vik Studios slideshow poster.", `Sign your contract and set everything up before Sunday ${formatSigningSunday(monday)}, midnight (Paris time) to start posting on Monday ${formatMonday(monday)}.`, 'How it works:'],
-    bullets: ['You post 2 ready-made slideshows a day, 7 days a week, on a TikTok account we give you. Everything is prepared for you: slides, caption and music.', 'Before your first Monday, you create the TikTok account and warm it up (use TikTok normally, without posting).', payment(amount)],
-    button: { label: 'Sign the contract', url: link }, after: [{ text: 'Read the Poster Guide before you sign:', url: guide(guideUrl) }],
-  }),
-  remindSignature: (to: string, name: string, link: string, storedMonday?: string|null) => {
-    const monday = startMondayAtSignature(storedMonday ?? null);
-    return send(to,name,'Your contract is waiting for your signature',{ paragraphs: [`Hi ${first(name)}, your contract is waiting for your signature. Sign it before Sunday ${formatSigningSunday(monday)}, midnight (Paris time) to start on Monday ${formatMonday(monday)}. It takes 2 minutes:`], after: [{ text: '', url: link }] });
+  ack: (to: string, name: string, _lang: ApplicantLang, kind: 'open'|'closed'|'neutral' = 'closed', country?: Country) => { const l = loc(country); return send(l,to,name,l.t('ackSubject'),{ paragraphs: [l.t('greet',{name:first(name)}), l.t(kind === 'open' ? 'ackOpen' : kind === 'neutral' ? 'ackNeutral' : 'ackClosed')] }); },
+  accepted: (to: string, name: string, _lang: ApplicantLang, monday: string, link: string, amount: number|null, guideUrl: string|null, _slackUrl: string|null, country?: Country) => { const l = loc(country); return send(l,to,name,l.t('accSubject'),{
+    paragraphs: [l.t('greet',{name:first(name)}), l.t('accGood'), l.t('accSign',{sunday:l.date(signingSunday(monday)),monday:l.date(monday)}), l.t('accHow')],
+    bullets: [l.t('accB1'), l.t('accB2'), payment(l, amount)],
+    button: { label: l.t('accButton'), url: link }, after: [{ text: l.t('accGuide'), url: guide(guideUrl) }],
+  }); },
+  remindSignature: (to: string, name: string, link: string, storedMonday?: string|null, country?: Country) => {
+    const l = loc(country); const monday = startMondayAtSignature(storedMonday ?? null);
+    return send(l,to,name,l.t('remSubject'),{ paragraphs: [l.t('remBody',{name:first(name),sunday:l.date(signingSunday(monday)),monday:l.date(monday)})], after: [{ text: '', url: link }] });
   },
-  rejected: (to: string, name: string, _lang: ApplicantLang, reason: string|null) => send(to,name,'Your application',{ paragraphs: [`Hi ${first(name)},`, "Thank you for applying. We can't take your application forward at the moment.", ...(reason ? [`Reason: ${reason}`] : [])] }),
-  expired: (to: string, name: string, _lang: ApplicantLang) => send(to,name,'Your application',{ paragraphs: [`Hi ${first(name)},`, "We didn't open your country in the past weeks. Feel free to apply again later — thank you for your interest."] }),
-  logins: (to: string, name: string, _lang: ApplicantLang, o: { osUrl: string; login: string; password: string; slack: string|null; monday: string; ruulEmail: string; weekly: number|null; guideUrl?: string|null }) => send(to,name,'Welcome to Vik Studios — your access',{
-    paragraphs: [`Hi ${first(name)}, welcome to Vik Studios! Here is everything you need:`],
-    access: [{ label: 'Your dashboard', value: o.osUrl, url: o.osUrl }, { label: 'Login', value: o.login }, { label: 'Password', value: o.password }, { label: 'Poster Guide', value: guide(o.guideUrl), url: guide(o.guideUrl) }, ...(o.slack ? [{ label: 'Slack', value: o.slack, url: o.slack }] : [])],
-    checklist: { deadline: `Before Sunday ${formatSigningSunday(o.monday)}, midnight (Paris time):`, steps: ['Log in to your dashboard. Enter your first and last name exactly as on your ID, and the email you want to use for Ruul.', 'Create your TikTok account with the exact username shown on your dashboard.', 'Click "Start warmup", follow 5 accounts and use TikTok normally, without posting.', 'Join Slack with your full name (first and last name). Please never share amounts in channels.'], closing: ["Any question about the job? Ask it in the Sophia OS: log in to your dashboard and click Help. You'll get an answer right away, and you can escalate to our team if needed.", `Your first posts arrive on Monday ${formatMonday(o.monday)}.`, payment(o.weekly)] },
-  }),
+  rejected: (to: string, name: string, _lang: ApplicantLang, reason: string|null, country?: Country) => { const l = loc(country); return send(l,to,name,l.t('rejSubject'),{ paragraphs: [l.t('greet',{name:first(name)}), l.t('rejBody'), ...(reason ? [l.t('rejReason',{reason})] : [])] }); },
+  expired: (to: string, name: string, _lang: ApplicantLang, country?: Country) => { const l = loc(country); return send(l,to,name,l.t('rejSubject'),{ paragraphs: [l.t('greet',{name:first(name)}), l.t('expBody')] }); },
+  logins: (to: string, name: string, _lang: ApplicantLang, o: { osUrl: string; login: string; password: string; slack: string|null; monday: string; ruulEmail: string; weekly: number|null; guideUrl?: string|null; country?: Country }) => { const l = loc(o.country); return send(l,to,name,l.t('logSubject'),{
+    paragraphs: [l.t('logIntro',{name:first(name)})],
+    access: [{ label: l.t('lDash'), value: o.osUrl, url: o.osUrl }, { label: l.t('lLogin'), value: o.login }, { label: l.t('lPass'), value: o.password }, { label: l.t('lGuide'), value: guide(o.guideUrl), url: guide(o.guideUrl) }, ...(o.slack ? [{ label: 'Slack', value: o.slack, url: o.slack }] : [])],
+    checklist: { deadline: l.t('lDeadline',{sunday:l.date(signingSunday(o.monday))}), steps: [l.t('s1'), l.t('s2'), l.t('s3'), l.t('s4')], closing: [l.t('lHelp'), l.t('lFirst',{monday:l.date(o.monday)}), payment(l, o.weekly)] },
+  }); },
 };

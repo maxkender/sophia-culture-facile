@@ -210,7 +210,7 @@ export const rejectPoster = createServerFn({ method: "POST" })
     if (!app) throw new Error("Application not found");
     await a.from("slideshow_applications").update({ status: "rejected", rejected_reason: data.reason || null, rejection_reason: data.reason || null, decided_at: new Date().toISOString(), decided_by: me.id }).eq("id", app.id);
     await stamp(a, app.id, "rejected", me.name);
-    const sent = await posterEmails.rejected(app.email, app.full_name, pickLang(app.langue), data.reason || null);
+    const sent = await posterEmails.rejected(app.email, app.full_name, pickLang(app.langue), data.reason || null, app.country);
     return { ok: true, emailed: sent.sent };
   });
 
