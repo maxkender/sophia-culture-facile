@@ -197,6 +197,7 @@ export function SlideshowDocLanding({ app: appProp }: { app?: string | undefined
           <p>{r(t.doing1)}</p>
           <p>{r(t.doing2)}</p>
           <p>{r(t.doing3)}</p>
+          <p>{r(t.doing4)}</p>
         </Sec>
         <Sec>
           <H2>{r(t.whoTitle)}</H2>

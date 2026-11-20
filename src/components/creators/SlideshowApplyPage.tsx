@@ -158,6 +158,12 @@ export function SlideshowApplyPage() {
       </div>
       <form data-funnel="apply" data-track="slideshow" onFocusCapture={(e) => { const f = e.currentTarget; if (!f.dataset["started"]) { f.dataset["started"] = "1"; trackFunnel("apply_started", { track: "slideshow" }); } }} onSubmit={onSubmit} className="relative mt-8 space-y-8 border-t border-doc-line pt-7" noValidate>
         <Honeypot value={honey} onChange={setHoney} />
+        <div className="space-y-1.5 text-[15px] font-semibold leading-[1.6] text-doc-error">
+          <p>
+            <a href={withAttribution(landing, attribution)} className="underline underline-offset-2">{t.payCheck}</a>
+          </p>
+          <p>{t.payWarning}</p>
+        </div>
         <h2 className="font-doc tracking-tight text-xl font-semibold">{t.aboutYou}</h2>
         <div className="space-y-2">
           <label htmlFor="full_name" className={label}>{t.fullName}{req}</label>
@@ -217,6 +223,10 @@ export function SlideshowApplyPage() {
           </label>
         </div>
         {error ? <p role="alert" className="text-[15px] font-semibold text-doc-error">{error}</p> : null}
+        <p className="text-[15px] font-bold uppercase tracking-wide">{t.agreePay}</p>
+        <div className="rounded-[6px] border-2 border-doc-error bg-doc-paper p-4 text-[15px] font-bold uppercase leading-[1.5] text-doc-error">
+          {t.commitWarning}
+        </div>
         <button type="submit" className={docButton} disabled={busy || adult === "no"}>
           {busy ? t.sending : t.submit}
         </button>
