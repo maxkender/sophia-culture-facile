@@ -6101,6 +6101,9 @@ export type Database = {
           utm_medium: string | null
           utm_source: string | null
           utm_term: string | null
+          whatsapp_e164: string | null
+          whatsapp_optin: boolean | null
+          whatsapp_optin_at: string | null
           wise_email: string | null
           zone: string | null
           zone_note: string | null
@@ -6186,6 +6189,9 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
+          whatsapp_e164?: string | null
+          whatsapp_optin?: boolean | null
+          whatsapp_optin_at?: string | null
           wise_email?: string | null
           zone?: string | null
           zone_note?: string | null
@@ -6271,6 +6277,9 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
+          whatsapp_e164?: string | null
+          whatsapp_optin?: boolean | null
+          whatsapp_optin_at?: string | null
           wise_email?: string | null
           zone?: string | null
           zone_note?: string | null

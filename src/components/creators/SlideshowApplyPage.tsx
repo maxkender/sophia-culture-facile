@@ -19,6 +19,7 @@ import { browserAttribution } from "./SlideshowMarketing";
 import { withAttribution, type Attribution } from "@/lib/slideshow-attribution";
 import { browserConsent } from "@/lib/slideshow-marketing-consent";
 import { slideshowPixelLead } from "@/lib/slideshow-meta-pixel";
+import { isValidWhatsapp, normalizeWhatsapp } from "@/lib/slideshow-whatsapp";
 
 const LANG_NAMES: Record<ApplicantLang, string> = { fr: "Français", en: "English", es: "Español", it: "Italiano", pt: "Português", de: "Deutsch" };
 
@@ -46,6 +47,9 @@ export function SlideshowApplyPage() {
   const [referred, setReferred] = useState<"" | "yes" | "no">("");
   const [referralName, setReferralName] = useState("");
   const [consent, setConsent] = useState(false);
+  const [whatsapp, setWhatsapp] = useState("");
+  const [whatsappOptin, setWhatsappOptin] = useState(false);
+  const whatsappNumber = normalizeWhatsapp(whatsapp);
   const [honey, setHoney] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
@@ -83,6 +87,10 @@ export function SlideshowApplyPage() {
       setError(t.consentError);
       return;
     }
+    if (whatsappNumber && !isValidWhatsapp(whatsappNumber)) {
+      setError(t.whatsappError);
+      return;
+    }
     setBusy(true);
     try {
       const eventId=crypto.randomUUID();
@@ -95,6 +103,8 @@ export function SlideshowApplyPage() {
           website: honey,
           full_name: f.full_name,
           email: f.email,
+          whatsapp_e164: whatsappNumber,
+          whatsapp_optin: Boolean(whatsappNumber) && whatsappOptin,
           country: f.country,
           is_adult: true,
           consent: true,
@@ -173,6 +183,19 @@ export function SlideshowApplyPage() {
           <label htmlFor="email" className={label}>{t.email}{req}</label>
           <input id="email" type="email" className={field} autoComplete="email" aria-describedby="email-help" value={f.email} onChange={(e) => set("email", e.target.value)} />
           <p id="email-help" className="text-[13px] text-doc-muted">{t.emailExample}</p>
+        </div>
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <label htmlFor="whatsapp-number" className={label}>{t.whatsappNumber}</label>
+            <input id="whatsapp-number" type="tel" className={field} autoComplete="tel" placeholder="+33612345678" maxLength={100} value={whatsapp} onChange={(e) => {
+              setWhatsapp(e.target.value);
+              if (!normalizeWhatsapp(e.target.value)) setWhatsappOptin(false);
+            }} />
+          </div>
+          <label className="flex items-start gap-3 text-[15px] leading-[1.6]">
+            <Checkbox checked={Boolean(whatsappNumber) && whatsappOptin} disabled={!whatsappNumber} onCheckedChange={(v) => setWhatsappOptin(Boolean(whatsappNumber) && v === true)} className="mt-1 rounded-[4px] border-doc-field" />
+            <span>{t.whatsappOptin}</span>
+          </label>
         </div>
         <div className="space-y-2">
           <label htmlFor="country" className={label}>{t.country}{req}</label>

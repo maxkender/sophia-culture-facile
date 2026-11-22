@@ -3,7 +3,7 @@ import { SITE_URL } from "@/config/site";
 import { z } from "zod";
 import { hubSecretMatches, readBoundedJson } from "./os-email.server";
 
-const FIELDS = "id, full_name, email, country, is_adult, deux_telephones, q_country_now, q_hours_per_day, q_tiktok_daily, q_previous_content, referred, referral_name, ref, langue, status, created_at, accepted_at, contract_signed_at, os_created_at, os_profile_id, start_monday, expired_at, ruul_email, phone, unsubscribed_at";
+const FIELDS = "id, full_name, email, country, is_adult, deux_telephones, q_country_now, q_hours_per_day, q_tiktok_daily, q_previous_content, referred, referral_name, ref, langue, status, created_at, accepted_at, contract_signed_at, os_created_at, os_profile_id, start_monday, expired_at, ruul_email, phone, unsubscribed_at, whatsapp_e164, whatsapp_optin, whatsapp_optin_at";
 const SINCE_COLS = ["created_at", "decided_at", "accepted_at", "contract_signed_at", "os_created_at", "expired_at", "unsubscribed_at", "agreement_signed_at"];
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "cache-control": "no-store" } });
 const SITE = () => process.env["SITE_URL"] ?? SITE_URL;

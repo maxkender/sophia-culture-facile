@@ -7,6 +7,7 @@ import { isValidInternationalPhone } from "@/lib/creator-validation";
 import { referralCodeSchema } from "./slideshow-referral-code";
 import { attributionSchema, applicationSource, sourceDeclared } from "./slideshow-attribution";
 import { marketingConsentSchema, validMarketingConsent } from "./slideshow-marketing-consent";
+import { optionalWhatsappSchema, whatsappInsertFields } from "./slideshow-whatsapp";
 
 /** Public endpoints for the two creator application forms. Honeypot + rate limit. */
 
@@ -124,6 +125,8 @@ const slideSchema = z.object({
   full_name: z.string().trim().min(2).max(120),
   email: z.string().trim().email("Enter a complete email address, for example name@example.com.").max(200),
   phone: z.string().trim().max(40).optional(), // optional, any format accepted
+  whatsapp_e164: optionalWhatsappSchema,
+  whatsapp_optin: z.boolean().optional(),
   country: z.string().trim().min(2).max(80),
   is_adult: z.literal(true),
   has_upwork: z.boolean().optional(),
@@ -167,6 +170,7 @@ export const submitSlideshowApplication = createServerFn({ method: "POST" })
       full_name: data.full_name,
       email,
       phone: data.phone || null,
+      ...whatsappInsertFields(data.whatsapp_e164, data.whatsapp_optin),
       country: data.country,
       is_adult: true,
       has_upwork: data.has_upwork ?? null,

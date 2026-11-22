@@ -589,6 +589,13 @@
       "when": 1795340550366,
       "tag": "0083_bosnia_montenegro_zone_c",
       "breakpoints": true
+    },
+    {
+      "idx": 84,
+      "version": "7",
+      "when": 1795354896293,
+      "tag": "0084_slideshow_optional_whatsapp",
+      "breakpoints": true
     }
   ]
 }

@@ -298,7 +298,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "In the Sophia app"
+        "heardSophiaApp": "In the Sophia app",
+        "whatsappNumber": "WhatsApp number",
+        "whatsappOptin": "I agree to receive WhatsApp messages about my onboarding and posting",
+        "whatsappError": "Enter a WhatsApp number in international format, for example +33612345678."
       },
       "footer": {
         "privacy": "Privacy",
@@ -392,7 +395,10 @@
         "cookieNotice": "Avec votre accord, Meta reçoit un événement de candidature réussie, l’URL sans champs personnels, l’adresse IP, les informations du navigateur et les identifiants de clic publicitaire pour mesurer et optimiser les publicités de recrutement Instagram/Facebook. Aucun nom, e-mail ou réponse au formulaire n’est partagé. Refuser ne change pas votre candidature. Vous pouvez retirer votre accord ici à tout moment. Votre choix et la version de cette notice sont conservés 30 jours.",
         "cookieAccept": "Accepter les cookies publicitaires",
         "cookieReject": "Refuser les cookies publicitaires",
-        "heardSophiaApp": "Dans l’application Sophia"
+        "heardSophiaApp": "Dans l’application Sophia",
+        "whatsappNumber": "Numéro WhatsApp",
+        "whatsappOptin": "J’accepte de recevoir des messages WhatsApp concernant mon intégration et mes publications",
+        "whatsappError": "Saisissez un numéro WhatsApp au format international, par exemple +33612345678."
       },
       "footer": {
         "privacy": "Confidentialité",
@@ -486,7 +492,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "In der Sophia-App"
+        "heardSophiaApp": "In der Sophia-App",
+        "whatsappNumber": "WhatsApp-Nummer",
+        "whatsappOptin": "Ich bin damit einverstanden, WhatsApp-Nachrichten zu meiner Einarbeitung und meinen Posts zu erhalten",
+        "whatsappError": "Gib eine WhatsApp-Nummer im internationalen Format ein, zum Beispiel +33612345678."
       },
       "footer": {
         "privacy": "Datenschutz",
@@ -580,7 +589,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "En la app Sophia"
+        "heardSophiaApp": "En la app Sophia",
+        "whatsappNumber": "Número de WhatsApp",
+        "whatsappOptin": "Acepto recibir mensajes de WhatsApp sobre mi incorporación y mis publicaciones",
+        "whatsappError": "Introduce un número de WhatsApp en formato internacional, por ejemplo +33612345678."
       },
       "footer": {
         "privacy": "Privacidad",
@@ -674,7 +686,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "En la app Sophia"
+        "heardSophiaApp": "En la app Sophia",
+        "whatsappNumber": "Número de WhatsApp",
+        "whatsappOptin": "Acepto recibir mensajes de WhatsApp sobre mi incorporación y mis publicaciones",
+        "whatsappError": "Ingresa un número de WhatsApp en formato internacional, por ejemplo +33612345678."
       },
       "footer": {
         "privacy": "Privacidad",
@@ -768,7 +783,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "Nell’app Sophia"
+        "heardSophiaApp": "Nell’app Sophia",
+        "whatsappNumber": "Numero WhatsApp",
+        "whatsappOptin": "Accetto di ricevere messaggi WhatsApp sul mio inserimento e sulle mie pubblicazioni",
+        "whatsappError": "Inserisci un numero WhatsApp in formato internazionale, ad esempio +33612345678."
       },
       "footer": {
         "privacy": "Privacy",
@@ -862,7 +880,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "No aplicativo Sophia"
+        "heardSophiaApp": "No aplicativo Sophia",
+        "whatsappNumber": "Número do WhatsApp",
+        "whatsappOptin": "Concordo em receber mensagens pelo WhatsApp sobre minha integração e minhas publicações",
+        "whatsappError": "Digite um número do WhatsApp no formato internacional, por exemplo +33612345678."
       },
       "footer": {
         "privacy": "Privacidade",
@@ -956,7 +977,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "In de Sophia-app"
+        "heardSophiaApp": "In de Sophia-app",
+        "whatsappNumber": "WhatsApp-nummer",
+        "whatsappOptin": "Ik ga akkoord met WhatsApp-berichten over mijn onboarding en mijn posts",
+        "whatsappError": "Voer een WhatsApp-nummer in internationaal formaat in, bijvoorbeeld +33612345678."
       },
       "footer": {
         "privacy": "Privacy",
@@ -1050,7 +1074,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "I Sophia-appen"
+        "heardSophiaApp": "I Sophia-appen",
+        "whatsappNumber": "WhatsApp-nummer",
+        "whatsappOptin": "Jeg accepterer at modtage WhatsApp-beskeder om min opstart og mine opslag",
+        "whatsappError": "Indtast et WhatsApp-nummer i internationalt format, for eksempel +33612345678."
       },
       "footer": {
         "privacy": "Privatliv",
@@ -1144,7 +1171,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "I Sophia-appen"
+        "heardSophiaApp": "I Sophia-appen",
+        "whatsappNumber": "WhatsApp-nummer",
+        "whatsappOptin": "Jag samtycker till att få WhatsApp-meddelanden om min introduktion och mina inlägg",
+        "whatsappError": "Ange ett WhatsApp-nummer i internationellt format, till exempel +33612345678."
       },
       "footer": {
         "privacy": "Integritet",
@@ -1238,7 +1268,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "I Sophia-appen"
+        "heardSophiaApp": "I Sophia-appen",
+        "whatsappNumber": "WhatsApp-nummer",
+        "whatsappOptin": "Jeg samtykker til å motta WhatsApp-meldinger om min oppstart og mine innlegg",
+        "whatsappError": "Skriv inn et WhatsApp-nummer i internasjonalt format, for eksempel +33612345678."
       },
       "footer": {
         "privacy": "Personvern",
@@ -1332,7 +1365,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "Sophia-sovelluksessa"
+        "heardSophiaApp": "Sophia-sovelluksessa",
+        "whatsappNumber": "WhatsApp-numero",
+        "whatsappOptin": "Suostun vastaanottamaan WhatsApp-viestejä perehdytyksestäni ja julkaisuistani",
+        "whatsappError": "Anna WhatsApp-numero kansainvälisessä muodossa, esimerkiksi +33612345678."
       },
       "footer": {
         "privacy": "Tietosuoja",
@@ -1426,7 +1462,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "Sophia rakenduses"
+        "heardSophiaApp": "Sophia rakenduses",
+        "whatsappNumber": "WhatsAppi number",
+        "whatsappOptin": "Nõustun saama WhatsAppi sõnumeid oma sisseelamise ja postitamise kohta",
+        "whatsappError": "Sisesta WhatsAppi number rahvusvahelises vormingus, näiteks +33612345678."
       },
       "footer": {
         "privacy": "Privaatsus",
@@ -1520,7 +1559,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "Sophia lietotnē"
+        "heardSophiaApp": "Sophia lietotnē",
+        "whatsappNumber": "WhatsApp numurs",
+        "whatsappOptin": "Piekrītu saņemt WhatsApp ziņas par manu darba uzsākšanu un publikācijām",
+        "whatsappError": "Ievadi WhatsApp numuru starptautiskajā formātā, piemēram, +33612345678."
       },
       "footer": {
         "privacy": "Privātums",
@@ -1614,7 +1656,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "Sophia programėlėje"
+        "heardSophiaApp": "Sophia programėlėje",
+        "whatsappNumber": "WhatsApp numeris",
+        "whatsappOptin": "Sutinku gauti WhatsApp žinutes apie mano įvedimą į darbą ir įrašų skelbimą",
+        "whatsappError": "Įvesk WhatsApp numerį tarptautiniu formatu, pavyzdžiui, +33612345678."
       },
       "footer": {
         "privacy": "Privatumas",
@@ -1708,7 +1753,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "W aplikacji Sophia"
+        "heardSophiaApp": "W aplikacji Sophia",
+        "whatsappNumber": "Numer WhatsApp",
+        "whatsappOptin": "Zgadzam się otrzymywać wiadomości WhatsApp dotyczące mojego wdrożenia i publikowania postów",
+        "whatsappError": "Wpisz numer WhatsApp w formacie międzynarodowym, na przykład +33612345678."
       },
       "footer": {
         "privacy": "Prywatność",
@@ -1802,7 +1850,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "V aplikaci Sophia"
+        "heardSophiaApp": "V aplikaci Sophia",
+        "whatsappNumber": "Číslo WhatsApp",
+        "whatsappOptin": "Souhlasím s přijímáním zpráv na WhatsApp o mém zaučení a zveřejňování příspěvků",
+        "whatsappError": "Zadej číslo WhatsApp v mezinárodním formátu, například +33612345678."
       },
       "footer": {
         "privacy": "Soukromí",
@@ -1896,7 +1947,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "V aplikácii Sophia"
+        "heardSophiaApp": "V aplikácii Sophia",
+        "whatsappNumber": "Číslo WhatsApp",
+        "whatsappOptin": "Súhlasím s prijímaním správ na WhatsApp o mojom zaškolení a zverejňovaní príspevkov",
+        "whatsappError": "Zadaj číslo WhatsApp v medzinárodnom formáte, napríklad +33612345678."
       },
       "footer": {
         "privacy": "Súkromie",
@@ -1990,7 +2044,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "V aplikaciji Sophia"
+        "heardSophiaApp": "V aplikaciji Sophia",
+        "whatsappNumber": "Številka WhatsApp",
+        "whatsappOptin": "Strinjam se s prejemanjem sporočil WhatsApp o mojem uvajanju in objavljanju",
+        "whatsappError": "Vnesi številko WhatsApp v mednarodni obliki, na primer +33612345678."
       },
       "footer": {
         "privacy": "Zasebnost",
@@ -2084,7 +2141,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "U aplikaciji Sophia"
+        "heardSophiaApp": "U aplikaciji Sophia",
+        "whatsappNumber": "WhatsApp broj",
+        "whatsappOptin": "Pristajem primati WhatsApp poruke o svom uvođenju u posao i objavljivanju",
+        "whatsappError": "Unesi WhatsApp broj u međunarodnom formatu, na primjer +33612345678."
       },
       "footer": {
         "privacy": "Privatnost",
@@ -2178,7 +2238,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "U aplikaciji Sophia"
+        "heardSophiaApp": "U aplikaciji Sophia",
+        "whatsappNumber": "WhatsApp broj",
+        "whatsappOptin": "Pristajem da primam WhatsApp poruke o svom uvođenju u posao i objavljivanju",
+        "whatsappError": "Unesi WhatsApp broj u međunarodnom formatu, na primer +33612345678."
       },
       "footer": {
         "privacy": "Privatnost",
@@ -2272,7 +2335,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "A Sophia alkalmazásban"
+        "heardSophiaApp": "A Sophia alkalmazásban",
+        "whatsappNumber": "WhatsApp-szám",
+        "whatsappOptin": "Hozzájárulok, hogy WhatsApp-üzeneteket kapjak a betanulásomról és a posztolásról",
+        "whatsappError": "Add meg a WhatsApp-számod nemzetközi formátumban, például +33612345678."
       },
       "footer": {
         "privacy": "Adatvédelem",
@@ -2366,7 +2432,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "În aplicația Sophia"
+        "heardSophiaApp": "În aplicația Sophia",
+        "whatsappNumber": "Număr WhatsApp",
+        "whatsappOptin": "Sunt de acord să primesc mesaje WhatsApp despre integrarea mea și publicarea postărilor",
+        "whatsappError": "Introdu un număr WhatsApp în format internațional, de exemplu +33612345678."
       },
       "footer": {
         "privacy": "Confidențialitate",
@@ -2460,7 +2529,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "В приложението Sophia"
+        "heardSophiaApp": "В приложението Sophia",
+        "whatsappNumber": "WhatsApp номер",
+        "whatsappOptin": "Съгласен/съгласна съм да получавам WhatsApp съобщения за въвеждането ми в работата и публикуването",
+        "whatsappError": "Въведи WhatsApp номер в международен формат, например +33612345678."
       },
       "footer": {
         "privacy": "Поверителност",
@@ -2554,7 +2626,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "Στην εφαρμογή Sophia"
+        "heardSophiaApp": "Στην εφαρμογή Sophia",
+        "whatsappNumber": "Αριθμός WhatsApp",
+        "whatsappOptin": "Συμφωνώ να λαμβάνω μηνύματα WhatsApp σχετικά με την ένταξή μου και τις αναρτήσεις μου",
+        "whatsappError": "Πληκτρολόγησε αριθμό WhatsApp σε διεθνή μορφή, για παράδειγμα +33612345678."
       },
       "footer": {
         "privacy": "Απόρρητο",
@@ -2648,7 +2723,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "Sophia uygulamasında"
+        "heardSophiaApp": "Sophia uygulamasında",
+        "whatsappNumber": "WhatsApp numarası",
+        "whatsappOptin": "İşe başlama sürecim ve paylaşım yapmam hakkında WhatsApp mesajları almayı kabul ediyorum",
+        "whatsappError": "Uluslararası formatta bir WhatsApp numarası gir, örneğin +33612345678."
       },
       "footer": {
         "privacy": "Gizlilik",
@@ -2742,7 +2820,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "В приложении Sophia"
+        "heardSophiaApp": "В приложении Sophia",
+        "whatsappNumber": "Номер WhatsApp",
+        "whatsappOptin": "Я согласен получать сообщения WhatsApp о моём вводном обучении и публикациях",
+        "whatsappError": "Введите номер WhatsApp в международном формате, например +33612345678."
       },
       "footer": {
         "privacy": "Конфиденциальность",
@@ -2836,7 +2917,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "באפליקציית Sophia"
+        "heardSophiaApp": "באפליקציית Sophia",
+        "whatsappNumber": "מספר WhatsApp",
+        "whatsappOptin": "אני מסכים/ה לקבל הודעות WhatsApp על תהליך ההצטרפות שלי ועל פרסום הפוסטים",
+        "whatsappError": "יש להזין מספר WhatsApp בפורמט בינלאומי, למשל +33612345678."
       },
       "footer": {
         "privacy": "פרטיות",
@@ -2930,7 +3014,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "في تطبيق Sophia"
+        "heardSophiaApp": "في تطبيق Sophia",
+        "whatsappNumber": "رقم WhatsApp",
+        "whatsappOptin": "أوافق على تلقي رسائل WhatsApp بشأن انضمامي ونشر المحتوى",
+        "whatsappError": "أدخل رقم WhatsApp بالصيغة الدولية، مثل +33612345678."
       },
       "footer": {
         "privacy": "الخصوصية",
@@ -3024,7 +3111,10 @@
         "cookieNotice": "With your permission, Meta receives a successful application event, page URL without personal fields, IP address, browser information and advertising click identifiers to measure and optimize Instagram/Facebook recruiting ads. No name, email or application answers are shared. Refusing does not affect your application. You can withdraw here at any time. Your choice and notice version are retained for 30 days.",
         "cookieAccept": "Accept marketing cookies",
         "cookieReject": "Refuse marketing cookies",
-        "heardSophiaApp": "Sophiaアプリ内"
+        "heardSophiaApp": "Sophiaアプリ内",
+        "whatsappNumber": "WhatsApp番号",
+        "whatsappOptin": "参加準備と投稿に関するWhatsAppメッセージの受信に同意します",
+        "whatsappError": "WhatsApp番号を国際形式で入力してください。例：+33612345678。"
       },
       "footer": {
         "privacy": "プライバシー",

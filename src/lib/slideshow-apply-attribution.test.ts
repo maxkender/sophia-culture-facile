@@ -21,3 +21,20 @@ it("denied marketing consent strips fbclid and sends nothing",async()=>{await su
 it("sends no acknowledgement when the new application is immediately accepted",async()=>{fake.auto.mockResolvedValue({accepted:[{id:"a"}]});await submitSlideshowApplication({data:{...data,marketing_consent:undefined}});expect(fake.ack).not.toHaveBeenCalled();expect(fake.auto).toHaveBeenCalledWith(expect.anything(),["a"]);});
 it("keeps the acknowledgement when auto-accept is off or the country is closed",async()=>{await submitSlideshowApplication({data:{...data,country:"ID",marketing_consent:undefined}});expect(fake.ack).toHaveBeenCalledOnce();});
 it("does not acknowledge an acceptance persisted before a later failure",async()=>{fake.status="accepted";fake.auto.mockRejectedValue(new Error("test failure"));await submitSlideshowApplication({data:{...data,marketing_consent:undefined}});expect(fake.ack).not.toHaveBeenCalled();});
+it("stores optional WhatsApp opt-in with a server timestamp without changing legacy phone", async () => {
+  const before = Date.now();
+  await submitSlideshowApplication({ data: { ...data, phone: "legacy phone unchanged", whatsapp_e164: "+33 612345678", whatsapp_optin: true } });
+  const row = fake.writes[0];
+  expect(row?.["phone"]).toBe("legacy phone unchanged");
+  expect(row?.["whatsapp_e164"]).toBe("+33612345678");
+  expect(row?.["whatsapp_optin"]).toBe(true);
+  const at = row?.["whatsapp_optin_at"];
+  expect(typeof at).toBe("string");
+  if (typeof at !== "string") throw new Error("Missing server opt-in time");
+  expect(new Date(at).getTime()).toBeGreaterThanOrEqual(before);
+  expect(new Date(at).getTime()).toBeLessThanOrEqual(Date.now());
+});
+it("stores no WhatsApp consent when number is omitted even if opt-in is requested", async () => {
+  await submitSlideshowApplication({ data: { ...data, whatsapp_optin: true } });
+  expect(fake.writes[0]).toMatchObject({ whatsapp_e164: null, whatsapp_optin: false, whatsapp_optin_at: null });
+});

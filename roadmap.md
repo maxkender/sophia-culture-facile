@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Done
+- Optional WhatsApp application update: optional E.164 number and unchecked opt-in, additive storage and exact authenticated OS GET fields; legacy phone, POST actions, notifications, contracts and emails unchanged. 212 tests passed; EN/FR desktop/mobile checked without submitting; no publication. Broader phone/animation/contract plan remains suspended.
 - Creator branding: Vik Studios sender names (including forced OS relay), public recruiting headings/consent in 30 languages, signing/unsubscribe titles and acceptance copy; Sophia app and Sophia OS dashboard names retained. Tests and public page checks completed; no emails sent, owner publishes. OS-authored message bodies remain external templates.
 - Signing page: exact English after-signing box above Signature, shared start Monday rule; desktop/mobile checked on an unsigned page without signing, 171 tests passed. Test applicant signature and OS creation confirmed read-only; not published.
 - Brevo catch-up (13 Nov): one acceptance to each of 17 eligible people and one reminder to Maria Jönsson, existing signing links and verified zone rates; all 18 accepted by Brevo, outcomes checked by message ID and recorded in timelines. No welcome emails. All site poster templates and OS relay now audit provider results atomically; Hub history shows IDs and failures. 168 tests passed; not published. Admin preview inspection awaits a signed-in session.
@@ -12,7 +13,6 @@
 - Pass 2 — /start web-to-app funnel rebuilt to the iOS onboarding spec (30 steps, FR/EN, paywalls A/B, taap.it success, dataLayer events with ?src, resume, noindex). Tested end-to-end at 390px; not published.
 
 ## Open
-- Poster application update (plan awaiting approval): required E.164 phone/contact consent, localized six-step phone animation, slideshow contract v4 with immutable signature snapshots; preserve all Sophia OS lifecycle actions and existing signed contracts. Owner publishes.
 - OS-authored referral email wording: external OS owns the HTML/text passed to this site's relay, so its templates must adopt Help-only support there; local poster templates are updated and relay behavior remains unchanged.
 - Admin auth Site URL: owner must set https://vik-studios-creators.com in More → Users → Auth settings → Advanced. Hosted read confirms new and old domain redirect patterns are already allowed; Site URL still uses the published Lovable address. No agent tool can change this setting.
 - Meta slideshow: pixel 1755822698850602 enabled behind consent; last-UTM attribution, identifiers, browser UUID deduplication, Source column and matching payload built. 54 tests and mocked pixel consent/browser checks passed. CAPI transport still disabled: no available Meta connection, META_CAPI_TOKEN absent; real successful submission/provider receipt and privacy disclosure remain unverified. Not published.

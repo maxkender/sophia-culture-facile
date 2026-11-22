@@ -1,8 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { actionSchema } from "./os-candidatures.server";
+import { actionSchema, listCandidatures } from "./os-candidatures.server";
 import { unsubscribeToken, unsubscribeTokenValid } from "./slideshow-unsubscribe.server";
 
 const id = "11111111-1111-4111-8111-111111111111";
+
+it("exposes WhatsApp fields while keeping the legacy phone hidden", async () => {
+  let fields = "";
+  const candidate = { id, phone: "legacy", whatsapp_e164: "+33612345678", whatsapp_optin: true, whatsapp_optin_at: "2026-11-22T13:40:00Z" };
+  const query = { select: (value: string) => { fields = value; return query; }, order: () => query, limit: async () => ({ data: [candidate], error: null }) };
+  const rows = await listCandidatures({ from: () => query }, null);
+  for (const field of ["whatsapp_e164", "whatsapp_optin", "whatsapp_optin_at", "phone"]) expect(fields.split(", ")).toContain(field);
+  expect(rows).toEqual([{ id, has_phone: true, whatsapp_e164: "+33612345678", whatsapp_optin: true, whatsapp_optin_at: "2026-11-22T13:40:00Z" }]);
+});
 
 describe("os-candidatures actions", () => {
   it("accepts a Monday start date", () => {
