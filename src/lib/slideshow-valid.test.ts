@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 vi.mock("./slideshows.server", () => ({ getOsZones: vi.fn(), nextStartMonday: vi.fn(), randomToken: vi.fn(), RUUL_BLOCKED: ["IR"] }));
 vi.mock("./slideshow-emails.server", () => ({ posterEmails: {} }));
 import { validReason } from "./slideshow-accept.server";
-import { scopeValidSelection } from "./slideshow-valid-selection";
+import { scopeValidSelection, selectCountryQuantities } from "./slideshow-valid-selection";
 const zones = (langue_os: boolean) => ({ ok: true, ouverts: [{ pays_code: "FR", langue: "fr", langue_os }, { pays_code: "IR", langue: "fa", langue_os: true }], fermes: [{ pays_code: "DE" }] });
 const app = (country: string) => ({ id: "x", status: "pending", country, zone: "A" });
 describe("validReason", () => {
@@ -36,5 +36,23 @@ describe("country-batch confirmed selection", () => {
   });
   it("keeps the existing unscoped selection when no filter is supplied", () => {
     expect(scopeValidSelection(selection)).toEqual(selection);
+  });
+});
+
+describe("country batch quantities", () => {
+  const rows = Array.from({ length: 24 }, (_, i) => ({ id: `rs-${i}`, country: "RS" }));
+  it("selects exactly X out of 24 in the preview order", () => {
+    expect(selectCountryQuantities(rows, new Map([["RS", 8]])).map((row) => row.id)).toEqual(rows.slice(0, 8).map((row) => row.id));
+  });
+  it("applies each country's quantity independently", () => {
+    const mixed = [...rows, { id: "me-1", country: "ME" }, { id: "me-2", country: "ME" }];
+    expect(selectCountryQuantities(mixed, new Map([["RS", 2], ["ME", 1]])).map((row) => row.id)).toEqual(["rs-0", "rs-1", "me-1"]);
+  });
+  it("zero or unselected countries accept nobody", () => {
+    expect(selectCountryQuantities(rows, new Map([["RS", 0]]))).toEqual([]);
+    expect(selectCountryQuantities(rows, new Map())).toEqual([]);
+  });
+  it("cannot select more than the preview contains", () => {
+    expect(selectCountryQuantities(rows, new Map([["RS", 30]]))).toHaveLength(24);
   });
 });

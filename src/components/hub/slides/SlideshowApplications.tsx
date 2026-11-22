@@ -42,6 +42,8 @@ import { applicationSource, attributionCsv, sourceDeclared, SOURCE_LABELS } from
 import { Download } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
+import { selectCountryQuantities } from "@/lib/slideshow-valid-selection";
 import { autoAcceptReason, takenEmails } from "@/lib/slideshow-auto-accept";
 import { getAutoAccept, getOsSendsWelcome, setOsSendsWelcome, setAutoAccept } from "@/lib/slideshows.functions";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -1166,14 +1168,14 @@ function AcceptAllValidButton({ n }: { n: number }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [plan, setPlan] = useState<{ valid: ValidRow[]; skipped: SkipRow[] } | null>(null);
-  const [selectedCountries, setSelectedCountries] = useState<Set<string>>(new Set());
+  const [countryQuantities, setCountryQuantities] = useState<Map<string, number>>(new Map());
   const [progress, setProgress] = useState("");
   async function preview() {
     setBusy(true);
     try {
       const r = await run({ data: { dryRun: true, limit: 50 } });
       setPlan({ valid: r.valid ?? [], skipped: r.skipped ?? [] });
-      setSelectedCountries(new Set());
+      setCountryQuantities(new Map());
       setProgress("");
       setOpen(true);
     } catch (e) {
@@ -1210,7 +1212,11 @@ function AcceptAllValidButton({ n }: { n: number }) {
   }
   const groups = new Map<string, ValidRow[]>();
   for (const v of plan?.valid ?? []) groups.set(v.country, [...(groups.get(v.country) ?? []), v]);
-  const selectedRows = (plan?.valid ?? []).filter((row) => selectedCountries.has(row.country));
+  const selectedRows = selectCountryQuantities(plan?.valid ?? [], countryQuantities);
+  const selectedCountryCount = [...countryQuantities.values()].filter((quantity) => quantity > 0).length;
+  function setQuantity(country: string, quantity: number) {
+    setCountryQuantities((previous) => new Map(previous).set(country, quantity));
+  }
   return (
     <>
       <Button size="sm" disabled={n === 0 || busy} onClick={() => void preview()}>
@@ -1225,10 +1231,10 @@ function AcceptAllValidButton({ n }: { n: number }) {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-            <span className="font-medium">{selectedRows.length} applications · {selectedCountries.size} countries selected</span>
+            <span className="font-medium">{selectedRows.length} applications · {selectedCountryCount} countries selected</span>
             <div className="flex gap-1">
-              <Button size="sm" variant="ghost" disabled={busy} onClick={() => setSelectedCountries(new Set(groups.keys()))}>Select all</Button>
-              <Button size="sm" variant="ghost" disabled={busy || !selectedCountries.size} onClick={() => setSelectedCountries(new Set())}>Clear</Button>
+              <Button size="sm" variant="ghost" disabled={busy} onClick={() => setCountryQuantities(new Map([...groups].map(([country, rows]) => [country, rows.length])))}>Select all</Button>
+              <Button size="sm" variant="ghost" disabled={busy || !selectedCountryCount} onClick={() => setCountryQuantities(new Map())}>Clear</Button>
             </div>
           </div>
           <div className="space-y-1 text-sm">
@@ -1237,19 +1243,30 @@ function AcceptAllValidButton({ n }: { n: number }) {
                 <Checkbox
                   className="mt-1"
                   aria-label={`Select country ${c}`}
-                  checked={selectedCountries.has(c)}
+                  checked={(countryQuantities.get(c) ?? 0) === list.length ? true : (countryQuantities.get(c) ?? 0) > 0 ? "indeterminate" : false}
                   disabled={busy}
-                  onCheckedChange={(checked) => setSelectedCountries((previous) => {
-                    const next = new Set(previous);
-                    if (checked === true) next.add(c); else next.delete(c);
-                    return next;
-                  })}
+                  onCheckedChange={(checked) => setQuantity(c, checked === true ? list.length : 0)}
                 />
                 <details className="min-w-0 flex-1">
                   <summary className="cursor-pointer">
-                    <Country country={c} /> <span className="font-medium">{list.length}</span>
+                    <Country country={c} /> <span className="font-medium tabular-nums">{countryQuantities.get(c) ?? 0}/{list.length}</span>
                   </summary>
-                  <p className="break-words pt-1 text-xs text-brand-navySoft">{list.map((l) => l.name).join(", ")}</p>
+                  <div className="space-y-3 pb-1 pt-3">
+                    <div className="flex items-center gap-4">
+                      <Slider
+                        className="min-h-6 flex-1"
+                        aria-label={`Applications to accept in ${c}`}
+                        min={0}
+                        max={list.length}
+                        step={1}
+                        value={[countryQuantities.get(c) ?? 0]}
+                        disabled={busy}
+                        onValueChange={(values) => setQuantity(c, values[0] ?? 0)}
+                      />
+                      <span className="w-14 text-right font-medium tabular-nums">{countryQuantities.get(c) ?? 0}/{list.length}</span>
+                    </div>
+                    <p className="break-words text-xs text-brand-navySoft">{list.slice(0, countryQuantities.get(c) ?? 0).map((l) => l.name).join(", ")}</p>
+                  </div>
                 </details>
               </div>
             ))}
