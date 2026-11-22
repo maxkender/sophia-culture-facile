@@ -41,3 +41,4 @@ UGC acceptance/onboarding mutations use authenticated server functions to valida
 - Poster templates share the Help footer and one payment-copy helper; reminder jobs preserve the seven-day no-backfill window and report send/timeline failures, with no arbitrary 500-row cut; why: consistent messages and observable reminders without contacting historical applicants.
 - Poster/OS-relay emails audit every Brevo result via slideshow-email-audit.server.ts (service-role atomic timeline merge); Hub shows failures/IDs, acceptance is not delivery; why: visible provider failures.
 - Poster email copy: static per-language dicts in slideshow-email-i18n.ts, picked by country, English if incomplete; why: no half-translated emails.
+- Bulk valid acceptance scopes revalidation to confirmed IDs; why: country batches cannot accept other applicants.

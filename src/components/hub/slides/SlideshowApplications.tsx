@@ -41,6 +41,7 @@ import { STATUS_LABEL, useOsStatus, OS_UI_ENABLED } from "./useOs";
 import { applicationSource, attributionCsv, sourceDeclared, SOURCE_LABELS } from "@/lib/slideshow-attribution";
 import { Download } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { autoAcceptReason, takenEmails } from "@/lib/slideshow-auto-accept";
 import { getAutoAccept, getOsSendsWelcome, setOsSendsWelcome, setAutoAccept } from "@/lib/slideshows.functions";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -1165,12 +1166,14 @@ function AcceptAllValidButton({ n }: { n: number }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [plan, setPlan] = useState<{ valid: ValidRow[]; skipped: SkipRow[] } | null>(null);
+  const [selectedCountries, setSelectedCountries] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState("");
   async function preview() {
     setBusy(true);
     try {
       const r = await run({ data: { dryRun: true, limit: 50 } });
       setPlan({ valid: r.valid ?? [], skipped: r.skipped ?? [] });
+      setSelectedCountries(new Set());
       setProgress("");
       setOpen(true);
     } catch (e) {
@@ -1180,15 +1183,16 @@ function AcceptAllValidButton({ n }: { n: number }) {
     }
   }
   async function confirm() {
-    if (!plan) return;
+    if (!plan || !selectedRows.length) return;
     setBusy(true);
-    const total = plan.valid.length;
+    const applicationIds = selectedRows.map((row) => row.id);
+    const total = applicationIds.length;
     let accepted = 0;
     let failed = 0;
     let skipped = 0;
     try {
       for (let guard = 0; guard < 100; guard++) {
-        const r = await run({ data: { dryRun: false, limit: 50 } });
+        const r = await run({ data: { dryRun: false, limit: 50, applicationIds } });
         accepted += r.accepted?.length ?? 0;
         failed += r.failed?.length ?? 0;
         skipped = r.skipped?.length ?? 0;
@@ -1206,6 +1210,7 @@ function AcceptAllValidButton({ n }: { n: number }) {
   }
   const groups = new Map<string, ValidRow[]>();
   for (const v of plan?.valid ?? []) groups.set(v.country, [...(groups.get(v.country) ?? []), v]);
+  const selectedRows = (plan?.valid ?? []).filter((row) => selectedCountries.has(row.country));
   return (
     <>
       <Button size="sm" disabled={n === 0 || busy} onClick={() => void preview()}>
@@ -1214,19 +1219,39 @@ function AcceptAllValidButton({ n }: { n: number }) {
       <Dialog open={open} onOpenChange={(v) => !busy && setOpen(v)}>
         <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Accept {plan?.valid.length ?? 0} applications?</DialogTitle>
+            <DialogTitle>Accept by country</DialogTitle>
             <DialogDescription>
               Each one goes through the single Accept path: start Monday, contract link and acceptance email.
             </DialogDescription>
           </DialogHeader>
+          <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+            <span className="font-medium">{selectedRows.length} applications · {selectedCountries.size} countries selected</span>
+            <div className="flex gap-1">
+              <Button size="sm" variant="ghost" disabled={busy} onClick={() => setSelectedCountries(new Set(groups.keys()))}>Select all</Button>
+              <Button size="sm" variant="ghost" disabled={busy || !selectedCountries.size} onClick={() => setSelectedCountries(new Set())}>Clear</Button>
+            </div>
+          </div>
           <div className="space-y-1 text-sm">
             {[...groups.entries()].sort((x, y) => y[1].length - x[1].length).map(([c, list]) => (
-              <details key={c}>
-                <summary className="cursor-pointer">
-                  <Country country={c} /> <span className="font-medium">{list.length}</span>
-                </summary>
-                <p className="pl-5 text-xs text-brand-navySoft">{list.map((l) => l.name).join(", ")}</p>
-              </details>
+              <div key={c} className="flex items-start gap-3 border-b border-brand-line py-2">
+                <Checkbox
+                  className="mt-1"
+                  aria-label={`Select country ${c}`}
+                  checked={selectedCountries.has(c)}
+                  disabled={busy}
+                  onCheckedChange={(checked) => setSelectedCountries((previous) => {
+                    const next = new Set(previous);
+                    if (checked === true) next.add(c); else next.delete(c);
+                    return next;
+                  })}
+                />
+                <details className="min-w-0 flex-1">
+                  <summary className="cursor-pointer">
+                    <Country country={c} /> <span className="font-medium">{list.length}</span>
+                  </summary>
+                  <p className="break-words pt-1 text-xs text-brand-navySoft">{list.map((l) => l.name).join(", ")}</p>
+                </details>
+              </div>
             ))}
           </div>
           {plan?.skipped.length ? (
@@ -1244,8 +1269,8 @@ function AcceptAllValidButton({ n }: { n: number }) {
             <Button variant="ghost" disabled={busy} onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button disabled={busy || !plan?.valid.length} onClick={() => void confirm()}>
-              {busy ? "Accepting…" : `Accept ${plan?.valid.length ?? 0}`}
+            <Button disabled={busy || !selectedRows.length} onClick={() => void confirm()}>
+              {busy ? "Accepting…" : `Accept ${selectedRows.length}`}
             </Button>
           </DialogFooter>
         </DialogContent>

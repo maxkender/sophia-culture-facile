@@ -4,6 +4,7 @@ import { SLIDESHOW_CLOSED } from "./ruul";
 import { getOsZones, nextStartMonday, randomToken, RUUL_BLOCKED } from "./slideshows.server";
 import { posterEmails } from "./slideshow-emails.server";
 import { countryCodeOf, langOfCountry } from "@/config/countries";
+import { scopeValidSelection } from "./slideshow-valid-selection";
 
 type Admin = any;
 export type Langue = "fr" | "en" | "es" | "it" | "pt" | "de";
@@ -137,9 +138,9 @@ export async function selectAllValid(a: Admin, zones?: Zones): Promise<ValidSele
 }
 
 /** Accept up to `limit` valid applications through acceptMany; returns the bulk result plus valid ones left. */
-export async function acceptAllValidRun(a: Admin, by: AcceptBy, dryRun: boolean, limit = 50) {
+export async function acceptAllValidRun(a: Admin, by: AcceptBy, dryRun: boolean, limit = 50, applicationIds?: string[]) {
   const zones = await loadZones(a);
-  const sel = await selectAllValid(a, zones);
+  const sel = scopeValidSelection(await selectAllValid(a, zones), applicationIds);
   if (dryRun) return { ok: true as const, dry_run: true, ...sel, remaining: sel.valid.length };
   const batch = sel.valid.slice(0, limit);
   const r = await acceptMany(a, batch.map((v) => v.id), by);
