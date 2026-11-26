@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { joinRedirectFor } from "./i18n/slideshow-pages";
 import { detectLangFromHeaders } from "./lib/detect-lang";
 
 type ServerEntry = {
@@ -63,7 +64,9 @@ export function slideshowRedirect(pathname: string, lang: () => string): string 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const url = new URL(request.url);
-    if (request.method === "GET") {
+    if (request.method === "GET" || request.method === "HEAD") {
+      const join = joinRedirectFor(url.pathname, url.search);
+      if (join) return new Response(null, { status: 302, headers: { location: join, "cache-control": "no-store" } });
       const target = slideshowRedirect(url.pathname, () => detectLangFromHeaders(request.headers));
       if (target) {
         return new Response(null, { status: 301, headers: { location: `${target}${url.search}` } });

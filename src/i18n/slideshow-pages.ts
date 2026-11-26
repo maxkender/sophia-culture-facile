@@ -54,3 +54,21 @@ export function slideshowPageFromPath(pathname: string): { lang: SlideshowLangua
 export function fillSlideshow(t: string, v: Record<string, string | number>): string {
   return t.replace(/\{(\w+)\}/g, (m, k: string) => (k in v ? String(v[k]) : m));
 }
+
+/** Applications now happen on the separate join site. */
+export const JOIN_APPLY_ORIGIN = "https://join.vikstudios.com";
+
+/** join.vikstudios.com URL: ?lang=<code> (omitted when null) followed by the original query string unchanged. */
+export function joinApplyUrl(langCode: string | null, search = ""): string {
+  const q = [langCode ? `lang=${encodeURIComponent(langCode)}` : "", search.replace(/^\?/, "")].filter(Boolean).join("&");
+  return `${JOIN_APPLY_ORIGIN}/${q ? `?${q}` : ""}`;
+}
+
+/** Join target for a slideshow landing/apply pathname on this site, or null when it is not one. */
+export function joinRedirectFor(pathname: string, search: string): string | null {
+  const p = pathname.replace(/\/+$/, "");
+  if (p === "/creators/slideshow" || p === "/creators/slideshow/apply") return joinApplyUrl(null, search);
+  if (p === "/fr/creators/slideshow" || p === "/fr/creators/slideshow/apply") return joinApplyUrl("fr", search);
+  const hit = slideshowPageFromPath(p);
+  return hit ? joinApplyUrl(hit.lang.code, search) : null;
+}

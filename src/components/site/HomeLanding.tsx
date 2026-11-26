@@ -3,7 +3,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { CONTACT_EMAIL } from "@/config/links";
 import { ROUTES } from "@/i18n/routes";
-import { slideshowPath, slideshowStrings, findSlideshowLanguage, SLIDESHOW_LANGUAGES } from "@/i18n/slideshow-pages";
+import { joinApplyUrl, JOIN_APPLY_ORIGIN, slideshowStrings, findSlideshowLanguage, SLIDESHOW_LANGUAGES } from "@/i18n/slideshow-pages";
 import homeCopy from "@/i18n/home-landing.json";
 import { browserReferralCode, withReferralCode } from "@/lib/slideshow-referral-code";
 import { withAttribution, type Attribution } from "@/lib/slideshow-attribution";
@@ -52,16 +52,16 @@ export function HomeLanding({ lang }: { lang: string }) {
   const t = homeLandingCopy(language.code);
   const footer = slideshowStrings(language.code).footer;
   const legalLang = lang === "fr" ? "fr" : "en";
-  const target = slideshowPath(language.urlCode, "landing");
+  const target = `/?lang=${encodeURIComponent(language.code)}`;
   // Before hydration the link already carries ?ref / utm_* / fbclid from the URL, so an early tap keeps them.
   const searchStr = useLocation({ select: (l) => l.searchStr });
   const kept = new URLSearchParams([...new URLSearchParams(searchStr)].filter(([k]) => k === "ref" || k === "fbclid" || k.startsWith("utm_")));
-  const [href, setHref] = useState(kept.size ? `${target}?${kept}` : target);
+  const [href, setHref] = useState(joinApplyUrl(language.code, kept.toString()));
   const [search, setSearch] = useState("");
   useEffect(() => {
     const sync = () => {
       const attribution: Attribution = browserAttribution();
-      setHref(withAttribution(withReferralCode(target, browserReferralCode()), attribution));
+      setHref(JOIN_APPLY_ORIGIN + withAttribution(withReferralCode(target, browserReferralCode()), attribution));
     };
     sync();
     setSearch(window.location.search);
