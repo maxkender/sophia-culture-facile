@@ -84,7 +84,7 @@ export const getGuideForApplication = createServerFn({ method: "POST" })
 export const setApplicationZone = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({ applicationId: z.string().uuid(), zone: z.enum(["A", "B", "C"]), note: z.string().trim().min(3).max(500) }).parse(d),
+    z.object({ applicationId: z.string().uuid(), zone: z.enum(["A", "B", "C", "US"]), note: z.string().trim().min(3).max(500) }).parse(d),
   )
   .handler(async ({ data, context }) => {
     const actor = await assertAdmin(context);

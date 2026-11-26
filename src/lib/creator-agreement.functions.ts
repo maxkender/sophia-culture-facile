@@ -77,7 +77,7 @@ export const getSigningPage = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: app } = await supabaseAdmin
       .from("slideshow_applications")
-      .select("full_name, country, email, status, start_monday")
+      .select("full_name, country, email, status, start_monday, zone")
       .eq("signing_token", data.token)
       .maybeSingle();
     if (!app) {
@@ -88,10 +88,12 @@ export const getSigningPage = createServerFn({ method: "GET" })
     if (!["approved", "accepted"].includes(app.status)) return { state: "invalid" as const };
     const { data: doc } = await supabaseAdmin.from("documents").select("title, content, current_version, published").eq("slug", "creator-agreement").maybeSingle();
     if (!doc?.published) return { state: "unpublished" as const };
+    const { data: pay } = await supabaseAdmin.from("pay_zones").select("weekly_amount").eq("zone", app.zone ?? "").maybeSingle();
     const { startMondayAtSignature } = await import("./slideshow-start");
     return {
       state: "ready" as const,
       startMonday: startMondayAtSignature(app.start_monday),
+      weeklyAmount: pay?.weekly_amount != null ? Number(pay.weekly_amount) : null,
       name: app.full_name,
       country: app.country,
       email: app.email,

@@ -5,7 +5,7 @@ export const AUTO_ACCEPT_SETTING = "slides_auto_accept";
 export const AUTO_ACCEPT_MAX_PER_SWEEP = 100;
 /** Statuses that make the same email a duplicate. */
 export const TAKEN_STATUSES = ["accepted", "contract_signed", "os_created", "started"];
-export const ZONES_WITH_RATE = ["A", "B", "C"];
+export const ZONES_WITH_RATE = ["A", "B", "C", "US"];
 
 export type AutoAcceptReason = "Not pending" | "Portugal closed" | "No zone for this country" | "Not 18+" | "Duplicate email" | "Unsubscribed";
 type App = { id: string; status: string; zone: string | null; country: string | null; is_adult: boolean | null; email: string | null; unsubscribed_at?: string | null };

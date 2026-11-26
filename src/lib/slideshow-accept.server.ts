@@ -8,7 +8,7 @@ import { scopeValidSelection } from "./slideshow-valid-selection";
 
 type Admin = any;
 export type Langue = "fr" | "en" | "es" | "it" | "pt" | "de";
-export type AcceptInput = { applicationId: string; apps?: ("sophia" | "unswipe")[]; zone?: "A" | "B" | "C"; langue?: Langue; startMonday?: string };
+export type AcceptInput = { applicationId: string; apps?: ("sophia" | "unswipe")[]; zone?: "A" | "B" | "C" | "US"; langue?: Langue; startMonday?: string };
 export type AcceptBy = { id: string | null; name: string; via?: "auto" };
 type Zones = Awaited<ReturnType<typeof getOsZones>> | null;
 
@@ -44,7 +44,7 @@ export async function duplicateReason(a: Admin, app: any): Promise<string | null
 
 /** Defaults used when accepting without the card (bulk / assistant): same defaults the card pre-fills. */
 export function defaultsFor(app: any) {
-  return { apps: ["sophia"] as ("sophia" | "unswipe")[], zone: app.zone as "A" | "B" | "C" | null, langue: ((app.langue as Langue | null) ?? langOfCountry(app.country)) as Langue };
+  return { apps: ["sophia"] as ("sophia" | "unswipe")[], zone: app.zone as "A" | "B" | "C" | "US" | null, langue: ((app.langue as Langue | null) ?? langOfCountry(app.country)) as Langue };
 }
 
 /** Accept one application: status, start Monday, signing token, timeline, acceptance email. Throws on refusal. */

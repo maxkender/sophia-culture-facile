@@ -16,7 +16,7 @@ import { PortalCard } from "../ui";
 import { Country, DetailSheet } from "@/components/hub/slides/Crm";
 import { ZONE_BADGE } from "@/lib/slideshow-guide";
 
-type Zone = "A" | "B" | "C";
+type Zone = "A" | "B" | "C" | "US";
 const KEY = ["portal", "admin", "pay-zones"];
 
 export function PayZonesSettings({ compact = false }: { compact?: boolean }) {
@@ -203,7 +203,7 @@ export function PayZonesSettings({ compact = false }: { compact?: boolean }) {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {["A", "B", "C"].map((z) => (
+                            {["A", "B", "C", "US"].map((z) => (
                               <SelectItem key={z} value={z}>
                                 {z}
                               </SelectItem>
@@ -256,7 +256,7 @@ export function PayZonesSettings({ compact = false }: { compact?: boolean }) {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {["A", "B", "C"].map((z) => (
+                {["A", "B", "C", "US"].map((z) => (
                   <SelectItem key={z} value={z}>
                     {z}
                   </SelectItem>
@@ -355,7 +355,7 @@ export function PayZonesSettings({ compact = false }: { compact?: boolean }) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {["A", "B", "C"].map((z) => (
+                      {["A", "B", "C", "US"].map((z) => (
                         <SelectItem key={z} value={z}>
                           Zone {z}
                         </SelectItem>
@@ -405,7 +405,7 @@ export function PayZonesSettings({ compact = false }: { compact?: boolean }) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {["A", "B", "C"].map((z) => (
+            {["A", "B", "C", "US"].map((z) => (
               <SelectItem key={z} value={z}>
                 Zone {z}
               </SelectItem>

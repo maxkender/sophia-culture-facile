@@ -110,7 +110,7 @@ export const sendSignatureReminders = createServerFn({ method: "POST" })
 /** Accept: choose app(s), confirm zone; sets start Monday, creates the contract link and emails the applicant. */
 export const acceptPoster = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ applicationId: id, apps: z.array(z.enum(["sophia", "unswipe"])).min(1), zone: z.enum(["A", "B", "C"]), langue: z.enum(["fr", "en", "es", "it", "pt", "de"]) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ applicationId: id, apps: z.array(z.enum(["sophia", "unswipe"])).min(1), zone: z.enum(["A", "B", "C", "US"]), langue: z.enum(["fr", "en", "es", "it", "pt", "de"]) }).parse(d))
   .handler(async ({ data, context }) => {
     const me = await assertAdmin(context);
     const { acceptSlideshowApplication } = await import("./slideshow-accept.server");

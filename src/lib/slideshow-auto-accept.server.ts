@@ -12,7 +12,7 @@ export async function autoAcceptEnabled(a: Admin): Promise<boolean> {
 
 async function zonesWithRate(a: Admin): Promise<string[]> {
   const { data } = await a.from("pay_zones").select("zone, weekly_amount");
-  return (data ?? []).filter((z: any) => z.weekly_amount != null && ["A", "B", "C"].includes(z.zone)).map((z: any) => z.zone);
+  return (data ?? []).filter((z: any) => z.weekly_amount != null && ["A", "B", "C", "US"].includes(z.zone)).map((z: any) => z.zone);
 }
 
 async function audit(a: Admin, app: any, zone: string, rate: number | null) {

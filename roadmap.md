@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Done
+- US pay zone support: acceptance schemas/types and auto-accept rules, Hub zone selectors/filter/badge, and signing-page database rate display; existing application zones/overrides preserved. 229 tests passed, including US $30 and signed A $14 guide regressions. No database changes, messages sent, or publication.
 - Optional WhatsApp application update: optional E.164 number and unchecked opt-in, additive storage and exact authenticated OS GET fields; legacy phone, POST actions, notifications, contracts and emails unchanged. 212 tests passed; EN/FR desktop/mobile checked without submitting; no publication. Broader phone/animation/contract plan remains suspended.
 - Creator branding: Vik Studios sender names (including forced OS relay), public recruiting headings/consent in 30 languages, signing/unsubscribe titles and acceptance copy; Sophia app and Sophia OS dashboard names retained. Tests and public page checks completed; no emails sent, owner publishes. OS-authored message bodies remain external templates.
 - Signing page: exact English after-signing box above Signature, shared start Monday rule; desktop/mobile checked on an unsigned page without signing, 171 tests passed. Test applicant signature and OS creation confirmed read-only; not published.

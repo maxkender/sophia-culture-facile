@@ -77,7 +77,7 @@ export function Posters() {
           onChange={(e) => setSearch(e.target.value)}
         />
         <div className="flex gap-1">
-          {["all", "A", "B", "C"].map((z) => (
+          {["all", "A", "B", "C", "US"].map((z) => (
             <Button
               key={z}
               size="sm"

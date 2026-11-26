@@ -915,7 +915,7 @@ export function PosterCard({
                 onChange={(e) => setZone(e.target.value)}
               >
                 <option value="">Pick a zone</option>
-                {["A", "B", "C"].map((x) => (
+                {["A", "B", "C", "US"].map((x) => (
                   <option key={x} value={x}>
                     Zone {x}
                   </option>
@@ -954,7 +954,7 @@ export function PosterCard({
                       data: {
                         applicationId: a.id,
                         apps: apps as ("sophia" | "unswipe")[],
-                        zone: zone as "A",
+                        zone: zone as "A" | "B" | "C" | "US",
                         langue,
                       },
                     }),

@@ -6,6 +6,8 @@ const none = new Map<string, Set<string>>();
 
 describe("auto-accept eligibility", () => {
   it("accepts a pending adult in zone A/B/C", () => expect(autoAcceptReason(base, none)).toBeNull());
+  it("accepts an adult US applicant in zone US", () => expect(autoAcceptReason({ ...base, country: "United States", zone: "US" }, none)).toBeNull());
+  it("still requires a database rate for zone US", () => expect(autoAcceptReason({ ...base, country: "United States", zone: "US" }, none, ["A", "B", "C"])).toBe("No zone for this country"));
   it("refuses no zone", () => expect(autoAcceptReason({ ...base, zone: null }, none)).toBe("No zone for this country"));
   it("refuses Portugal", () => expect(autoAcceptReason({ ...base, country: "Portugal", zone: "B" }, none)).toBe("Portugal closed"));
   it("refuses minors", () => expect(autoAcceptReason({ ...base, is_adult: false }, none)).toBe("Not 18+"));

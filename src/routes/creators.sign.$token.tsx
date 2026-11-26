@@ -60,7 +60,7 @@ function SignPage() {
               <li>You start on Monday {new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${data.startMonday}T12:00:00Z`))}. You post 2 slideshows a day.</li>
               <li>Your access: we email you your login for the Sophia OS (your dashboard) right after you sign.</li>
               <li>The job: everything is prepared for you. You download the pictures, add the text on TikTok and post. It takes about 5 minutes.</li>
-              <li>Your pay: you're paid every Monday for the week before, through Ruul. Ruul is simply how we keep a safe, proper contract with you. You create a free Ruul account, verify your ID, and then every Monday your pay goes to your bank account.</li>
+              <li>Your pay: you're paid{data.weeklyAmount != null ? ` $${data.weeklyAmount} per week,` : ""} every Monday for the week before, through Ruul. Ruul is simply how we keep a safe, proper contract with you. You create a free Ruul account, verify your ID, and then every Monday your pay goes to your bank account.</li>
               <li>Questions or stopping: ask anything with Help on your dashboard. If you ever want to stop, press Stop there, no hard feelings.</li>
             </ul>
           </section>

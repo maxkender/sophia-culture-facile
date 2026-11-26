@@ -37,4 +37,5 @@ export const ZONE_BADGE: Record<string, string> = {
   A: "bg-portal-green/10 text-portal-green",
   B: "bg-portal-accent/10 text-portal-accent",
   C: "bg-portal-amber/15 text-portal-amber",
+  US: "bg-portal-green/10 text-portal-green",
 };

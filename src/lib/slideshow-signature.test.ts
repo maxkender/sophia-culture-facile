@@ -27,10 +27,11 @@ vi.mock("./slideshows.server", async (original) => ({
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: {
     from: (table: string) => {
+      let selectedZone: unknown;
       const chain = {
         select: () => chain,
-        eq: () => chain,
-        maybeSingle: async () => ({ data: table === "documents" ? { published: true, current_version: "1" } : { ...fake.app } }),
+        eq: (key: string, value: unknown) => { if (key === "zone") selectedZone = value; return chain; },
+        maybeSingle: async () => ({ data: table === "documents" ? { published: true, current_version: "1" } : table === "pay_zones" ? { weekly_amount: selectedZone === "US" ? 30 : 14 } : { ...fake.app } }),
         insert: async () => ({ error: null }),
         update: (values: Record<string, unknown>) => {
           fake.writes.push(values);
@@ -48,6 +49,13 @@ import { getSigningPage, signWithToken } from "./creator-agreement.functions";
 afterEach(() => vi.useRealTimers());
 
 describe("signing-page start Monday matches the signature date rule", () => {
+  it.each([["US", false, 30], ["A", true, 14]])("uses application zone %s rather than remapping the US country", async (zone, override, amount) => {
+    fake.app = { status: "accepted", country: "United States", zone, zone_override: override, start_monday: "2026-11-30" };
+    fake.writes = [];
+    const result = await getSigningPage({ data: { token: "test-token-no-real-contract" } });
+    expect(result).toMatchObject({ state: "ready", weeklyAmount: amount });
+    expect(fake.writes).toHaveLength(0);
+  });
   it.each([
     ["2026-11-13T12:00:00Z", "2026-11-16", "2026-11-16"],
     ["2026-11-15T23:00:00Z", "2026-11-16", "2026-11-23"],
